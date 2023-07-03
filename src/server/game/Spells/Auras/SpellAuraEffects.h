@@ -63,6 +63,9 @@ public:
     int32 GetAmount() const { return m_isAuraEnabled ? m_amount : 0; }
     int32 GetForcedAmount() const { return m_amount; }
     void SetAmount(int32 amount) { m_amount = amount; m_canBeRecalculated = false;}
+    int64 GetStoredValue(int32 key) const { return m_storeValues.at(key); }
+    void SetStoredValue(int32 key, int64 amount) { m_storeValues.insert_or_assign(key, amount); }
+    uint32 GetTriggerSpell() const;
 
     int32 GetPeriodicTimer() const { return m_periodicTimer; }
     void SetPeriodicTimer(int32 periodicTimer) { m_periodicTimer = periodicTimer; }
@@ -84,7 +87,8 @@ public:
     void UpdatePeriodic(Unit* caster);
 
     uint32 GetTickNumber() const { return m_tickNumber; }
-    int32 GetTotalTicks() const;
+    int32 GetTotalTicks(float&) const;
+    int32 GetTotalTicks(float&, bool noHaste) const;
     void ResetPeriodic(bool resetPeriodicTimer = false) { if (resetPeriodicTimer) m_periodicTimer = m_amplitude; m_tickNumber = 0;}
     void ResetTicks() { m_tickNumber = 0; }
 
@@ -116,6 +120,8 @@ public:
     void SetOldAmount(int32 amount) { m_oldAmount = amount; }
     void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
 
+    float m_dmgRatio = 1;
+    float m_tickCount = 0;
 private:
     Aura* const m_base;
 
@@ -144,6 +150,8 @@ private:
     uint8 const m_effIndex;
     bool m_canBeRecalculated;
     bool m_isPeriodic;
+
+    std::unordered_map<int32, int64> m_storeValues;
 private:
     float CalcPeriodicCritChance(Unit const* caster, Unit const* target) const;
 
@@ -240,12 +248,15 @@ public:
     void HandleModResistancePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModBaseResistance(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModTargetResistance(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModArmorFromMainStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     //    stat
     void HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModPercentStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModSpellDamagePercentFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModSpellHealingPercentFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModSpellDamagePercentFromAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModSpellDamagePercentFromArmor(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModBlockValueScaling(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModSpellHealingPercentFromAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModHealingDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModTotalPercentStat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -318,6 +329,9 @@ public:
     void HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandlePreventResurrection(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModTriggerSpellOnStacksSelf(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModTriggerSpellOnStacksTarget(AuraApplication const* aurApp, uint8 mode, bool apply) const; 
+    void HandleModToggleAuraCombatState(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
     // aura effect periodic tick handlers
     void HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const;

@@ -159,8 +159,9 @@ public:
     template<typename Worker>
     void DoForAllMapsWithMapId(uint32 mapId, Worker&& worker);
 
-private:
     typedef std::unordered_map<uint32, Map*> MapMapType;
+    MapMapType i_maps;
+private:
     typedef std::vector<bool> InstanceIds;
 
     MapMgr();
@@ -170,7 +171,6 @@ private:
     MapMgr& operator=(const MapMgr&);
 
     std::mutex Lock;
-    MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;
 

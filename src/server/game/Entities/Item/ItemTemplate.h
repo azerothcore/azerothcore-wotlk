@@ -68,10 +68,11 @@ enum ItemModType
     ITEM_MOD_SPELL_POWER              = 45,
     ITEM_MOD_HEALTH_REGEN             = 46,
     ITEM_MOD_SPELL_PENETRATION        = 47,
-    ITEM_MOD_BLOCK_VALUE              = 48
+    ITEM_MOD_BLOCK_VALUE              = 48,
+    ITEM_MOD_THORNS                   = 49
 };
 
-#define MAX_ITEM_MOD                    49
+#define MAX_ITEM_MOD                    50
 
 enum ItemSpelltriggerType
 {
@@ -317,6 +318,18 @@ enum ItemClass
 };
 
 #define MAX_ITEM_CLASS                            17
+
+enum ItemSubclassMisc
+{
+    ITEM_SUBCLASS_MISC_JUNK = 0,
+    ITEM_SUBCLASS_MISC_REAGENT = 1,
+    ITEM_SUBCLASS_MISC_PET = 2,
+    ITEM_SUBCLASS_MISC_HOLIDAY = 3,
+    ITEM_SUBCLASS_MISC_OTHER = 4,
+    ITEM_SUBCLASS_MISC_MOUNT  = 5
+};
+
+#define MAX_ITEM_SUBCLASS_MISC                    6
 
 enum ItemSubclassConsumable
 {

@@ -1361,7 +1361,10 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
-            if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()) - 1)
+            float dmgRatio;
+            int ticks = aurEff->GetTotalTicks(dmgRatio);
+
+            if (ticks > 0 && aurEff->GetTickNumber() == uint32(ticks) - 1)
             {
                 Unit* target = GetTarget();
                 Unit* caster = GetCaster();

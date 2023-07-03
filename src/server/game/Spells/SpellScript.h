@@ -475,6 +475,11 @@ public:
     void Cancel(); // pussywizard
 
     void SetCustomCastResultMessage(SpellCustomErrors result);
+
+    bool SpellIsCrit(Spell* spell);
+    bool SpellIsCrit(Spell* spell, ObjectGuid target);
+    bool CheckFamilyFlags(ProcEventInfo& eventInfo);
+    bool CheckFamilyFlags(ProcEventInfo& eventInfo, uint8 effect);
 };
 
 // AuraScript interface - enum used for runtime checks of script function calls
@@ -533,6 +538,7 @@ public:
         typedef bool(CLASSNAME::*AuraAfterCheckProcFnType)(ProcEventInfo&, bool); \
         typedef void(CLASSNAME::*AuraProcFnType)(ProcEventInfo&); \
         typedef void(CLASSNAME::*AuraEffectProcFnType)(AuraEffect const*, ProcEventInfo&); \
+        typedef void(CLASSNAME::*AuraApplyFnType)(); \
 
     AURASCRIPT_FUNCTION_TYPE_DEFINES(AuraScript)
 
@@ -608,6 +614,14 @@ public:
         AuraEffectApplicationModeFnType pEffectHandlerScript;
         AuraEffectHandleModes mode;
     };
+    class AuraApplyHandler : public EffectBase
+    {
+    public:
+        AuraApplyHandler(AuraApplyFnType _pEffectHandlerScript);
+        void Call(AuraScript* auraScript);
+    private:
+        AuraApplyFnType pEffectHandlerScript;
+    };
     class EffectAbsorbHandler : public EffectBase
     {
     public:
@@ -681,6 +695,7 @@ public:
         class AfterCheckProcHandlerFunction : public AuraScript::AfterCheckProcHandler { public: AfterCheckProcHandlerFunction(AuraAfterCheckProcFnType handlerScript) : AuraScript::AfterCheckProcHandler((AuraScript::AuraAfterCheckProcFnType)handlerScript) {} }; \
         class AuraProcHandlerFunction : public AuraScript::AuraProcHandler { public: AuraProcHandlerFunction(AuraProcFnType handlerScript) : AuraScript::AuraProcHandler((AuraScript::AuraProcFnType)handlerScript) {} }; \
         class EffectProcHandlerFunction : public AuraScript::EffectProcHandler { public: EffectProcHandlerFunction(AuraEffectProcFnType effectHandlerScript, uint8 effIndex, uint16 effName) : AuraScript::EffectProcHandler((AuraScript::AuraEffectProcFnType)effectHandlerScript, effIndex, effName) {} }; \
+        class AuraApplyHandlerFunction : public AuraScript::AuraApplyHandler { public: AuraApplyHandlerFunction(AuraApplyFnType _pEffectHandlerScript) : AuraScript::AuraApplyHandler((AuraScript::AuraApplyFnType)_pEffectHandlerScript) {} }; \
 
 #define PrepareAuraScript(CLASSNAME) AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME)
 
@@ -752,6 +767,20 @@ public:
     // where function is: void function (AuraEffect const* aurEff, AuraEffectHandleModes mode);
     HookList<EffectApplyHandler> AfterEffectRemove;
 #define AuraEffectRemoveFn(F, I, N, M) EffectApplyHandlerFunction(&F, I, N, M)
+
+    // executed when aura effect is applied with specified mode to target
+    // should be used when when effect handler preventing/replacing is needed, do not use this hook for triggering spellcasts/removing auras etc - may be unsafe
+    // example: OnAuraApply += AuraApplyFn(class::function);
+    // where function is: void function (AuraEffectHandleModes mode);
+    HookList<AuraApplyHandler> OnAuraApply;
+#define AuraApplyFn(F) AuraApplyHandlerFunction(&F)
+
+    // executed after aura effect is removed with specified mode from target
+    // should be used when when effect handler preventing/replacing is needed, do not use this hook for triggering spellcasts/removing auras etc - may be unsafe
+    // example: OnAuraRemove += AuraRemoveFn(class::function);
+    // where function is: void function (AuraEffectHandleModes mode);
+    HookList<AuraApplyHandler> OnAuraRemove;
+#define AuraRemoveFn(F) AuraApplyHandlerFunction(&F)
 
     // executed when periodic aura effect ticks on target
     // example: OnEffectPeriodic += AuraEffectPeriodicFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier);
@@ -926,6 +955,10 @@ public:
     Unit* GetTarget() const;
     // returns AuraApplication object of currently processed target
     AuraApplication const* GetTargetApplication() const;
+
+    bool SpellIsCrit(ProcEventInfo& eventInfo);
+    bool CheckFamilyFlags(ProcEventInfo& eventInfo);
+    bool CheckFamilyFlags(ProcEventInfo& eventInfo, uint8 effect);
 };
 
 //

@@ -284,6 +284,7 @@ enum UnitMods
     UNIT_MOD_DAMAGE_MAINHAND,
     UNIT_MOD_DAMAGE_OFFHAND,
     UNIT_MOD_DAMAGE_RANGED,
+    UNIT_MOD_THORNS,
     UNIT_MOD_END,
     // synonyms
     UNIT_MOD_STAT_START = UNIT_MOD_STAT_STRENGTH,
@@ -291,7 +292,7 @@ enum UnitMods
     UNIT_MOD_RESISTANCE_START = UNIT_MOD_ARMOR,
     UNIT_MOD_RESISTANCE_END = UNIT_MOD_RESISTANCE_ARCANE + 1,
     UNIT_MOD_POWER_START = UNIT_MOD_MANA,
-    UNIT_MOD_POWER_END = UNIT_MOD_RUNIC_POWER + 1
+    UNIT_MOD_POWER_END = UNIT_MOD_RUNIC_POWER + 1,
 };
 
 enum BaseModGroup
@@ -717,6 +718,11 @@ enum MeleeHitOutcome
     MELEE_HIT_GLANCING, MELEE_HIT_CRIT, MELEE_HIT_CRUSHING, MELEE_HIT_NORMAL
 };
 
+enum ForgeStats
+{
+    FORGE_STAT_THORNS
+};
+
 enum ExtraAttackSpells
 {
     SPELL_SWORD_SPECIALIZATION   = 16459,
@@ -771,6 +777,8 @@ private:
     uint32 m_resist;
     uint32 m_block;
     uint32 m_cleanDamage;
+    bool m_criticalBlock = false;
+    uint32 m_hitInfo;
 
     // amalgamation constructor (used for proc)
     DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2);
@@ -796,6 +804,8 @@ public:
     [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; };
     [[nodiscard]] uint32 GetResist() const { return m_resist; };
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
+    [[nodiscard]] bool GetCriticalBlock() const { return m_criticalBlock; };
+    [[nodiscard]] uint32 GetHitInfo() const { return m_hitInfo; };
 
     [[nodiscard]] uint32 GetUnmitigatedDamage() const;
 };
@@ -913,6 +923,7 @@ struct CalcDamageInfo
     uint32 procEx;
     uint32 cleanDamage;          // Used only for rage calculation
     MeleeHitOutcome hitOutCome;  /// @todo: remove this field (need use TargetState)
+    bool criticalBlock = false;
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
@@ -920,7 +931,7 @@ struct SpellNonMeleeDamage
 {
     SpellNonMeleeDamage(Unit* _attacker, Unit* _target, SpellInfo const* _spellInfo, uint32 _schoolMask)
         : target(_target), attacker(_attacker), spellInfo(_spellInfo), damage(0), overkill(0), schoolMask(_schoolMask),
-          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
+          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0), criticalBlock(false)
     {}
 
     Unit* target;
@@ -937,6 +948,7 @@ struct SpellNonMeleeDamage
     uint32 HitInfo;
     // Used for help
     uint32 cleanDamage;
+    bool criticalBlock = false;
 };
 
 struct SpellPeriodicAuraLogInfo
@@ -1298,6 +1310,13 @@ private:
     Unit* defaultValue;
 };
 
+class ThornsDamage
+{
+public:
+    std::unordered_map<SpellSchoolMask, uint32> ThornsDamageMap;
+    uint32 TotalDamage;
+};
+
 class Unit : public WorldObject
 {
 public:
@@ -1322,6 +1341,8 @@ public:
     typedef GuidUnorderedSet ComboPointHolderSet;
 
     typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
+
+    typedef std::unordered_map<ForgeStats, int32> ForgeStatMap;
 
     ~Unit() override;
 
@@ -1403,6 +1424,11 @@ public:
     void StopAttackingInvalidTarget();
     Unit* SelectNearbyTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
     Unit* SelectNearbyNoTotemTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
+    std::list<Unit*> SelectAllNearbyNoTotemTarget(Unit* exclude = nullptr, bool includeTarget = false, float dist = NOMINAL_MELEE_RANGE) const;
+    std::list<Unit*> SelectAllNearbyNoTotemParty(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
+    std::list<Unit*> SelectAllNearbyNoTotemRaid(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
+    std::list<Unit*> SelectAllNearbyNoTotemPartyAndRaid(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
+    AuraApplication* AuraExists(uint32 auraId) const;
     void SendMeleeAttackStop(Unit* victim = nullptr);
     void SendMeleeAttackStart(Unit* victim, Player* sendTo = nullptr);
 
@@ -1477,6 +1503,7 @@ public:
     // returns the change in power
     int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
     int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
+    [[nodiscard]] bool PowerBelowPct(int32 pct) const { return GetPower(getPowerType()) > GetPowerPct(getPowerType()); }
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
     {
@@ -1576,6 +1603,8 @@ public:
 
     void CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
+    ThornsDamage CalculateThorns();
+    ThornsDamage CalculateThorns(Unit* attacker, Unit* victim, bool calcMisses = true);
 
     void HandleProcExtraAttackFor(Unit* victim, uint32 count);
     void SetLastExtraAttackSpell(uint32 spellId) { _lastExtraAttackSpell = spellId; }
@@ -1709,6 +1738,7 @@ public:
     void ClearInPetCombat();
     [[nodiscard]] uint32 GetCombatTimer() const { return m_CombatTimer; }
     void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }
+    void ToggleCombatAuras(bool startingCombat);
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
@@ -1989,6 +2019,12 @@ public:
 
     AuraApplication* GetAuraApplication(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
     [[nodiscard]] Aura* GetAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] std::vector<Aura*> GetAurasByMiscA(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] std::vector<Aura*> GetAurasByMiscB(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] std::vector<Aura*> GetAurasByRank1(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] Aura* GetAuraByRank1(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] bool CheckAuraExistsByMiscA(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] bool CheckAuraExistsByMiscB(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
 
     AuraApplication* GetAuraApplicationOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
     [[nodiscard]] Aura* GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
@@ -2015,6 +2051,7 @@ public:
 
     [[nodiscard]] int32 GetTotalAuraModifierAreaExclusive(AuraType auratype) const;
     [[nodiscard]] int32 GetTotalAuraModifier(AuraType auratype) const;
+    [[nodiscard]] int32 GetTotalAuraModifier(AuraType auratype, bool combatCheck) const;
     [[nodiscard]] float GetTotalAuraMultiplier(AuraType auratype) const;
     int32 GetMaxPositiveAuraModifier(AuraType auratype);
     [[nodiscard]] int32 GetMaxNegativeAuraModifier(AuraType auratype) const;
@@ -2093,6 +2130,8 @@ public:
     }
 
     [[nodiscard]] bool IsInDisallowedMountForm() const;
+    [[nodiscard]] uint32 GetCriticalBlockAmount(Unit* blocker, uint32 damageBlocked) const;
+    [[nodiscard]] uint32 AdjustBeforeBlockDamage(Unit* blocker, uint32 damage) const;
 
     float m_modMeleeHitChance;
     float m_modRangedHitChance;
@@ -2101,6 +2140,8 @@ public:
 
     float m_threatModifier[MAX_SPELL_SCHOOL];
     float m_modAttackSpeedPct[3];
+    uint32 m_ComboPointDegenTimer;
+    uint32 m_focusRegen;
 
     // Event handler
     EventProcessor m_Events;
@@ -2125,6 +2166,7 @@ public:
     virtual void UpdateMaxPower(Powers power) = 0;
     virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
     virtual void UpdateDamagePhysical(WeaponAttackType attType);
+    virtual void UpdateThorns();
     float GetTotalAttackPowerValue(WeaponAttackType attType, Unit* pVictim = nullptr) const;
     [[nodiscard]] float GetWeaponDamageRange(WeaponAttackType attType, WeaponDamageRange type, uint8 damageIndex = 0) const;
     void SetBaseWeaponDamage(WeaponAttackType attType, WeaponDamageRange damageRange, float value, uint8 damageIndex = 0) { m_weaponDamage[attType][damageRange][damageIndex] = value; }
@@ -2219,8 +2261,11 @@ public:
     uint32 MeleeDamageBonusDone(Unit* pVictim, uint32 damage, WeaponAttackType attType, SpellInfo const* spellProto = nullptr, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL);
     uint32 MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackType attType, SpellInfo const* spellProto = nullptr, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL);
 
+    void MeleeDamageBonus(Unit* pVictim, int32& damage, float& DoneTotalMod, WeaponAttackType attType, SpellInfo const* spellProto = nullptr, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL);
+
     bool   isSpellBlocked(Unit* victim, SpellInfo const* spellProto, WeaponAttackType attackType = BASE_ATTACK);
     bool   isBlockCritical();
+    bool CanBlockSpells(Unit* victim);
     float  SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType, bool skipEffectCheck) const;
     float  SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto, SpellSchoolMask schoolMask, float doneChance, WeaponAttackType attackType, bool skipEffectCheck) const;
     static uint32 SpellCriticalDamageBonus(Unit const* caster, SpellInfo const* spellProto, uint32 damage, Unit const* victim);
@@ -2232,7 +2277,7 @@ public:
     void SetContestedPvP(Player* attackedPlayer = nullptr, bool lookForNearContestedGuards = true);
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
-    float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const;
+    float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype, Unit* caster) const;
 
     void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex = 0);
 
@@ -2299,18 +2344,18 @@ public:
 
     ///-----------Combo point system-------------------
        // This unit having CP on other units
-    [[nodiscard]] uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
-    [[nodiscard]] uint8 GetComboPoints(ObjectGuid const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
+    [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
     [[nodiscard]] Unit* GetComboTarget() const { return m_comboTarget; }
     [[nodiscard]] ObjectGuid const GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : ObjectGuid::Empty; }
     void AddComboPoints(Unit* target, int8 count);
     void AddComboPoints(int8 count) { AddComboPoints(nullptr, count); }
-    void ClearComboPoints();
+    void ClearComboPoints(bool clearPoints = true);
+    void SetComboPoints(int amount);
     void SendComboPoints();
     // Other units having CP on this unit
     void AddComboPointHolder(Unit* unit) { m_ComboPointHolders.insert(unit); }
     void RemoveComboPointHolder(Unit* unit) { m_ComboPointHolders.erase(unit); }
-    void ClearComboPointHolders();
+    void ClearComboPointHolders(bool removePoints = true);
 
     ///----------Pet responses methods-----------------
     void SendPetActionFeedback (uint8 msg);
@@ -2443,6 +2488,7 @@ public:
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 
     [[nodiscard]] ObjectGuid GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
+    [[nodiscard]] Unit* GetTargetUnit();
     virtual void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) = 0;
 
     void SetInstantCast(bool set) { _instantCast = set; }
@@ -2474,6 +2520,8 @@ public:
     std::string GetDebugInfo() const override;
 
     [[nodiscard]] uint32 GetOldFactionId() const { return _oldFactionId; }
+    void SetForgeStat(ForgeStats stat, int32 value) { m_forgestats[stat] = value; }
+    int32 GetForgeStat(ForgeStats stat) { return m_forgestats[stat]; }
 
 protected:
     explicit Unit (bool isWorldObject);
@@ -2555,6 +2603,7 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
 
+    ForgeStatMap m_forgestats;
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, ProcEventInfo const& eventInfo);

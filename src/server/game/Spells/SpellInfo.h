@@ -120,6 +120,7 @@ enum SpellTargetCheckTypes
     TARGET_CHECK_RAID_CLASS,
     TARGET_CHECK_PASSENGER,
     TARGET_CHECK_CORPSE,
+    TARGET_CHECK_SUMMON,
 };
 
 enum SpellTargetDirectionTypes
@@ -405,6 +406,8 @@ public:
 
     uint32 GetCategory() const;
     bool HasEffect(SpellEffects effect) const;
+    bool CheckFamilyFlagsApply(flag96 flags) const;
+    bool CheckFamilyFlagsApply(flag96 flags, uint8 effect) const;
     bool HasAura(AuraType aura) const;
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;
@@ -502,8 +505,12 @@ public:
 
     int32 GetDuration() const;
     int32 GetMaxDuration() const;
-
+    
+    uint32 GetMaxTicks(Unit*, float&) const;
     uint32 GetMaxTicks() const;
+    uint32 GetNoHasteTicks() const;
+    uint32 GetMaxTicks(int32 DotDuration, Unit* caster, float& dmgRatio) const;
+    uint32 CalculateTicks(uint32 ampl, int32 DotDuration, Unit* caster, float& dmgRatio) const;
 
     uint32 CalcCastTime(Unit* caster = nullptr, Spell* spell = nullptr) const;
     uint32 GetRecoveryTime() const;

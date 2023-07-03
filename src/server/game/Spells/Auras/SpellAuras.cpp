@@ -875,7 +875,7 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
 
     // IsPermanent() checks max duration (which we are supposed to calculate here)
     if (maxDuration != -1 && modOwner)
-        modOwner->ApplySpellMod(GetId(), SPELLMOD_DURATION, maxDuration);
+        modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, maxDuration);
     return maxDuration;
 }
 
@@ -885,10 +885,27 @@ void Aura::SetDuration(int32 duration, bool withMods)
     {
         if (Unit* caster = GetCaster())
             if (Player* modOwner = caster->GetSpellModOwner())
-                modOwner->ApplySpellMod(GetId(), SPELLMOD_DURATION, duration);
+                modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
     }
     m_duration = duration;
     SetNeedClientUpdateForTargets();
+}
+
+void Aura::AddDuration(int32 duration, bool capMax, bool withMods)
+{
+    if (withMods)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
+    }
+
+    int32 newDur = m_duration + duration;
+
+    if (capMax && newDur > m_maxDuration)
+        newDur = m_maxDuration;
+
+    SetDuration(newDur);
 }
 
 void Aura::RefreshDuration(bool withMods)
@@ -898,18 +915,7 @@ void Aura::RefreshDuration(bool withMods)
     if (!caster)
         return;
 
-    if (withMods && caster)
-    {
-        int32 duration = m_spellInfo->GetMaxDuration();
-        // Calculate duration of periodics affected by haste.
-        if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-            duration = int32(duration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-        SetMaxDuration(duration);
-
-        SetDuration(duration);
-    }
-    else
-        SetDuration(GetMaxDuration());
+    SetDuration(GetMaxDuration());
 
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
         m_timeCla = 1 * IN_MILLISECONDS;
@@ -980,7 +986,7 @@ uint8 Aura::CalcMaxCharges(Unit* caster) const
 
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetId(), SPELLMOD_CHARGES, maxProcCharges);
+            modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_CHARGES, maxProcCharges);
     return maxProcCharges;
 }
 
@@ -1202,7 +1208,7 @@ int32 Aura::CalcDispelChance(Unit* auraTarget, bool offensive) const
     // Apply dispel mod from aura caster
     if (Unit* caster = GetCaster())
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetId(), SPELLMOD_RESIST_DISPEL_CHANCE, resistChance);
+            modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_RESIST_DISPEL_CHANCE, resistChance);
 
     // Dispel resistance from target SPELL_AURA_MOD_DISPEL_RESIST
     // Only affects offensive dispels
@@ -1502,7 +1508,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         uint32 damage = GetEffect(0)->GetAmount();
                         damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT);
-                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
+                        float dmgRatio;
+                        int tickCount = GetEffect(0)->GetTotalTicks(dmgRatio);
+
+                        if (dmgRatio != 0)
+                            damage += damage * dmgRatio;
+
+                        int32 basepoints0 = aurEff->GetAmount() * tickCount * int32(damage) / 100;
                         int32 heal = int32(CalculatePct(basepoints0, 15));
 
                         caster->CastCustomSpell(target, 63675, &basepoints0, nullptr, nullptr, true, nullptr, GetEffect(0));
@@ -1547,49 +1559,49 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // Can't proc on self
                     if (GetCasterGUID() == target->GetGUID())
                         break;
+                    if (caster->GetAuraEffectDummy(1150043)){
+                        caster->CastSpell(target, 1150007, true);
+                    }
 
                     AuraEffect* aurEff = nullptr;
                     // Ebon Plaguebringer / Crypt Fever
                     Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    uint32 spellId;
                     for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
                     {
-                        if ((*itr)->GetMiscValue() == 7282)
+                        aurEff = *itr;
+                        if (aurEff->GetMiscValue() == 7282)
                         {
-                            aurEff = *itr;
-                            // Ebon Plaguebringer - end search if found
-                            if ((*itr)->GetSpellInfo()->SpellIconID == 1766)
-                                break;
+                            if((*itr)->GetSpellInfo()->SpellIconID == 264){
+                                switch (aurEff->GetId()){
+                                    case 1150039:
+                                        spellId = 1150067;
+                                        break;
+                                    case 1150038:
+                                        spellId = 1150066;
+                                        break;
+                                    case 1150027:
+                                        spellId = 1150065;
+                                        break;
+                                    default:
+                                        LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever ({}) found", aurEff->GetId());
+                                }
+                                caster->CastSpell(target, spellId, true, 0, GetEffect(0));
+                            }
                         }
-                    }
-                    if (aurEff)
-                    {
-                        uint32 spellId = 0;
-                        switch (aurEff->GetId())
-                        {
-                            // Ebon Plague
-                            case 51161:
-                                spellId = 51735;
+                        else if(aurEff->GetMiscValue() == 1150061) {
+                            switch (aurEff->GetId()) {
+                            case 1150061:
+                                spellId = 1150068;
                                 break;
-                            case 51160:
-                                spellId = 51734;
-                                break;
-                            case 51099:
-                                spellId = 51726;
-                                break;
-                            // Crypt Fever
-                            case 49632:
-                                spellId = 50510;
-                                break;
-                            case 49631:
-                                spellId = 50509;
-                                break;
-                            case 49032:
-                                spellId = 50508;
+                            case 1150062:
+                                spellId = 1150069;
                                 break;
                             default:
-                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
+                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Scarlet Fever ({}) found", aurEff->GetId());
+                            }
+                            caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                         }
-                        caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
                 }
                 // Unholy blight
@@ -1638,8 +1650,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     case 72369:
                         if (AuraEffect* aurEff = GetEffect(0))
                         {
-                            int32 remainingDamage = aurEff->GetAmount() * (aurEff->GetTotalTicks() - aurEff->GetTickNumber());
+                            float dmgRatio;
+                            int32 remainingDamage = aurEff->GetAmount() * (aurEff->GetTotalTicks(dmgRatio) - aurEff->GetTickNumber());
                             if (remainingDamage > 0)
+                                if (dmgRatio != 0)
+                                    remainingDamage += remainingDamage * dmgRatio;
                                 caster->CastCustomSpell(caster, 72373, nullptr, &remainingDamage, nullptr, true);
                         }
                         break;
@@ -1978,6 +1993,47 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
             }
             break;
+    }
+
+    if (apply)
+    {
+        Unit::AuraEffectList aurEffects;
+
+        if (caster == target)
+            aurEffects = caster->GetAuraEffectsByType(SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_SELF);
+        else
+            aurEffects = caster->GetAuraEffectsByType(SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_TARGET);
+
+        for (auto aurEff : aurEffects)
+        {
+            auto eff = aurEff->GetSpellInfo()->GetEffect(SpellEffIndex(aurEff->GetEffIndex()));
+
+            if (aurApp->GetBase()->GetId() == eff.MiscValue)
+                ProcessTriggerSpellOnStacks(aurApp->GetBase(), eff.MiscValueB, eff.TriggerSpell, eff.TargetA.GetTarget(), eff.Amplitude, caster, aurEff->GetBase()->GetEffect(aurEff->GetEffIndex()));
+        }
+    }
+}
+
+void Aura::ProcessTriggerSpellOnStacks(Aura* aurApp, int32 stackCount, int32 triggerSpell, Targets triggerSpellTarget, uint32 amplitude, Unit* caster, AuraEffect* const triggeringEffect)
+{
+    if (aurApp->GetStackAmount() == stackCount)
+    {
+        Unit* victim;
+        if (triggerSpellTarget == TARGET_UNIT_CASTER)
+            victim = caster;
+        else if (triggerSpellTarget == TARGET_UNIT_TARGET_ENEMY)
+        {
+            victim = aurApp->GetUnitOwner();
+
+            if (victim == caster)
+                victim = caster->GetTargetUnit();
+        }
+
+        if (victim->IsAlive())
+            caster->CastSpell(victim, triggerSpell, true, nullptr, triggeringEffect);
+
+        if (amplitude == 0)
+            aurApp->Remove();
     }
 }
 
@@ -2337,7 +2393,7 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
         }
         // apply chance modifer aura, applies also to ppm chance (see improved judgement of light spell)
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetId(), SPELLMOD_CHANCE_OF_SUCCESS, chance);
+            modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_CHANCE_OF_SUCCESS, chance);
     }
     return chance;
 }
@@ -2457,6 +2513,43 @@ bool Aura::CallScriptEffectRemoveHandlers(AuraEffect const* aurEff, AuraApplicat
         for (; effItr != effEndItr; ++effItr)
             if (effItr->IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
                 effItr->Call(*scritr, aurEff, mode);
+
+        if (!preventDefault)
+            preventDefault = (*scritr)->_IsDefaultActionPrevented();
+
+        (*scritr)->_FinishScriptCall();
+    }
+    return preventDefault;
+}
+
+bool Aura::CallScriptAuraApplyHandlers(AuraApplication const* aurApp)
+{
+    bool preventDefault = false;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_EFFECT_APPLY, aurApp);
+        std::list<AuraScript::AuraApplyHandler>::iterator effEndItr = (*scritr)->OnAuraApply.end(), effItr = (*scritr)->OnAuraApply.begin();
+        for (; effItr != effEndItr; ++effItr)
+            effItr->Call(*scritr);
+
+        if (!preventDefault)
+            preventDefault = (*scritr)->_IsDefaultActionPrevented();
+
+        (*scritr)->_FinishScriptCall();
+    }
+
+    return preventDefault;
+}
+
+bool Aura::CallScriptAuraRemoveHandlers(AuraApplication const* aurApp)
+{
+    bool preventDefault = false;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_EFFECT_REMOVE, aurApp);
+        std::list<AuraScript::AuraApplyHandler>::iterator effEndItr = (*scritr)->OnAuraRemove.end(), effItr = (*scritr)->OnAuraRemove.begin();
+        for (; effItr != effEndItr; ++effItr)
+            effItr->Call(*scritr);
 
         if (!preventDefault)
             preventDefault = (*scritr)->_IsDefaultActionPrevented();

@@ -435,7 +435,10 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
-            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
+            float dmgRatio;
+            int ticks = aurEff->GetTotalTicks(dmgRatio);
+
+            if (ticks >= 0 && aurEff->GetTickNumber() == uint32(ticks))
                 if (Unit* c = GetCaster())
                     if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX() + 20.0f * cos(c->GetOrientation()), c->GetPositionY() + 20.0f * std::sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {

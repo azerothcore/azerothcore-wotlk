@@ -659,6 +659,54 @@ SpellValue const* SpellScript::GetSpellValue()
     return m_spell->m_spellValue;
 }
 
+// check for any crit
+bool SpellScript::SpellIsCrit(Spell* spell)
+{
+    auto targetsInfo = spell->GetUniqueTargetInfo();
+
+    if (!targetsInfo || targetsInfo->empty())
+        return false;
+
+    for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+        if (ihit->crit)
+            return true;
+
+    return false;
+}
+
+// checks for crit on target
+bool SpellScript::SpellIsCrit(Spell* spell, ObjectGuid target)
+{
+    auto targetsInfo = spell->GetUniqueTargetInfo();
+
+    if (!targetsInfo || targetsInfo->empty())
+        return false;
+
+    for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+        if (ihit->targetGUID == target && ihit->crit)
+            return true;
+
+    return false;
+}
+
+// requires a caster and target
+bool SpellScript::CheckFamilyFlags(ProcEventInfo& eventInfo)
+{
+    auto aura = GetSpellInfo();
+    auto castSpell = eventInfo.GetProcSpell();
+
+    return aura && castSpell && aura->CheckFamilyFlagsApply(castSpell->GetSpellInfo()->SpellFamilyFlags);
+}
+
+// requires a caster and target
+bool SpellScript::CheckFamilyFlags(ProcEventInfo& eventInfo, uint8 effect)
+{
+    auto aura = GetSpellInfo();
+    auto castSpell = eventInfo.GetProcSpell();
+
+    return aura && castSpell && aura->CheckFamilyFlagsApply(castSpell->GetSpellInfo()->SpellFamilyFlags, effect);
+}
+
 bool AuraScript::_Validate(SpellInfo const* entry)
 {
     for (std::list<CheckAreaTargetHandler>::iterator itr = DoCheckAreaTarget.begin(); itr != DoCheckAreaTarget.end();  ++itr)
@@ -861,6 +909,17 @@ void AuraScript::EffectApplyHandler::Call(AuraScript* auraScript, AuraEffect con
 {
     if (_mode & mode)
         (auraScript->*pEffectHandlerScript)(_aurEff, _mode);
+}
+
+AuraScript::AuraApplyHandler::AuraApplyHandler(AuraApplyFnType _pEffectHandlerScript)
+    : AuraScript::EffectBase(0, 0)
+{
+    pEffectHandlerScript = _pEffectHandlerScript;
+}
+
+void AuraScript::AuraApplyHandler::Call(AuraScript* auraScript)
+{
+    (auraScript->*pEffectHandlerScript)();
 }
 
 AuraScript::EffectAbsorbHandler::EffectAbsorbHandler(AuraEffectAbsorbFnType _pEffectHandlerScript, uint8 _effIndex)
@@ -1194,4 +1253,33 @@ Unit* AuraScript::GetTarget() const
 AuraApplication const* AuraScript::GetTargetApplication() const
 {
     return m_auraApplication;
+}
+
+// requires a caster and target
+bool AuraScript::SpellIsCrit(ProcEventInfo& eventInfo)
+{
+    if (!eventInfo.GetActor() || !eventInfo.GetProcTarget())
+        return false;
+
+    DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+    return (damageInfo && (damageInfo->GetHitInfo() & HITINFO_CRITICALHIT)) || eventInfo.GetHitMask() & PROC_EX_CRITICAL_HIT;
+}
+
+// requires a caster and target
+bool AuraScript::CheckFamilyFlags(ProcEventInfo& eventInfo)
+{
+    auto aura = GetSpellInfo();
+    auto castSpell = eventInfo.GetProcSpell();
+
+    return aura && castSpell && aura->CheckFamilyFlagsApply(castSpell->GetSpellInfo()->SpellFamilyFlags);
+}
+
+// requires a caster and target
+bool AuraScript::CheckFamilyFlags(ProcEventInfo& eventInfo, uint8 effect)
+{
+    auto aura = GetSpellInfo();
+    auto castSpell = eventInfo.GetProcSpell();
+
+    return aura && castSpell && aura->CheckFamilyFlagsApply(castSpell->GetSpellInfo()->SpellFamilyFlags, effect);
 }

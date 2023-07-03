@@ -51,6 +51,7 @@
 #define STRINGIZE(a) #a
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
+#define MAX_NETCLIENT_SAFE_PACKET_SIZE (32267 - 1)
 
 // TimeConstants
 constexpr auto MINUTE = 60;

@@ -88,6 +88,12 @@ void Unit::UpdateDamagePhysical(WeaponAttackType attType)
     }
 }
 
+void Unit::UpdateThorns()
+{
+    float value = GetTotalAuraModValue(UNIT_MOD_THORNS);
+    SetForgeStat(FORGE_STAT_THORNS, value);
+}
+
 /*#######################################
 ########                         ########
 ########   PLAYERS STAT SYSTEM   ########
@@ -212,6 +218,7 @@ bool Player::UpdateAllStats()
     UpdateExpertise(OFF_ATTACK);
     RecalculateRating(CR_ARMOR_PENETRATION);
     UpdateAllResistances();
+    UpdateThorns();
 
     return true;
 }
@@ -595,11 +602,11 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bo
         weaponMinDamage = BASE_MINDAMAGE;
         weaponMaxDamage = BASE_MAXDAMAGE;
     }
-    else if (attType == RANGED_ATTACK) // add ammo DPS to ranged damage
-    {
-        weaponMinDamage += GetAmmoDPS() * attackSpeedMod;
-        weaponMaxDamage += GetAmmoDPS() * attackSpeedMod;
-    }
+    // else if (attType == RANGED_ATTACK) // add ammo DPS to ranged damage
+    // {
+    //     weaponMinDamage += GetAmmoDPS() * attackSpeedMod;
+    //     weaponMaxDamage += GetAmmoDPS() * attackSpeedMod;
+    // }
 
     minDamage = ((weaponMinDamage + baseValue) * basePct + totalValue) * totalPct;
     maxDamage = ((weaponMaxDamage + baseValue) * basePct + totalValue) * totalPct;
@@ -983,6 +990,16 @@ void Player::UpdateRuneRegen(RuneType rune)
     SetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(rune), regen);
 }
 
+void Player::UpdateThorns()
+{
+    UnitMods unitMod = UNIT_MOD_THORNS;
+
+    float value = GetModifierValue(unitMod, BASE_VALUE);
+    value += GetModifierValue(unitMod, TOTAL_VALUE);
+
+    SetForgeStat(FORGE_STAT_THORNS, value);
+}
+
 void Player::_ApplyAllStatBonuses()
 {
     SetCanModifyStats(false);
@@ -1159,6 +1176,12 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
         maxDamage = 0.0f;
     if (minDamage > maxDamage)
         minDamage = maxDamage;
+}
+
+void Creature::UpdateThorns()
+{
+    float value = GetTotalAuraModValue(UNIT_MOD_THORNS);
+    SetForgeStat(FORGE_STAT_THORNS, value);
 }
 
 /*#######################################
@@ -1380,4 +1403,10 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);
+}
+
+void Guardian::UpdateThorns()
+{
+    float value = GetTotalAuraModValue(UNIT_MOD_THORNS);
+    SetForgeStat(FORGE_STAT_THORNS, value);
 }

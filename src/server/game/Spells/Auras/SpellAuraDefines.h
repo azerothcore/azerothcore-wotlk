@@ -377,7 +377,18 @@ enum AuraType
     SPELL_AURA_PREVENT_RESURRECTION                         = 314,
     SPELL_AURA_UNDERWATER_WALKING                           = 315,
     SPELL_AURA_PERIODIC_HASTE                               = 316,
-    TOTAL_AURAS                                             = 317
+    SPELL_AURA_MOD_SPELL_DAMAGE_OF_ARMOR                    = 317,
+    SPELL_AURA_MOD_BLOCK_VALUE_SCALING = 318,
+    SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT = 319,
+    SPELL_AURA_PROC_ADD_DURATION = 320,
+    SPELL_AURA_MOD_CRITICAL_BLOCK_PCT = 321,
+    SPELL_AURA_MOD_SPELL_CHARGES = 322,
+    SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_SELF = 323,
+    SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_TARGET = 324,
+    SPELL_AURA_MOD_DAMAGE_TAKEN_PCT_BEFORE_BLOCK = 325,
+    SPELL_AURA_ADD_SPELL_BLOCK = 326,
+    SPELL_AURA_MOD_TOGGLE_AURA_COMBAT_STATE = 327,
+    TOTAL_AURAS
 };
 
 enum AuraObjectType
@@ -393,7 +404,26 @@ enum AuraRemoveMode
     AURA_REMOVE_BY_CANCEL,
     AURA_REMOVE_BY_ENEMY_SPELL,             // dispel and absorb aura destroy
     AURA_REMOVE_BY_EXPIRE,                  // aura duration has ended
-    AURA_REMOVE_BY_DEATH
+    AURA_REMOVE_BY_DEATH,
+    AURA_REMOVE_BY_REMOVED_FROM_MAP
+};
+
+enum WeaponDamageEffectMod // this number goes into Misc Value A. Set Misc Value B = 1 to remove aura after apply.
+{
+    WEAPON_DAMAGE_EFFECT_ADD_PCT_DAMAGE                         = 0, // Base Points + Die Sides is percent as a whole number. 100 = 100%
+    WEAPON_DAMAGE_EFFECT_ADD_BLOCK_VALUE_AS_DAMAGE_PCT          = 1, // Base Points + Die Sides is percent as a whole number. 100 = 100%
+    WEAPON_DAMAGE_EFFECT_ADD_ARMOR_VALUE_AS_DAMAGE_PCT          = 2, // Base Points + Die Sides is percent as a whole number. 100 = 100%
+    WEAPON_DAMAGE_EFFECT_ADD_ATTACK_POWER_AS_DAMAGE_PCT         = 3, // Base Points + Die Sides is percent as a whole number. 100 = 100%
+    WEAPON_DAMAGE_EFFECT_TRIGGER_SPELL                          = 4, // Trigger Spell is the aura applied. Applied on hit. Respects Target A.
+    WEAPON_DAMAGE_EFFECT_TRIGGER_SPELL_TARGET                   = 5, // (Deprecated) Trigger Spell is the aura applied. Applied on hit. Respects Target A.
+    WEAPON_DAMAGE_EFFECT_ADD_DAMAGE                             = 6, // Base Points + Die Sides as flat damage. On spells that level scale, set Amplitude = 1 to have this flat value scale.
+    WEAPON_DAMAGE_EFFECT_RETAIN_AURAS                           = 7, // Retain SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT auras that would be consumed.
+    WEAPON_DAMAGE_EFFECT_EXTRA_EFFECTS                          = 8, // Trigger Spell is the spellId for a dummy spell to process additional effects. Use to add more SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT mods.
+    WEAPON_DAMAGE_EFFECT_DAMAGE_PER_STACK                       = 9, // Base Points + Die Sides as flat damage for the number of stacks of Trigger Spell aura. Respects Target A for aura owner.
+    WEAPON_DAMAGE_EFFECT_PCT_DAMAGE_PER_STACK                   = 10, // Base Points + Die Sides as percent damage for the number of stacks of Trigger Spell aura. Respects Target A for aura owner. 100 = 100%
+    WEAPON_DAMAGE_EFFECT_ADD_STACKS                             = 11, // Base Points + Die Sides as the number of stacks of Trigger Spell aura to increase. Respects Target A for aura owner.
+    WEAPON_DAMAGE_EFFECT_ADD_THORNS_TO_DAMAGE                   = 12,
+    TOTAL_WEAPON_DAMAGE_EFFECTS,
 };
 
 #endif

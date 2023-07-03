@@ -449,16 +449,24 @@ class spell_hun_chimera_shot : public SpellScript
                     // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
                     if (familyFlag[0] & 0x4000)
                     {
-                        int32 TickCount = aurEff->GetTotalTicks();
+                        float f;
+                        int32 TickCount = aurEff->GetTotalTicks(f);
+
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_SERPENT;
                         basePoint = aurEff->GetAmount();
+
+                        if (f != 0)
+                            basePoint += basePoint * f;
+
                         ApplyPct(basePoint, TickCount * 40);
                         basePoint = unitTarget->SpellDamageBonusTaken(caster, aura->GetSpellInfo(), basePoint, DOT, aura->GetStackAmount());
                     }
                     // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
                     else if (familyFlag[1] & 0x00000080)
                     {
-                        int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
+                        float f;
+                        int32 TickCount = aura->GetEffect(0)->GetTotalTicks(f, true);
+
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_VIPER;
 
                         // Amount of one aura tick

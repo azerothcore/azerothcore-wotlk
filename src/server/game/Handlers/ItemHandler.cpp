@@ -326,6 +326,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
     }
 
     recoveryItem(pItem);
+    sScriptMgr->OnAfterPlayerDestroyItem(_player, pItem, bag, slot);
 
     if (count)
     {

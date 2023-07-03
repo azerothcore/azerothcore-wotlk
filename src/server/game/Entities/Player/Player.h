@@ -185,9 +185,17 @@ struct SpellModifier
     SpellModType type : 8;
     int16 charges     : 16;
     int32 value{0};
+    int32 exvalue{0};
     flag96 mask;
     uint32 spellId{0};
     Aura* const ownerAura;
+};
+
+struct ForgeAddonMessage
+{
+    Player* player;
+    std::string topic;
+    std::string message;
 };
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
@@ -209,13 +217,20 @@ struct SpellCooldown
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
-enum TrainerSpellState
+struct SpellCharge
 {
-    TRAINER_SPELL_GREEN = 0,
-    TRAINER_SPELL_RED   = 1,
-    TRAINER_SPELL_GRAY  = 2,
-    TRAINER_SPELL_GREEN_DISABLED = 10                       // custom value, not send to client: formally green but learn not allowed
+    uint32 end;
+    uint16 category;
+    uint32 itemid;
+    uint32 maxduration;
+    uint8 charges;
+    uint8 maxcharges;
+    uint32 chargeaura;
+    bool sendToSpectator : 1;
+    bool needSendToClient : 1;
 };
+
+typedef std::map<flag96, SpellCharge> SpellCharges;
 
 enum ActionButtonUpdateState
 {
@@ -887,6 +902,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
+    PLAYER_LOGIN_QUERY_LOAD_SPELL_CHARGES           = 38,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1112,6 +1128,7 @@ public:
 
     void SendInitialPacketsBeforeAddToMap();
     void SendInitialPacketsAfterAddToMap();
+    void SendSupercededSpell(uint32 oldSpell, uint32 newSpell);
     void SendTransferAborted(uint32 mapid, TransferAbortReason reason, uint8 arg = 0);
     void SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool onEnterMap);
 
@@ -1211,6 +1228,15 @@ public:
     /// Handles whispers from Addons and players based on sender, receiver's guid and language.
     void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
     void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
+
+    ///     Sends a message to be recieved by the Forge IU
+    /// </summary>
+    /// <param name="topic">Type of message</param>
+    /// <param name="message">the message</param>
+    void SendForgeUIMsg(std::string topic, std::string message);
+    std::vector<std::string> SplitString(const std::string& str, int splitLength);
+    void SendForgeUIMsg(ForgeTopic topic, std::string message);
+    void SendForgeUIMsg(int topic, std::string message);
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1337,6 +1363,7 @@ public:
     void AddArmorProficiency(uint32 newflag) { m_ArmorProficiency |= newflag; }
     [[nodiscard]] uint32 GetWeaponProficiency() const { return m_WeaponProficiency; }
     [[nodiscard]] uint32 GetArmorProficiency() const { return m_ArmorProficiency; }
+    PlayerSpellMap GetKnownSpells() { return m_spells;  }
 
     [[nodiscard]] bool IsTwoHandUsed() const
     {
@@ -1658,17 +1685,17 @@ public:
     void SendRemoveControlBar();
     [[nodiscard]] bool HasSpell(uint32 spell) const override;
     [[nodiscard]] bool HasActiveSpell(uint32 spell) const;            // show in spellbook
-    TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
     [[nodiscard]] bool IsSpellFitByClassAndRace(uint32 spell_id) const;
     bool IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const;
 
     void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
     void SendInitialSpells();
+    void SendUnlearnSpells();
     void SendLearnPacket(uint32 spellId, bool learn);
     bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false, bool learnFromSkill = false);
     bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false);
-    void learnSpell(uint32 spellId, bool temporary = false, bool learnFromSkill = false);
-    void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
+    void learnSpell(uint32 spellId, bool temporary = false, bool learnFromSkill = false, bool sendPlayerUpdate = true);
+    void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary, bool sendPlayerUpdate = true);
     void resetSpells();
     void LearnCustomSpells();
     void LearnDefaultSkills();
@@ -1739,28 +1766,47 @@ public:
     [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
 
+    [[nodiscard]] SpellCharges const& GetSpellChargesMap() const { return m_spellCharges; }
+    SpellCharges& GetSpellChargesMap() { return m_spellCharges; }
+
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
-    template <class T>
-    void ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false);
     void RemoveSpellMods(Spell* spell);
     void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void DropModCharge(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
+    template <class T>
+    void ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false, uint32 exValue = 0);
+    template <class T>
+    void ApplySpellMod(SpellInfo const* spellInfo, SpellModOp op, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false, uint32 exValue = 0);
+
 
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override;
     [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const;
+    void UpdateChargeCooldown(const SpellInfo* spellInfo, SpellEffIndex chargeAuraIndex);
+    void UpdateChargeCooldowns();
+    bool ConsumeSpellCharge(uint32 spell_id);
+    void InitializeSpellCharges();
+    void AddNewSpellCharges(SpellEffectInfo spellEff, flag96 classMask);
+    void AddNewSpellCharges(flag96 classMask, uint8 maxCharges, uint8 currentCharges, uint32 maxDuration, uint32 currentDuration, uint32 chargeAura);
+    void AddCategoryCooldowns(const SpellInfo* spellInfo, int32 recoveryTime, bool sendCooldowns = true);
     void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
     void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
     void ModifySpellCooldown(uint32 spellId, int32 cooldown);
+    void ModifySpellCooldowns(int32 cooldown);
+    void ModifySpellCharges(int32 cooldown);
     void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr, bool setCooldown = true);
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
+    void RemoveSpellCharges(flag96 familyFlags);
     void RemoveSpellCooldown(uint32 spell_id, bool update = false);
     void SendClearCooldown(uint32 spell_id, Unit* target);
+    SpellInfo* GetLatestSpellEffect(uint32 SpellId, uint32 enchanceId);
+    SpellInfo* GetLatestSpellEffectForDummy(uint32 SpellId);
+    SpellInfo* GetLatestSpellEffectForEnhacement(uint32 enchanceId);
 
     GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
 
@@ -1769,6 +1815,8 @@ public:
     void RemoveAllSpellCooldown();
     void _LoadSpellCooldowns(PreparedQueryResult result);
     void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
+    void _LoadSpellCharges(PreparedQueryResult result);
+    void _SaveSpellCharges(CharacterDatabaseTransaction trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
     void UpdatePotionCooldown(Spell* spell = nullptr);
@@ -1949,6 +1997,7 @@ public:
     void ApplyHealthRegenBonus(int32 amount, bool apply);
     void UpdateManaRegen();
     void UpdateRuneRegen(RuneType rune);
+    void UpdateThorns();
 
     [[nodiscard]] ObjectGuid GetLootGUID() const { return m_lootGuid; }
     void SetLootGUID(ObjectGuid guid) { m_lootGuid = guid; }
@@ -2127,6 +2176,7 @@ public:
     //End of PvP System
 
     [[nodiscard]] inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
+    [[nodiscard]] inline SpellCharges GetSpellCharges() const { return m_spellCharges; }
 
     void SetDrunkValue(uint8 newDrunkValue, uint32 itemId = 0);
     [[nodiscard]] uint8 GetDrunkValue() const { return GetByteValue(PLAYER_BYTES_3, 1); }
@@ -2473,7 +2523,11 @@ public:
     void SetLastUsedRune(RuneType type) { m_runes->lastUsedRune = type; }
     void SetBaseRune(uint8 index, RuneType baseRune) { m_runes->runes[index].BaseRune = baseRune; }
     void SetCurrentRune(uint8 index, RuneType currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
-    void SetRuneCooldown(uint8 index, uint32 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0)); }
+    void SetRuneCooldown(uint8 index, uint32 cooldown)
+    {
+        m_runes->runes[index].Cooldown = cooldown;
+        m_runes->SetRuneState(index, (cooldown == 0));
+    }
     void SetGracePeriod(uint8 index, uint32 period) { m_runes->runes[index].GracePeriod = period; }
     void SetRuneConvertAura(uint8 index, AuraEffect const* aura) { m_runes->runes[index].ConvertAura = aura; }
     void AddRuneByAuraEffect(uint8 index, RuneType newType, AuraEffect const* aura) { SetRuneConvertAura(index, aura); ConvertRune(index, newType); }
@@ -2925,6 +2979,8 @@ private:
     ReputationMgr*  m_reputationMgr;
 
     SpellCooldowns m_spellCooldowns;
+
+    SpellCharges m_spellCharges;
 
     uint32 m_ChampioningFaction;
 

@@ -606,9 +606,9 @@ uint32 SpellMgr::GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict) con
     return spell_id;
 }
 
-SpellRequiredMapBounds SpellMgr::GetSpellsRequiredForSpellBounds(uint32 spell_id) const
+Acore::IteratorPair<SpellRequiredMap::const_iterator> SpellMgr::GetSpellsRequiredForSpellBounds(uint32 spell_id) const
 {
-    return mSpellReq.equal_range(spell_id);
+    return Acore::Containers::MapEqualRange(mSpellReq, spell_id);
 }
 
 SpellsRequiringSpellMapBounds SpellMgr::GetSpellsRequiringSpellBounds(uint32 spell_id) const
@@ -796,6 +796,16 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
     // Trap casts are active by default
     if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
         active = true;
+
+    if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
+        return true;
+
+    // check crit events
+    if (procFlags & PROC_FLAG_CRITICAL_DAMAGE_DONE
+        || procFlags & PROC_FLAG_CRITICAL_DAMAGE_TAKEN
+        || procFlags & PROC_FLAG_CRITICAL_HEALING_DONE
+        || procFlags & PROC_FLAG_CRITICAL_HEALING_TAKEN)
+        return true;
 
     if (spellProcEvent)     // Exist event data
     {
@@ -1073,6 +1083,46 @@ SpellAreaForAuraMapBounds SpellMgr::GetSpellAreaForAuraMapBounds(uint32 spell_id
 SpellAreaForAreaMapBounds SpellMgr::GetSpellAreaForAreaMapBounds(uint32 area_id) const
 {
     return mSpellAreaForAreaMap.equal_range(area_id);
+}
+
+std::vector<SpellInfo*> SpellMgr::GetSpellInfosForDummyId(uint32 dummyId, uint32 enchanceId) const
+{
+    auto const valItt = mDummySpellMap.find(dummyId);
+
+    if (valItt != mDummySpellMap.end())
+    {
+        auto const enchItt = valItt->second.find(enchanceId);
+
+        if (enchItt != valItt->second.end())
+            return enchItt->second;
+    }
+
+    return std::vector<SpellInfo*>();
+}
+
+std::vector<SpellInfo*> SpellMgr::GetSpellInfosForDummyA(uint32 dummyId) const
+{
+    auto const valItt = mDummySpellMapA.find(dummyId);
+
+    if (valItt != mDummySpellMapA.end())
+        return valItt->second;
+
+    return std::vector<SpellInfo*>();
+}
+
+std::vector<SpellInfo*> SpellMgr::GetSpellInfosForDummyB(uint32 enchanceId) const
+{
+    auto const valItt = mDummySpellMapB.find(enchanceId);
+
+    if (valItt != mDummySpellMapB.end())
+        return valItt->second;
+
+    return std::vector<SpellInfo*>();
+}
+
+DummySpellMap SpellMgr::GetDummyMap() const
+{
+    return mDummySpellMap;
 }
 
 bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32 newArea) const
@@ -2714,13 +2764,28 @@ void SpellMgr::LoadSpellInfoStore()
         if (!mSpellInfoMap[spellIndex])
             continue;
 
-        for (SpellEffectInfo const& spellEffectInfo : mSpellInfoMap[spellIndex]->GetEffects())
+        auto* si = mSpellInfoMap[spellIndex];
+        auto& effects = si->GetEffects();
+
+        for (SpellEffectInfo const& spellEffectInfo : effects)
         {
             //ASSERT(effect.EffectIndex < MAX_SPELL_EFFECTS, "MAX_SPELL_EFFECTS must be at least %u", effect.EffectIndex + 1);
             ASSERT(spellEffectInfo.Effect < TOTAL_SPELL_EFFECTS, "TOTAL_SPELL_EFFECTS must be at least %u", spellEffectInfo.Effect + 1);
             ASSERT(spellEffectInfo.ApplyAuraName < TOTAL_AURAS, "TOTAL_AURAS must be at least %u", spellEffectInfo.ApplyAuraName + 1);
             ASSERT(spellEffectInfo.TargetA.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetA.GetTarget() + 1);
             ASSERT(spellEffectInfo.TargetB.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetB.GetTarget() + 1);
+        }
+
+        if (effects.size() > 0)
+        {
+            if (effects[0].MiscValue != 0 )
+                mDummySpellMapA[effects[0].MiscValue].push_back(si);
+
+            if (effects[0].MiscValueB != 0)
+                mDummySpellMapB[effects[0].MiscValueB].push_back(si);
+
+            if(effects[0].MiscValue != 0 && effects[0].MiscValueB != 0)
+                mDummySpellMap[effects[0].MiscValue][effects[0].MiscValueB].push_back(si);
         }
     }
 
@@ -3338,7 +3403,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 32594: // Earth Shield aura
             case 49283: // Earth Shield aura
             case 49284: // Earth Shield aura
-            case 50526: // Wandering Plague
+            case 1150002: // Wandering Plague
             case 53353: // Chimera Shot - Serpent trigger
             case 52752: // Ancestral Awakening Heal
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;

@@ -21,6 +21,7 @@
 // For static or at-server-startup loaded spell data
 
 #include "Common.h"
+#include "IteratorPair.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "Unit.h"
@@ -142,23 +143,36 @@ enum ProcFlags
 
     PROC_FLAG_DEATH                           = 0x01000000,    // 24 Died in any way
 
+    PROC_FLAG_DAMAGE_BLOCKED                  = 0x02000000,    // 25 Damage blocked
+
+    PROC_FLAG_CRITICAL_DAMAGE_DONE            = 0x04000000,    // 26 Damage blocked
+    PROC_FLAG_CRITICAL_DAMAGE_TAKEN           = 0x08000000,    // 26 Damage blocked
+
+    PROC_FLAG_CRITICAL_HEALING_DONE           = 0x10000000,    // 27 Damage blocked
+    PROC_FLAG_CRITICAL_HEALING_TAKEN          = 0x20000000,    // 27 Damage blocked
+
     // flag masks
     AUTO_ATTACK_PROC_FLAG_MASK                = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK,
+                                                | PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
+                                                | PROC_FLAG_DAMAGE_BLOCKED | PROC_FLAG_CRITICAL_DAMAGE_DONE | PROC_FLAG_CRITICAL_DAMAGE_TAKEN,
 
     MELEE_PROC_FLAG_MASK                      = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK
                                                 | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
-                                                | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+                                                | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK
+                                                | PROC_FLAG_DAMAGE_BLOCKED | PROC_FLAG_CRITICAL_DAMAGE_DONE | PROC_FLAG_CRITICAL_DAMAGE_TAKEN,
 
     RANGED_PROC_FLAG_MASK                     = PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS,
+                                                | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
+                                                | PROC_FLAG_DAMAGE_BLOCKED | PROC_FLAG_CRITICAL_DAMAGE_DONE | PROC_FLAG_CRITICAL_DAMAGE_TAKEN,
 
     SPELL_PROC_FLAG_MASK                      = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
                                                 | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG,
+                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
+                                                | PROC_FLAG_DAMAGE_BLOCKED | PROC_FLAG_CRITICAL_DAMAGE_DONE | PROC_FLAG_CRITICAL_DAMAGE_TAKEN
+                                                | PROC_FLAG_CRITICAL_HEALING_DONE | PROC_FLAG_CRITICAL_HEALING_TAKEN,
 
     SPELL_CAST_PROC_FLAG_MASK                  = SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION | RANGED_PROC_FLAG_MASK,
 
@@ -168,13 +182,15 @@ enum ProcFlags
                                                 | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
-                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK
+                                                | PROC_FLAG_CRITICAL_DAMAGE_DONE | PROC_FLAG_CRITICAL_HEALING_DONE,
 
     TAKEN_HIT_PROC_FLAG_MASK                   = PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
                                                 | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
                                                 | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
-                                                | PROC_FLAG_TAKEN_PERIODIC | PROC_FLAG_TAKEN_DAMAGE,
+                                                | PROC_FLAG_TAKEN_PERIODIC | PROC_FLAG_TAKEN_DAMAGE | PROC_FLAG_DAMAGE_BLOCKED
+                                                | PROC_FLAG_CRITICAL_DAMAGE_TAKEN | PROC_FLAG_CRITICAL_HEALING_TAKEN,
 
     REQ_SPELL_PHASE_PROC_FLAG_MASK             = SPELL_PROC_FLAG_MASK & DONE_HIT_PROC_FLAG_MASK,
 };
@@ -600,7 +616,11 @@ typedef std::vector<bool> EnchantCustomAttribute;
 
 typedef std::vector<SpellInfo*> SpellInfoMap;
 
-typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
+typedef std::unordered_map<uint32, std::unordered_map<uint32, std::vector<SpellInfo*>>> DummySpellMap;
+typedef std::unordered_map<uint32, std::vector<SpellInfo*>> DummySpellMapA;
+typedef std::unordered_map<uint32, std::vector<SpellInfo*>> DummySpellMapB;
+
+typedef std::map<int32, std::vector<int32>> SpellLinkedMap;
 
 struct SpellCooldownOverride
 {
@@ -668,8 +688,8 @@ public:
     [[nodiscard]] uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
 
     // Spell Required table
-    [[nodiscard]] SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
-    [[nodiscard]] SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
+    [[nodiscard]] SpellRequiredMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
+    [[nodiscard]] Acore::IteratorPair<SpellRequiredMap::const_iterator> GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
     [[nodiscard]] bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
 
     // Spell learning
@@ -731,6 +751,12 @@ public:
         ASSERT(spellInfo);
         return spellInfo;
     }
+
+    [[nodiscard]] std::vector<SpellInfo*> GetSpellInfosForDummyId(uint32 dummyId, uint32 enchanceId) const;
+    [[nodiscard]] std::vector<SpellInfo*> GetSpellInfosForDummyA(uint32 dummyId) const;
+    [[nodiscard]] std::vector<SpellInfo*> GetSpellInfosForDummyB(uint32 enchanceId) const;
+    DummySpellMap GetDummyMap() const;
+
     // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
     [[nodiscard]] SpellInfo const* CheckSpellInfo(uint32 spellId) const
     {
@@ -817,6 +843,9 @@ private:
     PetLevelupSpellMap         mPetLevelupSpellMap;
     PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
     SpellInfoMap               mSpellInfoMap;
+    DummySpellMap              mDummySpellMap;
+    DummySpellMapA             mDummySpellMapA;
+    DummySpellMapB             mDummySpellMapB;
     SpellCooldownOverrideMap   mSpellCooldownOverrideMap;
     TalentAdditionalSet        mTalentSpellAdditionalSet;
 };

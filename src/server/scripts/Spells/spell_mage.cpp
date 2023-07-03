@@ -708,7 +708,11 @@ class spell_mage_ignite : public AuraScript
         SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_MAGE_IGNITE);
         int32 pct = 8 * GetSpellInfo()->GetRank();
 
-        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
+        float dmgRatio;
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks(eventInfo.GetActor(), dmgRatio));
+
+        if (dmgRatio != 0)
+            amount = amount * dmgRatio;
 
         // Xinef: implement ignite bug
         eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE, SPELL_AURA_PERIODIC_DAMAGE, amount);
@@ -820,7 +824,8 @@ class spell_mage_master_of_elements : public AuraScript
                 {
                     if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
                     {
-                        _ticksModifier = std::max(1, aurEff->GetTotalTicks());
+                        float f;
+                        _ticksModifier = aurEff->GetTotalTicks(f);
                     }
                 }
             }
@@ -856,7 +861,7 @@ class spell_mage_master_of_elements : public AuraScript
 
 private:
     SpellInfo const* _spellInfo = nullptr;
-    uint8 _ticksModifier = 0;
+    uint8 _ticksModifier = 1;
 };
 
 enum SilvermoonPolymorph

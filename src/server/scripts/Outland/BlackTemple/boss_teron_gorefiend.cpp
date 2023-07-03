@@ -240,8 +240,9 @@ public:
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_2))
-                amount -= (amount / effect->GetTotalTicks()) * effect->GetTickNumber();
+            float f;
+            if(AuraEffect* effect = GetAura()->GetEffect(EFFECT_2))
+                amount -= (amount / effect->GetTotalTicks(f)) * effect->GetTickNumber();
         }
 
         void Update(AuraEffect const*  /*effect*/)

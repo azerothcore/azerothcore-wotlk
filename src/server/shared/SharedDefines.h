@@ -21,9 +21,85 @@
 #include "Define.h"
 #include "EnumFlag.h"
 #include <cassert>
+#include <string>
+#include <list>
+#include <vector>
+#include <unordered_map>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 constexpr float Z_OFFSET_FIND_HEIGHT = 2.0f;
+const std::string MSG_TYPE_FORGE = "FORGE";
+static std::vector<uint32> PRESTIGE_IGNORE_SPELLS = {};
+extern std::unordered_map<uint32, float> PlayerSpellScaleMap;
+
+enum class ForgeTopic
+{
+    GET_TALENTS = 0,
+    LEARN_TALENT = 1,
+    // a single talent
+    UNLEARN_TALENT = 2,
+    // respec talents
+    RESPEC_TALENTS = 3,
+    RESPEC_TALENTS_ERROR = 4,
+    UPDATE_SPEC = 5,
+    ACTIVATE_SPEC = 6,
+    PRESTIGE = 7,
+    TALENT_TREE_LAYOUT = 8,
+    GET_SHOP_ITEMS = 9,
+    UPDATE_SPEC_ERROR = 10,
+    ACTIVATE_SPEC_ERROR = 11,
+    LEARN_TALENT_ERROR = 12,
+    BUY_ITEM_ERROR = 13,
+    UNLEARN_TALENT_ERROR = 14,
+    GET_TALENT_ERROR = 15,
+    BUY_ITEMS = 16,
+    GET_ITEM_FROM_COLLECTION = 17,
+    GET_PLAYER_COLLECTION = 18,
+    GET_SHOP_LAYOUT = 19,
+    HOLIDAYS = 20,
+    GET_CHARACTER_SPECS = 21,
+    PRESTIGE_ERROR = 22,
+    ACTIVATE_CLASS_SPEC = 23,
+    ACTIVATE_CLASS_SPEC_ERROR = 24,
+    GET_TOOLTIPS = 25,
+    FORGET_TOOLTIP = 26,
+    GET_GAME_MODES = 27,
+    SET_GAME_MODES = 28,
+    SET_GAME_MODES_ERROR = 29,
+    END_GAME_MODES = 30,
+    COLLECTION_INIT = 31,
+    OUTFIT_COST = 32,
+    LOAD_XMOG_SET = 33,
+    LOAD_XMOG_SET_ERROR = 34,
+    SEARCH_XMOG = 35,
+    LOAD_XMOG = 36,
+    LOAD_MOUNTS = 37,
+    LOAD_PETS = 38,
+    LOAD_TOYS = 39,
+    LOAD_HEIRLOOM = 40,
+    MISSING_XMOG = 41,
+    PREVIEW_XMOG = 42,
+    PLAYER_XMOG = 43,
+    LEARN_MOUNT = 44,
+    USE_TOY = 45,
+    GET_XMOG_COST = 46,
+    APPLY_XMOG = 47,
+    REMOVE_XMOG_SET = 48,
+    SAVE_XMOG_SET = 49,
+    RENAME_XMOG_SET = 50,
+    MAX_OUTFITS = 51,
+    COLLECTION_SETUP_STARTED = 52,
+    COLLECTION_SETUP_FINISHED = 53,
+    ADD_XMOG = 54,
+    APPLY_XMOG_ERROR = 55
+};
+
+enum class ForgeError
+{
+    OK = 0,
+    UNKNOWN_SPELL = 1
+};
+
 
 enum SpellEffIndex
 {
@@ -1285,6 +1361,7 @@ enum AuraStateType
     //AURA_STATE_UNKNOWN21                  = 21,           //     | not used
     AURA_STATE_UNKNOWN22                    = 22,           // C  t| varius spells (63884, 50240)
     AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   |
+    AURA_STATE_POWER_BELOW_50_PERCENT       = 24,           // C   |
 };
 
 #define PER_CASTER_AURA_STATE_MASK (\
@@ -1483,6 +1560,7 @@ enum Targets
     TARGET_UNK_DEST_AREA_UNK_107       = 107, // not enough info - only generic spells avalible
     TARGET_GAMEOBJECT_CONE             = 108,
     TARGET_DEST_UNK_110                = 110, // 1 spell
+    TARGET_UNIT_CASTER_AREA_SUMMONS    = 111,
     TOTAL_SPELL_TARGETS
 };
 

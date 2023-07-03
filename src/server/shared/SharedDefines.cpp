@@ -18,3 +18,4 @@
 #include "SharedDefines.h"
 
 ServerProcessTypes Acore::Impl::CurrentServerProcessHolder::_type = NUM_SERVER_PROCESS_TYPES;
+std::unordered_map<uint32, float> PlayerSpellScaleMap = {};

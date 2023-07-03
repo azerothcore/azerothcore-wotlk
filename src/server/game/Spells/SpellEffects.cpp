@@ -238,6 +238,23 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
 };
 
+wEffect WeaponAndSchoolDamageEffects[TOTAL_WEAPON_DAMAGE_EFFECTS] =
+{
+    &Spell::AddDamagePercent,                               //  0
+    &Spell::CalcBlockValuePctAsDamage,                      //  1
+    &Spell::CalcArmorValuePctAsDamage,                      //  2
+    &Spell::CalcAttackPowerPctAsDamage,                     //  3
+    &Spell::TriggerCastSpell,                               //  4
+    &Spell::TriggerCastSpell,                               //  5
+    &Spell::AddDamage,                                      //  6
+    &Spell::RetainAuras,                                    //  7
+    &Spell::ProcessExtraEffects,                            //  8
+    &Spell::AddDamagePerStack,                              //  9
+    &Spell::AddDamagePercentPerStack,                       //  10
+    &Spell::AddStacksToAura,                                //  11
+    &Spell::AddThornsToDamage,                              //  12
+};
+
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
 {
     LOG_DEBUG("spells.aura", "WORLD: Spell Effect DUMMY");
@@ -328,8 +345,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
 
+    float damageMultiplier = m_spellInfo->GetEffect(effIndex).DamageMultiplier * 100;
+    float damageDivisor = 1.0f;
+
     if (unitTarget && unitTarget->IsAlive())
     {
+        ProcessWeaponDamageSchoolEffects(damage, damageMultiplier, effIndex);
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
         {
@@ -343,24 +364,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             if (ihit->effectMask & (1 << effIndex))
                                 ++count;
 
-                        damage /= count;                    // divide to all targets
+                        damageDivisor += count;                    // divide to all targets
                     }
                     break;
                 }
             case SPELLFAMILY_WARRIOR:
                 {
-                    // Shield Slam
-                    if (m_spellInfo->SpellFamilyFlags[1] & 0x200 && m_spellInfo->GetCategory() == 1209)
-                    {
-                        uint8 level = m_caster->GetLevel();
-                        // xinef: shield block should increase the limit
-                        float limit = m_caster->HasAura(2565) ? 2.0f : 1.0f;
-                        uint32 block_value = m_caster->GetShieldBlockValue(uint32(float(level) * 24.5f * limit), uint32(float(level) * 34.5f * limit));
-
-                        damage += int32(m_caster->ApplyEffectModifiers(m_spellInfo, effIndex, float(block_value)));
-                    }
                     // Victory Rush
-                    else if (m_spellInfo->SpellFamilyFlags[1] & 0x100)
+                    if (m_spellInfo->SpellFamilyFlags[1] & 0x100)
                         ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                     // Shockwave
                     else if (m_spellInfo->Id == 46968)
@@ -480,7 +491,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         // converts each extra point of energy into ($f1+$AP/410) additional damage
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                        float multiple = ap / 410 + m_spellInfo->Effects[effIndex].DamageMultiplier;
+                        float multiple = ap / 410 + (damageMultiplier / 100);
                         int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -30));
                         damage += int32(energy * multiple);
                         damage += int32(CalculatePct(m_caster->GetComboPoints() * ap, 7));
@@ -535,7 +546,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                         for (uint32 i = 0; i < doses; ++i)
                                             unitTarget->RemoveAuraFromStack(spellId, m_caster->GetGUID());
 
-                                    damage *= doses;
+                                    AddPct(damageMultiplier, doses*100);
                                     damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * combo);
                                 }
 
@@ -569,7 +580,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (m_spellInfo->SpellIconID == 1578)
                     {
                         if (m_caster->HasAura(57627))           // Charge 6 sec post-affect
-                            damage *= 2;
+                            AddPct(damageMultiplier, 200);
                     }
                     // Steady Shot
                     else if (m_spellInfo->SpellFamilyFlags[1] & 0x1)
@@ -658,9 +669,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             if (damage < 0)
                 damage = 0;
 
-            damage = m_originalCaster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE, effIndex);
+            damageMultiplier = (damageMultiplier * 0.01) + m_originalCaster->SpellPctDamageModsDone(unitTarget, m_spellInfo, SPELL_DIRECT_DAMAGE);
+
+            damage = m_originalCaster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE, damageMultiplier);
             damage = unitTarget->SpellDamageBonusTaken(m_originalCaster, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
         }
+
+        damage /= damageDivisor;
 
         m_damage += damage;
     }
@@ -2357,7 +2372,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     bool personalSpawn = (properties->Flags & SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER) != 0;
     int32 duration = m_spellInfo->GetDuration();
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
 
     TempSummon* summon = nullptr;
 
@@ -3154,7 +3169,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     int32 duration = m_spellInfo->GetDuration();
 
     if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
 
     Player* owner = m_originalCaster->ToPlayer();
     if (!owner && m_originalCaster->ToCreature()->IsTotem())
@@ -3347,9 +3362,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     }
 
     // some spell specific modifiers
-    float totalDamagePercentMod  = 100.0f;                  // applied to final bonus+weapon damage
-    int32 spell_bonus = 0;                                  // bonus specific for spell
-    bool normalized = false;
+    float totalDamagePercentMod  = m_spellInfo->GetEffect(effIndex).DamageMultiplier * 100;     // applied to final bonus+weapon damage
+    int32 spell_bonus = 0;                                                                      // bonus specific for spell
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -3440,9 +3454,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     case 53739:
                         if (AuraEffect const* sealsOfPure = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 25, 0))
                             AddPct(totalDamagePercentMod, sealsOfPure->GetAmount());
-                        break;
-                    case 53385:  // Divine Storm deals normalized damage
-                        normalized = true;
                         break;
                     default:
                         break;
@@ -3566,6 +3577,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
     }
 
+    bool normalized = false;
     float weaponDamagePercentMod = 100.0f;
     int32 fixed_bonus = 0;
 
@@ -3651,13 +3663,19 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     }
 
     weaponDamage += spell_bonus;
+    
+    ProcessWeaponDamageSchoolEffects(weaponDamage, totalDamagePercentMod, effIndex);
+    
+    totalDamagePercentMod = totalDamagePercentMod / 100; // adjust to a 100% = 1.0f value
+    m_caster->MeleeDamageBonus(unitTarget, weaponDamage, totalDamagePercentMod, m_attackType, m_spellInfo);
+    totalDamagePercentMod = totalDamagePercentMod * 100; // return to a 100% = 100.0f value
+
     ApplyPct(weaponDamage, totalDamagePercentMod);
 
     // prevent negative damage
     uint32 eff_damage(std::max(weaponDamage, 0));
 
-    // Add melee damage bonuses (also check for negative)
-    eff_damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
+    // adjust for enemy mods
     eff_damage = unitTarget->MeleeDamageBonusTaken(m_caster, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
 
     // Meteor like spells (divided damage to targets)
@@ -6069,7 +6087,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     int32 duration = m_spellInfo->GetDuration();
 
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+        modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
 
     //TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
     Map* map = caster->GetMap();
@@ -6407,4 +6425,161 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex  /*effIndex*/)
     data << uint32(m_caster->GetZoneId());
     data << uint32(MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS); // auto decline after msecs
     player->GetSession()->SendPacket(&data);
+}
+
+void Spell::ProcessWeaponDamageSchoolEffects(int32& damage, float& damageMultiplier, SpellEffIndex effIndex)
+{
+    std::vector<uint32> toRemove;
+    _retainEffectAuras = false;
+
+    // handle SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT dummy effects on the current spell
+    auto thisSpellsMods = m_spellInfo->GetEffects();
+    for (SpellEffectInfo weaponDmgMod : thisSpellsMods)
+    {
+        if (weaponDmgMod.Effect == SPELL_EFFECT_DUMMY && weaponDmgMod.ApplyAuraName == SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT)
+        {
+            (this->*WeaponAndSchoolDamageEffects[weaponDmgMod.MiscValue])
+                (WeaponSchoolDamageEvent(damage, damageMultiplier, weaponDmgMod.CalcValue(), effIndex, false, weaponDmgMod.TriggerSpell, weaponDmgMod.TargetA.GetTarget(), toRemove));
+        }
+    }
+
+    // Handle SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT aura Effects
+    Unit::AuraEffectList weaponDmgMods = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT);
+    for (AuraEffect* weaponDmgMod : weaponDmgMods)
+    {
+        auto index = weaponDmgMod->GetEffIndex();
+
+        if (weaponDmgMod->GetSpellInfo()->CheckFamilyFlagsApply(m_spellInfo->SpellFamilyFlags, index))
+        {
+            auto spellInfo = weaponDmgMod->GetSpellInfo();
+            auto spellEffect = spellInfo->GetEffect((SpellEffIndex)index);
+
+            (this->*WeaponAndSchoolDamageEffects[weaponDmgMod->GetMiscValue()])
+                (WeaponSchoolDamageEvent(damage, damageMultiplier, weaponDmgMod->GetAmount(), effIndex, true, spellEffect.TriggerSpell, spellEffect.TargetA.GetTarget(), toRemove));
+
+            if (weaponDmgMod->GetMiscValueB() == 1)
+                toRemove.push_back(spellInfo->Id);
+        }
+    }
+
+    // remove auras that only apply once
+    if (!_retainEffectAuras)
+        for (uint32 remAura : toRemove)
+            m_caster->RemoveAura(remAura);
+}
+
+void Spell::AddDamagePercent(WeaponSchoolDamageEvent wsdEvent)
+{
+    AddPct(wsdEvent.DamageMultiplier, wsdEvent.Amount);
+}
+
+void Spell::CalcBlockValuePctAsDamage(WeaponSchoolDamageEvent wsdEvent)
+{
+    float pct = wsdEvent.Amount * 0.01;
+
+    uint8 level = m_caster->getLevel();
+    // xinef: shield block should increase the limit
+    float limit = m_caster->HasAura(2565) ? 2.0f : 1.0f;
+    uint32 block_value = m_caster->GetShieldBlockValue(uint32(float(level) * 24.5f * limit), uint32(float(level) * 34.5f * limit));
+
+    wsdEvent.Damage += int32(m_caster->ApplyEffectModifiers(m_spellInfo, wsdEvent.EffIndex, float(block_value)) * pct);
+}
+
+void Spell::CalcArmorValuePctAsDamage(WeaponSchoolDamageEvent wsdEvent)
+{
+    float pct = wsdEvent.Amount * 0.01;
+    wsdEvent.Damage += int32(m_caster->ApplyEffectModifiers(m_spellInfo, wsdEvent.EffIndex, float(m_caster->GetArmor() * pct)));
+}
+
+void Spell::CalcAttackPowerPctAsDamage(WeaponSchoolDamageEvent wsdEvent)
+{
+    float pct = wsdEvent.Amount * 0.01;
+    wsdEvent.Damage += m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * pct;
+}
+
+void Spell::TriggerCastSpell(WeaponSchoolDamageEvent wsdEvent)
+{
+    if (Unit* target = ProcessTarget(wsdEvent.TargetType))
+        m_caster->CastSpell(target, wsdEvent.TriggerSpellId, true);
+}
+
+void Spell::AddDamage(WeaponSchoolDamageEvent wsdEvent)
+{
+    wsdEvent.Damage += wsdEvent.Amount;
+}
+
+void Spell::RetainAuras(WeaponSchoolDamageEvent wsdEvent)
+{
+    _retainEffectAuras = true;
+}
+
+void Spell::ProcessExtraEffects(WeaponSchoolDamageEvent wsdEvent)
+{
+    auto toProcess = sSpellMgr->GetSpellInfo(wsdEvent.TriggerSpellId);
+    bool remove = false;
+
+    for (auto weaponDmgMod : toProcess->GetEffects())
+    {
+        if (!wsdEvent.Aura)
+        {
+            if (weaponDmgMod.Effect == SPELL_EFFECT_DUMMY && weaponDmgMod.ApplyAuraName == SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT)
+                (this->*WeaponAndSchoolDamageEffects[weaponDmgMod.MiscValue])
+                (WeaponSchoolDamageEvent(wsdEvent.Damage, wsdEvent.DamageMultiplier, weaponDmgMod.CalcValue(), wsdEvent.EffIndex, wsdEvent.Aura,
+                    weaponDmgMod.TriggerSpell, weaponDmgMod.TargetA.GetTarget(), wsdEvent.AurasToRemove));
+        }
+        else
+        {
+            if (toProcess->CheckFamilyFlagsApply(m_spellInfo->SpellFamilyFlags, weaponDmgMod.Effect))
+            {
+                (this->*WeaponAndSchoolDamageEffects[weaponDmgMod.MiscValue])
+                    (WeaponSchoolDamageEvent(wsdEvent.Damage, wsdEvent.DamageMultiplier, weaponDmgMod.CalcValue(), wsdEvent.EffIndex, wsdEvent.Aura,
+                        weaponDmgMod.TriggerSpell, weaponDmgMod.TargetA.GetTarget(), wsdEvent.AurasToRemove));
+
+                if (weaponDmgMod.MiscValueB == 1)
+                    remove = true;
+            }
+        }
+    }
+
+    if (remove)
+        wsdEvent.AurasToRemove.push_back(toProcess->Id);
+}
+
+void Spell::AddDamagePerStack(WeaponSchoolDamageEvent wsdEvent)
+{
+    if (Unit* target = ProcessTarget(wsdEvent.TargetType))
+        if (Aura* aur = target->GetAura(wsdEvent.TriggerSpellId))
+            wsdEvent.Damage += aur->GetStackAmount() * wsdEvent.Amount;
+}
+
+void Spell::AddDamagePercentPerStack(WeaponSchoolDamageEvent wsdEvent)
+{
+    if (Unit* target = ProcessTarget(wsdEvent.TargetType))
+        if (Aura* aur = target->GetAura(wsdEvent.TriggerSpellId))
+            AddPct(wsdEvent.DamageMultiplier, aur->GetStackAmount() * wsdEvent.Amount);
+}
+
+void Spell::AddStacksToAura(WeaponSchoolDamageEvent wsdEvent)
+{
+    if (Unit* target = ProcessTarget(wsdEvent.TargetType))
+        if (Aura* aur = target->GetAura(wsdEvent.TriggerSpellId))
+            aur->SetStackAmount(aur->GetStackAmount() + wsdEvent.Amount);
+}
+
+void Spell::AddThornsToDamage(WeaponSchoolDamageEvent wsdEvent)
+{
+    float pct = wsdEvent.Amount * 0.01;
+    wsdEvent.Damage += m_caster->CalculateThorns().TotalDamage * pct;
+}
+
+Unit* Spell::ProcessTarget(int32 targetType)
+{
+    Unit* target;
+
+    if (targetType == 1)
+        target = m_caster;
+    else if (targetType == 6)
+        target = unitTarget;
+
+    return target;
 }

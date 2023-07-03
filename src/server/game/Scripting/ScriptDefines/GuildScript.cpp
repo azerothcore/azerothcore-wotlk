@@ -99,11 +99,11 @@ void ScriptMgr::OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType 
     });
 }
 
-void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
+void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Player* player, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
 {
     ExecuteScript<GuildScript>([&](GuildScript* script)
     {
-        script->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId);
+        script->OnBankEvent(guild, eventType, tabId, player, itemOrMoney, itemStackCount, destTabId);
     });
 }
 

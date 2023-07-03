@@ -143,6 +143,7 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
 
     if (GetPlayer()->m_taxi.SetTaximaskNode(curloc))
     {
+        sScriptMgr->OnNewTaxiNode(GetPlayer(), curloc);
         WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
         SendPacket(&msg);
 
@@ -161,6 +162,7 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
 {
     if (GetPlayer()->m_taxi.SetTaximaskNode(nodeid))
     {
+        sScriptMgr->OnNewTaxiNode(GetPlayer(), nodeid);
         WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
         SendPacket(&msg);
     }

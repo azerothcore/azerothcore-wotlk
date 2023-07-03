@@ -106,6 +106,7 @@ public:
     void UpdateMaxPower(Powers power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateDamagePhysical(WeaponAttackType attType) override;
+    void UpdateThorns();
 
     std::string GetDebugInfo() const override;
 };

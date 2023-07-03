@@ -132,6 +132,7 @@ public:
     int32 CalcMaxDuration(Unit* caster) const;
     int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration, bool withMods = false);    /// @todo - Look to convert to std::chrono
+    void AddDuration(int32 duration, bool capMax = true, bool withMods = false);
     void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
     void RefreshTimersWithMods();
@@ -190,6 +191,7 @@ public:
     bool CheckAreaTarget(Unit* target);
     bool CanStackWith(Aura const* checkAura, bool remove) const;
     bool IsAuraStronger(Aura const* newAura) const;
+    void ProcessTriggerSpellOnStacks(Aura* aurApp, int32 stackCount, int32 triggerSpell, Targets triggerSpellTarget, uint32 amplitude, Unit* caster, AuraEffect* const triggeringEffect);
 
     // Proc system
     // this subsystem is not yet in use - the core of it is functional, but still some research has to be done
@@ -211,6 +213,8 @@ public:
     void CallScriptAfterDispel(DispelInfo* dispelInfo);
     bool CallScriptEffectApplyHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
     bool CallScriptEffectRemoveHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
+    bool CallScriptAuraApplyHandlers(AuraApplication const* aurApp);
+    bool CallScriptAuraRemoveHandlers(AuraApplication const* aurApp);
     void CallScriptAfterEffectApplyHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
     void CallScriptAfterEffectRemoveHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
     bool CallScriptEffectPeriodicHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp);
