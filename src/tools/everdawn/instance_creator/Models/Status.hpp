@@ -24,7 +24,6 @@ namespace everdawn
         const char* message;
     };
 
-
     class StatusChangeEvent;
     wxDECLARE_EVENT(STATUS_EVENT_TYPE, StatusChangeEvent);
 
