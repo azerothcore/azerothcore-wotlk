@@ -1079,8 +1079,8 @@ public:                                                 // opcodes handlers
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-    uint32 _lastAuctionListItemsMSTime;
-    uint32 _lastAuctionListOwnerItemsMSTime;
+    Milliseconds _lastAuctionListItemsMSTime;
+    Milliseconds _lastAuctionListOwnerItemsMSTime;
 
     void HandleTeleportTimeout(bool updateInSessions);
     bool HandleSocketClosed();

@@ -2086,7 +2086,7 @@ public:
     ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
-    void RewardReputation(Unit* victim, float rate);
+    void RewardReputation(Unit* victim);
     void RewardReputation(Quest const* quest);
 
     float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);
