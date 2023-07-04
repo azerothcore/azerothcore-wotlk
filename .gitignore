@@ -100,3 +100,4 @@ local.properties
 # ==================
 
 !conf/config.cmake
+.vs

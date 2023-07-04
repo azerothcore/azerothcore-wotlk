@@ -24,7 +24,6 @@ namespace everdawn
         const char* message;
     };
 
-
     class StatusChangeEvent;
     wxDECLARE_EVENT(STATUS_EVENT_TYPE, StatusChangeEvent);
 
@@ -40,10 +39,10 @@ namespace everdawn
 
     typedef void (wxEvtHandler::* StatusChangeEventFunction)(StatusChangeEvent&);
 
-#define StatusChangeEventHandler(func) wxEVENT_HANDLER_CAST(StatusChangeEventFunction, func)                    
+#define StatusChangeEventHandler(func) wxEVENT_HANDLER_CAST(StatusChangeEventFunction, func)
 
 #define EVT_STATUS_CHANGE(id, func) \
- 	wx__DECLARE_EVT1(STATUS_EVENT_TYPE, id, StatusChangeEventHandler(func))
+     wx__DECLARE_EVT1(STATUS_EVENT_TYPE, id, StatusChangeEventHandler(func))
 
 } // namespace everdawn
 

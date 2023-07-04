@@ -34,7 +34,6 @@ namespace everdawn
             }
         };
 
-
         explicit Observable(Type object = Type())
             : object(object)
         {
