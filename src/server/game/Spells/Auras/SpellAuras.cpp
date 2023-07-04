@@ -2037,6 +2037,9 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
     // Can stack with self
     if (this == existingAura)
         return true;
+    // Explosive Shot Rank 1-4
+    if (m_spellInfo->Id == 45529 || m_spellInfo->Id == 60051 || m_spellInfo->Id == 60052 || m_spellInfo->Id == 60053)
+        return true;
 
     SpellInfo const* existingSpellInfo = existingAura->GetSpellInfo();
     bool sameCaster = GetCasterGUID() == existingAura->GetCasterGUID();
