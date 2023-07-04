@@ -26,7 +26,7 @@ add_subdirectory(stdfs)
 add_subdirectory(threads)
 add_subdirectory(utf8cpp)
 
-if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")) OR BUILD_TOOLS_DB_IMPORT)
+if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")) OR BUILD_TOOLS_DB_IMPORT OR BUILD_TOOLS_EVERDAWN)
   add_subdirectory(mysql)
 endif()
 
@@ -45,4 +45,8 @@ endif()
 if (BUILD_TOOLS_MAPS)
   add_subdirectory(bzip2)
   add_subdirectory(libmpq)
+endif()
+
+if(BUILD_TOOLS_EVERDAWN)
+  add_subdirectory(wxWidgets)
 endif()

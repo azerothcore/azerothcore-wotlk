@@ -30,6 +30,10 @@ if (TOOLS_BUILD MATCHES "-only")
   if (TOOLS_BUILD STREQUAL "db-only")
     list(APPEND BUILD_TOOLS_WHITELIST dbimport)
   endif()
+
+  if(TOOLS_BUILD STREQUAL "everdawn-only")
+    list(APPEND BUILD_TOOLS_WHITELIST everdawn)
+   endif()
 endif()
 
 # Set the TOOL_${TOOL_BUILD_NAME} variables from the
@@ -95,6 +99,14 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     continue()
   endif()
 
+  GetProjectNameOfToolName(${TOOL_NAME} TOOL_PROJECT_NAME)
+
+  if (${TOOL_PROJECT_NAME} MATCHES "everdawn")
+    message("Generating projects for ${TOOL_PROJECT_NAME} tools, check src/tools/everdawn/CMakeList.txt and src/cmake/macros/ConfigureEverdawnTools.cmake for details.")
+    add_subdirectory(${TOOL_PROJECT_NAME})
+    continue()
+  endif()
+
   unset(TOOL_PRIVATE_SOURCES)
   CollectSourceFiles(
     ${SOURCE_TOOL_PATH}
@@ -104,8 +116,7 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     list(APPEND TOOL_PRIVATE_SOURCES ${winDebugging})
   endif()
 
-  GetProjectNameOfToolName(${TOOL_NAME} TOOL_PROJECT_NAME)
-
+  message("Generating project for tool ${TOOL_PROJECT_NAME}")
   # Create the application project
   add_executable(${TOOL_PROJECT_NAME}
     ${TOOL_PRIVATE_SOURCES})
@@ -160,10 +171,11 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     PROPERTIES
       FOLDER
         "tools")
-
+ 
   if (UNIX)
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION bin)
   elseif (WIN32)
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
+  
 endforeach()

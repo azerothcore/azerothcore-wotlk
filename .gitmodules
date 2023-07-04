@@ -1,6 +1,3 @@
-[submodule "deps/git-subrepo"]
-	path = deps/git-subrepo
-	url = https://github.com/ingydotnet/git-subrepo.git
-[submodule "modules/BreakingNewsOverride"]
-	path = modules/BreakingNewsOverride
-	url = https://github.com/AnchyDev/BreakingNewsOverride
+[submodule "modules/mod-weekendbonus"]
+	path = modules/mod-weekendbonus
+	url = https://github.com/noisiver/mod-weekendbonus.git

@@ -727,7 +727,7 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
 bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
         std::wstring const& wsearchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-        uint32& count, uint32& totalcount, uint8 /*getAll*/, AuctionSortOrderVector const& sortOrder)
+        uint32& count, uint32& totalcount, uint8 /*getAll*/, AuctionSortOrderVector const& sortOrder, Milliseconds searchTimeout)
 {
     uint32 itrcounter = 0;
 
@@ -754,14 +754,11 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
         for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
         {
-            if (!AsyncAuctionListingMgr::IsAuctionListingAllowed())                                                    // pussywizard: World::Update is waiting for us...
+            if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
             {
-                if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
+                if (GetMSTimeDiff(GameTime::GetGameTimeMS(), GetTimeMS()) >= searchTimeout) // pussywizard: stop immediately if diff is high or waiting too long
                 {
-                    if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || GetMSTimeDiff(GameTime::GetGameTimeMS(), GetTimeMS()) >= 10ms) // pussywizard: stop immediately if diff is high or waiting too long
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
