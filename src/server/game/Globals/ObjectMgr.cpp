@@ -398,7 +398,7 @@ ObjectMgr::~ObjectMgr()
     for (CacheVendorItemContainer::iterator itr = _cacheVendorItemStore.begin(); itr != _cacheVendorItemStore.end(); ++itr)
         itr->second.Clear();
 
-     _cacheTrainerSpellStore.clear();
+    _cacheTrainerSpellStore.clear();
 
     for (DungeonEncounterContainer::iterator itr = _dungeonEncounterStore.begin(); itr != _dungeonEncounterStore.end(); ++itr)
         for (DungeonEncounterList::iterator encounterItr = itr->second.begin(); encounterItr != itr->second.end(); ++encounterItr)
@@ -729,7 +729,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.Movement.Rooted = fields[55].Get<bool>();
     if (!fields[56].IsNull())
     {
-        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[52].Get<uint8>());
+        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[55].Get<uint8>());
     }
     if (!fields[57].IsNull())
     {

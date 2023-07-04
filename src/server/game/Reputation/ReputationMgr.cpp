@@ -246,8 +246,7 @@ void ReputationMgr::SendInitialReputations()
 void ReputationMgr::SendStates()
 {
     for (FactionStateList::iterator itr = _factions.begin(); itr != _factions.end(); ++itr)
-        if(itr->second.needSend)
-            SendState(&(itr->second));
+        SendState(&(itr->second));
 }
 
 void ReputationMgr::SendVisible(FactionState const* faction) const

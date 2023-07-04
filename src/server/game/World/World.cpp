@@ -1937,7 +1937,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadGossipMenu();
 
     LOG_INFO("server.loading", "Loading Gossip Menu Options...");
-    sObjectMgr->LoadGossipMenuItems(); // must be after LoadTrainers
+    sObjectMgr->LoadGossipMenuItems();
 
     LOG_INFO("server.loading", "Loading Vendors...");
     sObjectMgr->LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate

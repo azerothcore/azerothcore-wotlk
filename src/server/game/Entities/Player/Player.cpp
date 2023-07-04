@@ -559,7 +559,9 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
 
     // set starting level
-    uint32 start_level = sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL);
+    uint32 start_level = getClass() != CLASS_DEATH_KNIGHT
+                         ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
+                         : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
     if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
     {
@@ -3311,10 +3313,10 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
 
         // add spell charges for this spell when learned
         auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
-
-        for (auto eff : spellInfo->GetEffects())
-            if (eff.ApplyAuraName == SPELL_AURA_MOD_SPELL_CHARGES)
-                AddNewSpellCharges(eff, spellInfo->SpellFamilyFlags);
+        if (spellInfo)
+            for (auto eff : spellInfo->GetEffects())
+                if (eff.ApplyAuraName == SPELL_AURA_MOD_SPELL_CHARGES)
+                    AddNewSpellCharges(eff, spellInfo->SpellFamilyFlags);
     }
 
     // pussywizard: rank stuff at the end!
@@ -13614,8 +13616,6 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     uint32 fieldIndexOffset = title->bit_index / 32;
     uint32 flag = 1 << (title->bit_index % 32);
 
-    sScriptMgr->OnNewTitle(this, title->bit_index, lost);
-
     if (lost)
     {
         if (!HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag))
@@ -15892,7 +15892,6 @@ bool Player::AddItem(uint32 itemId, uint32 count)
     else
         return false;
 
-    sScriptMgr->OnAddItem(this, itemId, count);
     return true;
 }
 

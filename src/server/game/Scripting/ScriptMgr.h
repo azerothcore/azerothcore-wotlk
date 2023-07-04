@@ -1088,10 +1088,6 @@ public:
     // Called when a player logs out.
     virtual void OnLogout(Player* /*player*/) { }
 
-    virtual void OnNewTaxiNode(Player* /*player*/, uint32 nodeid) { }
-
-    virtual void OnNewTitle(Player* /*player*/, uint32 title, bool lost) { }
-
     // Called when a player is created.
     virtual void OnCreate(Player* /*player*/) { }
 
@@ -1164,8 +1160,6 @@ public:
     // After an item has been moved from inventory
     virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
-    virtual void OnAfterPlayerDestroyItem(Player* player, Item* it, uint8 bag, uint8 slot) {}
-
     // After an item has been equipped
     virtual void OnEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
@@ -1184,9 +1178,6 @@ public:
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
     virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
-    //called after player.additem is called. DO NOT CREATE LOOPS WITH THIS.
-    virtual void OnAddItem(Player* /*player*/, uint32 /*item*/, uint32 /*count*/) { }
-
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
@@ -1201,8 +1192,6 @@ public:
 
     // After receiving item as a quest reward
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
-
-    virtual bool CanAddQuest(Player* player) { return true; }
 
     // When placing a bid or buying out an auction
     [[nodiscard]] virtual bool CanPlaceAuctionBid(Player* /*player*/, AuctionEntry* /*auction*/) { return true; }
@@ -1589,7 +1578,7 @@ public:
 
     virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, ObjectGuid::LowType /*playerGuid1*/, ObjectGuid::LowType /*playerGuid2*/, uint8 /*newRank*/) { }
 
-    virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, Player* /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
+    virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, ObjectGuid::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
 
     [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, WorldSession* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
 };
@@ -2346,7 +2335,6 @@ public: /* PlayerScript */
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
     void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item* item);
     void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-    void OnAfterPlayerDestroyItem(Player* player, Item* it, uint8 bag, uint8 slot);
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
@@ -2354,12 +2342,10 @@ public: /* PlayerScript */
     void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
-    void OnAddItem(Player* player, uint32 item, uint32 count);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
     void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
-    bool CanAddQuest(Player* player);
     bool CanPlaceAuctionBid(Player* player, AuctionEntry* auction);
     void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
     bool OnBeforeOpenItem(Player* player, Item* item);
@@ -2390,7 +2376,6 @@ public: /* PlayerScript */
     bool CanGroupAccept(Player* player, Group* group);
     bool CanSellItem(Player* player, Item* item, Creature* creature);
     bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
-    void OnReceiveItemFromMail(Player* player, Player* sender, Item* item);
     void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
@@ -2447,8 +2432,6 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
-    void OnNewTaxiNode(Player* player, uint32 nodeid);
-    void OnNewTitle(Player* player, uint32 title, bool lost);
     bool CanSendErrorAlreadyLooted(Player* player);
     void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
@@ -2485,7 +2468,7 @@ public: /* GuildScript */
     void OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
                          bool isDestBank, uint8 destContainer, uint8 destSlotId);
     void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
-    void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Player* player, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
+    void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
     bool CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots);
 
 public: /* GroupScript */

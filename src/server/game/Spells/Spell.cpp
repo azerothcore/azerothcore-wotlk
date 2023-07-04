@@ -4905,86 +4905,86 @@ void Spell::SendSpellGo()
 
 void Spell::WriteAmmoToPacket(WorldPacket* data)
 {
-    // uint32 ammoInventoryType = 0;
-    // uint32 ammoDisplayID = 0;
+    uint32 ammoInventoryType = 0;
+    uint32 ammoDisplayID = 0;
 
-    // if (m_caster->GetTypeId() == TYPEID_PLAYER)
-    // {
-    //     Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
-    //     if (pItem)
-    //     {
-    //         ammoInventoryType = pItem->GetTemplate()->InventoryType;
-    //         if (ammoInventoryType == INVTYPE_THROWN)
-    //             ammoDisplayID = pItem->GetTemplate()->DisplayInfoID;
-    //         else
-    //         {
-    //             uint32 ammoID = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID);
-    //             if (ammoID)
-    //             {
-    //                 ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(ammoID);
-    //                 if (pProto)
-    //                 {
-    //                     ammoDisplayID = pProto->DisplayInfoID;
-    //                     ammoInventoryType = pProto->InventoryType;
-    //                 }
-    //             }
-    //             else if (m_caster->HasAura(46699))      // Requires No Ammo
-    //             {
-    //                 ammoDisplayID = 5996;                   // normal arrow
-    //                 ammoInventoryType = INVTYPE_AMMO;
-    //             }
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     uint32 nonRangedAmmoDisplayID = 0;
-    //     uint32 nonRangedAmmoInventoryType = 0;
-    //     for (uint8 i = 0; i < 3; ++i)
-    //     {
-    //         if (uint32 item_id = m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i))
-    //         {
-    //             if (ItemEntry const* itemEntry = sItemStore.LookupEntry(item_id))
-    //             {
-    //                 if (itemEntry->ClassID == ITEM_CLASS_WEAPON)
-    //                 {
-    //                     switch (itemEntry->SubclassID)
-    //                     {
-    //                         case ITEM_SUBCLASS_WEAPON_THROWN:
-    //                             ammoDisplayID = itemEntry->DisplayInfoID;
-    //                             ammoInventoryType = itemEntry->InventoryType;
-    //                             break;
-    //                         case ITEM_SUBCLASS_WEAPON_BOW:
-    //                         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-    //                             ammoDisplayID = 5996;       // is this need fixing?
-    //                             ammoInventoryType = INVTYPE_AMMO;
-    //                             break;
-    //                         case ITEM_SUBCLASS_WEAPON_GUN:
-    //                             ammoDisplayID = 5998;       // is this need fixing?
-    //                             ammoInventoryType = INVTYPE_AMMO;
-    //                             break;
-    //                         default:
-    //                             nonRangedAmmoDisplayID = itemEntry->DisplayInfoID;
-    //                             nonRangedAmmoInventoryType = itemEntry->InventoryType;
-    //                             break;
-    //                     }
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
+        if (pItem)
+        {
+            ammoInventoryType = pItem->GetTemplate()->InventoryType;
+            if (ammoInventoryType == INVTYPE_THROWN)
+                ammoDisplayID = pItem->GetTemplate()->DisplayInfoID;
+            else
+            {
+                uint32 ammoID = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID);
+                if (ammoID)
+                {
+                    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(ammoID);
+                    if (pProto)
+                    {
+                        ammoDisplayID = pProto->DisplayInfoID;
+                        ammoInventoryType = pProto->InventoryType;
+                    }
+                }
+                else if (m_caster->HasAura(46699))      // Requires No Ammo
+                {
+                    ammoDisplayID = 5996;                   // normal arrow
+                    ammoInventoryType = INVTYPE_AMMO;
+                }
+            }
+        }
+    }
+    else
+    {
+        uint32 nonRangedAmmoDisplayID = 0;
+        uint32 nonRangedAmmoInventoryType = 0;
+        for (uint8 i = 0; i < 3; ++i)
+        {
+            if (uint32 item_id = m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i))
+            {
+                if (ItemEntry const* itemEntry = sItemStore.LookupEntry(item_id))
+                {
+                    if (itemEntry->ClassID == ITEM_CLASS_WEAPON)
+                    {
+                        switch (itemEntry->SubclassID)
+                        {
+                            case ITEM_SUBCLASS_WEAPON_THROWN:
+                                ammoDisplayID = itemEntry->DisplayInfoID;
+                                ammoInventoryType = itemEntry->InventoryType;
+                                break;
+                            case ITEM_SUBCLASS_WEAPON_BOW:
+                            case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+                                ammoDisplayID = 5996;       // is this need fixing?
+                                ammoInventoryType = INVTYPE_AMMO;
+                                break;
+                            case ITEM_SUBCLASS_WEAPON_GUN:
+                                ammoDisplayID = 5998;       // is this need fixing?
+                                ammoInventoryType = INVTYPE_AMMO;
+                                break;
+                            default:
+                                nonRangedAmmoDisplayID = itemEntry->DisplayInfoID;
+                                nonRangedAmmoInventoryType = itemEntry->InventoryType;
+                                break;
+                        }
 
-    //                     if (ammoDisplayID)
-    //                         break;
-    //                 }
-    //             }
-    //         }
-    //     }
+                        if (ammoDisplayID)
+                            break;
+                    }
+                }
+            }
+        }
 
-    //     if (!ammoDisplayID && !ammoInventoryType)
-    //     {
-    //         ammoDisplayID = nonRangedAmmoDisplayID;
-    //         ammoInventoryType = nonRangedAmmoInventoryType;
-    //     }
-    // }
+        if (!ammoDisplayID && !ammoInventoryType)
+        {
+            ammoDisplayID = nonRangedAmmoDisplayID;
+            ammoInventoryType = nonRangedAmmoInventoryType;
+        }
+    }
 
-    // *data << uint32(ammoDisplayID);
-    // *data << uint32(ammoInventoryType);
+    *data << uint32(ammoDisplayID);
+    *data << uint32(ammoInventoryType);
 }
 
 /// Writes miss and hit targets for a SMSG_SPELL_GO packet
@@ -5372,6 +5372,7 @@ void Spell::TakePower()
 
 void Spell::TakeAmmo()
 {
+    return;
     // if (m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
     // {
     //     Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
@@ -7655,11 +7656,11 @@ SpellCastResult Spell::CheckItems()
                     switch (pItem->GetTemplate()->SubClass)
                     {
                         case ITEM_SUBCLASS_WEAPON_THROWN:
-                            {
-                                // uint32 ammo = pItem->GetEntry();
-                                // if (!m_caster->ToPlayer()->HasItemCount(ammo))
-                                //     return SPELL_FAILED_NO_AMMO;
-                            };
+                            // {
+                            //         uint32 ammo = pItem->GetEntry();
+                            //     if (!m_caster->ToPlayer()->HasItemCount(ammo))
+                            //         return SPELL_FAILED_NO_AMMO;
+                            // };
                             break;
                         case ITEM_SUBCLASS_WEAPON_GUN:
                         case ITEM_SUBCLASS_WEAPON_BOW:
@@ -8263,7 +8264,7 @@ void Spell::HandleLaunchPhase()
         if (m_applyMultiplierMask & (1 << i))
             multiplier[i] = m_spellInfo->Effects[i].CalcDamageMultiplier(m_originalCaster, this);
 
-    // bool usesAmmo = m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DIRECT_DAMAGE);
+    bool usesAmmo = false; // m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DIRECT_DAMAGE);
     // Unit::AuraEffectList const& Auras = m_caster->GetAuraEffectsByType(SPELL_AURA_ABILITY_CONSUME_NO_AMMO);
     // for (Unit::AuraEffectList::const_iterator j = Auras.begin(); j != Auras.end(); ++j)
     // {
@@ -8285,27 +8286,27 @@ void Spell::HandleLaunchPhase()
         // if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->IsTargetingArea())
         //     usesAmmo = false;
 
-        // if (usesAmmo)
-        // {
-        //     bool ammoTaken = false;
-        //     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-        //     {
-        //         if (!(mask & 1 << i))
-        //             continue;
-        //         switch (m_spellInfo->Effects[i].Effect)
-        //         {
-        //             case SPELL_EFFECT_SCHOOL_DAMAGE:
-        //             case SPELL_EFFECT_WEAPON_DAMAGE:
-        //             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-        //             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-        //             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-        //                 ammoTaken = true;
-        //                 TakeAmmo();
-        //         }
-        //         if (ammoTaken)
-        //             break;
-        //     }
-        // }
+        if (usesAmmo)
+        {
+            bool ammoTaken = false;
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            {
+                if (!(mask & 1 << i))
+                    continue;
+                switch (m_spellInfo->Effects[i].Effect)
+                {
+                    case SPELL_EFFECT_SCHOOL_DAMAGE:
+                    case SPELL_EFFECT_WEAPON_DAMAGE:
+                    case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+                    case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                    case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+                        ammoTaken = true;
+                        TakeAmmo();
+                }
+                if (ammoTaken)
+                    break;
+            }
+        }
 
         DoAllEffectOnLaunchTarget(target, multiplier);
     }

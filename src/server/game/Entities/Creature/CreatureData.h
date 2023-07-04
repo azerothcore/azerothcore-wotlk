@@ -525,7 +525,6 @@ struct TrainerSpellData
     [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
 };
 
-
 struct CreatureSpellCooldown
 {
     CreatureSpellCooldown()  = default;

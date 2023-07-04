@@ -234,7 +234,7 @@ public:
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(CharacterDatabaseTransaction trans);
     virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(CharacterDatabaseTransaction trans, Player* player, ObjectGuid::LowType itemGuid);
+    static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
     static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void DeleteFromInventoryDB(CharacterDatabaseTransaction trans);

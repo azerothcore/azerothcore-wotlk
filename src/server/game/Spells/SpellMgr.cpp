@@ -3403,7 +3403,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 32594: // Earth Shield aura
             case 49283: // Earth Shield aura
             case 49284: // Earth Shield aura
-            case 1150002: // Wandering Plague
+            case 50526: // Wandering Plague
             case 53353: // Chimera Shot - Serpent trigger
             case 52752: // Ancestral Awakening Heal
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;

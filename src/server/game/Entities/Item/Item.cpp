@@ -517,7 +517,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 }
 
 /*static*/
-void Item::DeleteFromDB(CharacterDatabaseTransaction trans, Player* player, ObjectGuid::LowType itemGuid)
+void Item::DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     sScriptMgr->OnGlobalItemDelFromDB(trans, itemGuid);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
@@ -527,7 +527,7 @@ void Item::DeleteFromDB(CharacterDatabaseTransaction trans, Player* player, Obje
 
 void Item::DeleteFromDB(CharacterDatabaseTransaction trans)
 {
-    DeleteFromDB(trans, GetOwner(), GetGUID().GetCounter());
+    DeleteFromDB(trans, GetGUID().GetCounter());
 }
 
 /*static*/

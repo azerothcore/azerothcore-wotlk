@@ -224,7 +224,6 @@ public:
     [[nodiscard]] bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
     [[nodiscard]] bool HaveQuestLootFor(uint32 loot_id) const;
     bool HaveQuestLootForPlayer(uint32 loot_id, Player const* player) const;
-    LootTemplateMap GetLootTemplateMap() { return m_LootTemplates; }
 
     [[nodiscard]] LootTemplate const* GetLootFor(uint32 loot_id) const;
     [[nodiscard]] LootTemplate* GetLootForConditionFill(uint32 loot_id) const;
@@ -244,9 +243,9 @@ private:
 
 class LootTemplate
 {
-public:
     class LootGroup;                                       // A set of loot definitions for items (refs are not allowed inside)
     typedef std::vector<LootGroup*> LootGroups;
+public:
     LootTemplate() = default;
     ~LootTemplate();
 
@@ -266,13 +265,11 @@ public:
     void Verify(LootStore const& store, uint32 Id) const;
     void CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const;
     bool addConditionItem(Condition* cond);
-    LootStoreItemList* GetItemList() { return &Entries; }
-    LootGroups* GetItemGroups() { return &Groups; }
-    LootStoreItemList Entries;                          // not grouped only
-    LootGroups        Groups;                           // groups have own (optimised) processing, grouped entries go there
     [[nodiscard]] bool isReference(uint32 id) const;
 
 private:
+    LootStoreItemList Entries;                          // not grouped only
+    LootGroups        Groups;                           // groups have own (optimised) processing, grouped entries go there
 
     // Objects of this class must never be copied, we are storing pointers in container
     LootTemplate(LootTemplate const&);
