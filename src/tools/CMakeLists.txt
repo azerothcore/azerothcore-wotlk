@@ -171,11 +171,11 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     PROPERTIES
       FOLDER
         "tools")
- 
+
   if (UNIX)
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION bin)
   elseif (WIN32)
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
-  
+
 endforeach()

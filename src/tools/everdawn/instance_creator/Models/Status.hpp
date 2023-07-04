@@ -40,7 +40,7 @@ namespace everdawn
 
     typedef void (wxEvtHandler::* StatusChangeEventFunction)(StatusChangeEvent&);
 
-#define StatusChangeEventHandler(func) wxEVENT_HANDLER_CAST(StatusChangeEventFunction, func)                    
+#define StatusChangeEventHandler(func) wxEVENT_HANDLER_CAST(StatusChangeEventFunction, func)
 
 #define EVT_STATUS_CHANGE(id, func) \
      wx__DECLARE_EVT1(STATUS_EVENT_TYPE, id, StatusChangeEventHandler(func))
