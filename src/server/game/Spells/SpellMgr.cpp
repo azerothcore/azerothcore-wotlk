@@ -606,9 +606,9 @@ uint32 SpellMgr::GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict) con
     return spell_id;
 }
 
-Acore::IteratorPair<SpellRequiredMap::const_iterator> SpellMgr::GetSpellsRequiredForSpellBounds(uint32 spell_id) const
+SpellRequiredMapBounds SpellMgr::GetSpellsRequiredForSpellBounds(uint32 spell_id) const
 {
-    return Acore::Containers::MapEqualRange(mSpellReq, spell_id);
+    return mSpellReq.equal_range(spell_id);
 }
 
 SpellsRequiringSpellMapBounds SpellMgr::GetSpellsRequiringSpellBounds(uint32 spell_id) const

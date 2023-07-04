@@ -29,6 +29,5 @@
 #include "MiscPackets.h"
 #include "TotemPackets.h"
 #include "WorldStatePackets.h"
-#include "NPCPackets.h"
 
 #endif // AllPackets_h__

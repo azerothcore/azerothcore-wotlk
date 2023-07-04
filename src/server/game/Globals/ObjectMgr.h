@@ -35,7 +35,6 @@
 #include "ObjectDefines.h"
 #include "QuestDef.h"
 #include "TemporarySummon.h"
-#include "Trainer.h"
 #include "VehicleDefines.h"
 #include "GossipDef.h"
 #include <functional>
@@ -670,7 +669,7 @@ typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
 typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingContainer;
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
-//typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
+typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 typedef std::vector<uint32> CreatureCustomIDsContainer;
@@ -1098,8 +1097,8 @@ public:
     void LoadGossipMenuItems();
 
     void LoadVendors();
-    void LoadTrainers();
-    void LoadCreatureDefaultTrainers();
+    void LoadTrainerSpell();
+    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
     std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
@@ -1362,7 +1361,14 @@ public:
     bool AddGameTele(GameTele& data);
     bool DeleteGameTele(std::string_view name);
 
-    Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
+    [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
+    {
+        CacheTrainerSpellContainer::const_iterator  iter = _cacheTrainerSpellStore.find(entry);
+        if (iter == _cacheTrainerSpellStore.end())
+            return nullptr;
+
+        return &iter->second;
+    }
 
     [[nodiscard]] VendorItemData const* GetNpcVendorItemList(uint32 entry) const
     {
@@ -1606,8 +1612,7 @@ private:
     QuestGreetingLocaleContainer _questGreetingLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
-    std::unordered_map<uint32, Trainer::Trainer> _trainers;
-    std::unordered_map<uint32, uint32> _creatureDefaultTrainers;
+    CacheTrainerSpellContainer _cacheTrainerSpellStore;
 
     ServerMailContainer _serverMailStore;
 

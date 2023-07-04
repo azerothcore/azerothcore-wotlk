@@ -69,7 +69,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
         return;
     }
 
-     if (!unit->CanResetTalents(_player))
+     if (!unit->isCanTrainingAndResetTalentsOf(_player))
         return;
 
     // remove fake death

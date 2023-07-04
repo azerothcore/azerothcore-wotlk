@@ -526,7 +526,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
+                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             //Learn Alchemy
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -719,7 +719,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
+                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             //Learn Armor/Weapon
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1031,7 +1031,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
+                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             case GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE:
                 AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, DoMedUnlearnCost(player));
@@ -1133,7 +1133,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
+                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             //Learn Tailor
             case GOSSIP_ACTION_INFO_DEF + 1:

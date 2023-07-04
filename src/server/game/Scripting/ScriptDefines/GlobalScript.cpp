@@ -20,14 +20,14 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, Player* player, ObjectGuid::LowType itemGuid)
+void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     ASSERT(trans);
     ASSERT(itemGuid);
 
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {
-        script->OnItemDelFromDB(trans, player, itemGuid);
+        script->OnItemDelFromDB(trans, itemGuid);
     });
 }
 

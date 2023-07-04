@@ -643,7 +643,6 @@ bool ScriptMgr::CanAddQuest(Player* player)
     return true;
 }
 
-
 bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript *script)

@@ -93,7 +93,7 @@ public:
 
     ///// @todo RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
-    bool CanResetTalents(Player* player) const;
+    bool isCanTrainingAndResetTalentsOf(Player* player) const;
     [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
     void LoadSpellTemplateImmunity();
@@ -192,6 +192,8 @@ public:
     [[nodiscard]] VendorItemData const* GetVendorItems() const;
     uint32 GetVendorItemCurrentCount(VendorItem const* vItem);
     uint32 UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 used_count);
+
+    [[nodiscard]] TrainerSpellData const* GetTrainerSpells() const;
 
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }

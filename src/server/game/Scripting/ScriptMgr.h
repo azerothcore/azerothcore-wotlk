@@ -1630,7 +1630,7 @@ protected:
 
 public:
     // items
-    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, Player* player, ObjectGuid::LowType /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(Item const* /*item*/, uint32& /*display*/) { }
 
     // loot
@@ -2498,7 +2498,7 @@ public: /* GroupScript */
     void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, Player* player, ObjectGuid::LowType itemGuid);
+    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);

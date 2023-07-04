@@ -76,7 +76,6 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "TicketMgr.h"
-#include "Trainer.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -2160,6 +2159,11 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     if (!creature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return nullptr;
 
+    // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
+    // pussywizard: this function is not used when talking, but when already taking action (buy spell, reset talents, show spell list)
+    if (npcflagmask & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS) && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS && getClass() != creature->GetCreatureTemplate()->trainer_class)
+        return nullptr;
+
     return creature;
 }
 
@@ -2853,53 +2857,6 @@ void Player::SendInitialSpells()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUnlearnSpells()
-{
-    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
-
-    uint32 spellCount = 0;
-    size_t countPos   = data.wpos();
-    data << uint32(spellCount); // spell count placeholder
-
-    for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
-    {
-        if (itr->second->State == PLAYERSPELL_REMOVED)
-            continue;
-
-        if (itr->second->Active)
-            continue;
-
-        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr->first);
-        if (skillLineAbilities.first == skillLineAbilities.second)
-            continue;
-
-        bool hasSupercededSpellInfoInClient = false;
-        for (auto boundsItr = skillLineAbilities.first; boundsItr != skillLineAbilities.second; ++boundsItr)
-        {
-            if (boundsItr->second->SupercededBySpell)
-            {
-                hasSupercededSpellInfoInClient = true;
-                break;
-            }
-        }
-
-        if (hasSupercededSpellInfoInClient)
-            continue;
-
-        uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr->first);
-        if (!nextRank || !HasSpell(nextRank))
-            continue;
-
-        data << uint32(itr->first);
-
-        ++spellCount;
-    }
-
-    data.put<uint32>(countPos, spellCount); // write real count value
-
-    SendDirectMessage(&data);
-}
-
 void Player::RemoveMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
@@ -3079,31 +3036,6 @@ void Player::_addTalentAurasAndSpells(uint32 spellId)
     }
 }
 
-static bool IsUnlearnSpellsPacketNeededForSpell(uint32 spellId)
-{
-    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
-    if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())
-    {
-        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
-        if (skillLineAbilities.first != skillLineAbilities.second)
-        {
-            bool hasSupercededSpellInfoInClient = false;
-            for (auto boundsItr = skillLineAbilities.first; boundsItr != skillLineAbilities.second; ++boundsItr)
-            {
-                if (boundsItr->second->SupercededBySpell)
-                {
-                    hasSupercededSpellInfoInClient = true;
-                    break;
-                }
-            }
-
-            return !hasSupercededSpellInfoInClient;
-        }
-    }
-
-    return false;
-}
-
 void Player::SendLearnPacket(uint32 spellId, bool learn)
 {
     if (learn)
@@ -3131,7 +3063,6 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId); // must exist, checked in _addSpell
 
-    bool needsUnlearnSpellsPacket = false;
     // pussywizard: now update active state for all ranks of this spell! and send packet to swap on action bar
     // pussywizard: assumption - it's in all specs, can't be a talent
     if (!spellInfo->IsStackableWithRanks() && spellInfo->IsRanked())
@@ -3145,12 +3076,12 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                 if (nextSpellInfo->GetRank() < spellInfo->GetRank())
                 {
                     itr->second->Active = false;
-                    if (itr->second->State != PLAYERSPELL_NEW)
-                            itr->second->State = PLAYERSPELL_CHANGED;
                     if (IsInWorld())
                     {
-                        SendSupercededSpell(nextSpellInfo->Id, spellInfo->Id);
-                        needsUnlearnSpellsPacket = needsUnlearnSpellsPacket || IsUnlearnSpellsPacketNeededForSpell(itr->first);
+                        WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                        data << uint32(nextSpellInfo->Id);
+                        data << uint32(spellInfo->Id);
+                        GetSession()->SendPacket(&data);
                     }
                     return false;
                 }
@@ -3159,20 +3090,12 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     PlayerSpellMap::iterator itr2 = m_spells.find(spellInfo->Id);
                     if (itr2 != m_spells.end())
                         itr2->second->Active = false;
-
-                    if (IsInWorld())
-                    {
-                        SendSupercededSpell(spellInfo->Id, nextSpellInfo->Id);
-                        needsUnlearnSpellsPacket = needsUnlearnSpellsPacket || IsUnlearnSpellsPacketNeededForSpell(itr2->first);
-                    }
                     return false;
                 }
             }
             nextSpellInfo = nextSpellInfo->GetNextRankSpell();
         }
     }
-    if (needsUnlearnSpellsPacket)
-        SendUnlearnSpells();
 
     return true;
 }
@@ -3366,7 +3289,7 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
-void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFromSkill /*= false*/, bool sendPlayerUpdate)
+void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
@@ -3383,10 +3306,10 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
 
         // pussywizard: a system message "you have learnt spell X (rank Y)"
-        if (IsInWorld() && sendPlayerUpdate)
+        if (IsInWorld())
             SendLearnPacket(spellId, true);
 
-         // add spell charges for this spell when learned
+        // add spell charges for this spell when learned
         auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
         for (auto eff : spellInfo->GetEffects())
@@ -3414,7 +3337,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     }
 }
 
-void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary, bool sendPlayerUpdate)
+void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -3432,7 +3355,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     // pussywizard: do this at the beginning, not in the middle of removing!
     if (uint32 nextSpell = sSpellMgr->GetNextSpellInChain(spell_id))
         if (!GetTalentSpellPos(nextSpell))
-            removeSpell(nextSpell, removeSpecMask, onlyTemporary, sendPlayerUpdate);
+            removeSpell(nextSpell, removeSpecMask, onlyTemporary);
 
     // xinef: if current spell has talentcost, remove spells requiring this spell
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spell_id);
@@ -3441,7 +3364,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
         SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(firstRankSpellId);
         for (auto spellsItr = spellsRequiringSpell.first; spellsItr != spellsRequiringSpell.second; ++spellsItr)
         {
-            removeSpell(spellsItr->second, removeSpecMask, onlyTemporary, sendPlayerUpdate);
+            removeSpell(spellsItr->second, removeSpecMask, onlyTemporary);
         }
     }
 
@@ -3581,8 +3504,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
     {
         sScriptMgr->OnPlayerForgotSpell(this, spell_id);
-        if (sendPlayerUpdate)
-            SendLearnPacket(spell_id, false);
+        SendLearnPacket(spell_id, false);
     }
 }
 
@@ -4103,73 +4025,73 @@ bool Player::HasActiveSpell(uint32 spell) const
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active && itr->second->IsInSpec(m_activeSpec));
 }
 
-// TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
-// {
-//     if (!trainer_spell)
-//         return TRAINER_SPELL_RED;
+TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
+{
+    if (!trainer_spell)
+        return TRAINER_SPELL_RED;
 
-//     bool hasSpell = true;
-//     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-//     {
-//         if (!trainer_spell->learnedSpell[i])
-//             continue;
+    bool hasSpell = true;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!trainer_spell->learnedSpell[i])
+            continue;
 
-//         if (!HasSpell(trainer_spell->learnedSpell[i]))
-//         {
-//             hasSpell = false;
-//             break;
-//         }
-//     }
-//     // known spell
-//     if (hasSpell)
-//         return TRAINER_SPELL_GRAY;
+        if (!HasSpell(trainer_spell->learnedSpell[i]))
+        {
+            hasSpell = false;
+            break;
+        }
+    }
+    // known spell
+    if (hasSpell)
+        return TRAINER_SPELL_GRAY;
 
-//     // check skill requirement
-//     if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
-//         return TRAINER_SPELL_RED;
+    // check skill requirement
+    if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
+        return TRAINER_SPELL_RED;
 
-//     // check level requirement
-//     if (GetLevel() < trainer_spell->reqLevel)
-//         return TRAINER_SPELL_RED;
+    // check level requirement
+    if (GetLevel() < trainer_spell->reqLevel)
+        return TRAINER_SPELL_RED;
 
-//     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-//     {
-//         if (!trainer_spell->learnedSpell[i])
-//             continue;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!trainer_spell->learnedSpell[i])
+            continue;
 
-//         // check race/class requirement
-//         if (!IsSpellFitByClassAndRace(trainer_spell->learnedSpell[i]))
-//             return TRAINER_SPELL_RED;
+        // check race/class requirement
+        if (!IsSpellFitByClassAndRace(trainer_spell->learnedSpell[i]))
+            return TRAINER_SPELL_RED;
 
-//         if (uint32 prevSpell = sSpellMgr->GetPrevSpellInChain(trainer_spell->learnedSpell[i]))
-//         {
-//             // check prev.rank requirement
-//             if (prevSpell && !HasSpell(prevSpell))
-//                 return TRAINER_SPELL_RED;
-//         }
+        if (uint32 prevSpell = sSpellMgr->GetPrevSpellInChain(trainer_spell->learnedSpell[i]))
+        {
+            // check prev.rank requirement
+            if (prevSpell && !HasSpell(prevSpell))
+                return TRAINER_SPELL_RED;
+        }
 
-//         SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(trainer_spell->learnedSpell[i]);
-//         for (SpellsRequiringSpellMap::const_iterator itr = spellsRequired.first; itr != spellsRequired.second; ++itr)
-//         {
-//             // check additional spell requirement
-//             if (!HasSpell(itr->second))
-//                 return TRAINER_SPELL_RED;
-//         }
-//     }
+        SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(trainer_spell->learnedSpell[i]);
+        for (SpellsRequiringSpellMap::const_iterator itr = spellsRequired.first; itr != spellsRequired.second; ++itr)
+        {
+            // check additional spell requirement
+            if (!HasSpell(itr->second))
+                return TRAINER_SPELL_RED;
+        }
+    }
 
-//     // check primary prof. limit
-//     // first rank of primary profession spell when there are no proffesions avalible is disabled
-//     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-//     {
-//         if (!trainer_spell->learnedSpell[i])
-//             continue;
-//         SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainer_spell->learnedSpell[i]);
-//         if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
-//             return TRAINER_SPELL_GREEN_DISABLED;
-//     }
+    // check primary prof. limit
+    // first rank of primary profession spell when there are no proffesions avalible is disabled
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!trainer_spell->learnedSpell[i])
+            continue;
+        SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainer_spell->learnedSpell[i]);
+        if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
+            return TRAINER_SPELL_GREEN_DISABLED;
+    }
 
-//     return TRAINER_SPELL_GREEN;
-// }
+    return TRAINER_SPELL_GREEN;
+}
 
 /**
  * Deletes a character from the database
@@ -11949,7 +11871,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     GetSession()->SendPacket(&data);
 
     SendInitialSpells();
-    SendUnlearnSpells();
 
     data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
     data << uint32(0);                                      // count, for (count) uint32;
