@@ -1,3 +1,3 @@
 [submodule "mod-weekendbonus"]
-path = deps/modules/mod-weekendbonus
+path = modules/mod-weekendbonus
 url = https://github.com/noisiver/mod-weekendbonus.git
