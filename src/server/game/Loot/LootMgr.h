@@ -243,9 +243,9 @@ private:
 
 class LootTemplate
 {
+public:
     class LootGroup;                                       // A set of loot definitions for items (refs are not allowed inside)
     typedef std::vector<LootGroup*> LootGroups;
-public:
     LootTemplate() = default;
     ~LootTemplate();
 
@@ -265,11 +265,13 @@ public:
     void Verify(LootStore const& store, uint32 Id) const;
     void CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const;
     bool addConditionItem(Condition* cond);
+    LootStoreItemList* GetItemList() { return &Entries; }
+    LootGroups* GetItemGroups() { return &Groups; }
+    LootStoreItemList Entries;                          // not grouped only
+    LootGroups        Groups;                           // groups have own (optimised) processing, grouped entries go there
     [[nodiscard]] bool isReference(uint32 id) const;
 
 private:
-    LootStoreItemList Entries;                          // not grouped only
-    LootGroups        Groups;                           // groups have own (optimised) processing, grouped entries go there
 
     // Objects of this class must never be copied, we are storing pointers in container
     LootTemplate(LootTemplate const&);

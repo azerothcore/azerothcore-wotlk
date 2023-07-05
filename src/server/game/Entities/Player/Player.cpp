@@ -13616,6 +13616,8 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     uint32 fieldIndexOffset = title->bit_index / 32;
     uint32 flag = 1 << (title->bit_index % 32);
 
+    //sScriptMgr->OnNewTitle(this, title->bit_index, lost);
+
     if (lost)
     {
         if (!HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag))
@@ -15891,7 +15893,8 @@ bool Player::AddItem(uint32 itemId, uint32 count)
         SendNewItem(item, count, true, false);
     else
         return false;
-
+    
+    //sScriptMgr->OnAddItem(this, itemId, count);
     return true;
 }
 

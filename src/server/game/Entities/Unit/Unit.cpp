@@ -1367,13 +1367,9 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 if (blocked)
                 {
                     damageInfo->blocked = victim->GetShieldBlockValue();
-                    damage = AdjustBeforeBlockDamage(damageInfo->target, damage);
                     // double blocked amount if block is critical
                     if (victim->isBlockCritical())
-                    {
-                        damageInfo->blocked = GetCriticalBlockAmount(victim, damageInfo->blocked);
-                        damageInfo->criticalBlock = true;
-                    }
+                        damageInfo->blocked *= 2;
                     if (damage < int32(damageInfo->blocked))
                         damageInfo->blocked = uint32(damage);
 
@@ -1403,36 +1399,11 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         case SPELL_DAMAGE_CLASS_NONE:
         case SPELL_DAMAGE_CLASS_MAGIC:
             {
-                // Physical Damage
-                if (CanBlockSpells(victim))
-                {
-                    // Get blocked status
-                    blocked = isSpellBlocked(victim, spellInfo, attackType);
-                }
-
                 // If crit add critical bonus
                 if (crit)
                 {
                     damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
                     damage = Unit::SpellCriticalDamageBonus(this, spellInfo, damage, victim);
-                }
-
-                // Spell weapon based damage CAN BE crit & blocked at same time
-                if (blocked)
-                {
-                    damageInfo->blocked = victim->GetShieldBlockValue();
-                    damage = AdjustBeforeBlockDamage(damageInfo->target, damage);
-                    // double blocked amount if block is critical
-                    if (victim->isBlockCritical())
-                    {
-                        damageInfo->blocked = GetCriticalBlockAmount(victim, damageInfo->blocked);
-                        damageInfo->criticalBlock = true;
-                    }
-                    if (damage < int32(damageInfo->blocked))
-                        damageInfo->blocked = uint32(damage);
-
-                    damage -= damageInfo->blocked;
-                    cleanDamage += damageInfo->blocked;
                 }
 
                 int32 resilienceReduction = damage;
@@ -1512,8 +1483,6 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
     damageInfo->procAttacker     = PROC_FLAG_NONE;
     damageInfo->procVictim       = PROC_FLAG_NONE;
     damageInfo->procEx           = PROC_EX_NONE;
-    damageInfo->procVictim     |= PROC_FLAG_CRITICAL_DAMAGE_TAKEN;
-    damageInfo->procAttacker   |= PROC_FLAG_CRITICAL_DAMAGE_DONE;
     damageInfo->hitOutCome       = MELEE_HIT_EVADE;
 
     if (!victim)
@@ -2047,8 +2016,8 @@ ThornsDamage Unit::CalculateThorns(Unit* attacker, Unit* victim, bool calcMisses
         }
         thornsDmg.ThornsDamageMap[i_spellProto->GetSchoolMask()] += damage;
     }
-    auto otherThorns = shieldOwner->GetUInt32Value(UNIT_FIELD_THORNS);
-    thornsDmg.ThornsDamageMap[SPELL_SCHOOL_MASK_NORMAL] += otherThorns;
+    //auto otherThorns = shieldOwner->GetUInt32Value(UNIT_FIELD_THORNS);
+    //thornsDmg.ThornsDamageMap[SPELL_SCHOOL_MASK_NORMAL] += otherThorns;
 
     SpellInfo const* thornsSpellInfo = sSpellMgr->GetSpellInfo(1129999);
 
@@ -13959,7 +13928,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
         player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
 
-     AddComboPoints(victim, 0);
+    AddComboPoints(victim, 0);
 }
 
 void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
@@ -14104,6 +14073,12 @@ void Unit::ClearInCombat()
     {
         sScriptMgr->OnPlayerLeaveCombat(player);
     }
+
+    Unit::m_ComboPointDegenTimer = 0;
+    AddComboPoints(0);
+
+    ToggleCombatAuras(false);
+
 }
 
 void Unit::ClearInPetCombat()
@@ -17377,10 +17352,6 @@ void Unit::RestoreDisplayId()
 
 void Unit::AddComboPoints(Unit* target, int8 count)
 {
-    if (!count)
-    {
-        return;
-    }
 
     auto change = std::max<int8>(std::min<int8>(m_comboPoints + count, 5), 0);
 
@@ -17393,16 +17364,17 @@ void Unit::AddComboPoints(Unit* target, int8 count)
 
         m_comboTarget = target;
         m_comboPoints = change;
+        
         target->AddComboPointHolder(this);
         SendComboPoints();
         return;
     }
-    
+
     if (m_comboPoints != change)
     {
         m_comboPoints = change;
+        SendComboPoints();
     }
-    SendComboPoints();
 }
 
 void Unit::ClearComboPoints(bool clearPoints)
@@ -20988,6 +20960,7 @@ void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, Aura
         float dmgRatio;
         int ticks = aurEff->GetTotalTicks(dmgRatio);
         if (aurEff->GetCasterGUID() != caster->GetGUID() || aurEff->GetId() != spellId || aurEff->GetEffIndex() != effectIndex || !ticks)
+            continue;
 
         addAmount += ((aurEff->GetOldAmount() * std::max<int32>(ticks - int32(aurEff->GetTickNumber()), 0)) / ticks);
         break;

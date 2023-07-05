@@ -6118,7 +6118,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
         LOG_ERROR("entities.player", "Player::_LoadInventory: player ({}, name: '{}') has unknown item (entry: {}) in inventory. Deleting item.",
                   GetGUID().ToString(), GetName(), itemEntry);
         Item::DeleteFromInventoryDB(trans, itemGuid);
-        Item::DeleteFromDB(trans, itemGuid);
+        Item::DeleteFromDB(trans, this, itemGuid);
     }
     return item;
 }

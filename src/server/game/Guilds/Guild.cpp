@@ -808,8 +808,7 @@ void Guild::PlayerMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans,
 {
     ASSERT(pFrom);
     // Bank -> Char
-     m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_WITHDRAW_ITEM, pFrom->GetContainer(), m_pPlayer->GetGUID(),
-                            pFrom->GetItem()->GetEntry(), count);
+    m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_WITHDRAW_ITEM, pFrom->GetContainer(), m_pPlayer, pFrom->GetItem()->GetEntry(), count);
 }
 
 inline InventoryResult Guild::PlayerMoveItemData::CanStore(Item* pItem, bool swap)
@@ -893,11 +892,11 @@ void Guild::BankMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans, M
     ASSERT(pFrom->GetItem());
     if (pFrom->IsBank())
         // Bank -> Bank
-        m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_MOVE_ITEM, pFrom->GetContainer(), m_pPlayer->GetGUID(),
+        m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_MOVE_ITEM, pFrom->GetContainer(), m_pPlayer,
                                 pFrom->GetItem()->GetEntry(), count, m_container);
     else
         // Char -> Bank
-        m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_DEPOSIT_ITEM, m_container, m_pPlayer->GetGUID(),
+        m_pGuild->_LogBankEvent(trans, GUILD_BANK_LOG_DEPOSIT_ITEM, m_container, m_pPlayer,
                                 pFrom->GetItem()->GetEntry(), count);
 }
 
@@ -1665,7 +1664,7 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     player->ModifyMoney(-int32(amount));
     player->SaveGoldToDB(trans);
-    _LogBankEvent(trans, GUILD_BANK_LOG_DEPOSIT_MONEY, uint8(0), player->GetGUID(), amount);
+    _LogBankEvent(trans, GUILD_BANK_LOG_DEPOSIT_MONEY, uint8(0), player, amount);
 
     CharacterDatabase.CommitTransaction(trans);
 
@@ -1713,7 +1712,7 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     _ModifyBankMoney(trans, amount, false);
 
     // Log guild bank event
-    _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUID(), amount);
+    _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player, amount);
     CharacterDatabase.CommitTransaction(trans);
 
     if (amount > 10 * GOLD)     // sender_acc = 0 (guild has no account), sender_guid = Guild id, sender_name = Guild name
@@ -2600,7 +2599,7 @@ inline void Guild::_LogEvent(GuildEventLogTypes eventType, ObjectGuid playerGuid
 }
 
 // Add new bank event log record
-void Guild::_LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid guid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
+void Guild::_LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, Player* guid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
 {
     if (tabId > GUILD_BANK_MAX_TABS)
         return;
@@ -2616,9 +2615,9 @@ void Guild::_LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogT
         dbTabId = GUILD_BANK_MONEY_LOGS_TAB;
     }
     LogHolder<BankEventLogEntry>& pLog = m_bankEventLog[tabId];
-    pLog.AddEvent(trans, m_id, pLog.GetNextGUID(), eventType, dbTabId, guid, itemOrMoney, itemStackCount, destTabId);
+    pLog.AddEvent(trans, m_id, pLog.GetNextGUID(), eventType, dbTabId, guid->GetGUID(), itemOrMoney, itemStackCount, destTabId);
 
-    sScriptMgr->OnGuildBankEvent(this, uint8(eventType), tabId, guid.GetCounter(), itemOrMoney, itemStackCount, destTabId);
+    sScriptMgr->OnGuildBankEvent(this, uint8(eventType), tabId, guid, itemOrMoney, itemStackCount, destTabId);
 }
 
 inline Item* Guild::_GetItem(uint8 tabId, uint8 slotId) const

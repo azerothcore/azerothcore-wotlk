@@ -267,6 +267,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             ignoreChecks = true;
             break;
     }
+    
+    sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
 
     // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
     if (type == CHAT_MSG_GUILD && lang == LANG_ADDON && _warden && _warden->ProcessLuaCheckResponse(msg))
