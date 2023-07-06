@@ -1587,8 +1587,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             //LOG_ERROR("spells", "(collision) destZ rewrited in prevZ");
 
                             // Don't make the player move backward from the xy adjustments by collisions.
-                            if ((DELTA_X > 0 && startx > destx) || (DELTA_X < 0 && startx < destx)
-                            ||  (DELTA_Y > 0 && starty > desty) || (DELTA_Y < 0 && starty < desty))
+                            if ((DELTA_X > 0 && startx > destx) || (DELTA_X < 0 && startx < destx) ||
+                                (DELTA_Y > 0 && starty > desty) || (DELTA_Y < 0 && starty < desty))
                             {
                                 destx = startx;
                                 desty = starty;
