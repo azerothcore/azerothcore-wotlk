@@ -79,7 +79,6 @@ struct boss_nightbane : public BossAI
         _skeletonCount = 5;
     }
 
-
     InstanceScript* instance;
 
     void Reset() override
@@ -307,7 +306,6 @@ struct boss_nightbane : public BossAI
         _flying = true;
 
         ScheduleFly();
-
 
         //handle landing again
         scheduler.Schedule(45s, 60s, [this](TaskContext)
