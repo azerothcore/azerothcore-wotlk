@@ -66,8 +66,7 @@ struct boss_vazruden_the_herald : public BossAI
 
     void Reset() override
     {
-        BossAI::Reset();
-        _scheduler.CancelAll();
+        _Reset();
         me->SetVisible(true);
         me->SetReactState(REACT_PASSIVE);
         me->SummonCreature(NPC_HELLFIRE_SENTRY, -1372.56f, 1724.31f, 82.967f, 5.3058f);
