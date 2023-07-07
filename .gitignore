@@ -98,3 +98,6 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+
+!conf/config.cmake
+.vs

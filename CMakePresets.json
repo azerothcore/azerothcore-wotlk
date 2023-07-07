@@ -1,0 +1,96 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "Linux",
+      "displayName": "Debug Linux",
+      "description": "Sets Unix Makefiles generator, compilers, build and install directory, debug build type",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/",
+      "toolset": "clang",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+        "CMAKE_INSTALL_PREFIX": "$env{HOME}/everdawn-wotlk",
+        "MODULES": "static",
+        "SCRIPTS": "static",
+        "TOOLS_BUILD": "none",
+        "WITH_WARNINGS": "/usr/bin/clang++",
+        "APPS_BUILD": "all"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": "Linux",
+          "intelliSenseMode": "linux-gcc-x86",
+          "intelliSenseOptions": {
+            "useCompilerDefaults": true,
+            "additionalCompilerArgs": [ "" ]
+          },
+          "enableMicrosoftCodeAnalysis": false
+        },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "hostBinaryDir": "$ms{localSourceDir}/.vs/out/$ms{targetConnectionName}/build/${presetName}"
+        }
+      }
+    },
+    {
+      "name": "Windows",
+      "displayName": "Debug Windows",
+      "description": "Sets Windows MSBuild generator, compilers, build and install directory, debug build type",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/",
+      "installDir": "${sourceDir}/build/install/",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": "v143",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "D:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebugDLL",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "{sourceDir}/build/bin/everdawn-wotlk",
+        "MODULES": "static",
+        "SCRIPTS": "static",
+        "TOOLS_BUILD": "all",
+        "APPS_BUILD": "all",
+        "Boost_NO_WARN_NEW_VERSIONS": "1"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": "Windows",
+          "intelliSenseMode": "windows-clang-x64",
+          "intelliSenseOptions": {
+            "useCompilerDefaults": true,
+            "additionalCompilerArgs": [ "/MT" ]
+          },
+          "enableMicrosoftCodeAnalysis": false
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug Linux",
+      "displayName": "Build",
+      "configurePreset": "Linux",
+      "jobs": 6,
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "Debug Windows",
+      "displayName": "Build",
+      "configurePreset": "Windows",
+      "jobs": 6,
+      "configuration": "RelWithDebInfo"
+    }
+  ]
+}

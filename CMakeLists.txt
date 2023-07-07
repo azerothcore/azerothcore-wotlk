@@ -43,6 +43,7 @@ include(ConfigureScripts)
 include(ConfigureModules)
 include(ConfigureApplications)
 include(ConfigureTools)
+include(ConfigureEverdawnTools)
 
 # some utils for cmake
 include(deps/acore/cmake-utils/utils.cmake)
