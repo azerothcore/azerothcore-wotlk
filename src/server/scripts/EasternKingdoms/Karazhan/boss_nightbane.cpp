@@ -118,7 +118,6 @@ struct boss_nightbane : public BossAI
             _intro = true;
             Phase = 1;
             MovePhase = 0;
-            
         }
 
         ScheduleHealthCheckEvent({25, 50, 70}, [&]{
@@ -307,7 +306,6 @@ struct boss_nightbane : public BossAI
 
         _flying = true;
 
-        
         ScheduleFly();
 
 
