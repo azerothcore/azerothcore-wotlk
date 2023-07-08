@@ -20,13 +20,12 @@
 #include "ScriptedCreature.h"
 #include "violet_hold.h"
 
-#define CLEANUP_CHECK_INTERVAL  5000
-#define SPAWN_TIME              20000
-
 enum vYells
 {
     CYANIGOSA_SAY_SPAWN       = 3,
-    SAY_SINCLARI_1            = 0
+    SAY_SINCLARI_LEAVING      = 0,
+    SAY_SINCLARI_DOOR_LOCK    = 1,
+    SAY_SINCLARI_COMPLETE     = 2,
 };
 
 class instance_violet_hold : public InstanceMapScript
@@ -217,12 +216,12 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
-                            c->AI()->Talk(SAY_SINCLARI_1);
-                        events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4000);
+                            c->AI()->Talk(SAY_SINCLARI_LEAVING);
+                        events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
                     }
                     break;
                 case DATA_PORTAL_DEFEATED:
-                    events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3000);
+                    events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3s);
                     break;
                 case DATA_PORTAL_LOCATION:
                     PortalLocation = data;
@@ -254,11 +253,16 @@ public:
                         EncounterStatus = DONE;
                         HandleGameObject(GO_MainGateGUID, true);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
-                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); }
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_COMPLETE);
+                            c->DespawnOrUnsummon();
+                            c->SetRespawnTime(3);
+                        }
                     }
                     SaveToDB();
                     if (WaveCount < 18)
-                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 35000);
+                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 35s);
                     break;
                 case DATA_FAILED:
                     CLEANED = false;
@@ -406,7 +410,7 @@ public:
                     {
                         if( DoNeedCleanup(false) )
                             InstanceCleanup();
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_GUARDS_FALL_BACK:
@@ -419,7 +423,7 @@ public:
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, guardMovePosition);
                             }
-                        events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5000);
+                        events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5s);
                     }
                     break;
                 case EVENT_GUARDS_DISAPPEAR:
@@ -427,7 +431,7 @@ public:
                         for (uint8 i = 0; i < 4; ++i)
                             if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                                 c->SetVisible(false);
-                        events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2000);
+                        events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2s);
                     }
                     break;
                 case EVENT_SINCLARI_FALL_BACK:
@@ -438,13 +442,19 @@ public:
                             c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                         }
                         SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
-                        events.RescheduleEvent(EVENT_START_ENCOUNTER, 4000);
+                        events.RescheduleEvent(EVENT_START_ENCOUNTER, 4s);
                     }
                     break;
                 case EVENT_START_ENCOUNTER:
                     {
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        }
                         if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
+                        {
                             c->RemoveAllAuras(); // just to be sure...
+                        }
                         GateHealth = 100;
                         HandleGameObject(GO_MainGateGUID, false);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
@@ -457,7 +467,7 @@ public:
                                 HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                                 go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
-                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
+                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4s);
                     }
                     break;
                 case EVENT_SUMMON_PORTAL:
@@ -487,7 +497,7 @@ public:
                                 cyanigosa->AI()->Talk(CYANIGOSA_SAY_SPAWN);
                                 cyanigosa->GetMotionMaster()->MoveJump(MiddleRoomLocation.GetPositionX(), MiddleRoomLocation.GetPositionY(), MiddleRoomLocation.GetPositionZ(), 10.0f, 20.0f);
                             }
-                            events.RescheduleEvent(EVENT_CYANIGOSSA_TRANSFORM, 10000);
+                            events.RescheduleEvent(EVENT_CYANIGOSSA_TRANSFORM, 10s);
                         }
                     }
                     break;
@@ -496,7 +506,7 @@ public:
                     {
                         c->RemoveAurasDueToSpell(SPELL_CYANIGOSA_BLUE_AURA);
                         c->CastSpell(c, SPELL_CYANIGOSA_TRANSFORM, 0);
-                        events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500);
+                        events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500ms);
                     }
                     break;
                 case EVENT_CYANIGOSA_ATTACK:
@@ -523,7 +533,7 @@ public:
             else
                 plr->SendUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(bool enter)
@@ -622,7 +632,7 @@ public:
             if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
                 EncounterStatus = DONE;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

@@ -538,16 +538,6 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    if (!guid)
-    {
-        // Clear any active gossip related to current selection if not present at player's client
-        GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-        if (gossipMenu.GetSenderGUID() == _player->GetTarget())
-        {
-            _player->PlayerTalkClass->SendCloseGossip();
-        }
-    }
-
     _player->SetSelection(guid);
 
     // Change target of current autoshoot spell
@@ -726,6 +716,27 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     data << length;
     data << szStr;
     SendPacket(&data);
+}
+
+void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
+{
+    char const* format = GetAcoreString(entry);
+    if (format)
+    {
+        va_list ap;
+        char szStr[1024];
+        szStr[0] = '\0';
+
+        va_start(ap, entry);
+        vsnprintf(szStr, 1024, format, ap);
+        va_end(ap);
+
+        uint32 length = strlen(szStr) + 1;
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << szStr;
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)

@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtregenmpperspt_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtregenmpperspt_dbc: 1,100 rows
+-- Dumping data for table acore_world.gtregenmpperspt_dbc: ~1,100 rows (approximately)
 DELETE FROM `gtregenmpperspt_dbc`;
-/*!40000 ALTER TABLE `gtregenmpperspt_dbc` DISABLE KEYS */;
 INSERT INTO `gtregenmpperspt_dbc` (`ID`, `Data`) VALUES
 	(0, 0),
 	(1, 0),
@@ -1126,7 +1125,6 @@ INSERT INTO `gtregenmpperspt_dbc` (`ID`, `Data`) VALUES
 	(1097, 0),
 	(1098, 0),
 	(1099, 0);
-/*!40000 ALTER TABLE `gtregenmpperspt_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

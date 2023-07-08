@@ -205,6 +205,7 @@ public:
     void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }
     void MoveCircleTarget(Unit* target);
     void MoveBackwards(Unit* target, float dist);
+    void MoveForwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)

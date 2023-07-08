@@ -93,6 +93,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
+    sScriptMgr->OnAfterCreatureLoot(player);
+
     InventoryResult msg;
     LootItem* lootItem = player->StoreLootItem(lootSlot, loot, msg);
     if (msg != EQUIP_ERR_OK && lguid.IsItem() && loot->loot_type != LOOT_CORPSE)
@@ -209,6 +211,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
         else
         {
+            sScriptMgr->OnAfterCreatureLootMoney(player);
             player->ModifyMoney(loot->gold);
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
 
@@ -409,7 +412,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     }
 
     //Player is not looking at loot list, he doesn't need to see updates on the loot list
-    loot->RemoveLooter(player->GetGUID());
+    if (!lguid.IsItem())
+    {
+        loot->RemoveLooter(player->GetGUID());
+    }
 }
 
 void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)

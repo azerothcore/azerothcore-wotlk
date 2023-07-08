@@ -220,6 +220,9 @@ public:
     // Cast spell on all players in instance
     void DoCastSpellOnPlayers(uint32 spell);
 
+    // Cast spell on player
+    void DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/);
+
     // Return wether server allow two side groups or not
     bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 
@@ -257,6 +260,9 @@ public:
 
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
+
+    // Allows executing code using all creatures registered in the instance script as minions
+    void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }

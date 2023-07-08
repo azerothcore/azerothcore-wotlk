@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `lfg_data` (
   `dungeon` int unsigned NOT NULL DEFAULT '0',
   `state` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LFG Data';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LFG Data';
 
 -- Dumping data for table acore_characters.lfg_data: ~0 rows (approximately)
 DELETE FROM `lfg_data`;

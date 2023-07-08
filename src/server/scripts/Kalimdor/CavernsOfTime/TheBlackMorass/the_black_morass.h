@@ -24,23 +24,22 @@
 
 #define DataHeader "TBM"
 
+uint32 const EncounterCount = 3;
+
 #define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
 {
-    TYPE_CHRONO_LORD_DEJA               = 0,
-    TYPE_TEMPORUS                       = 1,
-    TYPE_AEONUS                         = 2,
+    DATA_CHRONO_LORD_DEJA               = 0,
+    DATA_TEMPORUS                       = 1,
+    DATA_AEONUS                         = 2,
     MAX_ENCOUNTER                       = 3,
 
     DATA_MEDIVH                         = 10,
-    DATA_RIFT_KILLED                    = 11,
+
     DATA_DAMAGE_SHIELD                  = 12,
     DATA_SHIELD_PERCENT                 = 13,
-    DATA_RIFT_NUMBER                    = 14,
-
-    DATA_SUMMONED_NPC                   = 20,
-    DATA_DELETED_NPC                    = 21,
+    DATA_RIFT_NUMBER                    = 14
 };
 
 enum WorldStateIds
@@ -48,6 +47,12 @@ enum WorldStateIds
     WORLD_STATE_BM                      = 2541,
     WORLD_STATE_BM_SHIELD               = 2540,
     WORLD_STATE_BM_RIFT                 = 2784
+};
+
+enum EventStatus
+{
+    EVENT_PREPARE                       = 0,
+    EVENT_IN_PROGRESS                   = 1
 };
 
 enum QuestIds
@@ -73,11 +78,16 @@ enum CreatureIds
     NPC_INFINITE_TIMEREAVER             = 21698,
     NPC_AEONUS                          = 17881,
 
-    NPC_INFINITE_ASSASIN                = 17835,
+    NPC_INFINITE_ASSASSIN               = 17835,
     NPC_INFINITE_WHELP                  = 21818,
-    NPC_INFINITE_CRONOMANCER            = 17892,
+    NPC_INFINITE_CHRONOMANCER           = 17892,
     NPC_INFINITE_EXECUTIONER            = 18994,
     NPC_INFINITE_VANQUISHER             = 18995,
+
+    NPC_INFINITE_ASSASSIN_2             = 21137,
+    NPC_INFINITE_CHRONOMANCER_2         = 21136,
+    NPC_INFINITE_EXECUTIONER_2          = 21138,
+    NPC_INFINITE_VANQUISHER_2           = 21139,
 
     NPC_DP_EMITTER_STALKER              = 18582,
     NPC_DP_CRYSTAL_STALKER              = 18553,
@@ -89,16 +99,9 @@ enum Misc
     SPELL_RIFT_CHANNEL                  = 31387,
     SPELL_TELEPORT_VISUAL               = 7791,
 
-    EVENT_NEXT_PORTAL                   = 1,
-    EVENT_SUMMON_KEEPER_1               = 2,
-    EVENT_SUMMON_KEEPER_2               = 3,
-    EVENT_SUMMON_KEEPER_3               = 4,
-    EVENT_SUMMON_KEEPER_4               = 5,
-    EVENT_WIPE_1                        = 6,
-    EVENT_WIPE_2                        = 7,
-    EVENT_WIPE_3                        = 8,
+    ACTION_OUTRO                        = 1,
 
-    ACTION_OUTRO                        = 1
+    CONTEXT_GROUP_RIFTS                 = 1
 };
 
 enum medivhSays

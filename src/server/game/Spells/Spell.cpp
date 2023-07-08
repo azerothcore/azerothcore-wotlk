@@ -4928,11 +4928,11 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
         {
             if (uint32 item_id = m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i))
             {
-                if (ItemTemplate const* itemEntry = sObjectMgr->GetItemTemplate(item_id))
+                if (ItemEntry const* itemEntry = sItemStore.LookupEntry(item_id))
                 {
-                    if (itemEntry->Class == ITEM_CLASS_WEAPON)
+                    if (itemEntry->ClassID == ITEM_CLASS_WEAPON)
                     {
-                        switch (itemEntry->SubClass)
+                        switch (itemEntry->SubclassID)
                         {
                             case ITEM_SUBCLASS_WEAPON_THROWN:
                                 ammoDisplayID = itemEntry->DisplayInfoID;
@@ -6328,7 +6328,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                     // chance for fail at lockpicking attempt
                     // second check prevent fail at rechecks
-                    if (skillId != SKILL_NONE && (!m_selfContainer || ((*m_selfContainer) != this)))
+                    // herbalism and mining cannot fail as of patch 3.1.0
+                    if (skillId != SKILL_NONE && skillId != SKILL_HERBALISM && skillId != SKILL_MINING && (!m_selfContainer || ((*m_selfContainer) != this)))
                     {
                         // chance for failure in orange lockpick
                         if (skillId == SKILL_LOCKPICKING && reqSkillValue > irand(skillValue - 25, skillValue + 37))

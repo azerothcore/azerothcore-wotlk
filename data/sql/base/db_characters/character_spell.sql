@@ -18,10 +18,10 @@
 DROP TABLE IF EXISTS `character_spell`;
 CREATE TABLE IF NOT EXISTS `character_spell` (
   `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `spell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `spell` int unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
   `specMask` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_spell: ~0 rows (approximately)
 DELETE FROM `character_spell`;

@@ -55,7 +55,7 @@ class Aura;
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK set - aura is recalculated or is just applied/removed - need to redo all things related to m_amount
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK - logical or of above conditions
 // AURA_EFFECT_HANDLE_STAT - set when stats are reapplied
-// such checks will Speedup trinity change amount/send for client operations
+// such checks will Speedup azerothcore change amount/send for client operations
 // because for change amount operation packets will not be send
 // aura effect handlers shouldn't contain any AuraEffect or Aura object modifications
 
@@ -5043,11 +5043,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (caster && target->CanHaveThreatList())
                         target->AddThreat(caster, 10.0f);
                     break;
-                case 13139:                                     // net-o-matic
-                    // root to self part of (root_target->charge->root_self sequence
-                    if (caster)
-                        caster->CastSpell(caster, 13138, true, nullptr, this);
-                    break;
                 case 34026:   // kill command
                     {
                         Unit* pet = target->GetGuardianPet();
@@ -6032,13 +6027,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                                 Unit::Kill(target, target);
                                 return;
                             }
-                        // Spellcloth
-                        case 31373:
-                            {
-                                // Summon Elemental after create item
-                                target->SummonCreature(17870, 0, 0, 0, target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 0);
-                                return;
-                            }
                         // Eye of Grillok
                         case 38495:
                             triggerSpellId = 38530;
@@ -6633,8 +6621,9 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
     Unit::CalcHealAbsorb(healInfo);
     int32 gain = Unit::DealHeal(caster, target, healInfo.GetHeal());
+    healInfo.SetEffectiveHeal(gain);
 
-    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - gain, healInfo.GetAbsorb(), 0, 0.0f, crit);
+    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - healInfo.GetEffectiveHeal(), healInfo.GetAbsorb(), 0, 0.0f, crit);
     target->SendPeriodicAuraLog(&pInfo);
 
     if (caster)

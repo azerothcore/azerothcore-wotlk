@@ -17,7 +17,7 @@
 -- Dumping structure for table acore_world.game_weather
 DROP TABLE IF EXISTS `game_weather`;
 CREATE TABLE IF NOT EXISTS `game_weather` (
-  `zone` mediumint unsigned NOT NULL DEFAULT '0',
+  `zone` int unsigned NOT NULL DEFAULT '0',
   `spring_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `spring_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `spring_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
@@ -30,13 +30,12 @@ CREATE TABLE IF NOT EXISTS `game_weather` (
   `winter_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `winter_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `winter_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
-  `ScriptName` char(64) NOT NULL DEFAULT '',
+  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`zone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Weather System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Weather System';
 
--- Dumping data for table acore_world.game_weather: 35 rows
+-- Dumping data for table acore_world.game_weather: ~35 rows (approximately)
 DELETE FROM `game_weather`;
-/*!40000 ALTER TABLE `game_weather` DISABLE KEYS */;
 INSERT INTO `game_weather` (`zone`, `spring_rain_chance`, `spring_snow_chance`, `spring_storm_chance`, `summer_rain_chance`, `summer_snow_chance`, `summer_storm_chance`, `fall_rain_chance`, `fall_snow_chance`, `fall_storm_chance`, `winter_rain_chance`, `winter_snow_chance`, `winter_storm_chance`, `ScriptName`) VALUES
 	(1, 0, 25, 0, 0, 15, 0, 0, 25, 0, 0, 25, 0, ''),
 	(3, 0, 0, 20, 0, 0, 20, 0, 0, 20, 0, 0, 15, ''),
@@ -73,7 +72,6 @@ INSERT INTO `game_weather` (`zone`, `spring_rain_chance`, `spring_snow_chance`, 
 	(3429, 0, 0, 20, 0, 0, 20, 0, 0, 20, 0, 0, 20, ''),
 	(3521, 10, 0, 0, 15, 0, 0, 20, 0, 0, 10, 0, 0, ''),
 	(4080, 20, 0, 0, 20, 0, 0, 20, 0, 0, 10, 0, 0, '');
-/*!40000 ALTER TABLE `game_weather` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

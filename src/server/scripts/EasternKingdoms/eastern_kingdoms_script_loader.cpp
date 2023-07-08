@@ -68,6 +68,7 @@ void AddSC_instance_karazhan();              //Karazhan
 void AddSC_boss_servant_quarters();
 void AddSC_boss_attumen();
 void AddSC_boss_curator();
+void AddSC_boss_chess_event();
 void AddSC_boss_maiden_of_virtue();
 void AddSC_boss_shade_of_aran();
 void AddSC_boss_malchezaar();
@@ -156,7 +157,6 @@ void AddSC_isle_of_queldanas();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
-void AddSC_stranglethorn_vale();
 void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
@@ -220,6 +220,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_servant_quarters();
     AddSC_boss_attumen();
     AddSC_boss_curator();
+    AddSC_boss_chess_event();
     AddSC_boss_maiden_of_virtue();
     AddSC_boss_shade_of_aran();
     AddSC_boss_malchezaar();
@@ -308,7 +309,6 @@ void AddEasternKingdomsScripts()
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
-    AddSC_stranglethorn_vale();
     AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();

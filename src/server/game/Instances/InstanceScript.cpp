@@ -208,7 +208,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
                 minion->Respawn();
             else
             {
-                minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                if (minion->GetReactState() == REACT_AGGRESSIVE)
+                {
+                    minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                }
             }
             break;
         default:
@@ -362,6 +365,20 @@ void InstanceScript::StorePersistentData(uint32 index, uint32 data)
     persistentData[index] = data;
 }
 
+void InstanceScript::DoForAllMinions(uint32 id, std::function<void(Creature*)> exec)
+{
+    BossInfo* bossInfo = &bosses[id];
+    MinionSet listCopy = bossInfo->minion;
+
+    for (auto const& minion : listCopy)
+    {
+        if (minion)
+        {
+            exec(minion);
+        }
+    }
+}
+
 void InstanceScript::Load(const char* data)
 {
     if (!data)
@@ -488,16 +505,26 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
 {
     if (GameObject* go = instance->GetGameObject(uiGuid))
     {
-        //not expect any of these should ever be handled
-        if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE || go->GetGoType() == GAMEOBJECT_TYPE_DOOR ||
-                go->GetGoType() == GAMEOBJECT_TYPE_BUTTON || go->GetGoType() == GAMEOBJECT_TYPE_TRAP)
-            return;
+        switch (go->GetGoType())
+        {
+            case GAMEOBJECT_TYPE_DOOR:
+            case GAMEOBJECT_TYPE_BUTTON:
+            case GAMEOBJECT_TYPE_TRAP:
+            case GAMEOBJECT_TYPE_FISHINGNODE:
+                // not expect any of these should ever be handled
+                LOG_ERROR("scripts", "InstanceScript: DoRespawnGameObject can't respawn gameobject entry {}, because type is {}.", go->GetEntry(), go->GetGoType());
+                return;
+            default:
+                break;
+        }
 
         if (go->isSpawned())
             return;
 
         go->SetRespawnTime(uiTimeToDespawn);
     }
+    else
+        LOG_DEBUG("scripts", "InstanceScript: DoRespawnGameObject failed");
 }
 
 void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
@@ -610,6 +637,35 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);
+}
+
+void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
+{
+    if (!player)
+        return;
+
+    player->CastSpell(player, spell, true);
+
+    if (!includePets)
+        return;
+
+    for (uint8 itr2 = 0; itr2 < MAX_SUMMON_SLOT; ++itr2)
+    {
+        ObjectGuid summonGUID = player->m_SummonSlot[itr2];
+        if (!summonGUID.IsEmpty())
+            if (Creature* summon = instance->GetCreature(summonGUID))
+                summon->CastSpell(player, spell, true);
+    }
+
+    if (!includeControlled)
+        return;
+
+    for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
+    {
+        if (Unit* controlled = *itr2)
+            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+                controlled->CastSpell(player, spell, true);
+    }
 }
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= nullptr*/, uint32 /*miscvalue1*/ /*= 0*/)

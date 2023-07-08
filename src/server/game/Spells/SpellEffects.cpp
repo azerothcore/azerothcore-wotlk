@@ -2704,11 +2704,8 @@ void Spell::EffectDistract(SpellEffIndex /*effIndex*/)
     if (unitTarget->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING))
         return;
 
-    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget));
-    unitTarget->ClearUnitState(UNIT_STATE_MOVING);
-
-    if (unitTarget->GetTypeId() == TYPEID_UNIT)
-        unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
+    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget)); /// @BUG Causes the player to stop moving + interrupts spellcast.
+    unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
 }
 
 void Spell::EffectPickPocket(SpellEffIndex /*effIndex*/)
@@ -3352,6 +3349,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     // some spell specific modifiers
     float totalDamagePercentMod  = 100.0f;                  // applied to final bonus+weapon damage
     int32 spell_bonus = 0;                                  // bonus specific for spell
+    bool normalized = false;
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -3432,11 +3430,22 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
         case SPELLFAMILY_PALADIN:
             {
-                // Seal of Command Unleashed
-                if (m_spellInfo->Id == 20467)
+                switch (m_spellInfo->Id)
                 {
-                    spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                    spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                    case 20467: // Seal of Command Unleashed
+                        spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                        break;
+                    case 42463: // Seals of the Pure for Seal of Vengeance/Corruption
+                    case 53739:
+                        if (AuraEffect const* sealsOfPure = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 25, 0))
+                            AddPct(totalDamagePercentMod, sealsOfPure->GetAmount());
+                        break;
+                    case 53385:  // Divine Storm deals normalized damage
+                        normalized = true;
+                        break;
+                    default:
+                        break;
                 }
                 break;
             }
@@ -3557,13 +3566,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
     }
 
-    bool normalized = false;
     float weaponDamagePercentMod = 100.0f;
     int32 fixed_bonus = 0;
-
-    // xinef: Divine Storm deals normalized damage
-    if (m_spellInfo->Id == 53385)
-        normalized = true;
 
     for (int j = 0; j < MAX_SPELL_EFFECTS; ++j)
     {
@@ -4939,7 +4943,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 
         ObjectGuid targetGUID = ObjectGuid::Empty;
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) && !m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER &&
+            m_caster->GetTarget() == unitTarget->GetGUID())
         {
             targetGUID = unitTarget->GetGUID();
         }

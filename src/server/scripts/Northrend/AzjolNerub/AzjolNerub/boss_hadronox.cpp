@@ -97,10 +97,10 @@ public:
             {
                 instance->SetBossState(DATA_HADRONOX_EVENT, IN_PROGRESS);
                 me->setActive(true);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80000);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80s);
             }
         }
 
@@ -139,10 +139,10 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
-            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
-            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1000);
-            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15000);
+            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10s);
+            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4s);
+            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1s);
+            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15s);
         }
 
         bool AnyPlayerValid() const
@@ -183,20 +183,20 @@ public:
             {
                 case EVENT_HADRONOX_PIERCE:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCE_ARMOR, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
+                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8s);
                     break;
                 case EVENT_HADRONOX_ACID:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25s);
                     break;
                 case EVENT_HADRONOX_LEECH:
                     me->CastSpell(me, SPELL_LEECH_POISON, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12000);
+                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12s);
                     break;
                 case EVENT_HADRONOX_GRAB:
                     me->CastSpell(me, SPELL_WEB_GRAB, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25s);
                     break;
                 case EVENT_HADRONOX_MOVE4:
                     me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
@@ -281,8 +281,8 @@ public:
                         Talk(SAY_CRUSHER_AGGRO);
                     }
 
-            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8000, 0, 0);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8s, 0, 0);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -298,7 +298,7 @@ public:
             {
                 case EVENT_CRUSHER_SMASH:
                     me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15000);
+                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
@@ -307,7 +307,7 @@ public:
                         me->CastSpell(me, SPELL_FRENZY, false);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
                     break;
             }
 

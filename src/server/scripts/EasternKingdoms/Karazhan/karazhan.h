@@ -36,7 +36,7 @@ enum KZDataTypes
     DATA_ARAN                       = 6,
     DATA_TERESTIAN                  = 7,
     DATA_NETHERSPITE                = 8,
-    DATA_CHESS                      = 9,
+    DATA_CHESS_EVENT                = 9,
     DATA_MALCHEZZAR                 = 10,
     DATA_NIGHTBANE                  = 11,
     DATA_SERVANT_QUARTERS           = 12,
@@ -60,40 +60,63 @@ enum KZDataTypes
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
     DATA_PRINCE                     = 30,
     DATA_SPAWN_OPERA_DECORATIONS    = 31,
-    DATA_MIDNIGHT                   = 32
+    DATA_MIDNIGHT                   = 32,
+
+    // Chess Event
+    CHESS_EVENT_TEAM                = 33,
+    DATA_CHESS_REINIT_PIECES        = 34,
+    DATA_CHESS_GAME_PHASE           = 35,
+    DATA_ECHO_OF_MEDIVH             = 36,
+    DATA_DUST_COVERED_CHEST         = 37
 };
 
 enum KZOperaEvents
 {
-    EVENT_OZ = 1,
-    EVENT_HOOD = 2,
-    EVENT_RAJ = 3
+    EVENT_OZ    = 1,
+    EVENT_HOOD  = 2,
+    EVENT_RAJ   = 3
 };
 
-enum KZMiscCreatures
+enum KZCreatures
 {
-    NPC_HYAKISS_THE_LURKER           = 16179,
-    NPC_ROKAD_THE_RAVAGER            = 16181,
-    NPC_SHADIKITH_THE_GLIDER         = 16180,
-    NPC_TERESTIAN_ILLHOOF            = 15688,
-    NPC_MOROES                       = 15687,
-    NPC_ATTUMEN_THE_HUNTSMAN         = 15550,
-    NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED = 16152,
-    NPC_MIDNIGHT                     = 16151,
-    NPC_NIGHTBANE                    = 17225,
+    NPC_HYAKISS_THE_LURKER              = 16179,
+    NPC_ROKAD_THE_RAVAGER               = 16181,
+    NPC_SHADIKITH_THE_GLIDER            = 16180,
+    NPC_TERESTIAN_ILLHOOF               = 15688,
+    NPC_MOROES                          = 15687,
+    NPC_ATTUMEN_THE_HUNTSMAN            = 15550,
+    NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED    = 16152,
+    NPC_MIDNIGHT                        = 16151,
+    NPC_NIGHTBANE                       = 17225,
 
     // Trash
-    NPC_COLDMIST_WIDOW               = 16171,
-    NPC_COLDMIST_STALKER             = 16170,
-    NPC_SHADOWBAT                    = 16173,
-    NPC_VAMPIRIC_SHADOWBAT           = 16175,
-    NPC_GREATER_SHADOWBAT            = 16174,
-    NPC_PHASE_HOUND                  = 16178,
-    NPC_DREADBEAST                   = 16177,
-    NPC_SHADOWBEAST                  = 16176,
-    NPC_KILREK                       = 17229,
-    NPC_RELAY                        = 17645,
-    NPC_BARNES                       = 16812
+    NPC_COLDMIST_WIDOW                  = 16171,
+    NPC_COLDMIST_STALKER                = 16170,
+    NPC_SHADOWBAT                       = 16173,
+    NPC_VAMPIRIC_SHADOWBAT              = 16175,
+    NPC_GREATER_SHADOWBAT               = 16174,
+    NPC_PHASE_HOUND                     = 16178,
+    NPC_DREADBEAST                      = 16177,
+    NPC_SHADOWBEAST                     = 16176,
+    NPC_KILREK                          = 17229,
+    NPC_RELAY                           = 17645,
+    NPC_BARNES                          = 16812,
+
+    // Chess Event
+    NPC_ECHO_OF_MEDIVH                  = 16816,
+    NPC_PAWN_H                          = 17469,
+    NPC_PAWN_A                          = 17211,
+    NPC_KNIGHT_H                        = 21748,
+    NPC_KNIGHT_A                        = 21664,
+    NPC_QUEEN_H                         = 21750,
+    NPC_QUEEN_A                         = 21683,
+    NPC_BISHOP_H                        = 21747,
+    NPC_BISHOP_A                        = 21682,
+    NPC_ROOK_H                          = 21726,
+    NPC_ROOK_A                          = 21160,
+    NPC_KING_H                          = 21752,
+    NPC_KING_A                          = 21684,
+    NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521
 };
 
 enum KZGameObjectIds
@@ -124,14 +147,39 @@ enum KZGameObjectIds
 
 enum KZMisc
 {
-    OPTIONAL_BOSS_REQUIRED_DEATH_COUNT = 50
+    OPTIONAL_BOSS_REQUIRED_DEATH_COUNT      = 50,
+
+    ACTION_CHESS_PIECE_RESET_ORIENTATION    = 1
 };
 
 enum KarazhanSpells
 {
-    SPELL_RATTLED = 32437,
-    SPELL_OVERLOAD = 29766,
-    SPELL_BLINK = 29884
+    SPELL_RATTLED           = 32437,
+    SPELL_OVERLOAD          = 29766,
+    SPELL_BLINK             = 29884,
+
+    // Chess Event
+    SPELL_GAME_IN_SESSION   = 39331,
+    SPELL_HAND_OF_MEDIVH    = 39339, // 1st cheat: AOE spell burn cell under enemy chesspieces.
+    SPELL_FURY_OF_MEDIVH    = 39383  // 2nd cheat: Berserk own chesspieces.
+};
+
+enum KarazhanChessGamePhase
+{
+    CHESS_PHASE_NOT_STARTED     = 0,
+    CHESS_PHASE_PVE_WARMUP      = 1, // Medivh has been spoken too but king isn't controlled yet
+    CHESS_PHASE_INPROGRESS_PVE  = 2,
+    CHESS_PHASE_FAILED          = 3,
+    CHESS_PHASE_PVE_FINISHED    = 4,
+    CHESS_PHASE_PVP_WARMUP      = 5,
+    CHESS_PHASE_INPROGRESS_PVP  = 6  // Get back to PVE_FINISHED after that
+};
+
+enum KarazhanChessGameFactions
+{
+    CHESS_FACTION_HORDE         = 1689,
+    CHESS_FACTION_ALLIANCE      = 1690,
+    CHESS_FACTION_BOTH          = 536
 };
 
 template <class AI, class T>

@@ -72,13 +72,15 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
  *  2 - paused
  */
 int m_ServiceStatus = -1;
+
+#include <boost/dll/shared_library.hpp>
+#include <timeapi.h>
 #endif
 
 #ifndef _ACORE_CORE_CONFIG
 #define _ACORE_CORE_CONFIG "worldserver.conf"
 #endif
 
-#define WORLD_SLEEP_CONST 10
 using namespace boost::program_options;
 namespace fs = std::filesystem;
 
@@ -111,7 +113,6 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
 AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 void ShutdownCLIThread(std::thread* cliThread);
 void AuctionListingRunnable();
-void ShutdownAuctionListingThread(std::thread* thread);
 void WorldUpdateLoop();
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& cfg_service);
 
@@ -137,6 +138,44 @@ int main(int argc, char** argv)
         return WinServiceUninstall() == true ? 0 : 1;
     else if (configService.compare("run") == 0)
         WinServiceRun();
+
+    Optional<UINT> newTimerResolution;
+    boost::system::error_code dllError;
+    std::shared_ptr<boost::dll::shared_library> winmm(new boost::dll::shared_library("winmm.dll", dllError, boost::dll::load_mode::search_system_folders), [&](boost::dll::shared_library* lib)
+    {
+        try
+        {
+            if (newTimerResolution)
+                lib->get<decltype(timeEndPeriod)>("timeEndPeriod")(*newTimerResolution);
+        }
+        catch (std::exception const&)
+        {
+            // ignore
+        }
+
+        delete lib;
+    });
+
+    if (winmm->is_loaded())
+    {
+        try
+        {
+            auto timeGetDevCapsPtr = winmm->get<decltype(timeGetDevCaps)>("timeGetDevCaps");
+            // setup timer resolution
+            TIMECAPS timeResolutionLimits;
+            if (timeGetDevCapsPtr(&timeResolutionLimits, sizeof(TIMECAPS)) == TIMERR_NOERROR)
+            {
+                auto timeBeginPeriodPtr = winmm->get<decltype(timeBeginPeriod)>("timeBeginPeriod");
+                newTimerResolution = std::min(std::max(timeResolutionLimits.wPeriodMin, 1u), timeResolutionLimits.wPeriodMax);
+                timeBeginPeriodPtr(*newTimerResolution);
+            }
+        }
+        catch (std::exception const& e)
+        {
+            printf("Failed to initialize timer resolution: %s\n", e.what());
+        }
+    }
+
 #endif
 
     // Add file and args in config
@@ -358,9 +397,9 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
-    // Launch CliRunnable thread
-    std::shared_ptr<std::thread> auctionLisingThread;
-    auctionLisingThread.reset(new std::thread(AuctionListingRunnable),
+    // Launch auction listing thread
+    std::shared_ptr<std::thread> auctionListingThread;
+    auctionListingThread.reset(new std::thread(AuctionListingRunnable),
         [](std::thread* thr)
     {
         thr->join();
@@ -522,8 +561,14 @@ void ShutdownCLIThread(std::thread* cliThread)
 
 void WorldUpdateLoop()
 {
+    uint32 minUpdateDiff = uint32(sConfigMgr->GetOption<int32>("MinWorldUpdateTime", 1));
     uint32 realCurrTime = 0;
     uint32 realPrevTime = getMSTime();
+
+    uint32 maxCoreStuckTime = uint32(sConfigMgr->GetOption<int32>("MaxCoreStuckTime", 60)) * 1000;
+    uint32 halfMaxCoreStuckTime = maxCoreStuckTime / 2;
+    if (!halfMaxCoreStuckTime)
+        halfMaxCoreStuckTime = std::numeric_limits<uint32>::max();
 
     LoginDatabase.WarnAboutSyncQueries(true);
     CharacterDatabase.WarnAboutSyncQueries(true);
@@ -536,17 +581,18 @@ void WorldUpdateLoop()
         realCurrTime = getMSTime();
 
         uint32 diff = getMSTimeDiff(realPrevTime, realCurrTime);
+        if (diff < minUpdateDiff)
+        {
+            uint32 sleepTime = minUpdateDiff - diff;
+            if (sleepTime >= halfMaxCoreStuckTime)
+                LOG_ERROR("server.worldserver", "WorldUpdateLoop() waiting for {} ms with MaxCoreStuckTime set to {} ms", sleepTime, maxCoreStuckTime);
+            // sleep until enough time passes that we can update all timers
+            std::this_thread::sleep_for(Milliseconds(sleepTime));
+            continue;
+        }
 
         sWorld->Update(diff);
         realPrevTime = realCurrTime;
-
-        uint32 executionTimeDiff = getMSTimeDiff(realCurrTime, getMSTime());
-
-        // we know exactly how long it took to update the world, if the update took less than WORLD_SLEEP_CONST, sleep for WORLD_SLEEP_CONST - world update time
-        if (executionTimeDiff < WORLD_SLEEP_CONST)
-        {
-            std::this_thread::sleep_for(Milliseconds(WORLD_SLEEP_CONST - executionTimeDiff));
-        }
 
 #ifdef _WIN32
         if (m_ServiceStatus == 0)
@@ -583,10 +629,14 @@ void FreezeDetector::Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, bo
                 freezeDetector->_worldLoopCounter = worldLoopCounter;
             }
             // possible freeze
-            else if (getMSTimeDiff(freezeDetector->_lastChangeMsTime, curtime) > freezeDetector->_maxCoreStuckTimeInMs)
+            else
             {
-                LOG_ERROR("server.worldserver", "World Thread hangs, kicking out server!");
-                ABORT();
+                uint32 msTimeDiff = getMSTimeDiff(freezeDetector->_lastChangeMsTime, curtime);
+                if (msTimeDiff > freezeDetector->_maxCoreStuckTimeInMs)
+                {
+                    LOG_ERROR("server.worldserver", "World Thread hangs for {} ms, forcing a crash!", msTimeDiff);
+                    ABORT("World Thread hangs for {} ms, forcing a crash!", msTimeDiff);
+                }
             }
 
             freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(1));
@@ -666,57 +716,47 @@ void AuctionListingRunnable()
 
     while (!World::IsStopped())
     {
-        if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
+        Milliseconds diff = AsyncAuctionListingMgr::GetDiff();
+        AsyncAuctionListingMgr::ResetDiff();
+
+        if (!AsyncAuctionListingMgr::GetTempList().empty() || !AsyncAuctionListingMgr::GetList().empty())
         {
-            uint32 diff = AsyncAuctionListingMgr::GetDiff();
-            AsyncAuctionListingMgr::ResetDiff();
-
-            if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
 
+                for (auto const& delayEvent: AsyncAuctionListingMgr::GetTempList())
+                    AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
+
+                AsyncAuctionListingMgr::GetTempList().clear();
+            }
+
+            for (auto& itr: AsyncAuctionListingMgr::GetList())
+            {
+                if (itr._pickupTimer <= diff)
                 {
-                    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-
-                    for (auto const& delayEvent : AsyncAuctionListingMgr::GetTempList())
-                        AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
-
-                    AsyncAuctionListingMgr::GetTempList().clear();
+                    itr._pickupTimer = Milliseconds::zero();
                 }
-
-                for (auto& itr : AsyncAuctionListingMgr::GetList())
+                else
                 {
-                    if (itr._msTimer <= diff)
-                        itr._msTimer = 0;
-                    else
-                        itr._msTimer -= diff;
+                    itr._pickupTimer -= diff;
                 }
+            }
 
-                for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-                {
-                    if ((*itr)._msTimer != 0)
-                        continue;
+            for (auto itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
+            {
+                if ((*itr)._pickupTimer != Milliseconds::zero())
+                    continue;
 
-                    if ((*itr).Execute())
-                        AsyncAuctionListingMgr::GetList().erase(itr);
+                if ((*itr).Execute())
+                    AsyncAuctionListingMgr::GetList().erase(itr);
 
-                    break;
-                }
+                break;
             }
         }
         std::this_thread::sleep_for(1ms);
     }
 
     LOG_INFO("server", "Auction House Listing thread exiting without problems.");
-}
-
-void ShutdownAuctionListingThread(std::thread* thread)
-{
-    if (thread)
-    {
-        thread->join();
-        delete thread;
-    }
 }
 
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& configService)
@@ -728,7 +768,7 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [
         ("dry-run,d", "Dry run")
         ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG))), "use <arg> as configuration file");
 
-#if AC_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     options_description win("Windows platform specific options");
     win.add_options()
         ("service,s", value<std::string>(&configService)->default_value(""), "Windows service options: [install | uninstall]");

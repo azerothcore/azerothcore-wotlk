@@ -459,17 +459,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    float runSpeed = cinfo->speed_run;
-    if (Pet* pet = ToPet())
-    {
-        if (pet->isControlled() && pet->GetOwnerGUID().IsPlayer())
-        {
-            runSpeed = 1.15f;
-        }
-    }
-
     SetSpeed(MOVE_WALK, cinfo->speed_walk);
-    SetSpeed(MOVE_RUN, runSpeed);
+    SetSpeed(MOVE_RUN, cinfo->speed_run);
     SetSpeed(MOVE_SWIM, cinfo->speed_swim);
     SetSpeed(MOVE_FLIGHT, cinfo->speed_flight);
 
@@ -2454,8 +2445,8 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (GetCharmerOrOwnerGUID())
         return false;
 
-    // Check for ignore assistance extra flag
-    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ASSISTANCE_CALL))
+    /// @todo: Implement aggro range, detection range and assistance range templates
+    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ALL_ASSISTANCE_CALLS))
     {
         return false;
     }

@@ -18,9 +18,9 @@
 DROP TABLE IF EXISTS `item_soulbound_trade_data`;
 CREATE TABLE IF NOT EXISTS `item_soulbound_trade_data` (
   `itemGuid` int unsigned NOT NULL COMMENT 'Item GUID',
-  `allowedPlayers` text NOT NULL COMMENT 'Space separated GUID list of players who can receive this item in trade',
+  `allowedPlayers` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Space separated GUID list of players who can receive this item in trade',
   PRIMARY KEY (`itemGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item Refund System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item Refund System';
 
 -- Dumping data for table acore_characters.item_soulbound_trade_data: ~0 rows (approximately)
 DELETE FROM `item_soulbound_trade_data`;

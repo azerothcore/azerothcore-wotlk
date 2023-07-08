@@ -19,22 +19,21 @@ DROP TABLE IF EXISTS `dungeon_access_requirements`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_requirements` (
   `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
-  `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_note` varchar(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `requirement_id` int unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
+  `requirement_note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` tinyint unsigned DEFAULT NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
   `leader_only` tinyint NOT NULL DEFAULT '0' COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
-  `comment` varchar(255) DEFAULT NULL,
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`dungeon_access_id`,`requirement_type`,`requirement_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
 
--- Dumping data for table acore_world.dungeon_access_requirements: 35 rows
+-- Dumping data for table acore_world.dungeon_access_requirements: ~35 rows (approximately)
 DELETE FROM `dungeon_access_requirements`;
-/*!40000 ALTER TABLE `dungeon_access_requirements` DISABLE KEYS */;
 INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `requirement_note`, `faction`, `priority`, `leader_only`, `comment`) VALUES
 	(17, 1, 10285, 'You must complete the quest "Return to Andormu" before entering the Black Morass.', 2, NULL, 0, 'Caverns of Time: Opening the Dark Portal (Normal)'),
-	(18, 2, 30635, NULL, 2, NULL, 0, 'Caverns of Time: Opening the Dark Portal (Heroic)'),
 	(18, 1, 10285, 'You must complete the quest "Return to Andormu" and be level 70 before entering the Heroic difficulty of the Black Morass.', 2, NULL, 1, 'Caverns of Time: Opening the Dark Portal (Heroic)'),
+	(18, 2, 30635, NULL, 2, NULL, 0, 'Caverns of Time: Opening the Dark Portal (Heroic)'),
 	(34, 2, 30622, NULL, 0, NULL, 0, 'Hellfire Citadel: The Shattered Halls (Heroic)'),
 	(34, 2, 30637, NULL, 1, NULL, 0, 'Hellfire Citadel: The Shattered Halls (Heroic)'),
 	(36, 2, 30622, NULL, 0, NULL, 0, 'Hellfire Citadel: The Blood Furnace (Heroic)'),
@@ -51,6 +50,8 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
 	(57, 2, 30633, NULL, 2, NULL, 0, 'Auchindoun: Sethekk Halls (Heroic)'),
 	(59, 2, 30633, NULL, 2, NULL, 0, 'Auchindoun: Mana-Tombs (Heroic)'),
 	(61, 2, 30633, NULL, 2, NULL, 0, 'Auchindoun: Auchenai Crypts (Heroic)'),
+	(62, 1, 10277, 'You must complete the quest "The Caverns of Time" before entering Old Hillsbrad Foothills', 2, NULL, 0, 'Caverns Of Time: Escape from Durnholde (Normal)'),
+	(63, 1, 10277, 'You must complete the quest "The Caverns of Time" and be level 70 before entering the Heroic difficulty of Old Hillsbrad Foothills', 2, NULL, 0, 'Caverns Of Time: Escape from Durnholde (Heroic)'),
 	(63, 2, 30635, NULL, 2, NULL, 0, 'Caverns Of Time: Escape from Durnholde (Heroic)'),
 	(77, 1, 11492, 'You must complete the quest "Hard to Kill" and be level 70 before entering the Heroic difficulty of the Magisters\' Terrace.', 2, NULL, 0, 'Isle of Quel\'Danas: Magisters\' Terrace (Heroic)'),
 	(104, 0, 4530, NULL, 2, NULL, 0, 'Icecrown Citadel (10 player, Heroic)'),
@@ -64,10 +65,7 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
 	(116, 1, 24710, 'You must complete the quest "Deliverance from the Pit" before entering the Halls of Reflection.', 0, NULL, 0, 'Icecrown Citadel: Halls of Reflection (Normal)'),
 	(116, 1, 24712, 'You must complete the quest "Deliverance from the Pit" before entering the Halls of Reflection.', 1, NULL, 0, 'Icecrown Citadel: Halls of Reflection (Normal)'),
 	(117, 1, 24710, 'You must complete the quest "Deliverance from the Pit" and be level 80 before entering the Heroic difficulty of the Halls of Reflection.', 0, NULL, 0, 'Icecrown Citadel: Halls of Reflection (Heroic)'),
-	(117, 1, 24712, 'You must complete the quest "Deliverance from the Pit" and be level 80 before entering the Heroic difficulty of the Halls of Reflection.', 1, NULL, 0, 'Icecrown Citadel: Halls of Reflection (Heroic)'),
-	(62, 1, 10277, 'You must complete the quest "The Caverns of Time" before entering Old Hillsbrad Foothills', 2, NULL, 0, 'Caverns Of Time: Escape from Durnholde (Normal)'),
-	(63, 1, 10277, 'You must complete the quest "The Caverns of Time" and be level 70 before entering the Heroic difficulty of Old Hillsbrad Foothills', 2, NULL, 0, 'Caverns Of Time: Escape from Durnholde (Heroic)');
-/*!40000 ALTER TABLE `dungeon_access_requirements` ENABLE KEYS */;
+	(117, 1, 24712, 'You must complete the quest "Deliverance from the Pit" and be level 80 before entering the Heroic difficulty of the Halls of Reflection.', 1, NULL, 0, 'Icecrown Citadel: Halls of Reflection (Heroic)');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
