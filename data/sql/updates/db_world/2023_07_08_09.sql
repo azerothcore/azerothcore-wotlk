@@ -1,3 +1,4 @@
+-- DB update 2023_07_08_08 -> 2023_07_08_09
 --
 -- Creature entry 20287, Zaxxis Ambusher
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20287;
