@@ -125,7 +125,7 @@ class AC_DATABASE_API LoginDatabasePool : public DatabaseWorkerPool
 {
 public:
     LoginDatabasePool() : DatabaseWorkerPool(DatabaseType::Auth) { }
-    ~LoginDatabasePool() = default;
+    ~LoginDatabasePool() override = default;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;

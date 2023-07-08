@@ -49,7 +49,7 @@ struct AC_DATABASE_API MySQLConnectionInfo
 class AC_DATABASE_API MySQLConnection
 {
 public:
-    explicit MySQLConnection(MySQLConnectionInfo& connInfo, ProducerConsumerQueue<AsyncOperation*>* dbQueue, bool isDynamic = false);
+    MySQLConnection(MySQLConnectionInfo& connInfo, ProducerConsumerQueue<AsyncOperation*>* dbQueue, bool isDynamic = false);
     virtual ~MySQLConnection();
 
     virtual uint32 Open();
@@ -92,13 +92,16 @@ public:
     [[nodiscard]] bool CanRemoveConnection();
     [[nodiscard]] std::size_t GetQueueSize() const;
 
+protected:
+    virtual bool HandleMySQLError(uint32 errNo, uint8 attempts = 5);
+
+    MySQLHandle* _mysqlHandle{ nullptr };
+
 private:
     bool Query(std::string_view sql, MySQLResult** result, MySQLField** fields, uint64* rowCount, uint32* fieldCount);
     bool Query(PreparedStatement stmt, MySQLPreparedStatement** mysqlStmt, MySQLResult** pResult, uint64* pRowCount, uint32* pFieldCount);
-    bool HandleMySQLError(uint32 errNo, uint8 attempts = 5);
     inline void UpdateLastUseTime() { _lastUseTime = std::chrono::system_clock::now(); }
 
-    MySQLHandle* _mysqlHandle{ nullptr };
     MySQLConnectionInfo& _connectionInfo;
     ConnectionFlags _connectionFlags{ ConnectionFlags::Sync };
     PreparedStatementList _stmtList;

@@ -108,7 +108,7 @@ class AC_DATABASE_API WorldDatabasePool : public DatabaseWorkerPool
 {
 public:
     WorldDatabasePool() : DatabaseWorkerPool(DatabaseType::World) { }
-    ~WorldDatabasePool() = default;
+    ~WorldDatabasePool() override = default;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;

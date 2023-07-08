@@ -529,7 +529,7 @@ class AC_DATABASE_API CharacterDatabasePool : public DatabaseWorkerPool
 {
 public:
     CharacterDatabasePool() : DatabaseWorkerPool(DatabaseType::Character) { }
-    ~CharacterDatabasePool() = default;
+    ~CharacterDatabasePool() override = default;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;

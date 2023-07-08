@@ -38,8 +38,8 @@ enum class DatabaseType : uint8
     Auth        = 1,
     Character   = 2,
     World       = 4,
-//    Dbc         = 8,
-    All   = Auth | Character | World /*| Dbc*/
+    Custom      = 8,
+    All         = Auth | Character | World | Custom
 };
 
 class Field;

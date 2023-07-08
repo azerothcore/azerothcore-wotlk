@@ -58,7 +58,7 @@ private:
 
 public:
     explicit DatabaseWorkerPool(DatabaseType type);
-    ~DatabaseWorkerPool();
+    virtual ~DatabaseWorkerPool();
 
     void SetConnectionInfo(std::string_view infoString);
 
