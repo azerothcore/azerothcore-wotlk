@@ -80,8 +80,8 @@ DatabaseWorkerPool::DatabaseWorkerPool(DatabaseType type) :
     bool isSameClientDB    = true; // Client version 3.2.3?
 #endif
 
-    ASSERT(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.3");
-    ASSERT(isSameClientDB, "Used DB library version ({} id {}) does not match the version id used to compile AzerothCore (id {})", mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
+    ASSERT(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.3\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00043)");
+    ASSERT(isSameClientDB, "Used DB library version ({} id {}) does not match the version id used to compile AzerothCore (id {})\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00046).", mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
 
     _scheduler = std::make_unique<TaskScheduler>();
     _queue = std::make_unique<ProducerConsumerQueue<AsyncOperation*>>();
