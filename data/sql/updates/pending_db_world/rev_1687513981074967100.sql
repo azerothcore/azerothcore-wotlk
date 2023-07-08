@@ -9,7 +9,7 @@ DELETE FROM `quest_details` WHERE `ID`=1476;
 INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES
 (1476, 6, 11, 1, 0, 200, 0, 0, 0, 0);
 
-UPDATE `quest_offer_reward` SET `Emote1`=1 WHERE `ID`=1472;-- EMOTE_ONESHOT_TALK
+
 
 -- Use SmatAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5693;
