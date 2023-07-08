@@ -1,3 +1,4 @@
+-- DB update 2023_07_08_02 -> 2023_07_08_03
 -- Fix Un'goro's Crystal Pylons --
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` IN (164955, 164956, 164957);
 
