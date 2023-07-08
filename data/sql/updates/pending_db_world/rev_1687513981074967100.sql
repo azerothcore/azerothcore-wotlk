@@ -22,8 +22,17 @@ UPDATE `creature_text` SET `Emote`=1 WHERE `CreatureID`=5693 AND `GroupID`=3 AND
 UPDATE `creature_text` SET `Emote`=11 WHERE `CreatureID`=5693 AND `GroupID`=4 AND `ID`=0;-- EMOTE_ONESHOT_LAUGH
 
 -- Update unit_flags Make summoned NPCs unattackable and unselectable
-UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5691);
-UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE (`entry` = 5692);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5692;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5692);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(5692, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33555200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Update unit_flags unselectable');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5691;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5691);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(5691, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33555200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Update unit_flags unselectable');
+
+
 
 -- SmatAI Start-------------------------------------
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5693);
