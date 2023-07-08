@@ -176,21 +176,32 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
         Path moduleDir{ *_sourceDirectory };
         moduleDir /= "modules";
         moduleDir /= name;
-        moduleDir /= "sql";
+        moduleDir /= "data/sql/";
 
         // Skip check if not exist sql dir in module
         if (!is_directory(moduleDir))
             continue;
 
-        moduleDir /= _dbModuleName; // modules/mod-name/sql/db-world
+        auto defaultPathToDB = moduleDir;
+        auto acPathToDB      = moduleDir;
+        defaultPathToDB /= _dbModuleName;
 
-        if (!fs::is_directory(moduleDir))
-            continue;
+        {
+            std::string acModuleDb = _dbModuleName;
+            std::replace(acModuleDb.begin(), acModuleDb.end(), '_', '-');
+            acPathToDB /= acModuleDb;
+        }
 
-        DirectoryEntry const entry = { moduleDir, MODULE };
-        directories.emplace_back(entry);
-
-        LOG_TRACE("db.update", "Added applied modules file \"{}\" from remote.", moduleDir.filename().generic_string());
+        if (fs::is_directory(defaultPathToDB))
+        {
+            directories.emplace_back(defaultPathToDB, MODULE);
+            LOG_TRACE("db.update", "Added applied modules file \"{}\" from remote.", defaultPathToDB.generic_string());
+        }
+        else if (fs::is_directory(acPathToDB))
+        {
+            directories.emplace_back(acPathToDB, MODULE);
+            LOG_TRACE("db.update", "Added applied modules file \"{}\" from remote.", acPathToDB.generic_string());
+        }
     }
 
     return directories;
