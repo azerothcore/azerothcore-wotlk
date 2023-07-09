@@ -1,1 +1,1 @@
-UPDATE `acore_world`.`broadcast_text` SET `MaleText` = 'You will find a pair of draenei conversing with Tyrande Whisperwind in the upper level of The Temple of the Moon.$B$BThey will know how to help you.', `FemaleText` = 'You will find a pair of draenei conversing with Tyrande Whisperwind in the upper level of The Temple of the Moon.$B$BThey will know how to help you.' WHERE (`ID` = '40591');
+UPDATE `npc_text` SET `BroadcastTextID0` = 0 WHERE `ID` = 15906 AND `BroadcastTextID0` = 40591; -- Unlink incorrect broadcast text
