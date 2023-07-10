@@ -177,11 +177,11 @@ public:
                 scheduler.Schedule(9s, [this](TaskContext context)
                 {
                     DoCastVictim(SPELL_CLEAVE);
-                    context.Repeat(10s);
-                }).Schedule(10s, [this](TaskContext context)
+                    context.Repeat(1200ms, 16300ms);
+                }).Schedule(20s, [this](TaskContext context)
                 {
                     me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
-                    context.Repeat(30s);
+                    context.Repeat(11s, 39s);
                 }).Schedule(40s, [this](TaskContext context)
                 {
                     me->CastSpell(me, SPELL_QUAKE); //needs fixes with custom spell
@@ -203,7 +203,7 @@ public:
                             scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
                         });
                     });
-                    context.Repeat(50s);
+                    context.Repeat(53s, 56s);
                 }).Schedule(1320s, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_BERSERK, true);
