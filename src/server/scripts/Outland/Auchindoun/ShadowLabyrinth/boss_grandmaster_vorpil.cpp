@@ -20,47 +20,52 @@
 #include "ScriptedCreature.h"
 #include "shadow_labyrinth.h"
 
-enum GrandmasterVorpil
+enum Text
 {
     SAY_INTRO                   = 0,
     SAY_AGGRO                   = 1,
     SAY_HELP                    = 2,
     SAY_SLAY                    = 3,
-    SAY_DEATH                   = 4,
+    SAY_DEATH                   = 4
+};
 
+enum Spells
+{
+    // Vorpil
     SPELL_RAIN_OF_FIRE          = 33617,
-
     SPELL_DRAW_SHADOWS          = 33563,
     SPELL_SHADOWBOLT_VOLLEY     = 33841,
     SPELL_BANISH                = 38791,
 
-    NPC_VOID_TRAVELER           = 19226,
+    // Void Traveler
     SPELL_SACRIFICE             = 33587,
     SPELL_SHADOW_NOVA           = 33846,
     SPELL_EMPOWERING_SHADOWS    = 33783,
 
-    NPC_VOID_PORTAL             = 19224,
-    SPELL_VOID_PORTAL_VISUAL    = 33569,
+    SPELL_VOID_PORTAL_VISUAL    = 33569
+};
+
+enum Npc
+{
+    NPC_VOID_TRAVELER           = 19226,
+    NPC_VOID_PORTAL             = 19224
 };
 
 float VorpilPosition[3] = {-253.548f, -263.646f, 17.0864f};
 
-//x, y, z, and orientation
+// x, y, z, and orientation
 float VoidPortalCoords[5][4] =
 {
-    {-208.411f, -263.652f, 17.086313f, 3.121870040893554687f},  //portal A 33566
-    {-261.676f, -297.69f, 17.087011f, 1.360249996185302734f},   //portal B 33614
-    {-282.272f, -240.432f, 12.683899f, 5.580170154571533203f},  //portal C 33615
-    {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f},  //portal D 33567
-    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f}   //portal E 33616
+    {-208.411f, -263.652f, 17.086313f, 3.121870040893554687f},  // portal A 33566
+    {-261.676f, -297.69f, 17.087011f, 1.360249996185302734f},   // portal B 33614
+    {-282.272f, -240.432f, 12.683899f, 5.580170154571533203f},  // portal C 33615
+    {-291.833f, -268.595f, 12.682545f, 0.047733999788761138f},  // portal D 33567
+    {-303.966f, -255.759f, 12.683404f, 6.012829780578613281f}   // portal E 33616
 };
 
 struct boss_grandmaster_vorpil : public BossAI
 {
-    boss_grandmaster_vorpil(Creature* creature) : BossAI(creature, DATA_GRANDMASTER_VORPIL)
-    {
-        sayIntro = false;
-    }
+    boss_grandmaster_vorpil(Creature* creature) : BossAI(creature, DATA_GRANDMASTER_VORPIL), sayIntro(false) {}
 
     bool sayIntro, sayHelp;
 
@@ -111,7 +116,6 @@ struct boss_grandmaster_vorpil : public BossAI
             default:
                 return 4800ms;
         }
-
         return 1s;
     }
 
@@ -146,7 +150,6 @@ struct boss_grandmaster_vorpil : public BossAI
     {
         Talk(SAY_AGGRO);
         summonPortals();
-
         scheduler.Schedule(9700ms, 20s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
