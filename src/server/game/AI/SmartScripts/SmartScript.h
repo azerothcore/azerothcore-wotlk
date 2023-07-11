@@ -30,8 +30,7 @@
 class SmartScript
 {
 using SmartScriptFrame = std::tuple<SmartScriptHolder, Unit*, uint32, uint32, bool, SpellInfo const*, GameObject*>;
-public:
-    
+public: 
     SmartScript();
     ~SmartScript();
 
