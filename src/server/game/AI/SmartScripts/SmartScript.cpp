@@ -106,7 +106,22 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
             ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
             if (sConditionMgr->IsObjectMeetToConditions(info, conds))
-                ProcessEvent(*i, unit, var0, var1, bvar, spell, gob);
+            {
+                //TODO: do this steps
+                //initialize the stack, I'll put stack as a class attrib for now but it can be a local variable as I clear it here 
+                executionStack.clear();
+                //put event data on stack
+                executionStack.emplace_back(*i, unit, var0, var1, bvar, spell, gob);
+                //while stack not empty
+                while (!executionStack.empty())
+                {
+                    //pop top event data from stack
+                    auto [stack_holder , stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                    executionStack.pop_back();
+                    //ProcessEvents
+                    ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                }
+            }
         }
     }
 }
@@ -2884,7 +2899,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     {
         SmartScriptHolder linked = FindLinkedEvent(e.link);
         if (linked.GetActionType() && linked.GetEventType() == SMART_EVENT_LINK)
-            ProcessEvent(linked, unit, var0, var1, bvar, spell, gob);
+            executionStack.emplace_back(linked, unit, var0, var1, bvar, spell, gob);
         else
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.link);
     }

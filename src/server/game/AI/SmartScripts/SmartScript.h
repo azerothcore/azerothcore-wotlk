@@ -25,10 +25,13 @@
 #include "SmartScriptMgr.h"
 #include "Spell.h"
 #include "Unit.h"
+#include <deque>
 
 class SmartScript
 {
+using SmartScriptFrame = std::tuple<SmartScriptHolder, Unit*, uint32, uint32, bool, SpellInfo const*, GameObject*>;
 public:
+    
     SmartScript();
     ~SmartScript();
 
@@ -311,6 +314,8 @@ private:
     }
 
     GuidUnorderedSet _summonList;
+
+    std::deque<SmartScriptFrame> executionStack;
 };
 
 #endif
