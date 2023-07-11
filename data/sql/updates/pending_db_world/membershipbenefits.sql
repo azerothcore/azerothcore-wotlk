@@ -22,8 +22,8 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 (25424, 1, 526791, 55, 0, 1, 1, 1, 1, ''),
 (25424, 2, 526791, 55, 0, 1, 2, 1, 1, ''),
 (25424, 3, 526792, 4, 0, 1, 0, 1, 1, ''),
-(25424, 3, 526792, 4, 0, 1, 1, 1, 1, ''),
-(25424, 3, 526792, 4, 0, 1, 2, 1, 1, '');
+(25424, 4, 526792, 4, 0, 1, 1, 1, 1, ''),
+(25424, 5, 526792, 4, 0, 1, 2, 1, 1, '');
 
 DELETE FROM `item_loot_template` WHERE (`Entry` = 25419) AND (`Item` IN (21929, 23077, 23079, 23107, 23112, 23117, 23436, 23437, 23438, 23439, 23440, 23441, 0, 1, 2, 3));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -31,8 +31,8 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 (25419, 1, 526791, 55, 0, 1, 1, 1, 1, ''),
 (25419, 2, 526791, 55, 0, 1, 2, 1, 1, ''),
 (25419, 3, 526792, 4, 0, 1, 0, 1, 1, ''),
-(25419, 3, 526792, 4, 0, 1, 1, 1, 1, ''),
-(25419, 3, 526792, 4, 0, 1, 2, 1, 1, '');
+(25419, 4, 526792, 4, 0, 1, 1, 1, 1, ''),
+(25419, 5, 526792, 4, 0, 1, 2, 1, 1, '');
 
 DELETE FROM `item_loot_template` WHERE (`Entry` = 25422) AND (`Item` IN (21929, 23077, 23079, 23107, 23112, 23117, 23436, 23437, 23438, 23439, 23440, 23441, 0, 1, 2, 3));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -40,8 +40,8 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 (25422, 1, 526791, 67, 0, 1, 1, 1, 1, ''),
 (25422, 2, 526791, 67, 0, 1, 2, 1, 1, ''),
 (25422, 3, 526792, 22, 0, 1, 0, 1, 1, ''),
-(25422, 3, 526792, 22, 0, 1, 1, 1, 1, ''),
-(25422, 3, 526792, 22, 0, 1, 2, 1, 1, '');
+(25422, 4, 526792, 22, 0, 1, 1, 1, 1, ''),
+(25422, 5, 526792, 22, 0, 1, 2, 1, 1, '');
 
 DELETE FROM `item_loot_template` WHERE (`Entry` = 25423) AND (`Item` IN (21929, 23077, 23079, 23107, 23112, 23117, 23436, 23437, 23438, 23439, 23440, 23441, 0, 1, 2, 3));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -50,4 +50,4 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 (25423, 2, 526791, 70, 0, 1, 2, 1, 1, ''),
 (25423, 3, 526792, 100, 0, 1, 0, 1, 1, ''),
 (25423, 4, 526792, 25, 0, 1, 1, 1, 1, ''),
-(25423, 4, 526792, 25, 0, 1, 2, 1, 1, '');
+(25423, 5, 526792, 25, 0, 1, 2, 1, 1, '');
