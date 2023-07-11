@@ -1,3 +1,4 @@
+-- DB update 2023_07_10_03 -> 2023_07_11_00
 -- Old Hillsbrad Foothills
 UPDATE `creature_loot_template` SET `GroupID` = 7 WHERE `Entry` = 20531 AND `Item` IN (
 27904, -- Resounding Ring of Glory
