@@ -275,6 +275,10 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.rangeRepeat.onlyFireOnRepeat > 1)
                     temp.event.rangeRepeat.onlyFireOnRepeat = 1;
                 break;
+            case SMART_EVENT_AREA_RANGE:
+                if (temp.event.areaRange.repeatMin == 0 && temp.event.areaRange.repeatMax == 0)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
                 if (temp.event.minMaxRepeat.min == 0 && temp.event.minMaxRepeat.max == 0)
@@ -349,6 +353,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_TARGET_HEALTH_PCT:
         case SMART_EVENT_TARGET_MANA_PCT:
         case SMART_EVENT_RANGE:
+        case SMART_EVENT_AREA_RANGE:
         case SMART_EVENT_VICTIM_CASTING:
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_TARGET_BUFFED:
@@ -581,6 +586,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_NEAR_UNIT: return sizeof(SmartEvent::nearUnit);
             case SMART_EVENT_NEAR_UNIT_NEGATION: return sizeof(SmartEvent::nearUnitNegation);
             case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::areaCasting);
+            case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::areaRange);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -962,6 +968,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
 
                 if (!IsMinMaxValid(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax))
+                    return false;
+                break;
+            case SMART_EVENT_AREA_RANGE:
+                if (!IsMinMaxValid(e, e.event.areaRange.minRange, e.event.areaRange.maxRange))
+                    return false;
+
+                if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
                     return false;
                 break;
             case SMART_EVENT_SPELLHIT:

@@ -3691,7 +3691,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                         ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
                 }
                 else
-                    RecalcTimer(e, 500, 500); // make it predictable
+                    RecalcTimer(e, 1200, 1200); // make it predictable
 
                 break;
             }
@@ -4347,9 +4347,28 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     return;
                 }
             }
+        }
+        case SMART_EVENT_AREA_RANGE:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    if (!(me->IsInRange(target, (float)e.event.areaRange.minRange, (float)e.event.areaRange.maxRange)))
+                        continue;
+
+                    ProcessAction(e, target);
+                    RecalcTimer(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax);
+                    return;
+                }
+            }
 
             // If no targets are found and it's off cooldown, check again
-            RecalcTimer(e, e.event.areaCasting.checkTimer, e.event.areaCasting.checkTimer);
+            RecalcTimer(e, e.event.areaRange.checkTimer, e.event.areaRange.checkTimer);
             break;
         }
         default:
@@ -4368,7 +4387,10 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
                 e.event.rangeRepeat.onlyFireOnRepeat = 2;
             // make it predictable
-            RecalcTimer(e, 500, 500);
+            RecalcTimer(e, 1200, 1200);
+            break;
+        case SMART_EVENT_AREA_RANGE:
+            RecalcTimer(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax);
             break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
@@ -4458,6 +4480,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_MANA_PCT:
             case SMART_EVENT_TARGET_MANA_PCT:
             case SMART_EVENT_RANGE:
+            case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_FRIENDLY_HEALTH:
