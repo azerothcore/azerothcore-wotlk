@@ -196,8 +196,7 @@ struct boss_magtheridon : public BossAI
                             me->InterruptNonMeleeSpells(true);
                             scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
                         }
-                        else
-                            context.Repeat(50ms);
+                        context.Repeat(50ms);
                     }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
                     {
                         _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
