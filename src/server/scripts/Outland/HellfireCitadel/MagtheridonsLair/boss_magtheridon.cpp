@@ -49,6 +49,7 @@ enum Spells
     SPELL_SHADOW_GRASP_VISUAL   = 30166,
     SPELL_MIND_EXHAUSTION       = 44032,
     SPELL_QUAKE                 = 30657,
+    SPELL_QUAKE_KNOCKBACK       = 30571,
     SPELL_COLLAPSE_DAMAGE       = 36449,
     SPELL_CAMERA_SHAKE          = 36455,
     SPELL_DEBRIS_VISUAL         = 30632,
@@ -77,232 +78,217 @@ private:
     ObjectGuid _targetGUID;
 };
 
-class boss_magtheridon : public CreatureScript
+struct boss_magtheridon : public BossAI
 {
-public:
-    boss_magtheridon() : CreatureScript("boss_magtheridon") { }
-
-    struct boss_magtheridonAI : public BossAI
+    boss_magtheridon(Creature* creature) : BossAI(creature, TYPE_MAGTHERIDON)
     {
-        boss_magtheridonAI(Creature* creature) : BossAI(creature, TYPE_MAGTHERIDON)
+        scheduler.SetValidator([this]
         {
-            scheduler.SetValidator([this]
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        _currentPhase = 0;
+        _recentlySpoken = false;
+        scheduler.Schedule(90s, [this](TaskContext context)
+        {
+            Talk(SAY_TAUNT);
+            context.Repeat(90s);
+        });
+        DoCastSelf(SPELL_SHADOW_CAGE, true);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetImmuneToPC(true);
+
+        ScheduleHealthCheckEvent(30, [&]
+        {
+            _currentPhase = 1;
+            Talk(SAY_PHASE3);
+            me->GetMotionMaster()->Clear();
+            scheduler.DelayAll(18s);
+            scheduler.Schedule(8s, [this](TaskContext /*context*/)
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
+                DoCastSelf(SPELL_CAMERA_SHAKE, true);
+                instance->SetData(DATA_COLLAPSE, GO_STATE_ACTIVE);
+            }).Schedule(15s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_COLLAPSE_DAMAGE, true);
+                me->resetAttackTimer();
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                _currentPhase = 0;
+                scheduler.Schedule(20s, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    {
+                        target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, nullptr, nullptr, me->GetGUID());
+                        me->m_Events.AddEvent(new DealDebrisDamage(*me, target->GetGUID()), me->m_Events.CalculateTime(5000));
+                    }
+                    context.Repeat(20s);
+                });
             });
+        });
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (!_recentlySpoken)
+        {
+            Talk(SAY_SLAY);
+            _recentlySpoken = true;
         }
 
-        void Reset() override
+        scheduler.Schedule(5s, [this](TaskContext /*context*/)
         {
-            _Reset();
-            _currentPhase = 0;
             _recentlySpoken = false;
-            scheduler.Schedule(90s, [this](TaskContext context)
-            {
-                Talk(SAY_TAUNT);
-                context.Repeat(90s);
-            });
-            me->CastSpell(me, SPELL_SHADOW_CAGE, true);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetImmuneToPC(true);
+        });
+    }
 
-            ScheduleHealthCheckEvent(30, [&] {
-                _currentPhase = 1;
-                Talk(SAY_PHASE3);
-                me->GetMotionMaster()->Clear();
-                scheduler.DelayAll(18s);
-                scheduler.Schedule(8s, [this](TaskContext /*context*/)
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_EMOTE_BEGIN);
+
+        scheduler.Schedule(60s, [this](TaskContext /*context*/)
+        {
+            Talk(SAY_EMOTE_NEARLY);
+        }).Schedule(120s, [this](TaskContext /*context*/)
+        {
+            Talk(SAY_EMOTE_FREE);
+        }).Schedule(123s, [this](TaskContext /*context*/)
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToPC(false);
+            me->SetReactState(REACT_AGGRESSIVE);
+            instance->SetData(DATA_ACTIVATE_CUBES, 1);
+            me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
+
+            scheduler.Schedule(9s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_CLEAVE);
+                context.Repeat(1200ms, 16300ms);
+            }).Schedule(20s, [this](TaskContext context)
+            {
+                me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
+                context.Repeat(11s, 39s);
+            }).Schedule(40s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_QUAKE); //needs fixes with custom spell
+                scheduler.Schedule(7s, [this](TaskContext /*context*/)
                 {
-                    DoCastSelf(SPELL_CAMERA_SHAKE, true);
-                    instance->SetData(DATA_COLLAPSE, GO_STATE_ACTIVE);
-                }).Schedule(15s, [this](TaskContext /*context*/)
-                {
-                    DoCastSelf(SPELL_COLLAPSE_DAMAGE, true);
-                    me->resetAttackTimer();
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    _currentPhase = 0;
-                    scheduler.Schedule(20s, [this](TaskContext context)
+                    DoCastSelf(SPELL_BLAST_NOVA);
+
+                    scheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                        if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
                         {
-                            target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, nullptr, nullptr, me->GetGUID());
-                            me->m_Events.AddEvent(new DealDebrisDamage(*me, target->GetGUID()), me->m_Events.CalculateTime(5000));
-                        }
-                        context.Repeat(20s);
-                    });
-                });
-            });
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if(!_recentlySpoken)
-            {
-                Talk(SAY_SLAY);
-                _recentlySpoken = true;
-            }
-
-            scheduler.Schedule(5s, [this](TaskContext /*context*/)
-            {
-                _recentlySpoken = false;
-            });
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            Talk(SAY_EMOTE_BEGIN);
-
-            scheduler.Schedule(60s, [this](TaskContext /*context*/)
-            {
-                Talk(SAY_EMOTE_NEARLY);
-            }).Schedule(120s, [this](TaskContext /*context*/)
-            {
-                Talk(SAY_EMOTE_FREE);
-            }).Schedule(123s, [this](TaskContext /*context*/)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetImmuneToPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-                instance->SetData(DATA_ACTIVATE_CUBES, 1);
-                me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
-
-                scheduler.Schedule(9s, [this](TaskContext context)
-                {
-                    DoCastVictim(SPELL_CLEAVE);
-                    context.Repeat(10s);
-                }).Schedule(10s, [this](TaskContext context)
-                {
-                    me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
-                    context.Repeat(30s);
-                }).Schedule(40s, [this](TaskContext context)
-                {
-                    me->CastSpell(me, SPELL_QUAKE); //needs fixes with custom spell
-                    scheduler.Schedule(7s, [this](TaskContext /*context*/)
-                    {
-                        DoCastSelf(SPELL_BLAST_NOVA);
-
-                        scheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
-                        {
-                            if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
-                            {
-                                Talk(SAY_BANISH);
-                                me->InterruptNonMeleeSpells(true);
-                                scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                            }
-                            context.Repeat(50ms);
-                        }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
-                        {
+                            Talk(SAY_BANISH);
+                            me->InterruptNonMeleeSpells(true);
                             scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                        });
+                        }
+                        context.Repeat(50ms);
+                    }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
+                    {
+                        scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
                     });
-                    context.Repeat(50s);
-                }).Schedule(1320s, [this](TaskContext /*context*/)
-                {
-                    DoCastSelf(SPELL_BERSERK, true);
                 });
-            });
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            scheduler.Update(diff);
-
-            if (_currentPhase != 1)
+                context.Repeat(53s, 56s);
+            }).Schedule(1320s, [this](TaskContext /*context*/)
             {
-                DoMeleeAttackIfReady();
-            }
-        }
-    private:
-        bool _recentlySpoken;
-        uint8 _currentPhase;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMagtheridonsLairAI<boss_magtheridonAI>(creature);
+                DoCastSelf(SPELL_BERSERK, true);
+            });
+        });
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (_currentPhase != 1)
+        {
+            DoMeleeAttackIfReady();
+        }
+    }
+
+private:
+    bool _recentlySpoken;
+    uint8 _currentPhase;
 };
 
-class spell_magtheridon_blaze : public SpellScriptLoader
+class spell_magtheridon_blaze : public SpellScript
 {
-public:
-    spell_magtheridon_blaze() : SpellScriptLoader("spell_magtheridon_blaze") { }
+    PrepareSpellScript(spell_magtheridon_blaze);
 
-    class spell_magtheridon_blaze_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_magtheridon_blaze_SpellScript);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_magtheridon_blaze_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_magtheridon_blaze_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_magtheridon_blaze::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_magtheridon_shadow_grasp : public SpellScriptLoader
+class spell_magtheridon_shadow_grasp : public AuraScript
 {
-public:
-    spell_magtheridon_shadow_grasp() : SpellScriptLoader("spell_magtheridon_shadow_grasp") { }
+    PrepareAuraScript(spell_magtheridon_shadow_grasp);
 
-    class spell_magtheridon_shadow_grasp_AuraScript : public AuraScript
+    void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_magtheridon_shadow_grasp_AuraScript)
+        GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP_VISUAL, false);
+    }
 
-        void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP_VISUAL, false);
-        }
-
-        void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->InterruptNonMeleeSpells(true);
-        }
-
-        void HandlePeriodicRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_MIND_EXHAUSTION, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_magtheridon_shadow_grasp_AuraScript::HandleDummyApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_shadow_grasp_AuraScript::HandleDummyRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_shadow_grasp_AuraScript::HandlePeriodicRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_magtheridon_shadow_grasp_AuraScript();
+        GetUnitOwner()->InterruptNonMeleeSpells(true);
+    }
+
+    void HandlePeriodicRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_MIND_EXHAUSTION, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_magtheridon_shadow_grasp::HandleDummyApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_shadow_grasp::HandleDummyRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_shadow_grasp::HandlePeriodicRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_magtheridon_quake : public SpellScript
+{
+    PrepareSpellScript(spell_magtheridon_quake);
+
+    void HandleHit()
+    {
+        if (urand(0, 3) == 0)
+            GetCaster()->CastSpell(GetCaster(), SPELL_QUAKE_KNOCKBACK, true);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_magtheridon_quake::HandleHit);
     }
 };
 
 void AddSC_boss_magtheridon()
 {
-    new boss_magtheridon();
-    new spell_magtheridon_blaze();
-    new spell_magtheridon_shadow_grasp();
+    RegisterMagtheridonsLairCreatureAI(boss_magtheridon);
+    RegisterSpellScript(spell_magtheridon_blaze);
+    RegisterSpellScript(spell_magtheridon_shadow_grasp);
+    RegisterSpellScript(spell_magtheridon_quake);
 }
