@@ -976,6 +976,12 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
                     return false;
+
+                if (!e.event.areaRange.checkTimer)
+                {
+                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} check timer cannot be zero, try 1200 instead, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
                 break;
             case SMART_EVENT_SPELLHIT:
             case SMART_EVENT_SPELLHIT_TARGET:
@@ -1075,6 +1081,12 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
                     return false;
+
+                if (!e.event.areaCasting.checkTimer)
+                {
+                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} check timer cannot be zero, try 1200 instead, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
             case SMART_EVENT_PASSENGER_REMOVED:
