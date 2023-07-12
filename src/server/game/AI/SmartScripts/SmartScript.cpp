@@ -4346,6 +4346,10 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMin);
                     return;
                 }
+
+                // If no targets are found and it's off cooldown, check again
+                RecalcTimer(e, e.event.areaCasting.checkTimer, e.event.areaCasting.checkTimer);
+                break;
             }
 
             break;

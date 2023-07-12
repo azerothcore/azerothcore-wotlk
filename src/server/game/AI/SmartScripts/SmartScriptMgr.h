@@ -519,10 +519,10 @@ struct SmartEvent
 
         struct
         {
-            uint32 spellId;
-            uint32 range;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 spellId;
+            uint32 range;
             uint32 checkTimer;
         } areaCasting;
 
