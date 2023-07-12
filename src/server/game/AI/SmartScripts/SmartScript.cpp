@@ -4434,7 +4434,14 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
                 {
-                    ProcessEvent(e );
+                    ASSERT(executionStack.empty());
+                    executionStack.emplace_back(e, nullptr, 0, 0, false, nullptr, nullptr);
+                    while (!executionStack.empty())
+                    {
+                        auto [stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                        executionStack.pop_back();
+                        ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                    }
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
                     {
                         e.enableTimed = false;//disable event if it is in an ActionList and was processed once
