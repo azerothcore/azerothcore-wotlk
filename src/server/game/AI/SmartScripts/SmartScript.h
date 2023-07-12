@@ -29,7 +29,7 @@
 
 class SmartScript
 {
-using SmartScriptFrame = std::tuple<SmartScriptHolder, Unit*, uint32, uint32, bool, SpellInfo const*, GameObject*>;
+using SmartScriptFrame = std::tuple<SmartScriptHolder&, Unit*, uint32, uint32, bool, SpellInfo const*, GameObject*>;
 public:
     SmartScript();
     ~SmartScript();
@@ -296,20 +296,20 @@ private:
             }
         }
     }
-    SmartScriptHolder FindLinkedEvent (uint32 link)
+    std::optional<std::reference_wrapper<
+        SmartScriptHolder>> FindLinkedEvent(uint32 id)
     {
         if (!mEvents.empty())
         {
             for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)
             {
-                if (i->event_id == link)
+                if (i->event_id == id)
                 {
-                    return (*i);
+                    return std::ref(*i);
                 }
             }
         }
-        SmartScriptHolder s;
-        return s;
+        return std::nullopt;
     }
 
     GuidUnorderedSet _summonList;
