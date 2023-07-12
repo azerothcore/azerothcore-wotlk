@@ -4347,6 +4347,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     return;
                 }
             }
+
+            break;
         }
         case SMART_EVENT_AREA_RANGE:
         {
