@@ -297,13 +297,13 @@ private:
         }
     }
     std::optional<std::reference_wrapper<
-        SmartScriptHolder>> FindLinkedEvent(uint32 id)
+        SmartScriptHolder>> FindLinkedEvent(uint32 link)
     {
         if (!mEvents.empty())
         {
             for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)
             {
-                if (i->event_id == id)
+                if (i->event_id == link)
                 {
                     return std::ref(*i);
                 }
