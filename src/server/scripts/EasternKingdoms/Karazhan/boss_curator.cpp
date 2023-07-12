@@ -53,15 +53,16 @@ class boss_curator : public BossAI
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_MANA_LEECH, true);
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_POWER_BURN, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_BURN, true);
+        ScheduleHealthCheckEvent(15, [&] {
+        DoCastSelf(SPELL_ARCANE_INFUSION, true);
+        Talk(SAY_ENRAGE);
+        });
     }
 
-    void KilledUnit(Unit*  /*victim*/) override
+    void KilledUnit(Unit* victim) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-        {
-            Talk(SAY_KILL);
-            events.ScheduleEvent(EVENT_KILL_TALK, 5000);
-        }
+        BossAI::KilledUnit(victim);
+        Talk(SAY_KILL);
     }
 
     void JustDied(Unit* killer) override
@@ -74,11 +75,47 @@ class boss_curator : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_SPELL_HATEFUL_BOLT, 10000);
-        events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 6000);
-        events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
-        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
         DoZoneInCombat();
+        scheduler.Schedule(10min, [this](TaskContext /*context*/)
+        {
+            Talk(SAY_ENRAGE);
+            me->InterruptNonMeleeSpells(true);
+            DoCastSelf(SPELL_ASTRAL_DECONSTRUCTION, true);
+        }).Schedule(10s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 45.0f, true, false))
+            {
+                DoCast(target, SPELL_HATEFUL_BOLT);
+            }
+            else
+            {
+                DoCastVictim(SPELL_HATEFUL_BOLT);
+            }
+            context.Repeat(7s, 15s);
+        }).Schedule(6s, [this](TaskContext context)
+        {
+            if (me->HealthAbovePct(15))
+            {
+                if (roll_chance_i(50))
+                {
+                    Talk(SAY_SUMMON);
+                }
+                DoCastSelf(RAND(SPELL_SUMMON_ASTRAL_FLARE1, SPELL_SUMMON_ASTRAL_FLARE2, SPELL_SUMMON_ASTRAL_FLARE3, SPELL_SUMMON_ASTRAL_FLARE4));
+                int32 mana = CalculatePct(me->GetMaxPower(POWER_MANA), 10);
+                me->ModifyPower(POWER_MANA, -mana);
+                if (me->GetPowerPct(POWER_MANA) < 10.0f)
+                {
+                    Talk(SAY_EVOCATE);
+                    DoCastSelf(SPELL_EVOCATION);
+                    scheduler.DelayAll(20s);
+                    context.Repeat(20s);
+                }
+                else
+                {
+                    context.Repeat(10s);
+                }
+            }
+        });
     }
 
     void JustSummoned(Creature* summon) override
@@ -97,57 +134,10 @@ class boss_curator : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
+        scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_CHECK_HEALTH:
-                if (me->HealthBelowPct(16))
-                {
-                    events.CancelEvent(EVENT_SPELL_ASTRAL_FLARE);
-                    me->CastSpell(me, SPELL_ARCANE_INFUSION, true);
-                    Talk(SAY_ENRAGE);
-                    break;
-                }
-                events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                break;
-            case EVENT_SPELL_BERSERK:
-                Talk(SAY_ENRAGE);
-                me->InterruptNonMeleeSpells(true);
-                me->CastSpell(me, SPELL_ASTRAL_DECONSTRUCTION, true);
-                break;
-            case EVENT_SPELL_HATEFUL_BOLT:
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 2), 40.0f))
-                {
-                    me->CastSpell(target, SPELL_HATEFUL_BOLT, false);
-                }
-                events.ScheduleEvent(EVENT_SPELL_HATEFUL_BOLT, urand(5000, 7500) * (events.GetNextEventTime(EVENT_SPELL_BERSERK) == 0 ? 1 : 2));
-                break;
-            case EVENT_SPELL_ASTRAL_FLARE:
-                {
-                    me->CastSpell(me, RAND(SPELL_SUMMON_ASTRAL_FLARE1, SPELL_SUMMON_ASTRAL_FLARE2, SPELL_SUMMON_ASTRAL_FLARE3, SPELL_SUMMON_ASTRAL_FLARE4), false);
-                    int32 mana = CalculatePct(me->GetMaxPower(POWER_MANA), 10);
-                    me->ModifyPower(POWER_MANA, -mana);
-                    if (me->GetPowerPct(POWER_MANA) < 10.0f)
-                    {
-                        Talk(SAY_EVOCATE);
-                        me->CastSpell(me, SPELL_EVOCATION, false);
-                        events.DelayEvents(20000);
-                        events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 20000);
-                    }
-                    else
-                    {
-                        if (roll_chance_i(50))
-                        {
-                            Talk(SAY_SUMMON);
-                        }
-                        events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 10000);
-                    }
-                    break;
-                }
-        }
         DoMeleeAttackIfReady();
     }
 };
