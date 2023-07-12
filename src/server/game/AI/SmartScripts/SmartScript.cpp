@@ -2892,7 +2892,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     if (e.link && e.link != e.event_id)
     {
         auto linked = FindLinkedEvent(e.link);
-        if(linked.has_value())
+        if (linked.has_value())
             executionStack.emplace_back(linked.value(), unit, var0, var1, bvar, spell, gob);
         else
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.link);
@@ -4461,7 +4461,7 @@ bool SmartScript::CheckTimer(SmartScriptHolder const& e) const
     return e.active;
 }
 
-void SmartScript::InstallEvents() 
+void SmartScript::InstallEvents()
 {
     if (!mInstallEvents.empty())
     {
