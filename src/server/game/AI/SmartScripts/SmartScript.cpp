@@ -4338,7 +4338,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                         continue;
 
                     ProcessAction(e, target);
-                    RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMin);
+                    RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax);
                     return;
                 }
 
