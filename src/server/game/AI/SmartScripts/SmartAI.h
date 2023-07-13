@@ -109,6 +109,15 @@ public:
     // Called when spell hits a target
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
+    // Called when a spell finishes
+    void OnSpellCast(SpellInfo const* spellInfo) override;
+
+    // Called when a spell fails
+    void OnSpellFailed(SpellInfo const* spellInfo) override;
+
+    // Called when a spell starts
+    void OnSpellStart(SpellInfo const* spellInfo) override;
+
     // Called at any Damage from any attacker (before damage apply)
     void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
 

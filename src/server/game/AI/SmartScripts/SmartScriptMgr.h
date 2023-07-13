@@ -200,8 +200,11 @@ enum SMART_EVENT
     SMART_EVENT_SCENE_COMPLETE           = 81,      // don't use on 3.3.5a
 
     SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_CAST            = 83,      // SpellID, CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_FAILED          = 84,      // SpellID, CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_START           = 85,      // SpellID, CooldownMin, CooldownMax
 
-    SMART_EVENT_TC_END                   = 83,
+    SMART_EVENT_TC_END                   = 86,
 
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
@@ -254,6 +257,13 @@ struct SmartEvent
             uint32 cooldownMin;
             uint32 cooldownMax;
         } spellHit;
+
+        struct
+        {
+            uint32 spell;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
+        } spellCast;
 
         struct
         {
@@ -1799,9 +1809,9 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 80
     { 0, 0 }, // 81
     {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
-    { 0, 0 }, // 83
-    { 0, 0 }, // 84
-    { 0, 0 }, // 85
+    {SMART_EVENT_ON_SPELL_CAST,             SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_ON_SPELL_FAILED,           SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_ON_SPELL_START,            SMART_SCRIPT_TYPE_MASK_CREATURE },
     { 0, 0 }, // 86
     { 0, 0 }, // 87
     { 0, 0 }, // 88

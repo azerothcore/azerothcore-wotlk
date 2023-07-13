@@ -576,6 +576,9 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
                 //case SMART_EVENT_SCENE_CANCEL: return sizeof(SmartEvent::raw);
                 //case SMART_EVENT_SCENE_COMPLETE: return sizeof(SmartEvent::raw);
             case SMART_EVENT_SUMMONED_UNIT_DIES: return sizeof(SmartEvent::summoned);
+            case SMART_EVENT_ON_SPELL_CAST: return sizeof(SmartEvent::spellCast);
+            case SMART_EVENT_ON_SPELL_FAILED: return sizeof(SmartEvent::spellCast);
+            case SMART_EVENT_ON_SPELL_START: return sizeof(SmartEvent::spellCast);
             case SMART_EVENT_NEAR_PLAYERS: return sizeof(SmartEvent::nearPlayer);
             case SMART_EVENT_NEAR_PLAYERS_NEGATION: return sizeof(SmartEvent::nearPlayerNegation);
             case SMART_EVENT_NEAR_UNIT: return sizeof(SmartEvent::nearUnit);
@@ -981,6 +984,17 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.spellHit.cooldownMin, e.event.spellHit.cooldownMax))
                     return false;
                 break;
+            case SMART_EVENT_ON_SPELL_CAST:
+            case SMART_EVENT_ON_SPELL_FAILED:
+            case SMART_EVENT_ON_SPELL_START:
+            {
+                if (!IsSpellValid(e, e.event.spellCast.spell))
+                    return false;
+
+                if (!IsMinMaxValid(e, e.event.spellCast.cooldownMin, e.event.spellCast.cooldownMax))
+                    return false;
+                break;
+            }
             case SMART_EVENT_OOC_LOS:
             case SMART_EVENT_IC_LOS:
                 if (!IsMinMaxValid(e, e.event.los.cooldownMin, e.event.los.cooldownMax))

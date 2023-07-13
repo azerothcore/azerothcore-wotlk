@@ -3685,6 +3685,11 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_GCD))
             TriggerGlobalCooldown();
+
+        // Call CreatureAI hook OnSpellStart
+        if (Creature* caster = m_originalCaster->ToCreature())
+            if (caster->IsAIEnabled())
+                caster->AI()->OnSpellStart(GetSpellInfo());
     }
 
     return SPELL_CAST_OK;
@@ -4083,6 +4088,11 @@ void Spell::_cast(bool skipCheck)
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
             m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
 
+    // Call CreatureAI hook OnSpellCast
+    if (Creature* caster = m_originalCaster->ToCreature())
+        if (caster->IsAIEnabled())
+            caster->AI()->OnSpellCast(GetSpellInfo());
+
     SetExecutedCurrently(false);
 }
 
@@ -4438,6 +4448,11 @@ void Spell::update(uint32 difftime)
                     LOG_DEBUG("spells.aura", "Channeled spell {} is removed due to lack of targets", m_spellInfo->Id);
                     SendChannelUpdate(0);
                     finish();
+
+                    // We call the hook here instead of in Spell::finish because we only want to call it for completed channeling. Everything else is handled by interrupts
+                    if (Creature* caster = m_caster->ToCreature())
+                        if (caster->IsAIEnabled())
+                            caster->AI()->OnChannelFinished(m_spellInfo);
                 }
                 break;
             }
