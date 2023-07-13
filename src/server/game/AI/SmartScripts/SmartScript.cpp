@@ -4331,24 +4331,19 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
+                    if (!target || target->IsPet() || !target->IsNonMeleeSpellCast(false, false, true))
+                        continue;
+
                     if (e.event.areaCasting.range && !me->IsWithinDistInMap(target, range))
                         continue;
-
-                    if (!target || !target->IsNonMeleeSpellCast(false, false, true))
-                        continue;
-
-                    if (e.event.areaCasting.spellId > 0)
-                        if (Spell* currSpell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL))
-                            if (currSpell->m_spellInfo->Id != e.event.areaCasting.spellId)
-                                continue;
 
                     ProcessAction(e, target);
                     RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMin);
                     return;
                 }
 
-                // If no targets are found and it's off cooldown, check again
-                RecalcTimer(e, e.event.areaCasting.checkTimer, e.event.areaCasting.checkTimer);
+                // If no targets are found and it's off cooldown, check again in 1200ms
+                RecalcTimer(e, 1200, 1200);
                 break;
             }
 
@@ -4364,7 +4359,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!(me->IsInRange(target, (float)e.event.areaRange.minRange, (float)e.event.areaRange.maxRange)))
+                    if (!(me->IsInRange(target, 0.f, (float)e.event.areaRange.range)))
                         continue;
 
                     ProcessAction(e, target);
@@ -4374,7 +4369,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
 
             // If no targets are found and it's off cooldown, check again
-            RecalcTimer(e, e.event.areaRange.checkTimer, e.event.areaRange.checkTimer);
+            RecalcTimer(e, 1200, 1200);
             break;
         }
         default:
@@ -4396,7 +4391,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             RecalcTimer(e, 1200, 1200);
             break;
         case SMART_EVENT_AREA_RANGE:
-            RecalcTimer(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax);
+            RecalcTimer(e, e.event.areaRange.min, e.event.areaRange.max);
             break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
@@ -4421,7 +4416,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
             break;
         case SMART_EVENT_AREA_CASTING:
-            RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax);
+            RecalcTimer(e, e.event.areaCasting.min, e.event.areaCasting.max);
             break;
         default:
             e.active = true;

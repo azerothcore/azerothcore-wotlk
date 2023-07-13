@@ -210,8 +210,8 @@ enum SMART_EVENT
     SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
     SMART_EVENT_NEAR_UNIT_NEGATION       = 104,      // type (0: creature 1: gob), entry, count, range, timer
-    SMART_EVENT_AREA_CASTING             = 105,      // spellId (0: any), range (0: any), repeatMin, repeatMax, checkTimer
-    SMART_EVENT_AREA_RANGE               = 106,      // minRange, maxRange, repeatMin, repeatMax, checkTimer
+    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, range
+    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, range
 
     SMART_EVENT_AC_END                   = 107
 };
@@ -519,20 +519,20 @@ struct SmartEvent
 
         struct
         {
+            uint32 min;
+            uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 spellId;
             uint32 range;
-            uint32 checkTimer;
         } areaCasting;
 
         struct
         {
-            uint32 minRange;
-            uint32 maxRange;
+            uint32 min;
+            uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 checkTimer;
+            uint32 range;
         } areaRange;
 
         struct

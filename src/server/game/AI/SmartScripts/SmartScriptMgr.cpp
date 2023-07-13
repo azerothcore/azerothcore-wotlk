@@ -971,17 +971,12 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_AREA_RANGE:
-                if (!IsMinMaxValid(e, e.event.areaRange.minRange, e.event.areaRange.maxRange))
+                if (!IsMinMaxValid(e, 0, e.event.areaRange.range))
                     return false;
 
-                if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
+                if ((!IsMinMaxValid(e, e.event.areaRange.min, e.event.areaRange.max)) || (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax)))
                     return false;
 
-                if (!e.event.areaRange.checkTimer)
-                {
-                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} check timer cannot be zero, try 1200 instead, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
-                    return false;
-                }
                 break;
             case SMART_EVENT_SPELLHIT:
             case SMART_EVENT_SPELLHIT_TARGET:
@@ -1073,20 +1068,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_AREA_CASTING:
-                if (e.event.areaCasting.spellId > 0 && !sSpellMgr->GetSpellInfo(e.event.areaCasting.spellId))
-                {
-                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.spellHit.spell);
-                    return false;
-                }
-
                 if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
                     return false;
 
-                if (!e.event.areaCasting.checkTimer)
-                {
-                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} check timer cannot be zero, try 1200 instead, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                if (!IsMinMaxValid(e, e.event.areaCasting.min, e.event.areaCasting.max))
                     return false;
-                }
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
             case SMART_EVENT_PASSENGER_REMOVED:
