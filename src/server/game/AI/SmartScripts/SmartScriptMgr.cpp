@@ -971,10 +971,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_AREA_RANGE:
-                if (!IsMinMaxValid(e, 0, e.event.areaRange.range))
+                if (!IsMinMaxValid(e, e.event.areaRange.min, e.event.areaRange.max))
                     return false;
 
-                if ((!IsMinMaxValid(e, e.event.areaRange.min, e.event.areaRange.max)) || (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax)))
+                if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
                     return false;
 
                 break;
@@ -1068,10 +1068,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_AREA_CASTING:
-                if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
+                if (!IsMinMaxValid(e, e.event.areaCasting.min, e.event.areaCasting.max))
                     return false;
 
-                if (!IsMinMaxValid(e, e.event.areaCasting.min, e.event.areaCasting.max))
+                if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
                     return false;
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
