@@ -4331,7 +4331,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!target || target->IsPet() || !target->IsNonMeleeSpellCast(false, false, true))
+                    if (!target || target->IsPet() || target->IsTotem() || !target->IsNonMeleeSpellCast(false, false, true))
                         continue;
 
                     if (e.event.areaCasting.range && !me->IsWithinDistInMap(target, range))
