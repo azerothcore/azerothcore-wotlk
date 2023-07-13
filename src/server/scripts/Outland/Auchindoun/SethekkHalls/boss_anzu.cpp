@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "Unit.h"
 #include "sethekk_halls.h"
 
 enum Text
@@ -185,28 +186,12 @@ struct npc_anzu_spirit : public ScriptedAI
 {
     npc_anzu_spirit(Creature* creature) : ScriptedAI(creature) { }
 
-    std::array<uint32, MAX_DRUID_SPELLS> const druidSpells =
-    {
-      774, 1058, 1430, 2090, 2091, 3627, 8910, 9839, 9840, 9841, 25299, 26981, 26982, 48440, 48441, /* Rejuvenation */
-      8936, 8938, 8939, 8940, 8941, 9750, 9856, 9857, 9858, 26980, 48442, 48443, /* Regrowth */
-    };
-
-    bool HasDruidHot()
-    {
-        for (uint32 spellId : druidSpells)
-        {
-            if (me->HasAura(spellId))
-                return true;
-        }
-        return false;
-    }
-
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         _scheduler.Schedule(1ms, [this](TaskContext task)
             {
                 // Check for Druid HoTs every 2400ms
-                if (HasDruidHot())
+                if (me->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 64, 0))
                 {
                     me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                     me->RemoveAurasDueToSpell(SPELL_STONEFORM);
