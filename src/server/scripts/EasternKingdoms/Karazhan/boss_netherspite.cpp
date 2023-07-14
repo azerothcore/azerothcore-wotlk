@@ -261,7 +261,7 @@ struct boss_netherspite : public BossAI
         {
             DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
             context.Repeat(15s);
-        }).Schedule(9min, [this](TaskContext context)
+        }).Schedule(9min, [this](TaskContext /*context*/)
         {
             if (!berserk)
             {
