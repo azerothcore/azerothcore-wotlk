@@ -42,7 +42,7 @@ enum Spells
     SPELL_SUMMON_ASTRAL_FLARE4      = 30241
 };
 
-class boss_curator : public BossAI
+struct boss_curator : public BossAI
 {
     boss_curator(Creature* creature) : BossAI(creature, DATA_CURATOR) { }
 
