@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Terestian_Illhoof
-SD%Complete: 95
-SDComment: Complete! Needs adjustments to use spell though.
-SDCategory: Karazhan
-EndScriptData */
-
 #include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -69,9 +62,6 @@ struct npc_kilrek : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
-    InstanceScript* instance;
-    ObjectGuid TerestianGUID;
-
     void Reset() override
     {
         _scheduler.CancelAll();
@@ -116,6 +106,8 @@ struct npc_kilrek : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+    InstanceScript* instance;
+    ObjectGuid TerestianGUID;
 };
 
 struct npc_demon_chain : public ScriptedAI
@@ -247,13 +239,13 @@ struct boss_terestian_illhoof : public BossAI
         DoCastSelf(SPELL_SUMMON_IMP);
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_BROKEN_PACT)
         {
-            scheduler.Schedule(45s, [this](TaskContext context) {
+            scheduler.Schedule(45s, [this](TaskContext /*context*/) {
                 SummonKilrek();
-            });
+                });
         }
     }
 
@@ -292,7 +284,7 @@ struct boss_terestian_illhoof : public BossAI
                 }
                 context.Repeat(5s);
             }
-        }).Schedule(10min, [this](TaskContext context)
+        }).Schedule(10min, [this](TaskContext /*context*/)
         {
             if (!berserk)
             {
