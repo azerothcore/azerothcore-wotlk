@@ -50,6 +50,7 @@ public:
         void Reset() override
         {
             _inEnrage = false;
+            _scheduler.CancelAll();
         }
 
         void KilledUnit(Unit* victim) override
