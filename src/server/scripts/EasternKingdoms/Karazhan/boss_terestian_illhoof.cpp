@@ -18,6 +18,7 @@
 #include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 #include "karazhan.h"
 
 enum Text
