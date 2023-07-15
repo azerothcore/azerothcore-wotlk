@@ -1,3 +1,4 @@
+-- DB update 2023_07_15_02 -> 2023_07_15_03
 --
 DELETE FROM `reference_loot_template` WHERE `Entry` IN (526791, 526792);
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
