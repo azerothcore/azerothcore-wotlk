@@ -1,3 +1,4 @@
+-- DB update 2023_07_15_03 -> 2023_07_15_04
 --
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_anzu_spirit' WHERE (`entry` IN (23134, 23135, 23136));
 
