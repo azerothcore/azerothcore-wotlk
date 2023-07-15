@@ -4553,7 +4553,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     // item: Carrot on a Stick (https://www.wowhead.com/tbc/spell=48777/mount-speed)
     ApplySpellFix({ 48776, 7215, 13927, 48777 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK;
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK;
     });
 
