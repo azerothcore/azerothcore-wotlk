@@ -2,6 +2,7 @@
 #define _BOTMGR_H
 
 #include "botcommon.h"
+#include "DBCEnums.h"
 
 #include <functional>
 #include <mutex>
