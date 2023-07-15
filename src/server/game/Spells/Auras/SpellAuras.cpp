@@ -1952,6 +1952,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                     }
                     break;
+                case 34026: // Kill Command
+                    // Dungeon Set 3
+                    if (caster->HasAura(37483))
+                    {
+                        if (apply)
+                        {
+                            caster->CastSpell(caster, 37482, true);
+                        }
+                    }
+                    break;
             }
             break;
         case SPELLFAMILY_PALADIN:

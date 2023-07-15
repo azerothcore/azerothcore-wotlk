@@ -4835,6 +4835,7 @@ class spell_freezing_circle : public SpellScript
     }
 };
 
+// 35385 - Threshalisk Charge
 enum Threshalisk
 {
     SPELL_THRESHALISK_CHARGE = 35385,
@@ -4867,6 +4868,40 @@ class spell_gen_threshalisk_charge : public SpellScript
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_gen_threshalisk_charge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 37589 - Shriveling Gaze
+enum ShrivelingGaze
+{
+    SPELL_SHRIVELING_GAZE         = 37589,
+    SPELL_SHRIVELING_GAZE_REMOVAL = 30023, // Serverside - Gushing Wound Removal
+};
+
+class spell_gen_shriveling_gaze : public AuraScript
+{
+    PrepareAuraScript(spell_gen_shriveling_gaze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHRIVELING_GAZE });
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        ModStackAmount(20);
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_shriveling_gaze::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_shriveling_gaze::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -5014,4 +5049,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_basic_campfire);
     RegisterSpellScript(spell_freezing_circle);
     RegisterSpellScript(spell_gen_threshalisk_charge);
+    RegisterSpellScript(spell_gen_shriveling_gaze);
 }

@@ -3844,6 +3844,13 @@ ChangeFaction.MaxMoney = 0
 Pet.RankMod.Health = 1
 
 #
+#     AuctionHouse.SearchTimeout
+#        Description: Time (in milliseconds) after which an auction house search is discarded.
+#        Default:     1000 - (1 second)
+
+AuctionHouse.SearchTimeout = 1000
+
+#
 ###################################################################################################
 
 ###################################################################################################

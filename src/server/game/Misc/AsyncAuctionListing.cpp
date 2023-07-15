@@ -22,11 +22,9 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 
-uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
-bool AsyncAuctionListingMgr::auctionListingAllowed = false;
+Milliseconds AsyncAuctionListingMgr::auctionListingDiff = Milliseconds::zero();
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingList;
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingListTemp;
-std::mutex AsyncAuctionListingMgr::auctionListingLock;
 std::mutex AsyncAuctionListingMgr::auctionListingTempLock;
 
 bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
@@ -60,18 +58,19 @@ bool AuctionListItemsDelayEvent::Execute()
 
     wstrToLower(wsearchedname);
 
+    uint32 searchTimeout = sWorld->getIntConfig(CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT);
     bool result = auctionHouse->BuildListAuctionItems(data, plr,
                   wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
                   _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
-                  count, totalcount, _getAll, _sortOrder);
+                  count, totalcount, _getAll, _sortOrder, Milliseconds(searchTimeout));
 
-    if (!result)
-        return false;
-
-    data.put<uint32>(0, count);
-    data << (uint32) totalcount;
-    data << (uint32) 300; // clientside search cooldown [ms] (gray search button)
-    plr->GetSession()->SendPacket(&data);
+    if (result)
+    {
+        data.put<uint32>(0, count);
+        data << (uint32) totalcount;
+        data << (uint32) 300; // clientside search cooldown [ms] (gray search button)
+        plr->GetSession()->SendPacket(&data);
+    }
 
     return true;
 }

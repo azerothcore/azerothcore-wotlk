@@ -3659,6 +3659,11 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                         spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
                         break;
+                    case 42463: // Seals of the Pure for Seal of Vengeance/Corruption
+                    case 53739:
+                        if (AuraEffect const* sealsOfPure = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 25, 0))
+                            AddPct(totalDamagePercentMod, sealsOfPure->GetAmount());
+                        break;
                     case 53385:  // Divine Storm deals normalized damage
                         normalized = true;
                         break;
