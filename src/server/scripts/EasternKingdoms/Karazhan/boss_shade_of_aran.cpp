@@ -93,10 +93,10 @@ struct boss_shade_of_aran : public BossAI
     uint32 CurrentNormalSpell;
 
     bool Drinking;
-    
+
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         LastSuperSpell = rand() % 3;
 
         for (uint8 i = 0; i < 3; ++i)
@@ -118,7 +118,6 @@ struct boss_shade_of_aran : public BossAI
             libraryDoor->SetGoState(GO_STATE_ACTIVE);
             libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
-
 
         ScheduleHealthCheckEvent(40, [&]{
             Creature* ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
@@ -348,7 +347,7 @@ struct boss_shade_of_aran : public BossAI
                         }
                         context.Repeat(500ms);
                     });
-                
+
                     FlameWreathTarget[0].Clear();
                     FlameWreathTarget[1].Clear();
                     FlameWreathTarget[2].Clear();
@@ -430,7 +429,6 @@ struct boss_shade_of_aran : public BossAI
         if (!UpdateVictim())
             return;
 
-
         if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
         {
             Drinking = true;
@@ -477,7 +475,7 @@ struct boss_shade_of_aran : public BossAI
             DoMeleeAttackIfReady();
     }
 
-    /* find a different way to do this
+    /* find a different way to do this already done. seems to work.
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (!DrinkInturrupted && Drinking && damage)
@@ -533,7 +531,7 @@ private:
 struct npc_aran_elemental : public ScriptedAI
 {
     npc_aran_elemental(Creature* creature) : ScriptedAI(creature)
-    { 
+    {
         SetCombatMovement(false);
         _scheduler.SetValidator([this]
         {
@@ -547,7 +545,7 @@ struct npc_aran_elemental : public ScriptedAI
     }
 
     void JustEngagedWith(Unit* /*who*/) override
-    { 
+    {
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_WATERBOLT);
@@ -565,7 +563,6 @@ struct npc_aran_elemental : public ScriptedAI
 private:
     TaskScheduler _scheduler;
 };
-
 
 void AddSC_boss_shade_of_aran()
 {
