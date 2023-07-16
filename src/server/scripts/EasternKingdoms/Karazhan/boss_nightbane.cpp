@@ -181,6 +181,7 @@ struct boss_nightbane : public BossAI
             DoCastVictim(SPELL_RAIN_OF_BONES);
             _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
             {
+                me->Yell("test skeletonscheduler", LANG_UNIVERSAL);
                 //spawns skeletons every second until skeletonCount is reached
                 if(_skeletonSpawnCounter < _skeletonCount)
                 {
