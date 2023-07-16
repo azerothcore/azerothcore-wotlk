@@ -366,6 +366,7 @@ struct boss_nightbane : public BossAI
             return;
 
         scheduler.Update(diff);
+        _skeletonscheduler.Update(diff);
 
         //  Phase 1 "GROUND FIGHT"
         if (Phase == 1)
