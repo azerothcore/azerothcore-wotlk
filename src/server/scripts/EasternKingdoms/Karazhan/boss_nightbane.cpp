@@ -25,6 +25,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "karazhan.h"
 
 enum Spells
@@ -81,6 +82,7 @@ struct boss_nightbane : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        skeletonscheduler.CancelAll();
         Phase = 1;
         MovePhase = 0;
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -174,7 +176,7 @@ struct boss_nightbane : public BossAI
     void ScheduleFly() {
         _skeletonSpawnCounter = 0;
 
-        scheduler.Schedule(5s, GROUP_FLYING, [this](TaskContext context)
+        skeletonscheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext context)
         {
             //spawns skeletons every second until skeletonCount is reached
             if(_skeletonSpawnCounter < _skeletonCount)
@@ -183,7 +185,8 @@ struct boss_nightbane : public BossAI
                 _skeletonSpawnCounter++;
                 context.Repeat(2s);
             }
-        }).Schedule(2s, GROUP_FLYING, [this](TaskContext)
+        });
+        scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
             DoCastVictim(SPELL_RAIN_OF_BONES);
         }).Schedule(20s, GROUP_FLYING, [this](TaskContext context)
@@ -379,6 +382,8 @@ struct boss_nightbane : public BossAI
 
 private:
     uint32 Phase;
+
+    TaskScheduler _skeletonscheduler
 
     bool _intro;
     bool _flying;
