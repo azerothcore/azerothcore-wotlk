@@ -61,8 +61,10 @@ struct boss_curator : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        BossAI::KilledUnit(victim);
-        Talk(SAY_KILL);
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_KILL);
+        }
     }
 
     void JustDied(Unit* killer) override
