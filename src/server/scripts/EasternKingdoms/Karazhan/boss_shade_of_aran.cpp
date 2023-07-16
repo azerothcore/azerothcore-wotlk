@@ -434,8 +434,9 @@ struct boss_shade_of_aran : public BossAI
             scheduler.DelayAll(10s);
             DoCastSelf(SPELL_MASS_POLY, true);
             DoCastSelf(SPELL_CONJURE, false);
-            DoCastSelf(SPELL_DRINK, false);
+            me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
+            DoCastSelf(SPELL_DRINK, false);
             _currentHealth = me->GetHealth();
             drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
             {
@@ -445,6 +446,7 @@ struct boss_shade_of_aran : public BossAI
                     Drinking = false;
                     me->RemoveAurasDueToSpell(SPELL_DRINK);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
                     me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                     DoCastSelf(SPELL_POTION, false);
                     drinkScheduler.CancelGroup(GROUP_DRINKING);
@@ -454,6 +456,7 @@ struct boss_shade_of_aran : public BossAI
             }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                 DoCastSelf(SPELL_POTION, true);
                 DoCastSelf(SPELL_AOE_PYROBLAST, false);
