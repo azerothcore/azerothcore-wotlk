@@ -142,12 +142,15 @@ struct boss_moroes : public BossAI
         }
     }
 
-    void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* victim) override
     {
         if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
-            Talk(SAY_KILL);
-            events.ScheduleEvent(EVENT_KILL_TALK, 5s);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+            {
+                Talk(SAY_KILL);
+                events.ScheduleEvent(EVENT_KILL_TALK, 5s);
+            }
         }
     }
 
