@@ -449,6 +449,7 @@ struct boss_shade_of_aran : public BossAI
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                     DoCastSelf(SPELL_POTION, false);
+                    DoCastSelf(SPELL_AOE_PYROBLAST, false);
                     drinkScheduler.CancelGroup(GROUP_DRINKING);
                 } else {
                     context.Repeat(500ms);
