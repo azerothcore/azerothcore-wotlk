@@ -44,7 +44,7 @@ enum Portals
 {
     RED_PORTAL              = 0, // Perseverence
     GREEN_PORTAL            = 1, // Serenity
-    BLUE_PORTAL             = 2 // Dominance
+    BLUE_PORTAL             = 2  // Dominance
 };
 
 const float PortalCoord[3][3] =
@@ -54,11 +54,11 @@ const float PortalCoord[3][3] =
     {-11094.493164f, -1591.969238f, 279.949188f}  // Back side
 };
 
-const uint32 PortalID[3] = {17369, 17367, 17368};
+const uint32 PortalID[3] =     {17369, 17367, 17368};
 const uint32 PortalVisual[3] = {30487, 30490, 30491};
-const uint32 PortalBeam[3] = {30465, 30464, 30463};
-const uint32 PlayerBuff[3] = {30421, 30422, 30423};
-const uint32 NetherBuff[3] = {30466, 30467, 30468};
+const uint32 PortalBeam[3] =   {30465, 30464, 30463};
+const uint32 PlayerBuff[3] =   {30421, 30422, 30423};
+const uint32 NetherBuff[3] =   {30466, 30467, 30468};
 const uint32 PlayerDebuff[3] = {38637, 38638, 38639};
 
 struct boss_netherspite : public BossAI
@@ -67,20 +67,6 @@ struct boss_netherspite : public BossAI
     {
         instance = creature->GetInstanceScript();
     }
-
-    InstanceScript* instance;
-
-    bool PortalPhase;
-    bool berserk;
-    uint32 PhaseTimer; // timer for phase switching
-    uint32 VoidZoneTimer;
-    uint32 NetherInfusionTimer; // berserking timer
-    uint32 NetherbreathTimer;
-    uint32 EmpowermentTimer;
-    uint32 PortalTimer; // timer for beam checking
-    ObjectGuid PortalGUID[3]; // guid's of portals
-    ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
-    ObjectGuid BeamTarget[3]; // guid's of portals' current targets
 
     bool IsBetween(WorldObject* u1, WorldObject* target, WorldObject* u2) // the in-line checker
     {
@@ -352,6 +338,20 @@ struct boss_netherspite : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool PortalPhase;
+    bool berserk;
+    InstanceScript* instance;
+    uint32 PhaseTimer; // timer for phase switching
+    uint32 VoidZoneTimer;
+    uint32 NetherInfusionTimer; // berserking timer
+    uint32 NetherbreathTimer;
+    uint32 EmpowermentTimer;
+    uint32 PortalTimer; // timer for beam checking
+    ObjectGuid PortalGUID[3]; // guid's of portals
+    ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
+    ObjectGuid BeamTarget[3]; // guid's of portals' current targets
 };
 
 class spell_nether_portal_perseverence : public AuraScript
