@@ -77,8 +77,6 @@ struct boss_nightbane : public BossAI
     {
         _intro = true;
         _skeletonCount = 5;
-        _nightbaneHelperGUID = instance->GetGuidData(DATA_NIGHTBANE_HELPER);
-
     }
 
     void Reset() override
@@ -186,9 +184,7 @@ struct boss_nightbane : public BossAI
                 //spawns skeletons every second until skeletonCount is reached
                 if(_skeletonSpawnCounter < _skeletonCount)
                 {
-                    if(Creature* helper = ObjectAccessor::GetCreature(*me, _nightbaneHelperGUID)) {
-                        helper->CastSpell(me->GetVictim(), SPELL_SUMMON_SKELETON, true);
-                    }
+                    DoCastVictim(SPELL_SUMMON_SKELETON, true);
                     _skeletonSpawnCounter++;
                     context.Repeat(2s);
                 }
@@ -389,8 +385,6 @@ private:
     uint32 Phase;
 
     TaskScheduler _skeletonscheduler;
-
-    ObjectGuid _nightbaneHelperGUID;
 
     bool _intro;
     bool _flying;
