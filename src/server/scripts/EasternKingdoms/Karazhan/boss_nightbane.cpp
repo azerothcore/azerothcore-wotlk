@@ -79,8 +79,6 @@ struct boss_nightbane : public BossAI
         _skeletonCount = 5;
     }
 
-    InstanceScript* instance;
-
     void Reset() override
     {
         _Reset();
