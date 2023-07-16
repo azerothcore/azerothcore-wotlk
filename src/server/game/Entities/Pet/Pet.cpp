@@ -1225,8 +1225,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             float highAmt = petlevel / 11.0f;
                             float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt* lowAmt* lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt* highAmt* highAmt);
+                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
+                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
 
                             AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_WARLOCK_PET_SCALING_01, this);
