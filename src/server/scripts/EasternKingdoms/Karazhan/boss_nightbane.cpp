@@ -82,7 +82,7 @@ struct boss_nightbane : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        skeletonscheduler.CancelAll();
+        _skeletonscheduler.CancelAll();
         Phase = 1;
         MovePhase = 0;
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -181,7 +181,6 @@ struct boss_nightbane : public BossAI
             DoCastVictim(SPELL_RAIN_OF_BONES);
             _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
             {
-                me->Yell("test skeletonscheduler", LANG_UNIVERSAL);
                 //spawns skeletons every second until skeletonCount is reached
                 if(_skeletonSpawnCounter < _skeletonCount)
                 {
