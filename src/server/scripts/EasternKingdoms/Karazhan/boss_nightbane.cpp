@@ -80,7 +80,7 @@ struct boss_nightbane : public BossAI
 
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         Phase = 1;
         MovePhase = 0;
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
