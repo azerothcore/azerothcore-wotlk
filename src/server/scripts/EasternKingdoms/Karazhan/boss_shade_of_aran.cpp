@@ -81,7 +81,7 @@ struct boss_shade_of_aran : public BossAI
 {
     boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN)
     {
-        SetCombatMovement(false);
+        
     }
 
     uint8 LastSuperSpell;
@@ -97,6 +97,7 @@ struct boss_shade_of_aran : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        drinkScheduler.CancelAll();
         LastSuperSpell = rand() % 3;
 
         for (uint8 i = 0; i < 3; ++i)
@@ -380,10 +381,6 @@ struct boss_shade_of_aran : public BossAI
             Talk(SAY_TIMEOVER);
 
             context.Repeat(1min);
-        }).Schedule(15s, [this](TaskContext)
-        {
-            me->Yell("Oof ouch owie, my mana!", LANG_UNIVERSAL);
-            me->SetPower(POWER_MANA, 3000);
         });
     }
 
@@ -425,6 +422,7 @@ struct boss_shade_of_aran : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+        drinkScheduler.Update(diff);
 
         if (!UpdateVictim())
             return;
@@ -436,52 +434,41 @@ struct boss_shade_of_aran : public BossAI
 
             Talk(SAY_DRINK);
 
+            scheduler.DelayAll(10s);
             DoCastSelf(SPELL_MASS_POLY, true);
             DoCastSelf(SPELL_CONJURE, false);
             DoCastSelf(SPELL_DRINK, false);
             me->SetStandState(UNIT_STAND_STATE_SIT);
             _currentHealth = me->GetHealth();
-            scheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
+            drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
             {
                 //check for damage to interrupt
                 if(CheckDamageDuringDrinking(_currentHealth))
                 {
-                    me->Yell("I took damage", LANG_UNIVERSAL);
                     Drinking = false;
                     me->RemoveAurasDueToSpell(SPELL_DRINK);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                     DoCastSelf(SPELL_POTION, false);
-                    scheduler.CancelGroup(GROUP_DRINKING);
+                    drinkScheduler.CancelGroup(GROUP_DRINKING);
+                } else {
+                    context.Repeat(500ms);
                 }
-                me->Yell("Repeating drinking process", LANG_UNIVERSAL);
-                context.Repeat(500ms);
-            })
-            .Schedule(10s, GROUP_DRINKING, [this](TaskContext)
+            }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
             {
-                me->Yell("I got to drink all!", LANG_UNIVERSAL);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                 DoCastSelf(SPELL_POTION, true);
                 DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                
                 Drinking = false;
+                drinkScheduler.CancelGroup(GROUP_DRINKING);
             });
         }
 
-        //Don't execute any more code if we are drinking
-        if (Drinking)
-            return;
-
-        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown)
+        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown && !Drinking)
             DoMeleeAttackIfReady();
     }
-
-    /* find a different way to do this already done. seems to work.
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (!DrinkInturrupted && Drinking && damage)
-            DrinkInturrupted = true;
-    }
-    */
 
     bool CheckDamageDuringDrinking(uint32 oldHealth)
     {
@@ -522,6 +509,8 @@ struct boss_shade_of_aran : public BossAI
         }
     }
 private:
+    TaskScheduler drinkScheduler;
+
     bool _arcaneCooledDown;
     bool _fireCooledDown;
     bool _frostCooledDown;
