@@ -79,10 +79,7 @@ enum Groups
 
 struct boss_shade_of_aran : public BossAI
 {
-    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN)
-    {
-        
-    }
+    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN) { }
 
     uint8 LastSuperSpell;
 
@@ -460,7 +457,7 @@ struct boss_shade_of_aran : public BossAI
                 me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                 DoCastSelf(SPELL_POTION, true);
                 DoCastSelf(SPELL_AOE_PYROBLAST, false);
-                
+
                 Drinking = false;
                 drinkScheduler.CancelGroup(GROUP_DRINKING);
             });
@@ -481,6 +478,7 @@ struct boss_shade_of_aran : public BossAI
         }
         return false;
     }
+
     void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
     {
         //We only care about interrupt effects and only if they are durring a spell currently being cast
