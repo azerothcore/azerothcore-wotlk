@@ -63,10 +63,7 @@ const uint32 PlayerDebuff[3] = {38637, 38638, 38639};
 
 struct boss_netherspite : public BossAI
 {
-    boss_netherspite(Creature* creature) : BossAI(creature, DATA_NETHERSPITE)
-    {
-        instance = creature->GetInstanceScript();
-    }
+    boss_netherspite(Creature* creature) : BossAI(creature, DATA_NETHERSPITE) {}
 
     bool IsBetween(WorldObject* u1, WorldObject* target, WorldObject* u2) // the in-line checker
     {
@@ -95,7 +92,7 @@ struct boss_netherspite : public BossAI
 
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         berserk = false;
         NetherInfusionTimer = 540000;
         VoidZoneTimer = 15000;
@@ -237,12 +234,12 @@ struct boss_netherspite : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
+        BossAI::JustEngagedWith(who);
         HandleDoors(false);
         SwitchToPortalPhase();
         DoZoneInCombat();
-
         scheduler.Schedule(15s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
@@ -258,8 +255,9 @@ struct boss_netherspite : public BossAI
         });
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
+        BossAI::JustDied(killer);
         HandleDoors(true);
         DestroyPortals();
     }
@@ -342,7 +340,6 @@ struct boss_netherspite : public BossAI
 private:
     bool PortalPhase;
     bool berserk;
-    InstanceScript* instance;
     uint32 PhaseTimer; // timer for phase switching
     uint32 VoidZoneTimer;
     uint32 NetherInfusionTimer; // berserking timer
