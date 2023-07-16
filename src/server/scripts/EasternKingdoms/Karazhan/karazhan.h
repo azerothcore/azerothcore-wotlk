@@ -67,7 +67,10 @@ enum KZDataTypes
     DATA_CHESS_REINIT_PIECES        = 34,
     DATA_CHESS_GAME_PHASE           = 35,
     DATA_ECHO_OF_MEDIVH             = 36,
-    DATA_DUST_COVERED_CHEST         = 37
+    DATA_DUST_COVERED_CHEST         = 37,
+
+    // Helpers misc
+    DATA_NIGHTBANE_HELPER           = 38
 };
 
 enum KZOperaEvents
@@ -116,7 +119,10 @@ enum KZCreatures
     NPC_ROOK_A                          = 21160,
     NPC_KING_H                          = 21752,
     NPC_KING_A                          = 21684,
-    NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521
+    NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521,
+
+    // Helpers misc
+    NPC_NIGHTBANE_HELPER_TARGET         = 17260
 };
 
 enum KZGameObjectIds
