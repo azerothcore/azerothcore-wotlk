@@ -383,7 +383,7 @@ struct boss_nightbane : public BossAI
 private:
     uint32 Phase;
 
-    TaskScheduler _skeletonscheduler
+    TaskScheduler _skeletonscheduler;
 
     bool _intro;
     bool _flying;
