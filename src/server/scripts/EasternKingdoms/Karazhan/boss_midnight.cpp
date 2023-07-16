@@ -136,9 +136,12 @@ struct boss_attumen : public BossAI
         }
     }
 
-    void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* victim) override
     {
-        Talk(SAY_KILL);
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_KILL);
+        }
     }
 
     void JustSummoned(Creature* summon) override
