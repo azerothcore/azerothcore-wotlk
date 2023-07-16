@@ -74,7 +74,6 @@ struct boss_nightbane : public BossAI
 {
     boss_nightbane(Creature* creature) : BossAI(creature, DATA_NIGHTBANE)
     {
-        instance = creature->GetInstanceScript();
         _intro = true;
         _skeletonCount = 5;
     }
