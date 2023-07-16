@@ -176,19 +176,19 @@ struct boss_nightbane : public BossAI
     void ScheduleFly() {
         _skeletonSpawnCounter = 0;
 
-        _skeletonscheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext context)
-        {
-            //spawns skeletons every second until skeletonCount is reached
-            if(_skeletonSpawnCounter < _skeletonCount)
-            {
-                DoCastVictim(SPELL_SUMMON_SKELETON);
-                _skeletonSpawnCounter++;
-                context.Repeat(2s);
-            }
-        });
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
             DoCastVictim(SPELL_RAIN_OF_BONES);
+            _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
+            {
+                //spawns skeletons every second until skeletonCount is reached
+                if(_skeletonSpawnCounter < _skeletonCount)
+                {
+                    DoCastVictim(SPELL_SUMMON_SKELETON);
+                    _skeletonSpawnCounter++;
+                    context.Repeat(2s);
+                }
+            });
         }).Schedule(20s, GROUP_FLYING, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_DISTRACTING_ASH);
