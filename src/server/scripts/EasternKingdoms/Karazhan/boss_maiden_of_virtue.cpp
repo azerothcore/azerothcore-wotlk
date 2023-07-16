@@ -40,6 +40,11 @@ struct boss_maiden_of_virtue : public BossAI
 {
     boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
+    void Reset() override
+    {
+        BossAI::Reset();
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -66,8 +71,10 @@ struct boss_maiden_of_virtue : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        BossAI::KilledUnit(victim);
-        Talk(SAY_SLAY);
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_SLAY);
+        }
     }
 
     void JustDied(Unit* killer) override
