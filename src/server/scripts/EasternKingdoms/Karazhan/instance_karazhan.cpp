@@ -92,6 +92,9 @@ public:
                         creature->Respawn(true);
                     }
                     break;
+                case NPC_NIGHTBANE_HELPER_TARGET:
+                    _helperGUID = creature->GetGUID();
+                    break;
                 case NPC_PAWN_H:
                 case NPC_KNIGHT_H:
                 case NPC_QUEEN_H:
@@ -409,6 +412,8 @@ public:
                     return m_uiTerestianGUID;
                 case DATA_MOROES:
                     return m_uiMoroesGUID;
+                case DATA_NIGHTBANE_HELPER:
+                    return _helperGUID;
                 case DATA_GO_STAGEDOORLEFT:
                     return m_uiStageDoorLeftGUID;
                 case DATA_GO_STAGEDOORRIGHT:
@@ -470,6 +475,7 @@ public:
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
         ObjectGuid _barnesGUID;
+        ObjectGuid _helperGUID;
         ObjectGuid _echoOfMedivhGUID;
 
         GuidVector _operaDecorations[EVENT_RAJ];
