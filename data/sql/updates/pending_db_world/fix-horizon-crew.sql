@@ -5,5 +5,5 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (8388, 0, 0, 0, 0, 26, 0, ''), -- cook
 (8389, 0, 0, 0, 0, 26, 0, ''), -- engineer
 (8394, 0, 0, 0, 0, 26, 0, '12508'); -- roland geardabbler
--- changing class (was 2)
-UPDATE `creature_template` SET `unit_class` = 8 WHERE `entry` = 8394;
+
+UPDATE `creature_template` SET `unit_class` = 8 WHERE `entry` = 8394; -- changing class from 2 to 8
