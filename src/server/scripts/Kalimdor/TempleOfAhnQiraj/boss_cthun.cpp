@@ -231,18 +231,18 @@ struct boss_eye_of_cthun : public BossAI
             {
                 if (task.GetRepeatCounter() < 3 && onEngage)
                 {
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
-                    {
-                        DoCast(target, SPELL_GREEN_BEAM);
-                    }
-
+                    DoCastRandomTarget(SPELL_GREEN_BEAM);
                     task.Repeat();
                 }
                 else
                 {
                     scheduler.Schedule(5s, [this](TaskContext task)
                     {
-                        DoCastRandomTarget(SPELL_GREEN_BEAM);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        {
+                            DoCast(target, SPELL_GREEN_BEAM);
+                            DarkGlareAngle = me->GetAngle(target); //keep as the location dark glare will be at
+                        }
 
                         task.SetGroup(GROUP_BEAM_PHASE);
                         task.Repeat(3s);
@@ -284,21 +284,18 @@ struct boss_eye_of_cthun : public BossAI
 
                 scheduler.Schedule(1s, [this](TaskContext /*task*/)
                 {
-                    //Select random target for dark beam to start on
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                    {
-                        //Face our target
-                        DarkGlareAngle = me->GetAngle(target);
-                        DarkGlareTick = 0;
-                        ClockWise = RAND(true, false);
+                    //Select last target that had a beam cast on it
+                    //Face our target
+                    
+                    DarkGlareTick = 0;
+                    ClockWise = RAND(true, false);
 
-                        //Add red coloration to C'thun
-                        DoCast(me, SPELL_RED_COLORATION, true);
+                    //Add red coloration to C'thun
+                    DoCast(me, SPELL_RED_COLORATION, true);
 
-                        me->StopMoving();
-                        me->SetFacingToObject(target);
-                        me->SetOrientation(DarkGlareAngle);
-                    }
+                    me->StopMoving();
+                    me->SetOrientation(DarkGlareAngle);
+                    me->SetFacingTo(DarkGlareAngle);
 
                     scheduler.Schedule(3s, [this](TaskContext tasker)
                     {
