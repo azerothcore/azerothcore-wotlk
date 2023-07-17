@@ -87,7 +87,13 @@ float elementalPositions[4][4] =
 
 struct boss_shade_of_aran : public BossAI
 {
-    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN) { }
+    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN)
+    { 
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     uint8 LastSuperSpell;
 
