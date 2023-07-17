@@ -59,9 +59,9 @@ enum ShadeOfAran
     SPELL_SHADOW_PYRO = 29978,
 
     //Creatures
-    CREATURE_WATER_ELEMENTAL = 17167,
-    CREATURE_SHADOW_OF_ARAN = 18254,
-    CREATURE_ARAN_BLIZZARD = 17161,
+    NPC_WATER_ELEMENTAL = 17167,
+    NPC_SHADOW_OF_ARAN = 18254,
+    NPC_ARAN_BLIZZARD = 17161,
 };
 
 enum SuperSpell
@@ -75,6 +75,14 @@ enum Groups
 {
     GROUP_FLAMEWREATH   = 0,
     GROUP_DRINKING      = 1
+};
+
+float elementalPositions[4][4] =
+{
+    {-11168.1f, -1939.29f, 232.092f, 1.46f},
+    {-11138.2f, -1915.38f, 232.092f, 3.00f},
+    {-11161.7f, -1885.36f, 232.092f, 4.59f},
+    {-11192.4f, -1909.36f, 232.092f, 6.19f}
 };
 
 struct boss_shade_of_aran : public BossAI
@@ -118,10 +126,10 @@ struct boss_shade_of_aran : public BossAI
         }
 
         ScheduleHealthCheckEvent(40, [&]{
-            Creature* ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+            Creature* ElementalOne = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[0][0], elementalPositions[0][1], elementalPositions[0][2], elementalPositions[0][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+            Creature* ElementalTwo = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[1][0], elementalPositions[1][1], elementalPositions[1][2], elementalPositions[1][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+            Creature* ElementalThree = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[2][0], elementalPositions[2][1], elementalPositions[2][2], elementalPositions[2][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+            Creature* ElementalFour = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[3][0], elementalPositions[3][1], elementalPositions[3][2], elementalPositions[3][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
 
             if (ElementalOne)
             {
@@ -132,9 +140,6 @@ struct boss_shade_of_aran : public BossAI
                 DoStartNoMovement(target);
                 ElementalOne->SetInCombatWithZone();
                 ElementalOne->CombatStart(target);
-                ElementalOne->SetFaction(me->GetFaction());
-                ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
             }
 
             if (ElementalTwo)
@@ -146,9 +151,6 @@ struct boss_shade_of_aran : public BossAI
                 DoStartNoMovement(target);
                 ElementalTwo->SetInCombatWithZone();
                 ElementalTwo->CombatStart(target);
-                ElementalTwo->SetFaction(me->GetFaction());
-                ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
             }
 
             if (ElementalThree)
@@ -160,9 +162,6 @@ struct boss_shade_of_aran : public BossAI
                 DoStartNoMovement(target);
                 ElementalThree->SetInCombatWithZone();
                 ElementalThree->CombatStart(target);
-                ElementalThree->SetFaction(me->GetFaction());
-                ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
             }
 
             if (ElementalFour)
@@ -174,9 +173,6 @@ struct boss_shade_of_aran : public BossAI
                 DoStartNoMovement(target);
                 ElementalFour->SetInCombatWithZone();
                 ElementalFour->CombatStart(target);
-                ElementalFour->SetFaction(me->GetFaction());
-                ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
             }
 
             Talk(SAY_ELEMENTALS);
@@ -356,7 +352,7 @@ struct boss_shade_of_aran : public BossAI
                 case SUPER_BLIZZARD:
                     Talk(SAY_BLIZZARD);
 
-                    if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                    if (Creature* pSpawn = me->SummonCreature(NPC_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
                     {
                         pSpawn->SetFaction(me->GetFaction());
                         pSpawn->CastSpell(me, SPELL_CIRCULAR_BLIZZARD, false);
@@ -368,7 +364,7 @@ struct boss_shade_of_aran : public BossAI
         {
             for (uint32 i = 0; i < 5; ++i)
             {
-                if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                if (Creature* unit = me->SummonCreature(NPC_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
                     unit->Attack(me->GetVictim(), true);
                     unit->SetFaction(me->GetFaction());
@@ -436,7 +432,7 @@ struct boss_shade_of_aran : public BossAI
             DoCastSelf(SPELL_CONJURE, false);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
-            DoCastSelf(SPELL_DRINK, false);
+            DoCastSelf(SPELL_DRINK, true);
             _currentHealth = me->GetHealth();
             drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
             {
