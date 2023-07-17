@@ -4026,7 +4026,7 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
             spell->SetReferencedFromCurrent(false);
         }
 
-        if (GetTypeId() == TYPEID_UNIT && IsAIEnabled())
+        if (GetTypeId() == TYPEID_UNIT && IsAIEnabled)
             ToCreature()->AI()->OnSpellFailed(spell->GetSpellInfo());
     }
 }
