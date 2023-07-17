@@ -141,8 +141,8 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
-    // Called when a channeled spell finishes with this creature as the target
-    virtual void OnChannelFinishedHit(Unit* /*caster*/, SpellInfo const* /*spell*/) {}
+    // Called when hit by a channeled spell when its duration is finished
+    virtual void SpellHitChannel(Unit* /*caster*/, SpellInfo const* /*spell*/) {}
 
     // Called when a spell finishes
     virtual void OnSpellCast(SpellInfo const* /*spell*/) {}

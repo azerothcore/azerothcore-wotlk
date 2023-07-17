@@ -4456,7 +4456,7 @@ void Spell::update(uint32 difftime)
                             caster->AI()->OnChannelFinished(m_spellInfo);
 
                             if (Creature* target = m_targets.GetUnitTarget()->ToCreature())
-                                target->AI()->OnChannelFinishedHit(caster, m_spellInfo);
+                                target->AI()->SpellHitChannel(caster, m_spellInfo);
                         }
                 }
                 break;
