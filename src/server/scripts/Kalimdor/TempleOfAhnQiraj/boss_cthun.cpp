@@ -620,6 +620,7 @@ struct npc_eye_tentacle : public ScriptedAI
 
     void Reset() override
     {
+        DoZoneInCombat();
         _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
         {
             DoCastAOE(SPELL_GROUND_RUPTURE);
@@ -630,20 +631,8 @@ struct npc_eye_tentacle : public ScriptedAI
         });
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-        //necessary because the grouped summons dont instantly order the eye tentacles
-        if(who->IsPlayer())
-        {
-            DoZoneInCombat();
-            me->Attack(who, false);
-        }
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
-        DoZoneInCombat();
-
         _scheduler.Schedule(1s, 5s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
