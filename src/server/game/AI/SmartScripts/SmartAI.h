@@ -109,6 +109,9 @@ public:
     // Called when spell hits a target
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
+    // Called when a channeled spell finishes with this creature as the target
+    void OnChannelFinishedHit(Unit* unit, SpellInfo const* spellInfo) override;
+
     // Called when a spell finishes
     void OnSpellCast(SpellInfo const* spellInfo) override;
 

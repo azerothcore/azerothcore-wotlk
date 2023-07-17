@@ -4452,7 +4452,12 @@ void Spell::update(uint32 difftime)
                     // We call the hook here instead of in Spell::finish because we only want to call it for completed channeling. Everything else is handled by interrupts
                     if (Creature* caster = m_caster->ToCreature())
                         if (caster->IsAIEnabled)
+                        {
                             caster->AI()->OnChannelFinished(m_spellInfo);
+
+                            if (Creature* target = m_targets.GetUnitTarget()->ToCreature())
+                                target->AI()->OnChannelFinishedHit(caster, m_spellInfo);
+                        }
                 }
                 break;
             }

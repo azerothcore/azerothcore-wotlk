@@ -855,6 +855,11 @@ void SmartAI::SpellHitTarget(Unit* target, SpellInfo const* spellInfo)
     GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT_TARGET, target, 0, 0, false, spellInfo);
 }
 
+void SmartAI::OnChannelFinishedHit(Unit* unit, SpellInfo const* spellInfo)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_ON_CHANNEL_FINISHED_HIT, unit, 0, 0, false, spellInfo);
+}
+
 void SmartAI::OnSpellCast(SpellInfo const* spellInfo)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELL_CAST, nullptr, 0, 0, false, spellInfo);
