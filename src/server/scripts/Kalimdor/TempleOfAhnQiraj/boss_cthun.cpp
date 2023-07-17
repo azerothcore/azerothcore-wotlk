@@ -235,7 +235,7 @@ struct boss_eye_of_cthun : public BossAI
                     {
                         DoCast(target, SPELL_GREEN_BEAM);
                     }
-                    
+
                     task.Repeat();
                 }
                 else
@@ -290,7 +290,7 @@ struct boss_eye_of_cthun : public BossAI
                 {
                     //Select last target that had a beam cast on it
                     //Face our target
-                    
+
                     DarkGlareTick = 0;
                     ClockWise = RAND(true, false);
 
