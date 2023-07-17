@@ -77,6 +77,10 @@ struct boss_nightbane : public BossAI
     {
         _intro = true;
         _skeletonCount = 5;
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void Reset() override
