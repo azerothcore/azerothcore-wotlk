@@ -231,7 +231,11 @@ struct boss_eye_of_cthun : public BossAI
             {
                 if (task.GetRepeatCounter() < 3 && onEngage)
                 {
-                    DoCastRandomTarget(SPELL_GREEN_BEAM);
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, _beamTarget))
+                    {
+                        DoCast(target, SPELL_GREEN_BEAM);
+                    }
+                    
                     task.Repeat();
                 }
                 else
