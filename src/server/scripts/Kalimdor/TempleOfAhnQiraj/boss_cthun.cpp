@@ -620,7 +620,6 @@ struct npc_eye_tentacle : public ScriptedAI
 
     void Reset() override
     {
-        
         _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
             {
                 DoCastAOE(SPELL_GROUND_RUPTURE);
