@@ -153,9 +153,9 @@ struct boss_moroes : public BossAI
             scheduler.DelayAll(9s);
             _vanished = true;
             DoCastSelf(SPELL_VANISH);
+            Talk(SAY_SPECIAL);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
-                Talk(SAY_SPECIAL);
                 DoCastRandomTarget(SPELL_GARROTE, 0, 100.0f, true, true);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
