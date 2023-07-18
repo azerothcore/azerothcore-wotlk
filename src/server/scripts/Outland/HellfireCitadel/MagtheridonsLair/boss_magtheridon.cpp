@@ -215,6 +215,8 @@ struct boss_magtheridon : public BossAI
 
             if (_channelersKilled >= 5 && !_magReleased)
             {
+                Talk(SAY_EMOTE_FREE);
+                Talk(SAY_FREE);
                 scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
                 scheduler.Schedule(3s, [this](TaskContext)
                 {
@@ -236,6 +238,7 @@ struct boss_magtheridon : public BossAI
         }).Schedule(120s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_FREE);
+            Talk(SAY_FREE);
         }).Schedule(123s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             ScheduleCombatEvents();
