@@ -208,7 +208,7 @@ struct boss_magtheridon : public BossAI
 
     void DoAction(int32 action) override
     {
-        if(action == ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT)
+        if (action == ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT)
         {
             _channelersKilled++;
         }
