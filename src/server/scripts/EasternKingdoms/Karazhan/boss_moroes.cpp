@@ -46,17 +46,13 @@ enum Spells
 
 enum Misc
 {
-    EVENT_GUEST_TALK            = 1,
-    EVENT_GUEST_TALK2           = 2,
-    EVENT_SPELL_VANISH          = 3,
-    EVENT_SPELL_GARROTE         = 4,
-    EVENT_SPELL_BLIND           = 5,
-    EVENT_SPELL_GOUGE           = 6,
-    EVENT_SPELL_ENRAGE          = 7,
-    EVENT_KILL_TALK             = 8,
-
     ACTIVE_GUEST_COUNT          = 4,
     MAX_GUEST_COUNT             = 6
+};
+
+enum Groups
+{
+    GROUP_PRECOMBAT_TALK        = 0
 };
 
 const Position GuestsPosition[4] =
@@ -116,14 +112,14 @@ struct boss_moroes : public BossAI
             }
         }
 
-        scheduler.Schedule(10s, [this](TaskContext context)
+        scheduler.Schedule(10s, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
             if(Creature* guest = GetRandomGuest())
             {
                 guest->AI()->Talk(SAY_GUEST);
             }
             context.Repeat(5s);
-        }).Schedule(1min, 2min, [this](TaskContext context)
+        }).Schedule(1min, 2min, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
             //this was not scheduled in the previous commit
             //does this have to be removed?
@@ -150,6 +146,7 @@ struct boss_moroes : public BossAI
         Talk(SAY_AGGRO);
         me->CallForHelp(20.0f);
         DoZoneInCombat();
+        scheduler.CancelGroup(GROUP_PRECOMBAT_TALK);
 
         scheduler.Schedule(30s, [this](TaskContext context)
         {
@@ -220,7 +217,7 @@ struct boss_moroes : public BossAI
         if (_vanished == false)
         {
             DoMeleeAttackIfReady();
-        } 
+        }
     }
 
     private:
