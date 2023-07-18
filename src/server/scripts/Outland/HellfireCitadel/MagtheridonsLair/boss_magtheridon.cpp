@@ -101,6 +101,7 @@ struct boss_magtheridon : public BossAI
         _channelersKilled = 0;
         _currentPhase = 0;
         _recentlySpoken = false;
+        _magReleased = false;
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
@@ -200,7 +201,7 @@ struct boss_magtheridon : public BossAI
                 });
             });
             context.Repeat(53s, 56s);
-        }).Schedule(1320s, [this](TaskContext /*context*/)
+        }).Schedule(22min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);
         });
@@ -211,6 +212,16 @@ struct boss_magtheridon : public BossAI
         if (action == ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT)
         {
             _channelersKilled++;
+
+            if (_channelersKilled >= 5 && !_magReleased)
+            {
+                scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
+                scheduler.Schedule(3s, [this](TaskContext)
+                {
+                    _magReleased = true; //redundancy
+                    ScheduleCombatEvents();
+                });
+            }
         }
     }
 
@@ -219,22 +230,7 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
-        scheduler.Schedule(50ms, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext context)
-        {
-            //check for dead channelers
-            if (_channelersKilled >= 5)
-            {
-                scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK);
-                scheduler.Schedule(3s, [this](TaskContext)
-                {
-                    ScheduleCombatEvents();
-                });
-            }
-            else
-            {
-                context.Repeat(2s);
-            }
-        }).Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
+        scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
         }).Schedule(120s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
@@ -242,7 +238,6 @@ struct boss_magtheridon : public BossAI
             Talk(SAY_EMOTE_FREE);
         }).Schedule(123s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
-            scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK);
             ScheduleCombatEvents();
         });
     }
@@ -263,6 +258,7 @@ struct boss_magtheridon : public BossAI
 
 private:
     bool _recentlySpoken;
+    bool _magReleased;
     uint8 _currentPhase;
     uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
