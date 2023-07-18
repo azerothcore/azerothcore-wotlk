@@ -160,7 +160,7 @@ struct boss_magtheridon : public BossAI
         Talk(SAY_EMOTE_BEGIN);
 
         scheduler.CancelAll();
-        
+ 
         scheduler.Schedule(60s, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
@@ -216,10 +216,10 @@ struct boss_magtheridon : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        
+ 
         if (!UpdateVictim())
             return;
-        
+ 
         _interruptScheduler.Update(diff);
 
         if (_currentPhase != 1)
