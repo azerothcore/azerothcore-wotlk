@@ -162,6 +162,7 @@ struct boss_moroes : public BossAI
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
+
             context.Repeat(30s);
         }).Schedule(20s, [this](TaskContext context)
         {
