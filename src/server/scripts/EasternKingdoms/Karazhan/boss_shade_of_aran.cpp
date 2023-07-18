@@ -138,14 +138,11 @@ struct boss_shade_of_aran : public BossAI
             {
                 if(Creature* elemental = me->SummonCreature(NPC_WATER_ELEMENTAL, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
                 {
-                    if(elemental)
+                    if(Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
                     {
-                        if(Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
-                        {
-                            DoStartNoMovement(target);
-                            elemental->SetInCombatWithZone();
-                            elemental->CombatStart(target);
-                        }
+                        DoStartNoMovement(target);
+                        elemental->SetInCombatWithZone();
+                        elemental->CombatStart(target);
                     }
                 }
             }
