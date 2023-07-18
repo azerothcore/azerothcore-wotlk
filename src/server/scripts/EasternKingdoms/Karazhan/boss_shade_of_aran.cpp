@@ -77,7 +77,7 @@ enum Groups
     GROUP_DRINKING      = 1
 };
 
-float elementalPositions[4][4] =
+Position const elementalPos[4] =
 {
     {-11168.1f, -1939.29f, 232.092f, 1.46f},
     {-11138.2f, -1915.38f, 232.092f, 3.00f},
@@ -132,56 +132,23 @@ struct boss_shade_of_aran : public BossAI
         }
 
         ScheduleHealthCheckEvent(40, [&]{
-            Creature* ElementalOne = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[0][0], elementalPositions[0][1], elementalPositions[0][2], elementalPositions[0][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalTwo = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[1][0], elementalPositions[1][1], elementalPositions[1][2], elementalPositions[1][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalThree = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[2][0], elementalPositions[2][1], elementalPositions[2][2], elementalPositions[2][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-            Creature* ElementalFour = me->SummonCreature(NPC_WATER_ELEMENTAL, elementalPositions[3][0], elementalPositions[3][1], elementalPositions[3][2], elementalPositions[3][3], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-
-            if (ElementalOne)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                if (!target)
-                    return;
-
-                DoStartNoMovement(target);
-                ElementalOne->SetInCombatWithZone();
-                ElementalOne->CombatStart(target);
-            }
-
-            if (ElementalTwo)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                if (!target)
-                    return;
-
-                DoStartNoMovement(target);
-                ElementalTwo->SetInCombatWithZone();
-                ElementalTwo->CombatStart(target);
-            }
-
-            if (ElementalThree)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                if (!target)
-                    return;
-
-                DoStartNoMovement(target);
-                ElementalThree->SetInCombatWithZone();
-                ElementalThree->CombatStart(target);
-            }
-
-            if (ElementalFour)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                if (!target)
-                    return;
-
-                DoStartNoMovement(target);
-                ElementalFour->SetInCombatWithZone();
-                ElementalFour->CombatStart(target);
-            }
-
             Talk(SAY_ELEMENTALS);
+
+            for(Position pos : elementalPos)
+            {
+                if(Creature* elemental = me->SummonCreature(NPC_WATER_ELEMENTAL, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
+                {
+                    if(elemental)
+                    {
+                        if(Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                        {
+                            DoStartNoMovement(target);
+                            elemental->SetInCombatWithZone();
+                            elemental->CombatStart(target);
+                        }
+                    }
+                }
+            }
         });
     }
 
