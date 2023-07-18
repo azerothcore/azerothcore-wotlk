@@ -222,7 +222,7 @@ struct boss_magtheridon : public BossAI
         scheduler.Schedule(50ms, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext context)
         {
             //check for dead channelers
-            if(_channelersKilled >= 5)
+            if (_channelersKilled >= 5)
             {
                 scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK);
                 scheduler.Schedule(3s, [this](TaskContext)
