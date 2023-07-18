@@ -152,10 +152,12 @@ struct boss_moroes : public BossAI
         {
             scheduler.DelayAll(9s);
             _vanished = true;
-            DoCastSelf(SPELL_VANISH);
             Talk(SAY_SPECIAL);
+            DoCastSelf(SPELL_VANISH);
+            me->SetImmuneToAll(true);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
+                me->SetImmuneToAll(false);
                 DoCastRandomTarget(SPELL_GARROTE, 0, 100.0f, true, true);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
