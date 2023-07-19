@@ -1,2 +1,3 @@
-update `spell_proc_event` set `ppmRate` = '10' where `entry` = 26480;
-update `spell_proc_event` set `procFlags` = '68' where `entry` = 26480;
+--
+UPDATE `spell_proc_event` SET `ppmRate` = 10 WHERE `entry` = 26480;
+UPDATE `spell_proc_event` SET `procFlags` = 68 WHERE `entry` = 26480;
