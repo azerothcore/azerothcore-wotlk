@@ -1,3 +1,4 @@
+-- DB update 2023_07_19_03 -> 2023_07_19_04
 --
 UPDATE `spell_proc_event` SET `Cooldown` = 50000 WHERE `entry` = 37655;
 UPDATE `spell_proc_event` SET `Cooldown` = 40000 WHERE `entry` = 37247;
