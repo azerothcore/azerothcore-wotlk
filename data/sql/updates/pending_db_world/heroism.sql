@@ -1,1 +1,1 @@
-update `spell_proc_event`set`procFlags` = '4' where `entry` = 23689;
+UPDATE `spell_proc_event`SET`procFlags` = 4 WHERE `entry` = 23689;
