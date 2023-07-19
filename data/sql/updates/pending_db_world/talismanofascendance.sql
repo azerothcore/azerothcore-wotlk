@@ -1,1 +1,1 @@
-update `spell_proc_event` set `procEx` = '262144' where `entry` = 28200;
+UPDATE `spell_proc_event` SET `procEx` = 262144 WHERE `entry` = 28200;
