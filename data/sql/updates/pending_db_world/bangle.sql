@@ -1,2 +1,2 @@
 --
-update `spell_proc_event` set `Cooldown` = '50000' where `entry` = 38334;
+UPDATE `spell_proc_event` SET `Cooldown` = 50000 WHERE `entry` = 38334;
