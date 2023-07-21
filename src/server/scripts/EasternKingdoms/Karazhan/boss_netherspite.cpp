@@ -203,7 +203,7 @@ struct boss_netherspite : public BossAI
 
     void SwitchToPortalPhase()
     {
-        scheduler.CancelGroup(VANISH_PHASE);        
+        scheduler.CancelGroup(VANISH_PHASE);
         me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
         me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
         SummonPortals();
