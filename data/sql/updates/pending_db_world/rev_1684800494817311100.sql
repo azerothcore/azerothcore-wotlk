@@ -6,7 +6,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 
 UPDATE `creature_template` SET `ScriptName`='npc_korkron_or_wildhammer' WHERE `entry` IN (22059, 21998);
 
-UPDATE `creature_template` SET `speed_run` = 1.14286 WHERE (`entry` = 21998);
+UPDATE `creature_template` SET `speed_run` = 2.28571 WHERE `entry` IN (22059, 21998);
 
 SET @NPC_WILDHAMMER_GRYPHON_RIDER := 22059;
 DELETE FROM `creature_text` WHERE `CreatureID`=@NPC_WILDHAMMER_GRYPHON_RIDER;
