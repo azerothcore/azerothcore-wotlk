@@ -2455,7 +2455,7 @@ enum book
 
 class spell_q10651_q10692_book_of_fel_names : public SpellScript
 {
-    PrepareSpellScript(spell_q10651_q10692_book_of_fel_names)
+    PrepareSpellScript(spell_q10651_q10692_book_of_fel_names);
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
