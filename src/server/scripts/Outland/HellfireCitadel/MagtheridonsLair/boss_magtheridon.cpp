@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "TaskScheduler.h"
 #include "magtheridons_lair.h"
 
 enum Yells
@@ -93,6 +94,7 @@ struct boss_magtheridon : public BossAI
         BossAI::Reset();
         _currentPhase = 0;
         _recentlySpoken = false;
+        _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
             Talk(SAY_TAUNT);
@@ -186,7 +188,7 @@ struct boss_magtheridon : public BossAI
                 {
                     DoCastSelf(SPELL_BLAST_NOVA);
 
-                    scheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
+                    _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
                     {
                         if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
                         {
@@ -194,10 +196,11 @@ struct boss_magtheridon : public BossAI
                             me->InterruptNonMeleeSpells(true);
                             scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
                         }
-                        context.Repeat(50ms);
+                        else
+                            context.Repeat(50ms);
                     }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
                     {
-                        scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                        _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
                     });
                 });
                 context.Repeat(53s, 56s);
@@ -214,6 +217,7 @@ struct boss_magtheridon : public BossAI
             return;
 
         scheduler.Update(diff);
+        _interruptScheduler.Update(diff);
 
         if (_currentPhase != 1)
         {
@@ -224,6 +228,7 @@ struct boss_magtheridon : public BossAI
 private:
     bool _recentlySpoken;
     uint8 _currentPhase;
+    TaskScheduler _interruptScheduler;
 };
 
 class spell_magtheridon_blaze : public SpellScript
