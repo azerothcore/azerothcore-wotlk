@@ -47,6 +47,12 @@ enum Portals
     BLUE_PORTAL             = 2  // Dominance
 };
 
+enum Groups
+{
+    PORTAL_PHASE            = 0,
+    VANISH_PHASE            = 1
+};
+
 const float PortalCoord[3][3] =
 {
     {-11195.353516f, -1613.237183f, 278.237258f}, // Left side
@@ -94,9 +100,6 @@ struct boss_netherspite : public BossAI
     {
         BossAI::Reset();
         berserk = false;
-        NetherInfusionTimer = 540000;
-        VoidZoneTimer = 15000;
-        NetherbreathTimer = 3000;
         HandleDoors(true);
         DestroyPortals();
     }
@@ -200,25 +203,50 @@ struct boss_netherspite : public BossAI
 
     void SwitchToPortalPhase()
     {
+        scheduler.CancelGroup(VANISH_PHASE);        
         me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
         me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
         SummonPortals();
-        PhaseTimer = 60000;
-        PortalPhase = true;
-        PortalTimer = 10000;
-        EmpowermentTimer = 10000;
+        scheduler.Schedule(60s, [this](TaskContext /*context*/)
+        {
+            if (!me->IsNonMeleeSpellCast(false))
+            {
+                SwitchToBanishPhase();
+                return;
+            }
+        }).Schedule(10s, PORTAL_PHASE, [this](TaskContext context)
+        {
+                UpdatePortals();
+                context.Repeat(1s);
+        }).Schedule(10s, PORTAL_PHASE, [this](TaskContext context)
+        {
+                DoCastSelf(SPELL_EMPOWERMENT);
+                me->AddAura(SPELL_NETHERBURN_AURA, me);
+                context.Repeat(90s);
+        });
         Talk(EMOTE_PHASE_PORTAL);
     }
 
     void SwitchToBanishPhase()
     {
+        scheduler.CancelGroup(PORTAL_PHASE);
         me->RemoveAurasDueToSpell(SPELL_EMPOWERMENT);
         me->RemoveAurasDueToSpell(SPELL_NETHERBURN_AURA);
-        DoCast(me, SPELL_BANISH_VISUAL, true);
-        DoCast(me, SPELL_BANISH_ROOT, true);
+        DoCastSelf(SPELL_BANISH_VISUAL, true);
+        DoCastSelf(SPELL_BANISH_ROOT, true);
         DestroyPortals();
-        PhaseTimer = 30000;
-        PortalPhase = false;
+        scheduler.Schedule(30s, [this](TaskContext /*context*/)
+        {
+            if (!me->IsNonMeleeSpellCast(false))
+            {
+                SwitchToPortalPhase();
+                return;
+            }
+        }).Schedule(10s, VANISH_PHASE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
+            context.Repeat(5s, 7s);
+        });
         Talk(EMOTE_PHASE_BANISH);
         for (uint8 i = 0; i < 3; ++i)
         {
@@ -271,81 +299,11 @@ struct boss_netherspite : public BossAI
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        if (PortalPhase)
-        {
-            // Distribute beams and buffs
-            if (PortalTimer <= diff)
-            {
-                UpdatePortals();
-                PortalTimer = 1000;
-            }
-            else
-            {
-                PortalTimer -= diff;
-            }
-
-            if (EmpowermentTimer <= diff)
-            {
-                DoCastSelf(SPELL_EMPOWERMENT);
-                me->AddAura(SPELL_NETHERBURN_AURA, me);
-                EmpowermentTimer = 90000;
-            }
-            else
-            {
-                EmpowermentTimer -= diff;
-            }
-
-            if (PhaseTimer <= diff)
-            {
-                if (!me->IsNonMeleeSpellCast(false))
-                {
-                    SwitchToBanishPhase();
-                    return;
-                }
-            }
-            else
-            {
-                PhaseTimer -= diff;
-            }
-        }
-        else // BANISH PHASE
-        {
-            if (NetherbreathTimer <= diff)
-            {
-                DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
-                NetherbreathTimer = urand(5000, 7000);
-            }
-            else
-            {
-                NetherbreathTimer -= diff;
-            }
-
-            if (PhaseTimer <= diff)
-            {
-                if (!me->IsNonMeleeSpellCast(false))
-                {
-                    SwitchToPortalPhase();
-                    return;
-                }
-            }
-            else
-            {
-                PhaseTimer -= diff;
-            }
-        }
-
         DoMeleeAttackIfReady();
     }
 
 private:
-    bool PortalPhase;
     bool berserk;
-    uint32 PhaseTimer; // timer for phase switching
-    uint32 VoidZoneTimer;
-    uint32 NetherInfusionTimer; // berserking timer
-    uint32 NetherbreathTimer;
-    uint32 EmpowermentTimer;
-    uint32 PortalTimer; // timer for beam checking
     ObjectGuid PortalGUID[3]; // guid's of portals
     ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
     ObjectGuid BeamTarget[3]; // guid's of portals' current targets
