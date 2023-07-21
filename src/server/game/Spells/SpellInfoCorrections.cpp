@@ -4547,6 +4547,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Mulgore Hatchling (periodic)
+    ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 62585; // Mulgore Hatchling (fear)
+    });
+
     // item: Riding Crop/Skybreaker Whip (https://www.wowhead.com/tbc/spell=48776/mount-speed)
     // item: Mithril Spurs (https://www.wowhead.com/tbc/spell=7215/mithril-spurs)
     // item: Enchant Gloves - Riding Skill (https://www.wowhead.com/tbc/spell=13927/minor-mount-speed) modified in wolk expansion
