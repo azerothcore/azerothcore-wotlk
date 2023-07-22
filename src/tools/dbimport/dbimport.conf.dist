@@ -295,3 +295,14 @@ Appender.DBImport=2,5,0,DBImport.log,w
 
 Logger.root=4,Console DBImport
 ###################################################################################################
+#
+#    include ...
+#       Description: Include another configuration file. The paramaters from
+#                    that file will overwrite any conflicting parameters in this
+#                    file.
+#
+#include /etc/azerothcore/dbimport.conf
+#
+## To include a directory (and all files under it), make sure there's a slash at the end of the path
+#
+#include /etc/azerothcore/common.d/

@@ -4153,3 +4153,14 @@ Metric.OverallStatusInterval = 1
 
 #
 ###################################################################################################
+#
+#    include ...
+#       Description: Include another configuration file. The paramaters from
+#                    that file will overwrite any conflicting parameters in this
+#                    file.
+#
+#include /etc/azerothcore/worldserver.conf
+#
+## To include a directory (and all files under it), make sure there's a slash at the end of the path
+#
+#include /etc/azerothcore/common.d/
