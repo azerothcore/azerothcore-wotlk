@@ -1,3 +1,4 @@
+-- DB update 2023_07_19_04 -> 2023_07_22_00
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName`='' WHERE `entry` IN (18445,18369,20812);
 UPDATE `gameobject_template` SET `Data2`=300000, `AIName`='SmartGameObjectAI', `ScriptName`='' WHERE `entry` IN (182521,182349,182350);
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (182521,182349,182350) AND `source_type`=1;
