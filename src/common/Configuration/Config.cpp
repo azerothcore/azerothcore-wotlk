@@ -22,6 +22,7 @@
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
+#include "fmt/core.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -29,6 +30,7 @@
 #include <mutex>
 #include <numeric>
 #include <regex>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <boost/algorithm/string/join.hpp>
@@ -43,20 +45,11 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
 
-    // Check logging system configs like Appender.* and Logger.*
-    bool IsLoggingSystemOptions(std::string_view optionName)
-    {
-        size_t foundAppender = optionName.find("Appender.");
-        size_t foundLogger = optionName.find("Logger.");
-
-        return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
-    }
-
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
         std::string message = Acore::StringFormatFmt(std::forward<Format>(fmt), std::forward<Args>(args)...);
-        fmt::print("parsing config file at {}: {}\n", filename, message);
+        fmt::print("Error parsing config file {}: {}\n", filename, message);
     }
 
     void AddKey(std::string const& optionKey, std::string const& optionValue)
@@ -73,8 +66,8 @@ namespace
         _configOptions.emplace(optionKey, optionValue);
     }
 
-    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::vector<std::string> configFiles = {});
-    bool ParseFile(std::string const& file, bool isOptional, bool isReload, std::vector<std::string> configFiles = {})
+    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::set<std::string> configFiles = {});
+    bool ParseFile(std::string const& file, bool isOptional, bool isReload, std::set<std::string> configFiles = {})
     {
         fs::path filePath(file);
         if (!fs::exists(filePath))
@@ -85,10 +78,10 @@ namespace
         // Check if path is a directory
         if (filePath.filename().empty())
         {
-            return ParseDirectory(file, isOptional, isReload);
+            return ParseDirectory(file, isOptional, isReload, configFiles);
         }
 
-        // Check if the file is empty
+        // Exit early if the file is empty
         if (fs::is_empty(filePath))
         {
             return false;
@@ -104,20 +97,22 @@ namespace
 
         std::unordered_map<std::string, std::string> fileConfigs = {};
 
-        auto absPath = fs::absolute(filePath).string();
+        std::string absPath = fs::absolute(filePath).string();
+        auto pathInsert = configFiles.insert(absPath);
 
         // Cyclic include check
-        if (std::find(configFiles.begin(), configFiles.end(), absPath) != configFiles.end())
+        if (!pathInsert.second)
         {
             std::string lineage = boost::algorithm::join(configFiles, " => ");
             throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Cyclic include statements found\n  files: {}", lineage));
         }
 
-        configFiles.push_back(absPath);
-
+        // Create a vec of string that will hold filenames from include
+        // statements.
+        // These will be parsed after all of the parameters have been persisted.
         std::vector<std::string> includesToParse;
 
-        std::cout << "parsing file: " << absPath << "\n";
+        std::cout << "Parsing config file: " << absPath << "\n";
         if (in.fail())
         {
             if (isOptional)
@@ -177,22 +172,22 @@ namespace
         }
 
         // Add correct keys if file load without errors
-        for (auto const& [entry, key] : fileConfigs)
+        for (auto const& [key, value] : fileConfigs)
         {
-            AddKey(entry, key, file, isOptional, isReload);
+            AddKey(key, value);
         }
 
         // Parse the saved included files now that this file has been entirely
         // parsed
         for (auto const& include : includesToParse)
         {
-            ParseFile(include, isOptional, isReload);
+            ParseFile(include, isOptional, isReload, configFiles);
         }
 
         return count > 0;
     }
 
-    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::vector<std::string> configFiles)
+    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::set<std::string> configFiles)
     {
         std::vector<bool> results;
         for (auto const& entry : fs::recursive_directory_iterator(dir))
@@ -220,7 +215,7 @@ namespace
         }
         catch (const std::exception& e)
         {
-            PrintError(file, "> {}", e.what());
+            PrintError(file, "{}", e.what());
         }
 
         return false;
