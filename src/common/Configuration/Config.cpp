@@ -164,7 +164,7 @@ namespace
                 if (match.size() == 2)
                 {
                     std::string includeFile = std::ssub_match(match[1]).str();
-                    // Save include statesments to be parsed after all the keys
+                    // Save include statements to be parsed after all the keys
                     // are added for this file.
                     includesToParse.push_back(includeFile);
                 }
