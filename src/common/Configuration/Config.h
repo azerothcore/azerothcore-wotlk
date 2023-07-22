@@ -48,7 +48,7 @@ public:
     T GetOption(std::string const& name, T const& def, bool showLogs = true) const;
 
     /*
-     * Deprecated geters. This geters will be deleted
+     * Deprecatted geters. This getters will be deleted
      */
 
     [[deprecated("Use GetOption<std::string> instead")]]

@@ -16,31 +16,32 @@
  */
 
 #include "Config.h"
+#include "Define.h"
 #include "Log.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <mutex>
+#include <numeric>
+#include <regex>
+#include <string>
 #include <unordered_map>
+#include <boost/algorithm/string/join.hpp>
+
+namespace fs = std::filesystem;
 
 namespace
 {
     std::string _filename;
-    std::vector<std::string> _additonalFiles;
+    std::vector<std::string> _additionalFiles;
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
-
-    // Check system configs like *server.conf*
-    bool IsAppConfig(std::string_view fileName)
-    {
-        size_t foundAuth = fileName.find("authserver.conf");
-        size_t foundWorld = fileName.find("worldserver.conf");
-
-        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos;
-    }
 
     // Check logging system configs like Appender.* and Logger.*
     bool IsLoggingSystemOptions(std::string_view optionName)
@@ -55,75 +56,81 @@ namespace
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
         std::string message = Acore::StringFormatFmt(std::forward<Format>(fmt), std::forward<Args>(args)...);
-
-        if (IsAppConfig(filename))
-        {
-            fmt::print("{}\n", message);
-        }
-        else
-        {
-            LOG_ERROR("server.loading", message);
-        }
+        fmt::print("parsing config file at {}: {}\n", filename, message);
     }
 
-    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional, [[maybe_unused]] bool isReload)
+    void AddKey(std::string const& optionKey, std::string const& optionValue)
     {
-        auto const& itr = _configOptions.find(optionName);
+        // Check if key is in the options already
+        auto const& itr = _configOptions.find(optionKey);
 
-        // Check old option
-        if (isOptional && itr == _configOptions.end())
-        {
-            if (!IsLoggingSystemOptions(optionName) && !isReload)
-            {
-                PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
-
-#ifdef CONFIG_ABORT_INCORRECT_OPTIONS
-                ABORT("> Core can't start if found incorrect options");
-#endif
-
-                return;
-            }
-        }
-
-        // Check exit option
+        // Clear option if it was defined at a later point in time
         if (itr != _configOptions.end())
         {
-            _configOptions.erase(optionName);
+            _configOptions.erase(optionKey);
         }
 
-        _configOptions.emplace(optionName, optionKey);
+        _configOptions.emplace(optionKey, optionValue);
     }
 
-    bool ParseFile(std::string const& file, bool isOptional, bool isReload)
+    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::vector<std::string> configFiles = {});
+    bool ParseFile(std::string const& file, bool isOptional, bool isReload, std::vector<std::string> configFiles = {})
     {
+        fs::path filePath(file);
+        if (!fs::exists(filePath))
+        {
+            return false;
+        }
+
+        // Check if path is a directory
+        if (filePath.filename().empty())
+        {
+            return ParseDirectory(file, isOptional, isReload);
+        }
+
+        // Check if the file is empty
+        if (fs::is_empty(filePath))
+        {
+            return false;
+        }
+
         std::ifstream in(file);
 
+        // Values are taken until there's a # or end of line
+        const std::regex parameter_regex("^\\s*([a-zA-Z0-9\\.]+)\\s*=\\s*([^#\\n]+)(?:#[^\\n]*)?$");
+        const std::regex include_regex("^\\s*include\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
+
+        std::smatch match;
+
+        std::unordered_map<std::string, std::string> fileConfigs = {};
+
+        auto absPath = fs::absolute(filePath).string();
+
+        // Cyclic include check
+        if (std::find(configFiles.begin(), configFiles.end(), absPath) != configFiles.end())
+        {
+            std::string lineage = boost::algorithm::join(configFiles, " => ");
+            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Cyclic include statements found\n  files: {}", lineage));
+        }
+
+        configFiles.push_back(absPath);
+
+        std::vector<std::string> includesToParse;
+
+        std::cout << "parsing file: " << absPath << "\n";
         if (in.fail())
         {
             if (isOptional)
             {
-                // No display erorr if file optional
+                // No display error if file optional
                 return false;
             }
 
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
+            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Failed to open {}file '{}'", isOptional ? "optional " : "", file));
         }
 
         uint32 count = 0;
         uint32 lineNumber = 0;
-        std::unordered_map<std::string /*name*/, std::string /*value*/> fileConfigs;
-
-        auto IsDuplicateOption = [&](std::string const& confOption)
-        {
-            auto const& itr = fileConfigs.find(confOption);
-            if (itr != fileConfigs.end())
-            {
-                PrintError(file, "> Config::LoadFile: Dublicate key name '{}' in config file '{}'", confOption, file);
-                return true;
-            }
-
-            return false;
-        };
 
         while (in.good())
         {
@@ -137,60 +144,36 @@ namespace
                 throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
             }
 
-            // remove whitespace in line
-            line = Acore::String::Trim(line, in.getloc());
-
-            if (line.empty())
+            if (std::regex_match(line, match, parameter_regex))
             {
-                continue;
+                if (match.size() == 3)
+                {
+                    std::string entry = std::ssub_match(match[1]).str();
+                    std::string value = std::ssub_match(match[2]).str();
+
+                    entry = Acore::String::Trim(entry);
+                    value = Acore::String::Trim(value);
+
+                    // remove double quotes from config value
+                    value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
+
+                    // add to fileConfigs
+                    fileConfigs.emplace(entry, value);
+                    // increment parameters changed
+                    count++;
+                }
             }
 
-            // comments
-            if (line[0] == '#' || line[0] == '[')
+            if (std::regex_match(line, match, include_regex))
             {
-                continue;
+                if (match.size() == 2)
+                {
+                    std::string includeFile = std::ssub_match(match[1]).str();
+                    // Save include statesments to be parsed after all the keys
+                    // are added for this file.
+                    includesToParse.push_back(includeFile);
+                }
             }
-
-            size_t found = line.find_first_of('#');
-            if (found != std::string::npos)
-            {
-                line = line.substr(0, found);
-            }
-
-            auto const equal_pos = line.find('=');
-
-            if (equal_pos == std::string::npos || equal_pos == line.length())
-            {
-                PrintError(file, "> Config::LoadFile: Failure to read line number {} in file '{}'. Skip this line", lineNumber, file);
-                continue;
-            }
-
-            auto entry = Acore::String::Trim(line.substr(0, equal_pos), in.getloc());
-            auto value = Acore::String::Trim(line.substr(equal_pos + 1, std::string::npos), in.getloc());
-
-            value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
-
-            // Skip if 2+ same options in one config file
-            if (IsDuplicateOption(entry))
-            {
-                continue;
-            }
-
-            // Add to temp container
-            fileConfigs.emplace(entry, value);
-            count++;
-        }
-
-        // No lines read
-        if (!count)
-        {
-            if (isOptional)
-            {
-                // No display erorr if file optional
-                return false;
-            }
-
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Empty file '{}'", file));
         }
 
         // Add correct keys if file load without errors
@@ -199,7 +182,34 @@ namespace
             AddKey(entry, key, file, isOptional, isReload);
         }
 
-        return true;
+        // Parse the saved included files now that this file has been entirely
+        // parsed
+        for (auto const& include : includesToParse)
+        {
+            ParseFile(include, isOptional, isReload);
+        }
+
+        return count > 0;
+    }
+
+    bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::vector<std::string> configFiles)
+    {
+        std::vector<bool> results;
+        for (auto const& entry : fs::recursive_directory_iterator(dir))
+        {
+            // Skip directories
+            if (entry.path().filename().empty())
+            {
+                continue;
+            }
+
+            bool result = ParseFile(entry.path().string(), isOptional, isReload, configFiles);
+            results.push_back(result);
+        }
+        unsigned long returnVal = std::accumulate(results.begin(), results.end(), 0);
+
+        // Return results of all ParseFile
+        return returnVal == (results.size() - 1);
     }
 
     bool LoadFile(std::string const& file, bool isOptional, bool isReload)
@@ -369,7 +379,7 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
     {
         for (auto const& itr : Acore::Tokenize(modulesConfigList, ',', false))
         {
-            _additonalFiles.emplace_back(itr);
+            _additionalFiles.emplace_back(itr);
         }
     }
 }
@@ -387,7 +397,7 @@ bool ConfigMgr::LoadAppConfigs(bool isReload /*= false*/)
 
 bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintInfo /*= true*/)
 {
-    if (_additonalFiles.empty())
+    if (_additionalFiles.empty())
     {
         // Send successful load if no found files
         return true;
@@ -404,7 +414,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     bool isExistDefaultConfig = true;
     bool isExistDistConfig = true;
 
-    for (auto const& distFileName : _additonalFiles)
+    for (auto const& distFileName : _additionalFiles)
     {
         std::string defaultFileName = distFileName;
 
