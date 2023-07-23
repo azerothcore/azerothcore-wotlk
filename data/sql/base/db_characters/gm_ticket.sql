@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS `gm_ticket` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '0 open, 1 closed, 2 character deleted',
   `playerGuid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier of ticket creator',
-  `name` varchar(12) NOT NULL COMMENT 'Name of ticket creator',
-  `description` text NOT NULL,
+  `name` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of ticket creator',
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `createTime` int unsigned NOT NULL DEFAULT '0',
   `mapId` smallint unsigned NOT NULL DEFAULT '0',
   `posX` float NOT NULL DEFAULT '0',
@@ -30,15 +30,15 @@ CREATE TABLE IF NOT EXISTS `gm_ticket` (
   `lastModifiedTime` int unsigned NOT NULL DEFAULT '0',
   `closedBy` int NOT NULL DEFAULT '0' COMMENT '-1 Closed by Console, >0 GUID of GM',
   `assignedTo` int unsigned NOT NULL DEFAULT '0' COMMENT 'GUID of admin to whom ticket is assigned',
-  `comment` text NOT NULL,
-  `response` text NOT NULL,
+  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `response` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `completed` tinyint unsigned NOT NULL DEFAULT '0',
   `escalated` tinyint unsigned NOT NULL DEFAULT '0',
   `viewed` tinyint unsigned NOT NULL DEFAULT '0',
   `needMoreHelp` tinyint unsigned NOT NULL DEFAULT '0',
   `resolvedBy` int NOT NULL DEFAULT '0' COMMENT '-1 Resolved by Console, >0 GUID of GM',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.gm_ticket: ~0 rows (approximately)
 DELETE FROM `gm_ticket`;

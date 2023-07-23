@@ -2372,8 +2372,6 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 
     uint8 level = GetLevel();
 
-    sScriptMgr->OnGivePlayerXP(this, xp, victim);
-
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
@@ -5145,7 +5143,7 @@ float Player::OCTRegenHPPerSpirit()
     if (baseSpirit > 50)
         baseSpirit = 50;
     float moreSpirit = spirit - baseSpirit;
-    float regen = baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio;
+    float regen = (baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio) * 2;
     return regen;
 }
 
@@ -5730,6 +5728,7 @@ void Player::CheckAreaExploreAndOutdoor()
                     XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level) * sWorld->getRate(RATE_XP_EXPLORE));
                 }
 
+                sScriptMgr->OnGivePlayerXP(this, XP, nullptr, PlayerXPSource::XPSOURCE_EXPLORE);
                 GiveXP(XP, nullptr);
                 SendExplorationExperience(areaId, XP);
             }
@@ -5857,7 +5856,7 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
 }
 
 // Calculates how many reputation points player gains in victim's enemy factions
-void Player::RewardReputation(Unit* victim, float rate)
+void Player::RewardReputation(Unit* victim)
 {
     if (!victim || victim->GetTypeId() == TYPEID_PLAYER)
         return;
@@ -5877,7 +5876,7 @@ void Player::RewardReputation(Unit* victim, float rate)
         Map const* map = GetMap();
         if (map->IsNonRaidDungeon())
             if (LFGDungeonEntry const* dungeon = GetLFGDungeon(map->GetId(), map->GetDifficulty()))
-                if (dungeon->reclevel == 80)
+                if (dungeon->TargetLevel == 80)
                     ChampioningFaction = GetChampioningFaction();
     }
 
@@ -5886,7 +5885,6 @@ void Player::RewardReputation(Unit* victim, float rate)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
-        donerep1 *= rate;
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -5898,7 +5896,6 @@ void Player::RewardReputation(Unit* victim, float rate)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
-        donerep2 *= rate;
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
@@ -6119,7 +6116,11 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             bg->UpdatePlayerScore(this, SCORE_BONUS_HONOR, honor, false); //false: prevent looping
             // Xinef: Only for BG activities
             if (!uVictim)
-                GiveXP(uint32(honor * (3 + GetLevel() * 0.30f)), nullptr);
+            {
+                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                sScriptMgr->OnGivePlayerXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
+                GiveXP(xp, nullptr);
+            }
         }
 
     if (sWorld->getBoolConfig(CONFIG_PVP_TOKEN_ENABLE))
@@ -7072,7 +7073,8 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
 
         LOG_DEBUG("entities.player", "WORLD: cast {} Equip spellId - {}", (item ? "item" : "itemset"), spellInfo->Id);
 
-        CastSpell(this, spellInfo, true, item);
+        //Ignore spellInfo->DurationEntry, cast with -1 duration
+        CastCustomSpell(spellInfo->Id, SPELLVALUE_AURA_DURATION, -1, this, true, item);
     }
     else
     {
@@ -7222,6 +7224,9 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                     continue;
             }
 
+            if (entry && (entry->attributeMask & ENCHANT_PROC_ATTR_WHITE_HIT) && (procVictim & SPELL_PROC_FLAG_MASK))
+                continue;
+
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
             {
@@ -7270,10 +7275,8 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                         item->SetEnchantmentCharges(EnchantmentSlot(e_slot), charges);
                 }
 
-                if (spellInfo->IsPositive())
-                    CastSpell(this, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
-                else
-                    CastSpell(target, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+                Unit* unitTarget = spellInfo->IsPositive() ? this : target;
+                CastSpell(unitTarget, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
             }
         }
     }
@@ -9018,20 +9021,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     else
     {
         pet->CombatStop();
-
-        if (returnreagent)
-        {
-            switch (pet->GetEntry())
-            {
-                //warlock pets except imp are removed(?) when logging out
-                case 1860:
-                case 1863:
-                case 417:
-                case 17252:
-                    mode = PET_SAVE_NOT_IN_SLOT;
-                    break;
-            }
-        }
 
         // only if current pet in slot
         pet->SavePetToDB(mode);
@@ -13438,7 +13427,10 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
     LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
     if (!item || item->is_looted)
     {
-        SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
+        if (!sScriptMgr->CanSendErrorAlreadyLooted(this))
+        {
+            SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
+        }
         return nullptr;
     }
 

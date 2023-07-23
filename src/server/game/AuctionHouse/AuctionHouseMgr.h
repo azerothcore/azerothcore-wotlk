@@ -133,7 +133,7 @@ public:
     AuctionHouseObject() { _next = _auctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (auto & itr : _auctionsMap)
+        for (auto& itr : _auctionsMap)
             delete itr.second;
     }
 
@@ -162,7 +162,7 @@ public:
     bool BuildListAuctionItems(WorldPacket& data, Player* player,
                                std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
                                uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
+                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder, Milliseconds searchTimeout);
 
 private:
     AuctionEntryMap _auctionsMap;
@@ -184,7 +184,6 @@ public:
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
     AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
-    AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
 
     Item* GetAItem(ObjectGuid itemGuid)
     {

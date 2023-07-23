@@ -18,24 +18,24 @@
 DROP TABLE IF EXISTS `itemrandomsuffix_dbc`;
 CREATE TABLE IF NOT EXISTS `itemrandomsuffix_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name_Lang_enUS` varchar(100) DEFAULT NULL,
-  `Name_Lang_enGB` varchar(100) DEFAULT NULL,
-  `Name_Lang_koKR` varchar(100) DEFAULT NULL,
-  `Name_Lang_frFR` varchar(100) DEFAULT NULL,
-  `Name_Lang_deDE` varchar(100) DEFAULT NULL,
-  `Name_Lang_enCN` varchar(100) DEFAULT NULL,
-  `Name_Lang_zhCN` varchar(100) DEFAULT NULL,
-  `Name_Lang_enTW` varchar(100) DEFAULT NULL,
-  `Name_Lang_zhTW` varchar(100) DEFAULT NULL,
-  `Name_Lang_esES` varchar(100) DEFAULT NULL,
-  `Name_Lang_esMX` varchar(100) DEFAULT NULL,
-  `Name_Lang_ruRU` varchar(100) DEFAULT NULL,
-  `Name_Lang_ptPT` varchar(100) DEFAULT NULL,
-  `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
-  `Name_Lang_itIT` varchar(100) DEFAULT NULL,
-  `Name_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Name_Lang_enUS` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enGB` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_koKR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_frFR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_deDE` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_zhCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_zhTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_esES` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_esMX` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ruRU` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ptPT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ptBR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_itIT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Name_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
-  `InternalName` varchar(100) DEFAULT NULL,
+  `InternalName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Enchantment_1` int NOT NULL DEFAULT '0',
   `Enchantment_2` int NOT NULL DEFAULT '0',
   `Enchantment_3` int NOT NULL DEFAULT '0',
@@ -47,12 +47,10 @@ CREATE TABLE IF NOT EXISTS `itemrandomsuffix_dbc` (
   `AllocationPct_4` int NOT NULL DEFAULT '0',
   `AllocationPct_5` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.itemrandomsuffix_dbc: 0 rows
+-- Dumping data for table acore_world.itemrandomsuffix_dbc: ~0 rows (approximately)
 DELETE FROM `itemrandomsuffix_dbc`;
-/*!40000 ALTER TABLE `itemrandomsuffix_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `itemrandomsuffix_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

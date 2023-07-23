@@ -1298,16 +1298,12 @@ AllowTickets = 1
 DeletedCharacterTicketTrace = 0
 
 #
-#     DungeonFinder.OptionsMask
-#        Description: Dungeon and raid finder system.
-#        Value is a bitmask consisting of:
-#           LFG_OPTION_ENABLE_DUNGEON_FINDER    = 1,     Enable the dungeon finder browser
-#           LFG_OPTION_ENABLE_RAID_BROWSER      = 2,     Enable the raid browser
-#           LFG_OPTION_ENABLE_SEASONAL_BOSSES   = 4,     Enable seasonal bosses
+#   DBC.EnforceItemAttributes
+#        Disallow overriding item attributes stored in DBC files with values from the database
+#        Default: 0 - Off, Use DB values
+#                 1 - On, Enforce DBC Values (default)
 
-#        Default:     5
-
-DungeonFinder.OptionsMask = 5
+DBC.EnforceItemAttributes = 1
 
 #
 #   AccountInstancesPerHour
@@ -2259,7 +2255,20 @@ Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
-#    RewardBonusMoney
+#    Rate.Drop.Item.ReferencedAmount
+#        Description: Multiplier for referenced loot amount. Makes many raid bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.ReferencedAmount = 1
+
+#
+#    Rate.Drop.Item.GroupAmount
+#        Description: Multiplier for grouped items. Makes many dungeon bosses (and others) drop additional loot.
+#        Default:     1
+
+Rate.Drop.Item.GroupAmount = 1
+
+#    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
 #                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
 #                     NOTE: the final amount will also affected by Rate.Drop.Money
@@ -2322,13 +2331,6 @@ Rate.BuyValue.Item.Epic             = 1
 Rate.BuyValue.Item.Legendary        = 1
 Rate.BuyValue.Item.Artifact         = 1
 Rate.BuyValue.Item.Heirloom         = 1
-
-#
-#    Rate.Drop.Item.ReferencedAmount
-#        Description: Multiplier for referenced loot amount.
-#        Default:     1
-
-Rate.Drop.Item.ReferencedAmount = 1
 
 #
 #    Rate.XP.Kill
@@ -3669,6 +3671,17 @@ Calculate.Gameoject.Zone.Area.Data = 0
 Group.Raid.LevelRestriction = 10
 
 #
+#     DungeonFinder.OptionsMask
+#        Description: Dungeon and raid finder system.
+#        Value is a bitmask consisting of:
+#           LFG_OPTION_ENABLE_DUNGEON_FINDER    = 1,     Enable the dungeon finder browser
+#           LFG_OPTION_ENABLE_RAID_BROWSER      = 2,     Enable the raid browser
+#           LFG_OPTION_ENABLE_SEASONAL_BOSSES   = 4,     Enable seasonal bosses
+#        Default:     5
+
+DungeonFinder.OptionsMask = 5
+
+#
 #    LFG.Location.All
 #
 #     Includes satellite to search for work elsewhere LFG
@@ -3829,6 +3842,13 @@ ChangeFaction.MaxMoney = 0
 #                     0 - Disabled
 
 Pet.RankMod.Health = 1
+
+#
+#     AuctionHouse.SearchTimeout
+#        Description: Time (in milliseconds) after which an auction house search is discarded.
+#        Default:     1000 - (1 second)
+
+AuctionHouse.SearchTimeout = 1000
 
 #
 ###################################################################################################

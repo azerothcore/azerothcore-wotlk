@@ -10369,7 +10369,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
 
         /// @todo: Implement aggro range, detection range and assistance range templates
-        if (!(creature->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
+        if (!(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
         {
             creature->CallAssistance();
         }
@@ -12465,32 +12465,6 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_DRUID:
-        {
-            // Nourish vs Idol of the Flourishing Life
-            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-
-            // Lifebloom vs Idol of Lush Moss/Increased Lifebloom Periodic
-            if (spellProto->SpellFamilyFlags[1] & 00000010)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(60779, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-
-                if (AuraEffect const* relicAurEff = GetAuraEffect(34246, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-            break;
-        }
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Impurity
@@ -20044,6 +20018,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
 
+    if (!vehicleBase)
+        return;
+
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
@@ -20158,7 +20135,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     if (player)
+    {
         player->ResummonPetTemporaryUnSummonedIfAny();
+        player->SetCanTeleport(true);
+    }
 }
 
 void Unit::BuildMovementPacket(ByteBuffer* data) const

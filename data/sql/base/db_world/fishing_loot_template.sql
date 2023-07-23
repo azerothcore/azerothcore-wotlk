@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.fishing_loot_template
 DROP TABLE IF EXISTS `fishing_loot_template`;
 CREATE TABLE IF NOT EXISTS `fishing_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.fishing_loot_template: 254 rows
+-- Dumping data for table acore_world.fishing_loot_template: ~254 rows (approximately)
 DELETE FROM `fishing_loot_template`;
-/*!40000 ALTER TABLE `fishing_loot_template` DISABLE KEYS */;
 INSERT INTO `fishing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(1, 11000, 11000, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(1, 11799, 11799, 100, 0, 32768, 1, 1, 1, '(ReferenceTable)'),
@@ -288,7 +287,6 @@ INSERT INTO `fishing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Qu
 	(4813, 41808, 0, 58, 0, 1, 1, 1, 1, 'Bonescale Snapper'),
 	(4813, 43572, 0, 20.5, 0, 1, 1, 1, 1, 'Magic Eater'),
 	(4813, 44475, 0, 1.1, 0, 1, 1, 1, 1, 'Reinforced Crate');
-/*!40000 ALTER TABLE `fishing_loot_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtcombatratings_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtcombatratings_dbc: 3,200 rows
+-- Dumping data for table acore_world.gtcombatratings_dbc: ~3,200 rows (approximately)
 DELETE FROM `gtcombatratings_dbc`;
-/*!40000 ALTER TABLE `gtcombatratings_dbc` DISABLE KEYS */;
 INSERT INTO `gtcombatratings_dbc` (`ID`, `Data`) VALUES
 	(0, 0.096154),
 	(1, 0.096154),
@@ -3226,7 +3225,6 @@ INSERT INTO `gtcombatratings_dbc` (`ID`, `Data`) VALUES
 	(3197, 0),
 	(3198, 0),
 	(3199, 0);
-/*!40000 ALTER TABLE `gtcombatratings_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
