@@ -39,7 +39,6 @@ void ForgeCommonMessage::SendTalentTreeLayout(Player* player, uint32 tab)
 
         BuildTree(player, CharacterPointType::SKILL_PAGE, tabs);
     }
-
 }
 
 std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType pointType, std::list<ForgeTalentTab*> tabs)
@@ -380,6 +379,49 @@ void ForgeCommonMessage::SendTalents(Player* player)
     }
 }
 
+<<<<<<< Updated upstream
+=======
+void ForgeCommonMessage::SendPerks(Player* player, uint8 specId)
+{
+    std::vector<CharacterSpecPerk*> spec;
+    fc->TryGetCharacterPerks(player, specId, spec);
+    std::string clientMsg = std::to_string(specId)+"^";
+    clientMsg += DoBuildPerks(spec, player);
+    player->SendForgeUIMsg(ForgeTopic::GET_PERKS, clientMsg);
+}
+
+void ForgeCommonMessage::SendAllPerks(Player* player)
+{
+    std::vector<Perk*> perks;
+    fc->TryGetAllPerks(perks);
+    std::string clientMsg = DoBuildPerkCatalogue(perks);
+    player->SendForgeUIMsg(ForgeTopic::GET_PERK_CATALOGUE, clientMsg);
+}
+
+void ForgeCommonMessage::SendWithstandingSelect(Player* player)
+{
+    ForgeCharacterSpec* spec;
+    std::string out = "";
+    std::string delim = "*";
+    if (fc->TryGetCharacterActiveSpec(player, spec)) {
+        auto perkQueue = spec->perkQueue;
+        if (!perkQueue.empty()) {
+            if (perkQueue.begin()->second.size() > 2) {
+                for (CharacterSpecPerk* perk : perkQueue.begin()->second)
+                    out = out + std::to_string(perk->spell->spellId) + "^"
+                    + std::to_string(perk->uuid != perkQueue.begin()->first ? 1 : 0) + delim;
+
+                SendPerkSelection(player, out);
+            }
+        }
+    }
+}
+
+void ForgeCommonMessage::SendPerkSelection(Player* player, std::string clientMsg)
+{
+    player->SendForgeUIMsg(ForgeTopic::OFFER_SELECTION, clientMsg);
+}
+>>>>>>> Stashed changes
 
 std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCharacterTalent*>& spec, Player* player, std::string clientMsg, uint32 tabId)
 {
@@ -415,6 +457,44 @@ std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCha
     return clientMsg;
 }
 
+<<<<<<< Updated upstream
+=======
+std::string BuildPerk(Perk* perk)
+{
+    std::string out = "";
+    std::string dict = "~";
+
+    out = std::to_string(perk->spellId) +
+        "&" + std::to_string(perk->allowableClass) +
+        dict + std::to_string(perk->groupId) +
+        dict + std::to_string(perk->isAura) +
+        dict + std::to_string(perk->isUnique) +
+        dict + perk->tags+","; //comma-separated tags
+
+    return out;
+}
+
+std::string ForgeCommonMessage::DoBuildPerks(std::vector<CharacterSpecPerk*> spec, Player* player)
+{
+    std::string out = "";
+    for (auto perk : spec)
+    {
+        out += BuildPerk(perk->spell) + "~" + std::to_string(perk->rank) + "*";
+    }
+    return out;
+}
+
+std::string ForgeCommonMessage::DoBuildPerkCatalogue(std::vector<Perk*> perks)
+{
+    int i = 0;
+    std::string clientMsg = "";
+    for (auto perk : perks)
+    {
+        clientMsg += BuildPerk(perk) + "*";
+    }
+    return clientMsg;
+}
+>>>>>>> Stashed changes
 
 void ForgeCommonMessage::SendSpecInfo(Player* player)
 {

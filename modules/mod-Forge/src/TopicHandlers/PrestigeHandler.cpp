@@ -77,7 +77,7 @@ public:
                 }
             }
 
-
+            fc->PrestigePerks(iam.player);
             cm->ApplyKnownForgeSpells(iam.player);
 
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);

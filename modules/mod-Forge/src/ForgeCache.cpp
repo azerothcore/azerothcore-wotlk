@@ -13,6 +13,10 @@
 #include <unordered_map>
 #include <list>
 #include <tuple>
+<<<<<<< Updated upstream
+=======
+#include <random>
+>>>>>>> Stashed changes
 
 enum CharacterPointType
 {
@@ -78,6 +82,49 @@ struct ForgeTalentPrereq
     uint32 RequiredRank;
 };
 
+<<<<<<< Updated upstream
+=======
+//////// PERK ////////
+enum CharacterPerkType
+{
+    ARCHETYPE = 0,
+    COMBAT = 1,
+    UTILITY = 3,
+    FUN = 4
+};
+
+struct Perk {
+    uint32 spellId;
+    bool isUnique;
+    int32 allowableClass;
+    bool isPermanent;
+    uint8 chance;
+    uint8 category;
+    bool isAura;
+    uint32 groupId;
+    std::string tags;
+    // rank number, spellId
+    std::unordered_map<uint32, uint32> ranks;
+    // SpellId, Rank Number
+    std::unordered_map<uint32, uint32> ranksRev;
+    bool operator () (const Perk& m) const
+    {
+        return m.spellId == m.spellId;
+    }
+};
+
+struct CharacterSpecPerk {
+    Perk* spell;
+    std::string uuid;
+    uint8 rank;
+    bool operator () (const CharacterSpecPerk* m) const
+    {
+        return m->spell->spellId == m->spell->spellId;
+    }
+};
+//////////////////////
+
+>>>>>>> Stashed changes
 struct ForgeCharacterSpec
 {
     uint32 Id;
@@ -92,6 +139,12 @@ struct ForgeCharacterSpec
     std::unordered_map<uint32, std::unordered_map<uint32, ForgeCharacterTalent*>> Talents;
     // tabId
     std::unordered_map<uint32, uint8> PointsSpent;
+<<<<<<< Updated upstream
+=======
+    std::unordered_map<uint32, CharacterSpecPerk*> perks;
+    std::vector<CharacterSpecPerk*> prestigePerks;
+    std::unordered_map<std::string, std::vector<CharacterSpecPerk*>> perkQueue;
+>>>>>>> Stashed changes
 };
 
 struct ForgeTalent
@@ -230,6 +283,39 @@ public:
         return true;
     }
 
+<<<<<<< Updated upstream
+=======
+    bool TryGetCharacterPerks(Player* player, uint32 specId, OUT std::vector<CharacterSpecPerk*>& specPerks)
+    {
+        ForgeCharacterSpec* charSpec;
+        if (!TryGetCharacterActiveSpec(player, charSpec))
+            return false;
+
+        for (auto perk : charSpec->perks)
+            specPerks.push_back(perk.second);
+
+        return specPerks.size() == charSpec->perks.size();
+    }
+
+    bool TryGetAllPerks(OUT std::vector<Perk*>& perks)
+    {
+        for (auto perk : AllPerks)
+            perks.push_back(perk.second);
+
+        return perks.size() == AllPerks.size();
+    }
+
+    bool TryGetCharacterPerkQueue(Player* player, uint32 specId, OUT std::unordered_map<std::string /*uuid*/, std::vector<CharacterSpecPerk*>> queue)
+    {
+        ForgeCharacterSpec* charSpec;
+        if (!TryGetCharacterActiveSpec(player, charSpec))
+            return false;
+
+        queue = charSpec->perkQueue;
+        return true;
+    }
+
+>>>>>>> Stashed changes
     bool TryGetAllCharacterSpecs(Player* player, OUT std::list<ForgeCharacterSpec*>& specs)
     {
         auto charSpecItt = CharacterSpecs.find(player->GetGUID());
@@ -251,6 +337,25 @@ public:
             return false;
 
         return TryGetCharacterSpec(player, cas->second, spec);
+    }
+
+    int FindMissingPerks(Player* player)
+    {
+        // TODO GRAB NUMBER FROM CATEGORY:COUNT MAP
+        int max = player->GetLevel() / 2;
+        int count = 0;
+        ForgeCharacterSpec* spec;
+        if (TryGetCharacterActiveSpec(player, spec)) {
+            auto perks = spec->perks;
+            if (!perks.empty())
+                for (auto perk : spec->perks)
+                    count += perk.second->rank;
+
+            auto queue = spec->perkQueue;
+            if (!queue.empty())
+                count += queue.size();
+        }
+        return max - count;
     }
 
     bool TryGetCharacterSpec(Player* player, uint32 specId, OUT ForgeCharacterSpec*& spec)
@@ -558,6 +663,24 @@ public:
         CharacterDatabase.CommitTransaction(trans);
     }
 
+<<<<<<< Updated upstream
+=======
+    void UpdateCharacterPerks(Player* player, ForgeCharacterSpec* spec, CharacterSpecPerk* perk, bool learn)
+    {
+        auto trans = CharacterDatabase.BeginTransaction();
+        std::string rollKey = FindRollKey(spec, perk->uuid);
+
+        if (learn)
+            LearnCharacterPerkInternal(player, trans, spec, rollKey, perk);
+        else
+            ForgetCharacterPerkInternal(player->GetGUID().GetCounter(), trans, spec->Id, perk->spell->spellId);
+        CharacterDatabase.DirectCommitTransaction(trans);
+
+        spec->perkQueue.erase(rollKey);
+        spec->perks[perk->spell->spellId] = perk;
+    }
+
+>>>>>>> Stashed changes
     void ApplyAccountBoundTalents(Player* player)
     {
         ForgeCharacterSpec* currentSpec;
@@ -580,7 +703,10 @@ public:
 
                         for (auto spell : tab->Talents)
                         {
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                             if (playerLevel != 80 && modes.size() == 0 && talItt != currentSpec->Talents.end())
                             {
                                 auto spellItt = talItt->second.find(spell.first);
@@ -616,11 +742,15 @@ public:
             fp->PointType = cpt;
             fp->SpecId = UINT_MAX;
             fp->Max = 0;
+<<<<<<< Updated upstream
 
             if (cpt == CharacterPointType::FORGE_SKILL_TREE)
                 fp->Sum = GetConfig("level10ForgePoints", 30);
             else
                 fp->Sum = 0;
+=======
+            fp->Sum = 0;
+>>>>>>> Stashed changes
 
             return fp;
         }
@@ -705,6 +835,11 @@ public:
             trans->Append("DELETE FROM forge_character_points WHERE guid = {} AND spec != {}", guid.GetCounter(), ACCOUNT_WIDE_KEY);
             trans->Append("DELETE FROM forge_character_talents WHERE guid = {} AND spec != {}", guid.GetCounter(), ACCOUNT_WIDE_KEY);
             trans->Append("DELETE FROM forge_character_talents_spent WHERE guid = {} AND spec != {}", guid.GetCounter(), ACCOUNT_WIDE_KEY);
+<<<<<<< Updated upstream
+=======
+            trans->Append("DELETE FROM character_spec_perks WHERE guid = {}", guid.GetCounter());
+            trans->Append("DELETE FROM character_perk_selection_queue WHERE guid = {}", guid.GetCounter());
+>>>>>>> Stashed changes
             CharacterDatabase.CommitTransaction(trans);
         }
     }
@@ -764,6 +899,167 @@ public:
         return newFp;
     }
 
+<<<<<<< Updated upstream
+=======
+    Perk* GetPerk(uint32 charClass, uint32 spellId)
+    {
+        Perk* perk = new Perk();
+        perk->spellId = spellId;
+
+        auto it = std::find_if(Perks[charClass].begin(), Perks[charClass].end(),
+            [&spellId](Perk* perk) {return perk->spellId == spellId; });
+
+        return *it;
+    }
+
+    Perk* GetRandomPerk(Player* player)
+    {
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        auto perks = Perks[player->getClass()];
+        std::uniform_int_distribution<> distr(0, perks.size() - 1);
+        auto index = distr(eng);
+        auto it = perks[index];
+        return it;
+    }
+
+    bool perkEquals(Perk a, Perk b) {
+        return a.spellId == b.spellId;
+    }
+
+    uint32 CountCharacterSpecPerkOccurences(Player* player, uint8 specId, Perk* perk)
+    {
+        ForgeCharacterSpec* charSpec;
+
+        if (!TryGetCharacterActiveSpec(player, charSpec))
+            return -1;
+        uint16 count = 0;
+
+        QueryResult countQueue = CharacterDatabase.Query("Select count(*) from character_perk_selection_queue where `guid` = {} and `specId` = {} and `spellId` = {}", player->GetGUID().GetCounter(), charSpec->Id, perk->spellId);
+        if (!countQueue) count += 0;
+        else {
+            Field* selectionFields = countQueue->Fetch();
+            uint32 rowCount = selectionFields[0].Get<uint64>();
+            count += rowCount;
+        }
+
+        QueryResult countPrestige = CharacterDatabase.Query("Select count(*) from character_prestige_perk_carryover where `guid` = {} and `specId` = {} and `spellId` = {}", player->GetGUID().GetCounter(), charSpec->Id, perk->spellId);
+        if (!countPrestige) count += 0;
+        else {
+            Field* selectionFields = countPrestige->Fetch();
+            uint32 rowCount = selectionFields[0].Get<uint64>();
+            count += rowCount;
+        }
+
+        auto csp = charSpec->perks.find(perk->spellId);
+        if (csp != charSpec->perks.end())
+            count += csp->second->rank;
+
+        return count;
+    }
+
+    void InsertPerkSelection(Player* player, std::string uuidStr, Perk* perk, std::string rollKey)
+    {
+        ForgeCharacterSpec* charSpec;
+
+        if (!TryGetCharacterActiveSpec(player, charSpec))
+            return;
+
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        trans->Append("INSERT INTO character_perk_selection_queue (`guid`, `specId`, `rollkey`, `uuid`, `spellId`) VALUES ({}, {}, '{}', '{}', {} )",
+            player->GetGUID().GetCounter(), charSpec->Id, rollKey, uuidStr, perk->spellId);
+        CharacterDatabase.CommitTransaction(trans);
+
+        CharacterSpecPerk* spec = new CharacterSpecPerk();
+        spec->spell = perk;
+        spec->uuid = uuidStr;
+        spec->rank = 1;
+        charSpec->perkQueue[rollKey].push_back(spec);
+    }
+
+    void UpdateCharacterPerkQueue(Player* player)
+    {
+        QueryResult queueQuery = CharacterDatabase.Query("SELECT * FROM character_perk_selection_queue WHERE `guid` = {}", player->GetGUID().GetCounter());
+        if (!queueQuery) return;
+
+        ForgeCharacterSpec* spec = CharacterSpecs[player->GetGUID()][player->GetActiveSpec()+1];
+        spec->perkQueue.clear();
+
+        do {
+            Field* selectionFields = queueQuery->Fetch();
+            uint32 guid = selectionFields[0].Get<uint64>();
+            ObjectGuid characterGuid = ObjectGuid::Create<HighGuid::Player>(guid);
+            uint8 specId = selectionFields[1].Get<uint8>();
+            std::string rollKey = selectionFields[2].Get<std::string>();
+            std::string uuid = selectionFields[3].Get<std::string>();
+            uint32 spellId = selectionFields[4].Get<uint32>();
+
+            CharacterSpecPerk* perk = new CharacterSpecPerk();
+            perk->spell = GetPerk( player->getClass(), spellId);
+            perk->uuid = uuid;
+
+            spec->perkQueue[rollKey].push_back(perk);
+        } while (queueQuery->NextRow());
+    }
+
+    void PrestigePerks(Player* player)
+    {
+        std::unordered_map<uint32, ForgeCharacterSpec*> charSpecs = CharacterSpecs.at(player->GetGUID());
+        for (auto i : charSpecs) {
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            i.second->perkQueue.clear();
+            i.second->prestigePerks.clear();
+            for (auto perkMap : i.second->perks) {
+                auto perk = perkMap.second;
+                for (auto j = 1; j <= perk->rank; j++) {
+                    trans->Append("INSERT INTO character_prestige_perk_carryover (`guid`, `specId`, `uuid`, `spellId`, `rank`) VALUES ({} , {} , '{}' , {} , {} )",
+                        player->GetGUID().GetCounter(), i.first, perk->uuid, perk->spell->spellId, j);
+                    auto copy = perk;
+                    copy->rank = j;
+                    i.second->prestigePerks.push_back(copy);
+                }
+                PurgePerk(player, i.second, perk);
+            }
+
+            trans->Append("DELETE FROM character_spec_perks WHERE `guid` = {} AND `specId` = {}",
+                player->GetGUID().GetCounter(), i.first);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    CharacterSpecPerk* GetPrestigePerk(Player* player) {
+        ForgeCharacterSpec* spec;
+        if (TryGetCharacterActiveSpec(player, spec)) {
+            if (spec->prestigePerks.size() > 0) {
+                std::random_device rd;
+                std::mt19937 eng(rd());
+                std::uniform_int_distribution<> distr(0, spec->prestigePerks.size() - 1);
+                auto index = distr(eng);
+                auto it = spec->prestigePerks[index];
+
+                CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+                trans->Append("DELETE FROM character_prestige_perk_carryover WHERE `guid` = {} AND `specId` = {} AND `uuid` = '{}' AND `spellId` = {} and `rank` = {}"
+                    , player->GetGUID().GetCounter(), spec->Id, it->uuid, it->spell->spellId, it->rank);
+                CharacterDatabase.CommitTransaction(trans);
+                spec->prestigePerks.erase(spec->prestigePerks.begin() + index);
+
+                return it;
+            }
+            else
+                return nullptr;
+        }
+    }
+
+    std::string FindFirstUuid(ForgeCharacterSpec* spec, uint32 spellId)
+    {
+        std::string out = "NONE";
+        for (auto roll : spec->perkQueue)
+            for (auto perk : roll.second)
+                if (perk->spell->spellId == spellId)
+                    out = perk->uuid;
+        return out;
+    }
+>>>>>>> Stashed changes
 
     std::vector<uint32> RACE_LIST;
     std::vector<uint32> CLASS_LIST;
@@ -778,7 +1074,7 @@ private:
     // charId, specId
     std::unordered_map<ObjectGuid, std::unordered_map<uint32, ForgeCharacterSpec*>> CharacterSpecs;
     std::unordered_map<uint32, ForgeCharacterSpec*> AccountWideCharacterSpecs;
-
+    
     // charId, PointType, specid
     std::unordered_map<ObjectGuid, std::unordered_map<CharacterPointType, std::unordered_map<uint32, ForgeCharacterPoint*>>> CharacterPoints;
     std::unordered_map<CharacterPointType, ForgeCharacterPoint*> MaxPointDefaults;
@@ -799,6 +1095,13 @@ private:
 
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
 
+<<<<<<< Updated upstream
+=======
+    // Perks
+    std::unordered_map<uint32, std::vector<Perk*>> Perks;
+    std::unordered_map<uint32, Perk*> AllPerks;
+
+>>>>>>> Stashed changes
     void BuildForgeCache()
     {
         CharacterActiveSpecs.clear();
@@ -832,11 +1135,21 @@ private:
         AddTalentRanks();
         AddTalentUnlearn();
         AddCharacterSpecs();
+<<<<<<< Updated upstream
+=======
+        AddPerks();
+        AddPerkRanks();
+>>>>>>> Stashed changes
         AddTalentSpent();
         AddCharacterTalents();
         AddCharacterPointsFromDB();
         AddCharacterClassSpecs();
+<<<<<<< Updated upstream
         AddPlayerSpellScaler();
+=======
+        AddCharacterPerks();
+        AddCharacterPrestigePerks();
+>>>>>>> Stashed changes
     }
 
     void GetCharacters()
@@ -954,6 +1267,125 @@ private:
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }
 
+<<<<<<< Updated upstream
+=======
+    void LearnCharacterPerkInternal(Player* player, CharacterDatabaseTransaction& trans, ForgeCharacterSpec* spec, std::string rollKey, CharacterSpecPerk* perk) {
+        trans->Append("INSERT INTO character_spec_perks (`guid`, `specId`, `uuid`, `spellId`, `rank`) VALUES ({}, {}, '{}', {}, {}) ON DUPLICATE KEY UPDATE `rank` = `rank`+1",
+            player->GetGUID().GetCounter(), spec->Id, perk->uuid, perk->spell->spellId, perk->rank);
+        trans->Append("INSERT INTO character_perk_roll_history select {} as `accountId`, `guid`, `uuid`, `specId`, `spellId`, {} as `level`, 0 as `carryover` from character_perk_selection_queue where rollkey = '{}' ON DUPLICATE KEY UPDATE `carryover` = `carryover`+1",
+            player->GetSession()->GetAccountId(), player->GetLevel(), perk->uuid);
+        trans->Append("DELETE FROM character_perk_selection_queue where `rollkey` = '{}'", rollKey);
+    }
+
+    void ForgetCharacterPerkInternal(uint32 charId, CharacterDatabaseTransaction& trans, uint32 spec, uint32 spellId) {
+        trans->Append("DELETE FROM character_perks WHERE spellId = {} and specId = {}", spellId, spec);
+    }
+
+    void AddPerkRanks()
+    {
+        LOG_INFO("server.load", "Loading perk ranks...");
+        QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM perk_ranks");
+        do
+        {
+            Field* perkFields = perkRanks->Fetch();
+            auto perkId = perkFields[0].Get<uint32>();
+            auto rank = perkFields[1].Get<uint32>();
+            auto spellId = perkFields[2].Get<uint32>();
+
+            AllPerks[perkId]->ranks[rank] = spellId;
+            AllPerks[perkId]->ranksRev[spellId] = rank;
+        } while (perkRanks->NextRow());
+    }
+
+    void AddPerks()
+    {
+        LOG_INFO("server.load", "Loading all perks...");
+
+        QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
+        do
+        {
+            Field* perkFields = perks->Fetch();
+            Perk* newPerk = new Perk();
+            newPerk->spellId = perkFields[0].Get<uint32>();
+            newPerk->isUnique = perkFields[1].Get<int>() == 0 ? false : true;
+            newPerk->allowableClass = perkFields[2].Get<int>();
+            newPerk->isPermanent = perkFields[3].Get<int>() == 0 ? false : true;
+            newPerk->chance = perkFields[4].Get<uint8>();
+            newPerk->category = perkFields[5].Get<uint8>();
+            newPerk->isAura = perkFields[6].Get<int>() == 0 ? false : true;
+            newPerk->groupId = perkFields[7].Get<int>();
+            newPerk->tags = perkFields[8].Get<std::string>();
+            //newPerk->rank = perkFields[9].Get<uint8>();
+
+            switch (newPerk->allowableClass) {
+                case CLASSMASK_CASTER:
+                    Perks[CLASS_PRIEST].push_back(newPerk);
+                    Perks[CLASS_SHAMAN].push_back(newPerk);
+                    Perks[CLASS_MAGE].push_back(newPerk);
+                    Perks[CLASS_WARLOCK].push_back(newPerk);
+                    Perks[CLASS_DRUID].push_back(newPerk);
+                    break;
+                case CLASSMASK_PETCLASS:
+                    Perks[CLASS_HUNTER].push_back(newPerk);
+                    Perks[CLASS_WARLOCK].push_back(newPerk);
+                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                    break;
+                case CLASSMASK_MELEE:
+                    Perks[CLASS_WARRIOR].push_back(newPerk);
+                    Perks[CLASS_PALADIN].push_back(newPerk);
+                    Perks[CLASS_ROGUE].push_back(newPerk);
+                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                    Perks[CLASS_SHAMAN].push_back(newPerk);
+                    Perks[CLASS_DRUID].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_WARRIOR - 1)):
+                    Perks[CLASS_WARRIOR].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_PALADIN - 1)):
+                    Perks[CLASS_PALADIN].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_HUNTER - 1)):
+                    Perks[CLASS_HUNTER].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_ROGUE - 1)):
+                    Perks[CLASS_ROGUE].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_PRIEST - 1)):
+                    Perks[CLASS_PRIEST].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_DEATH_KNIGHT - 1)):
+                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_SHAMAN - 1)):
+                    Perks[CLASS_SHAMAN].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_MAGE - 1)):
+                    Perks[CLASS_MAGE].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_WARLOCK - 1)):
+                    Perks[CLASS_WARLOCK].push_back(newPerk);
+                    break;
+                case (1 << (CLASS_DRUID - 1)):
+                    Perks[CLASS_DRUID].push_back(newPerk);
+                    break;
+                default:
+                    Perks[CLASS_WARRIOR].push_back(newPerk);
+                    Perks[CLASS_PALADIN].push_back(newPerk);
+                    Perks[CLASS_HUNTER].push_back(newPerk);
+                    Perks[CLASS_ROGUE].push_back(newPerk);
+                    Perks[CLASS_PRIEST].push_back(newPerk);
+                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                    Perks[CLASS_SHAMAN].push_back(newPerk);
+                    Perks[CLASS_MAGE].push_back(newPerk);
+                    Perks[CLASS_WARLOCK].push_back(newPerk);
+                    Perks[CLASS_DRUID].push_back(newPerk);
+            }
+
+            AllPerks[newPerk->spellId] = newPerk;
+        } while (perks->NextRow());
+    }
+
+>>>>>>> Stashed changes
     void AddTalentTrees()
     {
         QueryResult talentTab = WorldDatabase.Query("SELECT * FROM forge_talent_tabs");
@@ -1253,6 +1685,63 @@ private:
         } while (talentsQuery->NextRow());
     }
 
+<<<<<<< Updated upstream
+=======
+    void AddCharacterPerks()
+    {
+        LOG_INFO("server.load", "Loading character perks...");
+        QueryResult perkQuery = CharacterDatabase.Query("SELECT A.* ,c.class FROM `character_spec_perks` A join `characters` c on A.guid = c.guid");
+        if (!perkQuery) return;
+
+        do {
+            Field* perkFields = perkQuery->Fetch();
+            uint32 guid = perkFields[0].Get<uint64>();
+            ObjectGuid characterGuid = ObjectGuid::Create<HighGuid::Player>(guid);
+            uint8 specId = perkFields[1].Get<uint8>();
+            std::string uuid = perkFields[2].Get<std::string>();
+            uint32 spellId = perkFields[3].Get<uint32>();
+            uint8 rank = perkFields[4].Get<uint8>();
+            uint32 classMask = perkFields[5].Get<uint32>();
+
+
+            CharacterSpecPerk* perk = new CharacterSpecPerk();
+            Perk* copy = GetPerk(classMask, spellId);
+            perk->spell = GetPerk(classMask, spellId);
+            perk->rank = rank;
+            perk->uuid = uuid;
+
+            ForgeCharacterSpec* spec = CharacterSpecs[characterGuid][specId];
+            spec->perks[spellId] = perk;
+        } while (perkQuery->NextRow());
+    }
+
+    void AddCharacterPrestigePerks()
+    {
+        LOG_INFO("server.load", "Loading character prestige perks...");
+        QueryResult prestigeQuery = CharacterDatabase.Query("SELECT A.*, c.class FROM character_prestige_perk_carryover A join acore_characters.`characters` c where A.guid  = c.guid");
+        if (!prestigeQuery) return;
+
+        do {
+            Field* perkFields = prestigeQuery->Fetch();
+            uint32 guid = perkFields[0].Get<uint64>();
+            ObjectGuid characterGuid = ObjectGuid::Create<HighGuid::Player>(guid);
+            uint8 specId = perkFields[1].Get<uint8>();
+            std::string uuid = perkFields[2].Get<std::string>();
+            uint32 spellId = perkFields[3].Get<uint32>();
+            uint8 rank = perkFields[4].Get<uint32>();
+            uint32 pClass = perkFields[5].Get<uint32>();
+
+            CharacterSpecPerk* perk = new CharacterSpecPerk();
+            perk->spell = GetPerk(pClass, spellId);
+            perk->uuid = uuid;
+            perk->rank = 1;
+
+            ForgeCharacterSpec* spec = CharacterSpecs[characterGuid][specId];
+            spec->prestigePerks.push_back(perk);
+        } while (prestigeQuery->NextRow());
+    }
+
+>>>>>>> Stashed changes
     void AddCharacterPointsFromDB()
     {
         QueryResult pointsQuery = CharacterDatabase.Query("SELECT * FROM forge_character_points");
@@ -1329,6 +1818,7 @@ private:
         } while (specsQuery->NextRow());*/
     }
 
+<<<<<<< Updated upstream
     void AddPlayerSpellScaler()
     {
         QueryResult scale = WorldDatabase.Query("SELECT * FROM forge_player_spell_scale");
@@ -1347,6 +1837,26 @@ private:
         } while (scale->NextRow());
     }
 
+=======
+    std::string FindRollKey(ForgeCharacterSpec* spec, std::string uuid)
+    {
+        std::string out = "NONE";
+        for (auto roll : spec->perkQueue)
+            for (auto perk : roll.second)
+                if (perk->uuid == uuid)
+                    out = roll.first;
+        return out;
+    }
+
+    void PurgePerk(Player* player, ForgeCharacterSpec* spec, CharacterSpecPerk* perk)
+    {
+        for (auto rank : AllPerks[perk->spell->spellId]->ranksRev) {
+            auto spellId = rank.first;
+            player->removeSpell(spellId, SPEC_MASK_ALL, false);
+            spec->perks.erase(spellId);
+        }
+    }
+>>>>>>> Stashed changes
 };
 
 #define sForgeCache ForgeCache::get_instance()

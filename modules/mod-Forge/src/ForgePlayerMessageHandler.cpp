@@ -25,6 +25,14 @@
 #include <ForgeCache.cpp>
 #include <ForgeCacheCommands.cpp>
 #include <ActivateClassSpecHandler.cpp>
+<<<<<<< Updated upstream
+=======
+#include <unordered_map>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+>>>>>>> Stashed changes
 
 // Add player scripts
 class ForgePlayerMessageHandler : public PlayerScript
@@ -68,6 +76,7 @@ public:
         }
 
         fc->ApplyAccountBoundTalents(player);
+        cm->SendWithstandingSelect(player);
     }
 
     void OnDelete(ObjectGuid guid, uint32 accountId) override
@@ -173,6 +182,17 @@ public:
                 cm->SendTalents(player);
             }
 
+<<<<<<< Updated upstream
+=======
+            auto missing = fc->FindMissingPerks(player);
+            while (missing > 0)
+            {
+                InsertNewPerksForLevelUp(player);
+                missing--;
+            }
+
+            cm->SendWithstandingSelect(player);
+>>>>>>> Stashed changes
         }
     }
 
@@ -252,6 +272,54 @@ private:
     ForgeCache* fc;
     ForgeCommonMessage* cm;
     uint32 FORGE_SCRAP = 90000;
+<<<<<<< Updated upstream
+=======
+
+    bool GetPrestigeStatus(Player* player)
+    {
+        return false;
+    }
+
+    std::string InsertNewPerksForLevelUp(Player* player)
+    {
+        std::string out = "";
+        std::string delim = "*";
+
+        ForgeCharacterPoint* pp = fc->GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
+        bool prestiged = pp->Sum > 0;
+        uint8 maxPerks = prestiged ? 2 : 3;
+        uint8 totalPerks = 0;
+
+        auto roll = boost::uuids::random_generator()();
+        auto rollKey = boost::lexical_cast<std::string>(roll);
+        auto guid = player->GetGUID().GetCounter();
+
+        if (prestiged) {
+            CharacterSpecPerk* perk = fc->GetPrestigePerk(player);
+            if (perk != nullptr) {
+                fc->InsertPerkSelection(player, perk->uuid, perk->spell, rollKey);
+                out = out + std::to_string(perk->spell->spellId) + delim;
+            }
+        }
+
+        if (out == "") // No prestige carryover
+            maxPerks = 3;
+
+        do {
+            Perk* possibility = fc->GetRandomPerk(player);
+
+            uint32 count = fc->CountCharacterSpecPerkOccurences(player, player->GetActiveSpec(), possibility);
+            if((count != -1) && ((count < 3 && !possibility->isUnique) || (count == 0 && possibility->isUnique))
+                && (out.find(std::to_string(possibility->spellId)) == std::string::npos))
+            {
+                fc->InsertPerkSelection(player, rollKey, possibility, rollKey);
+                totalPerks++;
+                out = out + std::to_string(possibility->spellId) + delim;
+            }
+        } while (totalPerks < maxPerks);
+        return out;
+    }
+>>>>>>> Stashed changes
 };
 
 // Add all scripts in one

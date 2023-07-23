@@ -92,6 +92,17 @@ enum class ForgeTopic
     COLLECTION_SETUP_FINISHED = 53,
     ADD_XMOG = 54,
     APPLY_XMOG_ERROR = 55,
+<<<<<<< Updated upstream
+=======
+    GET_PERKS = 56,
+    LEARN_PERK = 57,
+    LEARN_PERK_ERROR = 58,
+    REROLL_PERK = 59,
+    REROLL_PERK_ERROR = 60,
+    RESET_ALL_PERKS = 61,
+    OFFER_SELECTION = 62,
+    GET_PERK_CATALOGUE = 63,
+>>>>>>> Stashed changes
 };
 
 enum class ForgeError
@@ -207,6 +218,17 @@ enum Classes
     (1<<(CLASS_ROGUE-1))  |(1<<(CLASS_PRIEST-1)) |(1<<(CLASS_SHAMAN-1))| \
     (1<<(CLASS_MAGE-1))   |(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DRUID-1)) | \
     (1<<(CLASS_DEATH_KNIGHT-1)))
+
+#define CLASSMASK_PETCLASS \
+    ((1<<(CLASS_HUNTER-1))|(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DEATH_KNIGHT-1)))
+
+#define CLASSMASK_CASTER \
+    ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_SHAMAN-1))| \
+    (1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DRUID-1)))
+
+#define CLASSMASK_MELEE \
+    ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_ROGUE-1))| \
+    (1<<(CLASS_SHAMAN-1))|(1<<(CLASS_DRUID-1))|(1<<(CLASS_DEATH_KNIGHT-1)))
 
 // valid classes for creature_template.unit_class
 enum UnitClass
