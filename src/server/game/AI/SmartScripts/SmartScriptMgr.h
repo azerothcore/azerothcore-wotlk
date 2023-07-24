@@ -206,10 +206,12 @@ enum SMART_EVENT
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
-    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, check timer
-    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // min, radius, first timer, check timer
+    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
+    SMART_EVENT_AREA_CASTING             = 104,      // spellId (0: any), range (0: any), repeatMin, repeatMax, checkTimer
 
-    SMART_EVENT_AC_END                   = 103
+    SMART_EVENT_AC_END                   = 105
 };
 
 struct SmartEvent
@@ -482,16 +484,36 @@ struct SmartEvent
             uint32 minCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 checkTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayer;
 
         struct
         {
-            uint32 minCount;
+            uint32 maxCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 checkTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayerNegation;
+
+        struct
+        {
+            uint32 type;
+            uint32 entry;
+            uint32 count;
+            uint32 range;
+            uint32 timer;
+        } nearUnit;
+
+        struct
+        {
+            uint32 spellId;
+            uint32 range;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 checkTimer;
+        } areaCasting;
 
         struct
         {
@@ -588,7 +610,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
     SMART_ACTION_WP_RESUME                          = 65,     // none
-    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1)
+    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1), turnAngle
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
     SMART_ACTION_MOVE_TO_POS                        = 69,     // PointId (optional x,y,z offset), transport, controlled, ContactDistance
@@ -693,9 +715,11 @@ enum SMART_ACTION
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
-    SMART_ACTION_DISABLE                            = 226,    // Disable the targeted creatures, setting them Invisible and Immune to All
+    SMART_ACTION_DISABLE                            = 226,    // state
+    SMART_ACTION_SET_SCALE                          = 227,    // scale
+    SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
 
-    SMART_ACTION_AC_END                             = 227,    // placeholder
+    SMART_ACTION_AC_END                             = 229,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1289,6 +1313,7 @@ struct SmartAction
         {
             uint32 quickChange;
             uint32 random;
+            uint32 turnAngle;
         } orientation;
 
         struct
@@ -1376,6 +1401,21 @@ struct SmartAction
         {
             SAIBool state;
         } disable;
+
+        struct
+        {
+            uint32 scale;
+        } setScale;
+
+        struct
+        {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 repetitions;
+            uint32 startAngle;
+            uint32 stepAngle;
+            uint32 dist;
+        } radialSummon;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1777,8 +1817,10 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 98
     { 0, 0 }, // 99
     { 0, 0 }, // 100
-    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_UNIT,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
