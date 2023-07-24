@@ -141,6 +141,7 @@ struct boss_netherspite : public BossAI
     void UpdatePortals() // Here we handle the beams' behavior
     {
         for (int j = 0; j < 3; ++j) // j = color
+        {
             if (Creature* portal = ObjectAccessor::GetCreature(*me, PortalGUID[j]))
             {
                 // the one who's been cast upon before
@@ -157,12 +158,12 @@ struct boss_netherspite : public BossAI
                     {
                         Player* p = i->GetSource();
                         if (p && p->IsAlive() // alive
-                              && (!target || target->GetDistance2d(portal) > p->GetDistance2d(portal)) // closer than current best
-                              && !p->HasAura(PlayerDebuff[j]) // not exhausted
-                              && !p->HasAura(PlayerBuff[(j + 1) % 3]) // not on another beam
-                              && !p->HasAura(PlayerBuff[(j + 2) % 3])
-                              && IsBetween(me, p, portal)) // on the beam
-                              target = p;
+                            && (!target || target->GetDistance2d(portal) > p->GetDistance2d(portal)) // closer than current best
+                            && !p->HasAura(PlayerDebuff[j]) // not exhausted
+                            && !p->HasAura(PlayerBuff[(j + 1) % 3]) // not on another beam
+                            && !p->HasAura(PlayerBuff[(j + 2) % 3])
+                            && IsBetween(me, p, portal)) // on the beam
+                            target = p;
                     }
                 }
                 // buff the target
@@ -199,6 +200,7 @@ struct boss_netherspite : public BossAI
                     me->GetThreatMgr().AddThreat(target, 100000.0f + DoGetThreat(me->GetVictim()));
                 }
             }
+        }
     }
 
     void SwitchToPortalPhase()
@@ -256,9 +258,9 @@ struct boss_netherspite : public BossAI
 
     void HandleDoors(bool open)
     {
-        if (GameObject* Door = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_GO_MASSIVE_DOOR)))
+        if (GameObject* door = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_GO_MASSIVE_DOOR)))
         {
-            Door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
+            door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
         }
     }
 
