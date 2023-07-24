@@ -59,7 +59,13 @@ enum Spells
 
 enum Groups
 {
-    GROUP_INTERRUPT_CHECK       = 0
+    GROUP_INTERRUPT_CHECK       = 0,
+    GROUP_EARLY_RELEASE_CHECK   = 1
+};
+
+enum Actions
+{
+    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1
 };
 
 class DealDebrisDamage : public BasicEvent
@@ -92,8 +98,10 @@ struct boss_magtheridon : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        _channelersKilled = 0;
         _currentPhase = 0;
         _recentlySpoken = false;
+        _magReleased = false;
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
@@ -154,60 +162,86 @@ struct boss_magtheridon : public BossAI
         BossAI::JustDied(killer);
     }
 
+    void ScheduleCombatEvents()
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetImmuneToPC(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+        instance->SetData(DATA_ACTIVATE_CUBES, 1);
+        me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
+
+        scheduler.Schedule(9s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(1200ms, 16300ms);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
+            context.Repeat(11s, 39s);
+        }).Schedule(40s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_QUAKE); //needs fixes with custom spell
+            scheduler.Schedule(7s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_BLAST_NOVA);
+
+                _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
+                {
+                    if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
+                    {
+                        Talk(SAY_BANISH);
+                        me->InterruptNonMeleeSpells(true);
+                        scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                    }
+                    else
+                        context.Repeat(50ms);
+                }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
+                {
+                    _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                });
+            });
+            context.Repeat(53s, 56s);
+        }).Schedule(22min, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_BERSERK, true);
+        });
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT)
+        {
+            _channelersKilled++;
+
+            if (_channelersKilled >= 5 && !_magReleased)
+            {
+                Talk(SAY_EMOTE_FREE);
+                Talk(SAY_FREE);
+                scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
+                scheduler.Schedule(3s, [this](TaskContext)
+                {
+                    _magReleased = true; //redundancy
+                    ScheduleCombatEvents();
+                });
+            }
+        }
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
-        scheduler.Schedule(60s, [this](TaskContext /*context*/)
+        scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
-        }).Schedule(120s, [this](TaskContext /*context*/)
+        }).Schedule(120s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_FREE);
-        }).Schedule(123s, [this](TaskContext /*context*/)
+            Talk(SAY_FREE);
+        }).Schedule(123s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetImmuneToPC(false);
-            me->SetReactState(REACT_AGGRESSIVE);
-            instance->SetData(DATA_ACTIVATE_CUBES, 1);
-            me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
-
-            scheduler.Schedule(9s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_CLEAVE);
-                context.Repeat(1200ms, 16300ms);
-            }).Schedule(20s, [this](TaskContext context)
-            {
-                me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
-                context.Repeat(11s, 39s);
-            }).Schedule(40s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_QUAKE); //needs fixes with custom spell
-                scheduler.Schedule(7s, [this](TaskContext /*context*/)
-                {
-                    DoCastSelf(SPELL_BLAST_NOVA);
-
-                    _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
-                    {
-                        if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
-                        {
-                            Talk(SAY_BANISH);
-                            me->InterruptNonMeleeSpells(true);
-                            scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                        }
-                        else
-                            context.Repeat(50ms);
-                    }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
-                    {
-                        _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                    });
-                });
-                context.Repeat(53s, 56s);
-            }).Schedule(1320s, [this](TaskContext /*context*/)
-            {
-                DoCastSelf(SPELL_BERSERK, true);
-            });
+            ScheduleCombatEvents();
         });
     }
 
@@ -227,7 +261,9 @@ struct boss_magtheridon : public BossAI
 
 private:
     bool _recentlySpoken;
+    bool _magReleased;
     uint8 _currentPhase;
+    uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
 };
 
