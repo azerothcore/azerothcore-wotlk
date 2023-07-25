@@ -54,6 +54,24 @@ struct boss_nethermancer_sepethrea : public BossAI
         });
     }
 
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (me->GetThreatMgr().GetThreatListSize() > 1)
+        {
+            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
+            --lastRef;
+            if (Unit* lastTarget = (*lastRef)->getTarget())
+            {
+                if (lastTarget != target)
+                {
+                    return !target->HasAura(SPELL_DRAGONS_BREATH);
+                }
+            }
+        }
+
+        return true;
+    }
+
     void JustEngagedWith(Unit*  /*who*/) override
     {
         _JustEngagedWith();

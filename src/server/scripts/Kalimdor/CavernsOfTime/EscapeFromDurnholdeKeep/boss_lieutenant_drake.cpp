@@ -21,159 +21,151 @@
 #include "SmartScriptMgr.h"
 #include "old_hillsbrad.h"
 
-enum LieutenantDrake
+enum Text
 {
-    SAY_ENTER               = 0,
-    SAY_AGGRO               = 1,
-    SAY_SLAY                = 2,
-    SAY_MORTAL              = 3,
-    SAY_SHOUT               = 4,
-    SAY_DEATH               = 5,
-
-    SPELL_WHIRLWIND         = 31909,
-    SPELL_EXPLODING_SHOT    = 33792,
-    SPELL_HAMSTRING         = 9080,
-    SPELL_MORTAL_STRIKE     = 31911,
-    SPELL_FRIGHTENING_SHOUT = 33789,
-
-    EVENT_WHIRLWIND         = 1,
-    EVENT_FRIGHTENING_SHOUT = 2,
-    EVENT_MORTAL_STRIKE     = 3,
-    EVENT_HAMSTRING         = 4,
-    EVENT_EXPLODING_SHOT    = 5
+    SAY_ENTER                = 0,
+    SAY_AGGRO                = 1,
+    SAY_SLAY                 = 2,
+    SAY_MORTAL               = 3,
+    SAY_SHOUT                = 4,
+    SAY_DEATH                = 5
 };
 
-class boss_lieutenant_drake : public CreatureScript
+enum Spells
 {
-public:
-    boss_lieutenant_drake() : CreatureScript("boss_lieutenant_drake") { }
+    SPELL_WHIRLWIND          = 31909,
+    SPELL_EXPLODING_SHOT     = 33792,
+    SPELL_HAMSTRING          = 9080,
+    SPELL_MORTAL_STRIKE      = 31911,
+    SPELL_FRIGHTENING_SHOUT  = 33789
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_lieutenant_drake : public BossAI
+{
+    boss_lieutenant_drake(Creature* creature) : BossAI(creature, DATA_LIEUTENANT_DRAKE)
     {
-        return GetOldHillsbradAI<boss_lieutenant_drakeAI>(creature);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_lieutenant_drakeAI : public ScriptedAI
+    void InitializeAI() override
     {
-        boss_lieutenant_drakeAI(Creature* creature) : ScriptedAI(creature)
+        runSecondPath = false;
+        pathId = me->GetEntry() * 10;
+        me->GetMotionMaster()->MovePath(pathId, false);
+    }
+
+    void Reset() override
+    {
+        _Reset();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+        scheduler.Schedule(4s, [this](TaskContext context)
         {
+            DoCastSelf(SPELL_WHIRLWIND);
+            context.Repeat(25s);
+        }).Schedule(14s, [this](TaskContext context)
+        {
+            if (roll_chance_i(40))
+            {
+                Talk(SAY_SHOUT);
+            }
+            DoCastSelf(SPELL_FRIGHTENING_SHOUT);
+            context.Repeat(25s);
+        }).Schedule(9s, [this](TaskContext context)
+        {
+            if (roll_chance_i(40))
+            {
+                Talk(SAY_MORTAL);
+            }
+            DoCastVictim(SPELL_MORTAL_STRIKE);
+            context.Repeat(10s);
+        }).Schedule(18s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_HAMSTRING);
+            context.Repeat(25s);
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f))
+            {
+                DoCast(target, SPELL_EXPLODING_SHOT);
+            }
+            context.Repeat(25s);
+        });
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+        if (InstanceScript* instance = me->GetInstanceScript())
+        {
+            instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type != WAYPOINT_MOTION_TYPE)
+        {
+            return;
         }
 
-        void InitializeAI() override
+        if (pathId == me->GetEntry() * 10)
+        {
+            switch (point)
+            {
+                case 7:
+                    Talk(SAY_ENTER);
+                    break;
+                case 10:
+                    pathId = (me->GetEntry() * 10) + 1;
+                    runSecondPath = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (runSecondPath)
         {
             runSecondPath = false;
-            pathId = me->GetEntry() * 10;
-            me->GetMotionMaster()->MovePath(pathId, false);
+            me->GetMotionMaster()->MovePath(pathId, true);
         }
 
-        void Reset() override
-        {
-            events.Reset();
-        }
+        if (!UpdateVictim())
+            return;
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
-            events.ScheduleEvent(EVENT_WHIRLWIND, 4000);
-            events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 14000);
-            events.ScheduleEvent(EVENT_MORTAL_STRIKE, 9000);
-            events.ScheduleEvent(EVENT_HAMSTRING, 18000);
-            events.ScheduleEvent(EVENT_EXPLODING_SHOT, 1000);
-        }
+        DoMeleeAttackIfReady();
+    }
 
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
-        }
-
-        void MovementInform(uint32 type, uint32 point) override
-        {
-            if (type != WAYPOINT_MOTION_TYPE)
-            {
-                return;
-            }
-
-            if (pathId == me->GetEntry() * 10)
-            {
-                switch (point)
-                {
-                    case 7:
-                        Talk(SAY_ENTER);
-                        break;
-                    case 10:
-                        pathId = (me->GetEntry() * 10) + 1;
-                        runSecondPath = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (runSecondPath)
-            {
-                runSecondPath = false;
-                me->GetMotionMaster()->MovePath(pathId, true);
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_WHIRLWIND:
-                    me->CastSpell(me, SPELL_WHIRLWIND, false);
-                    events.ScheduleEvent(EVENT_WHIRLWIND, 25000);
-                    break;
-                case EVENT_EXPLODING_SHOT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f))
-                        me->CastSpell(target, SPELL_EXPLODING_SHOT, false);
-                    events.ScheduleEvent(EVENT_EXPLODING_SHOT, 25000);
-                    break;
-                case EVENT_MORTAL_STRIKE:
-                    if (roll_chance_i(40))
-                        Talk(SAY_MORTAL);
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.ScheduleEvent(EVENT_MORTAL_STRIKE, 10000);
-                    break;
-                case EVENT_FRIGHTENING_SHOUT:
-                    if (roll_chance_i(40))
-                        Talk(SAY_SHOUT);
-                    me->CastSpell(me, SPELL_FRIGHTENING_SHOUT, false);
-                    events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 25000);
-                    break;
-                case EVENT_HAMSTRING:
-                    me->CastSpell(me->GetVictim(), SPELL_HAMSTRING, false);
-                    events.ScheduleEvent(EVENT_HAMSTRING, 25000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        EventMap events;
-        uint32 pathId;
-        bool runSecondPath;
-    };
+private:
+    uint32 pathId;
+    bool runSecondPath;
 };
 
 void AddSC_boss_lieutenant_drake()
 {
-    new boss_lieutenant_drake();
+    RegisterOldHillsbradCreatureAI(boss_lieutenant_drake);
 }

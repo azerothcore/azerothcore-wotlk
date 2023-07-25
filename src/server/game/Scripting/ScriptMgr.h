@@ -1181,6 +1181,9 @@ public:
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
+    //Before looting item
+    virtual void OnBeforeFillQuestLootItem(Player* /*player*/, LootItem& /*item*/) { }
+
     //After looting item (includes master loot).
     virtual void OnStoreNewItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
@@ -1270,6 +1273,29 @@ public:
     [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
+
+    /**
+     * @brief This hook called before gathering skill gain is applied to the character.
+     *
+     * @param player Contains information about the Player sender
+     * @param skill_id Contains information about the skill line
+     * @param current Contains the current skill level for skill
+     * @param gray Contains the gray skill level for current application
+     * @param green Contains the green skill level for current application
+     * @param yellow Contains the yellow skill level for current application
+     * @param gain Contains the amount of points that should be added to the Player
+     */
+    virtual void OnUpdateGatheringSkill(Player* /*player*/, uint32 /*skill_id*/, uint32 /*current*/, uint32 /*gray*/, uint32 /*green*/, uint32 /*yellow*/, uint32& /*gain*/) { }
+
+    /**
+     * @brief This hook is called before crafting skill gain is applied to the character.
+     *
+     * @param player Contains information about the Player sender
+     * @param skill Contains information about the skill line
+     * @param current_level Contains the current skill level for skill
+     * @param gain Contains the amount of points that should be added to the Player
+     */
+    virtual void OnUpdateCraftingSkill(Player* /*player*/, SkillLineAbilityEntry const* /*skill*/, uint32 /*current_level*/, uint32& /*gain*/) { }
 
     [[nodiscard]] virtual bool OnUpdateFishingSkill(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
 
@@ -1455,6 +1481,30 @@ public:
     virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
     [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
     [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
+
+    /**
+     * @brief This hook is called, to avoid displaying the error message that the body has already been stripped
+     *
+     * @param player Contains information about the Player
+     *
+     * @return true Avoiding displaying the error message that the loot has already been taken.
+     */
+    virtual bool CanSendErrorAlreadyLooted(Player* /*player*/) { return true; }
+
+    /**
+     * @brief It is used when an item is taken from a creature.
+     *
+     * @param player Contains information about the Player
+     *
+    */
+    virtual void OnAfterCreatureLoot(Player* /*player*/) { }
+
+    /**
+     * @brief After a creature's money is taken
+     *
+     * @param player Contains information about the Player
+     */
+    virtual void OnAfterCreatureLootMoney(Player* /*player*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -2290,6 +2340,7 @@ public: /* PlayerScript */
     void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+    void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
     void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
@@ -2330,6 +2381,8 @@ public: /* PlayerScript */
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
+    void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
+    void OnUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
     bool OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
     bool CanAreaExploreAndOutdoor(Player* player);
     void OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
@@ -2377,6 +2430,9 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnQuestAbandon(Player* player, uint32 questId);
+    bool CanSendErrorAlreadyLooted(Player* player);
+    void OnAfterCreatureLoot(Player* player);
+    void OnAfterCreatureLootMoney(Player* player);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);

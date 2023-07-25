@@ -126,6 +126,8 @@ struct boss_warchief_kargath_bladefist : public BossAI
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
+        if (Creature* warchiefPortal = instance->GetCreature(DATA_WARCHIEF_PORTAL))
+            warchiefPortal->AI()->SetData(DATA_RESET_FIGHT, 0);
         if (instance)
         {
             if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))

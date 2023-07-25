@@ -439,6 +439,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000040, 0x00000000, 0x00000000);
     });
 
+    // Idol of the Flourishing Life
+    ApplySpellFix({ 64949 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000000, 0x02000000, 0x00000000);
+        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
+    });
+
     ApplySpellFix({
         34231,  // Libram of the Lightbringer
         60792,  // Libram of Tolerance
@@ -4532,6 +4539,18 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 30745 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Acid Spit
+    ApplySpellFix({ 34290 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Mulgore Hatchling (periodic)
+    ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 62585; // Mulgore Hatchling (fear)
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

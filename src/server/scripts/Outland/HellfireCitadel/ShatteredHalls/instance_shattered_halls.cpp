@@ -17,6 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
 
@@ -181,40 +182,6 @@ public:
     };
 };
 
-class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
-{
-public:
-    spell_tsh_shoot_flame_arrow() : SpellScriptLoader("spell_tsh_shoot_flame_arrow") { }
-
-    class spell_tsh_shoot_flame_arrow_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_tsh_shoot_flame_arrow_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            Acore::Containers::RandomResize(unitList, 1);
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, 30953, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_tsh_shoot_flame_arrow_SpellScript();
-    }
-};
-
 class at_shattered_halls_execution : public AreaTriggerScript
 {
 public:
@@ -223,7 +190,12 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
-            instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+        {
+            if (player->GetMap()->IsHeroic())
+            {
+                instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+            }
+        }
 
         return true;
     }
@@ -232,6 +204,5 @@ public:
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
-    new spell_tsh_shoot_flame_arrow();
     new at_shattered_halls_execution();
 }
