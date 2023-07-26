@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "karazhan.h"
+#include "TaskScheduler.h"
 
 enum ShadeOfAran
 {
@@ -58,9 +59,9 @@ enum ShadeOfAran
     SPELL_SHADOW_PYRO = 29978,
 
     //Creatures
-    CREATURE_WATER_ELEMENTAL = 17167,
-    CREATURE_SHADOW_OF_ARAN = 18254,
-    CREATURE_ARAN_BLIZZARD = 17161,
+    NPC_WATER_ELEMENTAL = 17167,
+    NPC_SHADOW_OF_ARAN = 18254,
+    NPC_ARAN_BLIZZARD = 17161,
 };
 
 enum SuperSpell
@@ -70,560 +71,458 @@ enum SuperSpell
     SUPER_AE,
 };
 
-class boss_shade_of_aran : public CreatureScript
+enum Groups
 {
-public:
-    boss_shade_of_aran() : CreatureScript("boss_shade_of_aran") { }
+    GROUP_FLAMEWREATH   = 0,
+    GROUP_DRINKING      = 1
+};
 
-    struct boss_aranAI : public BossAI
+Position const elementalPos[4] =
+{
+    {-11168.1f, -1939.29f, 232.092f, 1.46f},
+    {-11138.2f, -1915.38f, 232.092f, 3.00f},
+    {-11161.7f, -1885.36f, 232.092f, 4.59f},
+    {-11192.4f, -1909.36f, 232.092f, 6.19f}
+};
+
+struct boss_shade_of_aran : public BossAI
+{
+    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN)
     {
-        boss_aranAI(Creature* creature) : BossAI(creature, DATA_ARAN)
+        scheduler.SetValidator([this]
         {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    uint8 LastSuperSpell;
+
+    ObjectGuid FlameWreathTarget[3];
+    float FWTargPosX[3];
+    float FWTargPosY[3];
+
+    uint32 CurrentNormalSpell;
+
+    bool Drinking;
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        drinkScheduler.CancelAll();
+        LastSuperSpell = rand() % 3;
+
+        for (uint8 i = 0; i < 3; ++i)
+            FlameWreathTarget[i].Clear();
+
+        CurrentNormalSpell = 0;
+
+        _arcaneCooledDown = true;
+        _fireCooledDown = true;
+        _frostCooledDown = true;
+
+        Drinking = false;
+
+        // Not in progress
+        instance->SetData(DATA_ARAN, NOT_STARTED);
+
+        if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+        {
+            libraryDoor->SetGoState(GO_STATE_ACTIVE);
+            libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
-        uint32 SecondarySpellTimer;
-        uint32 NormalCastTimer;
-        uint32 SuperCastTimer;
-        uint32 BerserkTimer;
-        uint32 CloseDoorTimer;                                  // Don't close the door right on aggro in case some people are still entering.
+        ScheduleHealthCheckEvent(40, [&]{
+            Talk(SAY_ELEMENTALS);
 
-        uint8 LastSuperSpell;
-
-        uint32 FlameWreathTimer;
-        uint32 FlameWreathCheckTime;
-        ObjectGuid FlameWreathTarget[3];
-        float FWTargPosX[3];
-        float FWTargPosY[3];
-
-        uint32 CurrentNormalSpell;
-        uint32 ArcaneCooldown;
-        uint32 FireCooldown;
-        uint32 FrostCooldown;
-
-        uint32 DrinkInterruptTimer;
-
-        bool ElementalsSpawned;
-        bool Drinking;
-        bool DrinkInturrupted;
-        void Reset() override
-        {
-            SecondarySpellTimer = 5000;
-            NormalCastTimer = 0;
-            SuperCastTimer = 35000;
-            BerserkTimer = 720000;
-            CloseDoorTimer = 15000;
-
-            LastSuperSpell = rand() % 3;
-
-            FlameWreathTimer = 0;
-            FlameWreathCheckTime = 0;
-
-            for (uint8 i = 0; i < 3; ++i)
-                FlameWreathTarget[i].Clear();
-
-            CurrentNormalSpell = 0;
-            ArcaneCooldown = 0;
-            FireCooldown = 0;
-            FrostCooldown = 0;
-
-            DrinkInterruptTimer = 10000;
-
-            ElementalsSpawned = false;
-            Drinking = false;
-            DrinkInturrupted = false;
-
-            // Not in progress
-            instance->SetData(DATA_ARAN, NOT_STARTED);
-
-            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+            for(Position pos : elementalPos)
             {
-                libraryDoor->SetGoState(GO_STATE_ACTIVE);
-                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                if(Creature* elemental = me->SummonCreature(NPC_WATER_ELEMENTAL, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
+                {
+                    if(Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                    {
+                        DoStartNoMovement(target);
+                        elemental->SetInCombatWithZone();
+                        elemental->CombatStart(target);
+                    }
+                }
             }
-        }
+        });
+    }
 
-        void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        Talk(SAY_KILL);
+    }
+
+    void TriggerArcaneCooldown()
+    {
+        scheduler.Schedule(5s, [this](TaskContext)
         {
-            Talk(SAY_KILL);
-        }
+            _arcaneCooledDown = true;
+        });
+    }
 
-        void JustDied(Unit* /*killer*/) override
+    void TriggerFireCooldown()
+    {
+        scheduler.Schedule(5s, [this](TaskContext)
         {
-            Talk(SAY_DEATH);
+            _fireCooledDown = true;
+        });
+    }
 
-            instance->SetData(DATA_ARAN, DONE);
-
-            if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
-            {
-                libraryDoor->SetGoState(GO_STATE_ACTIVE);
-                libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-            }
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
+    void TriggerFrostCooldown()
+    {
+        scheduler.Schedule(5s, [this](TaskContext)
         {
-            Talk(SAY_AGGRO);
+            _frostCooledDown = true;
+        });
+    }
 
-            instance->SetData(DATA_ARAN, IN_PROGRESS);
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
 
+        instance->SetData(DATA_ARAN, DONE);
+
+        if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+        {
+            libraryDoor->SetGoState(GO_STATE_ACTIVE);
+            libraryDoor->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+
+        instance->SetData(DATA_ARAN, IN_PROGRESS);
+
+        DoZoneInCombat();
+
+        //handle timed closing door
+        scheduler.Schedule(15s, [this](TaskContext)
+        {
             if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
             {
                 libraryDoor->SetGoState(GO_STATE_READY);
                 libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             }
-
-            DoZoneInCombat();
-        }
-
-        void FlameWreathEffect()
+        }).Schedule(1ms, [this](TaskContext context)
         {
-            std::vector<Unit*> targets;
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-
-            if (t_list.empty())
-                return;
-
-            //store the threat list in a different container
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            if (!me->IsNonMeleeSpellCast(false))
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                //only on alive players
-                if (target && target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                    targets.push_back(target);
-            }
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
+                if (!target)
+                    return;
 
-            //cut down to size if we have more than 3 targets
-            while (targets.size() > 3)
-                targets.erase(targets.begin() + rand() % targets.size());
+                uint32 Spells[3];
+                uint8 AvailableSpells = 0;
 
-            uint32 i = 0;
-            for (std::vector<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            {
-                if (*itr)
+                //Check for what spells are not on cooldown
+                if (_arcaneCooledDown)
                 {
-                    FlameWreathTarget[i] = (*itr)->GetGUID();
-                    FWTargPosX[i] = (*itr)->GetPositionX();
-                    FWTargPosY[i] = (*itr)->GetPositionY();
-                    DoCast((*itr), SPELL_FLAME_WREATH, true);
-                    ++i;
+                    Spells[AvailableSpells] = SPELL_ARCMISSLE;
+                    ++AvailableSpells;
+                }
+                if (_fireCooledDown)
+                {
+                    Spells[AvailableSpells] = SPELL_FIREBALL;
+                    ++AvailableSpells;
+                }
+                if (_frostCooledDown)
+                {
+                    Spells[AvailableSpells] = SPELL_FROSTBOLT;
+                    ++AvailableSpells;
+                }
+
+                //If no available spells wait 1 second and try again
+                if (AvailableSpells)
+                {
+                    CurrentNormalSpell = Spells[rand() % AvailableSpells];
+                    DoCast(target, CurrentNormalSpell);
                 }
             }
-        }
-
-        void UpdateAI(uint32 diff) override
+            context.Repeat(10s);
+        }).Schedule(5s, [this](TaskContext context)
         {
-            if (!UpdateVictim())
-                return;
-
-            if (CloseDoorTimer)
+            switch (urand(0, 1))
             {
-                if (CloseDoorTimer <= diff)
-                {
-                    if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
+                case 0:
+                    DoCastSelf(SPELL_AOE_CS);
+                    break;
+                case 1:
+                    DoCastRandomTarget(SPELL_CHAINSOFICE);
+                    break;
+            }
+            context.Repeat(5s, 20s);
+        }).Schedule(35s, [this](TaskContext context)
+        {
+            uint8 Available[2];
+
+            switch (LastSuperSpell)
+            {
+                case SUPER_AE:
+                    Available[0] = SUPER_FLAME;
+                    Available[1] = SUPER_BLIZZARD;
+                    break;
+                case SUPER_FLAME:
+                    Available[0] = SUPER_AE;
+                    Available[1] = SUPER_BLIZZARD;
+                    break;
+                case SUPER_BLIZZARD:
+                    Available[0] = SUPER_FLAME;
+                    Available[1] = SUPER_AE;
+                    break;
+            }
+
+            LastSuperSpell = Available[urand(0, 1)];
+
+            switch (LastSuperSpell)
+            {
+                case SUPER_AE:
+                    Talk(SAY_EXPLOSION);
+
+                    DoCastSelf(SPELL_BLINK_CENTER, true);
+                    DoCastSelf(SPELL_PLAYERPULL, true);
+                    DoCastSelf(SPELL_MASSSLOW, true);
+                    DoCastSelf(SPELL_AEXPLOSION, false);
+                    break;
+
+                case SUPER_FLAME:
+                    Talk(SAY_FLAMEWREATH);
+
+                    scheduler.Schedule(20s, GROUP_FLAMEWREATH, [this](TaskContext)
                     {
-                        libraryDoor->SetGoState(GO_STATE_READY);
-                        libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    }
-                    CloseDoorTimer = 0;
-                }
-                else
-                    CloseDoorTimer -= diff;
-            }
-
-            //Cooldowns for casts
-            if (ArcaneCooldown)
-            {
-                if (ArcaneCooldown >= diff)
-                    ArcaneCooldown -= diff;
-                else
-                    ArcaneCooldown = 0;
-            }
-
-            if (FireCooldown)
-            {
-                if (FireCooldown >= diff)
-                    FireCooldown -= diff;
-                else
-                    FireCooldown = 0;
-            }
-
-            if (FrostCooldown)
-            {
-                if (FrostCooldown >= diff)
-                    FrostCooldown -= diff;
-                else
-                    FrostCooldown = 0;
-            }
-
-            if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
-            {
-                Drinking = true;
-                me->InterruptNonMeleeSpells(false);
-
-                Talk(SAY_DRINK);
-
-                if (!DrinkInturrupted)
-                {
-                    DoCast(me, SPELL_MASS_POLY, true);
-                    DoCast(me, SPELL_CONJURE, false);
-                    DoCast(me, SPELL_DRINK, false);
-                    me->SetStandState(UNIT_STAND_STATE_SIT);
-                    DrinkInterruptTimer = 10000;
-                }
-            }
-
-            //Drink Interrupt
-            if (Drinking && DrinkInturrupted)
-            {
-                Drinking = false;
-                me->RemoveAurasDueToSpell(SPELL_DRINK);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
-                DoCast(me, SPELL_POTION, false);
-            }
-
-            //Drink Interrupt Timer
-            if (Drinking && !DrinkInturrupted)
-            {
-                if (DrinkInterruptTimer >= diff)
-                    DrinkInterruptTimer -= diff;
-                else
-                {
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoCast(me, SPELL_POTION, true);
-                    DoCast(me, SPELL_AOE_PYROBLAST, false);
-                    DrinkInturrupted = true;
-                    Drinking = false;
-                }
-            }
-
-            //Don't execute any more code if we are drinking
-            if (Drinking)
-                return;
-
-            //Normal casts
-            if (NormalCastTimer <= diff)
-            {
-                if (!me->IsNonMeleeSpellCast(false))
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
-                    if (!target)
-                        return;
-
-                    uint32 Spells[3];
-                    uint8 AvailableSpells = 0;
-
-                    //Check for what spells are not on cooldown
-                    if (!ArcaneCooldown)
+                        scheduler.CancelGroup(GROUP_FLAMEWREATH);
+                    }).Schedule(500ms, GROUP_FLAMEWREATH, [this](TaskContext context)
                     {
-                        Spells[AvailableSpells] = SPELL_ARCMISSLE;
-                        ++AvailableSpells;
-                    }
-                    if (!FireCooldown)
-                    {
-                        Spells[AvailableSpells] = SPELL_FIREBALL;
-                        ++AvailableSpells;
-                    }
-                    if (!FrostCooldown)
-                    {
-                        Spells[AvailableSpells] = SPELL_FROSTBOLT;
-                        ++AvailableSpells;
-                    }
-
-                    //If no available spells wait 1 second and try again
-                    if (AvailableSpells)
-                    {
-                        CurrentNormalSpell = Spells[rand() % AvailableSpells];
-                        DoCast(target, CurrentNormalSpell);
-                    }
-                }
-                NormalCastTimer = 1000;
-            }
-            else
-                NormalCastTimer -= diff;
-
-            if (SecondarySpellTimer <= diff)
-            {
-                switch (urand(0, 1))
-                {
-                    case 0:
-                        DoCast(me, SPELL_AOE_CS);
-                        break;
-                    case 1:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                            DoCast(target, SPELL_CHAINSOFICE);
-                        break;
-                }
-                SecondarySpellTimer = urand(5000, 20000);
-            }
-            else
-                SecondarySpellTimer -= diff;
-
-            if (SuperCastTimer <= diff)
-            {
-                uint8 Available[2];
-
-                switch (LastSuperSpell)
-                {
-                    case SUPER_AE:
-                        Available[0] = SUPER_FLAME;
-                        Available[1] = SUPER_BLIZZARD;
-                        break;
-                    case SUPER_FLAME:
-                        Available[0] = SUPER_AE;
-                        Available[1] = SUPER_BLIZZARD;
-                        break;
-                    case SUPER_BLIZZARD:
-                        Available[0] = SUPER_FLAME;
-                        Available[1] = SUPER_AE;
-                        break;
-                }
-
-                LastSuperSpell = Available[urand(0, 1)];
-
-                switch (LastSuperSpell)
-                {
-                    case SUPER_AE:
-                        Talk(SAY_EXPLOSION);
-
-                        DoCast(me, SPELL_BLINK_CENTER, true);
-                        DoCast(me, SPELL_PLAYERPULL, true);
-                        DoCast(me, SPELL_MASSSLOW, true);
-                        DoCast(me, SPELL_AEXPLOSION, false);
-                        break;
-
-                    case SUPER_FLAME:
-                        Talk(SAY_FLAMEWREATH);
-
-                        FlameWreathTimer = 20000;
-                        FlameWreathCheckTime = 500;
-
-                        FlameWreathTarget[0].Clear();
-                        FlameWreathTarget[1].Clear();
-                        FlameWreathTarget[2].Clear();
-
-                        FlameWreathEffect();
-                        break;
-
-                    case SUPER_BLIZZARD:
-                        Talk(SAY_BLIZZARD);
-
-                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                        for (uint8 i = 0; i < 3; ++i)
                         {
-                            pSpawn->SetFaction(me->GetFaction());
-                            pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
+                            if (!FlameWreathTarget[i])
+                                continue;
+
+                            Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
+                            if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
+                            {
+                                unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
+                                unit->CastSpell(unit, 11027, true);
+                                FlameWreathTarget[i].Clear();
+                            }
                         }
-                        break;
-                }
+                        context.Repeat(500ms);
+                    });
 
-                SuperCastTimer = urand(35000, 40000);
-            }
-            else
-                SuperCastTimer -= diff;
+                    FlameWreathTarget[0].Clear();
+                    FlameWreathTarget[1].Clear();
+                    FlameWreathTarget[2].Clear();
 
-            if (!ElementalsSpawned && HealthBelowPct(40))
-            {
-                ElementalsSpawned = true;
+                    FlameWreathEffect();
+                    break;
 
-                Creature* ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                Creature* ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                Creature* ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                Creature* ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                case SUPER_BLIZZARD:
+                    Talk(SAY_BLIZZARD);
 
-                if (ElementalOne)
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                    if (!target)
-                        return;
-
-                    DoStartNoMovement(target);
-                    ElementalOne->SetInCombatWithZone();
-                    ElementalOne->CombatStart(target);
-                    ElementalOne->SetFaction(me->GetFaction());
-                    ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
-                }
-
-                if (ElementalTwo)
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                    if (!target)
-                        return;
-
-                    DoStartNoMovement(target);
-                    ElementalTwo->SetInCombatWithZone();
-                    ElementalTwo->CombatStart(target);
-                    ElementalTwo->SetFaction(me->GetFaction());
-                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
-                }
-
-                if (ElementalThree)
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                    if (!target)
-                        return;
-
-                    DoStartNoMovement(target);
-                    ElementalThree->SetInCombatWithZone();
-                    ElementalThree->CombatStart(target);
-                    ElementalThree->SetFaction(me->GetFaction());
-                    ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
-                }
-
-                if (ElementalFour)
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
-                    if (!target)
-                        return;
-
-                    DoStartNoMovement(target);
-                    ElementalFour->SetInCombatWithZone();
-                    ElementalFour->CombatStart(target);
-                    ElementalFour->SetFaction(me->GetFaction());
-                    ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
-                }
-
-                Talk(SAY_ELEMENTALS);
-            }
-
-            if (BerserkTimer <= diff)
-            {
-                for (uint32 i = 0; i < 5; ++i)
-                {
-                    if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                    if (Creature* pSpawn = me->SummonCreature(NPC_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
                     {
-                        unit->Attack(me->GetVictim(), true);
-                        unit->SetFaction(me->GetFaction());
+                        pSpawn->SetFaction(me->GetFaction());
+                        pSpawn->CastSpell(me, SPELL_CIRCULAR_BLIZZARD, false);
                     }
-                }
-
-                Talk(SAY_TIMEOVER);
-
-                BerserkTimer = 60000;
+                    break;
             }
-            else
-                BerserkTimer -= diff;
-
-            //Flame Wreath check
-            if (FlameWreathTimer)
+            context.Repeat(35s, 40s);
+        }).Schedule(12min, [this](TaskContext context)
+        {
+            for (uint32 i = 0; i < 5; ++i)
             {
-                if (FlameWreathTimer >= diff)
-                    FlameWreathTimer -= diff;
-                else
-                    FlameWreathTimer = 0;
-
-                if (FlameWreathCheckTime <= diff)
+                if (Creature* unit = me->SummonCreature(NPC_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
-                    for (uint8 i = 0; i < 3; ++i)
-                    {
-                        if (!FlameWreathTarget[i])
-                            continue;
-
-                        Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
-                        if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
-                        {
-                            unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
-                            unit->CastSpell(unit, 11027, true);
-                            FlameWreathTarget[i].Clear();
-                        }
-                    }
-                    FlameWreathCheckTime = 500;
+                    unit->Attack(me->GetVictim(), true);
+                    unit->SetFaction(me->GetFaction());
                 }
-                else
-                    FlameWreathCheckTime -= diff;
             }
 
-            if (ArcaneCooldown && FireCooldown && FrostCooldown)
-                DoMeleeAttackIfReady();
+            Talk(SAY_TIMEOVER);
+
+            context.Repeat(1min);
+        });
+    }
+
+    void FlameWreathEffect()
+    {
+        std::vector<Unit*> targets;
+        ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
+
+        if (t_list.empty())
+            return;
+
+        //store the threat list in a different container
+        for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+        {
+            Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+            //only on alive players
+            if (target && target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
+                targets.push_back(target);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        //cut down to size if we have more than 3 targets
+        while (targets.size() > 3)
+            targets.erase(targets.begin() + rand() % targets.size());
+
+        uint32 i = 0;
+        for (std::vector<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
         {
-            if (!DrinkInturrupted && Drinking && damage)
-                DrinkInturrupted = true;
+            if (*itr)
+            {
+                FlameWreathTarget[i] = (*itr)->GetGUID();
+                FWTargPosX[i] = (*itr)->GetPositionX();
+                FWTargPosY[i] = (*itr)->GetPositionY();
+                DoCast((*itr), SPELL_FLAME_WREATH, true);
+                ++i;
+            }
         }
+    }
 
-        void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+        drinkScheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
         {
-            //We only care about interrupt effects and only if they are durring a spell currently being cast
-            if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                    Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                    Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
-                return;
-
-            //Interrupt effect
+            Drinking = true;
             me->InterruptNonMeleeSpells(false);
 
-            //Normally we would set the cooldown equal to the spell duration
-            //but we do not have access to the DurationStore
+            Talk(SAY_DRINK);
 
-            switch (CurrentNormalSpell)
+            scheduler.DelayAll(10s);
+            DoCastSelf(SPELL_MASS_POLY, true);
+            DoCastSelf(SPELL_CONJURE, false);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SIT);
+            DoCastSelf(SPELL_DRINK, true);
+            _currentHealth = me->GetHealth();
+            drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
             {
-                case SPELL_ARCMISSLE:
-                    ArcaneCooldown = 5000;
-                    break;
-                case SPELL_FIREBALL:
-                    FireCooldown = 5000;
-                    break;
-                case SPELL_FROSTBOLT:
-                    FrostCooldown = 5000;
-                    break;
+                //check for damage to interrupt
+                if(CheckDamageDuringDrinking(_currentHealth))
+                {
+                    Drinking = false;
+                    me->RemoveAurasDueToSpell(SPELL_DRINK);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
+                    DoCastSelf(SPELL_POTION, false);
+                    DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                    drinkScheduler.CancelGroup(GROUP_DRINKING);
+                } else {
+                    context.Repeat(500ms);
+                }
+            }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
+                DoCastSelf(SPELL_POTION, true);
+                DoCastSelf(SPELL_AOE_PYROBLAST, false);
+
+                Drinking = false;
+                drinkScheduler.CancelGroup(GROUP_DRINKING);
+            });
+        }
+
+        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown && !Drinking)
+            DoMeleeAttackIfReady();
+    }
+
+    bool CheckDamageDuringDrinking(uint32 oldHealth)
+    {
+        if (Drinking)
+        {
+            if (me->GetHealth() < oldHealth)
+            {
+                return true;
             }
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetKarazhanAI<boss_aranAI>(creature);
+        return false;
     }
+
+    void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
+    {
+        //We only care about interrupt effects and only if they are durring a spell currently being cast
+        if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
+                Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
+                Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
+            return;
+
+        //Interrupt effect
+        me->InterruptNonMeleeSpells(false);
+
+        //Normally we would set the cooldown equal to the spell duration
+        //but we do not have access to the DurationStore
+
+        switch (CurrentNormalSpell)
+        {
+            case SPELL_ARCMISSLE:
+                TriggerArcaneCooldown();
+                break;
+            case SPELL_FIREBALL:
+                TriggerFireCooldown();
+                break;
+            case SPELL_FROSTBOLT:
+                TriggerFrostCooldown();
+                break;
+        }
+    }
+private:
+    TaskScheduler drinkScheduler;
+
+    bool _arcaneCooledDown;
+    bool _fireCooledDown;
+    bool _frostCooledDown;
+    uint32 _currentHealth;
 };
 
-class npc_aran_elemental : public CreatureScript
+struct npc_aran_elemental : public ScriptedAI
 {
-public:
-    npc_aran_elemental() : CreatureScript("npc_aran_elemental") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_aran_elemental(Creature* creature) : ScriptedAI(creature)
     {
-        return new water_elementalAI(creature);
+        SetCombatMovement(false);
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct water_elementalAI : public ScriptedAI
+    void Reset() override
     {
-        water_elementalAI(Creature* creature) : ScriptedAI(creature)
+        _scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(2s, [this](TaskContext context)
         {
-        }
+            DoCastVictim(SPELL_WATERBOLT);
+            context.Repeat(2s);
+        });
+    }
 
-        uint32 CastTimer;
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
 
-        void Reset() override
-        {
-            CastTimer = 2000 + (rand() % 3000);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (CastTimer <= diff)
-            {
-                DoCastVictim(SPELL_WATERBOLT);
-                CastTimer = urand(2000, 5000);
-            }
-            else
-                CastTimer -= diff;
-        }
-    };
+        _scheduler.Update(diff);
+    }
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_shade_of_aran()
 {
-    new boss_shade_of_aran();
-    new npc_aran_elemental();
+    RegisterKarazhanCreatureAI(boss_shade_of_aran);
+    RegisterKarazhanCreatureAI(npc_aran_elemental);
 }

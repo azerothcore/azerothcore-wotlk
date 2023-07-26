@@ -259,127 +259,6 @@ public:
     };
 };
 
-/*######
-## go_corkis_prison and npc_corki
-######*/
-
-enum CorkiData
-{
-    // first quest
-    QUEST_HELP                                    = 9923,
-    NPC_CORKI                                     = 18445,
-    NPC_CORKI_CREDIT_1                            = 18369,
-    GO_CORKIS_PRISON                              = 182349,
-    CORKI_SAY_THANKS                              = 0,
-    // 2nd quest
-    QUEST_CORKIS_GONE_MISSING_AGAIN               = 9924,
-    NPC_CORKI_2                                   = 20812,
-    GO_CORKIS_PRISON_2                            = 182350,
-    CORKI_SAY_PROMISE                             = 0,
-    // 3rd quest
-    QUEST_CHOWAR_THE_PILLAGER                     = 9955,
-    NPC_CORKI_3                                   = 18369,
-    NPC_CORKI_CREDIT_3                            = 18444,
-    GO_CORKIS_PRISON_3                            = 182521,
-    CORKI_SAY_LAST                                = 0
-};
-
-class go_corkis_prison : public GameObjectScript
-{
-public:
-    go_corkis_prison() : GameObjectScript("go_corkis_prison") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        go->SetGoState(GO_STATE_READY);
-        if (go->GetEntry() == GO_CORKIS_PRISON)
-        {
-            if (Creature* corki = go->FindNearestCreature(NPC_CORKI, 25, true))
-            {
-                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
-                if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1);
-            }
-        }
-
-        if (go->GetEntry() == GO_CORKIS_PRISON_2)
-        {
-            if (Creature* corki = go->FindNearestCreature(NPC_CORKI_2, 25, true))
-            {
-                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 5, go->GetPositionY(), go->GetPositionZ());
-                if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_2);
-            }
-        }
-
-        if (go->GetEntry() == GO_CORKIS_PRISON_3)
-        {
-            if (Creature* corki = go->FindNearestCreature(NPC_CORKI_3, 25, true))
-            {
-                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 4, go->GetPositionY(), go->GetPositionZ());
-                if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3);
-            }
-        }
-
-        return true;
-    }
-};
-
-class npc_corki : public CreatureScript
-{
-public:
-    npc_corki() : CreatureScript("npc_corki") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_corkiAI(creature);
-    }
-
-    struct npc_corkiAI : public ScriptedAI
-    {
-        npc_corkiAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 Say_Timer;
-        bool ReleasedFromCage;
-
-        void Reset() override
-        {
-            Say_Timer = 5000;
-            ReleasedFromCage = false;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (ReleasedFromCage)
-            {
-                if (Say_Timer <= diff)
-                {
-                    me->DespawnOrUnsummon();
-                    ReleasedFromCage = false;
-                }
-                else
-                    Say_Timer -= diff;
-            }
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == POINT_MOTION_TYPE && id == 1)
-            {
-                Say_Timer = 5000;
-                ReleasedFromCage = true;
-                if (me->GetEntry() == NPC_CORKI)
-                    Talk(CORKI_SAY_THANKS);
-                if (me->GetEntry() == NPC_CORKI_2)
-                    Talk(CORKI_SAY_PROMISE);
-                if (me->GetEntry() == NPC_CORKI_3)
-                    Talk(CORKI_SAY_LAST);
-            }
-        };
-    };
-};
-
 /*#####
 ## npc_kurenai_captive
 #####*/
@@ -608,8 +487,6 @@ void AddSC_nagrand()
 {
     new npc_maghar_captive();
     new npc_creditmarker_visit_with_ancestors();
-    new npc_corki();
-    new go_corkis_prison();
     new npc_kurenai_captive();
     new go_warmaul_prison();
 }
