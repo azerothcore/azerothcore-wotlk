@@ -39,6 +39,9 @@ public:
 
     bool Reload();
 
+    /// Overrides configuration with environment variables and returns overridden keys
+    std::vector<std::string> OverrideWithEnvVariablesIfAny();
+
     std::string const GetFilename();
     std::string const GetConfigPath();
     [[nodiscard]] std::vector<std::string> const& GetArguments() const;
