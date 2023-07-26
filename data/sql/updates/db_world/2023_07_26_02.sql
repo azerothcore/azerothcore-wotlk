@@ -1,3 +1,4 @@
+-- DB update 2023_07_26_01 -> 2023_07_26_02
 --
 UPDATE `item_template` SET `spellcooldown_1` = -1 WHERE (`entry` = 37111);
 UPDATE `item_template` SET `spellcooldown_1` = -1, `spellcategorycooldown_1` = 2000 WHERE (`entry` = 47477);
