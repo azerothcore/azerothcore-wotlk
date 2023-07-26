@@ -87,6 +87,8 @@ namespace
             return false;
         }
 
+
+
         std::ifstream in(file);
 
         // Values are taken until there's a # or end of line
@@ -107,11 +109,6 @@ namespace
             throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Cyclic include statements found\n  files: {}", lineage));
         }
 
-        // Create a vec of string that will hold filenames from include
-        // statements.
-        // These will be parsed after all of the parameters have been persisted.
-        std::vector<std::string> includesToParse;
-
         std::cout << "Parsing config file: " << absPath << "\n";
         if (in.fail())
         {
@@ -126,6 +123,18 @@ namespace
 
         uint32 count = 0;
         uint32 lineNumber = 0;
+
+        // return true if duplicate found for this file
+        // does not find duplicates across include statements
+        auto IsDuplicateOption = [&](std::string const& confOption)
+        {
+            auto const& itr = fileConfigs.find(confOption);
+            if (itr != fileConfigs.end())
+            {
+                PrintError(file, "> Config::LoadFile: Duplicate key name '{}' in config file '{}'", confOption, file);
+            }
+            return itr != fileConfigs.end();
+        };
 
         while (in.good())
         {
@@ -152,6 +161,12 @@ namespace
                     // remove double quotes from config value
                     value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
+                    // Skip Duplicate keys in config
+                    if (IsDuplicateOption(entry))
+                    {
+                        continue;
+                    }
+
                     // add to fileConfigs
                     fileConfigs.emplace(entry, value);
                     // increment parameters changed
@@ -166,7 +181,7 @@ namespace
                     std::string includeFile = std::ssub_match(match[1]).str();
                     // Save include statements to be parsed after all the keys
                     // are added for this file.
-                    includesToParse.push_back(includeFile);
+                    ParseFile(includeFile, isOptional, isReload, configFiles);
                 }
             }
         }
@@ -175,13 +190,6 @@ namespace
         for (auto const& [key, value] : fileConfigs)
         {
             AddKey(key, value);
-        }
-
-        // Parse the saved included files now that this file has been entirely
-        // parsed
-        for (auto const& include : includesToParse)
-        {
-            ParseFile(include, isOptional, isReload, configFiles);
         }
 
         return count > 0;
