@@ -59,24 +59,25 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
 
         int i = 0;
 
-        for (auto& taletKvp : tab->Talents)
+        for (auto& talentKvp : tab->Talents)
         {
             std::string delimiter = "*";
 
             if (i == 0)
                 delimiter = "";
 
-            msg = msg + delimiter + std::to_string(taletKvp.second->SpellId) + "&" +
-                std::to_string(taletKvp.second->ColumnIndex) + "&" +
-                std::to_string(taletKvp.second->RowIndex) + "&" +
-                std::to_string(taletKvp.second->RankCost) + "&" +
-                std::to_string(taletKvp.second->RequiredLevel) + "&" +
-                std::to_string(taletKvp.second->NumberOfRanks) + "&" +
-                std::to_string((int)taletKvp.second->PreReqType) + "&";
+            msg = msg + delimiter + std::to_string(talentKvp.second->SpellId) + "&" +
+                std::to_string(talentKvp.second->ColumnIndex) + "&" +
+                std::to_string(talentKvp.second->RowIndex) + "&" +
+                std::to_string(talentKvp.second->RankCost) + "&" +
+                std::to_string(talentKvp.second->RequiredLevel) + "&" +
+                std::to_string(talentKvp.second->TabPointReq) + "&" +
+                std::to_string(talentKvp.second->NumberOfRanks) + "&" +
+                std::to_string((int)talentKvp.second->PreReqType) + "&";
 
             int j = 0;
 
-            for (auto& preReq : taletKvp.second->Prereqs)
+            for (auto& preReq : talentKvp.second->Prereqs)
             {
                 std::string reqDel = "@";
 
@@ -94,7 +95,7 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
 
             j = 0;
 
-            for (auto& preReq : taletKvp.second->ExclusiveWith)
+            for (auto& preReq : talentKvp.second->ExclusiveWith)
             {
                 std::string reqDel = "!";
 
@@ -110,7 +111,7 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
 
             j = 0;
 
-            for (auto& preReq : taletKvp.second->Ranks)
+            for (auto& preReq : talentKvp.second->Ranks)
             {
                 std::string reqDel = "%";
 
@@ -127,7 +128,7 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
 
             j = 0;
 
-            for (auto& preReq : taletKvp.second->UnleanSpells)
+            for (auto& preReq : talentKvp.second->UnlearnSpells)
             {
                 std::string reqDel = "`";
 
@@ -168,7 +169,7 @@ void ForgeCommonMessage::ApplyKnownForgeSpells(Player* player)
 
                 player->removeSpell(fsId, SPEC_MASK_ALL, false);
 
-                for (auto s : spell->UnleanSpells)
+                for (auto s : spell->UnlearnSpells)
                     player->removeSpell(s, SPEC_MASK_ALL, false);
 
                 if (!player->HasSpell(fsId))

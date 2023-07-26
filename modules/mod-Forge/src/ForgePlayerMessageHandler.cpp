@@ -187,7 +187,7 @@ public:
                 auto* spell = tab->Talents[fs->SpellId];
                 auto fsId = spell->Ranks[fs->CurrentRank];
 
-                for (auto s : spell->UnleanSpells)
+                for (auto s : spell->UnlearnSpells)
                     player->removeSpell(s, SPEC_MASK_ALL, false);
 
                 if (!player->HasSpell(fsId))
