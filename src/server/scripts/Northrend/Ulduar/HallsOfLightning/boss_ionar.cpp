@@ -97,9 +97,6 @@ public:
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_IONAR, NOT_STARTED);
-
-            // Ionar is immune to nature damage
-            me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
         void ScheduleEvents(bool spark)

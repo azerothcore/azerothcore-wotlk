@@ -2394,6 +2394,11 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
+CompletedAchievementMap const& AchievementMgr::GetCompletedAchievements()
+{
+    return _completedAchievements;
+}
+
 AchievementGlobalMgr* AchievementGlobalMgr::instance()
 {
     static AchievementGlobalMgr instance;
@@ -2683,7 +2688,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
             if (dataType != ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT)
                 LOG_ERROR("sql.sql", "Table `achievement_criteria_data` has ScriptName set for non-scripted data type (Entry: {}, type {}), useless data.", criteria_id, dataType);
             else
-                scriptId = sObjectMgr->GetScriptId(scriptName.c_str());
+                scriptId = sObjectMgr->GetScriptId(scriptName);
         }
 
         AchievementCriteriaData data(dataType, fields[2].Get<uint32>(), fields[3].Get<uint32>(), scriptId);

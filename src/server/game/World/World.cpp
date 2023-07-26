@@ -492,7 +492,9 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_DROP_ITEM_ARTIFACT]          = sConfigMgr->GetOption<float>("Rate.Drop.Item.Artifact", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED]        = sConfigMgr->GetOption<float>("Rate.Drop.Item.Referenced", 1.0f);
     _rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetOption<float>("Rate.Drop.Item.ReferencedAmount", 1.0f);
+    _rate_values[RATE_DROP_ITEM_GROUP_AMOUNT]      = sConfigMgr->GetOption<float>("Rate.Drop.Item.GroupAmount", 1.0f);
     _rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetOption<float>("Rate.Drop.Money", 1.0f);
+
     _rate_values[RATE_REWARD_BONUS_MONEY]          = sConfigMgr->GetOption<float>("Rate.RewardBonusMoney", 1.0f);
     _rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     _rate_values[RATE_XP_BG_KILL_AV]               = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKillAV", 1.0f);
@@ -1283,6 +1285,8 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
 
+    _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1355,6 +1359,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Dungeon finder
     _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
+
+    // DBC_ItemAttributes
+    _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
 
     // Max instances per hour
     _int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
@@ -2344,41 +2351,27 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard:
-    // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
-    // so we don't have to do it in every packet that modifies auctions
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
+    // pussywizard: handle auctions when the timer has passed
+    if (_timers[WUPDATE_AUCTIONS].Passed())
     {
-        std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
 
-        // pussywizard: handle auctions when the timer has passed
-        if (_timers[WUPDATE_AUCTIONS].Passed())
-        {
-            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
+        _timers[WUPDATE_AUCTIONS].Reset();
 
-            _timers[WUPDATE_AUCTIONS].Reset();
-
-            // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-            sAuctionMgr->Update();
-        }
-
-        AsyncAuctionListingMgr::Update(diff);
-
-        if (currentGameTime > _mail_expire_check_timer)
-        {
-            sObjectMgr->ReturnOrDeleteOldMails(true);
-            _mail_expire_check_timer = currentGameTime + 6h;
-        }
-
-        {
-            /// <li> Handle session updates when the timer has passed
-            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
-            UpdateSessions(diff);
-        }
+        // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
+        sAuctionMgr->Update();
     }
 
-    // end of section with mutex
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
+    AsyncAuctionListingMgr::Update(Milliseconds(diff));
+
+    if (currentGameTime > _mail_expire_check_timer)
+    {
+        sObjectMgr->ReturnOrDeleteOldMails(true);
+        _mail_expire_check_timer = currentGameTime + 6h;
+    }
+
+    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
+    UpdateSessions(diff);
 
     /// <li> Handle weather updates when the timer has passed
     if (_timers[WUPDATE_WEATHERS].Passed())

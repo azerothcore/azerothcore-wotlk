@@ -1445,6 +1445,22 @@ enum Enraged_Dpirits
     NPC_ENRAGED_AIR_SPIRIT                  = 21060,
     NPC_ENRAGED_WATER_SPIRIT                = 21059,
 
+    // ENRAGED WATER SPIRIT SPELLS
+    SPELL_STORMBOLT                         = 38032,
+
+    // ENRAGED AIR SPIRIT SPELLS
+    SPELL_AIR_SPIRIT_CHAIN_LIGHTNING        = 12058,
+    SPELL_HURRICANE                         = 32717,
+    SPELL_ENRAGE                            = 8599,
+
+    // ENRAGED FIRE SPIRIT SPELLS - Will be using the enrage spell from Air Spirit
+    SPELL_FEL_FIREBALL                      = 36247,
+    SPELL_FEL_FIRE_AURA                     = 36006, // Earth spirit uses this one
+
+    // ENRAGED EARTH SPIRIT SPELLS
+    SPELL_FIERY_BOULDER                     = 38498,
+    SPELL_SUMMON_ENRAGED_EARTH_SHARD        = 38365,
+
     // SOULS
     NPC_EARTHEN_SOUL                        = 21073,
     NPC_FIERY_SOUL                          = 21097,
@@ -1483,7 +1499,88 @@ public:
 
         void Reset() override { }
 
-        void JustEngagedWith(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            switch (me->GetEntry())
+            {
+                case NPC_ENRAGED_WATER_SPIRIT:
+                    _scheduler.Schedule(0s, 1s, [this](TaskContext context)
+                    {
+                        if (UpdateVictim())
+                        {
+                            DoCastVictim(SPELL_STORMBOLT);
+                        }
+                        context.Repeat(17s, 23s);
+                    });
+                    break;
+                case NPC_ENRAGED_FIRE_SPIRIT:
+                    if (!me->GetAura(SPELL_FEL_FIRE_AURA))
+                    {
+                        DoCastSelf(SPELL_FEL_FIRE_AURA);
+                    }
+                    _scheduler.Schedule(2s, 10s, [this](TaskContext context)
+                    {
+                        if (UpdateVictim())
+                        {
+                            DoCastVictim(SPELL_FEL_FIREBALL);
+                        }
+                        context.Repeat(6s, 12s);
+                    });
+                    break;
+                case NPC_ENRAGED_EARTH_SPIRIT:
+                    if (!me->GetAura(SPELL_FEL_FIRE_AURA))
+                    {
+                        DoCastSelf(SPELL_FEL_FIRE_AURA);
+                    }
+                    _scheduler.Schedule(3s, 4s, [this](TaskContext context)
+                    {
+                        if (UpdateVictim())
+                        {
+                            DoCastVictim(SPELL_FIERY_BOULDER);
+                        }
+                        context.Repeat(6s, 9s);
+                    });
+                    break;
+                case NPC_ENRAGED_AIR_SPIRIT:
+                    _scheduler.Schedule(10s, [this](TaskContext context)
+                    {
+                        if (UpdateVictim())
+                        {
+                            DoCastVictim(SPELL_AIR_SPIRIT_CHAIN_LIGHTNING);
+                        }
+                        _scheduler.Schedule(3s, 5s, [this](TaskContext /*context*/)
+                        {
+                            if (UpdateVictim())
+                            {
+                                DoCastVictim(SPELL_HURRICANE);
+                            }
+                        });
+                        context.Repeat(12s, 15s);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            _scheduler.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (me->GetEntry() == NPC_ENRAGED_FIRE_SPIRIT || me->GetEntry() == NPC_ENRAGED_AIR_SPIRIT)
+            {
+                if (HealthBelowPct(35) && !me->GetAura(SPELL_ENRAGE))
+                {
+                    DoCastSelf(SPELL_ENRAGE);
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1504,6 +1601,7 @@ public:
                     entry  = NPC_EARTHEN_SOUL;
                     //credit = SPELL_EARTHEN_SOUL_CAPTURED_CREDIT;
                     credit = NPC_CREDIT_EARTH;
+                    DoCastSelf(SPELL_SUMMON_ENRAGED_EARTH_SHARD);
                     break;
                 case NPC_ENRAGED_AIR_SPIRIT:
                     entry  = NPC_ENRAGED_AIRY_SOUL;
@@ -1542,6 +1640,8 @@ public:
                 }
             }
         }
+    private:
+        TaskScheduler _scheduler;
     };
 };
 
