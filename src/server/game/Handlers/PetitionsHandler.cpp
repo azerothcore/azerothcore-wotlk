@@ -565,7 +565,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     if (!petition)
         return;
 
-    if (GetPlayer()->GetTeamId() != player->GetTeamId())
+    if (GetPlayer()->GetTeamId() != player->GetTeamId() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
     {
         if (petition->petitionType != GUILD_CHARTER_TYPE)
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
