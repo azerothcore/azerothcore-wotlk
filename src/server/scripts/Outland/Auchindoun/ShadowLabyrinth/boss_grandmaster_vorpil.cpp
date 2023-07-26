@@ -201,6 +201,8 @@ struct npc_voidtraveler : public ScriptedAI
 
     void Reset() override
     {
+        me->SetReactState(REACT_PASSIVE);
+
         if (TempSummon* summon = me->ToTempSummon())
         {
             if (Unit* vorpil = summon->GetSummonerUnit())
