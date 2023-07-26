@@ -25,4 +25,4 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 DELETE FROM `creature_addon` WHERE `guid` = 30758;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(30758, @NPC, 0, 1, 0, 0, 0, '');
+(30758, @NPC, 0, 0, 1, 0, 0, '');
