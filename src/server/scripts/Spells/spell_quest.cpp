@@ -974,6 +974,9 @@ class spell_q6124_6129_apply_salve : public SpellScript
                 if (newEntry)
                 {
                     creatureTarget->UpdateEntry(newEntry);
+                    creatureTarget->GetMotionMaster()->Clear();
+                    creatureTarget->GetMotionMaster()->MoveFleeing(caster);
+                    creatureTarget->SetUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                     creatureTarget->DespawnOrUnsummon(DESPAWN_TIME);
                     caster->KilledMonsterCredit(newEntry);
                 }
