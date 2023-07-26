@@ -196,10 +196,10 @@ struct Position
 
     float GetRelativeAngle(const Position* pos) const
     {
-        return GetAngle(pos) - m_orientation;
+        return NormalizeOrientation(GetAngle(pos) - m_orientation);
     }
 
-    [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    [[nodiscard]] float GetRelativeAngle(float x, float y) const { return NormalizeOrientation(GetAngle(x, y) - m_orientation); }
     [[nodiscard]] float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
 
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
