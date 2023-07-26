@@ -1,5 +1,5 @@
--- path of Garn Mathers
-SET @NPC := 30758 * 10; -- Garn mathers GUID * 10
+--
+SET @NPC := 30758 * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @NPC;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
 (@NPC, 1, -3050.0679, -4329.487, 8.319094, 0),
