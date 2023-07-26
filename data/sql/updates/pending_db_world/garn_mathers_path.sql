@@ -1,5 +1,5 @@
---
-SET @NPC := 30758 * 10;
+-- path of Garn Mathers
+SET @NPC := 30758 * 10; -- Garn mathers GUID * 10
 DELETE FROM `waypoint_data` WHERE `id` = @NPC;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
 (@NPC, 1, -3050.0679, -4329.487, 8.319094, 0),
@@ -21,7 +21,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 DELETE FROM `creature` WHERE `id1` = 23679 AND `guid` = 30758;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(30758, 23679, 0, 0, 1, 0, 0, 1, 1, 1, -3050.214, -4329.639, 8.156482, 1.730132341384887695, 180, 0, 0, 1536, 0, 2, 0, 0, 0, '', 0);
+(30758, 23679, 0, 0, 1, 0, 0, 1, 1, 1, -3050.214, -4329.639, 8.156482, 1.730132341384887695, 180, 0, 0, 1536, 0, 2, 0, 0, 0, '', 50375);
 
 DELETE FROM `creature_addon` WHERE `guid` = 30758;
-INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES (30758, @NPC);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(30758, @NPC, 0, 1, 0, 0, 0, '');
