@@ -87,8 +87,6 @@ namespace
             return false;
         }
 
-
-
         std::ifstream in(file);
 
         // Values are taken until there's a # or end of line
