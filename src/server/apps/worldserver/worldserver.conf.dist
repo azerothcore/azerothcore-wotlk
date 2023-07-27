@@ -1564,6 +1564,14 @@ AllowTwoSide.Interaction.Group = 0
 AllowTwoSide.Interaction.Guild = 0
 
 #
+#    AllowTwoSide.Interaction.Arena
+#        Description: Allow joining arena teams between factions.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.Arena = 0
+
+#
 #    AllowTwoSide.Interaction.Auction
 #        Description: Allow auctions between factions.
 #        Default:     0 - (Disabled)
