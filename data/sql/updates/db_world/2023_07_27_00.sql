@@ -1,3 +1,4 @@
+-- DB update 2023_07_26_04 -> 2023_07_27_00
 -- path of Garn Mathers
 SET @NPC := 30758 * 10; -- Garn mathers GUID * 10
 DELETE FROM `waypoint_data` WHERE `id` = @NPC;
