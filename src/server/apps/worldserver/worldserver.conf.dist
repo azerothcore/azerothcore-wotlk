@@ -4162,7 +4162,7 @@ Metric.OverallStatusInterval = 1
 # services. More details here: https://github.com/walkline/ToCloud9.
 #
 #    Cluster.Enabled
-#		 Description: Enables/disables cluster mode.
+#        Description: Enables/disables cluster mode.
 #        Default: 0 - (Disabled)
 #                 1 - (Enabled)
 
