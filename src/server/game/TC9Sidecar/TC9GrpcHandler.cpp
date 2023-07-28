@@ -79,7 +79,6 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
     return resp;
 }
 
-
 RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuidsFromPlayer(uint64 playerGuid, uint64* items, int itemsLen, uint64 assignToPlayerGuid)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
@@ -106,7 +105,6 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
         itemsFound++;
         deletedItems[i] = item->GetGUID().GetRawValue();
 
-
         item->SetNotRefundable(player);
         player->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
 
@@ -131,7 +129,6 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
     {
         if (deletedItems[i] == 0)
             continue;
-
 
         itemsResult[itemsResultsItr] = deletedItems[i];
         itemsResultsItr++;

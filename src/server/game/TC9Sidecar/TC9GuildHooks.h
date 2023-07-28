@@ -31,5 +31,4 @@ public:
     static void OnGuildMemberLeft(uint64 guild, uint64 character);
 };
 
-
 #endif // _TC9_GUILD_HOOKS_H

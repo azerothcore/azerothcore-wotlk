@@ -19,7 +19,6 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 
-
 void ToCloud9GuildHooks::OnGuildMemberAdded(uint64 guild, uint64 character)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(character));

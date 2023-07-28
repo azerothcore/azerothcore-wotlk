@@ -516,6 +516,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
             return;
         }
 
+        // Check that Key and account name are the same on client and server
         uint8 t[4] = { 0x00,0x00,0x00,0x00 };
 
         Acore::Crypto::SHA1 sha;
@@ -604,9 +605,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
         LoginDatabase.Execute(stmt);
     }
-
-    // Check that Key and account name are the same on client and server
-
 
     // At this point, we can safely hook a successful login
     sScriptMgr->OnAccountLogin(account.Id);
