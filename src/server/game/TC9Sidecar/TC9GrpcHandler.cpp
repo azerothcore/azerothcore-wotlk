@@ -24,7 +24,7 @@
 GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 playerGuid, uint64* items, int itemsLen)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         GetPlayerItemsByGuidsResponse resp;
         resp.errorCode = PlayerItemErrorCodePlayerNotFound;
@@ -36,7 +36,7 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
     for (int i = 0; i < itemsLen; i++)
     {
         foundItems[i] = player->GetItemByGuid(ObjectGuid(items[i]));
-        if (foundItems[i] != nullptr)
+        if (foundItems[i])
             itemsFound++;
     }
 
@@ -45,7 +45,7 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
     int itemsResultsItr = 0;
     for (int i = 0; i < itemsLen; i++)
     {
-        if (foundItems[i] == nullptr)
+        if (!foundItems[i])
             continue;
 
         Item* pItem = foundItems[i];
@@ -82,7 +82,7 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
 RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuidsFromPlayer(uint64 playerGuid, uint64* items, int itemsLen, uint64 assignToPlayerGuid)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         RemoveItemsWithGuidsFromPlayerResponse resp;
         resp.errorCode = PlayerItemErrorCodePlayerNotFound;
@@ -96,7 +96,7 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
     for (int i = 0; i < itemsLen; i++)
     {
         Item *item = player->GetItemByGuid(ObjectGuid(items[i]));
-        if (item == nullptr)
+        if (!item)
         {
             deletedItems[i] = 0;
             continue;
@@ -145,11 +145,11 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
 PlayerItemErrorCode ToCloud9GrpcHandler::AddExistingItemToPlayer(AddExistingItemToPlayerRequest* request)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(request->playerGuid));
-    if (player == nullptr)
+    if (!player)
         return PlayerItemErrorCodePlayerNotFound;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(request->itemEntry);
-    if (proto == nullptr)
+    if (!proto)
         return PlayerItemErrorUnknownTemplate;
 
     Item* item = NewItemOrBag(proto);
@@ -186,7 +186,7 @@ PlayerItemErrorCode ToCloud9GrpcHandler::AddExistingItemToPlayer(AddExistingItem
 GetMoneyForPlayerResponse ToCloud9GrpcHandler::GetMoneyForPlayer(uint64 playerGuid)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         GetMoneyForPlayerResponse resp;
         resp.errorCode = PlayerMoneyErrorCodePlayerNotFound;
@@ -202,7 +202,7 @@ GetMoneyForPlayerResponse ToCloud9GrpcHandler::GetMoneyForPlayer(uint64 playerGu
 ModifyMoneyForPlayerResponse ToCloud9GrpcHandler::ModifyMoneyForPlayer(uint64 playerGuid, int32 value)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         ModifyMoneyForPlayerResponse resp;
         resp.errorCode = PlayerMoneyErrorCodePlayerNotFound;
@@ -225,7 +225,7 @@ ModifyMoneyForPlayerResponse ToCloud9GrpcHandler::ModifyMoneyForPlayer(uint64 pl
 CanPlayerInteractWithGOAndTypeResponse ToCloud9GrpcHandler::CanPlayerInteractWithGOAndType(uint64 playerGuid, uint64 go, uint8 goType)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         CanPlayerInteractWithGOAndTypeResponse resp;
         resp.errorCode = PlayerInteractionErrorCodeCodePlayerNotFound;
@@ -241,7 +241,7 @@ CanPlayerInteractWithGOAndTypeResponse ToCloud9GrpcHandler::CanPlayerInteractWit
 CanPlayerInteractWithNPCAndFlagsResponse ToCloud9GrpcHandler::CanPlayerInteractWithNPCAndFlags(uint64 playerGuid, uint64 npc, uint32 unitFlags)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
-    if (player == nullptr)
+    if (!player)
     {
         CanPlayerInteractWithNPCAndFlagsResponse resp;
         resp.errorCode = PlayerInteractionErrorCodeCodePlayerNotFound;

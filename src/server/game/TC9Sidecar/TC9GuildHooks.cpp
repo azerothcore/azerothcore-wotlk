@@ -22,7 +22,7 @@
 void ToCloud9GuildHooks::OnGuildMemberAdded(uint64 guild, uint64 character)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(character));
-    if (player == NULL)
+    if (!player)
         return;
 
     player->SetInGuild(guild);
@@ -31,7 +31,7 @@ void ToCloud9GuildHooks::OnGuildMemberAdded(uint64 guild, uint64 character)
 void ToCloud9GuildHooks::OnGuildMemberRemoved(uint64 /*guild*/, uint64 character)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(character));
-    if (player == NULL)
+    if (!player)
         return;
 
     player->SetInGuild(0);
@@ -40,7 +40,7 @@ void ToCloud9GuildHooks::OnGuildMemberRemoved(uint64 /*guild*/, uint64 character
 void ToCloud9GuildHooks::OnGuildMemberLeft(uint64 /*guild*/, uint64 character)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(character));
-    if (player == NULL)
+    if (!player)
         return;
 
     player->SetInGuild(0);

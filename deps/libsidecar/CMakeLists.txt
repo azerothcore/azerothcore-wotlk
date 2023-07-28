@@ -10,15 +10,15 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Since it's a Golang library (https://github.com/walkline/ToCloud9/tree/master/game-server/libsidecar), to 
-# build a C library from Go sources on Windows, you need to use the GCC compiler. However, AzerothCore is 
-# configured to use the MSVC compiler or clang-cl, and both of them are not compatible with GCC on Windows. 
+# Since it's a Golang library (https://github.com/walkline/ToCloud9/tree/master/game-server/libsidecar), to
+# build a C library from Go sources on Windows, you need to use the GCC compiler. However, AzerothCore is
+# configured to use the MSVC compiler or clang-cl, and both of them are not compatible with GCC on Windows.
 #
 # This can be changed with implementation of one of these feature requests:
 #   https://github.com/golang/go/issues/17014
 #   https://github.com/golang/go/issues/20982
 
-if (WIN32)
+if (WIN32 OR NOT USE_REAL_LIBSIDECAR)
 
     file(GLOB sources stub/*.c stub/*.h)
 
