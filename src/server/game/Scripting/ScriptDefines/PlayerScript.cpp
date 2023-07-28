@@ -582,6 +582,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnBeforeFillQuestLootItem(Player* player, LootItem& item)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeFillQuestLootItem(player, item);
+    });
+}
+
 void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -897,6 +905,37 @@ bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid 
     return true;
 }
 
+bool ScriptMgr::CanSendErrorAlreadyLooted(Player* player)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return !script->CanSendErrorAlreadyLooted(player);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void ScriptMgr::OnAfterCreatureLoot(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnAfterCreatureLoot(player);
+    });
+}
+
+void ScriptMgr::OnAfterCreatureLootMoney(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnAfterCreatureLootMoney(player);
+    });
+}
+
 void ScriptMgr::PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -964,6 +1003,20 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnGetMaxSkillValue(player, skill, result, IsPure);
+    });
+}
+
+void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnUpdateGatheringSkill(player, skillId, currentLevel, gray, green, yellow, gain);
+    });
+}
+
+void ScriptMgr::OnUpdateCraftingSkill(Player *player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain) {
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnUpdateCraftingSkill(player, skill, currentLevel, gain);
     });
 }
 

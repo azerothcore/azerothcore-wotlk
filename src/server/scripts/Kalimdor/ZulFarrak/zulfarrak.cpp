@@ -44,6 +44,7 @@ enum blySays
 
 enum blySpells
 {
+    SPELL_BLYS_BAND_ESCAPE     = 11365,
     SPELL_SHIELD_BASH          = 11972,
     SPELL_REVENGE              = 12170
 };
@@ -64,6 +65,7 @@ public:
 
         void InitializeAI() override
         {
+            ableToPortHome = false;
             startedFight = false;
             me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
@@ -74,16 +76,33 @@ public:
         InstanceScript* instance;
 
         bool startedFight;
+        bool ableToPortHome;
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
-        uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
+        uint32 Revenge_Timer; //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
+        uint32 Porthome_Timer;
         ObjectGuid PlayerGUID;
 
         void Reset() override
         {
             ShieldBash_Timer = 5000;
             Revenge_Timer = 8000;
+            Porthome_Timer = 156000;
+            ableToPortHome = false;
+            startedFight = false;
+        }
+
+        void EnterEvadeMode(EvadeReason /*reason*/) override
+        {
+            if (ableToPortHome)
+                return;
+
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            {
+                ableToPortHome = true;
+                Porthome_Timer = 156000;
+            }
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override
@@ -112,6 +131,7 @@ public:
                     switch (postGossipStep)
                     {
                         case 1:
+                            startedFight = true;
                             //weegli doesn't fight - he goes & blows up the door
                             if (Creature* pWeegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
                             {
@@ -128,6 +148,7 @@ public:
                             me->SetFaction(FACTION_MONSTER);
                             Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
 
+                            switchFactionIfAlive(NPC_WEEGLI, target);
                             switchFactionIfAlive(NPC_RAVEN, target);
                             switchFactionIfAlive(NPC_ORO, target);
                             switchFactionIfAlive(NPC_MURTA, target);
@@ -144,6 +165,37 @@ public:
                 {
                     Text_Timer -= diff;
                 }
+            }
+
+            if (Porthome_Timer <= diff && ableToPortHome == true)
+            {
+                if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+                {
+                    weegli->CastSpell(weegli, SPELL_BLYS_BAND_ESCAPE);
+                    weegli->DespawnOrUnsummon(10000);
+                }
+                if (Creature* raven = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAVEN)))
+                {
+                    raven->CastSpell(raven, SPELL_BLYS_BAND_ESCAPE);
+                    raven->DespawnOrUnsummon(10000);
+                }
+                if (Creature* oro = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ORO)))
+                {
+                    oro->CastSpell(oro, SPELL_BLYS_BAND_ESCAPE);
+                    oro->DespawnOrUnsummon(10000);
+                }
+                if (Creature* murta = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURTA)))
+                {
+                    murta->CastSpell(murta, SPELL_BLYS_BAND_ESCAPE);
+                    murta->DespawnOrUnsummon(10000);
+                }
+                DoCastSelf(SPELL_BLYS_BAND_ESCAPE);
+                me->DespawnOrUnsummon(10000);
+                Porthome_Timer = 156000; //set timer back so that the event doesn't keep triggering
+            }
+            else
+            {
+                Porthome_Timer -= diff;
             }
 
             if (!UpdateVictim())
@@ -176,6 +228,7 @@ public:
 
         void DoAction(int32 /*param*/) override
         {
+            ableToPortHome = false;
             postGossipStep = 1;
             Text_Timer = 0;
         }
@@ -211,9 +264,8 @@ public:
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES && !startedFight)
+            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_MOVED_DOWNSTAIRS && !startedFight)
             {
-                startedFight = true;
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
             }
@@ -261,6 +313,17 @@ public:
 
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
+            //setting gossip option as soon as the cages open
+            if(Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
+            {
+                bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            }
+
+            if(Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+            {
+                weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            }
+
             //set bly & co to aggressive & start moving to top of stairs
             initBlyCrewMember(NPC_BLY, 1884.99f, 1263, 41.52f);
             initBlyCrewMember(NPC_RAVEN, 1882.5f, 1263, 41.52f);
@@ -281,15 +344,6 @@ public:
                 crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
                 crew->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
 
-                switch (entry)
-                {
-                    case NPC_BLY:
-                    case NPC_WEEGLI:
-                        crew->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        break;
-                    default:
-                        break;
-                }
             }
         }
     };
@@ -429,13 +483,13 @@ public:
         {
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
@@ -452,13 +506,13 @@ public:
 
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
@@ -476,10 +530,6 @@ public:
                 me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);
                 Talk(SAY_WEEGLI_OK_I_GO);
                 instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
-                if (Creature* sergeantBly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
-                {
-                    sergeantBly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                }
             }
         }
 
@@ -501,6 +551,7 @@ public:
             switch (instance->GetData(DATA_PYRAMID))
             {
                 case PYRAMID_MOVED_DOWNSTAIRS:
+                case PYRAMID_KILLED_ALL_TROLLS:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEEGLI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 1514, me->GetGUID());  //if event can proceed to end
                     break;
@@ -508,7 +559,7 @@ public:
                     SendGossipMenuFor(player, 1511, me->GetGUID());  //if event not started
                     break;
                 default:
-                    SendGossipMenuFor(player, 1513, me->GetGUID());  //if event are in progress
+                    SendGossipMenuFor(player, 1513, me->GetGUID());  //if event is in progress
             }
         }
     };

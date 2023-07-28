@@ -292,6 +292,7 @@ public:
         {
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
+            me->SetReactState(REACT_AGGRESSIVE);
             DoomfireSpiritGUID.Clear();
             WorldTreeGUID.Clear();
             WispCount = 0;
@@ -618,6 +619,7 @@ public:
                         break;
                     }
                 case EVENT_BELOW_10_PERCENT_HP:
+                    me->SetReactState(REACT_PASSIVE);
                     DoCastProtection();     // Protection of Elune against Finger and Hand of Death
                     BelowTenPercent = true;
                     me->GetMotionMaster()->Clear(false);

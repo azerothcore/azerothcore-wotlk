@@ -19,32 +19,38 @@
 #include "ScriptedCreature.h"
 #include "shadow_labyrinth.h"
 
-enum BlackheartTheInciter
+enum Text
 {
-    SPELL_INCITE_CHAOS      = 33676,
-    SPELL_INCITE_CHAOS_B    = 33684,    //debuff applied to each member of party
-    SPELL_CHARGE            = 33709,
-    SPELL_WAR_STOMP         = 33707,
-    SPELL_LAUGHTER          = 33722,
-
     SAY_INTRO               = 0,
     SAY_AGGRO               = 1,
     SAY_SLAY                = 2,
     SAY_HELP                = 3,
-    SAY_DEATH               = 4,
+    SAY_DEATH               = 4
+};
 
-    EVENT_SPELL_INCITE      = 1,
-    EVENT_INCITE_WAIT       = 2,
-    EVENT_SPELL_CHARGE      = 3,
-    EVENT_SPELL_KNOCKBACK   = 4,
-    EVENT_SPELL_WAR_STOMP   = 5,
+enum Spells
+{
+    SPELL_INCITE_CHAOS      = 33676,
+    SPELL_INCITE_CHAOS_B    = 33684, // debuff applied to each player
+    SPELL_CHARGE            = 33709,
+    SPELL_WAR_STOMP         = 33707,
+    SPELL_LAUGHTER          = 33722
+};
 
-    NPC_INCITE_TRIGGER   = 19300
+enum Npc
+{
+    NPC_INCITE_TRIGGER      = 19300
 };
 
 struct boss_blackheart_the_inciter : public BossAI
 {
-    boss_blackheart_the_inciter(Creature* creature) : BossAI(creature, DATA_BLACKHEARTTHEINCITEREVENT) { }
+    boss_blackheart_the_inciter(Creature* creature) : BossAI(creature, DATA_BLACKHEARTTHEINCITEREVENT)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     bool InciteChaos;
 
@@ -72,12 +78,48 @@ struct boss_blackheart_the_inciter : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
-        me->CallForHelp(100.0f);
-        events.ScheduleEvent(EVENT_SPELL_INCITE, 24000);
-        events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
-        events.ScheduleEvent(EVENT_SPELL_CHARGE, urand(30000, 50000));
-        events.ScheduleEvent(EVENT_SPELL_WAR_STOMP, urand(16950, 26350));
         _JustEngagedWith();
+        me->CallForHelp(100.0f);
+        scheduler.Schedule(24s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_INCITE_CHAOS);
+            DoCastSelf(SPELL_LAUGHTER, true);
+            uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
+            std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
+            for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            {
+                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                if (target && target->IsPlayer())
+                {
+                    if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                    {
+                        inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                    }
+                }
+            }
+            DoResetThreatList();
+            me->SetImmuneToPC(true);
+            InciteChaos = true;
+            scheduler.DelayAll(15s);
+            context.Repeat(50s, 70s);
+            scheduler.Schedule(15s, [this](TaskContext /*context*/)
+            {
+                me->SetImmuneToPC(false);
+                InciteChaos = false;
+            });
+        }).Schedule(15s, [this](TaskContext /*context*/)
+        {
+            me->SetImmuneToPC(false);
+            InciteChaos = false;
+        }).Schedule(30s, 50s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_CHARGE);
+            context.Repeat(30s, 50s);
+        }).Schedule(16950ms, 26350ms, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_WAR_STOMP);
+            context.Repeat(16950ms, 26350ms);
+        });
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -91,55 +133,9 @@ struct boss_blackheart_the_inciter : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim() && !InciteChaos)
-        {
             return;
-        }
 
-        events.Update(diff);
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_INCITE_WAIT:
-            me->SetImmuneToPC(false);
-            InciteChaos = false;
-            break;
-        case EVENT_SPELL_INCITE:
-        {
-            DoCastAOE(SPELL_INCITE_CHAOS);
-            DoCastSelf(SPELL_LAUGHTER, true);
-
-            uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
-            std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
-            for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-
-                if (target && target->IsPlayer())
-                {
-                    if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
-                    {
-                        inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
-                    }
-                }
-            }
-
-            DoResetThreatList();
-            me->SetImmuneToPC(true);
-            InciteChaos = true;
-            events.DelayEvents(15000);
-            events.RepeatEvent(urand(50000, 70000));
-            events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
-            break;
-        }
-        case EVENT_SPELL_CHARGE:
-            DoCastRandomTarget(SPELL_CHARGE);
-            events.RepeatEvent(urand(30000, 50000));
-            break;
-        case EVENT_SPELL_WAR_STOMP:
-            DoCastAOE(SPELL_WAR_STOMP);
-            events.RepeatEvent(urand(16950, 26350));
-            break;
-        }
-
+        scheduler.Update(diff);
         if (InciteChaos)
             return;
 

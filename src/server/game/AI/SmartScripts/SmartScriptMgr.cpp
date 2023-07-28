@@ -280,6 +280,10 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.minMaxRepeat.min == 0 && temp.event.minMaxRepeat.max == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
+            case SMART_EVENT_AREA_CASTING:
+                if (temp.event.areaCasting.repeatMin == 0 && temp.event.areaCasting.repeatMax == 0)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
@@ -346,10 +350,12 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_TARGET_MANA_PCT:
         case SMART_EVENT_RANGE:
         case SMART_EVENT_VICTIM_CASTING:
+        case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_TARGET_BUFFED:
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
+        case SMART_EVENT_NEAR_PLAYERS:
             return true;
         default:
             return false;
@@ -572,6 +578,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_SUMMONED_UNIT_DIES: return sizeof(SmartEvent::summoned);
             case SMART_EVENT_NEAR_PLAYERS: return sizeof(SmartEvent::nearPlayer);
             case SMART_EVENT_NEAR_PLAYERS_NEGATION: return sizeof(SmartEvent::nearPlayerNegation);
+            case SMART_EVENT_NEAR_UNIT: return sizeof(SmartEvent::nearUnit);
+            case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::areaCasting);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -671,7 +679,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
             case SMART_ACTION_STORE_TARGET_LIST: return sizeof(SmartAction::storeTargets);
             case SMART_ACTION_WP_RESUME: return NO_PARAMS;
-            case SMART_ACTION_SET_ORIENTATION: return NO_PARAMS;
+            case SMART_ACTION_SET_ORIENTATION: return sizeof(SmartAction::orientation);
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
             case SMART_ACTION_MOVE_TO_POS: return sizeof(SmartAction::moveToPos);
@@ -763,6 +771,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
             case SMART_ACTION_DISABLE: return sizeof(SmartAction::disable);
+            case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
+            case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1041,6 +1051,16 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.targetCasting.repeatMin, e.event.targetCasting.repeatMax))
                     return false;
                 break;
+            case SMART_EVENT_AREA_CASTING:
+                if (e.event.areaCasting.spellId > 0 && !sSpellMgr->GetSpellInfo(e.event.areaCasting.spellId))
+                {
+                    LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.spellHit.spell);
+                    return false;
+                }
+
+                if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
+                    return false;
+                break;
             case SMART_EVENT_PASSENGER_BOARDED:
             case SMART_EVENT_PASSENGER_REMOVED:
                 if (!IsMinMaxValid(e, e.event.minMax.repeatMin, e.event.minMax.repeatMax))
@@ -1265,11 +1285,18 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 }
                 break;
+            case SMART_EVENT_NEAR_PLAYERS:
+                if (!IsMinMaxValid(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax))
+                    return false;
+                break;
+            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+                if (!IsMinMaxValid(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax))
+                    return false;
+                break;
             case SMART_EVENT_CHARMED:
             case SMART_EVENT_GO_STATE_CHANGED:
             case SMART_EVENT_GO_EVENT_INFORM:
-            case SMART_EVENT_NEAR_PLAYERS:
-            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+            case SMART_EVENT_NEAR_UNIT:
             case SMART_EVENT_TIMED_EVENT_TRIGGERED:
             case SMART_EVENT_INSTANCE_PLAYER_ENTER:
             case SMART_EVENT_TRANSPORT_RELOCATE:
@@ -1920,6 +1947,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
         case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SET_SCALE:
+        case SMART_ACTION_SUMMON_RADIAL:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
