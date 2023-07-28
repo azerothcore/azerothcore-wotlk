@@ -86,10 +86,10 @@ void ToCloud9Sidecar::ProcessGrpcRequests()
 
 uint32 ToCloud9Sidecar::GenerateCharacterGuid()
 {
-    return ObjectGuid::LowType(TC9GetNextAvailableCharacterGuid());
+    return uint32(TC9GetNextAvailableCharacterGuid());
 }
 
 uint32 ToCloud9Sidecar::GenerateItemGuid()
 {
-    return ObjectGuid::LowType(TC9GetNextAvailableItemGuid());
+    return uint32(TC9GetNextAvailableItemGuid());
 }
