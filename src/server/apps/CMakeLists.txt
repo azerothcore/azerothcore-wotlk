@@ -141,7 +141,7 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
         readline
         gperftools
         libsidecar)
-        
+
     if (UNIX AND NOT NOJEM)
       set(${APP_PROJECT_NAME}_LINK_FLAGS "-pthread -lncurses ${${APP_PROJECT_NAME}_LINK_FLAGS}")
     endif()

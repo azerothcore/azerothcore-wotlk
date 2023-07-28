@@ -420,7 +420,7 @@ int main(int argc, char** argv)
     threadPool.reset();
 
     sToCloud9Sidecar->Deinit();
-    
+
     sLog->SetSynchronous();
 
     sScriptMgr->OnShutdown();

@@ -1749,7 +1749,7 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
     }
 
     LOG_DEBUG("network", "Starting saving, AccountId = {}", GetAccountId());
-    
+
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->SaveToDB(trans, false, true);
     AddTransactionCallback(CharacterDatabase.AsyncCommitTransaction(trans)).AfterComplete([this](bool success)
@@ -1757,15 +1757,15 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
         WorldPacket data(TC9_SMSG_READY_FOR_REDIRECT, 1);
         data << uint8(!success); // 0 - Success, 1 - Failed.
         SendPacket(&data);
-        
+
         if (!success)
         {
             LOG_ERROR("network", "Failed to save player, AccountId = %d", GetAccountId());
             return;
         }
-        
+
         LOG_DEBUG("network", "Saved, AccountId = %d", GetAccountId());
-        
+
         KickPlayer("HandlePrepareForRedirect client redirected");
         LogoutPlayer(false, true);
     });
