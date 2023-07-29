@@ -71,7 +71,6 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
                 std::to_string(talentKvp.second->RowIndex) + "&" +
                 std::to_string(talentKvp.second->RankCost) + "&" +
                 std::to_string(talentKvp.second->RequiredLevel) + "&" +
-                std::to_string(talentKvp.second->TabPointReq) + "&" +
                 std::to_string(talentKvp.second->NumberOfRanks) + "&" +
                 std::to_string((int)talentKvp.second->PreReqType) + "&";
 
@@ -206,6 +205,9 @@ bool ForgeCommonMessage::CanLearnTalent(Player* player, uint32 tabId, uint32 spe
         auto ft = talItt->second;
 
         if (ft->RequiredLevel > player->getLevel())
+            return false;
+
+        if (ft->TabPointReq > spec->PointsSpent[tabId])
             return false;
 
         if (curPoints->Sum < ft->RankCost)
