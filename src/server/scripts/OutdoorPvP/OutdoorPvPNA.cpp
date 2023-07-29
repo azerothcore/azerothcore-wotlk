@@ -85,7 +85,7 @@ uint32 OPvPCapturePointNA::GetAliveGuardsCount()
     {
         auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
         for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
-            if (itr2->second->IsAlive() && (itr2->second->GetEntry() == 18192 || itr2->second->GetEntry() == 18256))
+            if (itr2->second->IsAlive() && (itr2->second->GetEntry() == NA_HALAANI_GUARD_A || itr2->second->GetEntry() == NA_HALAANI_GUARD_H))
                 ++cnt;
     }
     return cnt;
@@ -96,9 +96,9 @@ TeamId OPvPCapturePointNA::GetControllingFaction() const
     return m_ControllingFaction;
 }
 
-void OPvPCapturePointNA::DeSpawnNPCs(HalaaNPCS teamNPC)
+void OPvPCapturePointNA::DespawnNPCs(HalaaNPCS teamNPC)
 {
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
         auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
@@ -118,10 +118,13 @@ void OPvPCapturePointNA::DeSpawnNPCs(HalaaNPCS teamNPC)
 
 void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
 {
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
+        if (!data) {
+            return;
+        }
         sObjectMgr->UpdateCreatureHalaa(spawnId, m_PvP->GetMap(), data->posX, data->posY);
         m_Creatures[i] = spawnId;
         m_CreatureTypes[m_Creatures[i]] = i;
@@ -168,7 +171,7 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_A));
     else if (m_ControllingFaction == TEAM_HORDE)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_H));
-    DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
+    DespawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
     m_ControllingFaction = teamId;
     if (m_ControllingFaction != TEAM_NEUTRAL)
         sGraveyard->AddGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
@@ -419,9 +422,8 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
         ItemPosCountVec dest;
 
         int32 count = 10;
-        uint32 itemid = 24538;
         // bomb id count
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count, &noSpaceForCount);
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, NA_HALAA_BOMB, count, &noSpaceForCount);
         if (msg != EQUIP_ERR_OK)                               // convert to possible store amount
             count -= noSpaceForCount;
 
@@ -430,7 +432,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             return true;
         }
 
-        Item* item = player->StoreNewItem(dest, itemid, true);
+        Item* item = player->StoreNewItem(dest, NA_HALAA_BOMB, true);
 
         if (count > 0 && item)
         {
@@ -707,7 +709,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
                 m_canRecap = true;
                 DeSpawnGOs();
-                DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
+                DespawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
             }
         }
         else //blue
@@ -734,7 +736,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
                 //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
                 m_canRecap = true;
                 DeSpawnGOs();
-                DeSpawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
+                DespawnNPCs(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
             }
         }
 
@@ -868,27 +870,27 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
 
     void UpdateAI(uint32 diff)
     {
-        if(halaaNPCHorde.size() != 20 && halaaNPCAlly.size() != 20)
+        if(halaaNPCHorde.size() != NA_HALAA_CREATURE_TEAM_SPAWN && halaaNPCAlly.size() != NA_HALAA_CREATURE_TEAM_SPAWN)
         {
             std::list<Creature*> creatures;
             uint32 entry = 0;
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < NA_HALAA_CREATURES; i++)
             {
                 me->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 250);
             }
 
-            if (creatures.size() == 40)
+            if (creatures.size() == NA_HALAA_MAX_CREATURE_SPAWN)
             {
                 for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 {
                     Creature* const c = *itr;
-                    if (entry < 20)
+                    if (entry < NA_HALAA_CREATURE_TEAM_SPAWN)
                     {
                         halaaNPCHorde[entry] = (c->GetSpawnId());
                     }
                     else
                     {
-                        halaaNPCAlly[entry - 20] = (c->GetSpawnId());
+                        halaaNPCAlly[entry - NA_HALAA_CREATURE_TEAM_SPAWN] = (c->GetSpawnId());
                     }
                     c->AddObjectToRemoveList();
                     entry++;

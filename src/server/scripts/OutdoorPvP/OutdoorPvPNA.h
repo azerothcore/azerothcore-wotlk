@@ -46,6 +46,8 @@ const uint32 NA_RESPAWN_TIME = 3600000; // one hour to capture after defeating a
 
 const uint32 NA_GUARD_CHECK_TIME = 500; // every half second
 
+const uint32 NA_HALAA_BOMB = 24538; // Item id Bomb throwed in Halaa
+
 enum OutdoorPvPNAWorldStates
 {
     NA_UI_HORDE_GUARDS_SHOW = 2503,
@@ -116,6 +118,20 @@ enum FlightSpellsNA
     NA_SPELL_FLY_WEST = 32068,
     NA_SPELL_FLY_NORTH = 32075,
     NA_SPELL_FLY_EAST = 32081
+};
+
+//Npc ids from Halaa guards, Ally and Horde
+enum HalaaGuardsNA
+{
+    NA_HALAANI_GUARD_A = 18256,
+    NA_HALAANI_GUARD_H = 18192
+};
+
+enum HalaaCreaturesSpawn
+{
+    NA_HALAA_CREATURES = 12,
+    NA_HALAA_CREATURE_TEAM_SPAWN = 20,
+    NA_HALAA_MAX_CREATURE_SPAWN = 40
 };
 
 // spawned when the alliance is attacking, horde is in control
@@ -231,7 +247,7 @@ protected:
     void FactionTakeOver(TeamId teamId);
 
     void DeSpawnGOs();
-    void DeSpawnNPCs(HalaaNPCS teamNPC);
+    void DespawnNPCs(HalaaNPCS teamNPC);
 
     void SpawnNPCsForTeam(HalaaNPCS teamNPC);
     void SpawnGOsForTeam(TeamId teamId);
