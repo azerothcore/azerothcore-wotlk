@@ -92,8 +92,6 @@ enum class ForgeTopic
     COLLECTION_SETUP_FINISHED = 53,
     ADD_XMOG = 54,
     APPLY_XMOG_ERROR = 55,
-<<<<<<< Updated upstream
-=======
     GET_PERKS = 56,
     LEARN_PERK = 57,
     LEARN_PERK_ERROR = 58,
@@ -102,7 +100,6 @@ enum class ForgeTopic
     RESET_ALL_PERKS = 61,
     OFFER_SELECTION = 62,
     GET_PERK_CATALOGUE = 63,
->>>>>>> Stashed changes
 };
 
 enum class ForgeError

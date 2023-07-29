@@ -62,16 +62,6 @@ public:
                         }
                     }
                     break;
-
-                case CharacterPointType::FORGE_SKILL_TREE:
-                    ForgeTalentTab* fftt;
-
-                    if (fc->TryGetTalentTab(iam.player, tab.first, fftt))
-                        for (auto t : tab.second)
-                        {
-                            iam.player->removeSpell(fftt->Talents[t.second->SpellId]->Ranks[t.second->CurrentRank], SPEC_MASK_ALL, false); // Remove all spells.
-                        }
-                    break;
                 default:
                     break;
                 }

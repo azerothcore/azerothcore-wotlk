@@ -19,13 +19,6 @@ void ForgeCommonMessage::SendTalentTreeLayout(Player* player)
             BuildTree(player, tpt, tabs);
         }
     }
-
-    std::list<ForgeTalentTab*> tabs;
-
-    if (fc->TryGetForgeTalentTabs(player, CharacterPointType::SKILL_PAGE, tabs))
-    {
-        BuildTree(player, CharacterPointType::SKILL_PAGE, tabs);
-    }
 }
 
 void ForgeCommonMessage::SendTalentTreeLayout(Player* player, uint32 tab)
@@ -36,8 +29,6 @@ void ForgeCommonMessage::SendTalentTreeLayout(Player* player, uint32 tab)
     if (fc->TryGetTalentTab(player, tab, tabObj))
     {
         tabs.push_back(tabObj);
-
-        BuildTree(player, CharacterPointType::SKILL_PAGE, tabs);
     }
 }
 
@@ -379,8 +370,6 @@ void ForgeCommonMessage::SendTalents(Player* player)
     }
 }
 
-<<<<<<< Updated upstream
-=======
 void ForgeCommonMessage::SendPerks(Player* player, uint8 specId)
 {
     std::vector<CharacterSpecPerk*> spec;
@@ -421,13 +410,11 @@ void ForgeCommonMessage::SendPerkSelection(Player* player, std::string clientMsg
 {
     player->SendForgeUIMsg(ForgeTopic::OFFER_SELECTION, clientMsg);
 }
->>>>>>> Stashed changes
 
 std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCharacterTalent*>& spec, Player* player, std::string clientMsg, uint32 tabId)
 {
     int i = 0;
     ForgeTalentTab* tab;
-
 
     if (fc->TryGetTalentTab(player, tabId, tab))
     {
@@ -457,8 +444,6 @@ std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCha
     return clientMsg;
 }
 
-<<<<<<< Updated upstream
-=======
 std::string BuildPerk(Perk* perk)
 {
     std::string out = "";
@@ -494,7 +479,6 @@ std::string ForgeCommonMessage::DoBuildPerkCatalogue(std::vector<Perk*> perks)
     }
     return clientMsg;
 }
->>>>>>> Stashed changes
 
 void ForgeCommonMessage::SendSpecInfo(Player* player)
 {

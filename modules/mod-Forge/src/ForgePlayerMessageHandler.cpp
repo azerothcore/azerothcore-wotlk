@@ -19,20 +19,19 @@
 #include <UnlearnTalentHandler.cpp>
 #include <UpdateSpecHandler.cpp>
 #include <GetTalentsHandler.cpp>
+#include <GetPerksHandler.cpp>
+#include <LearnPerkHandler.cpp>
+//#include <UnlearnPerkHandler.cpp>
 #include <PrestigeHandler.cpp>
 #include <UseSkillbook.cpp>
-#include <unordered_map>
 #include <ForgeCache.cpp>
 #include <ForgeCacheCommands.cpp>
 #include <ActivateClassSpecHandler.cpp>
-<<<<<<< Updated upstream
-=======
 #include <unordered_map>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
->>>>>>> Stashed changes
 
 // Add player scripts
 class ForgePlayerMessageHandler : public PlayerScript
@@ -49,7 +48,6 @@ public:
         // setup DB
         player->SetSpecsCount(0);
         fc->AddCharacterSpecSlot(player);
-        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 8));
         fc->UpdateCharacters(player->GetSession()->GetAccountId(), player);
     }
 
@@ -130,29 +128,6 @@ public:
 
                 ForgeCharacterPoint* pp = fc->GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
 
-                if (oldlevel < 10 && pp->Sum == 0)
-                {
-                    auto points = fc->GetConfig("fogepointsAt10", 30);
-                    fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::FORGE_SKILL_TREE, points);
-                }
-
-                if (pp->Sum == 0)
-                {
-                    fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::FORGE_SKILL_TREE, amount * fc->GetConfig("InitialForgePointsPerLevel", 1));
-
-                    if (currentLevel >= 20 && oldlevel < 20)
-                        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("MilestonePoints", 4));
-
-                    if (currentLevel >= 40 && oldlevel < 40)
-                        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("MilestonePoints", 4));
-
-                    if (currentLevel >= 60 && oldlevel < 60)
-                        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("MilestonePoints", 4));
-
-                    if (currentLevel == 80)
-                        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("MilestonePoints", 4));
-                }
-
                 cm->SendActiveSpecInfo(player);
                 cm->SendTalentTreeLayout(player);
                 cm->SendTalents(player);
@@ -182,17 +157,13 @@ public:
                 cm->SendTalents(player);
             }
 
-<<<<<<< Updated upstream
-=======
             auto missing = fc->FindMissingPerks(player);
             while (missing > 0)
             {
                 InsertNewPerksForLevelUp(player);
                 missing--;
             }
-
             cm->SendWithstandingSelect(player);
->>>>>>> Stashed changes
         }
     }
 
@@ -272,8 +243,6 @@ private:
     ForgeCache* fc;
     ForgeCommonMessage* cm;
     uint32 FORGE_SCRAP = 90000;
-<<<<<<< Updated upstream
-=======
 
     bool GetPrestigeStatus(Player* player)
     {
@@ -319,7 +288,6 @@ private:
         } while (totalPerks < maxPerks);
         return out;
     }
->>>>>>> Stashed changes
 };
 
 // Add all scripts in one
@@ -339,6 +307,9 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new UpdateSpecHandler(cache));
     sTopicRouter->AddHandler(new PrestigeHandler(cache, cm));
     sTopicRouter->AddHandler(new ActivateClassSpecHandler(cache, cm));
+    sTopicRouter->AddHandler(new GetPerksHandler(cache, cm));
+    sTopicRouter->AddHandler(new LearnPerkHandler(cache, cm));
+    //sTopicRouter->AddHandler(new UnlearnPerkHandler(cache, cm));
 
     new UseSkillBook();
     new ForgeCacheCommands();

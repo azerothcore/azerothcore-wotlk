@@ -24,13 +24,10 @@ public:
 
     void SendTalents(Player*, uint32);
     void SendTalents(Player*);
-<<<<<<< Updated upstream
-=======
     void SendPerks(Player*, uint8);
     void SendAllPerks(Player*);
     void SendWithstandingSelect(Player*);
     void SendPerkSelection(Player*, std::string);
->>>>>>> Stashed changes
     void SendTalentTreeLayout(Player*);
     void SendTalentTreeLayout(Player*, uint32);
     void SendSpecInfo(Player*);
@@ -41,11 +38,6 @@ public:
 private:
 
     std::string DoBuildRanks(std::unordered_map<uint32, ForgeCharacterTalent*>& spec, Player* player, std::string clientMsg, uint32 tabId);
-<<<<<<< Updated upstream
-=======
     std::string DoBuildPerks(std::vector<CharacterSpecPerk*> spec, Player* player);
     std::string DoBuildPerkCatalogue(std::vector<Perk*> perks);
->>>>>>> Stashed changes
 };
-
-
