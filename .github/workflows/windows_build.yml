@@ -40,6 +40,10 @@ jobs:
         run: |
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
+      - name: Copy dll files
+        shell: bash
+        run: |
+          cp "/c/Program Files/OpenSSL-Win64/bin/legacy.dll" "env/dist"
       - name: Dry run authserver
         shell: bash
         run: |
