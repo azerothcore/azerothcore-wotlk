@@ -32,6 +32,7 @@
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
+#include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "World.h"
 
@@ -2653,6 +2654,32 @@ public:
     }
 };
 
+struct npc_crashin_thrashin_robot : public ScriptedAI
+{
+public:
+    npc_crashin_thrashin_robot(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        _scheduler.Schedule(180s, [this](TaskContext /*context*/)
+        {
+            me->KillSelf();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        ScriptedAI::UpdateAI(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2680,4 +2707,5 @@ void AddSC_npcs_special()
     new npc_spring_rabbit();
     new npc_stable_master();
     RegisterCreatureAI(npc_arcanite_dragonling);
+    RegisterCreatureAI(npc_crashin_thrashin_robot);
 }
