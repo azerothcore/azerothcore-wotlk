@@ -4909,7 +4909,7 @@ class spell_gen_curse_of_pain : public AuraScript
                 target->RemoveAurasDueToSpell(SPELL_CURSE_OF_PAIN);
             }
         }
-   }
+    }
 
     void Register() override
     {
