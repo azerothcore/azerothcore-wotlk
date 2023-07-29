@@ -26,6 +26,8 @@ jobs:
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
       - uses: actions/checkout@v2
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.9
       - name: Configure OS
         shell: bash
         env:
@@ -43,7 +45,7 @@ jobs:
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/Program Files/OpenSSL-Win64/bin/legacy.dll" "env/dist"
+          cp "/c/Program Files/OpenSSL/bin/legacy.dll" "env/dist"
       - name: Dry run authserver
         shell: bash
         run: |
