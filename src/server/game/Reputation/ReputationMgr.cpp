@@ -376,7 +376,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, float standi
     return res;
 }
 
-bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, float stand, bool incremental, Optional<ReputationRank> repMaxCap)
+bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, float stand, bool incremental, Optional<ReputationRank> repMaxCap, bool atLogin)
 {
     FactionStateList::iterator itr = _factions.find(factionEntry->reputationListID);
     if (itr != _factions.end())
@@ -439,6 +439,11 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, fl
             if (new_rank != old_rank)
             {
                 sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
+            }
+
+            if (itr->second.Standing > 0 && !atLogin) {
+                uint32 accountId = _player->GetSession()->GetAccountId();
+                CharacterDatabase.Query("INSERT INTO character_accountwide_reputation (accountId, standing, factionId) VALUES ({}, {}, {}) ON DUPLICATE KEY UPDATE standing = {}", accountId, standing, factionEntry->ID, standing);
             }
 
             UpdateRankCounters(old_rank, new_rank);

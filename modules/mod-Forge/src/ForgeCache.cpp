@@ -145,13 +145,14 @@ struct ForgeTalent
     uint32 ColumnIndex;
     uint32 RowIndex;
     uint8 RankCost;
+    uint16 TabPointReq;
     uint8 RequiredLevel;
     CharacterPointType TalentType;
     uint8 NumberOfRanks;
     PereqReqirementType PreReqType;
     std::list<ForgeTalentPrereq*> Prereqs;
     std::list<uint32> ExclusiveWith;
-    std::list<uint32> UnleanSpells;
+    std::list<uint32> UnlearnSpells;
     // rank number, spellId
     std::unordered_map<uint32, uint32> Ranks;
     // SpellId, Rank Number
@@ -1384,6 +1385,7 @@ private:
             newTalent->TalentType = (CharacterPointType)talentFields[6].Get<uint8>();
             newTalent->NumberOfRanks = talentFields[7].Get<uint8>();
             newTalent->PreReqType = (PereqReqirementType)talentFields[8].Get<uint8>();
+            newTalent->TabPointReq = talentFields[9].Get<uint16>();
 
             auto tabItt = TalentTabs.find(newTalent->TalentTabId);
 
@@ -1502,7 +1504,7 @@ private:
 
             if (lt != nullptr)
             {
-                lt->UnleanSpells.push_back(exclusiveSpellId);
+                lt->UnlearnSpells.push_back(exclusiveSpellId);
             }
             else
             {

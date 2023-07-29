@@ -77,6 +77,12 @@ public:
                 return;
             }
 
+            if (spec->PointsSpent[tabId] < ft->TabPointReq)
+            {
+                iam.player->SendForgeUIMsg(ForgeTopic::LEARN_TALENT_ERROR, "You need to spend more points in this tree to be able to invest.");
+                return;
+            }
+
             auto sklTItt = spec->Talents.find(tabId);
             std::unordered_map<uint32, ForgeCharacterTalent*> skillTabs;
 
@@ -206,7 +212,7 @@ public:
             spec->PointsSpent[tabId] += ft->RankCost;
             curPoints->Sum -= ft->RankCost;
 
-            for (auto s : ft->UnleanSpells)
+            for (auto s : ft->UnlearnSpells)
                 iam.player->removeSpell(s, SPEC_MASK_ALL, false);
 
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
