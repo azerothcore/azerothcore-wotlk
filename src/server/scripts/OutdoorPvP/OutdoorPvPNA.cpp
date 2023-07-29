@@ -107,6 +107,10 @@ void OPvPCapturePointNA::DespawnNPCs(HalaaNPCS teamNPC)
         {
             // can happen when closing the core
             Creature* c = itr->second;
+            if (!c)
+            {
+                return;
+            }
             ++itr;
             c->AddObjectToRemoveList();
             sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
