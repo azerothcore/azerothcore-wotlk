@@ -107,15 +107,14 @@ void OPvPCapturePointNA::DespawnNPCs(HalaaNPCS teamNPC)
         {
             // can happen when closing the core
             Creature* c = itr->second;
-            if (!c)
+            if (c)
             {
-                return;
+                ++itr;
+                c->AddObjectToRemoveList();
+                sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
+                m_Creatures[i] = 0;
+                m_CreatureTypes[m_Creatures[i]] = 0;
             }
-            ++itr;
-            c->AddObjectToRemoveList();
-            sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
-            m_Creatures[i] = 0;
-            m_CreatureTypes[m_Creatures[i]] = 0;
         }
     }
 }
@@ -126,12 +125,11 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
-        if (!data) {
-            return;
+        if (data) {
+            sObjectMgr->UpdateCreatureHalaa(spawnId, m_PvP->GetMap(), data->posX, data->posY);
+            m_Creatures[i] = spawnId;
+            m_CreatureTypes[m_Creatures[i]] = i;
         }
-        sObjectMgr->UpdateCreatureHalaa(spawnId, m_PvP->GetMap(), data->posX, data->posY);
-        m_Creatures[i] = spawnId;
-        m_CreatureTypes[m_Creatures[i]] = i;
     }
 }
 
