@@ -526,6 +526,14 @@ void ScriptMgr::OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uin
     });
 }
 
+void ScriptMgr::OnAfterPlayerDestroyItem(Player* player, Item* it, uint8 bag, uint8 slot)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnAfterPlayerDestroyItem(player, it, bag, slot);
+        });
+}
+
 void ScriptMgr::OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -574,6 +582,14 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uin
     });
 }
 
+void ScriptMgr::OnAddItem(Player* player, uint32 item, uint32 count)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnAddItem(player, item, count);
+        });
+}
+
 void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -620,6 +636,19 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     {
         script->OnQuestRewardItem(player, item, count);
     });
+}
+
+bool ScriptMgr::CanAddQuest(Player* player)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return script->CanAddQuest(player);
+    });
+
+    if (ret && *ret)
+        return false;
+
+    return true;
 }
 
 bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
@@ -941,6 +970,14 @@ void ScriptMgr::OnAfterCreatureLootMoney(Player* player)
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnAfterCreatureLootMoney(player);
+    });
+}
+
+void ScriptMgr::OnReceiveItemFromMail(Player* player, Player* sender, Item* item)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnReceiveItemFromMail(player, sender, item);
     });
 }
 
@@ -1601,6 +1638,22 @@ void ScriptMgr::OnQuestAbandon(Player* player, uint32 questId)
     {
         script->OnQuestAbandon(player, questId);
     });
+}
+
+void ScriptMgr::OnNewTaxiNode(Player* player, uint32 nodeId)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnNewTaxiNode(player, nodeId);
+        });
+}
+
+void ScriptMgr::OnNewTitle(Player* player, uint32 title, bool lost)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnNewTitle(player, title, lost);
+        });
 }
 
 // Player anti cheat

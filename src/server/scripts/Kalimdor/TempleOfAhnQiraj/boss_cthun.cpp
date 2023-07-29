@@ -242,7 +242,11 @@ struct boss_eye_of_cthun : public BossAI
                 {
                     scheduler.Schedule(5s, [this](TaskContext task)
                     {
-                        DoCastRandomTarget(SPELL_GREEN_BEAM);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        {
+                            DoCast(target, SPELL_GREEN_BEAM);
+                            DarkGlareAngle = me->GetAngle(target); //keep as the location dark glare will be at
+                        }
 
                         task.SetGroup(GROUP_BEAM_PHASE);
                         task.Repeat(3s);
@@ -284,21 +288,18 @@ struct boss_eye_of_cthun : public BossAI
 
                 scheduler.Schedule(1s, [this](TaskContext /*task*/)
                 {
-                    //Select random target for dark beam to start on
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                    {
-                        //Face our target
-                        DarkGlareAngle = me->GetAngle(target);
-                        DarkGlareTick = 0;
-                        ClockWise = RAND(true, false);
+                    //Select last target that had a beam cast on it
+                    //Face our target
 
-                        //Add red coloration to C'thun
-                        DoCast(me, SPELL_RED_COLORATION, true);
+                    DarkGlareTick = 0;
+                    ClockWise = RAND(true, false);
 
-                        me->StopMoving();
-                        me->SetFacingToObject(target);
-                        me->SetOrientation(DarkGlareAngle);
-                    }
+                    //Add red coloration to C'thun
+                    DoCast(me, SPELL_RED_COLORATION, true);
+
+                    me->StopMoving();
+                    me->SetOrientation(DarkGlareAngle);
+                    me->SetFacingTo(DarkGlareAngle);
 
                     scheduler.Schedule(3s, [this](TaskContext tasker)
                     {
@@ -620,28 +621,28 @@ struct npc_eye_tentacle : public ScriptedAI
 
     void Reset() override
     {
+        DoZoneInCombat();
         _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
-            {
-                DoCastAOE(SPELL_GROUND_RUPTURE);
-            })
-            .Schedule(5min, [this](TaskContext /*task*/)
-            {
-                me->DespawnOrUnsummon();
-            })
-            .Schedule(1s, 5s, [this](TaskContext context)
-            {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
-                {
-                    DoCast(target, SPELL_MIND_FLAY);
-                }
-
-                context.Repeat(10s, 15s);
-            });
+        {
+            DoCastAOE(SPELL_GROUND_RUPTURE);
+        })
+        .Schedule(5min, [this](TaskContext /*task*/)
+        {
+            me->DespawnOrUnsummon();
+        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        DoZoneInCombat();
+        _scheduler.Schedule(1s, 5s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
+            {
+                DoCast(target, SPELL_MIND_FLAY);
+            }
+
+            context.Repeat(10s, 15s);
+        });
     }
 
     void UpdateAI(uint32 diff) override

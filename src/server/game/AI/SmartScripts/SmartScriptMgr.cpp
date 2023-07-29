@@ -1285,14 +1285,17 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 }
                 break;
-            case SMART_EVENT_CHARMED:
-            case SMART_EVENT_GO_STATE_CHANGED:
-            case SMART_EVENT_GO_EVENT_INFORM:
             case SMART_EVENT_NEAR_PLAYERS:
-            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
                 if (!IsMinMaxValid(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax))
                     return false;
                 break;
+            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+                if (!IsMinMaxValid(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax))
+                    return false;
+                break;
+            case SMART_EVENT_CHARMED:
+            case SMART_EVENT_GO_STATE_CHANGED:
+            case SMART_EVENT_GO_EVENT_INFORM:
             case SMART_EVENT_NEAR_UNIT:
             case SMART_EVENT_TIMED_EVENT_TRIGGERED:
             case SMART_EVENT_INSTANCE_PLAYER_ENTER:

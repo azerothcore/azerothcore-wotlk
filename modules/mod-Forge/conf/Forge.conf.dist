@@ -1,0 +1,18 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# Forge Talents configuration
+########################################
+#
+#    ForgeTalents.Enable
+#        Description: Enable my module and print "Hello World" message at server start
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+forge.levelMod = 5
+forge.scrapsPerLevelMod = 1
