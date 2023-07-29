@@ -3051,7 +3051,7 @@ Arena.GamesRequired = 10
 Arena.QueueAnnouncer.Enable = 0
 
 #
-#    Battleground.QueueAnnouncer.PlayerOnly
+#    Arena.QueueAnnouncer.PlayerOnly
 #        Description: Battleground queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
 #                     1 - (Private, Only queued players can see it)
@@ -3060,7 +3060,7 @@ Arena.QueueAnnouncer.Enable = 0
 Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
-#    Battleground.QueueAnnouncer.Detail
+#    Arena.QueueAnnouncer.Detail
 #        Description: The amount of detail to announce on teams queued for arenas.
 #        Default:     3 - (Announce the team's name and rating)
 #                     2 - (Announce only the team's name)
