@@ -3052,7 +3052,7 @@ Arena.QueueAnnouncer.Enable = 0
 
 #
 #    Arena.QueueAnnouncer.PlayerOnly
-#        Description: Battleground queue announcement type.
+#        Description: Arena queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
 #                     1 - (Private, Only queued players can see it)
 #
