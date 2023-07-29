@@ -2033,8 +2033,19 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
+        
         ClearGossipMenuFor(player);
-
+        
+        if (!player->HasEnoughMoney(toggleXpCost))
+        {
+            player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+        
+        player->ModifyMoney(-toggleXpCost);
+        
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1://xp off
@@ -2044,7 +2055,7 @@ public:
                 player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
                 break;
         }
-
+        
         player->PlayerTalkClass->SendCloseGossip();
         return true;
     }
