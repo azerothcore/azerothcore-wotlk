@@ -3060,6 +3060,17 @@ Arena.QueueAnnouncer.Enable = 0
 Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
+#    Battleground.QueueAnnouncer.Detail
+#        Description: The amount of detail to announce on teams queued for arenas.
+#        Default:     3 - (Announce the team's name and rating)
+#                     2 - (Announce only the team's name)
+#                     1 - (Announce only the team's rating)
+#                     0 - (Do not announce any information about the teams)
+#
+
+Arena.QueueAnnouncer.Detail = 3
+
+#
 #    Arena.ArenaSeason.ID
 #        Description: Current arena season id shown in clients.
 #        Default:     8
