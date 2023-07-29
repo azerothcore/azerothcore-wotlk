@@ -7,7 +7,7 @@
 
 ## Build Status
 
-[![core](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core_matrix_build.yml/badge.svg)](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core_matrix_build.yml)
+[![core](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core_matrix_build.yml/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core_matrix_build.yml)
 [![core-modules-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/core-modules-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Acore-modules-build+branch%3Amaster+event%3Apush)
 [![windows-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/windows-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Awindows-build+branch%3Amaster+event%3Apush)
 [![macos-build](https://github.com/azerothcore/azerothcore-wotlk/workflows/macos-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/azerothcore-wotlk/actions?query=workflow%3Amacos-build+branch%3Amaster+event%3Apush)
