@@ -57,6 +57,8 @@ namespace
         // Check if key is in the options already
         auto const& itr = _configOptions.find(optionKey);
 
+        std::cout << optionKey << " = " << optionValue << "\n";
+
         // Clear option if it was defined at a later point in time
         if (itr != _configOptions.end())
         {
@@ -72,13 +74,12 @@ namespace
         fs::path filePath(file);
         if (!fs::exists(filePath))
         {
-            return false;
+            throw ConfigException(Acore::StringFormatFmt("Config::ParseFile: '{}' does not exist", file));
         }
 
-        // Check if path is a directory
-        if (filePath.filename().empty())
+        if (!fs::is_regular_file(filePath))
         {
-            return ParseDirectory(file, isOptional, isReload, configFiles);
+            throw ConfigException(Acore::StringFormatFmt("Config::ParseFile: '{}' is not a file", file));
         }
 
         // Exit early if the file is empty
@@ -91,11 +92,16 @@ namespace
 
         // Values are taken until there's a # or end of line
         const std::regex parameter_regex("^\\s*([a-zA-Z0-9\\.]+)\\s*=\\s*([^#\\n]+)(?:#[^\\n]*)?$");
+        // include will parse values from another file
         const std::regex include_regex("^\\s*include\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
+        // includedir will include values from files in a directory
+        const std::regex include_dir_regex("^\\s*includedir\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
 
         std::smatch match;
 
-        std::unordered_map<std::string, std::string> fileConfigs = {};
+        // Keep track of configs in this specific file.
+        // Duplicate values will be skipped
+        std::set<std::string> fileConfigs;
 
         std::string absPath = fs::absolute(filePath).string();
         auto pathInsert = configFiles.insert(absPath);
@@ -134,6 +140,20 @@ namespace
             return itr != fileConfigs.end();
         };
 
+        // Used for include statements
+        // If path is absolute, return path
+        // else, return path relative to filePath (the current file)
+        auto GetRelative = [&](std::string const& path)
+        {
+            fs::path includePath(path);
+            if (includePath.is_absolute())
+            {
+                return includePath.string();
+            } else {
+                return (filePath.parent_path() / path).string();
+            }
+        };
+
         while (in.good())
         {
             lineNumber++;
@@ -150,23 +170,24 @@ namespace
             {
                 if (match.size() == 3)
                 {
-                    std::string entry = std::ssub_match(match[1]).str();
+                    std::string key = std::ssub_match(match[1]).str();
                     std::string value = std::ssub_match(match[2]).str();
 
-                    entry = Acore::String::Trim(entry);
+                    key = Acore::String::Trim(key);
                     value = Acore::String::Trim(value);
 
                     // remove double quotes from config value
                     value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
-                    // Skip Duplicate keys in config
-                    if (IsDuplicateOption(entry))
+                    // add to fileConfigs and check if duplicate
+                    auto checkDuplicate = fileConfigs.insert(key);
+                    if (!checkDuplicate.second)
                     {
+                        PrintError(file, "Found duplicate key '{}'. This will be skipped", key);
                         continue;
                     }
-
-                    // add to fileConfigs
-                    fileConfigs.emplace(entry, value);
+                    // add to final configs
+                    AddKey(key, value);
                     // increment parameters changed
                     count++;
                 }
@@ -176,18 +197,18 @@ namespace
             {
                 if (match.size() == 2)
                 {
-                    std::string includeFile = std::ssub_match(match[1]).str();
-                    // Save include statements to be parsed after all the keys
-                    // are added for this file.
+                    std::string includeFile = GetRelative(std::ssub_match(match[1]).str());
                     ParseFile(includeFile, isOptional, isReload, configFiles);
                 }
             }
-        }
-
-        // Add correct keys if file load without errors
-        for (auto const& [key, value] : fileConfigs)
-        {
-            AddKey(key, value);
+            if (std::regex_match(line, match, include_dir_regex))
+            {
+                if (match.size() == 2)
+                {
+                    std::string includeDir = GetRelative(std::ssub_match(match[1]).str());
+                    ParseDirectory(includeDir, isOptional, isReload, configFiles);
+                }
+            }
         }
 
         return count > 0;
@@ -196,16 +217,18 @@ namespace
     bool ParseDirectory(std::string const& dir, bool isOptional, bool isReload, std::set<std::string> configFiles)
     {
         std::vector<bool> results;
-        for (auto const& entry : fs::recursive_directory_iterator(dir))
+        if (!fs::is_directory(dir))
         {
-            // Skip directories
-            if (entry.path().filename().empty())
+            throw ConfigException(Acore::StringFormatFmt("Config::ParseDirectory: '{}' is not a directory", dir));
+        }
+        for (auto const& entry : fs::directory_iterator(dir))
+        {
+            // Only parse immediate children of the directory
+            if (fs::is_regular_file(entry))
             {
-                continue;
+                bool result = ParseFile(entry.path().string(), isOptional, isReload, configFiles);
+                results.push_back(result);
             }
-
-            bool result = ParseFile(entry.path().string(), isOptional, isReload, configFiles);
-            results.push_back(result);
         }
         unsigned long returnVal = std::accumulate(results.begin(), results.end(), 0);
 
@@ -217,6 +240,10 @@ namespace
     {
         try
         {
+            if (fs::is_directory(file))
+            {
+                return ParseDirectory(file, isOptional, isReload);
+            }
             return ParseFile(file, isOptional, isReload);
         }
         catch (const std::exception& e)
