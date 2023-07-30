@@ -124,7 +124,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: var/docker/ccache
           key: ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}:${{ github.sha }}

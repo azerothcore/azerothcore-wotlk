@@ -988,7 +988,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            if (targets.empty())
+            if (e.target.type == SMART_TARGET_NONE || e.target.type == SMART_TARGET_SELF)
             {
                 CAST_AI(SmartAI, me->AI())->StopFollow(false);
                 break;
@@ -1139,7 +1139,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_DIE:
         {
-            if (me && !me->isDead())
+            if (e.action.die.milliseconds)
+            {
+                if (me && !me->isDead())
+                {
+                    me->m_Events.AddEventAtOffset([&]
+                        {
+                            // We need to check again to see if we didn't die in the process.
+                            if (me && !me->isDead())
+                            {
+                                me->KillSelf();
+                                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
+                            }
+                        }, Milliseconds(e.action.die.milliseconds));
+                }
+            }
+            else if (me && !me->isDead())
             {
                 me->KillSelf();
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_DIE: Creature {}", me->GetGUID().ToString());
@@ -1626,6 +1641,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 me->SetFacingTo(randomOri);
                 if (e.action.orientation.quickChange)
                     me->SetOrientation(randomOri);
+                break;
+            }
+
+            if (e.action.orientation.turnAngle)
+            {
+                float turnOri = me->GetOrientation() + (static_cast<float>(e.action.orientation.turnAngle) * M_PI / 180.0f);
+                me->SetFacingTo(turnOri);
+                if (e.action.orientation.quickChange)
+                    me->SetOrientation(turnOri);
                 break;
             }
 
@@ -2809,6 +2833,60 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_SET_SCALE:
+        {
+            float scale = static_cast<float>(e.action.setScale.scale) / 100.0f;
+
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    target->ToUnit()->SetObjectScale(scale);
+                }
+            }
+            break;
+        }
+        case SMART_ACTION_SUMMON_RADIAL:
+        {
+            if (!me)
+                break;
+
+            TempSummonType spawnType = (e.action.radialSummon.summonDuration > 0) ? TEMPSUMMON_TIMED_DESPAWN : TEMPSUMMON_CORPSE_DESPAWN;
+
+            float startAngle = me->GetOrientation() + (static_cast<float>(e.action.radialSummon.startAngle) * M_PI / 180.0f);
+            float stepAngle = static_cast<float>(e.action.radialSummon.stepAngle) * M_PI / 180.0f;
+
+            if (e.action.radialSummon.dist)
+            {
+                for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+                {
+                    Position summonPos = me->GetPosition();
+                    summonPos.RelocatePolarOffset(itr * stepAngle, static_cast<float>(e.action.radialSummon.dist));
+                    me->SummonCreature(e.action.radialSummon.summonEntry, summonPos, spawnType, e.action.radialSummon.summonDuration);
+                }
+                break;
+            }
+
+            for (uint32 itr = 0; itr < e.action.radialSummon.repetitions; itr++)
+            {
+                float currentAngle = startAngle + (itr * stepAngle);
+                me->SummonCreature(e.action.radialSummon.summonEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), currentAngle, spawnType, e.action.radialSummon.summonDuration);
+            }
+
+            break;
+        }
+        case SMART_ACTION_PLAY_SPELL_VISUAL:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    if (e.action.spellVisual.visualId)
+                        target->ToUnit()->SendPlaySpellVisual(e.action.spellVisual.visualId);
+                }
+            }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -3613,7 +3691,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                         ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
                 }
                 else
-                    RecalcTimer(e, 500, 500); // make it predictable
+                    RecalcTimer(e, 1200, 1200); // make it predictable
 
                 break;
             }
@@ -4142,34 +4220,156 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             break;
         case SMART_EVENT_NEAR_PLAYERS:
         {
-            ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayer.radius));
+            uint32 playerCount = 0;
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearPlayer.radius));
 
-            if (!units.empty())
+            if (!targets.empty())
             {
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
-                    return;
+                for (WorldObject* target : targets)
+                {
+                    if (IsPlayer(target))
+                        playerCount++;
 
-                if (units.size() >= e.event.nearPlayer.minCount)
-                    ProcessAction(e, unit);
+                    if (playerCount >= e.event.nearPlayer.minCount)
+                        ProcessAction(e, target->ToUnit());
+                }
             }
-            RecalcTimer(e, e.event.nearPlayer.checkTimer, e.event.nearPlayer.checkTimer);
+            RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
         }
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
         {
-            ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.event.nearPlayerNegation.radius));
+            uint32 playerCount = 0;
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearPlayerNegation.radius));
 
-            if (!units.empty())
+            if (!targets.empty())
             {
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
-                    return;
+                for (WorldObject* target : targets)
+                {
+                    if (IsPlayer(target))
+                        playerCount++;
+                }
 
-                if (units.size() < e.event.nearPlayerNegation.minCount)
+                if (playerCount < e.event.nearPlayerNegation.maxCount)
                     ProcessAction(e, unit);
             }
-            RecalcTimer(e, e.event.nearPlayerNegation.checkTimer, e.event.nearPlayerNegation.checkTimer);
+            RecalcTimer(e, e.event.nearPlayerNegation.repeatMin, e.event.nearPlayerNegation.repeatMax);
+            break;
+        }
+        case SMART_EVENT_NEAR_UNIT:
+        {
+            uint32 unitCount = 0;
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearUnit.range));
+
+            if (!targets.empty())
+            {
+                if (e.event.nearUnit.type)
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsGameObject(target) && target->GetEntry() == e.event.nearUnit.entry)
+                            unitCount++;
+                    }
+                }
+                else
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target) && target->GetEntry() == e.event.nearUnit.entry)
+                            unitCount++;
+                    }
+                }
+
+                if (unitCount >= e.event.nearUnit.count)
+                    ProcessAction(e, unit);
+            }
+            RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
+            break;
+        }
+        case SMART_EVENT_NEAR_UNIT_NEGATION:
+        {
+            uint32 unitCount = 0;
+            ObjectVector targets;
+            GetWorldObjectsInDist(targets, static_cast<float>(e.event.nearUnitNegation.range));
+
+            if (!targets.empty())
+            {
+                if (e.event.nearUnitNegation.type)
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsGameObject(target) && target->GetEntry() == e.event.nearUnitNegation.entry)
+                            unitCount++;
+                    }
+                }
+                else
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target) && target->GetEntry() == e.event.nearUnitNegation.entry)
+                            unitCount++;
+                    }
+                }
+
+                if (unitCount < e.event.nearUnitNegation.count)
+                    ProcessAction(e, unit);
+            }
+            RecalcTimer(e, e.event.nearUnitNegation.timer, e.event.nearUnitNegation.timer);
+            break;
+        }
+        case SMART_EVENT_AREA_CASTING:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            float range = static_cast<float>(e.event.areaCasting.range);
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    if (!target || target->IsPet() || target->IsTotem() || !target->IsNonMeleeSpellCast(false, false, true))
+                        continue;
+
+                    if (e.event.areaCasting.range && !me->IsWithinDistInMap(target, range))
+                        continue;
+
+                    ProcessAction(e, target);
+                    RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax);
+                    return;
+                }
+
+                // If no targets are found and it's off cooldown, check again in 1200ms
+                RecalcTimer(e, 1200, 1200);
+                break;
+            }
+
+            break;
+        }
+        case SMART_EVENT_AREA_RANGE:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    if (!(me->IsInRange(target, 0.f, (float)e.event.areaRange.range)))
+                        continue;
+
+                    ProcessAction(e, target);
+                    RecalcTimer(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax);
+                    return;
+                }
+            }
+
+            // If no targets are found and it's off cooldown, check again
+            RecalcTimer(e, 1200, 1200);
             break;
         }
         default:
@@ -4188,7 +4388,10 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
                 e.event.rangeRepeat.onlyFireOnRepeat = 2;
             // make it predictable
-            RecalcTimer(e, 500, 500);
+            RecalcTimer(e, 1200, 1200);
+            break;
+        case SMART_EVENT_AREA_RANGE:
+            RecalcTimer(e, e.event.areaRange.min, e.event.areaRange.max);
             break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
@@ -4207,6 +4410,13 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_DISTANCE_CREATURE:
         case SMART_EVENT_DISTANCE_GAMEOBJECT:
             RecalcTimer(e, e.event.distance.repeat, e.event.distance.repeat);
+            break;
+        case SMART_EVENT_NEAR_UNIT:
+        case SMART_EVENT_NEAR_UNIT_NEGATION:
+            RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
+            break;
+        case SMART_EVENT_AREA_CASTING:
+            RecalcTimer(e, e.event.areaCasting.min, e.event.areaCasting.max);
             break;
         default:
             e.active = true;
@@ -4261,6 +4471,8 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         {
             case SMART_EVENT_NEAR_PLAYERS:
             case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+            case SMART_EVENT_NEAR_UNIT:
+            case SMART_EVENT_NEAR_UNIT_NEGATION:
             case SMART_EVENT_UPDATE:
             case SMART_EVENT_UPDATE_OOC:
             case SMART_EVENT_UPDATE_IC:
@@ -4269,7 +4481,9 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_MANA_PCT:
             case SMART_EVENT_TARGET_MANA_PCT:
             case SMART_EVENT_RANGE:
+            case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_VICTIM_CASTING:
+            case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_FRIENDLY_HEALTH:
             case SMART_EVENT_FRIENDLY_IS_CC:
             case SMART_EVENT_FRIENDLY_MISSING_BUFF:
