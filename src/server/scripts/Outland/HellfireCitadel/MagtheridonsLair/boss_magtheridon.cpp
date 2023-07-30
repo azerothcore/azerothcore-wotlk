@@ -218,9 +218,9 @@ struct boss_magtheridon : public BossAI
                 Talk(SAY_EMOTE_FREE);
                 Talk(SAY_FREE);
                 scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
+                _magReleased = true;
                 scheduler.Schedule(3s, [this](TaskContext)
                 {
-                    _magReleased = true; //redundancy
                     ScheduleCombatEvents();
                 });
             }
@@ -239,6 +239,7 @@ struct boss_magtheridon : public BossAI
         {
             Talk(SAY_EMOTE_FREE);
             Talk(SAY_FREE);
+            _magReleased = true;
         }).Schedule(123s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             ScheduleCombatEvents();

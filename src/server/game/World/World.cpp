@@ -731,6 +731,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL]  = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Channel", false);
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP]    = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Group", false);
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD]    = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Guild", false);
+    _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA]    = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Arena", false);
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION]  = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Auction", false);
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL]     = sConfigMgr->GetOption<bool>("AllowTwoSide.Interaction.Mail", false);
     _bool_configs[CONFIG_ALLOW_TWO_SIDE_WHO_LIST]             = sConfigMgr->GetOption<bool>("AllowTwoSide.WhoList", false);

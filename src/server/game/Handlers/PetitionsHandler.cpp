@@ -414,18 +414,14 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     if (!signatures)
         return;
 
-    // not let enemies sign guild charter
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && GetPlayer()->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(petition->ownerGuid))
-    {
-        if (type != GUILD_CHARTER_TYPE)
-            SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
-        else
-            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_NOT_ALLIED);
-        return;
-    }
-
     if (type != GUILD_CHARTER_TYPE)
     {
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && GetPlayer()->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(petition->ownerGuid))
+        {
+            SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
+            return;
+        }
+
         if (_player->GetLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", _player->GetName().c_str(), ERR_ARENA_TEAM_TARGET_TOO_LOW_S);
@@ -450,6 +446,12 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     }
     else
     {
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && GetPlayer()->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(petition->ownerGuid))
+        {
+            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_NOT_ALLIED);
+            return;
+        }
+
         if (_player->GetGuildId())
         {
             Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_ALREADY_IN_GUILD_S, _player->GetName());
@@ -567,17 +569,14 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     if (!petition)
         return;
 
-    if (GetPlayer()->GetTeamId() != player->GetTeamId())
-    {
-        if (petition->petitionType != GUILD_CHARTER_TYPE)
-            SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
-        else
-            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_NOT_ALLIED);
-        return;
-    }
-
     if (petition->petitionType != GUILD_CHARTER_TYPE)
     {
+        if (GetPlayer()->GetTeamId() != player->GetTeamId() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA))
+        {
+            SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
+            return;
+        }
+
         if (player->GetLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
             // player is too low level to join an arena team
@@ -604,6 +603,12 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     }
     else
     {
+        if (GetPlayer()->GetTeamId() != player->GetTeamId() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+        {
+            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_NOT_ALLIED);
+            return;
+        }
+
         if (player->GetGuildId())
         {
             Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_ALREADY_IN_GUILD_S, _player->GetName());
