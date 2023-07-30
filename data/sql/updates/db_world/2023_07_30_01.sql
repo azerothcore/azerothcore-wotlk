@@ -1,3 +1,4 @@
+-- DB update 2023_07_30_00 -> 2023_07_30_01
 -- Change from SMART_EVENT_RANGE to SMART_EVENT_AREA_RANGE
 UPDATE `smart_scripts` SET `event_type`=106, `event_param1`=12000, `event_param2`=15000, `event_param3`=12000, `event_param4`=15000, `event_param5`=8 WHERE `entryorguid`=2276 AND `source_type`=0 AND `id`=3 AND `link`=0;
 UPDATE `smart_scripts` SET `event_type`=106, `event_param1`=12000, `event_param2`=15000, `event_param3`=12000, `event_param4`=15000, `event_param5`=8 WHERE `entryorguid`=2335 AND `source_type`=0 AND `id`=1 AND `link`=0;
