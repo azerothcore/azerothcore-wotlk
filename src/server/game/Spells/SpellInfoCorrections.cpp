@@ -4553,14 +4553,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TriggerSpell = 62585; // Mulgore Hatchling (fear)
     });
 
-    // item: Riding Crop/Skybreaker Whip (https://www.wowhead.com/tbc/spell=48776/mount-speed)
-    // item: Mithril Spurs (https://www.wowhead.com/tbc/spell=7215/mithril-spurs)
+    // Mount Speed
+    // Mithril Spurs
     ApplySpellFix({ 48776, 7215 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK;
     });
 
-    // item: Carrot on a Stick (https://www.wowhead.com/tbc/spell=48777/mount-speed)
+    // Mount Speed
     ApplySpellFix({ 48777 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
