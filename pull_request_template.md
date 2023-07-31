@@ -15,7 +15,7 @@ If your pull request promotes complex changes that require a detailed explanatio
 <!-- If you can, include a source that can strengthen your claim -->
 - [ ] The changes promoted by this pull request have been validated through live research (checked on live servers)
 - [ ] The changes promoted by this pull request have been validated through sniffs (remember to share them with the opensource community!)
-- [ ] The changes promoted by this pull request come from a partially or entirelly from another project (cherry-pick). **Cherry-picks must be commited using the proper --author tag in order to be accepted, thus crediting the original authors, unless otherwise unable to be found**
+- [ ] The changes promoted by this pull request come partially or entirelly from another project (cherry-pick). **Cherry-picks must be commited using the proper --author tag in order to be accepted, thus crediting the original authors, unless otherwise unable to be found**
 
 ## Tests Performed:
 <!-- Does it build without errors? Did you test in-game? What did you test? On which OS did you test? Describe any other tests performed -->
