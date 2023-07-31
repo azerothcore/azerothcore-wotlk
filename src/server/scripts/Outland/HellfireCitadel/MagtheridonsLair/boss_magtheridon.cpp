@@ -334,7 +334,7 @@ class go_manticron_cube : public GameObjectScript
 public:
     go_manticron_cube() : GameObjectScript("go_manticron_cube") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
         if (player->HasAura(SPELL_MIND_EXHAUSTION) || player->HasAura(SPELL_SHADOW_GRASP))
             return true;
