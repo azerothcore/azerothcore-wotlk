@@ -128,18 +128,6 @@ namespace
         uint32 count = 0;
         uint32 lineNumber = 0;
 
-        // return true if duplicate found for this file
-        // does not find duplicates across include statements
-        auto IsDuplicateOption = [&](std::string const& confOption)
-        {
-            auto const& itr = fileConfigs.find(confOption);
-            if (itr != fileConfigs.end())
-            {
-                PrintError(file, "> Config::LoadFile: Duplicate key name '{}' in config file '{}'", confOption, file);
-            }
-            return itr != fileConfigs.end();
-        };
-
         // Used for include statements
         // If path is absolute, return path
         // else, return path relative to filePath (the current file)
