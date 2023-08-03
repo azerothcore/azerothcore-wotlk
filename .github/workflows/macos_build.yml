@@ -25,9 +25,9 @@ jobs:
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}

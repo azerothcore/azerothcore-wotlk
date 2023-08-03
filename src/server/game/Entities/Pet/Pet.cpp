@@ -1091,7 +1091,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(creature_ID, petlevel);
     if (pInfo)                                      // exist in DB
     {
-        SetCreateHealth(pInfo->health);
+        // Default scale value of 1 to use if Pet.RankMod.Health = 0
+        float factorHealth = 1;
+        // If config is set to allow pets to use health modifiers, apply it to creatures with a DB entry
+        // Pet.RankMod.Health = 1 use the factor value based on the rank of the pet, most pets have a rank of 0 and so use
+        // the Elite rank which is set as the default in Creature::_GetHealthMod(int32 Rank)
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
+        SetCreateHealth(pInfo->health*factorHealth);
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)pInfo->health);
         if (petType != HUNTER_PET) //hunter pet use focus
         {
@@ -1124,11 +1134,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
-        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
-        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
-        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
-        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
+        SetCreateStat(STAT_STRENGTH, 22);
+        SetCreateStat(STAT_AGILITY, 22);
+        SetCreateStat(STAT_STAMINA, 25);
+        SetCreateStat(STAT_INTELLECT, 28);
+        SetCreateStat(STAT_SPIRIT, 27);
     }
 
     switch (petType)
@@ -1348,6 +1358,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                             break;
                         }
+                    case NPC_VENOMOUS_SNAKE:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 0.7 - 38));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 0.8 - 40));
+                        break;
+                    case NPC_VIPER:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(1.3 * petlevel - 64));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(1.5 * petlevel - 68));
+                        break;
                     case NPC_GENERIC_IMP:
                     case NPC_GENERIC_VOIDWALKER:
                         {

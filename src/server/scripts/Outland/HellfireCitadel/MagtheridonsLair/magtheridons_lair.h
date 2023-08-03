@@ -39,7 +39,8 @@ enum NpcIds
 {
     NPC_MAGTHERIDON                 = 17257,
     NPC_HELLFIRE_CHANNELER          = 17256,
-    NPC_HELLFIRE_WARDER             = 18829
+    NPC_HELLFIRE_WARDER             = 18829,
+    NPC_HELLFIRE_RAID_TRIGGER       = 17376,
 };
 
 enum GoIds
@@ -61,5 +62,7 @@ inline AI* GetMagtheridonsLairAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, MagtheridonsLairScriptName);
 }
+
+#define RegisterMagtheridonsLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetMagtheridonsLairAI)
 
 #endif

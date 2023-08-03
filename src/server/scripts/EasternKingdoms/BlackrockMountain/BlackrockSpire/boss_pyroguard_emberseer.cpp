@@ -63,9 +63,9 @@ enum Events
     EVENT_PYROBLAST                 = 6,
     // Hack due to trigger spell not in dbc
     EVENT_FIRE_SHIELD               = 7,
-    // Make sure all players have aura from altar
-    EVENT_PLAYER_CHECK              = 8,
-    EVENT_ENTER_COMBAT              = 9
+    EVENT_PRE_ENTER_COMBAT_1        = 8,
+    EVENT_PRE_ENTER_COMBAT_2        = 9,
+    EVENT_ENTER_COMBAT              = 10
 };
 
 class boss_pyroguard_emberseer : public CreatureScript
@@ -101,7 +101,8 @@ public:
             switch (data)
             {
                 case 1:
-                    events.ScheduleEvent(EVENT_PLAYER_CHECK, 5s);
+                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 2s);
+                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
                     break;
                 case 2:
                     // Close these two doors on Blackhand Incarcerators aggro
@@ -153,14 +154,12 @@ public:
 
                 if (me->GetAuraCount(SPELL_EMBERSEER_GROWING_TRIGGER) == 20)
                 {
-                    me->RemoveAura(SPELL_ENCAGED_EMBERSEER);
-                    me->RemoveAura(SPELL_FREEZE_ANIM);
-                    me->CastSpell(me, SPELL_EMBERSEER_FULL_STRENGTH);
-                    Talk(EMOTE_FREE_OF_BONDS);
-                    Talk(YELL_FREE_OF_BONDS);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetImmuneToPC(false);
-                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 2s);
+                    events.CancelEvent(EVENT_FIRE_SHIELD); // temporarily cancel fire shield to keep it from interrupting combat start
+
+                    // Schedule out the pre-combat scene
+                    events.ScheduleEvent(EVENT_PRE_ENTER_COMBAT_1, 0s);
+                    events.ScheduleEvent(EVENT_PRE_ENTER_COMBAT_2, 2s);
+                    events.ScheduleEvent(EVENT_ENTER_COMBAT, 5s);
                 }
             }
         }
@@ -235,7 +234,7 @@ public:
                                     if (Creature* creature = *itr)
                                         creature->AI()->SetData(1, 1);
                                 }
-                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32s);
+                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 2s);
                                 break;
                             }
                         case EVENT_PRE_FIGHT_2:
@@ -248,25 +247,21 @@ public:
                             DoCast(me, SPELL_FIRE_SHIELD);
                             events.ScheduleEvent(EVENT_FIRE_SHIELD, 3s);
                             break;
-                        case EVENT_PLAYER_CHECK:
-                            {
-                                // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
-                                bool _hasAura = false;
-                                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                    if (Player* player = itr->GetSource()->ToPlayer())
-                                        if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
-                                            _hasAura = true;
-
-                                if (_hasAura)
-                                {
-                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1s);
-                                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
-                                }
-                                break;
-                            }
+                        case EVENT_PRE_ENTER_COMBAT_1:
+                            me->RemoveAura(SPELL_ENCAGED_EMBERSEER);
+                            me->RemoveAura(SPELL_FREEZE_ANIM);
+                            me->CastSpell(me, SPELL_EMBERSEER_FULL_STRENGTH);
+                            Talk(EMOTE_FREE_OF_BONDS);
+                            break;
+                        case EVENT_PRE_ENTER_COMBAT_2:
+                            Talk(YELL_FREE_OF_BONDS);
+                            break;
                         case EVENT_ENTER_COMBAT:
+                            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetImmuneToPC(false);
                             DoZoneInCombat();
+                            // re-enable fire shield
+                            events.ScheduleEvent(EVENT_FIRE_SHIELD, 0s);
                             break;
                         default:
                             break;
@@ -347,11 +342,6 @@ public:
             _fleedForAssistance = false;
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            me->DespawnOrUnsummon(10000);
-        }
-
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
             if (!_fleedForAssistance && me->HealthBelowPctDamaged(30, damage))
@@ -392,7 +382,6 @@ public:
             }
 
             _events.ScheduleEvent(EVENT_STRIKE, 8s, 16s);
-            _events.ScheduleEvent(EVENT_ENCAGE, 10s, 20s);
         }
 
         void UpdateAI(uint32 diff) override

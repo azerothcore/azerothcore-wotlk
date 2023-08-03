@@ -253,7 +253,7 @@ namespace MMAP
 
         // unload all tiles from given map
         MMapData* mmap = itr->second;
-        for (auto i : mmap->loadedTileRefs)
+        for (auto& i : mmap->loadedTileRefs)
         {
             uint32 x = (i.first >> 16);
             uint32 y = (i.first & 0x0000FFFF);

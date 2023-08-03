@@ -19,11 +19,11 @@ DROP TABLE IF EXISTS `petition`;
 CREATE TABLE IF NOT EXISTS `petition` (
   `ownerguid` int unsigned NOT NULL,
   `petitionguid` int unsigned DEFAULT '0',
-  `name` varchar(24) NOT NULL,
+  `name` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ownerguid`,`type`),
   UNIQUE KEY `index_ownerguid_petitionguid` (`ownerguid`,`petitionguid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Guild System';
 
 -- Dumping data for table acore_characters.petition: ~0 rows (approximately)
 DELETE FROM `petition`;

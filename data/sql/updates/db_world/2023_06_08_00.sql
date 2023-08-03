@@ -1,0 +1,12 @@
+-- DB update 2023_06_07_04 -> 2023_06_08_00
+--
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (8374,15039,33534,12548,33620,15659,38795);
+INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`) VALUES
+(8374, 8374, 38761),
+(15039, 15039, 15616),
+(33534, 33534, 38135),
+(12548, 12548, 21401),
+(33620, 33620, 38137),
+(15659, 15659, 15305),
+(38795, 38795, 33666);
+

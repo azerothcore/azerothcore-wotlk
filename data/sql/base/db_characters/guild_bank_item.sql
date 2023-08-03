@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `guild_bank_item` (
   PRIMARY KEY (`guildid`,`TabId`,`SlotId`),
   KEY `guildid_key` (`guildid`),
   KEY `Idx_item_guid` (`item_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.guild_bank_item: ~0 rows (approximately)
 DELETE FROM `guild_bank_item`;

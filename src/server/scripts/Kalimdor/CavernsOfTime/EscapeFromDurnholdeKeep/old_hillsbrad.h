@@ -27,6 +27,9 @@
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,
+    DATA_LIEUTENANT_DRAKE   = 1,
+    DATA_CAPTAIN_SKARLOC    = 2,
+    DATA_EPOCH_HUNTER       = 3,
 
     DATA_BOMBS_PLACED       = 10,
     DATA_THRALL_REPOSITION  = 11,
@@ -94,5 +97,7 @@ inline AI* GetOldHillsbradAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, OldHillsbradScriptName);
 }
+
+#define RegisterOldHillsbradCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetOldHillsbradAI)
 
 #endif
