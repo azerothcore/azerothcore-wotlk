@@ -109,8 +109,8 @@ public:
             if (currentLevel >= 10)
             {
                 uint8 amount = levelDiff;
-                if (oldlevel < 10 && levelDiff > 1)
-                    amount = levelDiff - (9 - oldlevel);
+                /*if (oldlevel < 10 && levelDiff > 1)
+                    amount = 1;
 
                 if (levelDiff < levelMod && currentLevel % levelMod == 0)
                 {
@@ -122,11 +122,9 @@ public:
                     uint32 pointsMultiplier = levelDiff / levelMod;
                     uint32 scrapEarned = fc->GetConfig("scrapsPerLevelMod", 1) * pointsMultiplier;
                     player->AddItem(FORGE_SCRAP, scrapEarned);
-                }
+                }*/
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
-
-                ForgeCharacterPoint* pp = fc->GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
 
                 cm->SendActiveSpecInfo(player);
                 cm->SendTalentTreeLayout(player);

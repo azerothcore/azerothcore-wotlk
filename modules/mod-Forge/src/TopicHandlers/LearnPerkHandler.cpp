@@ -58,18 +58,30 @@ public:
                 if (csp->spell->ranks.size() == csp->rank)
                 {
                     iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "This perk cannot be upgraded any further.");
+                    fc->UpdateCharacterPerks(iam.player, spec, csp, false);
+                    return;
+                }
+
+                if (spec->perks.size() >= 40)
+                {
+                    iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You have reached the maximum number of perks.");
+                    fc->UpdateCharacterPerks(iam.player, spec, csp, false);
                     return;
                 }
 
                 auto rankIt = spell->ranks.find(csp->rank);
-                if (rankIt != spell->ranks.end())
+                if (rankIt != spell->ranks.end()) {
+                    iam.player->RemoveAura(rankIt->second);
                     iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
+                }
 
                 csp->rank++;
 
                 rankIt = spell->ranks.find(csp->rank);
-                if (rankIt != spell->ranks.end())
+                if (rankIt != spell->ranks.end()) {
                     iam.player->learnSpell(rankIt->second, false, false);
+                    csp->uuid = rolled;
+                }
 
                 fc->UpdateCharacterPerks(iam.player, spec, csp, true);
                 fc->UpdateCharacterSpec(iam.player, spec);

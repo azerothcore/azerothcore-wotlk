@@ -654,14 +654,21 @@ public:
 
     void UpdateCharacterPerks(Player* player, ForgeCharacterSpec* spec, CharacterSpecPerk* perk, bool learn)
     {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         std::string rollKey = FindRollKey(spec, perk->uuid);
-
-        if (learn) {
-            LearnCharacterPerkInternal(player, spec, rollKey, perk);
+        if (rollKey != "NONE") {
+            if (learn) {
+                LearnCharacterPerkInternal(player, spec, rollKey, perk, trans);
+            }
         }
-        else
-            ForgetCharacterPerkInternal(player->GetGUID().GetCounter(), spec->Id, perk->spell->spellId);
 
+        trans->Append("INSERT INTO character_perk_roll_history select {} as `accountId`, `guid`, `uuid`, `specId`, `spellId`, {} as `level`, 0 as `carryover` from character_perk_selection_queue where rollkey = '{}' ON DUPLICATE KEY UPDATE `carryover` = `carryover`+1",
+            player->GetSession()->GetAccountId(), player->GetLevel(), perk->uuid);
+        trans->Append("DELETE FROM character_perk_selection_queue where `rollkey` = '{}'", rollKey);
+
+        CharacterDatabase.CommitTransaction(trans);
+        spec->perkQueue.erase(rollKey);
+        spec->perks[perk->spell->spellId] = perk;
     }
 
     void ApplyAccountBoundTalents(Player* player)
@@ -1198,17 +1205,9 @@ private:
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }
 
-    void LearnCharacterPerkInternal(Player* player, ForgeCharacterSpec* spec, std::string rollKey, CharacterSpecPerk* perk) {
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    void LearnCharacterPerkInternal(Player* player, ForgeCharacterSpec* spec, std::string rollKey, CharacterSpecPerk* perk, CharacterDatabaseTransaction trans) {
         trans->Append("INSERT INTO character_spec_perks (`guid`, `specId`, `uuid`, `spellId`, `rank`) VALUES ({}, {}, '{}', {}, {}) ON DUPLICATE KEY UPDATE `rank` = `rank`+1",
             player->GetGUID().GetCounter(), spec->Id, perk->uuid, perk->spell->spellId, perk->rank);
-        trans->Append("INSERT INTO character_perk_roll_history select {} as `accountId`, `guid`, `uuid`, `specId`, `spellId`, {} as `level`, 0 as `carryover` from character_perk_selection_queue where rollkey = '{}' ON DUPLICATE KEY UPDATE `carryover` = `carryover`+1",
-            player->GetSession()->GetAccountId(), player->GetLevel(), perk->uuid);
-        trans->Append("DELETE FROM character_perk_selection_queue where `rollkey` = '{}'", rollKey);
-
-        CharacterDatabase.CommitTransaction(trans);
-        spec->perkQueue.erase(rollKey);
-        spec->perks[perk->spell->spellId] = perk;
     }
 
     void ForgetCharacterPerkInternal(uint32 charId, uint32 spec, uint32 spellId) {
@@ -1218,7 +1217,7 @@ private:
     void AddPerkRanks()
     {
         LOG_INFO("server.load", "Loading perk ranks...");
-        QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM perk_ranks");
+        QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM `acore_world`.`perk_ranks`");
         do
         {
             Field* perkFields = perkRanks->Fetch();
