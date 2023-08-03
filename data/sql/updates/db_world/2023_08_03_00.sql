@@ -1,3 +1,4 @@
+-- DB update 2023_08_02_00 -> 2023_08_03_00
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (16152, 16457, 17521, 18168, 15691, 15687, 15688, 16524, 15689, 15690)) AND (`Item` IN (29434, 23809, 30480));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (16152, 23809, 0, 8, 0, 1, 0, 1, 1, 'Attumen the Huntsman - Schematic: Stabilized Eternium Scope'),
