@@ -11,6 +11,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: check codestyle
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check core codestyle
         run: source ./apps/ci/ci-codestyle.sh

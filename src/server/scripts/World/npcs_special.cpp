@@ -32,6 +32,7 @@
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
+#include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "World.h"
 
@@ -2015,13 +2016,15 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
+
         if (!player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
         {
-            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1); // "I no longer wish to gain experience."
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, toggleXpCost); // "I no longer wish to gain experience."
         }
         else
         {
-            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2); // "I wish to start gaining experience again."
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2, toggleXpCost); // "I wish to start gaining experience again."
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature);
@@ -2030,43 +2033,29 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        ClearGossipMenuFor(player);
-        bool noXPGain = player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-        bool doSwitch = false;
         auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
+
+        ClearGossipMenuFor(player);
+
+        if (!player->HasEnoughMoney(toggleXpCost))
+        {
+            player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+
+        player->ModifyMoney(-toggleXpCost);
 
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1://xp off
-                {
-                    if (!noXPGain)//does gain xp
-                        doSwitch = true;//switch to don't gain xp
-                }
+                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2://xp on
-                {
-                    if (noXPGain)//doesn't gain xp
-                        doSwitch = true;//switch to gain xp
-                }
+                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
                 break;
         }
-        if (doSwitch)
-        {
-            if (!player->HasEnoughMoney(toggleXpCost))
-            {
-                player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
-            }
-            else if (noXPGain)
-            {
-                player->ModifyMoney(-toggleXpCost);
-                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-            }
-            else if (!noXPGain)
-            {
-                player->ModifyMoney(-toggleXpCost);
-                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-            }
-        }
+
         player->PlayerTalkClass->SendCloseGossip();
         return true;
     }
@@ -2653,6 +2642,32 @@ public:
     }
 };
 
+struct npc_crashin_thrashin_robot : public ScriptedAI
+{
+public:
+    npc_crashin_thrashin_robot(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        _scheduler.Schedule(180s, [this](TaskContext /*context*/)
+        {
+            me->KillSelf();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        ScriptedAI::UpdateAI(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2680,4 +2695,5 @@ void AddSC_npcs_special()
     new npc_spring_rabbit();
     new npc_stable_master();
     RegisterCreatureAI(npc_arcanite_dragonling);
+    RegisterCreatureAI(npc_crashin_thrashin_robot);
 }
