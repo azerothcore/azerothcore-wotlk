@@ -2448,6 +2448,27 @@ class spell_q4735_collect_rookery_egg : public SpellScript
     }
 };
 
+enum Feralfen
+{
+    NPC_FERALFEN_TOTEM = 18186
+};
+
+class spell_q9847_a_spirit_ally : public SpellScript
+{
+    PrepareSpellScript(spell_q9847_a_spirit_ally);
+
+    void HandleSendEvent(SpellEffIndex /*effIndex*/)
+    {
+        Position pos = Position(-281.30f, 7235.84f + frand(-4.50f, 6.50f), 24.43f, 5.79f);
+        GetCaster()->SummonCreature(NPC_FERALFEN_TOTEM, pos, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_q9847_a_spirit_ally::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
@@ -2519,4 +2540,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12919_gymers_throw);
     RegisterSpellScript(spell_q5056_summon_shy_rotam);
     RegisterSpellScript(spell_q4735_collect_rookery_egg);
+    RegisterSpellScript(spell_q9847_a_spirit_ally);
 }
