@@ -174,11 +174,14 @@ struct boss_dorothee : public ScriptedAI
     void Reset() override
     {
         Initialize();
-        Talk(SAY_DOROTHEE_AGGRO);
+
         if(!_startIntro)
         {
             ScheduleActivation();
-            _scheduler.Schedule(12s, [this](TaskContext)
+            _.scheduler.Schedule(50ms, [this](TaskContext)
+            {
+                Talk(SAY_DOROTHEE_AGGRO);
+            }).Schedule(12s, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
@@ -247,7 +250,7 @@ struct boss_dorothee : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -344,7 +347,7 @@ struct boss_roar : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -449,7 +452,7 @@ struct boss_strawman : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -584,7 +587,7 @@ struct boss_tinhead : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -1019,8 +1022,6 @@ struct boss_julianne : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        DoZoneInCombat();
-
         _scheduler.Schedule(30s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_BLINDING_PASSION);
@@ -1051,6 +1052,8 @@ struct boss_julianne : public ScriptedAI
             }
             context.Repeat(45s, 60s);
         });
+
+        DoMeleeAttackIfReady();
     }
 
     void AttackStart(Unit* who) override
