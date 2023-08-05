@@ -118,6 +118,26 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
     }
 }
 
+void DespawnAll(InstanceScript* instance)
+{
+    if(Creature* dorothee = instance->GetCreature(DATA_DOROTHEE))
+    {
+        dorothee->DespawnOrUnsummon();
+    }
+    if(Creature* roar = instance->GetCreature(DATA_ROAR))
+    {
+        roar->DespawnOrUnsummon();
+    }
+    if(Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
+    {
+        strawman->DespawnOrUnsummon();
+    }
+    if(Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
+    {
+        tinhead->DespawnOrUnsummon();
+    }
+}
+
 struct boss_dorothee : public ScriptedAI
 {
     boss_dorothee(Creature* creature) : ScriptedAI(creature)
@@ -238,6 +258,7 @@ struct boss_dorothee : public ScriptedAI
         if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+            DespawnAll(instance);
             me->DespawnOrUnsummon();
         }
     }
@@ -251,17 +272,12 @@ struct boss_dorothee : public ScriptedAI
 
         if(!_startIntro)
         {
-            me->Yell("test scheduler", LANG_UNIVERSAL);
             ScheduleActivation();
             _scheduler.Schedule(12s, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
-            }).Schedule(1s, [this](TaskContext context)
-            {
-                me->Yell("debug heartbeat", LANG_UNIVERSAL);
-                context.Repeat(1s);
             });
             _startIntro = true;
         }
@@ -356,6 +372,7 @@ struct boss_roar : public ScriptedAI
         if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+            DespawnAll(instance);
             me->DespawnOrUnsummon();
         }
     }
@@ -461,6 +478,7 @@ struct boss_strawman : public ScriptedAI
         if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+            DespawnAll(instance);
             me->DespawnOrUnsummon();
         }
     }
@@ -596,6 +614,7 @@ struct boss_tinhead : public ScriptedAI
         if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+            DespawnAll(instance);
             me->DespawnOrUnsummon();
         }
     }
