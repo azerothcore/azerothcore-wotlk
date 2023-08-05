@@ -1201,6 +1201,14 @@ struct boss_julianne : public ScriptedAI
         //LOG_ERROR("scripts", "boss_julianneAI: DamageTaken reach end of code, that should not happen.");
     }
 
+    uint32 GetData(uint32 data) const override
+    {
+        if(DATA_FAKING_DEATH)
+        {
+            return IsFakingDeath ? IS_FAKING : NOT_FAKING;
+        }
+    }
+
     void EnterEvadeMode(EvadeReason reason) override
     {
         ScriptedAI::EnterEvadeMode(reason);
@@ -1280,14 +1288,14 @@ struct boss_romulo : public ScriptedAI
 
     uint32 Phase;
 
-    bool IsFakingDeath;
+    bool isFakingDeath;
     bool JulianneDead;
 
     void Reset() override
     {
         Phase = PHASE_ROMULO;
 
-        IsFakingDeath = false;
+        isFakingDeath = false;
         JulianneDead = false;
     }
 
@@ -1302,7 +1310,7 @@ struct boss_romulo : public ScriptedAI
                 Phase = PHASE_ROMULO;
                 break;
             case ACTION_FAKING_DEATH:
-                IsFakingDeath = false;
+                isFakingDeath = false;
                 break;
         }
     }
@@ -1323,7 +1331,7 @@ struct boss_romulo : public ScriptedAI
         {
             Talk(SAY_ROMULO_DEATH);
             PretendToDie(me);
-            IsFakingDeath = true;
+            isFakingDeath = true;
             me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
             Phase = PHASE_BOTH;
 
@@ -1368,7 +1376,7 @@ struct boss_romulo : public ScriptedAI
             if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
             {
                 PretendToDie(me);
-                IsFakingDeath = true;
+                isFakingDeath = true;
                 me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
                 //rez timer 10s of julianne
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
@@ -1447,7 +1455,7 @@ struct boss_romulo : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || IsFakingDeath)
+        if (!UpdateVictim() || isFakingDeath)
             return;
 
         _scheduler.Update(diff);
