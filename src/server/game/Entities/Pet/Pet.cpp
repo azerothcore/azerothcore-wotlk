@@ -2495,7 +2495,7 @@ float Pet::GetNativeObjectScale() const
         {
             if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
             {
-                // Exotische Haustiere haben eine Skalierung von 1
+                // Exotic pets have a scale of 1
                 scale = 1.0f;
             }
             else
@@ -2507,7 +2507,7 @@ float Pet::GetNativeObjectScale() const
         return scale;
     }
     
-    // Fallback-Wert, wenn die Bedingungen nicht erfüllt sind
+    // Fallback value if the conditions are not met
     return 1.0f;
 }
 
