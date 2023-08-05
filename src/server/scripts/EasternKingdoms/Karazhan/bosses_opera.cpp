@@ -128,29 +128,47 @@ struct boss_dorothee : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
-
+    void ScheduleActivation()
+    {
+        _scheduler.Schedule(16670ms, [this](TaskContext)
+        {
+            if(Creature* roar = instance->GetCreature(DATA_ROAR))
+            {
+                roar->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                roar->SetImmuneToPC(false);
+                roar->SetInCombatWithZone();
+            }
+        }).Schedule(26300ms, [this](TaskContext)
+        {
+            if(Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
+            {
+                strawman->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                strawman->SetImmuneToPC(false);
+                strawman->SetInCombatWithZone();
+            }
+        }).Schedule(34470ms, [this](TaskContext)
+        {
+            if(Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
+            {
+                tinhead->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                tinhead->SetImmuneToPC(false);
+                tinhead->SetInCombatWithZone();
+            }
+        });
+    }
 
     void Initialize()
     {
         TitoDied = false;
-        _introDone = false;
+        _startIntro = false;
     }
 
     InstanceScript* instance;
     bool TitoDied;
-    ObjectGuid DorotheeGUID;
 
     void Reset() override
     {
         Initialize();
-    }
-
-    void DoAction(int32 action) override
-    {
-        if(action == ACTION_TITO)
-        {
-            DorotheeGUID = me->GetGUID();
-        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -222,19 +240,16 @@ struct boss_dorothee : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if(!_introDone)
+        if(!_startIntro)
         {
-            if(!me->IsInEvadeMode())
+            _startIntro = true;
+            Talk(SAY_DOROTHEE_AGGRO);
+            _scheduler.Schedule(12s, [this](TaskContext)
             {
-                Talk(SAY_DOROTHEE_AGGRO);
-                _scheduler.Schedule(12s, [this](TaskContext)
-                {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetImmuneToPC(false);
-                    me->SetInCombatWithZone();
-                });
-                _introDone = true;
-            }
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
         }
 
         if (!UpdateVictim())
@@ -246,7 +261,7 @@ struct boss_dorothee : public ScriptedAI
     }
 private:
     TaskScheduler _scheduler;
-    bool _introDone;
+    bool _startIntro;
 };
 
 struct npc_tito : public ScriptedAI
@@ -309,12 +324,7 @@ struct boss_roar : public ScriptedAI
 
     void Reset() override
     {
-        _scheduler.Schedule(16670ms, [this](TaskContext)
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToPC(false);
-            me->SetInCombatWithZone();
-        });
+        
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -409,12 +419,6 @@ struct boss_strawman : public ScriptedAI
 
     void Reset() override
     {
-        _scheduler.Schedule(26300ms, [this](TaskContext)
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToPC(false);
-            me->SetInCombatWithZone();
-        });
     }
 
     void AttackStart(Unit* who) override
@@ -521,13 +525,6 @@ struct boss_tinhead : public ScriptedAI
     void Reset() override
     {
         _rustCount = 0;
-
-        _scheduler.Schedule(34470ms, [this](TaskContext)
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToPC(false);
-            me->SetInCombatWithZone();
-        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override
