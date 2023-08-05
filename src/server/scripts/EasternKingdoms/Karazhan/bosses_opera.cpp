@@ -174,9 +174,9 @@ struct boss_dorothee : public ScriptedAI
     void Reset() override
     {
         Initialize();
+        Talk(SAY_DOROTHEE_AGGRO);
         if(!_startIntro)
         {
-            Talk(SAY_DOROTHEE_AGGRO);
             ScheduleActivation();
             _scheduler.Schedule(12s, [this](TaskContext)
             {
@@ -215,6 +215,7 @@ struct boss_dorothee : public ScriptedAI
         {
             Talk(SAY_DOROTHEE_SUMMON);
             pTito->AI()->AttackStart(me->GetVictim());
+            pTito->SetInCombatWithZone();
             TitoDied = false;
         }
     }
@@ -279,8 +280,6 @@ struct npc_tito : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        me->SetInCombatWithZone();
-
         _scheduler.Schedule(10s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_YIPPING);
@@ -318,6 +317,11 @@ struct boss_roar : public ScriptedAI
     boss_roar(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     InstanceScript* instance;
@@ -358,7 +362,6 @@ struct boss_roar : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_ROAR_AGGRO);
-        DoZoneInCombat();
 
         _scheduler.Schedule(5s, [this](TaskContext context)
         {
@@ -412,6 +415,11 @@ struct boss_strawman : public ScriptedAI
     boss_strawman(Creature* creature) : ScriptedAI(creature)
     { 
         instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
 
@@ -450,7 +458,6 @@ struct boss_strawman : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_STRAWMAN_AGGRO);
-        DoZoneInCombat();
 
         _scheduler.Schedule(5s, [this](TaskContext context)
         {
@@ -512,6 +519,11 @@ struct boss_tinhead : public ScriptedAI
     boss_tinhead(Creature* creature) : ScriptedAI(creature) 
     {
         instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     InstanceScript* instance;
@@ -530,7 +542,6 @@ struct boss_tinhead : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_TINHEAD_AGGRO);
-        DoZoneInCombat();
 
         _scheduler.Schedule(5s, [this](TaskContext context)
         {
