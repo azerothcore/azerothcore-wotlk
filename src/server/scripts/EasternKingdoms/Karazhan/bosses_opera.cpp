@@ -176,7 +176,15 @@ struct boss_dorothee : public ScriptedAI
         me->DespawnOrUnsummon();
     }
 
-    void SummonTito();
+    void SummonTito()
+    {
+        if (Creature* pTito = me->SummonCreature(CREATURE_TITO, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+        {
+            Talk(SAY_DOROTHEE_SUMMON);
+            pTito->AI()->AttackStart(me->GetVictim());
+            TitoDied = false;
+        }
+    }
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -289,17 +297,6 @@ struct npc_tito : public ScriptedAI
 private:
     TaskScheduler _scheduler;
 };
-
-
-void boss_dorothee::SummonTito()
-{
-    if (Creature* pTito = me->SummonCreature(CREATURE_TITO, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-    {
-        Talk(SAY_DOROTHEE_SUMMON);
-        pTito->AI()->AttackStart(me->GetVictim());
-        TitoDied = false;
-    }
-}
 
 struct boss_roar : public ScriptedAI
 {
