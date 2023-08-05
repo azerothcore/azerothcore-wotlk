@@ -178,7 +178,6 @@ services:
     tty: true
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
-    command: ./acore.sh run-worldserver
     image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
@@ -213,7 +212,6 @@ services:
   ac-authserver:
     <<: *ac-service-conf # merge with ac-service-conf
     tty: true
-    command: ./acore.sh run-authserver
     image: acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
