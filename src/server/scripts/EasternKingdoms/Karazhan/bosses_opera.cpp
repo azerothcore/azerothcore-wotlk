@@ -1437,7 +1437,7 @@ struct boss_romulo : public ScriptedAI
                     Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
                     JulianneDead = false;
                 }
-            });     
+            });
         }
 
         DoMeleeAttackIfReady();
