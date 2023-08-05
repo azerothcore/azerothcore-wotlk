@@ -105,6 +105,8 @@ USER $DOCKER_USER
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 # Needed if we use the dev image without linking any external folder (e.g. acore-docker)
+# TODO(michaeldelago) This is confusing and isn't really needed. `env/docker`
+# should be removed/merged into `env/dist`
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
@@ -233,7 +235,10 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER ./CMakeLists.txt /azerothcore/CMakeLists.
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./deps /azerothcore/deps
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./src /azerothcore/src
 COPY --chown=$DOCKER_USER:$DOCKER_USER ./modules /azerothcore/modules
+# TODO(michaeldelago) Don't copy in cache, mount it in a cache volume instead
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
+# TODO(michaeldelago) This is confusing and isn't really needed. `env/docker`
+# should be removed/merged into `env/dist`
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
@@ -252,11 +257,6 @@ ARG CSCRIPTPCH=OFF
 ARG CCOREPCH=OFF
 ARG CTOOLS_BUILD=all
 ARG CSCRIPTS=static
-ARG DEFAULT_CMAKE_OPTIONS="\
-    -DCTYPE=$CTYPE -DAC_CCACHE=$AC_CCACHE \
-    -DCCACHE_CPP2=$CCACHE_CPP2 -DCSCRIPTPCH=$CCACHE_CPP2 \
-    -DCCOREPCH=$CCOREPCH -DCTOOLS_BUILD=$CTOOLS_BUILD -DCSCRIPTS=$CSCRIPTS"
-ARG EXTRA_CMAKE_OPTIONS
 
 # TODO(michaeldelago) don't copy in cache, mount it to a cache volume instead
 RUN bash /azerothcore/apps/docker/docker-build-prod.sh
@@ -355,6 +355,8 @@ RUN addgroup --gid $GROUP_ID $DOCKER_USER && \
     adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $DOCKER_USER && \
     passwd -d $DOCKER_USER
 
+# TODO(michaeldelago) is this the only place that `env/client` is used? It might
+# be something that we can remove/merge into `env/dist`
 RUN mkdir -p /azerothcore/env/client/ && \
     chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 

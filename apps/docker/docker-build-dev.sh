@@ -19,7 +19,6 @@ set -euo pipefail
 set -a
 AC_PATH_ROOT=/azerothcore
 CTOOLS_BUILD=all
-# Why do so many environment variables need to exist just to run a build?
 source /azerothcore/apps/bash_shared/includes.sh
 source /azerothcore/apps/bash_shared/defines.sh
 source /azerothcore/conf/dist/config.sh
