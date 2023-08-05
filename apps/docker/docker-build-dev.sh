@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# TODO(michaeldelago) Get as close as we can to running `cmake` and `make`
+# within the Dockerfile. We shouldn't have to jump out to another file to run
+# the build. It's makes it difficult to follow
+
 # The `functions.sh` file assumes that sudo is installed. We don't need to be
 # running builds as root and it creates more problems than it solves.
 function sudo () {
@@ -13,7 +17,8 @@ function sudo () {
 #              left side is where the failure actually occurred
 set -euo pipefail
 # TODO(michaeldelago) Evaluate if these includes are necessary
-# Import Config variables, mainly used in build
+# Import Config variables, mainly used in setting up the build
+# Many of them are essentially passed in as variables to cmake
 
 # Export all variables that get set
 set -a
