@@ -1009,7 +1009,6 @@ struct boss_julianne : public ScriptedAI
     boss_julianne(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
-        me->AI()->SetData(DATA_FAKING_DEATH, NOT_FAKING);
         IsFakingDeath = false;
     }
 
