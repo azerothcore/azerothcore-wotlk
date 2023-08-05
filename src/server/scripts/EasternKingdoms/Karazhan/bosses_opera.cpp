@@ -178,10 +178,7 @@ struct boss_dorothee : public ScriptedAI
         if(!_startIntro)
         {
             ScheduleActivation();
-            _.scheduler.Schedule(50ms, [this](TaskContext)
-            {
-                Talk(SAY_DOROTHEE_AGGRO);
-            }).Schedule(12s, [this](TaskContext)
+            _scheduler.Schedule(12s, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
@@ -250,7 +247,7 @@ struct boss_dorothee : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -259,6 +256,10 @@ struct boss_dorothee : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        if(_startIntro)
+        {
+            Talk(SAY_DOROTHEE_AGGRO);
+        }
         DoMeleeAttackIfReady();
 
         _scheduler.Update(diff);
@@ -347,7 +348,7 @@ struct boss_roar : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -452,7 +453,7 @@ struct boss_strawman : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
@@ -587,7 +588,7 @@ struct boss_tinhead : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NOT_ATTACKABLE))
+        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             me->DespawnOrUnsummon();
