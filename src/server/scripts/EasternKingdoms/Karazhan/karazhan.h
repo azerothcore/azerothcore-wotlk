@@ -67,7 +67,12 @@ enum KZDataTypes
     DATA_CHESS_REINIT_PIECES        = 34,
     DATA_CHESS_GAME_PHASE           = 35,
     DATA_ECHO_OF_MEDIVH             = 36,
-    DATA_DUST_COVERED_CHEST         = 37
+    DATA_DUST_COVERED_CHEST         = 37,
+
+    // Specific Opera Data
+    DATA_DOROTHEE                   = 38,
+    DATA_ROMULO                     = 39,
+    DATA_JULIANNE                   = 40
 };
 
 enum KZOperaEvents
@@ -101,6 +106,9 @@ enum KZCreatures
     NPC_KILREK                          = 17229,
     NPC_RELAY                           = 17645,
     NPC_BARNES                          = 16812,
+    NPC_DOROTHEE                        = 17535,
+    NPC_ROMULO                          = 17533,
+    NPC_JULIANNE                        = 17534,
 
     // Chess Event
     NPC_ECHO_OF_MEDIVH                  = 16816,

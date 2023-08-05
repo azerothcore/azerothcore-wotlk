@@ -243,21 +243,15 @@ private:
 
 struct npc_tito : public ScriptedAI
 {
-    npc_tito(Creature* creature) : ScriptedAI(creature) { }
+    npc_tito(Creature* creature) : ScriptedAI(creature)
+    { 
+        instance = creature->GetInstanceScript();
+    }
 
-    ObjectGuid DorotheeGUID;
+    InstanceScript* instance;
 
     void Reset() override
     {
-        DorotheeGUID.Clear();
-    }
-
-    void DoAction(int32 action) override
-    {
-        if(action == ACTION_TITO)
-        {
-            //dunno what to do uwu
-        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -273,10 +267,9 @@ struct npc_tito : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (DorotheeGUID)
+        if(Creature* Dorothee = instance->GetCreature(DATA_DOROTHEE))
         {
-            Creature* Dorothee = ObjectAccessor::GetCreature(*me, DorotheeGUID);
-            if (Dorothee && Dorothee->IsAlive())
+            if(Dorothee->IsAlive())
             {
                 Talk(SAY_DOROTHEE_TITO_DEATH, Dorothee);
             }
@@ -303,8 +296,6 @@ void boss_dorothee::SummonTito()
     if (Creature* pTito = me->SummonCreature(CREATURE_TITO, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
     {
         Talk(SAY_DOROTHEE_SUMMON);
-        //CAST_AI(npc_tito, pTito->AI())->DorotheeGUID = me->GetGUID();
-        pTito->AI()->DoAction(ACTION_TITO);
         pTito->AI()->AttackStart(me->GetVictim());
         TitoDied = false;
     }
@@ -983,8 +974,6 @@ struct boss_julianne : public ScriptedAI
 
     InstanceScript* instance;
 
-    ObjectGuid RomuloGUID;
-
     uint32 Phase;
 
     bool IsFakingDeath;
@@ -993,7 +982,6 @@ struct boss_julianne : public ScriptedAI
 
     void Reset() override
     {
-        RomuloGUID.Clear();
         Phase = PHASE_JULIANNE;
 
         if (IsFakingDeath)
@@ -1044,10 +1032,12 @@ struct boss_julianne : public ScriptedAI
         {
             if(urand(0, 1) && SummonedRomulo)
             {
-                Creature* Romulo = (ObjectAccessor::GetCreature((*me), RomuloGUID));
-                if (Romulo && Romulo->IsAlive() && !RomuloDied)
+                if(Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
-                    DoCast(Romulo, SPELL_ETERNAL_AFFECTION);
+                    if (Romulo->IsAlive() && !RomuloDied)
+                    {
+                        DoCast(Romulo, SPELL_ETERNAL_AFFECTION);
+                    }
                 }
             }
             else
@@ -1094,10 +1084,6 @@ struct boss_julianne : public ScriptedAI
                 {
                     if (Creature* pRomulo = me->SummonCreature(CREATURE_ROMULO, ROMULO_X, ROMULO_Y, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
                     {
-                        RomuloGUID = pRomulo->GetGUID();
-                        //CAST_AI(boss_romulo, pRomulo->AI())->JulianneGUID = me->GetGUID();
-                        //CAST_AI(boss_romulo, pRomulo->AI())->Phase = PHASE_ROMULO;
-                        //missing guid collection
                         pRomulo->AI()->DoAction(ACTION_PHASE_SET);
                         DoZoneInCombat(pRomulo);
                         pRomulo->SetFaction(FACTION_MONSTER_2);
@@ -1143,7 +1129,7 @@ struct boss_julianne : public ScriptedAI
             //if this is true then we have to kill romulo too
             if (RomuloDied)
             {
-                if (Creature* Romulo = (ObjectAccessor::GetCreature((*me), RomuloGUID)))
+                if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
                     Romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Romulo->GetMotionMaster()->Clear();
@@ -1159,12 +1145,11 @@ struct boss_julianne : public ScriptedAI
             }
 
             //if not already returned, then romulo is alive and we can pretend die
-            if (Creature* Romulo = (ObjectAccessor::GetCreature((*me), RomuloGUID)))
+            if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
             {
                 PretendToDie(me);
                 IsFakingDeath = true;
                 //rez timer for Romulo? still needs handling?
-                //CAST_AI(boss_romulo, Romulo->AI())->JulianneDead = true;
                 Romulo->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 damage = 0;
                 return;
@@ -1217,12 +1202,10 @@ struct boss_julianne : public ScriptedAI
             }
             _scheduler.Schedule(1s, [this](TaskContext)
             {
-                Creature* Romulo = (ObjectAccessor::GetCreature((*me), RomuloGUID));
-                if (Romulo/*handle Romulo is faking death*/)
+                if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
                     Talk(SAY_JULIANNE_RESURRECT);
                     Resurrect(Romulo);
-                    //CAST_AI(boss_romulo, Romulo->AI())->IsFakingDeath = false;
                     Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
                     RomuloDied = false;
                 }
@@ -1249,7 +1232,6 @@ struct boss_romulo : public ScriptedAI
 
     InstanceScript* instance;
 
-    ObjectGuid JulianneGUID;
     uint32 Phase;
 
     bool IsFakingDeath;
@@ -1257,7 +1239,6 @@ struct boss_romulo : public ScriptedAI
 
     void Reset() override
     {
-        JulianneGUID.Clear();
         Phase = PHASE_ROMULO;
 
         IsFakingDeath = false;
@@ -1272,7 +1253,6 @@ struct boss_romulo : public ScriptedAI
                 JulianneDead = true;
                 break;
             case ACTION_PHASE_SET:
-                //something doing the guid
                 Phase = PHASE_ROMULO;
                 break;
             case ACTION_FAKING_DEATH:
@@ -1300,16 +1280,13 @@ struct boss_romulo : public ScriptedAI
             IsFakingDeath = true;
             Phase = PHASE_BOTH;
 
-            if (Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID)))
+            if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
             {
-                //CAST_AI(boss_julianne, Julianne->AI())->RomuloDied = true;
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 //resurrect julianne
                 _scheduler.Schedule(10s, [this, Julianne](TaskContext)
                 {
                     Resurrect(Julianne);
-                    //CAST_AI(boss_julianne, Julianne->AI())->Phase = PHASE_BOTH;
-                    //CAST_AI(boss_julianne, Julianne->AI())->IsFakingDeath = false;
                     Julianne->AI()->DoAction(ACTION_PHASE_SET);
 
                     if(Julianne->GetVictim())
@@ -1327,7 +1304,7 @@ struct boss_romulo : public ScriptedAI
         {
             if (JulianneDead)
             {
-                if (Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID)))
+                if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                 {
                     Julianne->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Julianne->GetMotionMaster()->Clear();
@@ -1341,7 +1318,7 @@ struct boss_romulo : public ScriptedAI
                 return;
             }
 
-            if (Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID)))
+            if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
             {
                 PretendToDie(me);
                 IsFakingDeath = true;
@@ -1360,15 +1337,16 @@ struct boss_romulo : public ScriptedAI
     {
         DoZoneInCombat();
         Talk(SAY_ROMULO_AGGRO);
-        if (JulianneGUID)
+
+        if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
         {
-            Creature* Julianne = ObjectAccessor::GetCreature(*me, JulianneGUID);
-            if (Julianne && Julianne->GetVictim())
+            if (Julianne->GetVictim())
             {
                 me->AddThreat(Julianne->GetVictim(), 1.0f);
                 AttackStart(Julianne->GetVictim());
             }
         }
+
         _scheduler.Schedule(15s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
@@ -1432,12 +1410,11 @@ struct boss_romulo : public ScriptedAI
         {
             _scheduler.Schedule(10s, [this](TaskContext)
             {
-                Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID));
-                if (Julianne /* check julianne IsFakingDeath*/)
+                if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                 {
+                    //still need to check Julianne IsFakingDeath()
                     Talk(SAY_ROMULO_RESURRECT);
                     Resurrect(Julianne);
-                    //CAST_AI(boss_julianne, Julianne->AI())->IsFakingDeath = false;
                     Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
                     JulianneDead = false;
                 }
