@@ -293,15 +293,13 @@ private:
 struct npc_tito : public ScriptedAI
 {
     npc_tito(Creature* creature) : ScriptedAI(creature)
-    { 
+    {
         instance = creature->GetInstanceScript();
     }
 
     InstanceScript* instance;
 
-    void Reset() override
-    {
-    }
+    void Reset() override { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -330,7 +328,7 @@ struct npc_tito : public ScriptedAI
             return;
 
         _scheduler.Update(diff);
-        
+
         DoMeleeAttackIfReady();
     }
 private:
@@ -432,11 +430,10 @@ private:
     TaskScheduler _scheduler;
 };
 
-
 struct boss_strawman : public ScriptedAI
 {
     boss_strawman(Creature* creature) : ScriptedAI(creature)
-    { 
+    {
         instance = creature->GetInstanceScript();
 
         _scheduler.SetValidator([this]
@@ -444,7 +441,6 @@ struct boss_strawman : public ScriptedAI
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
-
 
     InstanceScript* instance;
 
@@ -535,10 +531,9 @@ private:
     TaskScheduler _scheduler;
 };
 
-
 struct boss_tinhead : public ScriptedAI
 {
-    boss_tinhead(Creature* creature) : ScriptedAI(creature) 
+    boss_tinhead(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
 
@@ -640,7 +635,6 @@ private:
     uint8 _rustCount;
 };
 
-
 struct boss_crone : public ScriptedAI
 {
     boss_crone(Creature* creature) : ScriptedAI(creature)
@@ -722,7 +716,7 @@ struct npc_cyclone : public ScriptedAI
     }
 
     void JustEngagedWith(Unit* /*who*/) override
-    { 
+    {
         _scheduler.Schedule(1s, [this](TaskContext context)
         {
             Position pos = me->GetRandomNearPosition(10);
@@ -741,7 +735,6 @@ struct npc_cyclone : public ScriptedAI
 private:
     TaskScheduler _scheduler;
 };
-
 
 /**************************************/
 /**** Opera Red Riding Hood Event* ***/
@@ -765,8 +758,6 @@ enum RedRidingHood
 struct npc_grandmother : public CreatureScript
 {
     npc_grandmother() : CreatureScript("npc_grandmother") { }
-
-
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
@@ -794,8 +785,13 @@ struct npc_grandmother : public CreatureScript
 struct boss_bigbadwolf : public ScriptedAI
 {
     boss_bigbadwolf(Creature* creature) : ScriptedAI(creature)
-    { 
+    {
         instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     InstanceScript* instance;
@@ -1201,7 +1197,7 @@ struct boss_julianne : public ScriptedAI
     }
 
     void UpdateAI(uint32 diff) override
-    { 
+    {
         if(!_introStarted)
         {
             _introStarted = true;
@@ -1426,7 +1422,7 @@ struct boss_romulo : public ScriptedAI
     {
         if (!UpdateVictim() || IsFakingDeath)
             return;
-        
+
         _scheduler.Update(diff);
 
         if (JulianneDead)
@@ -1441,8 +1437,7 @@ struct boss_romulo : public ScriptedAI
                     Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
                     JulianneDead = false;
                 }
-            });
-                
+            });     
         }
 
         DoMeleeAttackIfReady();
