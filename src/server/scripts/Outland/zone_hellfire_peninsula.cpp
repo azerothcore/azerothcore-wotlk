@@ -234,7 +234,8 @@ enum WoundedBloodElf
     SAY_ELF_AGGRO               = 5,
     QUEST_ROAD_TO_FALCON_WATCH  = 9375,
     NPC_HAALESHI_WINDWALKER     = 16966,
-    NPC_HAALESHI_TALONGUARD     = 16967
+    NPC_HAALESHI_TALONGUARD     = 16967,
+    ARAKKOA_CAGE                = 181664
 };
 
 class npc_wounded_blood_elf : public CreatureScript
@@ -246,7 +247,11 @@ public:
     {
         npc_wounded_blood_elfAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() override { }
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->FindNearestGameObject(ARAKKOA_CAGE, 10.0f)->SetGoState(GO_STATE_READY);
+        }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -263,6 +268,7 @@ public:
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
@@ -278,6 +284,7 @@ public:
             {
                 case 0:
                     Talk(SAY_ELF_START, player);
+                    me->FindNearestGameObject(ARAKKOA_CAGE, 10.0f)->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case 9:
                     Talk(SAY_ELF_SUMMON1, player);

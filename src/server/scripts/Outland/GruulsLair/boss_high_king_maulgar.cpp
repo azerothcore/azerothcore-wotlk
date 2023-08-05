@@ -85,7 +85,7 @@ struct boss_high_king_maulgar : public BossAI
                 context.Repeat(35s);
             }).Schedule(0ms, [this](TaskContext context)
             {
-                DoCastSelf(SPELL_ROAR);
+                DoCastVictim(SPELL_ROAR);
                 context.Repeat(20600ms, 29100ms);
             });
         });
@@ -259,6 +259,15 @@ struct boss_kiggler_the_crazed : public ScriptedAI
     {
         _scheduler.CancelAll();
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        if (me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 25.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
