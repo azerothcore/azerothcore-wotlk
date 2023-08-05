@@ -351,10 +351,7 @@ struct boss_roar : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override
-    {
-        
-    }
+    void Reset() override { }
 
     void MoveInLineOfSight(Unit* who) override
 
@@ -451,9 +448,7 @@ struct boss_strawman : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override
-    {
-    }
+    void Reset() override { }
 
     void AttackStart(Unit* who) override
     {
@@ -734,11 +729,6 @@ struct npc_cyclone : public ScriptedAI
             me->GetMotionMaster()->MovePoint(0, pos);
             context.Repeat(3s, 5s);
         });
-    }
-
-    void MoveInLineOfSight(Unit* /*who*/) override
-
-    {
     }
 
     void UpdateAI(uint32 diff) override
