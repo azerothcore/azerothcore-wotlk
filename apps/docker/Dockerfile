@@ -111,9 +111,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
 
-# Ensure Git works
-RUN git config --global --add safe.directory /azerothcore
-
 #================================================================
 #
 # SERVICE BASE: prepare the OS for the production-ready services
@@ -199,7 +196,7 @@ LABEL description="AC authserver image for local environment"
 # usage, built into docker) for service handling. Having a "restarter" such as
 # this doesn't add anything to docker
 CMD /azerothcore/apps/startup-scripts/simple-restarter \
-        /azerothcore/env/dist/bin/authserver
+        /azerothcore/env/dist/bin authserver
 
 USER $DOCKER_USER
 
@@ -211,7 +208,7 @@ LABEL description="AC worldserver image for local environment"
 # usage, built into docker) for service handling. Having a "restarter" such as
 # this doesn't add anything to docker
 CMD /azerothcore/apps/startup-scripts/simple-restarter \
-        /azerothcore/env/dist/bin/workdserver
+        /azerothcore/env/dist/bin worldserver
 
 USER $DOCKER_USER
 
