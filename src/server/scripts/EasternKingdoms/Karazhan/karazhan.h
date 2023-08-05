@@ -72,7 +72,11 @@ enum KZDataTypes
     // Specific Opera Data
     DATA_DOROTHEE                   = 38,
     DATA_ROMULO                     = 39,
-    DATA_JULIANNE                   = 40
+    DATA_JULIANNE                   = 40,
+
+    DATA_ROAR                       = 41,
+    DATA_STRAWMAN                   = 42,
+    DATA_TINHEAD                    = 43
 };
 
 enum KZOperaEvents
@@ -109,6 +113,9 @@ enum KZCreatures
     NPC_DOROTHEE                        = 17535,
     NPC_ROMULO                          = 17533,
     NPC_JULIANNE                        = 17534,
+    NPC_ROAR                            = 17546,
+    NPC_STRAWMAN                        = 17543,
+    NPC_TINHEAD                         = 17547,
 
     // Chess Event
     NPC_ECHO_OF_MEDIVH                  = 16816,
