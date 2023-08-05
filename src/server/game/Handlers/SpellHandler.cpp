@@ -331,6 +331,10 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     if (!go)
         return;
 
+    // Prevent use of GameObject if it is not selectable. Fixes hack.
+    if (go->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
+        return;
+
     if (!go->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         return;
 

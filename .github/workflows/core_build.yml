@@ -24,9 +24,9 @@ jobs:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'trickerer/AzerothCore-wotlk-with-NPCBots' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: var/ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}

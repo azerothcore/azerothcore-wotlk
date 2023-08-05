@@ -2228,7 +2228,7 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
     }
 
     // spell of same spell rank chain
-    if (m_spellInfo->IsRankOf(existingSpellInfo))
+    if (m_spellInfo->IsRankOf(existingSpellInfo) && !(m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->SpellFamilyFlags[1] & 0x80000000))
     {
         // don't allow passive area auras to stack
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())

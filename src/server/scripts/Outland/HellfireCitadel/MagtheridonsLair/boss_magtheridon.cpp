@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -47,6 +48,7 @@ enum Spells
     SPELL_BLAZE                 = 30541,
     SPELL_BLAZE_SUMMON          = 30542,
     SPELL_BERSERK               = 27680,
+    SPELL_SHADOW_GRASP          = 30410,
     SPELL_SHADOW_GRASP_VISUAL   = 30166,
     SPELL_MIND_EXHAUSTION       = 44032,
     SPELL_QUAKE                 = 30657,
@@ -327,10 +329,29 @@ class spell_magtheridon_quake : public SpellScript
     }
 };
 
+class go_manticron_cube : public GameObjectScript
+{
+public:
+    go_manticron_cube() : GameObjectScript("go_manticron_cube") { }
+
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    {
+        if (player->HasAura(SPELL_MIND_EXHAUSTION) || player->HasAura(SPELL_SHADOW_GRASP))
+            return true;
+
+        if (Creature* trigger = player->FindNearestCreature(NPC_HELLFIRE_RAID_TRIGGER, 10.0f))
+            trigger->CastSpell(nullptr, SPELL_SHADOW_GRASP_VISUAL);
+
+        player->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP, true);
+        return true;
+    }
+};
+
 void AddSC_boss_magtheridon()
 {
     RegisterMagtheridonsLairCreatureAI(boss_magtheridon);
     RegisterSpellScript(spell_magtheridon_blaze);
     RegisterSpellScript(spell_magtheridon_shadow_grasp);
     RegisterSpellScript(spell_magtheridon_quake);
+    new go_manticron_cube();
 }
