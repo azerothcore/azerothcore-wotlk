@@ -2,8 +2,8 @@
 -- If you don't use this database, then delete this file.
 CREATE TABLE `acore_characters`.`character_accountwide_reputation` (
   `accountId` INT UNSIGNED NOT NULL,
-  `factionGroup` INT UNSIGNED NOT NULL,
-  `factionId` INT UNSIGNED NOT NULL,
+  `standing` INT UNSIGNED NOT NULL,
+  `value` INT UNSIGNED NOT NULL,
   `rep` INT UNSIGNED NULL,
   PRIMARY KEY (`accountId`, `factionGroup`, `factionId`));
 
