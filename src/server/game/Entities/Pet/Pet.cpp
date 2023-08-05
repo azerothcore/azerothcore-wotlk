@@ -2492,13 +2492,23 @@ float Pet::GetNativeObjectScale() const
             scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
 
         if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        {
             if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
+            {
+                // Exotische Haustiere haben eine Skalierung von 1
+                scale = 1.0f;
+            }
+            else
+            {
                 scale *= displayInfo->scale;
+            }
+        }
 
         return scale;
     }
-
-    return Guardian::GetNativeObjectScale();
+    
+    // Fallback-Wert, wenn die Bedingungen nicht erfüllt sind
+    return 1.0f;
 }
 
 std::string Pet::GenerateActionBarData() const
