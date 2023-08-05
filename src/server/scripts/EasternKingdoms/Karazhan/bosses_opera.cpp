@@ -174,18 +174,6 @@ struct boss_dorothee : public ScriptedAI
     void Reset() override
     {
         Initialize();
-
-        if(!_startIntro)
-        {
-            ScheduleActivation();
-            _scheduler.Schedule(12s, [this](TaskContext)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToPC(false);
-                me->SetInCombatWithZone();
-            });
-            _startIntro = true;
-        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -256,9 +244,26 @@ struct boss_dorothee : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if(_startIntro)
+        if(!_startIntro)
         {
             Talk(SAY_DOROTHEE_AGGRO);
+        }
+
+        if(!_startIntro)
+        {
+            me->Yell("test scheduler", LANG_UNIVERSAL);
+            ScheduleActivation();
+            _scheduler.Schedule(12s, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            }).Schedule(1s, [this](TaskContext context)
+            {
+                me->Yell("debug heartbeat", LANG_UNIVERSAL);
+                context.Repeat(1s);
+            });
+            _startIntro = true;
         }
         DoMeleeAttackIfReady();
 
