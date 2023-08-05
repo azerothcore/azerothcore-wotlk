@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-cd /azerothcore
+#TODO(michaeldelago) evaluate if a separate prod/dev build is needed
 
-bash acore.sh compiler build
+exec bash /azerothcore/apps/docker/docker-build-dev.sh

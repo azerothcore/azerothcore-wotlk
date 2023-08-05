@@ -1,3 +1,7 @@
+// TODO(michaeldelago) evaluate if this file/procedure is necessary
+// Using Deno to run shell commands just increases complexity and adds another
+// dependency for no real benefit
+
 import { Command } from "https://cdn.deno.land/cmd/versions/v1.2.0/raw/mod.ts";
 import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
@@ -39,9 +43,11 @@ shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
   [
+    // TODO(michaeldelago) evaluate three-step process for the standard build
+    // process
     "docker compose --profile local --profile dev --profile dev-build build --parallel",
     "docker image prune -f",
-    "docker compose run --rm --no-deps ac-dev-build bash apps/docker/docker-build-dev.sh",
+    "docker compose run --rm --no-deps ac-dev-build /bin/bash apps/docker/docker-build-dev.sh",
   ],
   env
 );

@@ -1,4 +1,3 @@
-
 function comp_clean() {
   DIRTOCLEAN=${BUILDPATH:-var/build/obj}
   PATTERN="$DIRTOCLEAN/*"
@@ -61,7 +60,7 @@ function comp_configure() {
   #-DAC_WITH_UNIT_TEST=$CAC_UNIT_TEST -DAC_WITH_PLUGINS=$CAC_PLG \
 
   local DCONF=""
-  if [ ! -z "$CONFDIR" ]; then
+  if [ -n "${CONFDIR:-}" ]; then
     DCONF="-DCONF_DIR=$CONFDIR"
   fi
 
@@ -100,7 +99,8 @@ function comp_configure() {
 }
 
 function comp_compile() {
-  [ $MTHREADS == 0 ] && MTHREADS=$(grep -c ^processor /proc/cpuinfo) && MTHREADS=$(($MTHREADS + 2))
+  [[ $MTHREADS == 0 ]] && \
+    MTHREADS=$(grep -c ^processor /proc/cpuinfo) && MTHREADS=$(($MTHREADS + 2))
 
   echo "Using $MTHREADS threads"
 
@@ -138,6 +138,8 @@ function comp_compile() {
 
       popd >> /dev/null || exit 1
 
+      # TODO(michaeldelago) evaluate if setting root ownership and SUID bit is
+      # necessary
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chown root:root -- {} +
@@ -207,7 +209,7 @@ function conf_layer() {
         # if key in base and val not in line
         if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
           # Replace line
-          # Prevent issues with shell quoting 
+          # Prevent issues with shell quoting
           sed -i \
             's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' \
             "$BASE"

@@ -1,14 +1,33 @@
 #!/usr/bin/env bash
 
-CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# The `functions.sh` file assumes that sudo is installed. We don't need to be
+# running builds as root and it creates more problems than it solves.
+function sudo () {
+    $@
+}
 
-source "$CUR_PATH/docker-build-prod.sh"
+# Setting bash options for easier debugging
+# e          = exit on error
+# u          = error on unset variable
+# o pipefail = in a pipe, make sure the right side of the pipe is failed if the
+#              left side is where the failure actually occurred
+set -euo pipefail
+# TODO(michaeldelago) Evaluate if these includes are necessary
+# Import Config variables, mainly used in build
 
-echo "Fixing EOL..."
-# using -n (new file mode) should also fix the issue
-# when the file is created with the default acore user but you
-# set a different user into the docker configurations
-for file in "env/dist/etc/"*
-do
-    dos2unix -n $file $file
-done
+# Export all variables that get set
+set -a
+AC_PATH_ROOT=/azerothcore
+CTOOLS_BUILD=all
+# Why do so many environment variables need to exist just to run a build?
+source /azerothcore/apps/bash_shared/includes.sh
+source /azerothcore/apps/bash_shared/defines.sh
+source /azerothcore/conf/dist/config.sh
+set +a
+
+cd /azerothcore
+
+source /azerothcore/apps/compiler/includes/functions.sh
+set +eu
+
+comp_build
