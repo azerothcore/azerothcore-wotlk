@@ -1423,7 +1423,7 @@ struct boss_romulo : public ScriptedAI
             }
         }
 
-        _scheduler.Schedule(15s, [this](TaskContext context)
+        _scheduler.Schedule(15s, GROUP_COMBAT, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
             {
@@ -1433,15 +1433,15 @@ struct boss_romulo : public ScriptedAI
                     context.Repeat(15s, 30s);
                 }
             }
-        }).Schedule(20s, [this](TaskContext context)
+        }).Schedule(20s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastSelf(SPELL_DARING);
             context.Repeat(20s, 40s);
-        }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(25s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_DEADLY_SWATHE);
             context.Repeat(15s, 25s);
-        }).Schedule(10s, [this](TaskContext context)
+        }).Schedule(10s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastVictim(SPELL_POISON_THRUST);
             context.Repeat(10s, 20s);
