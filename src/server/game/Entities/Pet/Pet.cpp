@@ -2506,7 +2506,6 @@ float Pet::GetNativeObjectScale() const
 
         return scale;
     }
-    
     // Fallback value if the conditions are not met
     return 1.0f;
 }
