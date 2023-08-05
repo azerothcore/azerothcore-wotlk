@@ -973,9 +973,10 @@ enum RAJDataValue
 
 enum RAJActions
 {
-    ACTION_DIED_ANNOUNCE = 0,
-    ACTION_PHASE_SET     = 1,
-    ACTION_FAKING_DEATH  = 2
+    ACTION_DIED_ANNOUNCE    = 0,
+    ACTION_PHASE_SET        = 1,
+    ACTION_FAKING_DEATH     = 2,
+    ACTION_COMBAT_SCHEDULE  = 3
 };
 
 void PretendToDie(Creature* creature)
@@ -999,6 +1000,7 @@ void Resurrect(Creature* target)
     {
         target->GetMotionMaster()->MoveChase(target->GetVictim());
         target->AI()->AttackStart(target->GetVictim());
+        target->AI()->DoAction(ACTION_COMBAT_SCHEDULE);
     }
     else
         target->GetMotionMaster()->Initialize();
@@ -1049,10 +1051,13 @@ struct boss_julianne : public ScriptedAI
             case ACTION_FAKING_DEATH:
                 IsFakingDeath = false;
                 break;
+            case ACTION_COMBAT_SCHEDULE:
+                ScheduleCombat();
+                break;
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void ScheduleCombat()
     {
         _scheduler.Schedule(30s, GROUP_COMBAT, [this](TaskContext context)
         {
@@ -1084,6 +1089,11 @@ struct boss_julianne : public ScriptedAI
             }
             context.Repeat(45s, 60s);
         });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleCombat();
     }
 
     void AttackStart(Unit* who) override
@@ -1307,6 +1317,9 @@ struct boss_romulo : public ScriptedAI
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;
                 break;
+            case ACTION_COMBAT_SCHEDULE:
+                ScheduleCombat();
+                break;
         }
     }
 
@@ -1343,7 +1356,7 @@ struct boss_romulo : public ScriptedAI
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 //resurrect julianne
                 me->Yell("Attempting to resurrect Julianne", LANG_UNIVERSAL);
-                _scheduler.Schedule(10s, [this](TaskContext)
+                _scheduler.Schedule(10s, GROUP_RP, [this](TaskContext)
                 {
                     if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                     {
@@ -1356,6 +1369,10 @@ struct boss_romulo : public ScriptedAI
                             AttackStart(Julianne->GetVictim());
                         }
                     }
+                }).Schedule(1s, [this](TaskContext context)
+                {
+                    me->Yell("reviving wait heartbeat", LANG_UNIVERSAL);
+                    context.Repeat(1s);
                 });
             }
 
@@ -1395,10 +1412,8 @@ struct boss_romulo : public ScriptedAI
         //LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void ScheduleCombat()
     {
-        Talk(SAY_ROMULO_AGGRO);
-
         if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
         {
             if (Julianne->GetVictim())
@@ -1431,6 +1446,13 @@ struct boss_romulo : public ScriptedAI
             DoCastVictim(SPELL_POISON_THRUST);
             context.Repeat(10s, 20s);
         });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_ROMULO_AGGRO);
+
+        ScheduleCombat();
     }
 
     void MoveInLineOfSight(Unit* who) override
