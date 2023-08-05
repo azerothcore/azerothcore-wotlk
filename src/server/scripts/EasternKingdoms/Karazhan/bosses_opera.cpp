@@ -126,6 +126,11 @@ struct boss_dorothee : public ScriptedAI
         //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
         Initialize();
         instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void ScheduleActivation()
@@ -169,12 +174,22 @@ struct boss_dorothee : public ScriptedAI
     void Reset() override
     {
         Initialize();
+        if(!_startIntro)
+        {
+            Talk(SAY_DOROTHEE_AGGRO);
+            ScheduleActivation();
+            _scheduler.Schedule(12s, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+            _startIntro = true;
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        me->SetInCombatWithZone();
-
         _scheduler.Schedule(1ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_WATERBOLT);
@@ -240,22 +255,6 @@ struct boss_dorothee : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if(!_startIntro)
-        {
-            _startIntro = true;
-            Talk(SAY_DOROTHEE_AGGRO);
-            ScheduleActivation();
-            _scheduler.Schedule(12s, [this](TaskContext)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToPC(false);
-                me->SetInCombatWithZone();
-            });
-        }
-
-        if (!UpdateVictim())
-            return;
-
         DoMeleeAttackIfReady();
 
         _scheduler.Update(diff);
