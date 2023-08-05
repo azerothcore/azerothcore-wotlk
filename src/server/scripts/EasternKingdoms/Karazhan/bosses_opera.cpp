@@ -1205,6 +1205,7 @@ struct boss_julianne : public ScriptedAI
         if(!_introStarted)
         {
             _introStarted = true;
+            me->SetImmuneToPC(true);
             _scheduler.Schedule(1s, [this](TaskContext)
             {
                 Talk(SAY_JULIANNE_ENTER);
@@ -1213,7 +1214,8 @@ struct boss_julianne : public ScriptedAI
                 Talk(SAY_JULIANNE_AGGRO);
                 me->SetInCombatWithZone();
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFaction(FACTION_MONSTER_2);
+                me->SetImmuneToPC(false);
+
             });
         }
 
@@ -1249,8 +1251,6 @@ struct boss_romulo : public ScriptedAI
     {
         instance = creature->GetInstanceScript(); //not necessary
         //the following have no use???
-        //EntryYellTimer = 8000;
-        //AggroYellTimer = 15000;
     }
 
     InstanceScript* instance;
@@ -1346,7 +1346,6 @@ struct boss_romulo : public ScriptedAI
                 PretendToDie(me);
                 IsFakingDeath = true;
                 //rez timer 10s of julianne
-                //CAST_AI(boss_julianne, Julianne->AI())->RomuloDied = true;
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 damage = 0;
                 return;
@@ -1358,7 +1357,6 @@ struct boss_romulo : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        DoZoneInCombat();
         Talk(SAY_ROMULO_AGGRO);
 
         if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
