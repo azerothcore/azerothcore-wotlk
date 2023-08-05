@@ -1,3 +1,4 @@
+--
 -- Add acore_strings for arena queue announcer with less detail about the teams
 DELETE FROM `acore_string` WHERE `entry` IN (773, 774, 775, 776, 777, 778);
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_frFR`, `locale_deDE`, `locale_zhCN`) VALUES
