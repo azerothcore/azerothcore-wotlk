@@ -954,7 +954,24 @@ enum RAJPhase
     PHASE_BOTH          = 2,
 };
 
-enum ROJActions
+enum RAJGroups
+{
+    GROUP_COMBAT        = 0,
+    GROUP_RP            = 1
+};
+
+enum RAJDataType
+{
+    DATA_FAKING_DEATH   = 0
+};
+
+enum RAJDataValue
+{
+    NOT_FAKING          = 0,
+    IS_FAKING           = 1
+};
+
+enum RAJActions
 {
     ACTION_DIED_ANNOUNCE = 0,
     ACTION_PHASE_SET     = 1,
@@ -992,6 +1009,7 @@ struct boss_julianne : public ScriptedAI
     boss_julianne(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
+        me->AI()->SetData(DATA_FAKING_DEATH, NOT_FAKING);
         IsFakingDeath = false;
     }
 
@@ -1010,6 +1028,7 @@ struct boss_julianne : public ScriptedAI
         if (IsFakingDeath)
         {
             Resurrect(me);
+            me->AI()->SetData(DATA_FAKING_DEATH, NOT_FAKING);
             IsFakingDeath = false;
         }
 
@@ -1028,28 +1047,30 @@ struct boss_julianne : public ScriptedAI
             case ACTION_PHASE_SET:
                 Phase = PHASE_BOTH;
                 IsFakingDeath = false;
+                me->AI()->SetData(DATA_FAKING_DEATH, NOT_FAKING);
                 break;
             case ACTION_FAKING_DEATH:
                 IsFakingDeath = false;
+                me->AI()->SetData(DATA_FAKING_DEATH, NOT_FAKING);
                 break;
         }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        _scheduler.Schedule(30s, [this](TaskContext context)
+        _scheduler.Schedule(30s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_BLINDING_PASSION);
             context.Repeat(30s, 45s);
-        }).Schedule(15s, [this](TaskContext context)
+        }).Schedule(15s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastSelf(SPELL_DEVOTION);
             context.Repeat(15s, 45s);
-        }).Schedule(5s, [this](TaskContext context)
+        }).Schedule(5s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_POWERFUL_ATTRACTION);
             context.Repeat(5s, 30s);
-        }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(25s, GROUP_COMBAT, [this](TaskContext context)
         {
             if(urand(0, 1) && SummonedRomulo)
             {
@@ -1067,8 +1088,6 @@ struct boss_julianne : public ScriptedAI
             }
             context.Repeat(45s, 60s);
         });
-
-        DoMeleeAttackIfReady();
     }
 
     void AttackStart(Unit* who) override
@@ -1098,18 +1117,18 @@ struct boss_julianne : public ScriptedAI
         if (Spell->Id == SPELL_DRINK_POISON)
         {
             Talk(SAY_JULIANNE_DEATH01);
-            _scheduler.Schedule(2500ms, [this](TaskContext)
+            _scheduler.CancelGroup(GROUP_COMBAT);
+            _scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext)
             {
                 //will do this 2secs after spell hit. this is time to display visual as expected
                 PretendToDie(me);
                 Phase = PHASE_ROMULO;
-                _scheduler.Schedule(10s, [this](TaskContext)
+                _scheduler.Schedule(10s, GROUP_RP, [this](TaskContext)
                 {
                     if (Creature* pRomulo = me->SummonCreature(CREATURE_ROMULO, ROMULO_X, ROMULO_Y, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
                     {
                         pRomulo->AI()->DoAction(ACTION_PHASE_SET);
-                        DoZoneInCombat(pRomulo);
-                        pRomulo->SetFaction(FACTION_MONSTER_2);
+                        pRomulo->SetInCombatWithZone();
                     }
                     SummonedRomulo = true;
                 });
@@ -1136,6 +1155,7 @@ struct boss_julianne : public ScriptedAI
             DoCast(me, SPELL_DRINK_POISON);
 
             IsFakingDeath = true;
+            me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
             //IS THIS USEFULL? Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID));
             return;
         }
@@ -1172,6 +1192,7 @@ struct boss_julianne : public ScriptedAI
             {
                 PretendToDie(me);
                 IsFakingDeath = true;
+                me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
                 //rez timer for Romulo? still needs handling?
                 Romulo->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 damage = 0;
@@ -1229,10 +1250,13 @@ struct boss_julianne : public ScriptedAI
             {
                 if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
-                    Talk(SAY_JULIANNE_RESURRECT);
-                    Resurrect(Romulo);
-                    Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
-                    RomuloDied = false;
+                    if(Romulo->AI()->GetData(DATA_FAKING_DEATH) == IS_FAKING)
+                    {
+                        Talk(SAY_JULIANNE_RESURRECT);
+                        Resurrect(Romulo);
+                        Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
+                        RomuloDied = false;
+                    }
                 }
             });
         }
@@ -1301,6 +1325,7 @@ struct boss_romulo : public ScriptedAI
             Talk(SAY_ROMULO_DEATH);
             PretendToDie(me);
             IsFakingDeath = true;
+            me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
             Phase = PHASE_BOTH;
 
             if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
@@ -1345,6 +1370,7 @@ struct boss_romulo : public ScriptedAI
             {
                 PretendToDie(me);
                 IsFakingDeath = true;
+                me->AI()->SetData(DATA_FAKING_DEATH, IS_FAKING);
                 //rez timer 10s of julianne
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 damage = 0;
@@ -1433,11 +1459,13 @@ struct boss_romulo : public ScriptedAI
             {
                 if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                 {
-                    //still need to check Julianne IsFakingDeath()
-                    Talk(SAY_ROMULO_RESURRECT);
-                    Resurrect(Julianne);
-                    Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
-                    JulianneDead = false;
+                    if(Julianne->AI()->GetData(DATA_FAKING_DEATH) == IS_FAKING)
+                    {
+                        Talk(SAY_ROMULO_RESURRECT);
+                        Resurrect(Julianne);
+                        Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
+                        JulianneDead = false;
+                    }
                 }
             });
         }
