@@ -1343,15 +1343,18 @@ struct boss_romulo : public ScriptedAI
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 //resurrect julianne
                 me->Yell("Attempting to resurrect Julianne", LANG_UNIVERSAL);
-                _scheduler.Schedule(10s, [this, Julianne](TaskContext)
+                _scheduler.Schedule(10s, [this](TaskContext)
                 {
-                    me->Yell("Julianne resurrected", LANG_UNIVERSAL);
-                    Resurrect(Julianne);
-                    Julianne->AI()->DoAction(ACTION_PHASE_SET);
-
-                    if(Julianne->GetVictim())
+                    if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                     {
-                        AttackStart(Julianne->GetVictim());
+                        me->Yell("Julianne resurrected", LANG_UNIVERSAL);
+                        Resurrect(Julianne);
+                        Julianne->AI()->DoAction(ACTION_PHASE_SET);
+
+                        if(Julianne->GetVictim())
+                        {
+                            AttackStart(Julianne->GetVictim());
+                        }
                     }
                 });
             }
