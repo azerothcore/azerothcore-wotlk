@@ -136,6 +136,10 @@ void DespawnAll(InstanceScript* instance)
     {
         tinhead->DespawnOrUnsummon();
     }
+    if(Creature* tito = instance->GetCreature(DATA_TITO))
+    {
+        tito->DespawnOrUnsummon();
+    }
 }
 
 struct boss_dorothee : public ScriptedAI

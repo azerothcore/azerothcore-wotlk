@@ -37,6 +37,7 @@ ObjectData const creatureData[] =
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN  },
     { NPC_MIDNIGHT,             DATA_MIDNIGHT },
     { NPC_DOROTHEE,             DATA_DOROTHEE },
+    { NPC_TITO,                 DATA_TITO     },
     { NPC_ROAR,                 DATA_ROAR     },
     { NPC_STRAWMAN,             DATA_STRAWMAN },
     { NPC_TINHEAD,              DATA_TINHEAD  },
