@@ -1057,6 +1057,19 @@ struct boss_julianne : public ScriptedAI
         }
     }
 
+    
+    uint32 GetData(uint32 data) const override
+    {
+        if(DATA_FAKING_DEATH)
+        {
+            return IsFakingDeath ? IS_FAKING : NOT_FAKING;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     void ScheduleCombat()
     {
         _scheduler.Schedule(30s, GROUP_COMBAT, [this](TaskContext context)
@@ -1204,14 +1217,6 @@ struct boss_julianne : public ScriptedAI
             }
         }
         //LOG_ERROR("scripts", "boss_julianneAI: DamageTaken reach end of code, that should not happen.");
-    }
-
-    uint32 GetData(uint32 data) const override
-    {
-        if(DATA_FAKING_DEATH)
-        {
-            return IsFakingDeath ? IS_FAKING : NOT_FAKING;
-        }
     }
 
     void EnterEvadeMode(EvadeReason reason) override
