@@ -332,6 +332,8 @@ enum Outhouse
     SPELL_DUST_FIELD                = 48329,
     // Item
     ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
+    // NPC
+    NPC_OUTHOUSE_BUNNY_GRIZZLY      = 27326,
 };
 
 class spell_q12227_outhouse_groans : public SpellScript
