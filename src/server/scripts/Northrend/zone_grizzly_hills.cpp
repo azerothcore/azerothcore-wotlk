@@ -369,7 +369,27 @@ class spell_q12227_outhouse_groans : public SpellScript
         OnEffectHitTarget += SpellEffectFn(spell_q12227_outhouse_groans::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
+class spell_q12227_camera_shake : public SpellScript
+{
+    PrepareSpellScript(spell_q12227_camera_shake);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DUST_FIELD });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY_GRIZZLY, 3.0f)) // hackfix: Outhouse bunny doesnt show in any script. But the visual of Dust Field do not show if cast by the player
+                target->CastSpell(target, SPELL_DUST_FIELD, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_camera_shake::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 // Tallhorn Stage
 
 enum TallhornStage
