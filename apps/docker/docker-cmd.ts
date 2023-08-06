@@ -85,13 +85,6 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
-  "client-data",
-  "Download client data inside the ac-data volume",
-  ["docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data"],
-  env
-);
-
-shellCommandFactory(
   "dev:up",
   "Start the dev server container in background",
   ["docker compose up -d ac-dev-server"],
