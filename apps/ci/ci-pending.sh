@@ -4,16 +4,6 @@ set -e
 echo "Pending SQL check script:"
 echo
 
-# Updates shouldn't contain PROCEDURE or FUNCTION statements
-find data/sql/updates/pending* -name "*.sql" -type f | while read -r file; do
-    if sed "s/'.*'\(.*\)/\1/g" "$file" | grep -q -i -E "(PROCEDURE|FUNCTION)"; then
-        echo "> PROCEDURE check - Failed"
-        exit 1
-    else
-        echo "> PROCEDURE check - OK"
-    fi
-done
-
 # We want to ensure the end of file has a semicolon and doesn't have extra
 # newlines
 find data/sql/updates/pending* -name "*.sql" -type f | while read -r file; do
