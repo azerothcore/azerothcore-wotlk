@@ -662,7 +662,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Kill Command
-    ApplySpellFix({ 34027 }, [](SpellInfo* spellInfo)
+    // Kill Command, Overpower
+    ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 0;
     });
