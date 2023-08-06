@@ -319,8 +319,8 @@ public:
 };
 
 /*######
-## Quest 12227: Doing Your Duty
-######*/
++## Quest 12227: Doing Your Duty
++######*/
 
 enum Outhouse
 {
@@ -328,62 +328,70 @@ enum Outhouse
     SOUND_FEMALE                    = 12671,
     SOUND_MALE                      = 12670,
     // Spell
-    SPELL_OUTHOUSE_GROANS           = 48382,
     SPELL_CAMERA_SHAKE              = 47533,
-    SPELL_DUST_FIELD                = 48329
+    SPELL_DUST_FIELD                = 48329,
+    SPELL_CREATE_AMBERSEEDS         = 48330,
+    // Item
+    ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
 };
 
-class npc_outhouse_bunny : public CreatureScript
+class spell_q12227_outhouse_groans : public SpellScript
 {
-public:
-    npc_outhouse_bunny() : CreatureScript("npc_outhouse_bunny") { }
+    PrepareSpellScript(spell_q12227_outhouse_groans);
 
-    struct npc_outhouse_bunnyAI : public ScriptedAI
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
+        return ValidateSpellInfo({ SPELL_CAMERA_SHAKE, SPELL_DUST_FIELD });
+    }
 
-        void Reset() override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
         {
-            _counter = 0;
-            _gender  = 0;
-        }
+            player->CastSpell(player, SPELL_CAMERA_SHAKE, true);
+            player->CastSpell(player, SPELL_DUST_FIELD, true);
 
-        void SetData(uint32 Type, uint32 Data) override
-        {
-            if (Type == 1)
-                _gender = Data;
-        }
-
-        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
-        {
-            if (Spell->Id == SPELL_OUTHOUSE_GROANS)
+            switch (GetCaster()->getGender())
             {
-                ++_counter;
-                if (_counter < 5)
-                    DoCast(Caster, SPELL_CAMERA_SHAKE, true);
-                else
-                    _counter = 0;
-                DoCast(me, SPELL_DUST_FIELD, true);
-                switch (_gender)
-                {
-                    case GENDER_FEMALE:
-                        DoPlaySoundToSet(me, SOUND_FEMALE);
-                        break;
-
-                    case GENDER_MALE:
-                        DoPlaySoundToSet(me, SOUND_MALE);
-                        break;
-                }
+            case GENDER_FEMALE:
+                player->PlayDirectSound(SOUND_FEMALE);
+                break;
+            case GENDER_MALE:
+                player->PlayDirectSound(SOUND_MALE);
+                break;
+            default:
+                break;
             }
         }
-    private:
-        uint8 _counter;
-        uint8 _gender;
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return new npc_outhouse_bunnyAI(creature);
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_outhouse_groans::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_q12227_indisposed_i : public SpellScript
+{
+    PrepareSpellScript(spell_q12227_indisposed_i);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CREATE_AMBERSEEDS });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (player->HasItemCount(ITEM_ANDERHOLS_SLIDER_CIDER))
+                player->CastSpell(player, SPELL_CREATE_AMBERSEEDS);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_indisposed_i::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1300,7 +1308,6 @@ void AddSC_grizzly_hills()
     new npc_emily();
     new npc_mrfloppy();
     new npc_ravenous_worg();
-    new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
     RegisterCreatureAI(npc_wounded_skirmisher);
@@ -1314,4 +1321,6 @@ void AddSC_grizzly_hills()
     new spell_warhead_detonate();
     new spell_vehicle_warhead_fuse();
     new spell_warhead_fuse();
+    RegisterSpellScript(spell_q12227_outhouse_groans);
+    RegisterSpellScript(spell_q12227_indisposed_i);
 }
