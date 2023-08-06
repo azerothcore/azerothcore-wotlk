@@ -1163,7 +1163,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         switch (action)
