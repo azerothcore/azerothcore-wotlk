@@ -16,8 +16,8 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 27071;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (27071, 0, 0, 'I know, I know. Back in the bucket....', 12, 0, 100, 0, 0, 0, 26351, 0, 'Benjamin Jacobs // Benjamin Jacobs');
 
-DELETE FROM `waypoints` WHERE (entry = 27071) AND (pointid IN (1, 2));
-DELETE FROM `waypoints` WHERE (entry = 2707100) AND (pointid BETWEEN 1 AND 13);
+DELETE FROM `waypoints` WHERE (`entry` = 27071) AND (`pointid` IN (1, 2));
+DELETE FROM `waypoints` WHERE (`entry` = 2707100) AND (`pointid` BETWEEN 1 AND 13);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
 (27071, 1, 3405.55, -2792.33, 201.809, NULL, 0, NULL),
 (27071, 2, 3414.19, -2795.07, 201.514, NULL, 0, NULL),
