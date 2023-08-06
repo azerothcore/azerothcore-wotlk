@@ -962,8 +962,11 @@ public:
                 for (auto j = 1; j <= perk->rank; j++) {
                     trans->Append("INSERT INTO character_prestige_perk_carryover (`guid`, `specId`, `uuid`, `spellId`, `rank`) VALUES ({} , {} , '{}' , {} , {} )",
                         player->GetGUID().GetCounter(), i.first, perk->uuid, perk->spell->spellId, j);
-                    auto copy = perk;
-                    copy->rank = j;
+
+                    CharacterSpecPerk* copy = new CharacterSpecPerk();
+                    copy->uuid = perk->uuid;
+                    copy->spell = perk->spell;
+                    copy->rank = 1;
                     i.second->prestigePerks.push_back(copy);
                 }
                 PurgePerk(player, perk);
@@ -986,7 +989,7 @@ public:
                 auto it = spec->prestigePerks[index];
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-                trans->Append("DELETE FROM character_prestige_perk_carryover WHERE `guid` = {} AND `specId` = {} AND `uuid` = '{}' AND `spellId` = {} and `rank` = {}"
+                trans->Append("DELETE FROM character_prestige_perk_carryover WHERE `guid` = {} AND `specId` = {} AND `uuid` = '{}' AND `spellId` = {} LIMIT 1"
                     , player->GetGUID().GetCounter(), spec->Id, it->uuid, it->spell->spellId, it->rank);
                 CharacterDatabase.CommitTransaction(trans);
                 spec->prestigePerks.erase(spec->prestigePerks.begin() + index);

@@ -109,9 +109,9 @@ public:
             if (currentLevel >= 10)
             {
                 uint8 amount = levelDiff;
-                /*if (oldlevel < 10 && levelDiff > 1)
+                if (oldlevel < 10 && levelDiff > 1)
                     amount = 1;
-
+                /*
                 if (levelDiff < levelMod && currentLevel % levelMod == 0)
                 {
                     uint32 scrapEarned = fc->GetConfig("scrapsPerLevelMod", 1);

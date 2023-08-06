@@ -66,14 +66,13 @@ public:
                     break;
                 }
             }
-
             fc->PrestigePerks(iam.player);
-            cm->ApplyKnownForgeSpells(iam.player);
 
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
             ForgeCharacterPoint* prisCp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::PRESTIGE_COUNT);
 
+            baseFcp->Sum = 0;
             fcp->Sum = baseFcp->Sum;
             prisCp->Sum++;
 
