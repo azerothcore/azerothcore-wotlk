@@ -1,3 +1,4 @@
+-- DB update 2023_08_06_02 -> 2023_08_06_03
 --
 UPDATE `creature_template` SET `gossip_menu_id` = 7092, `npcflag` = `npcflag`|1 WHERE `entry`=16123;
 DELETE FROM `gossip_menu` WHERE `MenuID` = 7092;

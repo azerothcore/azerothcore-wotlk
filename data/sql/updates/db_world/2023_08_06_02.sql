@@ -1,3 +1,4 @@
+-- DB update 2023_08_06_01 -> 2023_08_06_02
 --
 UPDATE `creature_template` SET `ScriptName` = 'npc_magister_aledis' WHERE `entry` = 20159;
 
