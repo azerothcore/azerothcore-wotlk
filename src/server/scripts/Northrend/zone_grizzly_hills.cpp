@@ -319,8 +319,8 @@ public:
 };
 
 /*######
-+## Quest 12227: Doing Your Duty
-+######*/
+## Quest 12227: Doing Your Duty
+######*/
 
 enum Outhouse
 {
@@ -330,7 +330,6 @@ enum Outhouse
     // Spell
     SPELL_CAMERA_SHAKE              = 47533,
     SPELL_DUST_FIELD                = 48329,
-    SPELL_CREATE_AMBERSEEDS         = 48330,
     // Item
     ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
 };
@@ -1298,5 +1297,4 @@ void AddSC_grizzly_hills()
     new spell_vehicle_warhead_fuse();
     new spell_warhead_fuse();
     RegisterSpellScript(spell_q12227_outhouse_groans);
-    RegisterSpellScript(spell_q12227_indisposed_i);
 }
