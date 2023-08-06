@@ -1297,4 +1297,5 @@ void AddSC_grizzly_hills()
     new spell_vehicle_warhead_fuse();
     new spell_warhead_fuse();
     RegisterSpellScript(spell_q12227_outhouse_groans);
+    RegisterSpellScript(spell_q12227_camera_shake);
 }
