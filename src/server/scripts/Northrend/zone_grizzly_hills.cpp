@@ -350,7 +350,6 @@ class spell_q12227_outhouse_groans : public SpellScript
         if (Player* player = GetCaster()->ToPlayer())
         {
             player->CastSpell(player, SPELL_CAMERA_SHAKE, true);
-            player->CastSpell(player, SPELL_DUST_FIELD, true);
 
             switch (GetCaster()->getGender())
             {
