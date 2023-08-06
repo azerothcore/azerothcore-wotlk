@@ -662,7 +662,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Kill Command
-    // Overpower T5 2p
+    // Kill Command, Overpower
     ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 0;
