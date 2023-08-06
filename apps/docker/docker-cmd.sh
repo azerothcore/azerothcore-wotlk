@@ -33,6 +33,7 @@ EOF
 > pull                  # pull the development worldserver and authserver
 > build:nocache         # build the development worldserver and authserver without cache
 > clean:build           # clean build artifacts from the dev server
+> client-data           # download client data in the dev server
 > dev:up start          # the dev server
 > dev:build             # compile azerothcore using the dev server
 > dev:dash              # execute the dashboard in the dev server container
@@ -98,6 +99,13 @@ while [[ $# -gt 0 ]]; do
             docker image prune -f
             docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean
             docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean
+            set +x
+            shift
+            ;;
+
+        client-data)
+            set -x
+            docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data
             set +x
             shift
             ;;
