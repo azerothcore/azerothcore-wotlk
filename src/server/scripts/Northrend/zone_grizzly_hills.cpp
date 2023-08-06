@@ -330,7 +330,6 @@ enum Outhouse
     // Spell
     SPELL_CAMERA_SHAKE              = 47533,
     SPELL_DUST_FIELD                = 48329,
-    SPELL_CREATE_AMBERSEEDS         = 48330,
     // Item
     ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
 };
