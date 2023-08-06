@@ -1248,7 +1248,6 @@ struct boss_julianne : public ScriptedAI
                 me->SetInCombatWithZone();
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
-
             });
         }
 
@@ -1328,6 +1327,10 @@ struct boss_romulo : public ScriptedAI
         if(DATA_FAKING_DEATH)
         {
             return isFakingDeath ? IS_FAKING : NOT_FAKING;
+        }
+        else
+        {
+            return 0;
         }
     }
 
@@ -1484,9 +1487,6 @@ struct boss_romulo : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || isFakingDeath)
-            return;
-
         _scheduler.Update(diff);
 
         if (JulianneDead)
