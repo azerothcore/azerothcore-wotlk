@@ -9,3 +9,4 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (48382, 'spell_q12227_outhouse_groans');
 
 DELETE FROM `creature` WHERE  `guid`=113841;
+
