@@ -1,3 +1,4 @@
+-- DB update 2023_08_06_10 -> 2023_08_06_11
 UPDATE `creature_template` SET `scriptname` = '' WHERE `entry` = 27326;
 
 DELETE FROM `spell_target_position` WHERE `ID` = 48324 AND `EffectIndex` = 0;

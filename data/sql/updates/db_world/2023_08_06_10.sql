@@ -1,3 +1,4 @@
+-- DB update 2023_08_06_09 -> 2023_08_06_10
  -- Master Woodsman Anderhol smart ai
 SET @ENTRY := 27277;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
