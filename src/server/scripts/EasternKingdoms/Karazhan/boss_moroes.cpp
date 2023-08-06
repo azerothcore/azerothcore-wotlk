@@ -121,8 +121,6 @@ struct boss_moroes : public BossAI
             context.Repeat(5s);
         }).Schedule(1min, 2min, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
-            //this was not scheduled in the previous commit
-            //does this have to be removed?
             Talk(SAY_OUT_OF_COMBAT);
             context.Repeat(1min, 2min);
         });
