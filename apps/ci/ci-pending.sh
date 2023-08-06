@@ -17,7 +17,12 @@ done
 # We want to ensure the end of file has a semicolon and doesn't have extra
 # newlines
 find data/sql/updates/pending* -name "*.sql" -type f | while read -r file; do
-    ERR_AT_EOF="$(sed 's/ --[^-'\''"]*$//' "$file" | tr -d '\n ' | tail -c 1)"
+    # The first sed script collapses all strings into an empty string. The
+    # contents of strings aren't necessary for this check and its still valid
+    # sql.
+    #
+    # The second rule removes sql comments.
+    ERR_AT_EOF="$(sed -e "s/'.*'/''/g" -e 's/ --([^-])*$//' "$file" | tr -d '\n ' | tail -c 1)"
     if [[ "$ERR_AT_EOF" != ";"  ]]; then
         echo "Missing Semicolon (;) or multiple newlines at the end of the file."
         exit 1
