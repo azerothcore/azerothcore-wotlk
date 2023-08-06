@@ -319,8 +319,8 @@ public:
 };
 
 /*######
-+## Quest 12227: Doing Your Duty
-+######*/
+## Quest 12227: Doing Your Duty
+######*/
 
 enum Outhouse
 {
