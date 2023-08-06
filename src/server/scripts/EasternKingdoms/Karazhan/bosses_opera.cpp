@@ -1011,30 +1011,30 @@ struct boss_julianne : public ScriptedAI
     boss_julianne(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
-        IsFakingDeath = false;
+        isFakingDeath = false;
     }
 
     InstanceScript* instance;
 
     uint32 Phase;
 
-    bool IsFakingDeath;
-    bool SummonedRomulo;
-    bool RomuloDied;
+    bool isFakingDeath;
+    bool summonedRomulo;
+    bool romuloDied;
 
     void Reset() override
     {
         Phase = PHASE_JULIANNE;
 
-        if (IsFakingDeath)
+        if (isFakingDeath)
         {
             Resurrect(me);
-            IsFakingDeath = false;
+            isFakingDeath = false;
         }
 
         _introStarted = false;
-        SummonedRomulo = false;
-        RomuloDied = false;
+        summonedRomulo = false;
+        romuloDied = false;
     }
 
     void DoAction(int32 action) override
@@ -1042,14 +1042,14 @@ struct boss_julianne : public ScriptedAI
         switch(action)
         {
             case ACTION_DIED_ANNOUNCE:
-                RomuloDied = true;
+                romuloDied = true;
                 break;
             case ACTION_PHASE_SET:
                 Phase = PHASE_BOTH;
-                IsFakingDeath = false;
+                isFakingDeath = false;
                 break;
             case ACTION_FAKING_DEATH:
-                IsFakingDeath = false;
+                isFakingDeath = false;
                 break;
             case ACTION_COMBAT_SCHEDULE:
                 ScheduleCombat();
@@ -1062,7 +1062,7 @@ struct boss_julianne : public ScriptedAI
     {
         if(DATA_FAKING_DEATH)
         {
-            return IsFakingDeath ? IS_FAKING : NOT_FAKING;
+            return isFakingDeath ? IS_FAKING : NOT_FAKING;
         }
         else
         {
@@ -1086,11 +1086,11 @@ struct boss_julianne : public ScriptedAI
             context.Repeat(5s, 30s);
         }).Schedule(25s, GROUP_COMBAT, [this](TaskContext context)
         {
-            if(urand(0, 1) && SummonedRomulo)
+            if(urand(0, 1) && summonedRomulo)
             {
                 if(Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
-                    if (Romulo->IsAlive() && !RomuloDied)
+                    if (Romulo->IsAlive() && !romuloDied)
                     {
                         DoCast(Romulo, SPELL_ETERNAL_AFFECTION);
                     }
@@ -1149,7 +1149,7 @@ struct boss_julianne : public ScriptedAI
                         pRomulo->AI()->DoAction(ACTION_PHASE_SET);
                         pRomulo->SetInCombatWithZone();
                     }
-                    SummonedRomulo = true;
+                    summonedRomulo = true;
                 });
             });
         }
@@ -1167,13 +1167,13 @@ struct boss_julianne : public ScriptedAI
             damage = 0;
 
             //this means already drinking, so return
-            if (IsFakingDeath)
+            if (isFakingDeath)
                 return;
 
             me->InterruptNonMeleeSpells(true);
             DoCast(me, SPELL_DRINK_POISON);
 
-            IsFakingDeath = true;
+            isFakingDeath = true;
             //IS THIS USEFULL? Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID));
             return;
         }
@@ -1188,7 +1188,7 @@ struct boss_julianne : public ScriptedAI
         if (Phase == PHASE_BOTH)
         {
             //if this is true then we have to kill romulo too
-            if (RomuloDied)
+            if (romuloDied)
             {
                 if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
@@ -1209,7 +1209,7 @@ struct boss_julianne : public ScriptedAI
             if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
             {
                 PretendToDie(me);
-                IsFakingDeath = true;
+                isFakingDeath = true;
                 //rez timer for Romulo? still needs handling?
                 Romulo->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 damage = 0;
@@ -1256,7 +1256,7 @@ struct boss_julianne : public ScriptedAI
             });
         }
 
-        if (RomuloDied)
+        if (romuloDied)
         {
             if (Phase != PHASE_BOTH)
             {
@@ -1271,7 +1271,7 @@ struct boss_julianne : public ScriptedAI
                         Talk(SAY_JULIANNE_RESURRECT);
                         Resurrect(Romulo);
                         Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
-                        RomuloDied = false;
+                        romuloDied = false;
                     }
                 }
             });
@@ -1298,14 +1298,14 @@ struct boss_romulo : public ScriptedAI
     uint32 Phase;
 
     bool isFakingDeath;
-    bool JulianneDead;
+    bool julianneDead;
 
     void Reset() override
     {
         Phase = PHASE_ROMULO;
 
         isFakingDeath = false;
-        JulianneDead = false;
+        julianneDead = false;
     }
 
     void DoAction(int32 action) override
@@ -1313,7 +1313,7 @@ struct boss_romulo : public ScriptedAI
         switch(action)
         {
             case ACTION_DIED_ANNOUNCE:
-                JulianneDead = true;
+                julianneDead = true;
                 break;
             case ACTION_PHASE_SET:
                 Phase = PHASE_ROMULO;
@@ -1390,7 +1390,7 @@ struct boss_romulo : public ScriptedAI
 
         if (Phase == PHASE_BOTH)
         {
-            if (JulianneDead)
+            if (julianneDead)
             {
                 if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                 {
@@ -1494,7 +1494,7 @@ struct boss_romulo : public ScriptedAI
     {
         _scheduler.Update(diff);
 
-        if (JulianneDead)
+        if (julianneDead)
         {
             _scheduler.Schedule(10s, [this](TaskContext)
             {
@@ -1505,7 +1505,7 @@ struct boss_romulo : public ScriptedAI
                         Talk(SAY_ROMULO_RESURRECT);
                         Resurrect(Julianne);
                         Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
-                        JulianneDead = false;
+                        julianneDead = false;
                     }
                 }
             });
