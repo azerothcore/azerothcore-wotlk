@@ -8,3 +8,5 @@ DELETE FROM `spell_script_names` WHERE `spell_id` IN (48382, 53017);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (48382, 'spell_q12227_outhouse_groans'),
 (53017, 'spell_q12227_indisposed_i');
+
+DELETE FROM `creature` WHERE  `guid`=113841;
