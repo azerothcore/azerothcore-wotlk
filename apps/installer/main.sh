@@ -69,8 +69,7 @@ function _switch() {
             ;;
         ""|"v"|"version"|"14")
             # denoRunFile "$AC_PATH_APPS/installer/main.ts" "version"
-            version="$(jq -r '.version' < "$AC_PATH_ROOT/acore.json")"
-            printf "AzerothCore Rev. %s\n" "$version"
+            printf "AzerothCore Rev. %s\n" "$ACORE_VERSION"
             exit
             ;;
         ""|"quit"|"15")
