@@ -8,5 +8,5 @@ DELETE FROM `spell_script_names` WHERE `spell_id` IN (48382);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (48382, 'spell_q12227_outhouse_groans');
 
-DELETE FROM `creature` WHERE  `guid`=113841;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE `entry` =27326;
 
