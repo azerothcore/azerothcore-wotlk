@@ -22,13 +22,13 @@ public:
     {
         if (HasItemEquiped(iam.player))
         {
-            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "Must remove all equiptment before prestiging");
+            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must remove all equiptment before prestiging.");
             return;
         }
 
         if (iam.player->getLevel() != 80)
         {
-            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "Must be max level before prestiging");
+            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must be max level before prestiging.");
             return;
         }
 

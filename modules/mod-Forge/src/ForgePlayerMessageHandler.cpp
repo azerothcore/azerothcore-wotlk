@@ -108,9 +108,8 @@ public:
 
             if (currentLevel >= 10)
             {
-                uint8 amount = levelDiff;
-                if (oldlevel < 10 && levelDiff > 1)
-                    amount = 1;
+                uint8 amount = (oldlevel < 9) ? levelDiff - (9 - oldlevel) : levelDiff;
+
                 /*
                 if (levelDiff < levelMod && currentLevel % levelMod == 0)
                 {
