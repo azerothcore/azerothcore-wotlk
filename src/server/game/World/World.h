@@ -338,8 +338,6 @@ public:
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
 
-    void LoadMotd() override;
-
     void UpdateAreaDependentAuras() override;
 
     [[nodiscard]] uint32 GetCleaningFlags() const override { return _cleaningFlags; }

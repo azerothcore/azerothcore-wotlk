@@ -15,25 +15,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ServerMotd_h__
-#define ServerMotd_h__
+#ifndef _MOTDMGR_H_
+#define _MOTDMGR_H_
 
 #include "Define.h"
 #include <string>
 
 class WorldPacket;
 
-namespace Motd
+class AC_GAME_API MotdMgr
 {
+public:
+    static MotdMgr* instance();
+
     /// Set a new Message of the Day
     void SetMotd(std::string motd);
+
+    /// Load Message of the Day
+    void LoadMotd();
 
     /// Get the current Message of the Day
     char const* GetMotd();
 
     /// Get the motd packet to send at login
     WorldPacket const* GetMotdPacket();
-}
+};
 
-#endif //ServerMotd_h_
-// _
+#define sMotdMgr MotdMgr::instance()
+
+#endif // _MOTDMGR_H_

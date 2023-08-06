@@ -598,7 +598,6 @@ public:
     [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
-    virtual void LoadMotd() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;
