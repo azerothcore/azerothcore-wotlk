@@ -371,30 +371,6 @@ class spell_q12227_outhouse_groans : public SpellScript
     }
 };
 
-class spell_q12227_indisposed_i : public SpellScript
-{
-    PrepareSpellScript(spell_q12227_indisposed_i);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CREATE_AMBERSEEDS });
-    }
-
-    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-    {
-        if (Player* player = GetCaster()->ToPlayer())
-        {
-            if (player->HasItemCount(ITEM_ANDERHOLS_SLIDER_CIDER))
-                player->CastSpell(player, SPELL_CREATE_AMBERSEEDS);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_q12227_indisposed_i::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_APPLY_AURA);
-    }
-};
-
 // Tallhorn Stage
 
 enum TallhornStage
