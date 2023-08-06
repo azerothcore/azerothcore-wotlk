@@ -328,65 +328,69 @@ enum Outhouse
     SOUND_FEMALE                    = 12671,
     SOUND_MALE                      = 12670,
     // Spell
-    SPELL_OUTHOUSE_GROANS           = 48382,
     SPELL_CAMERA_SHAKE              = 47533,
-    SPELL_DUST_FIELD                = 48329
+    SPELL_DUST_FIELD                = 48329,
+    // Item
+    ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
+    // NPC
+    NPC_OUTHOUSE_BUNNY_GRIZZLY      = 27326,
 };
 
-class npc_outhouse_bunny : public CreatureScript
+class spell_q12227_outhouse_groans : public SpellScript
 {
-public:
-    npc_outhouse_bunny() : CreatureScript("npc_outhouse_bunny") { }
+    PrepareSpellScript(spell_q12227_outhouse_groans);
 
-    struct npc_outhouse_bunnyAI : public ScriptedAI
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
+        return ValidateSpellInfo({ SPELL_CAMERA_SHAKE, SPELL_DUST_FIELD });
+    }
 
-        void Reset() override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
         {
-            _counter = 0;
-            _gender  = 0;
-        }
+            player->CastSpell(player, SPELL_CAMERA_SHAKE, true);
 
-        void SetData(uint32 Type, uint32 Data) override
-        {
-            if (Type == 1)
-                _gender = Data;
-        }
-
-        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
-        {
-            if (Spell->Id == SPELL_OUTHOUSE_GROANS)
+            switch (GetCaster()->getGender())
             {
-                ++_counter;
-                if (_counter < 5)
-                    DoCast(Caster, SPELL_CAMERA_SHAKE, true);
-                else
-                    _counter = 0;
-                DoCast(me, SPELL_DUST_FIELD, true);
-                switch (_gender)
-                {
-                    case GENDER_FEMALE:
-                        DoPlaySoundToSet(me, SOUND_FEMALE);
-                        break;
-
-                    case GENDER_MALE:
-                        DoPlaySoundToSet(me, SOUND_MALE);
-                        break;
-                }
+            case GENDER_FEMALE:
+                player->PlayDirectSound(SOUND_FEMALE);
+                break;
+            case GENDER_MALE:
+                player->PlayDirectSound(SOUND_MALE);
+                break;
+            default:
+                break;
             }
         }
-    private:
-        uint8 _counter;
-        uint8 _gender;
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return new npc_outhouse_bunnyAI(creature);
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_outhouse_groans::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
+class spell_q12227_camera_shake : public SpellScript
+{
+    PrepareSpellScript(spell_q12227_camera_shake);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DUST_FIELD });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY_GRIZZLY, 3.0f)) // hackfix: Outhouse bunny doesnt show in any script. But the visual of Dust Field do not show if cast by the player
+                target->CastSpell(target, SPELL_DUST_FIELD, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_camera_shake::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 // Tallhorn Stage
 
 enum TallhornStage
@@ -1300,7 +1304,6 @@ void AddSC_grizzly_hills()
     new npc_emily();
     new npc_mrfloppy();
     new npc_ravenous_worg();
-    new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
     RegisterCreatureAI(npc_wounded_skirmisher);
@@ -1314,4 +1317,6 @@ void AddSC_grizzly_hills()
     new spell_warhead_detonate();
     new spell_vehicle_warhead_fuse();
     new spell_warhead_fuse();
+    RegisterSpellScript(spell_q12227_outhouse_groans);
+    RegisterSpellScript(spell_q12227_camera_shake);
 }
