@@ -296,6 +296,7 @@ int main(int argc, char** argv)
         METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
         METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
         METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_module", uint64(ModuleDatabase.QueueSize()));
     });
 
     METRIC_EVENT("events", "Worldserver started", "");
@@ -451,7 +452,8 @@ bool StartDB()
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
+        .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(ModuleDatabase, "Module");
 
     if (!loader.Load())
         return false;
@@ -497,6 +499,7 @@ void StopDB()
     CharacterDatabase.Close();
     WorldDatabase.Close();
     LoginDatabase.Close();
+    ModuleDatabase.Close();
 
     MySQL::Library_End();
 }
@@ -587,6 +590,7 @@ void WorldUpdateLoop()
     LoginDatabase.WarnAboutSyncQueries(true);
     CharacterDatabase.WarnAboutSyncQueries(true);
     WorldDatabase.WarnAboutSyncQueries(true);
+    ModuleDatabase.WarnAboutSyncQueries(true);
 
     ///- While we have not World::m_stopEvent, update the world
     while (!World::IsStopped())
@@ -620,6 +624,7 @@ void WorldUpdateLoop()
     LoginDatabase.WarnAboutSyncQueries(false);
     CharacterDatabase.WarnAboutSyncQueries(false);
     WorldDatabase.WarnAboutSyncQueries(false);
+    ModuleDatabase.WarnAboutSyncQueries(false);
 }
 
 void SignalHandler(boost::system::error_code const& error, int /*signalNumber*/)

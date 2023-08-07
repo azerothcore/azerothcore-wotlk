@@ -160,6 +160,38 @@ std::string DBUpdater<CharacterDatabaseConnection>::GetDBModuleName()
     return "db-characters";
 }
 
+// Module Database
+template<>
+std::string DBUpdater<ModuleDatabaseConnection>::GetConfigEntry()
+{
+    return "Updates.Module";
+}
+
+template<>
+std::string DBUpdater<ModuleDatabaseConnection>::GetTableName()
+{
+    return "Module";
+}
+
+template<>
+std::string DBUpdater<ModuleDatabaseConnection>::GetBaseFilesDirectory()
+{
+    return BuiltInConfig::GetSourceDirectory() + "/data/sql/base/db_module/";
+}
+
+template<>
+bool DBUpdater<ModuleDatabaseConnection>::IsEnabled(uint32 const updateMask)
+{
+    // This way silences warnings under msvc
+    return (updateMask & DatabaseLoader::DATABASE_MODULE) ? true : false;
+}
+
+template<>
+std::string DBUpdater<ModuleDatabaseConnection>::GetDBModuleName()
+{
+    return "db-module";
+}
+
 // All
 template<class T>
 BaseLocation DBUpdater<T>::GetBaseLocationType()
@@ -534,3 +566,4 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 template class AC_DATABASE_API DBUpdater<LoginDatabaseConnection>;
 template class AC_DATABASE_API DBUpdater<WorldDatabaseConnection>;
 template class AC_DATABASE_API DBUpdater<CharacterDatabaseConnection>;
+template class AC_DATABASE_API DBUpdater<ModuleDatabaseConnection>;

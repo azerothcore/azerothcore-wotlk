@@ -235,14 +235,22 @@ public:
             Field* fields = resW->Fetch();
             lwdb = fields[0].Get<std::string>();
         }
+        std::string mwdb = "No updates found!";
+        if (QueryResult resM = ModuleDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
+        {
+            Field* fields = resM->Fetch();
+            mwdb = fields[0].Get<std::string>();
+        }
 
         handler->PSendSysMessage("Latest LoginDatabase update: %s", lldb.c_str());
         handler->PSendSysMessage("Latest CharacterDatabase update: %s", lcdb.c_str());
         handler->PSendSysMessage("Latest WorldDatabase update: %s", lwdb.c_str());
+        handler->PSendSysMessage("Latest ModuleDatabase update: %s", mwdb.c_str());
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+        handler->PSendSysMessage("ModuleDatabase queue size: %zu", ModuleDatabase.QueueSize());
 
         if (Acore::Module::GetEnableModulesList().empty())
             handler->SendSysMessage("No modules enabled");
