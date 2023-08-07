@@ -949,11 +949,11 @@ MaxArenaPoints = 10000
 StartArenaPoints = 0
 
 #
-#   LegacyArenaPoints
+#   Arena.LegacyArenaPoints
 #        Description: If set 1 uses pre-wotlk arena points calculation when season < 6
 #        Default:     1
 
-LegacyArenaPoints = 1
+Arena.LegacyArenaPoints = 1
 
 #
 #    RecruitAFriend.MaxLevel
