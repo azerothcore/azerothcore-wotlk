@@ -170,7 +170,7 @@ ModuleDatabase.SynchThreads    = 1
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
-#           DATABASE_DBC       = 8, // Module database
+#           DATABASE_DBC       = 8, // DBC database
 #           DATABASE_MODULE    = 16, // Module database
 #
 #        Default:     31 - (All enabled)
