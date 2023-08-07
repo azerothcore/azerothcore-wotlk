@@ -15,10 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
+#include "DBCDatabase.h"
+#include "MySQLPreparedStatement.h"
 
-DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabase;
-DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabase;
-DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
-DatabaseWorkerPool<DBCDatabaseConnection> DBCDatabase;
-DatabaseWorkerPool<ModuleDatabaseConnection> ModuleDatabase;
+void DBCDatabaseConnection::DoPrepareStatements()
+{
+    if (!m_reconnecting)
+        m_stmts.resize(MAX_DBCDATABASE_STATEMENTS);
+}
+
+DBCDatabaseConnection::DBCDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
+{
+}
+
+DBCDatabaseConnection::DBCDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo)
+{
+}
+
+DBCDatabaseConnection::~DBCDatabaseConnection()
+{
+}

@@ -48,9 +48,10 @@ public:
         DATABASE_LOGIN      = 1,
         DATABASE_CHARACTER  = 2,
         DATABASE_WORLD      = 4,
-        DATABASE_MODULE     = 8,
+        DATABASE_DBC        = 8,
+        DATABASE_MODULE     = 16,
 
-        DATABASE_MASK_ALL   = DATABASE_LOGIN | DATABASE_CHARACTER | DATABASE_WORLD | DATABASE_MODULE
+        DATABASE_MASK_ALL   = DATABASE_LOGIN | DATABASE_CHARACTER | DATABASE_WORLD | DATABASE_DBC | DATABASE_MODULE
     };
 
     [[nodiscard]] uint32 GetUpdateFlags() const

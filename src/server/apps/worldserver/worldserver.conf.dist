@@ -95,6 +95,7 @@ TempDir = ""
 #    LoginDatabaseInfo
 #    WorldDatabaseInfo
 #    CharacterDatabaseInfo
+#    DBCDatabaseInfo
 #    ModuleDatabaseInfo
 #        Description: Database connection settings for the world server.
 #        Example:     "hostname;port;username;password;database"
@@ -106,11 +107,13 @@ TempDir = ""
 #        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
 #                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
 #                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
-#                     ""127.0.0.1;3306;acore;acore;acore_module"    - (ModuleDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_dbc"        - (DBCDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_module"     - (ModuleDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+DBCDatabaseInfo       = "127.0.0.1;3306;acore;acore;acore_dbc"
 ModuleDatabaseInfo    = "127.0.0.1;3306;acore;acore;acore_module"
 
 #
@@ -129,6 +132,7 @@ Database.Reconnect.Attempts = 20
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
 #    CharacterDatabase.WorkerThreads
+#    DBCDatabase.WorkerThreads
 #    ModuleDatabase.WorkerThreads
 #        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
 #                     statements. Each worker thread is mirrored with its own connection to the
@@ -136,27 +140,32 @@ Database.Reconnect.Attempts = 20
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     1 - (CharacterDatabase.WorkerThreads)
+#                     1 - (DBCDatabase.WorkerThreads)
 #                     1 - (ModuleDatabase.WorkerThreads)
 
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
+DBCDatabase.WorkerThreads       = 1
 ModuleDatabase.WorkerThreads    = 1
 
 #
 #    LoginDatabase.SynchThreads
 #    WorldDatabase.SynchThreads
 #    CharacterDatabase.SynchThreads
+#    DBCDatabase.SynchThreads
 #    ModuleDatabase.SynchThreads
 #        Description: The amount of MySQL connections spawned to handle.
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     2 - (CharacterDatabase.WorkerThreads)
+#                     1 - (DBCDatabase.SynchThreads)
 #                     1 - (ModuleDatabase.SynchThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 2
+DBCDatabase.SynchThreads       = 1
 ModuleDatabase.SynchThreads    = 1
 
 #

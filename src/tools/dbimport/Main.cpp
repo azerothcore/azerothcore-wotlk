@@ -104,6 +104,7 @@ bool StartDB()
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
         .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(DBCDatabase, "DBC")
         .AddDatabase(ModuleDatabase, "Module");
 
     if (!loader.Load())

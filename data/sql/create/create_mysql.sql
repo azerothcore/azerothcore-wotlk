@@ -9,6 +9,8 @@ CREATE DATABASE `acore_characters` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4
 
 CREATE DATABASE `acore_auth` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4_unicode_ci;
 
+CREATE DATABASE `acore_dbc` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4_unicode_ci;
+
 CREATE DATABASE `acore_module` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4_unicode_ci;
 
 GRANT ALL PRIVILEGES ON `acore_world` . * TO 'acore'@'localhost' WITH GRANT OPTION;
@@ -16,5 +18,7 @@ GRANT ALL PRIVILEGES ON `acore_world` . * TO 'acore'@'localhost' WITH GRANT OPTI
 GRANT ALL PRIVILEGES ON `acore_characters` . * TO 'acore'@'localhost' WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON `acore_auth` . * TO 'acore'@'localhost' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES ON `acore_dbc` . * TO 'acore'@'localhost' WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON `acore_module` . * TO 'acore'@'localhost' WITH GRANT OPTION;
