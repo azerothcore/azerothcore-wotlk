@@ -953,6 +953,7 @@ StartArenaPoints = 0
 #        Description: Use arena point calculation from TBC for season 1 - 5 when rating is less or equal to 1500
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
+
 Arena.LegacyArenaPoints = 1
 
 #
