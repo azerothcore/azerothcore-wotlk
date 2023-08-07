@@ -41,7 +41,8 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", "");
         if (dbString.empty())
         {
-            LOG_ERROR(_logger, "Database {} not specified in configuration file!", name);
+            LOG_ERROR(_logger, "{}DatabaseInfo is not specified in configuration file!"
+                      "\nSearch the wiki for ACE00047 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00043)", name);
             return false;
         }
 

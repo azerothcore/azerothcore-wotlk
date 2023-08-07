@@ -1392,13 +1392,14 @@ TOTPMasterSecret =
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
-#           DATABASE_MODULE    = 8, // Module database
+#           DATABASE_DBC       = 8, // DBC database
+#           DATABASE_MODULE    = 16, // Module database
 #
-#        Default:     15 - (All enabled)
+#        Default:     31 - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
-Updates.EnableDatabases = 15
+Updates.EnableDatabases = 31
 
 #
 #    Updates.AutoSetup
