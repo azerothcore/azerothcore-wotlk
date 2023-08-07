@@ -219,3 +219,5 @@ template AC_DATABASE_API
 DatabaseLoader& DatabaseLoader::AddDatabase<CharacterDatabaseConnection>(DatabaseWorkerPool<CharacterDatabaseConnection>&, std::string const&);
 template AC_DATABASE_API
 DatabaseLoader& DatabaseLoader::AddDatabase<WorldDatabaseConnection>(DatabaseWorkerPool<WorldDatabaseConnection>&, std::string const&);
+template AC_DATABASE_API
+DatabaseLoader& DatabaseLoader::AddDatabase<ModuleDatabaseConnection>(DatabaseWorkerPool<ModuleDatabaseConnection>&, std::string const&);
