@@ -1178,7 +1178,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]        = sConfigMgr->GetOption<uint32>("Arena.AutoDistributeInterval", 7); // pussywizard: spoiled by implementing constant day and hour, always 7 now
     _int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetOption<uint32>("Arena.GamesRequired", 10);
     _int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetOption<uint32>("Arena.ArenaSeason.ID", 1);
-    _int_configs[CONFIG_LEGACY_ARENA_POINTS_CALC]                   = sConfigMgr->GetOption<uint32>("Arena.LegacyArenaPoints", 1);    _int_configs[LEGACY_ARENA_POINTS_CALC]                          = sConfigMgr->GetOption<uint32>("Arena.LegacyArenaPoints", 1);
+    _int_configs[CONFIG_LEGACY_ARENA_POINTS_CALC]                   = sConfigMgr->GetOption<uint32>("Arena.LegacyArenaPoints", 1);
     _int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetOption<uint32>("Arena.ArenaStartPersonalRating", 1000);
     _int_configs[CONFIG_ARENA_START_MATCHMAKER_RATING]              = sConfigMgr->GetOption<uint32>("Arena.ArenaStartMatchmakerRating", 1500);
     _bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = sConfigMgr->GetOption<bool>("Arena.ArenaSeason.InProgress", true);
