@@ -1,2 +1,1 @@
-DELETE FROM `creature_text` WHERE `TEXT`='Behold the might of the Alliance! The dread lady, Onyxia, hangs from the arches! Let the rallying cry of the dragon slayer lift your spirits!' AND `CreatureID` = 14394;
-DELETE FROM `creature_text` WHERE `TEXT`='Citizens and allies of Stormwind, on this day, history has been made. $n has laid waste to that which had attempted to usurp the rule of the kingdom. Gather round and join me in honoring our heroes.' AND `CreatureID` = 14394;
+DELETE FROM `creature_text` WHERE (`BroadcastTextId`, `CreatureID`) IN ((9496, 14394), (9495, 14394));
