@@ -978,6 +978,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
                     return false;
 
+                if (!IsMinMaxValid(e, e.event.areaRange.rangeMin, e.event.areaRange.rangeMax))
+                    return false;
+
                 break;
             case SMART_EVENT_SPELLHIT:
             case SMART_EVENT_SPELLHIT_TARGET:

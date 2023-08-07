@@ -4364,7 +4364,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!(me->IsInRange(target, 0.f, (float)e.event.areaRange.range)))
+                    if (!(me->IsInRange(target, (float)e.event.areaRange.rangeMin, (float)e.event.areaRange.rangeMax)))
                         continue;
 
                     ProcessAction(e, target);
