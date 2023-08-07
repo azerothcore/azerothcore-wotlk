@@ -118,7 +118,6 @@ private:
     {
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(player, spec)) {
-            auto refundAmount = 0;
             for (auto tab : spec->Talents) {
                 CharacterPointType pt;
                 if (fc->TryGetTabPointType(tab.first, pt))
@@ -128,7 +127,7 @@ private:
                         for (auto spell : tab.second)
                         {
                             ForgeAddonMessage* msg = new ForgeAddonMessage();
-                            msg->topic = "2";
+                            msg->topic = 2;
                             msg->player = player;
                             msg->message = std::to_string(tab.first) + ";" + std::to_string(spell.first);
                             HandleMessage(*msg);
@@ -140,6 +139,8 @@ private:
                 }
             }
             cm->SendTalents(player);
+            cm->SendTalentTreeLayout(player);
+            cm->SendActiveSpecInfo(player);
         }
     }
 

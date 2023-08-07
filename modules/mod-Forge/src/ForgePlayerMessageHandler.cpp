@@ -21,6 +21,7 @@
 #include <GetTalentsHandler.cpp>
 #include <GetPerksHandler.cpp>
 #include <LearnPerkHandler.cpp>
+#include <GetPerkSelectionHandler.cpp>
 //#include <UnlearnPerkHandler.cpp>
 #include <PrestigeHandler.cpp>
 #include <UseSkillbook.cpp>
@@ -74,7 +75,6 @@ public:
         }
 
         fc->ApplyAccountBoundTalents(player);
-        cm->SendWithstandingSelect(player, "");
     }
 
     void OnDelete(ObjectGuid guid, uint32 accountId) override
@@ -159,7 +159,6 @@ public:
             }
 
             fc->UpdateCharacterSpec(player, spec);
-            cm->SendWithstandingSelect(player, "");
         }
     }
 
@@ -305,6 +304,7 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new ActivateClassSpecHandler(cache, cm));
     sTopicRouter->AddHandler(new GetPerksHandler(cache, cm));
     sTopicRouter->AddHandler(new LearnPerkHandler(cache, cm));
+    sTopicRouter->AddHandler(new GetPerkSelectionHandler(cache, cm));
     //sTopicRouter->AddHandler(new UnlearnPerkHandler(cache, cm));
 
     new UseSkillBook();

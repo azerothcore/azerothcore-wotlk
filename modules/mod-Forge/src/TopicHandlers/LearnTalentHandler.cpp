@@ -231,6 +231,7 @@ public:
             fc->UpdateCharacterSpec(iam.player, spec);
 
             cm->SendActiveSpecInfo(iam.player);
+            cm->SendTalentTreeLayout(iam.player);
             cm->SendTalents(iam.player, tabId);
 
             iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected
