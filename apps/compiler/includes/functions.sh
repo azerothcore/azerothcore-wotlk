@@ -208,8 +208,9 @@ function conf_layer() {
         if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
           # Replace line
           # Prevent issues with shell quoting 
-          # Updated replace due to permissions creating config files across platforms. 
-          sed 's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' "$BASE" > tmp; cat tmp > "$BASE"; rm tmp
+         TEMP="$(mktemp)"
+          sed 's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' "$BASE" > "$TEMP" 
+          mv "$TEMP" "$BASE"
         else
           # insert line
           echo "$KEY = $VAL$COMMENT" >> "$BASE"
