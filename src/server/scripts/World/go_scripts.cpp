@@ -1612,19 +1612,17 @@ public:
 ## go_amberpine_outhouse
 ######*/
 
-#define GOSSIP_USE_OUTHOUSE "Use the outhouse."
 #define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
 
 enum AmberpineOuthouse
 {
-    ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
-    NPC_OUTHOUSE_BUNNY              = 27326,
     QUEST_DOING_YOUR_DUTY           = 12227,
     SPELL_INDISPOSED                = 53017,
+    SPELL_INDISPOSED_II             = 48324,
     SPELL_INDISPOSED_III            = 48341,
-    SPELL_CREATE_AMBERSEEDS         = 48330,
     GOSSIP_OUTHOUSE_INUSE           = 12775,
-    GOSSIP_OUTHOUSE_VACANT          = 12779
+    GOSSIP_OUTHOUSE_VACANT          = 12779,
+    GOSSIP_USE_OUTHOUSE             = 9492,
 };
 
 class go_amberpine_outhouse : public GameObjectScript
@@ -1637,7 +1635,7 @@ public:
         QuestStatus status = player->GetQuestStatus(QUEST_DOING_YOUR_DUTY);
         if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_USE_OUTHOUSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_USE_OUTHOUSE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_OUTHOUSE_VACANT, go->GetGUID());
         }
         else
@@ -1646,21 +1644,15 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY, 3.0f);
-            if (target)
-            {
-                target->AI()->SetData(1, player->getGender());
-                go->CastSpell(target, SPELL_INDISPOSED_III);
-            }
-            go->CastSpell(player, SPELL_INDISPOSED);
-            if (player->HasItemCount(ITEM_ANDERHOLS_SLIDER_CIDER))
-                player->CastSpell(player, SPELL_CREATE_AMBERSEEDS, true);
+            player->CastSpell(player, SPELL_INDISPOSED);
+            player->CastSpell(player, SPELL_INDISPOSED_II);
+            player->CastSpell(player, SPELL_INDISPOSED_III);
             return true;
         }
         else

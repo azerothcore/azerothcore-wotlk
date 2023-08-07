@@ -340,7 +340,6 @@ public:
 #ifdef MOD_PLAYERBOTS
     [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
 #endif
-    void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
 

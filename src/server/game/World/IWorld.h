@@ -601,7 +601,6 @@ public:
 #ifdef MOD_PLAYERBOTS
     [[nodiscard]] virtual char const* GetPlayerbotsDBRevision() const = 0;
 #endif
-    virtual void LoadMotd() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;

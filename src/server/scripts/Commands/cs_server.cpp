@@ -32,7 +32,7 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
-#include "ServerMotd.h"
+#include "MotdMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"
@@ -295,7 +295,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd());
         return true;
     }
 
@@ -567,7 +567,7 @@ public:
         trans->Append(stmt);
         LoginDatabase.CommitTransaction(trans);
 
-        sWorld->LoadMotd();
+        sMotdMgr->LoadMotd();
         handler->PSendSysMessage(LANG_MOTD_NEW, Acore::StringTo<int32>(realmId).value(), strMotd);
         return true;
     }

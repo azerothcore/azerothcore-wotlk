@@ -33,7 +33,7 @@ EndScriptData */
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
-#include "ServerMotd.h"
+#include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -412,9 +412,9 @@ public:
     static bool HandleReloadMotdCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Motd...");
-        sWorld->LoadMotd();
+        sMotdMgr->LoadMotd();
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
-        handler->SendGlobalSysMessage(Motd::GetMotd());
+        handler->SendGlobalSysMessage(sMotdMgr->GetMotd());
         return true;
     }
 
