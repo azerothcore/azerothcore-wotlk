@@ -33,8 +33,11 @@ public:
         ForgeCharacterSpec* spec;
         CharacterPerkType perkType;
 
-        if(specId != iam.player->GetActiveSpec())
-            iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You are attempting to add a perk to a spec that is not active. Abuse of game systems will result in a ban.");
+        if (specId != iam.player->GetActiveSpec()+1) {
+            iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You are attempting to add a perk to a spec that is not active. Abuse of game systems will result in a ban. Id "
+                + std::to_string(specId) + " given when " + std::to_string(iam.player->GetActiveSpec()+1) + " expected.");
+            return;
+        }
 
         if (fc->TryGetCharacterActiveSpec(iam.player, spec))
         {

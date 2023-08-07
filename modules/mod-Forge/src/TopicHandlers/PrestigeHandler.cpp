@@ -32,10 +32,9 @@ public:
             return;
         }
 
- 
         iam.player->SetPhaseMask(1, false);
+        iam.player->ClearQuestStatus();
         iam.player->resetSpells();
-
 
         // add forge spells back
         ForgeCharacterSpec* spec;
