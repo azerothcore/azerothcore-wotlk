@@ -3009,6 +3009,7 @@ SmartScriptHolder SmartScript::CreateSmartEvent(SMART_EVENT e, uint32 event_flag
     script.event.raw.param3 = event_param3;
     script.event.raw.param4 = event_param4;
     script.event.raw.param5 = event_param5;
+    script.event.raw.param6 = event_param6;
     script.event.event_phase_mask = phaseMask;
     script.event.event_flags = event_flags;
     script.event.event_chance = 100;
