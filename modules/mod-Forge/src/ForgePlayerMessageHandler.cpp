@@ -124,8 +124,9 @@ public:
                 }*/
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
-                cm->SendActiveSpecInfo(player);
+
                 cm->SendTalents(player);
+                cm->SendActiveSpecInfo(player);
             }
 
             if (currentLevel == 80)
