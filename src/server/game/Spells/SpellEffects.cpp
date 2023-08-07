@@ -234,7 +234,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectForceCast,                                //160 SPELL_EFFECT_FORCE_CAST_2
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
-    &Spell::EffectNULL,                                     //163 unused
+    &Spell::EffectGrantXP,                                  //163 SPELL_EFFECT_GRANT_EXP
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
 };
 
@@ -6210,6 +6210,21 @@ void Spell::EffectActivateSpec(SpellEffIndex /*effIndex*/)
     {
         player->ActivateSpec(damage - 1); // damage is 1 or 2, spec is 0 or 1
     }
+}
+
+void Spell::EffectGrantXP(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget)
+        return;
+
+    if (Player* player = unitTarget->ToPlayer())
+        if (player->GetLevel() < 80) {
+            auto amount = player->GetLevel() * m_spellInfo->GetEffect(effIndex).BasePoints;
+            player->GiveXP(amount, unitTarget);
+        }
 }
 
 void Spell::EffectPlaySound(SpellEffIndex effIndex)

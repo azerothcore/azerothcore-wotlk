@@ -390,7 +390,7 @@ void ForgeCommonMessage::SendAllPerks(Player* player)
     player->SendForgeUIMsg(ForgeTopic::GET_PERK_CATALOGUE, clientMsg);
 }
 
-void ForgeCommonMessage::SendWithstandingSelect(Player* player)
+void ForgeCommonMessage::SendWithstandingSelect(Player* player, std::string lastRoll = "")
 {
     ForgeCharacterSpec* spec;
     std::string out = "";
@@ -398,13 +398,14 @@ void ForgeCommonMessage::SendWithstandingSelect(Player* player)
     if (fc->TryGetCharacterActiveSpec(player, spec)) {
         auto perkQueue = spec->perkQueue;
         if (!perkQueue.empty()) {
-            if (perkQueue.begin()->second.size() > 2) {
-                for (CharacterSpecPerk* perk : perkQueue.begin()->second)
-                    out = out + std::to_string(perk->spell->spellId) + "^"
+            if (perkQueue.find(lastRoll) != perkQueue.end())
+                perkQueue.erase(lastRoll);
+
+            for (CharacterSpecPerk* perk : perkQueue.begin()->second)
+                out = out + std::to_string(perk->spell->spellId) + "^"
                     + std::to_string(perk->uuid != perkQueue.begin()->first ? 1 : 0) + delim;
 
-                SendPerkSelection(player, out);
-            }
+            SendPerkSelection(player, out);
         }
     }
 }

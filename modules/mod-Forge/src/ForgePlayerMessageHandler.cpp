@@ -74,7 +74,7 @@ public:
         }
 
         fc->ApplyAccountBoundTalents(player);
-        cm->SendWithstandingSelect(player);
+        cm->SendWithstandingSelect(player, "");
     }
 
     void OnDelete(ObjectGuid guid, uint32 accountId) override
@@ -124,9 +124,7 @@ public:
                 }*/
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
-
                 cm->SendActiveSpecInfo(player);
-                cm->SendTalentTreeLayout(player);
                 cm->SendTalents(player);
             }
 
@@ -150,8 +148,7 @@ public:
                             }
                         }
                 }
-
-                cm->SendTalents(player);
+                
             }
 
             auto missing = fc->FindMissingPerks(player);
@@ -160,7 +157,9 @@ public:
                 InsertNewPerksForLevelUp(player);
                 missing--;
             }
-            cm->SendWithstandingSelect(player);
+
+            fc->UpdateCharacterSpec(player, spec);
+            cm->SendWithstandingSelect(player, "");
         }
     }
 
@@ -263,8 +262,8 @@ private:
         if (prestiged) {
             CharacterSpecPerk* perk = fc->GetPrestigePerk(player);
             if (perk != nullptr) {
-                fc->InsertPerkSelection(player, perk->uuid, perk->spell, rollKey);
-                out = out + std::to_string(perk->spell->spellId) + delim;
+                fc->InsertPerkSelection(player, perk->spell, rollKey);
+                out = out + std::to_string(perk->spell->spellId) + "~1" + delim;
             }
         }
 
@@ -278,9 +277,9 @@ private:
             if((count != -1) && ((count < 3 && !possibility->isUnique) || (count == 0 && possibility->isUnique))
                 && (out.find(std::to_string(possibility->spellId)) == std::string::npos))
             {
-                fc->InsertPerkSelection(player, rollKey, possibility, rollKey);
+                fc->InsertPerkSelection(player, possibility, rollKey);
                 totalPerks++;
-                out = out + std::to_string(possibility->spellId) + delim;
+                out = out + std::to_string(possibility->spellId) + "~0" + delim;
             }
         } while (totalPerks < maxPerks);
         return out;

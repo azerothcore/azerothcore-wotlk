@@ -58,14 +58,12 @@ public:
                 if (csp->spell->ranks.size() == csp->rank)
                 {
                     iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "This perk cannot be upgraded any further.");
-                    fc->UpdateCharacterPerks(iam.player, spec, csp, false);
                     return;
                 }
 
                 if (spec->perks.size() >= 40)
                 {
                     iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You have reached the maximum number of perks.");
-                    fc->UpdateCharacterPerks(iam.player, spec, csp, false);
                     return;
                 }
 
@@ -80,13 +78,22 @@ public:
                 rankIt = spell->ranks.find(csp->rank);
                 if (rankIt != spell->ranks.end()) {
                     iam.player->learnSpell(rankIt->second, false, false);
-                    csp->uuid = rolled;
+                    iam.player->AddAura(rankIt->second, iam.player);
                 }
 
-                fc->UpdateCharacterPerks(iam.player, spec, csp, true);
-                fc->UpdateCharacterSpec(iam.player, spec);
+                fc->LearnCharacterPerkInternal(iam.player, spec, csp);
+
+                spec->perkQueue.erase(rolled);
+                spec->perks[spellId] = csp;
+
                 cm->SendPerks(iam.player, specId);
-                cm->SendActiveSpecInfo(iam.player);
+
+                if (spec->perks.size() >= 40) {
+                    spec->perkQueue.clear();
+                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                }
+
+                cm->SendWithstandingSelect(iam.player, rolled);
 
                 iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected
                 iam.player->SendPlaySpellImpact(iam.player->GetGUID(), 362); // 113 EmoteSalute
@@ -96,8 +103,6 @@ public:
         }
         else
             iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "The perk you attempted to learn was not offered.");
-
-        cm->SendWithstandingSelect(iam.player);
     }
 
 private:

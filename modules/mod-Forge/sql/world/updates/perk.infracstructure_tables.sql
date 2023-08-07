@@ -3,10 +3,9 @@ CREATE TABLE acore_characters.`character_perk_selection_queue` (
   `guid` int NOT NULL,
   `specId` int NOT NULL, 
   `rollkey` varchar(100) not null,
-  `uuid` varchar(100) NOT NULL,
   `spellId` mediumint NOT NULL,
-  CONSTRAINT `pk_unique` PRIMARY KEY (`uuid`, `guid`, `specId`, `rollkey`, `spellId`),
-  index (`uuid`, `guid`, `specId`, `spellId`, `rollkey`)
+  CONSTRAINT `pk_unique` PRIMARY KEY ( `guid`, `specId`, `rollkey`, `spellId`),
+  index ( `guid`, `specId`, `spellId`, `rollkey`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 DROP table if exists acore_characters.`character_spec_perks`;
