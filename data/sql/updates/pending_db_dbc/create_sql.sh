@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-unamestr=`uname`
+unamestr=$(uname)
 if [[ "$unamestr" == 'Darwin' ]]; then
    date='gdate'
 else
