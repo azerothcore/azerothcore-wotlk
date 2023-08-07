@@ -949,6 +949,13 @@ MaxArenaPoints = 10000
 StartArenaPoints = 0
 
 #
+#   LegacyArenaPoints
+#        Description: If set 1 uses pre-wotlk arena points calculation when season < 6
+#        Default:     1
+
+LegacyArenaPoints = 1
+
+#
 #    RecruitAFriend.MaxLevel
 #        Description: Highest level up to which a character can benefit from the Recruit-A-Friend
 #                     experience multiplier.
