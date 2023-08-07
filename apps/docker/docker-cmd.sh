@@ -141,7 +141,7 @@ while [[ $# -gt 0 ]]; do
 
         build:prod|prod:build)
             set -x
-            docker compose --profile build --parallel
+            docker compose --profile build
             docker image prune -f
             set +x
             shift
