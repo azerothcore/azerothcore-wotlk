@@ -909,7 +909,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             CharacterDatabase.Execute(stmt);
         }
 
-        if(IsEventActive(46)) // Spirit of Competition event
+        if(IsEventActive(EVENT_SPIRIT_OF_COMPETITION)) // Spirit of Competition event
             SpiritofCompetitionEvent(winnerTeamId);
 
         WorldPacket data;
@@ -928,8 +928,8 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
     {
         TeamId bgTeamId = player->GetBgTeamId();
         if (bgTeamId == GetTeamId(winnerTeamId))
-            if (player->GetQuestStatus(12187) == QUEST_STATUS_INCOMPLETE) // FLAG: Participant
-                player->CastSpell(player, 48163, true); // Spirit of Competition: Participant - For tabbard
+            if (player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) == QUEST_STATUS_INCOMPLETE)
+                player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
     }
 
     for (int i; i < 1; ++i)
@@ -939,8 +939,8 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
         Player* plr = it->second;
 
         if (plr->GetBgTeamId() == GetTeamId(winnerTeamId) &&
-            plr->GetQuestStatus(12186) == QUEST_STATUS_INCOMPLETE) // FLAG: Winner
-            plr->CastSpell(plr, 48164, true); // Spirit of Competition: Winner
+            plr->GetQuestStatus(QUEST_FLAG_WINNER) == QUEST_FLAG_WINNER)
+            plr->CastSpell(plr, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
         else
             --i;
     }
