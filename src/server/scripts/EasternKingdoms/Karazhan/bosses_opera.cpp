@@ -1118,7 +1118,6 @@ struct boss_julianne : public ScriptedAI
     }
 
     void MoveInLineOfSight(Unit* who) override
-
     {
         if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             return;
@@ -1129,6 +1128,10 @@ struct boss_julianne : public ScriptedAI
     void JustReachedHome() override
     {
         me->DespawnOrUnsummon();
+        if(Creature* julianne = instance->GetCreature(DATA_JULIANNE))
+        {
+            julianne->DespawnOrUnsummon();
+        }
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* Spell) override
@@ -1253,6 +1256,7 @@ struct boss_julianne : public ScriptedAI
                 me->SetInCombatWithZone();
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
             });
         }
 
@@ -1293,7 +1297,6 @@ struct boss_romulo : public ScriptedAI
     boss_romulo(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript(); //not necessary
-        //the following have no use???
     }
 
     InstanceScript* instance;
@@ -1356,7 +1359,7 @@ struct boss_romulo : public ScriptedAI
 
         if (Phase == PHASE_ROMULO)
         {
-            me->Yell("I died. Resurrecting Julianne", LANG_UNIVERSAL);
+            _scheduler.CancelGroup(GROUP_COMBAT);
             Talk(SAY_ROMULO_DEATH);
             PretendToDie(me);
             isFakingDeath = true;
@@ -1366,12 +1369,10 @@ struct boss_romulo : public ScriptedAI
             {
                 Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
                 //resurrect julianne
-                me->Yell("Attempting to resurrect Julianne", LANG_UNIVERSAL);
                 _scheduler.Schedule(10s, GROUP_RP, [this](TaskContext)
                 {
                     if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                     {
-                        me->Yell("Julianne resurrected", LANG_UNIVERSAL);
                         Resurrect(Julianne);
                         Julianne->AI()->DoAction(ACTION_PHASE_SET);
 
@@ -1380,10 +1381,6 @@ struct boss_romulo : public ScriptedAI
                             AttackStart(Julianne->GetVictim());
                         }
                     }
-                }).Schedule(1s, [this](TaskContext context)
-                {
-                    me->Yell("reviving wait heartbeat", LANG_UNIVERSAL);
-                    context.Repeat(1s);
                 });
             }
 
