@@ -14,6 +14,11 @@
 #include <list>
 #include <tuple>
 #include <random>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+
 
 enum CharacterPointType
 {
@@ -329,10 +334,9 @@ public:
         return TryGetCharacterSpec(player, cas->second, spec);
     }
 
-    int FindMissingPerks(Player* player)
+    int CountPerks(Player* player)
     {
         // TODO GRAB NUMBER FROM CATEGORY:COUNT MAP
-        int max = player->GetLevel() / 2;
         int count = 0;
         ForgeCharacterSpec* spec;
         if (TryGetCharacterActiveSpec(player, spec)) {
@@ -340,12 +344,8 @@ public:
             if (!perks.empty())
                 for (auto perk : spec->perks)
                     count += perk.second->rank;
-
-            auto queue = spec->perkQueue;
-            if (!queue.empty())
-                count += queue.size();
         }
-        return max - count;
+        return count;
     }
 
     bool TryGetCharacterSpec(Player* player, uint32 specId, OUT ForgeCharacterSpec*& spec)
@@ -899,35 +899,31 @@ public:
     {
         ForgeCharacterSpec* charSpec;
 
-        if (!TryGetCharacterActiveSpec(player, charSpec))
+        if (TryGetCharacterActiveSpec(player, charSpec)) {
+
+            uint16 count = 0;
+
+            auto csp = charSpec->perks.find(perk->spellId);
+            if (csp != charSpec->perks.end())
+                count += csp->second->rank;
+
+            auto gp = charSpec->groupPerks.find(perk->groupId);
+            if (gp != charSpec->groupPerks.end())
+                count += 1;
+
+            for (auto roll : charSpec->perkQueue)
+                for (auto cperk : roll.second)
+                    if (cperk->spell->spellId == perk->spellId)
+                        count += 1;
+
+            for (auto pp : charSpec->prestigePerks)
+                if (pp->spell->spellId == perk->spellId)
+                    count += 1;
+
+            return count;
+        }
+        else
             return -1;
-        uint16 count = 0;
-
-        QueryResult countQueue = CharacterDatabase.Query("Select count(*) from character_perk_selection_queue where `guid` = {} and `specId` = {} and `spellId` = {}", player->GetGUID().GetCounter(), charSpec->Id, perk->spellId);
-        if (!countQueue) count += 0;
-        else {
-            Field* selectionFields = countQueue->Fetch();
-            uint32 rowCount = selectionFields[0].Get<uint64>();
-            count += rowCount;
-        }
-
-        QueryResult countPrestige = CharacterDatabase.Query("Select count(*) from character_prestige_perk_carryover where `guid` = {} and `specId` = {} and `spellId` = {}", player->GetGUID().GetCounter(), charSpec->Id, perk->spellId);
-        if (!countPrestige) count += 0;
-        else {
-            Field* selectionFields = countPrestige->Fetch();
-            uint32 rowCount = selectionFields[0].Get<uint64>();
-            count += rowCount;
-        }
-
-        auto csp = charSpec->perks.find(perk->spellId);
-        if (csp != charSpec->perks.end())
-            count += csp->second->rank;
-
-        auto gp = charSpec->groupPerks.find(perk->groupId);
-        if (gp != charSpec->groupPerks.end())
-            count += 1;
-
-        return count;
     }
 
     void InsertPerkSelection(Player* player, Perk* perk, std::string rollKey)
@@ -1009,6 +1005,46 @@ public:
                 if (perk->spell->spellId == spellId)
                     return perk->uuid;
         return "";
+    }
+
+    std::string InsertNewPerksForLevelUp(Player* player)
+    {
+        std::string out = "";
+        std::string delim = "*";
+
+        ForgeCharacterPoint* pp = GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
+        bool prestiged = pp->Sum > 0;
+        uint8 maxPerks = prestiged ? 2 : 3;
+        uint8 totalPerks = 0;
+
+        auto roll = boost::uuids::random_generator()();
+        auto rollKey = boost::lexical_cast<std::string>(roll);
+        auto guid = player->GetGUID().GetCounter();
+
+        if (prestiged) {
+            CharacterSpecPerk* perk = GetPrestigePerk(player);
+            if (perk != nullptr) {
+                InsertPerkSelection(player, perk->spell, rollKey);
+                out = out + std::to_string(perk->spell->spellId) + "~1" + delim;
+            }
+        }
+
+        if (out == "") // No prestige carryover
+            maxPerks = 3;
+
+        do {
+            Perk* possibility = GetRandomPerk(player);
+
+            uint32 count = CountCharacterSpecPerkOccurences(player, player->GetActiveSpec(), possibility);
+            if ((count != -1) && ((count < 3 && !possibility->isUnique) || (count == 0 && possibility->isUnique))
+                && (out.find(std::to_string(possibility->spellId)) == std::string::npos))
+            {
+                InsertPerkSelection(player, possibility, rollKey);
+                totalPerks++;
+                out = out + std::to_string(possibility->spellId) + "~0" + delim;
+            }
+        } while (totalPerks < maxPerks);
+        return out;
     }
 
     std::vector<uint32> RACE_LIST;

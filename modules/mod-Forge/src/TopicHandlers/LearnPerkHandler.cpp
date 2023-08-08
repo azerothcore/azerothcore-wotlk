@@ -64,25 +64,29 @@ public:
                     return;
                 }
 
-                if (spec->perks.size() >= 40)
+                if (fc->CountPerks(iam.player) >= 40)
                 {
                     iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You have reached the maximum number of perks.");
+                    spec->perkQueue.clear();
+                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
                     return;
                 }
 
                 auto rankIt = spell->ranks.find(csp->rank);
-                if (rankIt != spell->ranks.end()) {
-                    iam.player->RemoveAura(rankIt->second);
-                    iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
-                }
+                if (rankIt != spell->ranks.end())
+                    if (spell->isAura)
+                        iam.player->RemoveAura(rankIt->second);
+                    else
+                        iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
 
                 csp->rank++;
 
                 rankIt = spell->ranks.find(csp->rank);
-                if (rankIt != spell->ranks.end()) {
-                    iam.player->learnSpell(rankIt->second, false, false);
-                    iam.player->AddAura(rankIt->second, iam.player);
-                }
+                if (rankIt != spell->ranks.end())
+                    if (spell->isAura)
+                        iam.player->AddAura(rankIt->second, iam.player);
+                    else
+                        iam.player->learnSpell(rankIt->second, false, false);
 
                 fc->LearnCharacterPerkInternal(iam.player, spec, csp);
 
@@ -91,10 +95,9 @@ public:
 
                 cm->SendPerks(iam.player, specId);
 
-                if (spec->perks.size() >= 40) {
-                    spec->perkQueue.clear();
-                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
-                }
+                auto missing = iam.player->GetLevel() / 2 - (fc->CountPerks(iam.player) + spec->perkQueue.size());
+                if (missing > 0)
+                    fc->InsertNewPerksForLevelUp(iam.player);
 
                 cm->SendWithstandingSelect(iam.player, rolled);
 

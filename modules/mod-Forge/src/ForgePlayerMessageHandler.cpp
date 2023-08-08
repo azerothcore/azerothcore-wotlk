@@ -22,17 +22,14 @@
 #include <GetPerksHandler.cpp>
 #include <LearnPerkHandler.cpp>
 #include <GetPerkSelectionHandler.cpp>
-//#include <UnlearnPerkHandler.cpp>
+#include <RerollPerkHandler.cpp>
 #include <PrestigeHandler.cpp>
 #include <UseSkillbook.cpp>
 #include <ForgeCache.cpp>
 #include <ForgeCacheCommands.cpp>
 #include <ActivateClassSpecHandler.cpp>
 #include <unordered_map>
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+
 
 // Add player scripts
 class ForgePlayerMessageHandler : public PlayerScript
@@ -125,7 +122,7 @@ public:
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
 
-                cm->SendTalents(player);
+                cm->SendTalentTreeLayout(player);
                 cm->SendActiveSpecInfo(player);
             }
 
@@ -152,11 +149,10 @@ public:
                 
             }
 
-            auto missing = fc->FindMissingPerks(player);
-            while (missing > 0)
+            auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
+            if (missing > 0)
             {
-                InsertNewPerksForLevelUp(player);
-                missing--;
+                fc->InsertNewPerksForLevelUp(player);
             }
 
             fc->UpdateCharacterSpec(player, spec);
@@ -244,46 +240,6 @@ private:
     {
         return false;
     }
-
-    std::string InsertNewPerksForLevelUp(Player* player)
-    {
-        std::string out = "";
-        std::string delim = "*";
-
-        ForgeCharacterPoint* pp = fc->GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
-        bool prestiged = pp->Sum > 0;
-        uint8 maxPerks = prestiged ? 2 : 3;
-        uint8 totalPerks = 0;
-
-        auto roll = boost::uuids::random_generator()();
-        auto rollKey = boost::lexical_cast<std::string>(roll);
-        auto guid = player->GetGUID().GetCounter();
-
-        if (prestiged) {
-            CharacterSpecPerk* perk = fc->GetPrestigePerk(player);
-            if (perk != nullptr) {
-                fc->InsertPerkSelection(player, perk->spell, rollKey);
-                out = out + std::to_string(perk->spell->spellId) + "~1" + delim;
-            }
-        }
-
-        if (out == "") // No prestige carryover
-            maxPerks = 3;
-
-        do {
-            Perk* possibility = fc->GetRandomPerk(player);
-
-            uint32 count = fc->CountCharacterSpecPerkOccurences(player, player->GetActiveSpec(), possibility);
-            if((count != -1) && ((count < 3 && !possibility->isUnique) || (count == 0 && possibility->isUnique))
-                && (out.find(std::to_string(possibility->spellId)) == std::string::npos))
-            {
-                fc->InsertPerkSelection(player, possibility, rollKey);
-                totalPerks++;
-                out = out + std::to_string(possibility->spellId) + "~0" + delim;
-            }
-        } while (totalPerks < maxPerks);
-        return out;
-    }
 };
 
 // Add all scripts in one
@@ -306,7 +262,7 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new GetPerksHandler(cache, cm));
     sTopicRouter->AddHandler(new LearnPerkHandler(cache, cm));
     sTopicRouter->AddHandler(new GetPerkSelectionHandler(cache, cm));
-    //sTopicRouter->AddHandler(new UnlearnPerkHandler(cache, cm));
+    sTopicRouter->AddHandler(new RerollPerkHandler(cache, cm));
 
     new UseSkillBook();
     new ForgeCacheCommands();

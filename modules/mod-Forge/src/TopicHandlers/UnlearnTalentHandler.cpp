@@ -138,9 +138,9 @@ private:
                     }
                 }
             }
+            cm->SendSpecInfo(player);
             cm->SendTalents(player);
-            cm->SendTalentTreeLayout(player);
-            cm->SendActiveSpecInfo(player);
+            cm->SendSpecInfo(player);
         }
     }
 
