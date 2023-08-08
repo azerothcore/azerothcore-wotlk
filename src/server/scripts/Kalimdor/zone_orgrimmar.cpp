@@ -172,17 +172,17 @@ public:
     {
         ClearGossipMenuFor(player);
 
-        uint32 discussionOrder = action - GOSSIP_ACTION_INFO_DEF;
+        uint32 DiscussionOrder = action - GOSSIP_ACTION_INFO_DEF;
 
-        if (discussionOrder>= 1 && discussionOrder <= 6)
+        if (DiscussionOrder>= 1 && DiscussionOrder <= 6)
         {
-            uint32 nextAction = GOSSIP_ACTION_INFO_DEF + discussionOrder + 1;
-            uint32 gossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + discussionOrder - 1;
+            uint32 NextAction = GOSSIP_ACTION_INFO_DEF + DiscussionOrder + 1;
+            uint32 GossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + DiscussionOrder - 1;
 
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL + discussionOrder, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, nextAction);
-            SendGossipMenuFor(player, gossipResponse, creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, NextAction);
+            SendGossipMenuFor(player, GossipResponse, creature->GetGUID());
         }
-        else if (discussionOrder == 7)
+        else if (DiscussionOrder == 7)
         {
             CloseGossipMenuFor(player);
             player->AreaExploredOrEventHappens(QUEST_WHAT_THE_WIND_CARRIES);
