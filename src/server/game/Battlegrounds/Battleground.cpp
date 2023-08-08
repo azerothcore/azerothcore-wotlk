@@ -909,6 +909,9 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             CharacterDatabase.Execute(stmt);
         }
 
+        if(IsEventActive(46)) // Spirit of Competition event
+            SpiritofCompetitionEvent(winnerTeamId);
+
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime(), GetArenaType(), player->GetBgTeamId());
         player->GetSession()->SendPacket(&data);
@@ -917,6 +920,32 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     }
 
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
+}
+
+bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
+{
+    for (auto const& [playerGuid, player] : m_Players)
+    {
+        TeamId bgTeamId = player->GetBgTeamId();
+        if (bgTeamId == GetTeamId(winnerTeamId))
+            if (player->GetQuestStatus(12187) == QUEST_STATUS_INCOMPLETE) // FLAG: Participant
+                player->CastSpell(player, 48163, true); // Spirit of Competition: Participant - For tabbard
+    }
+
+    for (int i; i < 1; ++i)
+    {
+        auto it = GetPlayers().begin();
+        std::advance(it, rand() % GetPlayersSize());
+        Player* plr = it->second;
+
+        if (plr->GetBgTeamId() == GetTeamId(winnerTeamId) &&
+            plr->GetQuestStatus(12186) == QUEST_STATUS_INCOMPLETE) // FLAG: Winner
+            plr->CastSpell(plr, 48164, true); // Spirit of Competition: Winner
+        else
+            i--;
+    }
+
+    return true;
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const

@@ -337,6 +337,9 @@ public:
     [[nodiscard]] uint32 GetScriptId() const          { return ScriptId; }
     [[nodiscard]] uint32 GetBonusHonorFromKill(uint32 kills) const;
 
+    // Spirit of Competition event
+    bool SpiritofCompetitionEvent(PvPTeamId winnerTeamId);
+
     bool IsRandom() { return m_IsRandom; }
 
     // Set methods:
