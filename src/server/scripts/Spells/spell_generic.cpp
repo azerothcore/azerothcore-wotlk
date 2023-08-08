@@ -4919,13 +4919,17 @@ class spell_gen_curse_of_pain : public AuraScript
 
 enum SpiritofCompetition
 {
+    // Spells
     SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT = 48056,
-    SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT = 48057,
-    MAIL_THE_COMPETITIORS_TABARD = 195,
-    MAIL_A_GOLD_MEDALLION = 196,
-    NPC_SPIRIT_OF_COMPETITION = 27217,
-    ITEM_COMPETITORS_TABARD = 36941,
-    ITEM_GOLD_MEDALLION = 37297,
+    SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT      = 48057,
+    // Mail
+    MAIL_THE_COMPETITIORS_TABARD                   = 195,
+    MAIL_A_GOLD_MEDALLION                          = 196,
+    // NPC
+    NPC_SPIRIT_OF_COMPETITION                      = 27217,
+    // Items
+    ITEM_COMPETITORS_TABARD                        = 36941,
+    ITEM_GOLD_MEDALLION                            = 37297,
 };
 
 class spell_gen_spirit_of_competition_participant : public SpellScript
