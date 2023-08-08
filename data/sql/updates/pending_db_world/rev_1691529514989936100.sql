@@ -19,3 +19,8 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (@GEVENT, @CGUID+1),
 (@GEVENT, @CGUID+2),
 (@GEVENT, @CGUID+3);
+
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (48163,48164);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(48163,'spell_gen_spirit_of_competition_participant'),
+(48164,'spell_gen_spirit_of_competition_winner');
