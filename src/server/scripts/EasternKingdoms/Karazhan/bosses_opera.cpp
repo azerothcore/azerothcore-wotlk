@@ -994,11 +994,11 @@ void Resurrect(Creature* target)
     target->SetFullHealth();
     target->SetStandState(UNIT_STAND_STATE_STAND);
     target->CastSpell(target, SPELL_RES_VISUAL, true);
+    target->AI()->DoAction(ACTION_COMBAT_SCHEDULE);
     if (target->GetVictim())
     {
         target->GetMotionMaster()->MoveChase(target->GetVictim());
         target->AI()->AttackStart(target->GetVictim());
-        target->AI()->DoAction(ACTION_COMBAT_SCHEDULE);
     }
     else
         target->GetMotionMaster()->Initialize();
