@@ -1260,15 +1260,8 @@ struct boss_julianne : public ScriptedAI
             });
         }
 
-        if(!UpdateVictim())
-            return;
-
-        if (romuloDied)
+        if (romuloDied && Phase == PHASE_BOTH)
         {
-            if (Phase != PHASE_BOTH)
-            {
-                return;
-            }
             _scheduler.Schedule(1s, [this](TaskContext)
             {
                 if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
