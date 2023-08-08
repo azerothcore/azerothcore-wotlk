@@ -1260,7 +1260,7 @@ struct boss_julianne : public ScriptedAI
             });
         }
 
-        if(!UpdateVictim)
+        if(!UpdateVictim())
             return;
 
         if (romuloDied)
@@ -1498,7 +1498,7 @@ struct boss_romulo : public ScriptedAI
     {
         _scheduler.Update(diff);
 
-        if(!UpdateVictim)
+        if(!UpdateVictim())
             return;
 
         if (julianneDead)
