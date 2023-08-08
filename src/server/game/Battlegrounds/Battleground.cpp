@@ -942,7 +942,7 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
             plr->GetQuestStatus(12186) == QUEST_STATUS_INCOMPLETE) // FLAG: Winner
             plr->CastSpell(plr, 48164, true); // Spirit of Competition: Winner
         else
-            i--;
+            --i;
     }
 
     return true;
