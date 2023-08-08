@@ -140,6 +140,7 @@ void DespawnAll(InstanceScript* instance)
     {
         tito->DespawnOrUnsummon();
     }
+    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
 }
 
 struct boss_dorothee : public ScriptedAI
@@ -263,7 +264,6 @@ struct boss_dorothee : public ScriptedAI
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
-            me->DespawnOrUnsummon();
         }
     }
 
@@ -372,7 +372,6 @@ struct boss_roar : public ScriptedAI
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
-            me->DespawnOrUnsummon();
         }
     }
 
@@ -474,7 +473,6 @@ struct boss_strawman : public ScriptedAI
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
-            me->DespawnOrUnsummon();
         }
     }
     void JustEngagedWith(Unit* /*who*/) override
@@ -609,7 +607,6 @@ struct boss_tinhead : public ScriptedAI
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
-            me->DespawnOrUnsummon();
         }
     }
 
@@ -686,6 +683,7 @@ struct boss_crone : public ScriptedAI
         ScriptedAI::EnterEvadeMode(reason);
 
         instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -881,6 +879,7 @@ struct boss_bigbadwolf : public ScriptedAI
         ScriptedAI::EnterEvadeMode(reason);
 
         instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -1128,10 +1127,6 @@ struct boss_julianne : public ScriptedAI
     void JustReachedHome() override
     {
         me->DespawnOrUnsummon();
-        if(Creature* julianne = instance->GetCreature(DATA_JULIANNE))
-        {
-            julianne->DespawnOrUnsummon();
-        }
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* Spell) override
@@ -1226,7 +1221,12 @@ struct boss_julianne : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            me->DespawnOrUnsummon();
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
+            instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+        }
     }
 
     void JustDied(Unit*) override
@@ -1348,6 +1348,10 @@ struct boss_romulo : public ScriptedAI
     void JustReachedHome() override
     {
         me->DespawnOrUnsummon();
+        if(Creature* julianne = instance->GetCreature(DATA_JULIANNE))
+        {
+            julianne->DespawnOrUnsummon();
+        }
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
