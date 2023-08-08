@@ -34,6 +34,13 @@ public:
                 return;
             }
 
+            if (fc->CountPerks(iam.player) >= 40)
+            {
+                spec->perkQueue.clear();
+                CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                return;
+            }
+
             cm->SendWithstandingSelect(iam.player, "");
         }
     }
