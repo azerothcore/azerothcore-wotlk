@@ -94,8 +94,8 @@ namespace
         const std::regex parameter_regex("^\\s*([a-zA-Z0-9\\.]+)\\s*=\\s*([^#\\n]+)(?:#[^\\n]*)?$");
         // include will parse values from another file
         const std::regex include_regex("^\\s*include\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
-        // includedir will include values from files in a directory
-        const std::regex include_dir_regex("^\\s*includedir\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
+        // includeDir will include values from files in a directory
+        const std::regex include_dir_regex("^\\s*includeDir\\s+([^#\\n]+)(?:#[\\h\\S]*)?$");
 
         std::smatch match;
 

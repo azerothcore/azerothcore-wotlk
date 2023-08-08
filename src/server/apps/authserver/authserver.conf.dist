@@ -31,6 +31,19 @@
 ###################################################################################################
 
 ###################################################################################################
+# INCLUDING OTHER CONFIGURATION FILES
+#
+#    include ...
+#    includeDir ...
+#       Description: Include another configuration file. The paramaters from
+#                    that file will override conflicting configs occurring before it. Configs
+#                    after an include will override conflicting configs defined in the include
+#
+# include /etc/azerothcore/authserver.conf
+# includeDir /etc/azerothcore/common.d/
+###################################################################################################
+
+###################################################################################################
 # AUTH SERVER SETTINGS
 #
 #    LogsDir
@@ -431,14 +444,3 @@ Logger.root=4,Console Auth
 
 #
 ###################################################################################################
-#
-#    include ...
-#       Description: Include another configuration file. The paramaters from
-#                    that file will overwrite any conflicting parameters in this
-#                    file.
-#
-#include /etc/azerothcore/authserver.conf
-#
-## To include a directory (and all files under it), make sure there's a slash at the end of the path
-#
-#include /etc/azerothcore/common.d/
