@@ -2488,7 +2488,7 @@ float Pet::GetNativeObjectScale() const
         ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
 
     CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
-    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
     {
         float minScaleLevel = creatureFamily->minScaleLevel;
         uint8 level = getLevel();
@@ -2499,7 +2499,7 @@ float Pet::GetNativeObjectScale() const
         if (minLevelScaleMod > maxScaleMod)
             minLevelScaleMod = maxScaleMod;
 
-        float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? scaleMod = minLevelScaleMod / maxScaleMod : 0.f;
+        float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
 
         float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
 
