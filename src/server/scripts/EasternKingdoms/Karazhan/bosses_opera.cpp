@@ -1274,7 +1274,7 @@ struct boss_julianne : public ScriptedAI
                     }
                 }
             });
-            _secondResurrection == true;
+            _secondResurrection = true;
         }
 
         _scheduler.Update(diff);
