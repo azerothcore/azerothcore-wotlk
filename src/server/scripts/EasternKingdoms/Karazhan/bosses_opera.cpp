@@ -140,7 +140,6 @@ void DespawnAll(InstanceScript* instance)
     {
         tito->DespawnOrUnsummon();
     }
-    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
 }
 
 struct boss_dorothee : public ScriptedAI
@@ -683,7 +682,6 @@ struct boss_crone : public ScriptedAI
         ScriptedAI::EnterEvadeMode(reason);
 
         instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
-        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -879,7 +877,6 @@ struct boss_bigbadwolf : public ScriptedAI
         ScriptedAI::EnterEvadeMode(reason);
 
         instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
-        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -984,6 +981,7 @@ void PretendToDie(Creature* creature)
     creature->RemoveAllAuras();
     creature->SetHealth(0);
     creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    creature->SetReactState(REACT_PASSIVE);
     creature->GetMotionMaster()->MovementExpired(false);
     creature->GetMotionMaster()->MoveIdle();
     creature->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -992,6 +990,7 @@ void PretendToDie(Creature* creature)
 void Resurrect(Creature* target)
 {
     target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    target->SetReactState(REACT_AGGRESSIVE);
     target->SetFullHealth();
     target->SetStandState(UNIT_STAND_STATE_STAND);
     target->CastSpell(target, SPELL_RES_VISUAL, true);
@@ -1032,6 +1031,7 @@ struct boss_julianne : public ScriptedAI
         }
 
         _introStarted = false;
+        _secondResurrection = false;
         summonedRomulo = false;
         romuloDied = false;
     }
@@ -1225,7 +1225,6 @@ struct boss_julianne : public ScriptedAI
         {
             me->DespawnOrUnsummon();
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
-            instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
         }
     }
 
@@ -1260,7 +1259,7 @@ struct boss_julianne : public ScriptedAI
             });
         }
 
-        if (romuloDied && Phase == PHASE_BOTH)
+        if (romuloDied && Phase == PHASE_BOTH && !_secondResurrection)
         {
             _scheduler.Schedule(1s, [this](TaskContext)
             {
@@ -1275,7 +1274,9 @@ struct boss_julianne : public ScriptedAI
                     }
                 }
             });
+            _secondResurrection == true;
         }
+
         _scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
@@ -1283,6 +1284,7 @@ struct boss_julianne : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     bool _introStarted;
+    bool _secondResurrection;
 };
 
 struct boss_romulo : public ScriptedAI
