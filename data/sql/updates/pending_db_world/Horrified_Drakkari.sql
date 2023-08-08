@@ -1,2 +1,2 @@
-UPDATE `creature_template` SET `faction` = 37, `flags_extra` = 66 WHERE (`entry` = 26582);
-UPDATE `creature_template` SET `faction` = 37, `flags_extra` = 66 WHERE (`entry` = 26583);
+UPDATE `creature_template` SET `flags_extra` = REPLACE(`flags_extra`, "62", "64") WHERE (`entry` = 26582);
+UPDATE `creature_template` SET `flags_extra` = REPLACE(`flags_extra`, "62", "64") WHERE (`entry` = 26583);
