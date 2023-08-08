@@ -1256,6 +1256,9 @@ struct boss_julianne : public ScriptedAI
             });
         }
 
+        if(!UpdateVictim)
+            return;
+
         if (romuloDied)
         {
             if (Phase != PHASE_BOTH)
@@ -1493,6 +1496,9 @@ struct boss_romulo : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         _scheduler.Update(diff);
+
+        if(!UpdateVictim)
+            return;
 
         if (julianneDead)
         {
