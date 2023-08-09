@@ -99,13 +99,14 @@ public:
 
                     sfp->Sum += refund;
                     sfp->Max -= refund;
-                    //TODO AURA VS SPELL
+
                     auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
                     if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                        iam.player->RemoveAura(spellId);
+                        iam.player->RemoveAura(spellId, iam.player->GetGUID());
                     else
                         iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
 
+                    iam.player->UpdateAllStats();
                     spellItt->second->CurrentRank = 0;
 
                     fc->UpdateCharPoints(iam.player, sfp);
