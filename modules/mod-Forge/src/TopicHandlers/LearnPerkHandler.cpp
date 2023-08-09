@@ -86,7 +86,7 @@ public:
                     if (spell->isAura)
                         iam.player->AddAura(rankIt->second, iam.player);
                     else
-                        iam.player->learnSpell(rankIt->second, false, false);
+                        iam.player->learnSpell(rankIt->second);
 
                 fc->LearnCharacterPerkInternal(iam.player, spec, csp);
 

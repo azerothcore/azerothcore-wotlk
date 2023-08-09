@@ -102,9 +102,11 @@ public:
 
                     auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
                     if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                        iam.player->RemoveAura(spellId, iam.player->GetGUID());
+                        iam.player->RemoveOwnedAura(spellId);
                     else
                         iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
+
+                    iam.player->SendLearnPacket(spellId, false);
 
                     iam.player->UpdateAllStats();
                     spellItt->second->CurrentRank = 0;
