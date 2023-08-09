@@ -949,6 +949,14 @@ MaxArenaPoints = 10000
 StartArenaPoints = 0
 
 #
+#   Arena.LegacyArenaPoints
+#        Description: Use arena point calculation from TBC for season 1 - 5 when rating is less or equal to 1500
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Arena.LegacyArenaPoints = 0
+
+#
 #    RecruitAFriend.MaxLevel
 #        Description: Highest level up to which a character can benefit from the Recruit-A-Friend
 #                     experience multiplier.
