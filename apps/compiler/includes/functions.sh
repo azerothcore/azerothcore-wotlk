@@ -160,8 +160,10 @@ function comp_compile() {
           # if dist file doesn't exist, skip this iteration
           [ ! -f "$distPath" ] && continue
 
-          # replace params in foo.conf.dist with params in foo.conf.dockerdist
-          conf_layer "$dockerdist" "$distPath" " # Copied from dockerdist"
+          # override configs in configs in the root file with those needed for
+          # docker
+          echo >> "$distPath"
+          echo "include \"$(basename "$dockerdist")\"" >> "$distPath"
 
           # Copy modified dist file to $confDir/$filename
           # Don't overwrite foo.conf if it already exists.
@@ -184,37 +186,4 @@ function comp_build() {
 function comp_all() {
   comp_clean
   comp_build
-}
-
-# conf_layer FILENAME FILENAME
-# Layer the configuration parameters from the first argument onto the second argument
-function conf_layer() {
-  LAYER="$1"
-  BASE="$2"
-  COMMENT="$3"
-
-  # Loop over all defined params in conf file
-  grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
-    | while read -r param
-      do
-        # remove spaces from param
-        # foo       = bar becomes foo=bar
-        NOSPACE="$(tr -d '[:space:]' <<< "$param")"
-
-        # split into key and value
-        KEY="$(cut -f1 -d= <<< "$NOSPACE")"
-        VAL="$(cut -f2 -d= <<< "$NOSPACE")"
-        # if key in base and val not in line
-        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
-          # Replace line
-          # Prevent issues with shell quoting 
-          sed -i \
-            's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' \
-            "$BASE"
-        else
-          # insert line
-          echo "$KEY = $VAL$COMMENT" >> "$BASE"
-        fi
-      done
-  echo "Layered $LAYER onto $BASE"
 }
