@@ -142,7 +142,6 @@ private:
             cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);
             cm->SendTalents(player);
-            cm->SendTalents(player, tabId);
         }
     }
 
