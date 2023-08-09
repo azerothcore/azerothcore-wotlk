@@ -122,8 +122,12 @@ public:
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
 
-                cm->SendTalents(player);
                 cm->SendActiveSpecInfo(player);
+
+                std::list<ForgeTalentTab*> tabs;
+                if (fc->TryGetForgeTalentTabs(player, CharacterPointType::TALENT_TREE, tabs))
+                    for (auto* tab : tabs)
+                        cm->SendTalents(player, tab->Id);
             }
 
             if (currentLevel == 80)
