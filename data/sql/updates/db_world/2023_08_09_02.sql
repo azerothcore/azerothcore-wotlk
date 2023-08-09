@@ -1,3 +1,4 @@
+-- DB update 2023_08_09_01 -> 2023_08_09_02
 --
 -- Add acore_strings for arena queue announcer with less detail about the teams
 DELETE FROM `acore_string` WHERE `entry` IN (773, 774, 775, 776, 777, 778);
