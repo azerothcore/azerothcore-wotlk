@@ -102,11 +102,9 @@ public:
 
                     auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
                     if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                        iam.player->RemoveOwnedAura(spellId);
+                        iam.player->RemoveOwnedAura(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank]);
                     else
                         iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
-
-                    iam.player->SendLearnPacket(spellId, false);
 
                     iam.player->UpdateAllStats();
                     spellItt->second->CurrentRank = 0;
@@ -136,11 +134,14 @@ private:
                     {
                         for (auto spell : tab.second)
                         {
-                            ForgeAddonMessage* msg = new ForgeAddonMessage();
-                            msg->topic = 2;
-                            msg->player = player;
-                            msg->message = std::to_string(tab.first) + ";" + std::to_string(spell.first);
-                            HandleMessage(*msg);
+                            if (spell.second->CurrentRank > 0)
+                            {
+                                ForgeAddonMessage* msg = new ForgeAddonMessage();
+                                msg->topic = 2;
+                                msg->player = player;
+                                msg->message = std::to_string(tab.first) + ";" + std::to_string(spell.first);
+                                HandleMessage(*msg);
+                            }
                         }
                     }
                     else {
