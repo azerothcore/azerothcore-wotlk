@@ -99,6 +99,7 @@ public:
 
                     sfp->Sum += refund;
                     sfp->Max -= refund;
+                    //TODO AURA VS SPELL
                     iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
                     spellItt->second->CurrentRank = 0;
 
