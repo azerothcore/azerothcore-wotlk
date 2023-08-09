@@ -39,6 +39,10 @@ public:
             fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
             ForgeCharacterPoint* curPoints = fc->GetSpecPoints(iam.player, tabType, spec->Id);
+            if (tab->ClassMask != iam.player->getClassMask())
+            {
+                iam.player->SendForgeUIMsg(ForgeTopic::LEARN_TALENT_ERROR, "You are attempting to learn a talent from a another class; abuse of game systems will result in a ban.");
+            }
 
             if (curPoints->Sum == 0)
             {
@@ -217,20 +221,31 @@ public:
 
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
-            if (ranksItt != ft->Ranks.end())
-                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+            if (ranksItt != ft->Ranks.end()) {
+                auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
+                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                    iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+                else
+                    iam.player->RemoveAura(ranksItt->second);
+            }
 
             ct->CurrentRank++;
 
             ranksItt = ft->Ranks.find(ct->CurrentRank);
 
-            if (ranksItt != ft->Ranks.end())
-                iam.player->learnSpell(ranksItt->second, false, false);
-            
+            if (ranksItt != ft->Ranks.end()) {
+                auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
+                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                    iam.player->learnSpell(ranksItt->second);
+                else
+                    iam.player->AddAura(ranksItt->second, iam.player);
+            }
+
             fc->UpdateCharPoints(iam.player, curPoints);
             fc->UpdateCharacterSpec(iam.player, spec);
 
             cm->SendActiveSpecInfo(iam.player);
+            cm->SendSpecInfo(iam.player);
             cm->SendTalents(iam.player, tabId);
 
             iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected

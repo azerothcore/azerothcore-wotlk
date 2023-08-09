@@ -37,12 +37,10 @@ public:
         if (results.empty() || results.size() != 2 || !fc->isNumber(results[1]))
             return;
 
-        uint32 tabId = static_cast<uint32>(std::stoul(results[0]));
-        uint32 spellId = static_cast<uint32>(std::stoul(results[1]));
-        CharacterPointType pointType;
+
 
         if (results[0] == "-1") {
-            ResetAllTabsForSpec(iam.player);
+            ResetAllTabsForSpec(iam.player, static_cast<uint32>(std::stoul(results[1])));
             return;
         }
         else if (!fc->isNumber(results[0]))
@@ -50,6 +48,9 @@ public:
             return;
         }
         else {
+            uint32 tabId = static_cast<uint32>(std::stoul(results[0]));
+            uint32 spellId = static_cast<uint32>(std::stoul(results[1]));
+            CharacterPointType pointType;
 
             if (!fc->TryGetTabPointType(tabId, pointType))
             {
@@ -98,7 +99,14 @@ public:
 
                     sfp->Sum += refund;
                     sfp->Max -= refund;
-                    iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
+
+                    auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                    if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                        iam.player->RemoveOwnedAura(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank]);
+                    else
+                        iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
+
+                    iam.player->UpdateAllStats();
                     spellItt->second->CurrentRank = 0;
 
                     fc->UpdateCharPoints(iam.player, sfp);
@@ -114,11 +122,10 @@ public:
 
 private:
 
-    void ResetAllTabsForSpec(Player* player)
+    void ResetAllTabsForSpec(Player* player, uint32 tabId)
     {
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(player, spec)) {
-            auto refundAmount = 0;
             for (auto tab : spec->Talents) {
                 CharacterPointType pt;
                 if (fc->TryGetTabPointType(tab.first, pt))
@@ -127,11 +134,14 @@ private:
                     {
                         for (auto spell : tab.second)
                         {
-                            ForgeAddonMessage* msg = new ForgeAddonMessage();
-                            msg->topic = "2";
-                            msg->player = player;
-                            msg->message = std::to_string(tab.first) + ";" + std::to_string(spell.first);
-                            HandleMessage(*msg);
+                            if (spell.second->CurrentRank > 0)
+                            {
+                                ForgeAddonMessage* msg = new ForgeAddonMessage();
+                                msg->topic = 2;
+                                msg->player = player;
+                                msg->message = std::to_string(tab.first) + ";" + std::to_string(spell.first);
+                                HandleMessage(*msg);
+                            }
                         }
                     }
                     else {
@@ -139,6 +149,8 @@ private:
                     }
                 }
             }
+            cm->SendActiveSpecInfo(player);
+            cm->SendSpecInfo(player);
             cm->SendTalents(player);
         }
     }
