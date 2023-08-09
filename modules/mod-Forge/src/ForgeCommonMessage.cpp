@@ -403,7 +403,7 @@ void ForgeCommonMessage::SendWithstandingSelect(Player* player, std::string last
 
             for (CharacterSpecPerk* perk : perkQueue.begin()->second)
                 out = out + std::to_string(perk->spell->spellId) + "^"
-                    + std::to_string(perk->uuid != perkQueue.begin()->first ? 1 : 0) + delim;
+                    + std::to_string(perk->carryover) + delim;
 
             SendPerkSelection(player, out);
         }

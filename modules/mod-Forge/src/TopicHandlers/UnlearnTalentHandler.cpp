@@ -37,12 +37,10 @@ public:
         if (results.empty() || results.size() != 2 || !fc->isNumber(results[1]))
             return;
 
-        uint32 tabId = static_cast<uint32>(std::stoul(results[0]));
-        uint32 spellId = static_cast<uint32>(std::stoul(results[1]));
-        CharacterPointType pointType;
+
 
         if (results[0] == "-1") {
-            ResetAllTabsForSpec(iam.player);
+            ResetAllTabsForSpec(iam.player, static_cast<uint32>(std::stoul(results[1])));
             return;
         }
         else if (!fc->isNumber(results[0]))
@@ -50,6 +48,9 @@ public:
             return;
         }
         else {
+            uint32 tabId = static_cast<uint32>(std::stoul(results[0]));
+            uint32 spellId = static_cast<uint32>(std::stoul(results[1]));
+            CharacterPointType pointType;
 
             if (!fc->TryGetTabPointType(tabId, pointType))
             {
@@ -114,7 +115,7 @@ public:
 
 private:
 
-    void ResetAllTabsForSpec(Player* player)
+    void ResetAllTabsForSpec(Player* player, uint32 tabId)
     {
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(player, spec)) {
@@ -138,9 +139,10 @@ private:
                     }
                 }
             }
+            cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);
             cm->SendTalents(player);
-            cm->SendSpecInfo(player);
+            cm->SendTalents(player, tabId);
         }
     }
 

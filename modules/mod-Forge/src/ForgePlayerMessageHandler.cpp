@@ -152,7 +152,7 @@ public:
             auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
             if (missing > 0)
             {
-                fc->InsertNewPerksForLevelUp(player);
+                fc->InsertNewPerksForLevelUp(player, spec);
             }
 
             fc->UpdateCharacterSpec(player, spec);

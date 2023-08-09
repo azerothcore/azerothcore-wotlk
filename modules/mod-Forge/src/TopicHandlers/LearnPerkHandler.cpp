@@ -95,10 +95,6 @@ public:
 
                 cm->SendPerks(iam.player, specId);
 
-                auto missing = iam.player->GetLevel() / 2 - (fc->CountPerks(iam.player) + spec->perkQueue.size());
-                if (missing > 0)
-                    fc->InsertNewPerksForLevelUp(iam.player);
-
                 cm->SendWithstandingSelect(iam.player, rolled);
 
                 iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected

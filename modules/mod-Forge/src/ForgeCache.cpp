@@ -117,6 +117,7 @@ struct CharacterSpecPerk {
     Perk* spell;
     std::string uuid;
     uint8 rank;
+    uint8 carryover;
     bool operator () (const CharacterSpecPerk* m) const
     {
         return m->spell->spellId == m->spell->spellId;
@@ -926,7 +927,7 @@ public:
             return -1;
     }
 
-    void InsertPerkSelection(Player* player, Perk* perk, std::string rollKey)
+    void InsertPerkSelection(Player* player, Perk* perk, std::string rollKey, uint8 carryover)
     {
         ForgeCharacterSpec* charSpec;
 
@@ -941,6 +942,7 @@ public:
             csp->spell = perk;
             csp->uuid = rollKey;
             csp->rank = 1;
+            csp->carryover = carryover;
             charSpec->perkQueue[rollKey].push_back(csp);
         }
     }
@@ -1007,14 +1009,11 @@ public:
         return "";
     }
 
-    std::string InsertNewPerksForLevelUp(Player* player)
+    void InsertNewPerksForLevelUp(Player* player, ForgeCharacterSpec* spec)
     {
-        std::string out = "";
-        std::string delim = "*";
-
         ForgeCharacterPoint* pp = GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
         bool prestiged = pp->Sum > 0;
-        uint8 maxPerks = prestiged ? 2 : 3;
+        uint8 maxPerks = 3;
         uint8 totalPerks = 0;
 
         auto roll = boost::uuids::random_generator()();
@@ -1024,27 +1023,24 @@ public:
         if (prestiged) {
             CharacterSpecPerk* perk = GetPrestigePerk(player);
             if (perk != nullptr) {
-                InsertPerkSelection(player, perk->spell, rollKey);
-                out = out + std::to_string(perk->spell->spellId) + "~1" + delim;
+
+                InsertPerkSelection(player, perk->spell, rollKey, 1);
+                maxPerks--;
             }
         }
-
-        if (out == "") // No prestige carryover
-            maxPerks = 3;
 
         do {
             Perk* possibility = GetRandomPerk(player);
 
             uint32 count = CountCharacterSpecPerkOccurences(player, player->GetActiveSpec(), possibility);
             if ((count != -1) && ((count < 3 && !possibility->isUnique) || (count == 0 && possibility->isUnique))
-                && (out.find(std::to_string(possibility->spellId)) == std::string::npos))
+                && std::find_if(spec->perkQueue[rollKey].begin(), spec->perkQueue[rollKey].end(),
+                    [&possibility](CharacterSpecPerk* perk) {return perk->spell->spellId == possibility->spellId;}) == spec->perkQueue[rollKey].end())
             {
-                InsertPerkSelection(player, possibility, rollKey);
+                InsertPerkSelection(player, possibility, rollKey, 0);
                 totalPerks++;
-                out = out + std::to_string(possibility->spellId) + "~0" + delim;
             }
         } while (totalPerks < maxPerks);
-        return out;
     }
 
     std::vector<uint32> RACE_LIST;
