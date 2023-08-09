@@ -122,7 +122,7 @@ public:
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
 
-                cm->SendTalentTreeLayout(player);
+                cm->SendTalents(player);
                 cm->SendActiveSpecInfo(player);
             }
 
