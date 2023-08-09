@@ -954,7 +954,7 @@ StartArenaPoints = 0
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
-Arena.LegacyArenaPoints = 1
+Arena.LegacyArenaPoints = 0
 
 #
 #    RecruitAFriend.MaxLevel
