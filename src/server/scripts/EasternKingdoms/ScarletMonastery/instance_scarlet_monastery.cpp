@@ -695,7 +695,7 @@ class npc_fairbanks : public CreatureScript
 public:
     npc_fairbanks() : CreatureScript("npc_fairbanks") { }
 
-   struct npc_fairbanksAI : public SmartAI
+    struct npc_fairbanksAI : public SmartAI
     {
         npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
 
@@ -712,8 +712,6 @@ public:
                     {
                         me->SetFaction(FACTION_FRIENDLY);
                         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        //Gossip in Blizzard servers with a weapon in his hand when he gossips
-                        //me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
                         me->SetDisplayId(16179);
                         me->SetFacingToObject(player);
