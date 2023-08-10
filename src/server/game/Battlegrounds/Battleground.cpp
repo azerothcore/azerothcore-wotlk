@@ -934,7 +934,7 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
 
     // Incase of draw nobody get reward
     if (winnerTeamId == TEAM_NEUTRAL)
-        return false; 
+        return false;
     else
     {
         for (int i = 0; i < 1; ++i)
