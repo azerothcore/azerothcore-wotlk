@@ -188,12 +188,12 @@ struct boss_dorothee : public ScriptedAI
 
     void Initialize()
     {
-        TitoDied = false;
+        titoDied = false;
         _startIntro = false;
     }
 
     InstanceScript* instance;
-    bool TitoDied;
+    bool titoDied;
 
     void Reset() override
     {
@@ -228,7 +228,7 @@ struct boss_dorothee : public ScriptedAI
             Talk(SAY_DOROTHEE_SUMMON);
             pTito->AI()->AttackStart(me->GetVictim());
             pTito->SetInCombatWithZone();
-            TitoDied = false;
+            titoDied = false;
         }
     }
 
@@ -546,12 +546,6 @@ struct boss_tinhead : public ScriptedAI
 
     InstanceScript* instance;
 
-    uint32 AggroTimer;
-    uint32 CleaveTimer;
-    uint32 RustTimer;
-
-    uint8 RustCount;
-
     void Reset() override
     {
         _rustCount = 0;
@@ -564,7 +558,7 @@ struct boss_tinhead : public ScriptedAI
         _scheduler.Schedule(5s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CLEAVE);
-            CleaveTimer = 5000;
+            context.Repeat(5s);
         }).Schedule(15s, [this](TaskContext context)
         {
             if (_rustCount < 8)
@@ -708,12 +702,7 @@ struct npc_cyclone : public ScriptedAI
 {
     npc_cyclone(Creature* creature) : ScriptedAI(creature) { }
 
-    uint32 MoveTimer;
-
-    void Reset() override
-    {
-        MoveTimer = 1000;
-    }
+    void Reset() override { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -795,10 +784,6 @@ struct boss_bigbadwolf : public ScriptedAI
     }
 
     InstanceScript* instance;
-
-    uint32 ChaseTimer;
-    uint32 FearTimer;
-    uint32 SwipeTimer;
 
     ObjectGuid HoodGUID;
 
@@ -1007,7 +992,7 @@ struct boss_julianne : public ScriptedAI
 
     InstanceScript* instance;
 
-    uint32 Phase;
+    uint32 phase;
 
     bool isFakingDeath;
     bool summonedRomulo;
@@ -1015,7 +1000,7 @@ struct boss_julianne : public ScriptedAI
 
     void Reset() override
     {
-        Phase = PHASE_JULIANNE;
+        phase = PHASE_JULIANNE;
 
         if (isFakingDeath)
         {
@@ -1056,7 +1041,7 @@ struct boss_julianne : public ScriptedAI
                 });
                 break;
             case ACTION_PHASE_SET:
-                Phase = PHASE_BOTH;
+                phase = PHASE_BOTH;
                 isFakingDeath = false;
                 break;
             case ACTION_FAKING_DEATH:
@@ -1153,7 +1138,7 @@ struct boss_julianne : public ScriptedAI
             {
                 //will do this 2secs after spell hit. this is time to display visual as expected
                 PretendToDie(me);
-                Phase = PHASE_ROMULO;
+                phase = PHASE_ROMULO;
                 _scheduler.Schedule(10s, GROUP_RP, [this](TaskContext)
                 {
                     if (Creature* pRomulo = me->SummonCreature(CREATURE_ROMULO, ROMULO_X, ROMULO_Y, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
@@ -1176,7 +1161,7 @@ struct boss_julianne : public ScriptedAI
 
         //anything below only used if incoming damage will kill
 
-        if (Phase == PHASE_JULIANNE)
+        if (phase == PHASE_JULIANNE)
         {
             damage = 0;
 
@@ -1195,14 +1180,14 @@ struct boss_julianne : public ScriptedAI
             return;
         }
 
-        if (Phase == PHASE_ROMULO)
+        if (phase == PHASE_ROMULO)
         {
             //LOG_ERROR("scripts", "boss_julianneAI: cannot take damage in PHASE_ROMULO, why was i here?");
             damage = 0;
             return;
         }
 
-        if (Phase == PHASE_BOTH)
+        if (phase == PHASE_BOTH)
         {
             //if this is true then we have to kill romulo too
             if (romuloDied)
@@ -1293,14 +1278,14 @@ struct boss_romulo : public ScriptedAI
 
     InstanceScript* instance;
 
-    uint32 Phase;
+    uint32 phase;
 
     bool isFakingDeath;
     bool julianneDead;
 
     void Reset() override
     {
-        Phase = PHASE_ROMULO;
+        phase = PHASE_ROMULO;
 
         isFakingDeath = false;
         julianneDead = false;
@@ -1322,7 +1307,7 @@ struct boss_romulo : public ScriptedAI
                 });
                 break;
             case ACTION_PHASE_SET:
-                Phase = PHASE_ROMULO;
+                phase = PHASE_ROMULO;
                 break;
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;
@@ -1352,12 +1337,12 @@ struct boss_romulo : public ScriptedAI
 
         //anything below only used if incoming damage will kill
 
-        if (Phase == PHASE_ROMULO)
+        if (phase == PHASE_ROMULO)
         {
             Talk(SAY_ROMULO_DEATH);
             PretendToDie(me);
             isFakingDeath = true;
-            Phase = PHASE_BOTH;
+            phase = PHASE_BOTH;
 
             if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
             {
@@ -1382,7 +1367,7 @@ struct boss_romulo : public ScriptedAI
             return;
         }
 
-        if (Phase == PHASE_BOTH)
+        if (phase == PHASE_BOTH)
         {
             if (julianneDead)
             {
