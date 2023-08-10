@@ -115,23 +115,23 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
 
 void DespawnAll(InstanceScript* instance)
 {
-    if(Creature* dorothee = instance->GetCreature(DATA_DOROTHEE))
+    if (Creature* dorothee = instance->GetCreature(DATA_DOROTHEE))
     {
         dorothee->DespawnOrUnsummon();
     }
-    if(Creature* roar = instance->GetCreature(DATA_ROAR))
+    if (Creature* roar = instance->GetCreature(DATA_ROAR))
     {
         roar->DespawnOrUnsummon();
     }
-    if(Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
+    if (Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
     {
         strawman->DespawnOrUnsummon();
     }
-    if(Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
+    if (Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
     {
         tinhead->DespawnOrUnsummon();
     }
-    if(Creature* tito = instance->GetCreature(DATA_TITO))
+    if (Creature* tito = instance->GetCreature(DATA_TITO))
     {
         tito->DespawnOrUnsummon();
     }
@@ -156,7 +156,7 @@ struct boss_dorothee : public ScriptedAI
     {
         _scheduler.Schedule(16670ms, [this](TaskContext)
         {
-            if(Creature* roar = instance->GetCreature(DATA_ROAR))
+            if (Creature* roar = instance->GetCreature(DATA_ROAR))
             {
                 roar->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 roar->SetImmuneToPC(false);
@@ -164,7 +164,7 @@ struct boss_dorothee : public ScriptedAI
             }
         }).Schedule(26300ms, [this](TaskContext)
         {
-            if(Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
+            if (Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
             {
                 strawman->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 strawman->SetImmuneToPC(false);
@@ -172,7 +172,7 @@ struct boss_dorothee : public ScriptedAI
             }
         }).Schedule(34470ms, [this](TaskContext)
         {
-            if(Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
+            if (Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
             {
                 tinhead->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 tinhead->SetImmuneToPC(false);
@@ -254,7 +254,7 @@ struct boss_dorothee : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
@@ -263,12 +263,12 @@ struct boss_dorothee : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if(!_startIntro)
+        if (!_startIntro)
         {
             Talk(SAY_DOROTHEE_AGGRO);
         }
 
-        if(!_startIntro)
+        if (!_startIntro)
         {
             ScheduleActivation();
             _scheduler.Schedule(12s, [this](TaskContext)
@@ -310,9 +310,9 @@ struct npc_tito : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if(Creature* Dorothee = instance->GetCreature(DATA_DOROTHEE))
+        if (Creature* Dorothee = instance->GetCreature(DATA_DOROTHEE))
         {
-            if(Dorothee->IsAlive())
+            if (Dorothee->IsAlive())
             {
                 Talk(SAY_DOROTHEE_TITO_DEATH, Dorothee);
             }
@@ -362,7 +362,7 @@ struct boss_roar : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
@@ -463,7 +463,7 @@ struct boss_strawman : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
@@ -591,7 +591,7 @@ struct boss_tinhead : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
             DespawnAll(instance);
@@ -804,7 +804,7 @@ struct boss_bigbadwolf : public ScriptedAI
                     Talk(SAY_WOLF_HOOD);
                     DoCast(target, SPELL_LITTLE_RED_RIDING_HOOD, true);
                     _tempThreat = DoGetThreat(target);
-                    if(_tempThreat)
+                    if (_tempThreat)
                     {
                         DoModifyThreatByPercent(target, -100);
                     }
@@ -1079,9 +1079,9 @@ struct boss_julianne : public ScriptedAI
             context.Repeat(5s, 30s);
         }).Schedule(25s, GROUP_COMBAT, [this](TaskContext context)
         {
-            if(urand(0, 1) && summonedRomulo)
+            if (urand(0, 1) && summonedRomulo)
             {
-                if(Creature* Romulo = instance->GetCreature(DATA_ROMULO))
+                if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
                     if (Romulo->IsAlive() && !romuloDied)
                     {
@@ -1225,7 +1225,7 @@ struct boss_julianne : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode(reason);
 
-        if(!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
             me->DespawnOrUnsummon();
             instance->SetBossState(DATA_OPERA_PERFORMANCE, FAIL);
@@ -1249,12 +1249,12 @@ struct boss_julianne : public ScriptedAI
         _scheduler.Update(diff);
         _resurrectScheduler.Update(diff);
 
-        if(!UpdateVictim())
+        if (!UpdateVictim())
         {
             return;
         }
 
-        if(!isFakingDeath)
+        if (!isFakingDeath)
         {
             DoMeleeAttackIfReady();
         }
@@ -1319,7 +1319,7 @@ struct boss_romulo : public ScriptedAI
     void JustReachedHome() override
     {
         me->DespawnOrUnsummon();
-        if(Creature* julianne = instance->GetCreature(DATA_JULIANNE))
+        if (Creature* julianne = instance->GetCreature(DATA_JULIANNE))
         {
             julianne->DespawnOrUnsummon();
         }
@@ -1345,12 +1345,12 @@ struct boss_romulo : public ScriptedAI
                 //resurrect julianne
                 _scheduler.Schedule(10s, GROUP_RP, [this](TaskContext)
                 {
-                    if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
+                    if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                     {
                         Resurrect(Julianne);
                         Julianne->AI()->DoAction(ACTION_PHASE_SET);
                         Julianne->AI()->DoAction(ACTION_DO_RESURRECT);
-                        if(Julianne->GetVictim())
+                        if (Julianne->GetVictim())
                         {
                             AttackStart(Julianne->GetVictim());
                         }
@@ -1400,7 +1400,7 @@ struct boss_romulo : public ScriptedAI
 
     void ScheduleCombat()
     {
-        if(Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
+        if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
         {
             if (Julianne->GetVictim())
             {
@@ -1473,12 +1473,12 @@ struct boss_romulo : public ScriptedAI
         _scheduler.Update(diff);
         _resurrectScheduler.Update(diff);
 
-        if(!UpdateVictim())
+        if (!UpdateVictim())
         {
             return;
         }
 
-        if(!isFakingDeath)
+        if (!isFakingDeath)
         {
             DoMeleeAttackIfReady();
         }
