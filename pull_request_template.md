@@ -32,7 +32,7 @@ This PR has been:
 <!-- Describe in a detailed step-by-step order how to test the changes -->
 
 - [ ] This pull request can be tested by following the reproduction steps provided in the linked issue
-- [ ] This pull request requires further testing. Provide steps to test your changes.
+- [ ] This pull request requires further testing. Provide steps to test your changes. If it requires any specific setup e.g multiple players please specify it as well.
 
 1.
 2.
