@@ -956,27 +956,20 @@ enum RAJGroups
     GROUP_RP            = 1
 };
 
-enum RAJDataType
-{
-    DATA_FAKING_DEATH   = 0
-};
-
-enum RAJDataValue
-{
-    NOT_FAKING          = 0,
-    IS_FAKING           = 1
-};
-
 enum RAJActions
 {
     ACTION_DIED_ANNOUNCE    = 0,
     ACTION_PHASE_SET        = 1,
     ACTION_FAKING_DEATH     = 2,
-    ACTION_COMBAT_SCHEDULE  = 3
+    ACTION_COMBAT_SCHEDULE  = 3,
+    ACTION_DO_RESURRECT     = 4,
+    ACTION_EARLY_REVIVE     = 5,
+    ACTION_CANCEL_COMBAT    = 6
 };
 
 void PretendToDie(Creature* creature)
 {
+    creature->AI()->DoAction(ACTION_CANCEL_COMBAT);
     creature->InterruptNonMeleeSpells(true);
     creature->RemoveAllAuras();
     creature->SetHealth(0);
@@ -1030,10 +1023,23 @@ struct boss_julianne : public ScriptedAI
             isFakingDeath = false;
         }
 
-        _introStarted = false;
-        _secondResurrection = false;
         summonedRomulo = false;
         romuloDied = false;
+
+        me->SetImmuneToPC(true);
+
+        //intro sequence
+        _scheduler.Schedule(1s, [this](TaskContext)
+        {
+            Talk(SAY_JULIANNE_ENTER);
+        }).Schedule(10s, [this](TaskContext)
+        {
+            Talk(SAY_JULIANNE_AGGRO);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToPC(false);
+            me->SetInCombatWithZone();
+        });
+
     }
 
     void DoAction(int32 action) override
@@ -1042,6 +1048,14 @@ struct boss_julianne : public ScriptedAI
         {
             case ACTION_DIED_ANNOUNCE:
                 romuloDied = true;
+                break;
+            case ACTION_EARLY_REVIVE:
+                romuloDied = true;
+                _resurrectScheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Talk(SAY_JULIANNE_RESURRECT);
+                    romuloDied = false;
+                });
                 break;
             case ACTION_PHASE_SET:
                 Phase = PHASE_BOTH;
@@ -1053,19 +1067,21 @@ struct boss_julianne : public ScriptedAI
             case ACTION_COMBAT_SCHEDULE:
                 ScheduleCombat();
                 break;
-        }
-    }
-
-    
-    uint32 GetData(uint32 data) const override
-    {
-        if(DATA_FAKING_DEATH)
-        {
-            return isFakingDeath ? IS_FAKING : NOT_FAKING;
-        }
-        else
-        {
-            return 0;
+            case ACTION_DO_RESURRECT:
+                _resurrectScheduler.Schedule(1s, [this](TaskContext)
+                {
+                    if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
+                    {
+                        Talk(SAY_JULIANNE_RESURRECT);
+                        Resurrect(Romulo);
+                        Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
+                        romuloDied = false;
+                    }
+                });
+                break;
+            case ACTION_CANCEL_COMBAT:
+                _scheduler.CancelGroup(GROUP_COMBAT);
+                break;
         }
     }
 
@@ -1171,8 +1187,9 @@ struct boss_julianne : public ScriptedAI
             me->InterruptNonMeleeSpells(true);
             DoCast(me, SPELL_DRINK_POISON);
 
+            me->GetMotionMaster()->Clear();
+
             isFakingDeath = true;
-            //IS THIS USEFULL? Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID));
             return;
         }
 
@@ -1190,14 +1207,15 @@ struct boss_julianne : public ScriptedAI
             {
                 if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
                 {
+                    _scheduler.CancelAll();
+                    _resurrectScheduler.CancelAll();
                     Romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Romulo->GetMotionMaster()->Clear();
                     Romulo->setDeathState(JUST_DIED);
                     Romulo->CombatStop(true);
                     Romulo->GetThreatMgr().ClearAllThreat();
                     Romulo->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
-                    //handle self lootable too
-                    me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
+                    //this does not seem to really work - the lootable dynamic flags
                 }
 
                 return;
@@ -1209,7 +1227,12 @@ struct boss_julianne : public ScriptedAI
                 PretendToDie(me);
                 isFakingDeath = true;
                 //rez timer for Romulo? still needs handling?
-                Romulo->AI()->DoAction(ACTION_DIED_ANNOUNCE);
+                Romulo->AI()->DoAction(ACTION_EARLY_REVIVE);
+                _scheduler.Schedule(10050ms, [this](TaskContext)
+                {
+                    Resurrect(me);
+                    isFakingDeath = false;
+                });
                 damage = 0;
                 return;
             }
@@ -1242,49 +1265,21 @@ struct boss_julianne : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if(!_introStarted)
-        {
-            _introStarted = true;
-            me->SetImmuneToPC(true);
-            _scheduler.Schedule(1s, [this](TaskContext)
-            {
-                Talk(SAY_JULIANNE_ENTER);
-            }).Schedule(10s, [this](TaskContext)
-            {
-                Talk(SAY_JULIANNE_AGGRO);
-                me->SetInCombatWithZone();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToPC(false);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-            });
-        }
-
-        if (romuloDied && Phase == PHASE_BOTH && !_secondResurrection)
-        {
-            _scheduler.Schedule(1s, [this](TaskContext)
-            {
-                if (Creature* Romulo = instance->GetCreature(DATA_ROMULO))
-                {
-                    if(Romulo->AI()->GetData(DATA_FAKING_DEATH) == IS_FAKING)
-                    {
-                        Talk(SAY_JULIANNE_RESURRECT);
-                        Resurrect(Romulo);
-                        Romulo->AI()->DoAction(ACTION_FAKING_DEATH);
-                        romuloDied = false;
-                    }
-                }
-            });
-            _secondResurrection = true;
-        }
-
         _scheduler.Update(diff);
+        _resurrectScheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if(!UpdateVictim())
+            return;
+
+
+        if(!isFakingDeath)
+        {
+            DoMeleeAttackIfReady();
+        }
     }
 private:
     TaskScheduler _scheduler;
-    bool _introStarted;
-    bool _secondResurrection;
+    TaskScheduler _resurrectScheduler;
 };
 
 struct boss_romulo : public ScriptedAI
@@ -1316,6 +1311,14 @@ struct boss_romulo : public ScriptedAI
             case ACTION_DIED_ANNOUNCE:
                 julianneDead = true;
                 break;
+            case ACTION_EARLY_REVIVE:
+                julianneDead = true;
+                _resurrectScheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Talk(SAY_ROMULO_RESURRECT);
+                    julianneDead = false;
+                });
+                break;
             case ACTION_PHASE_SET:
                 Phase = PHASE_ROMULO;
                 break;
@@ -1325,18 +1328,9 @@ struct boss_romulo : public ScriptedAI
             case ACTION_COMBAT_SCHEDULE:
                 ScheduleCombat();
                 break;
-        }
-    }
-
-    uint32 GetData(uint32 data) const override
-    {
-        if(DATA_FAKING_DEATH)
-        {
-            return isFakingDeath ? IS_FAKING : NOT_FAKING;
-        }
-        else
-        {
-            return 0;
+            case ACTION_CANCEL_COMBAT:
+                _scheduler.CancelGroup(GROUP_COMBAT);
+                break;
         }
     }
 
@@ -1358,7 +1352,6 @@ struct boss_romulo : public ScriptedAI
 
         if (Phase == PHASE_ROMULO)
         {
-            _scheduler.CancelGroup(GROUP_COMBAT);
             Talk(SAY_ROMULO_DEATH);
             PretendToDie(me);
             isFakingDeath = true;
@@ -1374,7 +1367,7 @@ struct boss_romulo : public ScriptedAI
                     {
                         Resurrect(Julianne);
                         Julianne->AI()->DoAction(ACTION_PHASE_SET);
-
+                        Julianne->AI()->DoAction(ACTION_DO_RESURRECT);
                         if(Julianne->GetVictim())
                         {
                             AttackStart(Julianne->GetVictim());
@@ -1393,14 +1386,15 @@ struct boss_romulo : public ScriptedAI
             {
                 if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
                 {
+                    _scheduler.CancelAll();
+                    _resurrectScheduler.CancelAll();
                     Julianne->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Julianne->GetMotionMaster()->Clear();
                     Julianne->setDeathState(JUST_DIED);
                     Julianne->CombatStop(true);
                     Julianne->GetThreatMgr().ClearAllThreat();
                     Julianne->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
-                    //handle self lootable too
-                    me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
+                    //this does not seem to really work
                 }
                 return;
             }
@@ -1410,7 +1404,12 @@ struct boss_romulo : public ScriptedAI
                 PretendToDie(me);
                 isFakingDeath = true;
                 //rez timer 10s of julianne
-                Julianne->AI()->DoAction(ACTION_DIED_ANNOUNCE);
+                Julianne->AI()->DoAction(ACTION_EARLY_REVIVE);
+                _scheduler.Schedule(10050ms, [this](TaskContext)
+                {
+                    Resurrect(me);
+                    isFakingDeath = false;
+                });
                 damage = 0;
                 return;
             }
@@ -1492,31 +1491,19 @@ struct boss_romulo : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         _scheduler.Update(diff);
+        _resurrectScheduler.Update(diff);
 
         if(!UpdateVictim())
             return;
 
-        if (julianneDead)
+        if(!isFakingDeath)
         {
-            _scheduler.Schedule(10s, [this](TaskContext)
-            {
-                if (Creature* Julianne = instance->GetCreature(DATA_JULIANNE))
-                {
-                    if(Julianne->AI()->GetData(DATA_FAKING_DEATH) == IS_FAKING)
-                    {
-                        Talk(SAY_ROMULO_RESURRECT);
-                        Resurrect(Julianne);
-                        Julianne->AI()->DoAction(ACTION_FAKING_DEATH);
-                        julianneDead = false;
-                    }
-                }
-            });
+            DoMeleeAttackIfReady();
         }
-
-        DoMeleeAttackIfReady();
     }
 private:
     TaskScheduler _scheduler;
+    TaskScheduler _resurrectScheduler;
 };
 
 void AddSC_bosses_opera()
