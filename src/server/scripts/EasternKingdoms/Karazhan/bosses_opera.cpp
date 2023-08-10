@@ -1025,7 +1025,6 @@ struct boss_julianne : public ScriptedAI
 
         summonedRomulo = false;
         romuloDied = false;
-
         me->SetImmuneToPC(true);
 
         //intro sequence
@@ -1039,7 +1038,6 @@ struct boss_julianne : public ScriptedAI
             me->SetImmuneToPC(false);
             me->SetInCombatWithZone();
         });
-
     }
 
     void DoAction(int32 action) override
@@ -1172,7 +1170,9 @@ struct boss_julianne : public ScriptedAI
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (damage < me->GetHealth())
+        {
             return;
+        }
 
         //anything below only used if incoming damage will kill
 
@@ -1182,7 +1182,9 @@ struct boss_julianne : public ScriptedAI
 
             //this means already drinking, so return
             if (isFakingDeath)
+            {
                 return;
+            }
 
             me->InterruptNonMeleeSpells(true);
             DoCast(me, SPELL_DRINK_POISON);
@@ -1226,7 +1228,6 @@ struct boss_julianne : public ScriptedAI
             {
                 PretendToDie(me);
                 isFakingDeath = true;
-                //rez timer for Romulo? still needs handling?
                 Romulo->AI()->DoAction(ACTION_EARLY_REVIVE);
                 _scheduler.Schedule(10050ms, [this](TaskContext)
                 {
@@ -1269,8 +1270,9 @@ struct boss_julianne : public ScriptedAI
         _resurrectScheduler.Update(diff);
 
         if(!UpdateVictim())
+        {
             return;
-
+        }
 
         if(!isFakingDeath)
         {
@@ -1403,7 +1405,6 @@ struct boss_romulo : public ScriptedAI
             {
                 PretendToDie(me);
                 isFakingDeath = true;
-                //rez timer 10s of julianne
                 Julianne->AI()->DoAction(ACTION_EARLY_REVIVE);
                 _scheduler.Schedule(10050ms, [this](TaskContext)
                 {
@@ -1414,7 +1415,6 @@ struct boss_romulo : public ScriptedAI
                 return;
             }
         }
-
         //LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
     }
 
@@ -1494,7 +1494,9 @@ struct boss_romulo : public ScriptedAI
         _resurrectScheduler.Update(diff);
 
         if(!UpdateVictim())
+        {
             return;
+        }
 
         if(!isFakingDeath)
         {
