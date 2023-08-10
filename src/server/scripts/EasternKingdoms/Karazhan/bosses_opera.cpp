@@ -97,11 +97,6 @@ enum Creatures
     CREATURE_CRONE          = 18168,
 };
 
-enum OzActions
-{
-    ACTION_TITO             = 0
-};
-
 void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
 {
     instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, SPECIAL);  // Increment DeathCount
