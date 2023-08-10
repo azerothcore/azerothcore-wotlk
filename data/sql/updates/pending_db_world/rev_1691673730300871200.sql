@@ -168,6 +168,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (454204, 9, 5, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 5, 397, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, ' Fairbanks - On Script - Play Emote 397'),
 (454204, 9, 6, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ' Fairbanks - On Script - Set Sheath  ‘SHEATH_STATE_MELEE’');
 
+
+############conditions############
+##cmangos and vmangos conditions
+DELETE
+FROM `conditions`
+WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 7283) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 22691) AND (`ConditionValue2` = 1) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 7283, 0, 0, 0, 2, 0, 22691, 1, 0, 0, 0, 0, '', 'the gossip menu is only displayed if the player inventory "ASHBRINGER"--ASHBRINGER');
+
 ## Clean up 100100 - 100116 data
 DELETE
 FROM `npc_text`
