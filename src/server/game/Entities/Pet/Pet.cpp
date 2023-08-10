@@ -1091,7 +1091,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(creature_ID, petlevel);
     if (pInfo)                                      // exist in DB
     {
-        SetCreateHealth(pInfo->health);
+        // Default scale value of 1 to use if Pet.RankMod.Health = 0
+        float factorHealth = 1;
+        // If config is set to allow pets to use health modifiers, apply it to creatures with a DB entry
+        // Pet.RankMod.Health = 1 use the factor value based on the rank of the pet, most pets have a rank of 0 and so use
+        // the Elite rank which is set as the default in Creature::_GetHealthMod(int32 Rank)
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
+        SetCreateHealth(pInfo->health*factorHealth);
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)pInfo->health);
         if (petType != HUNTER_PET) //hunter pet use focus
         {
@@ -2470,24 +2480,33 @@ Player* Pet::GetOwner() const
 
 float Pet::GetNativeObjectScale() const
 {
-    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
-    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
-    {
-        float scale;
-        if (GetLevel() >= creatureFamily->maxScaleLevel)
-            scale = creatureFamily->maxScale;
-        else if (GetLevel() <= creatureFamily->minScaleLevel)
-            scale = creatureFamily->minScale;
-        else
-            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
+    uint8 ctFamily = GetCreatureTemplate()->family;
 
-        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
-            if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
-                scale *= displayInfo->scale;
+    // hackfix: Edge case where DBC scale values for DEVILSAUR pets make them too small.
+    // Therefore we take data from spirit beast instead.
+    if (ctFamily && ctFamily == CREATURE_FAMILY_DEVILSAUR)
+        ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
+
+    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
+    {
+        float minScaleLevel = creatureFamily->minScaleLevel;
+        uint8 level = getLevel();
+
+        float minLevelScaleMod = level >= minScaleLevel ? (level / minScaleLevel) : 0.0f;
+        float maxScaleMod = creatureFamily->maxScaleLevel - minScaleLevel;
+
+        if (minLevelScaleMod > maxScaleMod)
+            minLevelScaleMod = maxScaleMod;
+
+        float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
+
+        float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
 
         return scale;
     }
 
+    // take value for non-hunter pets from DB
     return Guardian::GetNativeObjectScale();
 }
 

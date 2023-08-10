@@ -774,6 +774,49 @@ struct npc_pet_gen_moth : public NullCreatureAI
     }
 };
 
+// Darting Hatchling
+enum Darting
+{
+    SPELL_DARTING_ON_SPAWN      = 62586, // Applied on spawn via creature_template_addon
+    SPELL_DARTING_FEAR          = 62585, // Applied every 20s from SPELL_DARTING_ON_SPAWN
+};
+
+struct npc_pet_darting_hatchling : public NullCreatureAI
+{
+    npc_pet_darting_hatchling(Creature* c) : NullCreatureAI(c)
+    {
+        goFast = false;
+        checkTimer = 0;
+    }
+
+    bool goFast;
+    uint32 checkTimer;
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_DARTING_FEAR)
+        {
+            goFast = true;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!goFast)
+        {
+            return;
+        }
+
+        checkTimer += diff;
+        if (checkTimer >= 2000)
+        {
+            me->RemoveAurasDueToSpell(SPELL_DARTING_FEAR);
+            checkTimer = 0;
+            goFast = false;
+        }
+    }
+};
+
 void AddSC_generic_pet_scripts()
 {
     RegisterCreatureAI(npc_pet_gen_soul_trader_beacon);
@@ -788,4 +831,5 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_toxic_wasteling);
     RegisterCreatureAI(npc_pet_gen_fetch_ball);
     RegisterCreatureAI(npc_pet_gen_moth);
+    RegisterCreatureAI(npc_pet_darting_hatchling);
 }

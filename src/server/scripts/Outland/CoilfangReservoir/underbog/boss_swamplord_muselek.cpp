@@ -85,7 +85,15 @@ struct boss_swamplord_muselek : public BossAI
 
     bool CanShootVictim()
     {
-        return me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim());
+        Unit* victim = me->GetVictim();
+
+        if (!victim || !me->IsWithinLOSInMap(victim) || !me->IsWithinRange(victim, 30.f) || me->IsWithinRange(victim, 10.f))
+        {
+            _canChase = true;
+            return false;
+        }
+
+        return true;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -100,6 +108,8 @@ struct boss_swamplord_muselek : public BossAI
                 me->LoadEquipment(1, true);
                 DoCastVictim(SPELL_SHOOT);
                 me->GetMotionMaster()->Clear();
+                me->StopMoving();
+                _canChase = false;
             }
             else if (_canChase)
             {
@@ -121,7 +131,7 @@ struct boss_swamplord_muselek : public BossAI
             context.Repeat(20s, 30s);
         }).Schedule(30s, 40s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, false, true))
             {
                 _markTarget = target->GetGUID();
                 _canChase = false;
@@ -135,6 +145,7 @@ struct boss_swamplord_muselek : public BossAI
                         {
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveForwards(me->GetVictim(), 10.0f);
+                            _canChase = false;
                         }
 
                         me->m_Events.AddEventAtOffset([this]()

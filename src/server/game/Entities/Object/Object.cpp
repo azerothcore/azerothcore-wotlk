@@ -3167,3 +3167,8 @@ GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
 {
     return _allowedLooters;
 }
+
+void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
+{
+    _allowedLooters.erase(guid);
+}

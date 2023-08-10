@@ -30,8 +30,6 @@ enum MekgineerSteamrigger
     SPELL_SAW_BLADE             = 31486,
     SPELL_ELECTRIFIED_NET       = 35107,
     SPELL_ENRAGE                = 26662,
-    SPELL_REPAIR_N              = 31532,
-    SPELL_REPAIR_H              = 37936,
 
     SPELL_SUMMON_MECHANICS_1    = 31528,
     SPELL_SUMMON_MECHANICS_2    = 31529,
