@@ -1,3 +1,4 @@
+-- DB update 2023_08_10_00 -> 2023_08_10_01
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (1201, 1222, 1249, 1258, 1262, 1273, 1324, 1358, 1361, 1367, 1368, 1380, 1381, 1382, 1384, 1385, 1386, 1387, 1434, 1439, 1456, 1457, 1458, 1459, 1466, 1467, 1485, 1487, 1488, 1489, 1498, 1525, 1560, 1578, 1579, 1598, 1618, 1640, 1654, 1655, 1657, 1679, 1692, 1704, 1714, 1719, 1795, 1799, 1819, 1940, 1955, 1957) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (1201, 'deDE', 'Habt Ihr die Spitzel gefunden, $N?', 0),

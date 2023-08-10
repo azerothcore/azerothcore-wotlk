@@ -1,3 +1,4 @@
+-- DB update 2023_08_10_01 -> 2023_08_10_02
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (2118, 2138, 2139, 2201, 2202, 2205, 2206, 2240, 2338, 2358, 2359, 2460, 2500, 2518, 2623, 2742, 2747, 2748, 2749, 2750, 2767, 2768, 2843, 2863, 2871, 2877, 2880, 2881, 2904, 2930, 2933, 2936, 2975, 2980, 2982, 2995) AND `locale` = 'deDE';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (2118, 'deDE', 'Habt Ihr mir das kranke Tier gebracht, $N?$B$BMacht Euch keine Sorgen, sollte das Zuschnappen der Falle nicht gelingen - Tharnariuns Hoffnung währt ewig. Wenn Ihr eine neue Falle braucht, lasst von Eurer Arbeit ab und meldet Euch bei mir.', 0),
