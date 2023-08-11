@@ -6,6 +6,8 @@ DELETE FROM `game_event` WHERE `eventEntry` = @GEVENT;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 (@GEVENT, '2008-09-08 12:00:00', '2008-09-24 12:00:00', 525600, 1, 0, 0, 'Spirit of Competition', 0, 2);
 
+UPDATE `creature_template` SET `gossip_menu_id` = 9517 WHERE `entry` = 27399;
+
 DELETE FROM `creature` WHERE `id1` IN (27346, 27398, 27399);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@CGUID, 27398, 0, 0, 0, 1537, 1537, 0, 1, 0, -5040.92, -1250.81, 507.76, 0.70, 300, 0, 0, 0, 0, 0, 0, 0, 0, '', 0), -- Grandhammer

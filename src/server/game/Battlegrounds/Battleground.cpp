@@ -938,7 +938,7 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
         return false;
 
     std::vector<Player*> filteredPlayers;
-    
+
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         Player* player = itr->second;
@@ -949,13 +949,14 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
             filteredPlayers.push_back(player);
         }
     }
-    
+
     if (filteredPlayers.size())
     {
         Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()];
-    
+
         wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
     }
+
     return true;
 }
 
