@@ -3,7 +3,7 @@ SET @GEVENT := 46;
 
 DELETE FROM `game_event` WHERE `eventEntry` = @GEVENT;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
-(@GEVENT, '2000-01-01 12:00:00', '2000-01-01 12:00:00', 525600, 1, 0, 0, 'Spirit of Competition', 0, 2);
+(@GEVENT, '2008-09-08 12:00:00', '2008-09-24 12:00:00', 525600, 1, 0, 0, 'Spirit of Competition', 0, 2);
 
 SET @CGUID := 152340;
 
