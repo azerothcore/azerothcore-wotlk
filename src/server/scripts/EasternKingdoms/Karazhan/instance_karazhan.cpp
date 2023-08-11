@@ -35,7 +35,14 @@ const Position OptionalSpawn[] =
 ObjectData const creatureData[] =
 {
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN  },
-    { NPC_MIDNIGHT,             DATA_MIDNIGHT }
+    { NPC_MIDNIGHT,             DATA_MIDNIGHT },
+    { NPC_DOROTHEE,             DATA_DOROTHEE },
+    { NPC_TITO,                 DATA_TITO     },
+    { NPC_ROAR,                 DATA_ROAR     },
+    { NPC_STRAWMAN,             DATA_STRAWMAN },
+    { NPC_TINHEAD,              DATA_TINHEAD  },
+    { NPC_ROMULO,               DATA_ROMULO   },
+    { NPC_JULIANNE,             DATA_JULIANNE },
 };
 
 class instance_karazhan : public InstanceMapScript

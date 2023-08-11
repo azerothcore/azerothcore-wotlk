@@ -666,8 +666,8 @@ enum AcoreStrings
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
     //                                      = 716, see LANG_PINFO_MAP_OFFLINE
     LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME_RATING = 718,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME_RATING = 719,
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
@@ -702,7 +702,13 @@ enum AcoreStrings
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
     //                                      = 752, see LANG_PINFO_ACC_IP
 
-    // Room for BG/ARENA                = 773-784, 788-799 not used
+    // Room for BG/ARENA                = 779-784, 788-799 not used
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME = 773,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME = 774,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_RATING = 775,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_RATING = 776,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 777,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 778,
     LANG_ARENA_TESTING                  = 785,
     LANG_AUTO_ANN                       = 786,
     LANG_ANNOUNCE_COLOR                 = 787,
