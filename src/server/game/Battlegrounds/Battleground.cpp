@@ -909,15 +909,15 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             CharacterDatabase.Execute(stmt);
         }
 
-        if(IsEventActive(EVENT_SPIRIT_OF_COMPETITION) && !isArena())
-            SpiritofCompetitionEvent(winnerTeamId);
-
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime(), GetArenaType(), player->GetBgTeamId());
         player->GetSession()->SendPacket(&data);
 
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, player->GetMapId());
     }
+
+    if (IsEventActive(EVENT_SPIRIT_OF_COMPETITION) && isBattleground())
+        SpiritofCompetitionEvent(winnerTeamId);
 
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
 }
