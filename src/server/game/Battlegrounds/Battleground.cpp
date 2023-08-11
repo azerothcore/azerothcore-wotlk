@@ -924,7 +924,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
 bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
 {
-    // Everyone is eligeble for tabard reward
+    // Everyone is eligible for tabard reward
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         Player* player = itr->second;
