@@ -20,6 +20,30 @@
 #include "MapMgr.h"
 #include "MoveSpline.h"
 #include "Transport.h"
+#include "TaskScheduler.h"
+#include "Config.h"
+#include <chrono>
+
+namespace
+{
+    // Spawns transport with delay to implement a strict schedule
+    // for transport and sync transport between cluster nodes.
+    TaskScheduler delayedTransportSpawnScheduler;
+
+    // Any date would work. Lets use this one - August 10, 2023, 00:00:00.
+    std::tm startDateTM = {0, 0, 0, 10, 7, 123};
+    std::chrono::system_clock::time_point tarnsportStartDate = std::chrono::system_clock::from_time_t(std::mktime(&startDateTM));
+
+    // Calculates milliseconds left till the next departure cycle.
+    std::chrono::milliseconds millisecondsLeftToFirstDeparture(int oneIterationInterval) {
+        std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
+        std::chrono::milliseconds interval(oneIterationInterval);
+        std::chrono::milliseconds timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - tarnsportStartDate);
+        int intervalsPassed = timeSinceStart.count() / oneIterationInterval;
+        std::chrono::system_clock::time_point nextDeparture = tarnsportStartDate + (interval * (intervalsPassed + 1));
+        return std::chrono::duration_cast<std::chrono::milliseconds>(nextDeparture - currentTime);
+    }
+}
 
 TransportTemplate::~TransportTemplate()
 {
@@ -40,6 +64,11 @@ TransportMgr* TransportMgr::instance()
 {
     static TransportMgr instance;
     return &instance;
+}
+
+void TransportMgr::Update(uint32 diff)
+{
+    delayedTransportSpawnScheduler.Update(diff);
 }
 
 void TransportMgr::Unload()
@@ -406,15 +435,27 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
         }
     }
 
-    // use preset map for instances (need to know which instance)
-    trans->SetMap(map ? map : sMapMgr->CreateMap(mapId, nullptr));
-    if (map && map->IsDungeon())
-        trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
+    // Synchronise transport between cluster nodes.
+    if (sConfigMgr->GetOption<bool>("Cluster.Enabled", false) && tInfo->mapsUsed.size() > 1)
+    {
+        delayedTransportSpawnScheduler.Schedule(Milliseconds(millisecondsLeftToFirstDeparture(tInfo->pathTime)), [trans, map, mapId](TaskContext /*context*/)
+        {
+            trans->SetMap(map ? map : sMapMgr->CreateMap(mapId, nullptr));
+            HashMapHolder<MotionTransport>::Insert(trans);
+            trans->GetMap()->AddToMap<MotionTransport>(trans);
+        });
+    }
+    else
+    {
+        // use preset map for instances (need to know which instance)
+        trans->SetMap(map ? map : sMapMgr->CreateMap(mapId, nullptr));
+        if (map && map->IsDungeon())
+            trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
 
-    // xinef: transports are active so passengers can be relocated (grids must be loaded)
-    trans->setActive(true);
-    HashMapHolder<MotionTransport>::Insert(trans);
-    trans->GetMap()->AddToMap<MotionTransport>(trans);
+        // xinef: transports are active so passengers can be relocated (grids must be loaded)
+        HashMapHolder<MotionTransport>::Insert(trans);
+        trans->GetMap()->AddToMap<MotionTransport>(trans);
+    }
     return trans;
 }
 

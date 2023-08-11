@@ -105,6 +105,8 @@ class TransportMgr
 public:
     static TransportMgr* instance();
 
+    void Update(uint32 diff);
+
     void Unload();
 
     void LoadTransportTemplates();
