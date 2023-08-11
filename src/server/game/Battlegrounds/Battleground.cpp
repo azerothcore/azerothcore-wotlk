@@ -928,7 +928,8 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         Player* player = itr->second;
-        if (player && player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) == QUEST_STATUS_INCOMPLETE)
+        bool questStatus = player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) != QUEST_STATUS_REWARDED;
+        if (player && questStatus)
             player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
     }
 
@@ -942,7 +943,9 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
         for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         {
             Player* player = itr->second;
-            if (player && player->GetBgTeamId() == GetTeamId(winnerTeamId) && player->GetQuestStatus(QUEST_FLAG_WINNER) == QUEST_STATUS_INCOMPLETE)
+            bool playerTeam = player->GetBgTeamId() == GetTeamId(winnerTeamId);
+            bool questStatus = player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED;
+            if (player && playerTeam && questStatus)
             {
                 filteredPlayers.push_back(player);
             }
