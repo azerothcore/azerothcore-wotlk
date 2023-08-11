@@ -352,7 +352,7 @@ public:
                     if (data == AREATRIGGER_DRAGONSPIRE_HALL)
                     {
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1s);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_STORE, 1s);
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
@@ -555,14 +555,14 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_DARGONSPIRE_ROOM_STORE:
+                    case EVENT_DRAGONSPIRE_ROOM_STORE:
                         Dragonspireroomstore();
-                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
+                        Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
-                    case EVENT_DARGONSPIRE_ROOM_CHECK:
+                    case EVENT_DRAGONSPIRE_ROOM_CHECK:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);
