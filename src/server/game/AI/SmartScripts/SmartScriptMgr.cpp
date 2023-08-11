@@ -1077,6 +1077,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
                     return false;
+
+                if (!IsMinMaxValid(e, e.event.areaCasting.rangeMin, e.event.areaCasting.rangeMax))
+                    return false;
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
             case SMART_EVENT_PASSENGER_REMOVED:

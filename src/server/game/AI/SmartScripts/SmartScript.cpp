@@ -4330,7 +4330,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!me || !me->IsEngaged())
                 return;
 
-            float range = static_cast<float>(e.event.areaCasting.range);
             ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
             for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
             {
@@ -4339,7 +4338,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     if (!target || target->IsPet() || target->IsTotem() || !target->IsNonMeleeSpellCast(false, false, true))
                         continue;
 
-                    if (e.event.areaCasting.range && !me->IsWithinDistInMap(target, range))
+                    if (e.event.areaCasting.rangeMin && !(me->IsInRange(target, (float)e.event.areaCasting.rangeMin, (float)e.event.areaCasting.rangeMax)))
                         continue;
 
                     ProcessAction(e, target);

@@ -4,3 +4,6 @@ ALTER TABLE `smart_scripts`
 
 UPDATE `smart_scripts` SET `event_param6` = `event_param5` WHERE `event_type` = 106 AND `source_type` = 0;
 UPDATE `smart_scripts` SET `event_param5` = 0 WHERE `event_type` = 106 AND `source_type` = 0;
+
+UPDATE `smart_scripts` SET `event_param6` = `event_param5` WHERE `event_type` = 105 AND `source_type` = 0;
+UPDATE `smart_scripts` SET `event_param5` = 0 WHERE `event_type` = 105 AND `source_type` = 0;
