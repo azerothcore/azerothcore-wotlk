@@ -1,3 +1,4 @@
+-- DB update 2023_08_11_02 -> 2023_08_11_03
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_inoculate_nestlewood_owlkin';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES

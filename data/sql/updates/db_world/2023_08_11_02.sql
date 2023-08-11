@@ -1,3 +1,4 @@
+-- DB update 2023_08_11_01 -> 2023_08_11_02
  -- Infected Wildkin smart ai
 SET @ENTRY := 17322;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
