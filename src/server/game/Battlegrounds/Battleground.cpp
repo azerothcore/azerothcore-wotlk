@@ -953,7 +953,6 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
     if (filteredPlayers.size())
     {
         Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()];
-
         wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
     }
 
