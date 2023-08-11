@@ -31,8 +31,8 @@ uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUM
 
 enum EventIds
 {
-    EVENT_DARGONSPIRE_ROOM_STORE           = 1,
-    EVENT_DARGONSPIRE_ROOM_CHECK           = 2,
+    EVENT_DRAGONSPIRE_ROOM_STORE           = 1,
+    EVENT_DRAGONSPIRE_ROOM_CHECK           = 2,
 
     EVENT_SOLAKAR_WAVE                     = 3
 };
