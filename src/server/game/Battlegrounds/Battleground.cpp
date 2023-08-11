@@ -933,7 +933,7 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
             player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
     }
 
-    // in case of draw nobody get reward
+    // In case of a draw nobody get rewarded
     if (winnerTeamId == PVP_TEAM_NEUTRAL)
         return false;
 
