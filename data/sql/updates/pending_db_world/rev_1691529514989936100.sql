@@ -4,9 +4,13 @@ SET @CGUID := 152340;
 
 DELETE FROM `game_event` WHERE `eventEntry` = @GEVENT;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
-(@GEVENT, '2008-09-08 12:00:00', '2008-09-24 12:00:00', 525600, 1, 0, 0, 'Spirit of Competition', 0, 2);
+(@GEVENT, '2008-09-08 12:00:00', '2008-09-24 12:00:00', 1051897, 23040 , 0, 0, 'Spirit of Competition', 0, 2);
 
-UPDATE `creature_template` SET `gossip_menu_id` = 9517 WHERE `entry` = 27399;
+UPDATE `creature_template` SET `gossip_menu_id` = 9517, `npcflag` = 1 WHERE `entry` = 27399;
+
+DELETE FROM `gossip_menu_option` WHERE `MenuID` = 9517 AND `OptionID` = 0;
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`) VALUES
+(9517, 0, 0, 'I would like to enter the secret code to receive my Competitor''s Souvenir.', 26513, 1, 1);
 
 DELETE FROM `creature` WHERE `id1` IN (27346, 27398, 27399);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
