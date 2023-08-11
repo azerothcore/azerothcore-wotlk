@@ -925,9 +925,10 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
 {
     // Everyone is eligeble for tabard reward
-    for (auto const& [playerGuid, player] : m_Players)
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        if (player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) == QUEST_STATUS_INCOMPLETE)
+        Player* player = itr->second;
+        if (player && player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) == QUEST_STATUS_INCOMPLETE)
             player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
     }
 
@@ -938,9 +939,10 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
     {
         std::vector<Player*> filteredPlayers;
 
-        for (auto const& [playerGuid, player] : m_Players)
+        for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         {
-            if (player->GetBgTeamId() == GetTeamId(winnerTeamId) && player->GetQuestStatus(QUEST_FLAG_WINNER) == QUEST_STATUS_INCOMPLETE)
+            Player* player = itr->second;
+            if (player && player->GetBgTeamId() == GetTeamId(winnerTeamId) && player->GetQuestStatus(QUEST_FLAG_WINNER) == QUEST_STATUS_INCOMPLETE)
             {
                 filteredPlayers.push_back(player);
             }
