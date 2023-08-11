@@ -936,29 +936,26 @@ bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
     // Incase of draw nobody get reward
     if (winnerTeamId == PVP_TEAM_NEUTRAL)
         return false;
-    else
+
+    std::vector<Player*> filteredPlayers;
+    
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        std::vector<Player*> filteredPlayers;
-
-        for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+        Player* player = itr->second;
+        bool playerTeam = player->GetBgTeamId() == GetTeamId(winnerTeamId);
+        bool questStatus = player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED;
+        if (player && playerTeam && questStatus)
         {
-            Player* player = itr->second;
-            bool playerTeam = player->GetBgTeamId() == GetTeamId(winnerTeamId);
-            bool questStatus = player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED;
-            if (player && playerTeam && questStatus)
-            {
-                filteredPlayers.push_back(player);
-            }
-        }
-
-        if (filteredPlayers.size())
-        {
-            Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()];
-
-            wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
+            filteredPlayers.push_back(player);
         }
     }
-
+    
+    if (filteredPlayers.size())
+    {
+        Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()];
+    
+        wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
+    }
     return true;
 }
 
