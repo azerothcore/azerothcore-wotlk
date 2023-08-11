@@ -2,7 +2,7 @@
 
 for i in $(ls -d */); do
     if [ -d $i ]; then
-        cd $i
+        cd $i || exit
         git config pull.rebase false
         git pull origin master
         cd ..
