@@ -7206,13 +7206,21 @@ void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
     stmt->SetData(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
+    // Add here the auras IDs to exclude
+    std::unordered_set<uint32> excludedAuraIds = {42533};
+
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
     {
         if (!itr->second->CanBeSaved())
             continue;
 
+        // Excludes auras with listed IDs
+        if (excludedAuraIds.find(itr->second->GetId()) != excludedAuraIds.end()) {
+            continue;
+        }
+
         Aura* aura = itr->second;
-        if( !logout && aura->GetDuration() < 60 * IN_MILLISECONDS )
+        if (!logout && aura->GetDuration() < 60 * IN_MILLISECONDS)
             continue;
 
         int32 damage[MAX_SPELL_EFFECTS];
