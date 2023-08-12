@@ -44,10 +44,10 @@ RUN git config --global --add safe.directory /azerothcore
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # must be created to set the correct permissions on them
 RUN mkdir -p /azerothcore/env/dist/bin
@@ -128,10 +128,10 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # install the required dependencies to run the server
 RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools libgoogle-perftools-dev net-tools \
@@ -285,10 +285,10 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # ENV DATAPATH=/azerothcore/env/dist/data-temp
 ENV DATAPATH=/azerothcore/env/dist/data
@@ -327,10 +327,10 @@ RUN apt-get update && apt-get install -y libmysqlclient-dev libssl-dev libbz2-de
     sudo && rm -rf /var/lib/apt/lists/* ;
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN mkdir -p /azerothcore/env/client/
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
