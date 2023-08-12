@@ -65,7 +65,7 @@ This project exists thanks to the [authors](https://github.com/azerothcore/azero
 
 ## Important Links
 
-- [Doxygen Documentation](https://www.azerothcore.org/pages/doxygen/index.html)
+- [Doxygen documentation](https://www.azerothcore.org/pages/doxygen/index.html)
 - [Website](http://www.azerothcore.org/)
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
 - [Our Discord server](https://discord.gg/gkt4y2x)
