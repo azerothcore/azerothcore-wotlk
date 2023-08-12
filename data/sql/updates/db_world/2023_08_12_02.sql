@@ -1,3 +1,4 @@
+-- DB update 2023_08_12_01 -> 2023_08_12_02
 --
 ALTER TABLE `smart_scripts`
 	ADD COLUMN `event_param6` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `event_param5`;
