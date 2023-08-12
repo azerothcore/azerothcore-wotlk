@@ -1,3 +1,4 @@
+-- DB update 2023_08_11_03 -> 2023_08_12_00
  -- Wrathscale Sorceress smart ai
 SET @ENTRY := 17336;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
