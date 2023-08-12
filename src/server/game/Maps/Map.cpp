@@ -2561,7 +2561,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-        if (*itr != player->GetTransport())
+        if (*itr != player->GetTransport() && player->InSamePhase(*itr))
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     WorldPacket packet;
