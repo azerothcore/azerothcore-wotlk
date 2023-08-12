@@ -32,7 +32,7 @@ Here are the main points we focus on:
   * We strive to make all in-game content to be blizzlike. Therefore we have a high standard for fixes being made.
 
 * Customization
-  * It should be easy to customize your experience using [modules](#modules).
+  * It is easy to customize your experience using [modules](#modules).
 
 * Community driven
   * AzerothCore has an active community of developers, contributors, and users who collaborate, share knowledge, and provide support through forums, Discord channels, and other communication platforms. 
