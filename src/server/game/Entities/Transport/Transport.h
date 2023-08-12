@@ -86,7 +86,7 @@ private:
     void DelayedTeleportTransport();
     void UpdatePassengerPositions(PassengerSet& passengers);
     void DoEventIfAny(KeyFrame const& node, bool departure);
-    
+
     uint32 HandleFirstDepartureSync(uint32 diff);
 
     //! Helpers to know if stop frame was reached

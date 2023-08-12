@@ -101,7 +101,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
         _requiresFirstDepartureSync = true;
         this->SetPhaseMask(2, true);
     }
-    
+
     // initialize waypoints
     _nextFrame = tInfo->keyFrames.begin();
     _currentFrame = _nextFrame++;
