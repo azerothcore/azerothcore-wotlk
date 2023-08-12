@@ -55,7 +55,7 @@ If you want to contribute to the project, you will find a lot of resources that 
 
 We also recommend you read our [CODE OF CONDUCT](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md).
 
-Feel free to join our [Discord server](https://discord.gg/gkt4y2x)
+Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
 
 Click on the "⭐ Star" button to help us gain more visibility on Github!
 
