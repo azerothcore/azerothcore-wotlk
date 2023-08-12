@@ -53,7 +53,7 @@ AzerothCore can also serve as a learning resource for aspiring developers who wa
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our [wiki](https://www.azerothcore.org/wiki/contribute).
 
-We also recommend you read our [CODE OF CONDUCT](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md).
+We also recommend you read our [Contributor Covenant Code of Conduct](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md).
 
 Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
 
