@@ -1179,6 +1179,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetOption<uint32>("Arena.GamesRequired", 10);
     _int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetOption<uint32>("Arena.ArenaSeason.ID", 1);
     _int_configs[CONFIG_ARENA_START_RATING]                         = sConfigMgr->GetOption<uint32>("Arena.ArenaStartRating", 0);
+    _int_configs[CONFIG_LEGACY_ARENA_POINTS_CALC]                   = sConfigMgr->GetOption<uint32>("Arena.LegacyArenaPoints", 0);
     _int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetOption<uint32>("Arena.ArenaStartPersonalRating", 1000);
     _int_configs[CONFIG_ARENA_START_MATCHMAKER_RATING]              = sConfigMgr->GetOption<uint32>("Arena.ArenaStartMatchmakerRating", 1500);
     _bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = sConfigMgr->GetOption<bool>("Arena.ArenaSeason.InProgress", true);
@@ -1188,6 +1189,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetOption<float>("Arena.ArenaMatchmakerRatingModifier", 24.0f);
     _bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]              = sConfigMgr->GetOption<bool>("Arena.QueueAnnouncer.Enable", false);
     _bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool>("Arena.QueueAnnouncer.PlayerOnly", false);
+    _int_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL]               = sConfigMgr->GetOption<uint32>("Arena.QueueAnnouncer.Detail", 3);
 
     _bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
     _int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER]                   = sConfigMgr->GetOption<uint32>("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
