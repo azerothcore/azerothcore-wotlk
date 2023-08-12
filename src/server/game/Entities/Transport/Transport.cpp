@@ -52,7 +52,7 @@ namespace
 }
 
 MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false),
-    _firstDepartureTime(tarnsportStartDate), _requiresFirstDepartureSync(false)
+    _requiresFirstDepartureSync(false), _firstDepartureTime(tarnsportStartDate)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
