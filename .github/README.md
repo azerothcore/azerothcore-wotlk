@@ -49,7 +49,7 @@ Detailed installation instructions are available [here](http://www.azerothcore.o
 
 ## Contributing
 
-AzerothCore can also serve as a learning resource for aspiring developers who want to understand how WoW servers work, how MMORPGs are structured, how game server emulators are created or to improve their C++ and SQL knowledge.
+AzerothCore can also serve as a learning resource for aspiring developers who want to understand how WoW servers work, how MMORPGs are structured, how game server emulators are created, or to improve their C++ and SQL knowledge.
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our [wiki](https://www.azerothcore.org/wiki/contribute).
 
