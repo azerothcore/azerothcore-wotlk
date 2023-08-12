@@ -43,13 +43,21 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
         CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureId);
         if (creatureTemplate && creatureTemplate->IsNPCBot())
         {
+            std::string creatureName = creatureTemplate->Name;
+            if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale(creatureId))
+            {
+                uint32 loc = GetSessionDbLocaleIndex();
+                if (creatureInfo->Name.size() > loc && !creatureInfo->Name[loc].empty() && Utf8FitTo(creatureInfo->Name[loc], {}))
+                    creatureName = creatureInfo->Name[loc];
+            }
+
             NpcBotExtras const* extData = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(creatureId));
             NpcBotAppearanceData const* appData = BotDataMgr::SelectNpcBotAppearance(creatureId);
 
             WorldPacket bpdata(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
             bpdata << guid.WriteAsPacked();
             bpdata << uint8(0);
-            bpdata << creatureTemplate->Name;
+            bpdata << creatureName;
             bpdata << uint8(0);
             bpdata << uint8(BotMgr::GetBotPlayerRace(extData->bclass, extData->race));
             bpdata << uint8(appData ? appData->gender : uint8(GENDER_MALE));
