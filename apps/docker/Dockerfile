@@ -18,6 +18,9 @@ LABEL description="AC base image for dev containers"
 
 ENV DOCKER=1
 
+# Ensure ac-dev-server can properly pull versions
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+
 # set timezone environment variable
 ENV TZ=Etc/UTC
 
@@ -33,6 +36,9 @@ RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sud
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev ccache \
   && rm -rf /var/lib/apt/lists/*
+
+# Ensure git will work with the AzerothCore source directory
+RUN git config --global --add safe.directory /azerothcore
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
