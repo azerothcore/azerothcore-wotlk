@@ -61,7 +61,7 @@ Click on the "⭐ Star" button to help us gain more visibility on Github!
 
 ## Authors & Contributors
 
-This project exists thanks to the [AUTHORS](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS).
+This project exists thanks to the [authors](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS).
 
 ## Important Links
 
