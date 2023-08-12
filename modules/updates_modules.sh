@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in $(ls -d ./*); do
+for i in ./*; do
     if [ -d $i ]; then
         cd $i || exit
         git config pull.rebase false
