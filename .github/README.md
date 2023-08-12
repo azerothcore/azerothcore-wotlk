@@ -70,7 +70,7 @@ This project exists thanks to the [authors](https://github.com/azerothcore/azero
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
 - [Our Discord server](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
-- [Our Forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
+- [Our forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
 - [Our Facebook page](https://www.facebook.com/AzerothCore/)
 - [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
