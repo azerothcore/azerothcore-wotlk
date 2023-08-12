@@ -2480,24 +2480,33 @@ Player* Pet::GetOwner() const
 
 float Pet::GetNativeObjectScale() const
 {
-    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
-    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
-    {
-        float scale;
-        if (GetLevel() >= creatureFamily->maxScaleLevel)
-            scale = creatureFamily->maxScale;
-        else if (GetLevel() <= creatureFamily->minScaleLevel)
-            scale = creatureFamily->minScale;
-        else
-            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
+    uint8 ctFamily = GetCreatureTemplate()->family;
 
-        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
-            if (displayInfo->scale > 1.f && GetCreatureTemplate()->IsExotic())
-                scale *= displayInfo->scale;
+    // hackfix: Edge case where DBC scale values for DEVILSAUR pets make them too small.
+    // Therefore we take data from spirit beast instead.
+    if (ctFamily && ctFamily == CREATURE_FAMILY_DEVILSAUR)
+        ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
+
+    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
+    {
+        float minScaleLevel = creatureFamily->minScaleLevel;
+        uint8 level = getLevel();
+
+        float minLevelScaleMod = level >= minScaleLevel ? (level / minScaleLevel) : 0.0f;
+        float maxScaleMod = creatureFamily->maxScaleLevel - minScaleLevel;
+
+        if (minLevelScaleMod > maxScaleMod)
+            minLevelScaleMod = maxScaleMod;
+
+        float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
+
+        float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
 
         return scale;
     }
 
+    // take value for non-hunter pets from DB
     return Guardian::GetNativeObjectScale();
 }
 

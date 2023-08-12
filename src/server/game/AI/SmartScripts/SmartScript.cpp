@@ -609,6 +609,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         me->InterruptNonMeleeSpells(false);
                     }
 
+                    if (e.action.cast.castFlags & SMARTCAST_THREATLIST_NOT_SINGLE)
+                        if (me->GetThreatMgr().GetThreatListSize() <= 1)
+                            break;
+
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
                     {

@@ -724,7 +724,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Kill Command
-    ApplySpellFix({ 34027 }, [](SpellInfo* spellInfo)
+    // Kill Command, Overpower
+    ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 0;
     });
@@ -4578,6 +4579,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
+     // Silence
+    ApplySpellFix({ 18278 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
+    });
+
     // Absorb Life
     ApplySpellFix({ 34239 }, [](SpellInfo* spellInfo)
     {
@@ -4613,6 +4620,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TriggerSpell = 62585; // Mulgore Hatchling (fear)
+    });
+
+    // Poultryized!
+    ApplySpellFix({ 30504 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -1876,7 +1876,8 @@ enum SmartCastFlags
     //CAST_NO_MELEE_IF_OOM        = 0x08,                     //Prevents creature from entering melee if out of mana or out of range
     //CAST_FORCE_TARGET_SELF      = 0x10,                     //Forces the target to cast this spell on itself
     SMARTCAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x40                      //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_COMBAT_MOVE            = 0x40,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x80                      //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
 };
 
 // one line in DB is one event
