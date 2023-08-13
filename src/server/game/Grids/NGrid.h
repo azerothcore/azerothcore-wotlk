@@ -91,9 +91,9 @@ public:
     }
 
     [[nodiscard]] uint32 GetGridId() const { return i_gridId; }
-    [[nodiscard]] void SetGridId(uint32 id) { i_gridId = id; }
+    void SetGridId(uint32 id) { i_gridId = id; }
     [[nodiscard]] grid_state_t GetGridState() const { return i_cellstate; }
-    [[nodiscard]] void SetGridState(grid_state_t s) { i_cellstate = s; }
+    void SetGridState(grid_state_t s) { i_cellstate = s; }
     [[nodiscard]] int32 getX() const { return i_x; }
     [[nodiscard]] int32 getY() const { return i_y; }
 
