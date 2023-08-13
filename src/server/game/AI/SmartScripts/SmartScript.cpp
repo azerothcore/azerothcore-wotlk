@@ -2891,6 +2891,52 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_FOLLOW_GROUP:
+        {
+            // stop/start
+            // follow type
+            // dist
+            // for (WorldObject* target : targets)
+            // {
+            //     if (target->ToCreature()->IsAlive())
+            //     {
+            //         target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle);
+            //     }
+            // }
+
+            if (!e.action.followGroup.state)
+            {
+                for (WorldObject* target : targets)
+                    if (IsUnit(target))
+                        target->ToCreature()->GetMotionMaster()->MoveIdle();
+
+                break;
+            }
+
+            uint8 followMembers = 0;
+            uint8 itr = 0;
+            for (WorldObject* target : targets)
+                followMembers++;
+
+            float stepAngle = 0.f;
+            float startAngle = 0.f;
+            float dist = float(e.action.followGroup.dist);
+            switch (e.action.followGroup.type)
+            {
+                case FOLLOW_TYPE_CROSS:
+                {
+                    stepAngle = x;
+                    startAngle = y;
+                    stepDist = z;
+                    
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
