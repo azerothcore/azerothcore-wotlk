@@ -40,11 +40,10 @@ enum KZDataTypes
     DATA_MALCHEZZAR                 = 10,
     DATA_NIGHTBANE                  = 11,
     DATA_SERVANT_QUARTERS           = 12,
-    DATA_SELECTED_RARE              = 13,
-    DATA_OPERA_OZ_DEATHCOUNT        = 14,
-    DATA_KILREK                     = 15,
+    DATA_OPERA_OZ_DEATHCOUNT        = 13,
+    DATA_KILREK                     = 14,
 
-    MAX_ENCOUNTERS                  = 16,
+    MAX_ENCOUNTERS                  = 15,
 
     DATA_GO_CURTAINS                = 18,
     DATA_GO_STAGEDOORLEFT           = 19,
