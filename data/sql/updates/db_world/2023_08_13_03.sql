@@ -1,3 +1,4 @@
+-- DB update 2023_08_13_02 -> 2023_08_13_03
 --
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|1|2|4|16|64|256|512|1024|2048|4096|8192|131072|8388608|33554432 WHERE `entry` = 16504;
 UPDATE `creature_template_addon` SET `auras` = '18950 19818' WHERE (`entry` = 16504);
