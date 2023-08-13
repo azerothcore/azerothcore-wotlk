@@ -1,3 +1,4 @@
+-- DB update 2023_08_12_02 -> 2023_08_13_00
 --
 DELETE FROM `event_scripts` WHERE `id` = 14376;
 
