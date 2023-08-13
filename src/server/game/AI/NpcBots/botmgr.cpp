@@ -52,7 +52,8 @@ static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
 uint8 _basefollowdist;
 uint8 _maxNpcBots;
 uint8 _maxClassNpcBots;
-uint8 _xpReductionNpcBots;
+uint8 _xpReductionAmount;
+uint8 _xpReductionStartingNumber;
 uint8 _healTargetIconFlags;
 uint8 _tankingTargetIconFlags;
 uint8 _offTankingTargetIconFlags;
@@ -281,7 +282,8 @@ void BotMgr::LoadConfig(bool reload)
     _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
     _filterRaces                    = sConfigMgr->GetBoolDefault("NpcBot.Botgiver.FilterRaces", false);
     _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
-    _xpReductionNpcBots             = sConfigMgr->GetIntDefault("NpcBot.XpReduction", 0);
+    _xpReductionAmount              = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Amount", 0);
+    _xpReductionStartingNumber      = sConfigMgr->GetIntDefault("NpcBot.XpReduction.StartingNumber", 2);
     _healTargetIconFlags            = sConfigMgr->GetIntDefault("NpcBot.HealTargetIconMask", 0);
     _tankingTargetIconFlags         = sConfigMgr->GetIntDefault("NpcBot.TankTargetIconMask", 0);
     _offTankingTargetIconFlags      = sConfigMgr->GetIntDefault("NpcBot.OffTankTargetIconMask", 0);
@@ -805,7 +807,11 @@ float BotMgr::GetBotStatLimitCrit()
 
 uint8 BotMgr::GetNpcBotXpReduction()
 {
-    return _xpReductionNpcBots;
+    return _xpReductionAmount;
+}
+uint8 BotMgr::GetNpcBotXpReductionStartingNumber()
+{
+    return _xpReductionStartingNumber;
 }
 
 uint8 BotMgr::GetMaxNpcBots()

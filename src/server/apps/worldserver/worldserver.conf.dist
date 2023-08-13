@@ -4226,13 +4226,16 @@ NpcBot.Botgiver.FilterRaces = 0
 NpcBot.BaseFollowDistance = 30
 
 #
-#    NpcBot.XpReduction
-#        Description: XP percent penalty for each bot used starting with second.
-#        Example:     3 bots, xp reduction is 20: ((3-1)*20) = 40%, 60% exp gained only.
+#    NpcBot.XpReduction.Amount
+#    NpcBot.XpReduction.StartingNumber
+#        Description: XP percent penalty for each bot used starting with <StartingNumber>.
+#        Example:     3 bots, reduction is 20, start is 2: ((3-(2-1))*20) = 40%, 60% exp gained.
 #        Note:        Maximum overall xp reduction is 90%.
-#        Default:     0
+#        Default:     0 - (NpcBot.XpReduction.Amount)
+#                     2 - (NpcBot.XpReduction.StartingNumber)
 
-NpcBot.XpReduction = 0
+NpcBot.XpReduction.Amount         = 0
+NpcBot.XpReduction.StartingNumber = 2
 
 #
 #    NpcBot.HealTargetIconMask
