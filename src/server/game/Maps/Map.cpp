@@ -451,7 +451,7 @@ void Map::EnsureGridCreated_i(const GridCoord& p)
 {
     if (!getNGrid(p.x_coord, p.y_coord))
     {
-        LOG_DEBUG("maps", "Creating grid[%u, %u] for map %u instance %u", p.x_coord, p.y_coord, GetId(), i_InstanceId);
+        LOG_DEBUG("maps", "Creating grid[{}, {}] for map {} instance {}", p.x_coord, p.y_coord, GetId(), i_InstanceId);
 
         setNGrid(new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord, i_gridExpiry), p.x_coord, p.y_coord);
 
@@ -481,7 +481,7 @@ void Map::EnsureGridLoadedForActiveObject(const Cell& cell, WorldObject* object)
     // refresh grid state & timer
     if (grid->GetGridState() != GRID_STATE_ACTIVE)
     {
-        LOG_DEBUG("maps", "Active object %s triggers loading of grid [%u, %u] on map %u", object->GetGUID().ToString().c_str(), cell.GridX(), cell.GridY(), GetId());
+        LOG_DEBUG("maps", "Active object {} triggers loading of grid [{}, {}] on map {}", object->GetGUID().ToString().c_str(), cell.GridX(), cell.GridY(), GetId());
         ResetGridExpiry(*grid, 0.1f);
         grid->SetGridState(GRID_STATE_ACTIVE);
     }
@@ -1063,7 +1063,7 @@ void Map::PlayerRelocation(Player* player, float x, float y, float z, float o)
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        LOG_DEBUG("maps", "Player %s relocation grid[%u, %u]cell[%u, %u]->grid[%u, %u]cell[%u, %u]", player->GetName().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "Player {} relocation grid[{}, {}]cell[{}, {}]->grid[{}, {}]cell[{}, {}]", player->GetName().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 
         player->RemoveFromGrid();
 
@@ -1091,7 +1091,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
             EnsureGridLoaded(new_cell);
 
         #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "Creature %s added to moving list from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", creature->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "Creature {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", creature->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
         AddCreatureToMoveList(creature, x, y, z, o);
     }
@@ -1118,7 +1118,7 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
             EnsureGridLoaded(new_cell);
 
         #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "GameObject %s added to moving list from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "GameObject {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
         AddGameObjectToMoveList(go, x, y, z, o);
     }
@@ -1144,7 +1144,7 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
             EnsureGridLoaded(new_cell);
 
         #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "GameObject %s added to moving list from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", dynObj->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "GameObject {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", dynObj->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
         AddDynamicObjectToMoveList(dynObj, x, y, z, o);
     }
@@ -1253,7 +1253,7 @@ void Map::MoveAllCreaturesInMoveList()
             {
                 // ... or unload (if respawn grid also not loaded)
 #ifdef ACORE_DEBUG
-                LOG_DEBUG("maps", "Creature %s cannot be move to unloaded respawn grid.", c->GetGUID().ToString().c_str());
+                LOG_DEBUG("maps", "Creature {} cannot be move to unloaded respawn grid.", c->GetGUID().ToString().c_str());
 #endif
                 //AddObjectToRemoveList(Pet*) should only be called in Pet::Remove
                 //This may happen when a player just logs in and a pet moves to a nearby unloaded cell
@@ -1308,7 +1308,7 @@ void Map::MoveAllGameObjectsInMoveList()
             {
                 // ... or unload (if respawn grid also not loaded)
 #ifdef ACORE_DEBUG
-                LOG_DEBUG("maps", "GameObject %s cannot be move to unloaded respawn grid.", go->GetGUID().ToString().c_str());
+                LOG_DEBUG("maps", "GameObject {} cannot be move to unloaded respawn grid.", go->GetGUID().ToString().c_str());
 #endif
                 AddObjectToRemoveList(go);
             }
@@ -1348,7 +1348,7 @@ void Map::MoveAllDynamicObjectsInMoveList()
         else
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "DynamicObject %s cannot be moved to unloaded grid.", dynObj->GetGUID().ToString().c_str());
+            LOG_DEBUG("maps", "DynamicObject {} cannot be moved to unloaded grid.", dynObj->GetGUID().ToString().c_str());
 #endif
         }
     }
@@ -1366,7 +1366,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell new_cell)
         if (old_cell.DiffCell(new_cell))
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "Creature %s moved in grid[%u, %u] from cell[%u, %u] to cell[%u, %u].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "Creature {} moved in grid[{}, {}] from cell[{}, {}] to cell[{}, {}].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
             c->RemoveFromGrid();
@@ -1375,7 +1375,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell new_cell)
         else
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "Creature %s moved in same grid[%u, %u]cell[%u, %u].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
+            LOG_DEBUG("maps", "Creature {} moved in same grid[{}, {}]cell[{}, {}].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
 #endif
         }
 
@@ -1388,7 +1388,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell new_cell)
         EnsureGridLoadedForActiveObject(new_cell, c);
 
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "Active creature %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "Active creature {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         c->RemoveFromGrid();
@@ -1404,7 +1404,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell new_cell)
     if (IsGridLoaded(GridCoord(new_cell.GridX(), new_cell.GridY())))
     {
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "Creature %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "Creature {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         c->RemoveFromGrid();
@@ -1416,7 +1416,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell new_cell)
 
     // fail to move: normal creature attempt move to unloaded grid
 #ifdef ACORE_DEBUG
-    LOG_DEBUG("maps", "Creature %s attempted to move from grid[%u, %u]cell[%u, %u] to unloaded grid[%u, %u]cell[%u, %u].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+    LOG_DEBUG("maps", "Creature {} attempted to move from grid[{}, {}]cell[{}, {}] to unloaded grid[{}, {}]cell[{}, {}].", c->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
     return false;
 }
@@ -1430,7 +1430,7 @@ bool Map::GameObjectCellRelocation(GameObject* go, Cell new_cell)
         if (old_cell.DiffCell(new_cell))
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "GameObject %s moved in grid[%u, %u] from cell[%u, %u] to cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "GameObject {} moved in grid[{}, {}] from cell[{}, {}] to cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
             go->RemoveFromGrid();
@@ -1439,7 +1439,7 @@ bool Map::GameObjectCellRelocation(GameObject* go, Cell new_cell)
         else
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "GameObject %s moved in same grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
+            LOG_DEBUG("maps", "GameObject {} moved in same grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
 #endif
         }
 
@@ -1452,7 +1452,7 @@ bool Map::GameObjectCellRelocation(GameObject* go, Cell new_cell)
         EnsureGridLoadedForActiveObject(new_cell, go);
 
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "Active GameObject %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "Active GameObject {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         go->RemoveFromGrid();
@@ -1465,7 +1465,7 @@ bool Map::GameObjectCellRelocation(GameObject* go, Cell new_cell)
     if (IsGridLoaded(GridCoord(new_cell.GridX(), new_cell.GridY())))
     {
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "GameObject %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "GameObject {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         go->RemoveFromGrid();
@@ -1477,7 +1477,7 @@ bool Map::GameObjectCellRelocation(GameObject* go, Cell new_cell)
 
     // fail to move: normal GameObject attempt move to unloaded grid
 #ifdef ACORE_DEBUG
-    LOG_DEBUG("maps", "GameObject %s attempted to move from grid[%u, %u]cell[%u, %u] to unloaded grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+    LOG_DEBUG("maps", "GameObject {} attempted to move from grid[{}, {}]cell[{}, {}] to unloaded grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
     return false;
 }
@@ -1491,7 +1491,7 @@ bool Map::DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell)
         if (old_cell.DiffCell(new_cell))
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "DynamicObject %s moved in grid[%u, %u] from cell[%u, %u] to cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
+            LOG_DEBUG("maps", "DynamicObject {} moved in grid[{}, {}] from cell[{}, {}] to cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
             go->RemoveFromGrid();
@@ -1500,7 +1500,7 @@ bool Map::DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell)
         else
         {
 #ifdef ACORE_DEBUG
-            LOG_DEBUG("maps", "DynamicObject %s moved in same grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
+            LOG_DEBUG("maps", "DynamicObject {} moved in same grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY());
 #endif
         }
 
@@ -1513,7 +1513,7 @@ bool Map::DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell)
         EnsureGridLoadedForActiveObject(new_cell, go);
 
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "Active DynamicObject %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "Active DynamicObject {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         go->RemoveFromGrid();
@@ -1526,7 +1526,7 @@ bool Map::DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell)
     if (IsGridLoaded(GridCoord(new_cell.GridX(), new_cell.GridY())))
     {
 #ifdef ACORE_DEBUG
-        LOG_DEBUG("maps", "DynamicObject %s moved from grid[%u, %u]cell[%u, %u] to grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        LOG_DEBUG("maps", "DynamicObject {} moved from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
 
         go->RemoveFromGrid();
@@ -1538,7 +1538,7 @@ bool Map::DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell)
 
     // fail to move: normal GameObject attempt move to unloaded grid
 #ifdef ACORE_DEBUG
-    LOG_DEBUG("maps", "DynamicObject %s attempted to move from grid[%u, %u]cell[%u, %u] to unloaded grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+    LOG_DEBUG("maps", "DynamicObject {} attempted to move from grid[{}, {}]cell[{}, {}] to unloaded grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 #endif
     return false;
 }
@@ -1557,7 +1557,7 @@ bool Map::CreatureRespawnRelocation(Creature* c, bool diffGridOnly)
     c->GetMotionMaster()->Clear();
 
 #ifdef ACORE_DEBUG
-    LOG_DEBUG("maps", "Creature %s moved from grid[%u, %u]cell[%u, %u] to respawn grid[%u, %u]cell[%u, %u].", c->GetGUID().ToString().c_str(), c->GetCurrentCell().GridX(), c->GetCurrentCell().GridY(), c->GetCurrentCell().CellX(), c->GetCurrentCell().CellY(), resp_cell.GridX(), resp_cell.GridY(), resp_cell.CellX(), resp_cell.CellY());
+    LOG_DEBUG("maps", "Creature {} moved from grid[{}, {}]cell[{}, {}] to respawn grid[{}, {}]cell[{}, {}].", c->GetGUID().ToString().c_str(), c->GetCurrentCell().GridX(), c->GetCurrentCell().GridY(), c->GetCurrentCell().CellX(), c->GetCurrentCell().CellY(), resp_cell.GridX(), resp_cell.GridY(), resp_cell.CellX(), resp_cell.CellY());
 #endif
 
     // teleport it to respawn point (like normal respawn if player see)
@@ -1585,7 +1585,7 @@ bool Map::GameObjectRespawnRelocation(GameObject* go, bool diffGridOnly)
         return true;
 
 #ifdef ACORE_DEBUG
-    LOG_DEBUG("maps", "GameObject %s moved from grid[%u, %u]cell[%u, %u] to respawn grid[%u, %u]cell[%u, %u].", go->GetGUID().ToString().c_str(), go->GetCurrentCell().GridX(), go->GetCurrentCell().GridY(), go->GetCurrentCell().CellX(), go->GetCurrentCell().CellY(), resp_cell.GridX(), resp_cell.GridY(), resp_cell.CellX(), resp_cell.CellY());
+    LOG_DEBUG("maps", "GameObject {} moved from grid[{}, {}]cell[{}, {}] to respawn grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), go->GetCurrentCell().GridX(), go->GetCurrentCell().GridY(), go->GetCurrentCell().CellX(), go->GetCurrentCell().CellY(), resp_cell.GridX(), resp_cell.GridY(), resp_cell.CellX(), resp_cell.CellY());
 #endif
 
     // teleport it to respawn point (like normal respawn if player see)
@@ -1616,7 +1616,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
                 return false;
         }
 
-        LOG_DEBUG("maps", "Unloading grid[%u, %u] for map %u", x, y, GetId());
+        LOG_DEBUG("maps", "Unloading grid[{}, {}] for map {}", x, y, GetId());
 
         if (!unloadAll)
         {
@@ -1675,7 +1675,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
 
         GridMaps[gx][gy] = nullptr;
     }
-    LOG_DEBUG("maps", "Unloading grid[%u, %u] for map %u finished", x, y, GetId());
+    LOG_DEBUG("maps", "Unloading grid[{}, {}] for map {} finished", x, y, GetId());
     return true;
 }
 
@@ -3247,7 +3247,7 @@ void Map::AddToActive(Creature* c)
         else
         {
             GridCoord p2 = Acore::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
-            LOG_ERROR("maps", "Active creature%s added to grid[%u, %u] but spawn grid[%u, %u] was not loaded.",
+            LOG_ERROR("maps", "Active creature {} added to grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
                 c->GetGUID().ToString().c_str(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
         }
     }
@@ -3287,7 +3287,7 @@ void Map::RemoveFromActive(Creature* c)
         else
         {
             GridCoord p2 = Acore::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
-            LOG_ERROR("maps", "Active creature %s removed from grid[%u, %u] but spawn grid[%u, %u] was not loaded.",
+            LOG_ERROR("maps", "Active creature {} removed from grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
                 c->GetGUID().ToString().c_str(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
         }
     }
