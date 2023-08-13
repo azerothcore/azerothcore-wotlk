@@ -643,7 +643,7 @@ void WorldSession::LogoutPlayer(bool save)
             guild->HandleMemberLogout(this);
 
         ///- Remove pet
-        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
 
         // pussywizard: on logout remove auras that are removed at map change (before saving to db)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
@@ -761,7 +761,7 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {}{} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
+    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
         GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))

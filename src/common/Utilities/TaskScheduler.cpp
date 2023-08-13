@@ -107,6 +107,11 @@ void TaskScheduler::Dispatch(success_t const& callback)
     callback();
 }
 
+bool TaskScheduler::IsGroupScheduled(group_t const group)
+{
+    return _task_holder.IsGroupQueued(group);
+}
+
 void TaskScheduler::TaskQueue::Push(TaskContainer&& task)
 {
     container.insert(task);
@@ -157,6 +162,19 @@ void TaskScheduler::TaskQueue::ModifyIf(std::function<bool(TaskContainer const&)
         }
 
     container.insert(cache.begin(), cache.end());
+}
+
+bool TaskScheduler::TaskQueue::IsGroupQueued(group_t const group)
+{
+    for (auto const& task : container)
+    {
+        if (task->IsInGroup(group))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool TaskScheduler::TaskQueue::IsEmpty() const

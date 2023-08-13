@@ -18,15 +18,14 @@
 DROP TABLE IF EXISTS `player_factionchange_spells`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_spells` (
   `alliance_id` int unsigned NOT NULL,
-  `alliance_comment` text NOT NULL,
+  `alliance_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `horde_id` int unsigned NOT NULL,
-  `horde_comment` text NOT NULL,
+  `horde_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.player_factionchange_spells: 113 rows
+-- Dumping data for table acore_world.player_factionchange_spells: ~113 rows (approximately)
 DELETE FROM `player_factionchange_spells`;
-/*!40000 ALTER TABLE `player_factionchange_spells` DISABLE KEYS */;
 INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 	(458, 'Brown Horse', 6654, 'Brown Wolf'),
 	(470, 'Black Stallion', 64658, 'Black Wolf'),
@@ -52,6 +51,7 @@ INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `h
 	(16083, 'White Stallion', 16081, 'Winter Wolf'),
 	(17229, 'Winterspring Frostsaber', 64659, 'Venomhide Ravasaur'),
 	(17453, 'Green Mechanostrider', 18989, 'Gray Kodo'),
+	(17454, 'Unpainted Mechanostrider', 18990, 'Brown Kodo'),
 	(17459, 'Icy Blue Mechanostrider Mod A', 18991, 'Green Kodo'),
 	(17460, 'Frost Ram', 17450, 'Ivory Raptor'),
 	(17461, 'Black Ram', 16084, 'Mottled Red Raptor'),
@@ -139,9 +139,7 @@ INSERT INTO `player_factionchange_spells` (`alliance_id`, `alliance_comment`, `h
 	(67095, 'Sunforged Breastplate', 67134, 'Sunforged Breastplate'),
 	(67096, 'Sunforged Bracers', 67135, 'Sunforged Bracers'),
 	(68057, 'Swift Alliance Steed', 68056, 'Swift Horde Wolf'),
-	(68187, 'Crusader\'s White Warhorse', 68188, 'Crusader\'s Black Warhorse'),
-	(17454, 'Unpainted Mechanostrider', 18990, 'Brown Kodo');
-/*!40000 ALTER TABLE `player_factionchange_spells` ENABLE KEYS */;
+	(68187, 'Crusader\'s White Warhorse', 68188, 'Crusader\'s Black Warhorse');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -21,23 +21,23 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
   `entry` int unsigned NOT NULL DEFAULT '0',
   `owner` int unsigned NOT NULL DEFAULT '0',
   `modelid` int unsigned DEFAULT '0',
-  `CreatedBySpell` mediumint unsigned NOT NULL DEFAULT '0',
+  `CreatedBySpell` int unsigned DEFAULT '0',
   `PetType` tinyint unsigned NOT NULL DEFAULT '0',
   `level` smallint unsigned NOT NULL DEFAULT '1',
   `exp` int unsigned NOT NULL DEFAULT '0',
   `Reactstate` tinyint unsigned NOT NULL DEFAULT '0',
-  `name` varchar(21) NOT NULL DEFAULT 'Pet',
+  `name` varchar(21) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pet',
   `renamed` tinyint unsigned NOT NULL DEFAULT '0',
   `slot` tinyint unsigned NOT NULL DEFAULT '0',
   `curhealth` int unsigned NOT NULL DEFAULT '1',
   `curmana` int unsigned NOT NULL DEFAULT '0',
   `curhappiness` int unsigned NOT NULL DEFAULT '0',
   `savetime` int unsigned NOT NULL DEFAULT '0',
-  `abdata` text,
+  `abdata` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   KEY `idx_slot` (`slot`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Pet System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Pet System';
 
 -- Dumping data for table acore_characters.character_pet: ~0 rows (approximately)
 DELETE FROM `character_pet`;

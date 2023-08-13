@@ -17,14 +17,13 @@
 -- Dumping structure for table acore_world.spell_required
 DROP TABLE IF EXISTS `spell_required`;
 CREATE TABLE IF NOT EXISTS `spell_required` (
-  `spell_id` mediumint NOT NULL DEFAULT '0',
-  `req_spell` mediumint NOT NULL DEFAULT '0',
+  `spell_id` int NOT NULL DEFAULT '0',
+  `req_spell` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`spell_id`,`req_spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Spell Additinal Data';
 
--- Dumping data for table acore_world.spell_required: 50 rows
+-- Dumping data for table acore_world.spell_required: ~50 rows (approximately)
 DELETE FROM `spell_required`;
-/*!40000 ALTER TABLE `spell_required` DISABLE KEYS */;
 INSERT INTO `spell_required` (`spell_id`, `req_spell`) VALUES
 	(99, 5487),
 	(779, 5487),
@@ -76,7 +75,6 @@ INSERT INTO `spell_required` (`spell_id`, `req_spell`) VALUES
 	(53312, 53308),
 	(62078, 768),
 	(62600, 5487);
-/*!40000 ALTER TABLE `spell_required` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `game_event_arena_seasons` (
   `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
   `season` tinyint unsigned NOT NULL COMMENT 'Arena season number',
   UNIQUE KEY `season` (`season`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_arena_seasons: 8 rows
+-- Dumping data for table acore_world.game_event_arena_seasons: ~8 rows (approximately)
 DELETE FROM `game_event_arena_seasons`;
-/*!40000 ALTER TABLE `game_event_arena_seasons` DISABLE KEYS */;
 INSERT INTO `game_event_arena_seasons` (`eventEntry`, `season`) VALUES
 	(75, 1),
 	(76, 2),
@@ -34,7 +33,6 @@ INSERT INTO `game_event_arena_seasons` (`eventEntry`, `season`) VALUES
 	(58, 6),
 	(59, 7),
 	(60, 8);
-/*!40000 ALTER TABLE `game_event_arena_seasons` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

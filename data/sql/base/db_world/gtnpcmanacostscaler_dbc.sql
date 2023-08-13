@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtnpcmanacostscaler_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtnpcmanacostscaler_dbc: 100 rows
+-- Dumping data for table acore_world.gtnpcmanacostscaler_dbc: ~100 rows (approximately)
 DELETE FROM `gtnpcmanacostscaler_dbc`;
-/*!40000 ALTER TABLE `gtnpcmanacostscaler_dbc` DISABLE KEYS */;
 INSERT INTO `gtnpcmanacostscaler_dbc` (`ID`, `Data`) VALUES
 	(0, 0.193),
 	(1, 0.216),
@@ -126,7 +125,6 @@ INSERT INTO `gtnpcmanacostscaler_dbc` (`ID`, `Data`) VALUES
 	(97, 9.902),
 	(98, 10.091),
 	(99, 10.293);
-/*!40000 ALTER TABLE `gtnpcmanacostscaler_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

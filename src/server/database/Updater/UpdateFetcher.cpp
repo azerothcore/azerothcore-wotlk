@@ -252,7 +252,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
 
     // Fill hash to name cache
     HashToFileNameStorage hashToName;
-    for (auto entry : applied)
+    for (auto& entry : applied)
         hashToName.insert(std::make_pair(entry.second.hash, entry.first));
 
     size_t importedUpdates = 0;

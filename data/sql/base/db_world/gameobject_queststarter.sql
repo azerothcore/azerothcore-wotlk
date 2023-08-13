@@ -17,14 +17,13 @@
 -- Dumping structure for table acore_world.gameobject_queststarter
 DROP TABLE IF EXISTS `gameobject_queststarter`;
 CREATE TABLE IF NOT EXISTS `gameobject_queststarter` (
-  `id` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `quest` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gameobject_queststarter: 455 rows
+-- Dumping data for table acore_world.gameobject_queststarter: ~455 rows (approximately)
 DELETE FROM `gameobject_queststarter`;
-/*!40000 ALTER TABLE `gameobject_queststarter` DISABLE KEYS */;
 INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(31, 248),
 	(31, 249),
@@ -126,6 +125,7 @@ INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(142151, 285),
 	(142179, 2867),
 	(142195, 2903),
+	(142343, 2954),
 	(142343, 2967),
 	(142343, 2977),
 	(142487, 2947),
@@ -308,7 +308,6 @@ INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(185165, 10820),
 	(185165, 10821),
 	(185166, 10809),
-	(186267, 11405),
 	(186420, 510),
 	(186420, 511),
 	(186426, 11184),
@@ -481,7 +480,6 @@ INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(194084, 13501),
 	(194119, 13548),
 	(194555, 13629);
-/*!40000 ALTER TABLE `gameobject_queststarter` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

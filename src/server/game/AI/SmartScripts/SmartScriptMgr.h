@@ -206,10 +206,14 @@ enum SMART_EVENT
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
-    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, check timer
-    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // min, radius, first timer, check timer
+    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
+    SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
+    SMART_EVENT_NEAR_UNIT_NEGATION       = 104,      // type (0: creature 1: gob), entry, count, range, timer
+    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, range
+    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, range
 
-    SMART_EVENT_AC_END                   = 103
+    SMART_EVENT_AC_END                   = 107
 };
 
 struct SmartEvent
@@ -482,16 +486,56 @@ struct SmartEvent
             uint32 minCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 checkTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayer;
 
         struct
         {
-            uint32 minCount;
+            uint32 maxCount;
             uint32 radius;
             uint32 firstTimer;
-            uint32 checkTimer;
+            uint32 repeatMin;
+            uint32 repeatMax;
         } nearPlayerNegation;
+
+        struct
+        {
+            uint32 type;
+            uint32 entry;
+            uint32 count;
+            uint32 range;
+            uint32 timer;
+        } nearUnit;
+
+        struct
+        {
+            uint32 type;
+            uint32 entry;
+            uint32 count;
+            uint32 range;
+            uint32 timer;
+        } nearUnitNegation;
+
+        struct
+        {
+            uint32 min;
+            uint32 max;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 rangeMin;
+            uint32 rangeMax;
+        } areaCasting;
+
+        struct
+        {
+            uint32 min;
+            uint32 max;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 rangeMin;
+            uint32 rangeMax;
+        } areaRange;
 
         struct
         {
@@ -500,6 +544,7 @@ struct SmartEvent
             uint32 param3;
             uint32 param4;
             uint32 param5;
+            uint32 param6;
         } raw;
     };
 
@@ -533,7 +578,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_REACT_STATE                    = 8,      // state
     SMART_ACTION_ACTIVATE_GOBJECT                   = 9,      //
     SMART_ACTION_RANDOM_EMOTE                       = 10,     // EmoteId1, EmoteId2, EmoteId3...
-    SMART_ACTION_CAST                               = 11,     // SpellId, CastFlags, LimitTargets
+    SMART_ACTION_CAST                               = 11,     // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_SUMMON_CREATURE                    = 12,     // CreatureID, summonType, duration in ms, attackInvoker, attackScriptOwner, flags(SmartActionSummonCreatureFlags)
     SMART_ACTION_THREAT_SINGLE_PCT                  = 13,     // Threat%
     SMART_ACTION_THREAT_ALL_PCT                     = 14,     // Threat%
@@ -559,7 +604,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_INST_DATA                      = 34,     // Field, Data
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
     SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
-    SMART_ACTION_DIE                                = 37,     // No Params
+    SMART_ACTION_DIE                                = 37,     // Milliseconds
     SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // Range (if outside of dungeon)
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
     SMART_ACTION_SET_SHEATH                         = 40,     // Sheath (0-unarmed, 1-melee, 2-ranged)
@@ -588,7 +633,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
     SMART_ACTION_WP_RESUME                          = 65,     // none
-    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1)
+    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1), turnAngle
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
     SMART_ACTION_MOVE_TO_POS                        = 69,     // PointId (optional x,y,z offset), transport, controlled, ContactDistance
@@ -607,7 +652,7 @@ enum SMART_ACTION
     SMART_ACTION_ADD_NPC_FLAG                       = 82,     // Flags
     SMART_ACTION_REMOVE_NPC_FLAG                    = 83,     // Flags
     SMART_ACTION_SIMPLE_TALK                        = 84,     // groupID, can be used to make players say groupID, Text_over event is not triggered, whisper can not be used (Target units will say the text)
-    SMART_ACTION_INVOKER_CAST                       = 85,     // spellID, castFlags,   if avaliable, last used invoker will cast spellId with castFlags on targets
+    SMART_ACTION_SELF_CAST                          = 85,     // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_CROSS_CAST                         = 86,     // spellID, castFlags, CasterTargetType, CasterTarget param1, CasterTarget param2, CasterTarget param3, ( + the origonal target fields as Destination target),   CasterTargets will cast spellID on all Targets (use with caution if targeting multiple * multiple units)
     SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST       = 87,     // script9 ids 1-9
     SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88,     // script9 id min, max
@@ -656,7 +701,7 @@ enum SMART_ACTION
     SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
-    // SMART_ACTION_INVOKER_CAST                    = 134,    /// @todo: solve name conflicts
+    SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
@@ -692,8 +737,13 @@ enum SMART_ACTION
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
+    SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
+    SMART_ACTION_DISABLE                            = 226,    // state
+    SMART_ACTION_SET_SCALE                          = 227,    // scale
+    SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
+    SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
 
-    SMART_ACTION_AC_END                             = 225,    // placeholder
+    SMART_ACTION_AC_END                             = 230,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -800,7 +850,8 @@ struct SmartAction
         struct
         {
             uint32 spell;
-            uint32 flags;
+            uint32 castFlags;
+            uint32 triggerFlags;
             uint32 targetsLimit;
         } cast;
 
@@ -921,6 +972,11 @@ struct SmartAction
             uint32 creature;
             SAIBool updateLevel;
         } updateTemplate;
+
+        struct
+        {
+            uint32 milliseconds;
+        } die;
 
         struct
         {
@@ -1281,6 +1337,7 @@ struct SmartAction
         {
             uint32 quickChange;
             uint32 random;
+            uint32 turnAngle;
         } orientation;
 
         struct
@@ -1357,6 +1414,37 @@ struct SmartAction
         {
             uint32 entry;
         } cinematic;
+
+        struct
+        {
+            SAIBool invokerGUID;
+            uint32 index;
+        } setGuid;
+
+        struct
+        {
+            SAIBool state;
+        } disable;
+
+        struct
+        {
+            uint32 scale;
+        } setScale;
+
+        struct
+        {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 repetitions;
+            uint32 startAngle;
+            uint32 stepAngle;
+            uint32 dist;
+        } radialSummon;
+
+        struct
+        {
+            uint32 visualId;
+        } spellVisual;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1758,8 +1846,12 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 98
     { 0, 0 }, // 99
     { 0, 0 }, // 100
-    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_UNIT,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_NEAR_UNIT_NEGATION,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
@@ -1787,7 +1879,8 @@ enum SmartCastFlags
     //CAST_NO_MELEE_IF_OOM        = 0x08,                     //Prevents creature from entering melee if out of mana or out of range
     //CAST_FORCE_TARGET_SELF      = 0x10,                     //Forces the target to cast this spell on itself
     SMARTCAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x40                      //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_COMBAT_MOVE            = 0x40,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x80                      //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
 };
 
 // one line in DB is one event
@@ -1999,7 +2092,7 @@ private:
 
     bool IsItemValid(SmartScriptHolder const& e, uint32 entry)
     {
-        if (!sObjectMgr->GetItemTemplate(entry))
+        if (!sItemStore.LookupEntry(entry))
         {
             LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Item entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;

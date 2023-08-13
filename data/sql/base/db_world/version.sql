@@ -17,17 +17,17 @@
 -- Dumping structure for table acore_world.version
 DROP TABLE IF EXISTS `version`;
 CREATE TABLE IF NOT EXISTS `version` (
-  `core_version` varchar(255) NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
-  `core_revision` varchar(120) DEFAULT NULL,
-  `db_version` varchar(120) DEFAULT NULL COMMENT 'Version of world DB.',
+  `core_version` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
+  `core_revision` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `db_version` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Version of world DB.',
   `cache_id` int DEFAULT '0',
   PRIMARY KEY (`core_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Version Notes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Version Notes';
 
 -- Dumping data for table acore_world.version: ~0 rows (approximately)
 DELETE FROM `version`;
 INSERT INTO `version` (`core_version`, `core_revision`, `db_version`, `cache_id`) VALUES
-	('AzerothCore rev. 5d6dfca80cf1 2022-08-21 09:48:09 +0200 (new-squash-POGGIES branch) (Win64, RelWithDebInfo, Static)', '5d6dfca80cf1', 'ACDB 335.8-dev', 8);
+	('AzerothCore rev. 5d6dfca80cf1 2022-08-21 09:48:09 +0200 (new-squash-POGGIES branch) (Win64, RelWithDebInfo, Static)', '5d6dfca80cf1', 'ACDB 335.9-dev', 9);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

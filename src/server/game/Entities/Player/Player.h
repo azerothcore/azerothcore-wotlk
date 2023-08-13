@@ -995,6 +995,16 @@ enum PlayerCommandStates
     CHEAT_WATERWALK = 0x10
 };
 
+// Used for OnGiveXP PlayerScript hook
+enum PlayerXPSource
+{
+    XPSOURCE_KILL = 0,
+    XPSOURCE_QUEST = 1,
+    XPSOURCE_QUEST_DF = 2,
+    XPSOURCE_EXPLORE = 3,
+    XPSOURCE_BATTLEGROUND = 4
+};
+
 enum InstantFlightGossipAction
 {
     GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
@@ -1801,7 +1811,7 @@ public:
     {
         Unit::SetPvP(state);
         if (!m_Controlled.empty())
-            for (auto itr : m_Controlled)
+            for (auto& itr : m_Controlled)
                 itr->SetPvP(state);
     }
     void UpdatePvP(bool state, bool _override = false);
@@ -2076,7 +2086,7 @@ public:
     ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
-    void RewardReputation(Unit* victim, float rate);
+    void RewardReputation(Unit* victim);
     void RewardReputation(Quest const* quest);
 
     float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);

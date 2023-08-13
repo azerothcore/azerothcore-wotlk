@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtbarbershopcostbase_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtbarbershopcostbase_dbc: 100 rows
+-- Dumping data for table acore_world.gtbarbershopcostbase_dbc: ~100 rows (approximately)
 DELETE FROM `gtbarbershopcostbase_dbc`;
-/*!40000 ALTER TABLE `gtbarbershopcostbase_dbc` DISABLE KEYS */;
 INSERT INTO `gtbarbershopcostbase_dbc` (`ID`, `Data`) VALUES
 	(0, 0),
 	(1, 3),
@@ -126,7 +125,6 @@ INSERT INTO `gtbarbershopcostbase_dbc` (`ID`, `Data`) VALUES
 	(97, 209835),
 	(98, 216580),
 	(99, 223468);
-/*!40000 ALTER TABLE `gtbarbershopcostbase_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -2030,8 +2030,7 @@ class spell_gen_animal_blood : public AuraScript
     {
         if (Unit* owner = GetUnitOwner())
         {
-            if (owner->IsInWater())
-                owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+            owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
         }
     }
 
@@ -2039,6 +2038,27 @@ class spell_gen_animal_blood : public AuraScript
     {
         AfterEffectApply += AuraEffectApplyFn(spell_gen_animal_blood::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_animal_blood::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 63471 - Spawn Blood Pool
+class spell_spawn_blood_pool : public SpellScript
+{
+    PrepareSpellScript(spell_spawn_blood_pool);
+
+    void SetDest(SpellDestination &dest)
+    {
+        Unit* caster = GetCaster();
+        LiquidData liquidStatus = caster->GetMap()->GetLiquidData(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), caster->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+
+        float level = liquidStatus.Level > INVALID_HEIGHT ? liquidStatus.Level : caster->GetPositionZ();
+        Position pos = Position(caster->GetPositionX(), caster->GetPositionY(), level, caster->GetOrientation());
+        dest.Relocate(pos);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_spawn_blood_pool::SetDest, EFFECT_0, TARGET_DEST_CASTER);
     }
 };
 
@@ -3643,7 +3663,9 @@ class spell_gen_ds_flush_knockback : public SpellScript
    60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
    38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
    66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
-   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp) */
+   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp)
+   33711/38794 - Murmur's Touch
+   */
 class spell_gen_count_pct_from_max_hp : public SpellScript
 {
     PrepareSpellScript(spell_gen_count_pct_from_max_hp)
@@ -4792,6 +4814,7 @@ class spell_freezing_circle : public SpellScript
     }
 };
 
+// 35385 - Threshalisk Charge
 enum Threshalisk
 {
     SPELL_THRESHALISK_CHARGE = 35385,
@@ -4824,6 +4847,73 @@ class spell_gen_threshalisk_charge : public SpellScript
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_gen_threshalisk_charge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 37589 - Shriveling Gaze
+enum ShrivelingGaze
+{
+    SPELL_SHRIVELING_GAZE         = 37589,
+    SPELL_SHRIVELING_GAZE_REMOVAL = 30023, // Serverside - Gushing Wound Removal
+};
+
+class spell_gen_shriveling_gaze : public AuraScript
+{
+    PrepareAuraScript(spell_gen_shriveling_gaze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHRIVELING_GAZE });
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        ModStackAmount(20);
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_shriveling_gaze::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_shriveling_gaze::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 38048 - Curse of Pain
+enum CurseOfPain
+{
+    SPELL_CURSE_OF_PAIN           = 38048,
+};
+
+class spell_gen_curse_of_pain : public AuraScript
+{
+    PrepareAuraScript(spell_gen_curse_of_pain);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CURSE_OF_PAIN });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target && target->ToPlayer())
+        {
+            if (target->GetHealthPct() < 50.f)
+            {
+                target->RemoveAurasDueToSpell(SPELL_CURSE_OF_PAIN);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_curse_of_pain::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -4893,6 +4983,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_feign_death_no_prevent_emotes);
     RegisterSpellScript(spell_pvp_trinket_wotf_shared_cd);
     RegisterSpellScript(spell_gen_animal_blood);
+    RegisterSpellScript(spell_spawn_blood_pool);
     RegisterSpellScript(spell_gen_divine_storm_cd_reset);
     RegisterSpellScript(spell_gen_profession_research);
     RegisterSpellScript(spell_gen_clone);
@@ -4970,4 +5061,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_basic_campfire);
     RegisterSpellScript(spell_freezing_circle);
     RegisterSpellScript(spell_gen_threshalisk_charge);
+    RegisterSpellScript(spell_gen_shriveling_gaze);
+    RegisterSpellScript(spell_gen_curse_of_pain);
 }

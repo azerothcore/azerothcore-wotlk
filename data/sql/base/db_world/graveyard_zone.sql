@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `GhostZone` mediumint unsigned NOT NULL DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `GhostZone` int unsigned NOT NULL DEFAULT '0',
   `Faction` smallint unsigned NOT NULL DEFAULT '0',
-  `Comment` text,
+  `Comment` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`ID`,`GhostZone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.graveyard_zone: 704 rows
+-- Dumping data for table acore_world.graveyard_zone: ~704 rows (approximately)
 DELETE FROM `graveyard_zone`;
-/*!40000 ALTER TABLE `graveyard_zone` DISABLE KEYS */;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(2, 44, 469, 'Redridge Mountains - Redridge Mountains'),
 	(3, 10, 469, 'Duskwood, Darkshire - Duskwood'),
@@ -57,6 +56,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(90, 141, 469, 'Teldrassil, Darnassus GY'),
 	(90, 1657, 469, 'Teldrassil, Darnassus GY'),
 	(91, 141, 0, 'Teldrassil, Dolanaar GY'),
+	(91, 1657, 67, 'Teldrassil, Dolanaar GY'),
 	(92, 331, 0, 'Ashenvale, Astranaar GY - Ashenvale'),
 	(93, 141, 469, 'Teldrassil, Aldrassil GY - Teldrassil'),
 	(94, 85, 67, 'Tirisfal Glades, Deathknell - Tirisfal Glades'),
@@ -96,7 +96,6 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(229, 17, 0, 'The Barrens, Camp Taurajo GY - Southern Barrens'),
 	(249, 17, 67, 'The Barrens, Ratchet'),
 	(249, 215, 469, 'The Barrens, Ratchet'),
-	(1435, 1638, 469, 'Mulgore, Bloodhoof Village GY - Mulgore'),
 	(289, 85, 67, 'Tirisfal Glades, Brill - Tirisfal Glades'),
 	(309, 357, 469, 'Feralas, New Feathermoon Stronghold GY (A) - Feralas'),
 	(309, 1477, 0, 'Feralas, New Feathermoon Stronghold GY (A) - Feralas'),
@@ -116,7 +115,6 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(450, 490, 0, 'Un\'Goro Crater, The Marshlands - Un\'Goro Crater'),
 	(469, 148, 0, 'Darkshore, Twilight Vale GY'),
 	(469, 719, 0, 'Darkshore, Twilight Vale GY'),
-	(91, 1657, 67, 'Teldrassil, Dolanaar GY'),
 	(489, 11, 0, 'Wetlands, Baradin Bay GY - Wetlands'),
 	(509, 28, 469, 'Western Plaguelands, Chillwind Camp - Western Plaguelands'),
 	(510, 139, 0, 'Eastern Plaguelands, Pestilent Scar - Eastern Plaguelands'),
@@ -167,6 +165,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(851, 215, 67, 'Mulgore, Thunder Bluff GY'),
 	(851, 1638, 67, 'Mulgore, Thunder Bluff GY'),
 	(852, 1, 469, 'Dun Morogh, Gates of Ironforge - Dun Morogh'),
+	(852, 1537, 469, 'Dun Morogh, Gates of Ironforge - Ironforge'),
 	(854, 12, 0, 'Elwynn Forest, Eastvale Logging Camp'),
 	(854, 1519, 67, 'Elwynn Forest, Eastvale Logging Camp'),
 	(869, 28, 0, 'Western Plaguelands, Caer Darrow - Western Plaguelands'),
@@ -523,6 +522,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1254, 3522, 0, 'Blade\'s Edge, Raven Wood GY - Blade\'s Edge Mountains'),
 	(1255, 3522, 0, 'Blade\'s Edge, NE Ridge GY - Blade\'s Edge Mountains'),
 	(1256, 130, 0, 'Silverpine Forest, South GY - Silverpine Forest'),
+	(1256, 209, 0, 'Silverpine Forest, South GY - Silverpine Forest'),
 	(1257, 3519, 0, 'Terokkar Forest, Ogre GY - Terokkar Forest'),
 	(1261, 3959, 469, 'Black Temple, Alliance GY - Black Temple'),
 	(1262, 3959, 67, 'Black Temple, Horde GY - Black Temple'),
@@ -655,6 +655,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1407, 210, 0, 'Icecrown Glacier, Jotunheim GY - Icecrown'),
 	(1408, 67, 0, 'Storm Peaks, Foot Steppes GY - The Storm Peaks'),
 	(1409, 85, 469, 'Undercity - Alliance - Wrath Gate - Tirisfal Glades'),
+	(1409, 1497, 469, 'Tirisfal Glades - Undercity - Alliance'),
 	(1411, 36, 0, 'Alterac Mountains - Central GY - Hillsbrad Foothills'),
 	(1416, 618, 0, 'Winterspring, Wintersaber GY - Winterspring'),
 	(1417, 618, 0, 'Winterspring, Crossroad GY - Winterspring'),
@@ -676,6 +677,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1433, 17, 0, 'The Barrens, Central GY - Southern Barrens'),
 	(1434, 17, 0, 'The Barrens, East GY - Northern Barrens'),
 	(1435, 215, 0, 'Mulgore, Southeast GY - Mulgore'),
+	(1435, 1638, 469, 'Mulgore, Bloodhoof Village GY - Mulgore'),
 	(1436, 215, 0, 'Mulgore, Red Rocks GY - Mulgore'),
 	(1437, 400, 0, 'Thousand Needles, Freewind Post GY (MOVED) - Thousand Needles'),
 	(1438, 400, 0, 'Thousand Needles, Speed Barge GY (MOVED) - Thousand Needles'),
@@ -717,6 +719,8 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1469, 2717, 0, 'Burning Steppes, Blackrock Mountain - Blackrock Mountain'),
 	(1470, 46, 0, 'Burning Steppes, East GY - Burning Steppes'),
 	(1471, 1, 0, 'Dun Morogh, Iceflow Lake - Dun Morogh'),
+	(1471, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh'),
+	(1471, 211, 469, 'Dun Morogh, Iceflow Lake - Dun Morogh'),
 	(1472, 1, 0, 'Dun Morogh, East Road - Dun Morogh'),
 	(1473, 38, 0, 'Loch Modan, The Loch - Loch Modan'),
 	(1474, 4603, 0, 'Wintergrasp, Fortress Graveyard (Indoors) - Vault of Archavon'),
@@ -726,13 +730,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1682, 4809, 0, 'Icecrown Glacier, Citadel GY'),
 	(1682, 4812, 0, 'Icecrown Glacier, Citadel GY'),
 	(1682, 4813, 0, 'Icecrown Glacier, Citadel GY'),
-	(1682, 4820, 0, 'Icecrown Glacier, Citadel GY'),
-	(852, 1537, 469, 'Dun Morogh, Gates of Ironforge - Ironforge'),
-	(1256, 209, 0, 'Silverpine Forest, South GY - Silverpine Forest'),
-	(1471, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh'),
-	(1409, 1497, 469, 'Tirisfal Glades - Undercity - Alliance'),
-	(1471, 211, 469, 'Dun Morogh, Iceflow Lake - Dun Morogh');
-/*!40000 ALTER TABLE `graveyard_zone` ENABLE KEYS */;
+	(1682, 4820, 0, 'Icecrown Glacier, Citadel GY');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

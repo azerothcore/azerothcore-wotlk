@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS `gm_survey` (
   `surveyId` int unsigned NOT NULL AUTO_INCREMENT,
   `guid` int unsigned NOT NULL DEFAULT '0',
   `mainSurvey` int unsigned NOT NULL DEFAULT '0',
-  `comment` longtext NOT NULL,
+  `comment` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `createTime` int unsigned NOT NULL DEFAULT '0',
   `maxMMR` smallint NOT NULL,
   PRIMARY KEY (`surveyId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.gm_survey: ~0 rows (approximately)
 DELETE FROM `gm_survey`;

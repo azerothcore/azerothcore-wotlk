@@ -17,18 +17,19 @@
 -- Dumping structure for table acore_world.areatrigger_scripts
 DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
-  `entry` mediumint NOT NULL,
-  `ScriptName` char(64) NOT NULL,
+  `entry` int NOT NULL,
+  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.areatrigger_scripts: 138 rows
+-- Dumping data for table acore_world.areatrigger_scripts: ~143 rows (approximately)
 DELETE FROM `areatrigger_scripts`;
-/*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(171, 'SmartTrigger'),
+	(173, 'SmartTrigger'),
 	(302, 'at_sentry_point'),
 	(962, 'SmartTrigger'),
+	(1125, 'SmartTrigger'),
 	(1447, 'SmartTrigger'),
 	(1526, 'at_ring_of_law'),
 	(1726, 'at_scent_larkorwi'),
@@ -46,8 +47,12 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(1738, 'at_scent_larkorwi'),
 	(1739, 'at_scent_larkorwi'),
 	(1740, 'at_scent_larkorwi'),
+	(1946, 'at_scarshield_infiltrator'),
+	(1986, 'near_scarshield_infiltrator'),
 	(2026, 'at_blackrock_stadium'),
 	(2046, 'at_dragonspire_hall'),
+	(2066, 'at_trigger_the_beast_movement'),
+	(2067, 'at_the_beast_room'),
 	(3066, 'SmartTrigger'),
 	(3546, 'at_bring_your_orphan_to'),
 	(3547, 'at_bring_your_orphan_to'),
@@ -56,17 +61,33 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(3551, 'at_bring_your_orphan_to'),
 	(3552, 'at_bring_your_orphan_to'),
 	(3587, 'at_ancient_leaf'),
+	(3626, 'SmartTrigger'),
 	(3746, 'SmartTrigger'),
 	(3766, 'SmartTrigger'),
+	(3847, 'at_orb_of_command'),
+	(3956, 'at_zulgurub_bridge_speech'),
+	(3957, 'at_zulgurub_entrance_speech'),
+	(3960, 'at_zulgurub_temple_speech'),
+	(3961, 'at_zulgurub_bloodfire_pit_speech'),
+	(3962, 'at_zulgurub_edge_of_madness_speech'),
 	(4016, 'at_malfurion_stormrage'),
 	(4017, 'at_twilight_grove'),
+	(4033, 'at_cthun_stomach_exit'),
+	(4036, 'at_cthun_center'),
+	(4047, 'at_twin_emperors'),
+	(4052, 'at_battleguard_sartura'),
 	(4113, 'at_thaddius_entrance'),
+	(4156, 'at_naxxramas_hub_portal'),
+	(4295, 'at_quagmirran_lair'),
+	(4302, 'at_underbog_ghazan'),
 	(4356, 'at_bring_your_orphan_to'),
+	(4389, 'SmartTrigger'),
 	(4422, 'at_area_52_entrance'),
 	(4466, 'at_area_52_entrance'),
 	(4471, 'at_area_52_entrance'),
 	(4472, 'at_area_52_entrance'),
 	(4479, 'SmartTrigger'),
+	(4495, 'SmartTrigger'),
 	(4497, 'at_commander_dawnforge'),
 	(4498, 'SmartTrigger'),
 	(4524, 'at_shattered_halls_execution'),
@@ -146,25 +167,7 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(5709, 'at_lady_deathwhisper_entrance'),
 	(5718, 'at_frozen_throne_teleport'),
 	(5729, 'at_icc_start_blood_quickening'),
-	(5867, 'at_baltharus_plateau'),
-	(3626, 'SmartTrigger'),
-	(3957, 'at_zulgurub_entrance_speech'),
-	(2066, 'at_trigger_the_beast_movement'),
-	(2067, 'at_the_beast_room'),
-	(3960, 'at_zulgurub_temple_speech'),
-	(3847, 'at_orb_of_command'),
-	(4052, 'at_battleguard_sartura'),
-	(3956, 'at_zulgurub_bridge_speech'),
-	(3961, 'at_zulgurub_bloodfire_pit_speech'),
-	(3962, 'at_zulgurub_edge_of_madness_speech'),
-	(4047, 'at_twin_emperors'),
-	(4033, 'at_cthun_stomach_exit'),
-	(4036, 'at_cthun_center'),
-	(1986, 'near_scarshield_infiltrator'),
-	(1946, 'at_scarshield_infiltrator'),
-	(4156, 'at_naxxramas_hub_portal'),
-	(4302, 'at_underbog_ghazan');
-/*!40000 ALTER TABLE `areatrigger_scripts` ENABLE KEYS */;
+	(5867, 'at_baltharus_plateau');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

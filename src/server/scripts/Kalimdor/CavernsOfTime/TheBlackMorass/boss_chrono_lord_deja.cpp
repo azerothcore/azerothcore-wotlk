@@ -19,19 +19,21 @@
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
 
-enum Enums
+enum Text
 {
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
-    SAY_DEATH                   = 4,
+    SAY_DEATH                   = 4
+};
 
+enum Spells
+{
     SPELL_ARCANE_BLAST          = 31457,
     SPELL_ARCANE_DISCHARGE      = 31472,
     SPELL_TIME_LAPSE            = 31467,
     SPELL_ATTRACTION            = 38540,
-
-    SPELL_BANISH_DRAGON_HELPER  = 31550,
+    SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
  struct boss_chrono_lord_deja : public BossAI

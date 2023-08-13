@@ -45,7 +45,7 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "ServerMotd.h"
+#include "MotdMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
@@ -823,7 +823,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     // Send MOTD
     {
-        SendPacket(Motd::GetMotdPacket());
+        SendPacket(sMotdMgr->GetMotdPacket());
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
@@ -1139,7 +1139,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
     // Send MOTD
     {
-        SendPacket(Motd::GetMotdPacket());
+        SendPacket(sMotdMgr->GetMotdPacket());
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
@@ -2249,7 +2249,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                     // Get level from LFGDungeonEntry because the one from AreaTableEntry is not valid
                     // If area level is too big, do not add new taxi
-                    if (lfgDungeon->minlevel > level)
+                    if (lfgDungeon->MinLevel > level)
                     {
                         FillTaxiMask(field, 0);
                         continue;

@@ -20,33 +20,31 @@ CREATE TABLE IF NOT EXISTS `mapdifficulty_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `MapID` int NOT NULL DEFAULT '0',
   `Difficulty` int NOT NULL DEFAULT '0',
-  `Message_Lang_enUS` varchar(200) DEFAULT NULL,
-  `Message_Lang_enGB` varchar(200) DEFAULT NULL,
-  `Message_Lang_koKR` varchar(200) DEFAULT NULL,
-  `Message_Lang_frFR` varchar(200) DEFAULT NULL,
-  `Message_Lang_deDE` varchar(200) DEFAULT NULL,
-  `Message_Lang_enCN` varchar(200) DEFAULT NULL,
-  `Message_Lang_zhCN` varchar(200) DEFAULT NULL,
-  `Message_Lang_enTW` varchar(200) DEFAULT NULL,
-  `Message_Lang_zhTW` varchar(200) DEFAULT NULL,
-  `Message_Lang_esES` varchar(200) DEFAULT NULL,
-  `Message_Lang_esMX` varchar(200) DEFAULT NULL,
-  `Message_Lang_ruRU` varchar(200) DEFAULT NULL,
-  `Message_Lang_ptPT` varchar(200) DEFAULT NULL,
-  `Message_Lang_ptBR` varchar(200) DEFAULT NULL,
-  `Message_Lang_itIT` varchar(200) DEFAULT NULL,
-  `Message_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Message_Lang_enUS` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enGB` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_koKR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_frFR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_deDE` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_zhCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_zhTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_esES` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_esMX` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ruRU` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ptPT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ptBR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_itIT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Message_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   `RaidDuration` int NOT NULL DEFAULT '0',
   `MaxPlayers` int NOT NULL DEFAULT '0',
-  `Difficultystring` varchar(100) DEFAULT NULL,
+  `Difficultystring` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.mapdifficulty_dbc: 0 rows
+-- Dumping data for table acore_world.mapdifficulty_dbc: ~0 rows (approximately)
 DELETE FROM `mapdifficulty_dbc`;
-/*!40000 ALTER TABLE `mapdifficulty_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `mapdifficulty_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

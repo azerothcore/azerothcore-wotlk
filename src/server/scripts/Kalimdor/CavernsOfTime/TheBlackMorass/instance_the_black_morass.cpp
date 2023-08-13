@@ -56,7 +56,8 @@ public:
             _currentRift = 0;
             _shieldPercent = 100;
             _encounterNPCs.clear();
-            _canSpawnPortal = true; // Delay after bosses
+            _noBossSpawnDelay = true; // Delay after bosses
+            _eventStatus = EVENT_PREPARE;
         }
 
         void CleanupInstance()
@@ -72,10 +73,24 @@ public:
                 _availableRiftPositions.push_back(pos);
             }
 
+            // prevent getting stuck if event fails during boss break
+            _noBossSpawnDelay = true;
+
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
-                medivh->DespawnOrUnsummon(0ms, 3s);
+                medivh->Respawn();
+            }
+            for (ObjectGuid const& guid : _encounterNPCs)
+            {
+                if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                {
+                    if (Creature* creature = instance->GetCreature(guid))
+                    {
+                            creature->Respawn();
+                    }
+                    break;
+                }
             }
         }
 
@@ -121,8 +136,8 @@ public:
                                     case NPC_RIFT_LORD:
                                     case NPC_RIFT_LORD_2:
                                     case NPC_TIME_RIFT:
-                                    case NPC_INFINITE_ASSASIN:
-                                    case NPC_INFINITE_ASSASIN_2:
+                                    case NPC_INFINITE_ASSASSIN:
+                                    case NPC_INFINITE_ASSASSIN_2:
                                     case NPC_INFINITE_WHELP:
                                     case NPC_INFINITE_CHRONOMANCER:
                                     case NPC_INFINITE_CHRONOMANCER_2:
@@ -143,14 +158,14 @@ public:
                     case DATA_CHRONO_LORD_DEJA:
                     case DATA_TEMPORUS:
                     {
-                        _canSpawnPortal = false;
+                        _noBossSpawnDelay = false;
 
                         _scheduler.Schedule(2min + 30s, [this](TaskContext)
                         {
-                            _canSpawnPortal = true;
+                            _noBossSpawnDelay = true;
+                            ScheduleNextPortal(0s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         });
 
-                        ScheduleNextPortal(2min + 30s, Position(0.0f, 0.0f, 0.0f, 0.0f));
                         break;
                     }
                     default:
@@ -163,26 +178,27 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (instance->GetPlayersCountExceptGMs() <= 1 && GetBossState(DATA_AEONUS) != DONE)
+            if (instance->GetPlayersCountExceptGMs() <= 1 && GetBossState(DATA_AEONUS) != DONE && _eventStatus != EVENT_IN_PROGRESS)
             {
                 CleanupInstance();
             }
 
-            player->SendUpdateWorldState(WORLD_STATE_BM, _currentRift > 0 ? 1 : 0);
+            player->SendUpdateWorldState(WORLD_STATE_BM, _eventStatus);
             player->SendUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
 
         void ScheduleNextPortal(Milliseconds time, Position lastPosition)
         {
+            // only one rift can be scheduled at any time
             _scheduler.CancelGroup(CONTEXT_GROUP_RIFTS);
 
             _scheduler.Schedule(time, [this, lastPosition](TaskContext context)
             {
                 if (GetCreature(DATA_MEDIVH))
                 {
-                    // Spawning prevented - there's a 150s delay after a boss dies.
-                    if (!_canSpawnPortal)
+                    // Spawning prevented: after-boss-delay or event failed/not started or last portal spawned
+                    if (!_noBossSpawnDelay || _eventStatus == EVENT_PREPARE || _currentRift >= 18)
                     {
                         return;
                     }
@@ -208,19 +224,10 @@ public:
 
                         instance->SummonCreature(NPC_TIME_RIFT, spawnPos);
 
-                        // Here we check if we have available rift spots.
-                        if (_currentRift < 18)
-                        {
-                            if (!_availableRiftPositions.empty())
-                            {
-                                context.Repeat((_currentRift >= 13 ? 2min : 90s));
-                            }
-                            else
-                            {
-                                context.Repeat(4s);
-                            }
-                        }
+                        // queue next portal if group doesn't kill keepers fast enough
+                        context.Repeat((_currentRift >= 13 ? 2min : 90s));
                     }
+                    // if no rift positions are available, the next rift will be scheduled in OnCreatureRemove
                 }
 
                 context.SetGroup(CONTEXT_GROUP_RIFTS);
@@ -241,8 +248,8 @@ public:
                 case NPC_RIFT_KEEPER_MAGE:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
-                case NPC_INFINITE_ASSASIN:
-                case NPC_INFINITE_ASSASIN_2:
+                case NPC_INFINITE_ASSASSIN:
+                case NPC_INFINITE_ASSASSIN_2:
                 case NPC_INFINITE_WHELP:
                 case NPC_INFINITE_CHRONOMANCER:
                 case NPC_INFINITE_CHRONOMANCER_2:
@@ -251,6 +258,7 @@ public:
                 case NPC_INFINITE_VANQUISHER:
                 case NPC_INFINITE_VANQUISHER_2:
                 case NPC_DP_BEAM_STALKER:
+                case NPC_DP_EMITTER_STALKER:
                     _encounterNPCs.insert(creature->GetGUID());
                     break;
             }
@@ -263,7 +271,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_TIME_RIFT:
-                    if (_currentRift < 18)
+                    if (_currentRift < 18 && _noBossSpawnDelay && _eventStatus == EVENT_IN_PROGRESS)
                     {
                         if (_availableRiftPositions.size() < 3)
                         {
@@ -286,8 +294,8 @@ public:
                 case NPC_RIFT_KEEPER_MAGE:
                 case NPC_RIFT_LORD:
                 case NPC_RIFT_LORD_2:
-                case NPC_INFINITE_ASSASIN:
-                case NPC_INFINITE_ASSASIN_2:
+                case NPC_INFINITE_ASSASSIN:
+                case NPC_INFINITE_ASSASSIN_2:
                 case NPC_INFINITE_WHELP:
                 case NPC_INFINITE_CHRONOMANCER:
                 case NPC_INFINITE_CHRONOMANCER_2:
@@ -295,6 +303,7 @@ public:
                 case NPC_INFINITE_EXECUTIONER_2:
                 case NPC_INFINITE_VANQUISHER:
                 case NPC_INFINITE_VANQUISHER_2:
+                case NPC_DP_EMITTER_STALKER:
                     _encounterNPCs.erase(creature->GetGUID());
                     break;
             }
@@ -308,26 +317,13 @@ public:
             {
                 case DATA_MEDIVH:
                 {
-                    DoUpdateWorldState(WORLD_STATE_BM, 1);
+                    _eventStatus = EVENT_IN_PROGRESS;
+
+                    DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
                     DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
                     DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
 
                     ScheduleNextPortal(3s, Position(0.0f, 0.0f, 0.0f, 0.0f));
-
-                    for (ObjectGuid const& guid : _encounterNPCs)
-                    {
-                        if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
-                        {
-                            if (Creature* creature = instance->GetCreature(guid))
-                            {
-                                if (!creature->IsAlive())
-                                {
-                                    creature->Respawn(true);
-                                }
-                            }
-                            break;
-                        }
-                    }
 
                     break;
                 }
@@ -348,6 +344,8 @@ public:
 
                     if (!_shieldPercent)
                     {
+                        _eventStatus = EVENT_PREPARE;
+
                         if (Creature* medivh = GetCreature(DATA_MEDIVH))
                         {
                             if (medivh->IsAlive() && medivh->IsAIEnabled)
@@ -404,6 +402,12 @@ public:
                                             GuidSet encounterNPCSCopy = _encounterNPCs;
                                             for (ObjectGuid const& guid : encounterNPCSCopy)
                                             {
+                                                // Don't despawn permanent visual effect NPC twice or it won't respawn correctly
+                                                if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
+                                                {
+                                                    continue;
+                                                }
+
                                                 if (Creature* creature = instance->GetCreature(guid))
                                                 {
                                                     creature->CastSpell(creature, SPELL_TELEPORT_VISUAL, true);
@@ -412,6 +416,16 @@ public:
                                             }
 
                                             _scheduler.CancelAll();
+
+                                            // Step 4 - Schedule instance cleanup without player interaction
+                                            _scheduler.Schedule(300s, [this](TaskContext)
+                                            {
+                                                CleanupInstance();
+
+                                                DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
+                                                DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
+                                                DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+                                            });
                                         });
                                     });
                                 });
@@ -447,7 +461,8 @@ public:
         GuidSet _encounterNPCs;
         uint8 _currentRift;
         int8 _shieldPercent;
-        bool _canSpawnPortal;
+        bool _noBossSpawnDelay;
+        EventStatus _eventStatus;
         TaskScheduler _scheduler;
     };
 };

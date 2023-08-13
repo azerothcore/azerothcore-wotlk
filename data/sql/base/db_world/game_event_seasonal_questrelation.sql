@@ -18,14 +18,13 @@
 DROP TABLE IF EXISTS `game_event_seasonal_questrelation`;
 CREATE TABLE IF NOT EXISTS `game_event_seasonal_questrelation` (
   `questId` int unsigned NOT NULL COMMENT 'Quest Identifier',
-  `eventEntry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of the game event',
+  `eventEntry` int unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of the game event',
   PRIMARY KEY (`questId`,`eventEntry`),
   KEY `idx_quest` (`questId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
--- Dumping data for table acore_world.game_event_seasonal_questrelation: 690 rows
+-- Dumping data for table acore_world.game_event_seasonal_questrelation: ~690 rows (approximately)
 DELETE FROM `game_event_seasonal_questrelation`;
-/*!40000 ALTER TABLE `game_event_seasonal_questrelation` DISABLE KEYS */;
 INSERT INTO `game_event_seasonal_questrelation` (`questId`, `eventEntry`) VALUES
 	(171, 10),
 	(172, 10),
@@ -717,7 +716,6 @@ INSERT INTO `game_event_seasonal_questrelation` (`questId`, `eventEntry`) VALUES
 	(24849, 8),
 	(24850, 8),
 	(24851, 8);
-/*!40000 ALTER TABLE `game_event_seasonal_questrelation` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -24,12 +24,10 @@ CREATE TABLE IF NOT EXISTS `summonproperties_dbc` (
   `Slot` int NOT NULL DEFAULT '0',
   `Flags` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.summonproperties_dbc: 0 rows
+-- Dumping data for table acore_world.summonproperties_dbc: ~0 rows (approximately)
 DELETE FROM `summonproperties_dbc`;
-/*!40000 ALTER TABLE `summonproperties_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `summonproperties_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

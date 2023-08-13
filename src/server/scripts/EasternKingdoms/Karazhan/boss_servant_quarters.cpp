@@ -19,7 +19,7 @@
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 
-enum ServantQuartersSpells
+enum Spells
 {
     SPELL_SNEAK                 = 22766,
     SPELL_ACIDIC_FANG           = 29901,
@@ -33,41 +33,37 @@ enum ServantQuartersSpells
     SPELL_RAVAGE                = 29906
 };
 
-enum ServantQuertersMisc
-{
-    EVENT_SPELL_ACIDIC_FANG     = 1,
-    EVENT_SPELL_HYAKISS_WEB     = 2,
-
-    EVENT_SPELL_DIVE            = 10,
-    EVENT_SPELL_SONIC_BURST     = 11,
-    EVENT_SPELL_WING_BUFFET     = 12,
-    EVENT_SPELL_FEAR            = 13,
-
-    EVENT_SPELL_RAVAGE          = 20,
-
-    EVENT_CHECK_VISIBILITY      = 30
-};
-
 struct boss_servant_quarters : public BossAI
 {
     boss_servant_quarters(Creature* creature) : BossAI(creature, DATA_SERVANT_QUARTERS) { }
 
     void Reset() override
     {
-        events.Reset();
+        _scheduler.CancelAll();
         me->SetVisible(false);
         me->SetReactState(REACT_PASSIVE);
         me->SetFaction(FACTION_FRIENDLY);
-        _events2.Reset();
-        _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5s);
-
+        _scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            if (instance->GetBossState(DATA_SERVANT_QUARTERS) == DONE)
+            {
+                me->SetVisible(true);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RestoreFaction();
+            }
+            else
+            {
+                context.Repeat(5s);
+            }
+        });
         if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
         {
             DoCastSelf(SPELL_SNEAK, true);
         }
-
         if (instance->GetData(DATA_SELECTED_RARE) != me->GetEntry())
+        {
             me->DespawnOrUnsummon(1);
+        }
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
@@ -75,18 +71,42 @@ struct boss_servant_quarters : public BossAI
         me->setActive(true);
         if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
         {
-            events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, 5s);
-            events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 9s);
+            _scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_ACIDIC_FANG);
+                context.Repeat(12s, 18s);
+            }).Schedule(9s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_HYAKISS_WEB, 0, 30.0f);
+                context.Repeat(15s);
+            });
         }
         else if (me->GetEntry() == NPC_SHADIKITH_THE_GLIDER)
         {
-            events.ScheduleEvent(EVENT_SPELL_SONIC_BURST, 4s);
-            events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 7s);
-            events.ScheduleEvent(EVENT_SPELL_DIVE, 10s);
+            _scheduler.Schedule(4s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_SONIC_BURST);
+                context.Repeat(12s, 18s);
+            }).Schedule(7s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_WING_BUFFET);
+                context.Repeat(12s, 18s);
+            }).Schedule(10s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
+                {
+                    me->CastSpell(target, SPELL_DIVE);
+                }
+                context.Repeat(20s);
+            });
         }
         else // if (me->GetEntry() == NPC_ROKAD_THE_RAVAGER)
         {
-            events.ScheduleEvent(EVENT_SPELL_RAVAGE, 3s);
+            _scheduler.Schedule(3s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_RAVAGE);
+                context.Repeat(10500ms);
+            });
         }
     }
 
@@ -97,70 +117,28 @@ struct boss_servant_quarters : public BossAI
     void MovementInform(uint32 type, uint32 point) override
     {
         if (type == POINT_MOTION_TYPE && point == EVENT_CHARGE)
-            events.ScheduleEvent(EVENT_SPELL_FEAR, 0);
+        {
+            _scheduler.Schedule(1ms, [this](TaskContext /*context*/)
+            {
+                DoCastVictim(SPELL_FEAR);
+            });
+        }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _events2.Update(diff);
-        switch (_events2.ExecuteEvent())
-        {
-            case EVENT_CHECK_VISIBILITY:
-                if (instance->GetBossState(DATA_SERVANT_QUARTERS) == DONE)
-                {
-                    me->SetVisible(true);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->RestoreFaction();
-                }
-                else
-                    _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5s);
-                break;
-        }
-
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
+        _scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
-
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_SPELL_ACIDIC_FANG:
-                me->CastSpell(me->GetVictim(), SPELL_ACIDIC_FANG, false);
-                events.Repeat(12s, 18s);
-                break;
-            case EVENT_SPELL_HYAKISS_WEB:
-                DoCastRandomTarget(SPELL_HYAKISS_WEB, 0, 30.0f);
-                events.Repeat(15s);
-                break;
-            case EVENT_SPELL_SONIC_BURST:
-                DoCastSelf(SPELL_SONIC_BURST);
-                events.Repeat(12s, 18s);
-                break;
-            case EVENT_SPELL_WING_BUFFET:
-                DoCastSelf(SPELL_WING_BUFFET);
-                events.Repeat(12s, 18s);
-                break;
-            case EVENT_SPELL_DIVE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
-                    me->CastSpell(target, SPELL_DIVE, false);
-                events.Repeat(20s);
-                break;
-            case EVENT_SPELL_FEAR:
-                DoCastVictim(SPELL_FEAR);
-                break;
-            case EVENT_SPELL_RAVAGE:
-                me->CastSpell(me->GetVictim(), SPELL_RAVAGE, false);
-                events.ScheduleEvent(EVENT_SPELL_RAVAGE, 10500);
-                break;
-        }
 
         DoMeleeAttackIfReady();
     }
 
     private:
-        EventMap _events2;
+        TaskScheduler _scheduler;
 };
 
 void AddSC_boss_servant_quarters()

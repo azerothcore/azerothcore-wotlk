@@ -222,7 +222,7 @@ public:
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (_dying && who->GetGUID() != me->GetGUID())
+        if (_dying && who && who->GetGUID() != me->GetGUID())
             damage = 0;
 
         if (me->HealthBelowPctDamaged(0, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)

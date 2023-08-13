@@ -17,8 +17,26 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "shattered_halls.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_GRAND_WARLOCK_NETHEKURSE  , DATA_NETHEKURSE     },
+    { NPC_WARCHIEF_KARGATH          , DATA_KARGATH        },
+    { NPC_OMROGG_LEFT_HEAD          , DATA_OMROGG_LEFT_HEAD },
+    { NPC_OMROGG_RIGHT_HEAD         , DATA_OMROGG_RIGHT_HEAD },
+    { NPC_WARCHIEF_PORTAL           , DATA_WARCHIEF_PORTAL },
+    { 0                             , 0                   }
+};
+
+DoorData const doorData[] =
+{
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_1, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { GO_GRAND_WARLOCK_CHAMBER_DOOR_2, DATA_NETHEKURSE, DOOR_TYPE_PASSAGE },
+    { 0,                                             0, DOOR_TYPE_ROOM    } // END
+};
 
 class instance_shattered_halls : public InstanceMapScript
 {
@@ -37,6 +55,8 @@ public:
         void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
+            LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
 
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
@@ -46,23 +66,6 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
-                    nethekurseDoor1GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-                case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
-                    nethekurseDoor2GUID = go->GetGUID();
-                    if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -77,9 +80,6 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_WARCHIEF_KARGATH:
-                    warchiefKargathGUID = creature->GetGUID();
-                    break;
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
                         creature->AddLootMode(2);
@@ -101,29 +101,7 @@ public:
                     prisonerGUID[2] = creature->GetGUID();
                     break;
             }
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            switch (type)
-            {
-                case DATA_NETHEKURSE:
-                    if (state == IN_PROGRESS)
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, false);
-                        HandleGameObject(nethekurseDoor2GUID, false);
-                    }
-                    else
-                    {
-                        HandleGameObject(nethekurseDoor1GUID, true);
-                        HandleGameObject(nethekurseDoor2GUID, true);
-                    }
-                    break;
-            }
-            return true;
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -133,7 +111,7 @@ public:
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
                 instance->LoadGrid(230, -80);
 
-                if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
+                if (Creature* kargath = GetCreature(DATA_KARGATH))
                     sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
@@ -197,49 +175,11 @@ public:
         }
 
     protected:
-        ObjectGuid warchiefKargathGUID;
-        ObjectGuid nethekurseDoor1GUID;
-        ObjectGuid nethekurseDoor2GUID;
-
         ObjectGuid executionerGUID;
         ObjectGuid prisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };
-};
-
-class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
-{
-public:
-    spell_tsh_shoot_flame_arrow() : SpellScriptLoader("spell_tsh_shoot_flame_arrow") { }
-
-    class spell_tsh_shoot_flame_arrow_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_tsh_shoot_flame_arrow_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            Acore::Containers::RandomResize(unitList, 1);
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, 30953, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_tsh_shoot_flame_arrow_SpellScript();
-    }
 };
 
 class at_shattered_halls_execution : public AreaTriggerScript
@@ -250,7 +190,12 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
-            instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+        {
+            if (player->GetMap()->IsHeroic())
+            {
+                instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);
+            }
+        }
 
         return true;
     }
@@ -259,6 +204,5 @@ public:
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
-    new spell_tsh_shoot_flame_arrow();
     new at_shattered_halls_execution();
 }

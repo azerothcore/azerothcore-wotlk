@@ -29,11 +29,10 @@ CREATE TABLE IF NOT EXISTS `quest_money_reward` (
   `Money8` int NOT NULL DEFAULT '0',
   `Money9` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_money_reward: 80 rows
+-- Dumping data for table acore_world.quest_money_reward: ~80 rows (approximately)
 DELETE FROM `quest_money_reward`;
-/*!40000 ALTER TABLE `quest_money_reward` DISABLE KEYS */;
 INSERT INTO `quest_money_reward` (`Level`, `Money0`, `Money1`, `Money2`, `Money3`, `Money4`, `Money5`, `Money6`, `Money7`, `Money8`, `Money9`) VALUES
 	(1, 0, 2, 4, 8, 12, 15, 30, 50, 75, 0),
 	(2, 0, 3, 8, 17, 25, 35, 65, 100, 125, 0),
@@ -115,7 +114,6 @@ INSERT INTO `quest_money_reward` (`Level`, `Money0`, `Money1`, `Money2`, `Money3
 	(78, 0, 6800, 17400, 34000, 53000, 68000, 136000, 204000, 272000, 0),
 	(79, 0, 7200, 18200, 36000, 55000, 71000, 142000, 213000, 284000, 0),
 	(80, 0, 7400, 19000, 37000, 58000, 74000, 148000, 222000, 296000, 0);
-/*!40000 ALTER TABLE `quest_money_reward` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

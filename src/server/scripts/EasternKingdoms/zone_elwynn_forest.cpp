@@ -101,7 +101,7 @@ struct npc_cameron : public ScriptedAI
         Acore::Containers::RandomShuffle(MovePosPositions);
 
         // first we break formation because children will need to move on their own now
-        for (auto guid : _childrenGUIDs)
+        for (auto& guid : _childrenGUIDs)
             if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
                 if (child->GetFormation())
                     child->GetFormation()->RemoveMember(child);
@@ -228,7 +228,7 @@ struct npc_cameron : public ScriptedAI
 
                 // If Formation was disbanded, remake.
                 if (!me->GetFormation()->IsFormed())
-                    for (auto guid : _childrenGUIDs)
+                    for (auto& guid : _childrenGUIDs)
                         if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
                             child->SearchFormation();
 

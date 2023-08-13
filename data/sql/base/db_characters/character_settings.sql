@@ -18,15 +18,13 @@
 DROP TABLE IF EXISTS `character_settings`;
 CREATE TABLE IF NOT EXISTS `character_settings` (
   `guid` int unsigned NOT NULL,
-  `source` varchar(40) NOT NULL,
-  `data` text,
+  `source` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`guid`,`source`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player Settings';
 
--- Dumping data for table acore_characters.character_settings: 0 rows
+-- Dumping data for table acore_characters.character_settings: ~0 rows (approximately)
 DELETE FROM `character_settings`;
-/*!40000 ALTER TABLE `character_settings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `character_settings` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

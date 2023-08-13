@@ -18,21 +18,19 @@
 DROP TABLE IF EXISTS `game_event_npcflag`;
 CREATE TABLE IF NOT EXISTS `game_event_npcflag` (
   `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
-  `guid` mediumint unsigned NOT NULL DEFAULT '0',
+  `guid` int unsigned NOT NULL DEFAULT '0',
   `npcflag` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_npcflag: 5 rows
+-- Dumping data for table acore_world.game_event_npcflag: ~5 rows (approximately)
 DELETE FROM `game_event_npcflag`;
-/*!40000 ALTER TABLE `game_event_npcflag` DISABLE KEYS */;
 INSERT INTO `game_event_npcflag` (`eventEntry`, `guid`, `npcflag`) VALUES
 	(17, 1803, 179),
 	(17, 26771, 179),
 	(17, 38112, 129),
 	(17, 46320, 177),
 	(17, 208240, 1048705);
-/*!40000 ALTER TABLE `game_event_npcflag` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

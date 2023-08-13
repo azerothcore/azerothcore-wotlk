@@ -17,24 +17,22 @@
 -- Dumping structure for table acore_world.quest_greeting_locale
 DROP TABLE IF EXISTS `quest_greeting_locale`;
 CREATE TABLE IF NOT EXISTS `quest_greeting_locale` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
   `type` tinyint unsigned NOT NULL DEFAULT '0',
-  `locale` varchar(4) NOT NULL,
-  `Greeting` text,
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Greeting` text COLLATE utf8mb4_unicode_ci,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`,`type`,`locale`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_greeting_locale: 5 rows
+-- Dumping data for table acore_world.quest_greeting_locale: ~5 rows (approximately)
 DELETE FROM `quest_greeting_locale`;
-/*!40000 ALTER TABLE `quest_greeting_locale` DISABLE KEYS */;
 INSERT INTO `quest_greeting_locale` (`ID`, `type`, `locale`, `Greeting`, `VerifiedBuild`) VALUES
-	(22292, 0, 'ruRU', 'Свет ещё не воссиял над Скеттисом.', 0),
+	(3390, 0, 'esES', 'Los Baldíos cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.', 47014),
+	(3390, 0, 'esMX', 'Los Baldíos cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.', 47014),
 	(5638, 0, 'esES', 'Tengo muchas cosas que hacer por aquí en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bViéndote que estás aquí para ayudar. ¿Por qué no empezamos?', NULL),
 	(5638, 0, 'esMX', 'Tengo muchas cosas que hacer por aquí en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bViéndote que estás aquí para ayudar. ¿Por qué no empezamos?', NULL),
-	(3390, 0, 'esES', 'Los Baldíos cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.', 47014),
-	(3390, 0, 'esMX', 'Los Baldíos cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.', 47014);
-/*!40000 ALTER TABLE `quest_greeting_locale` ENABLE KEYS */;
+	(22292, 0, 'ruRU', 'Свет ещё не воссиял над Скеттисом.', 0);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

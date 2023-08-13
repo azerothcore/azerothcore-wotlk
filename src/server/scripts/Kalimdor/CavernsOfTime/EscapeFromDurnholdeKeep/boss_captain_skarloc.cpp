@@ -19,29 +19,27 @@
 #include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
 
-enum CaptainSkarloc
+enum Text
 {
-    SAY_ENTER                   = 0,
-    SAY_TAUNT                   = 1,
-    SAY_SLAY                    = 2,
-    SAY_DEATH                   = 3,
+    SAY_ENTER                = 0,
+    SAY_TAUNT                = 1,
+    SAY_SLAY                 = 2,
+    SAY_DEATH                = 3
+};
 
-    SPELL_HOLY_LIGHT            = 29427,
-    SPELL_CLEANSE               = 29380,
-    SPELL_HAMMER_OF_JUSTICE     = 13005,
-    SPELL_HOLY_SHIELD           = 31904,
-    SPELL_DEVOTION_AURA         = 8258,
-    SPELL_CONSECRATION          = 38385,
+enum Spells
+{
+    SPELL_HOLY_LIGHT         = 29427,
+    SPELL_CLEANSE            = 29380,
+    SPELL_HAMMER_OF_JUSTICE  = 13005,
+    SPELL_HOLY_SHIELD        = 31904,
+    SPELL_DEVOTION_AURA      = 8258,
+    SPELL_CONSECRATION       = 38385
+};
 
-    WAYPOINTS_COUNT             = 4,
-
-    EVENT_INITIAL_TALK          = 1,
-    EVENT_START_FIGHT           = 2,
-    EVENT_SPELL_CLEANSE         = 10,
-    EVENT_SPELL_HAMMER          = 11,
-    EVENT_SPELL_HOLY_LIGHT      = 12,
-    EVENT_SPELL_HOLY_SHIELD     = 13,
-    EVENT_SPELL_CONSECRATION    = 14
+enum Misc
+{
+    WAYPOINTS_COUNT          = 4
 };
 
 const Position startPath[WAYPOINTS_COUNT] =
@@ -52,172 +50,174 @@ const Position startPath[WAYPOINTS_COUNT] =
     {2058.77f, 236.04f, 63.92f, 0.0f}
 };
 
-class boss_captain_skarloc : public CreatureScript
+struct boss_captain_skarloc : public BossAI
 {
-public:
-    boss_captain_skarloc() : CreatureScript("boss_captain_skarloc") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_captain_skarloc(Creature* creature) : BossAI(creature, DATA_CAPTAIN_SKARLOC), summons(me)
     {
-        return GetOldHillsbradAI<boss_captain_skarlocAI>(creature);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_captain_skarlocAI : public ScriptedAI
+    SummonList summons;
+
+    void Reset() override
     {
-        boss_captain_skarlocAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
+        _Reset();
+        summons.DespawnAll();
+    }
 
-        EventMap events;
-        SummonList summons;
-
-        void Reset() override
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
         {
-            events.Reset();
-            summons.DespawnAll();
+            thrall->AI()->JustSummoned(summon);
         }
+        summon->SetImmuneToAll(true);
+        if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
+            return;
 
-        void JustSummoned(Creature* summon) override
+        if (summons.size() == 1)
         {
-            summons.Summon(summon);
-            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
-                thrall->AI()->JustSummoned(summon);
-            summon->SetImmuneToAll(true);
-
-            if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
-                return;
-
-            if (summons.size() == 1)
-                summon->GetMotionMaster()->MovePoint(0, 2060.788f, 237.301f, 63.999f);
-            else
-                summon->GetMotionMaster()->MovePoint(0, 2056.870f, 234.853f, 63.839f);
+            summon->GetMotionMaster()->MovePoint(0, 2060.788f, 237.301f, 63.999f);
         }
-
-        void InitializeAI() override
+        else
         {
-            ScriptedAI::InitializeAI();
-
-            Movement::PointsArray path;
-            path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i)
-                path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
-
-            me->GetMotionMaster()->MoveSplinePath(&path);
-            me->SetImmuneToAll(true);
-            me->Mount(SKARLOC_MOUNT_MODEL);
+            summon->GetMotionMaster()->MovePoint(0, 2056.870f, 234.853f, 63.839f);
         }
+    }
 
-        void MovementInform(uint32 type, uint32 id) override
+    void InitializeAI() override
+    {
+        ScriptedAI::InitializeAI();
+        Movement::PointsArray path;
+        path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+        for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i)
         {
-            if (type != ESCORT_MOTION_TYPE)
-                return;
+            path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
+        }
+        me->GetMotionMaster()->MoveSplinePath(&path);
+        me->SetImmuneToAll(true);
+        me->Mount(SKARLOC_MOUNT_MODEL);
+    }
 
-            // Xinef: we can rely here on internal counting
-            if (id == 1)
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != ESCORT_MOTION_TYPE)
+            return;
+
+        // Xinef: we can rely here on internal counting
+        if (id == 1)
+        {
+            me->SummonCreature(NPC_DURNHOLDE_MAGE, 2038.549f, 273.303f, 63.420f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
+            me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2032.810f, 269.416f, 63.561f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
+        }
+        else if (id == 2)
+        {
+            me->Dismount();
+            me->SetWalk(true);
+            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
             {
-                me->SummonCreature(NPC_DURNHOLDE_MAGE, 2038.549f, 273.303f, 63.420f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
-                me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2032.810f, 269.416f, 63.561f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
-            }
-            else if (id == 2)
-            {
-                me->Dismount();
-                me->SetWalk(true);
-                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                        summon->SetWalk(true);
-                if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                 {
-                    mount->SetImmuneToNPC(true);
-                    mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    summon->SetWalk(true);
                 }
             }
-
-            if (me->movespline->Finalized())
+            if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
             {
-                Talk(SAY_ENTER, 500ms);
+                mount->SetImmuneToNPC(true);
+                mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            }
+        }
 
-                me->m_Events.AddEventAtOffset([this]()
+        if (me->movespline->Finalized())
+        {
+            Talk(SAY_ENTER, 500ms);
+
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->SetImmuneToAll(false);
+                me->SetInCombatWithZone();
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
-                    me->SetImmuneToAll(false);
-                    me->SetInCombatWithZone();
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                     {
-                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
                         {
-                            if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
-                            {
-                                summon->SetImmuneToAll(false);
-                                summon->SetInCombatWithZone();
-                            }
+                            summon->SetImmuneToAll(false);
+                            summon->SetInCombatWithZone();
                         }
                     }
-                }, 8s);
-            }
+                }
+            }, 8s);
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        DoCastSelf(SPELL_DEVOTION_AURA);
+        scheduler.Schedule(15s, [this](TaskContext context)
         {
-            me->CastSpell(me, SPELL_DEVOTION_AURA, true);
-
-            events.ScheduleEvent(EVENT_SPELL_HOLY_LIGHT, 15000);
-            events.ScheduleEvent(EVENT_SPELL_CLEANSE, 6000);
-            events.ScheduleEvent(EVENT_SPELL_HAMMER, 20000);
-            events.ScheduleEvent(EVENT_SPELL_HOLY_SHIELD, 10000);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 1000);
-        }
-
-        void KilledUnit(Unit*  /*victim*/) override
+            DoCastSelf(SPELL_HOLY_LIGHT);
+            context.Repeat(20s);
+        }).Schedule(6s, [this](TaskContext context)
         {
-            Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_SKARLOC_KILLED);
-            me->GetInstanceScript()->SetData(DATA_THRALL_ADD_FLAG, 0);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            if (roll_chance_i(33))
             {
-                case EVENT_SPELL_HOLY_LIGHT:
-                    me->CastSpell(me, SPELL_HOLY_LIGHT, false);
-                    events.ScheduleEvent(EVENT_SPELL_HOLY_LIGHT, 20000);
-                    break;
-                case EVENT_SPELL_CLEANSE:
-                    if (roll_chance_i(33))
-                        Talk(SAY_TAUNT);
-                    me->CastSpell(me, SPELL_CLEANSE, false);
-                    events.ScheduleEvent(EVENT_SPELL_CLEANSE, 10000);
-                    break;
-                case EVENT_SPELL_HAMMER:
-                    me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, false);
-                    events.ScheduleEvent(EVENT_SPELL_HAMMER, 30000);
-                    break;
-                case EVENT_SPELL_HOLY_SHIELD:
-                    me->CastSpell(me, SPELL_HOLY_SHIELD, false);
-                    events.ScheduleEvent(SPELL_HOLY_SHIELD, 30000);
-                    break;
-                case EVENT_SPELL_CONSECRATION:
-                    me->CastSpell(me, SPELL_CONSECRATION, false);
-                    events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 20000);
-                    break;
+                Talk(SAY_TAUNT);
             }
+            DoCastSelf(SPELL_CLEANSE);
+            context.Repeat(10s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
+            context.Repeat(30s);
+        }).Schedule(10s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_HOLY_SHIELD);
+            context.Repeat(30s);
+        });
 
-            DoMeleeAttackIfReady();
+        if (IsHeroic())
+        {
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_CONSECRATION);
+                context.Repeat(20s);
+            });
         }
-    };
+    }
+
+    void KilledUnit(Unit*  /*victim*/) override
+    {
+        Talk(SAY_SLAY);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+        me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_SKARLOC_KILLED);
+        me->GetInstanceScript()->SetData(DATA_THRALL_ADD_FLAG, 0);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_captain_skarloc()
 {
-    new boss_captain_skarloc();
+    RegisterOldHillsbradCreatureAI(boss_captain_skarloc);
 }

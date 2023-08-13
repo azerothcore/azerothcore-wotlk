@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `game_event_creature` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
   `guid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_creature: 8,817 rows
+-- Dumping data for table acore_world.game_event_creature: ~8,836 rows (approximately)
 DELETE FROM `game_event_creature`;
-/*!40000 ALTER TABLE `game_event_creature` DISABLE KEYS */;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(2, 24),
 	(22, 38),
@@ -100,7 +99,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(-24, 12372),
 	(10, 12401),
 	(23, 12604),
-	(13, 14461),
 	(12, 17338),
 	(12, 17339),
 	(60, 17676),
@@ -8798,6 +8796,26 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(3, 247001),
 	(4, 247002),
 	(4, 247003),
+	(13, 247200),
+	(13, 247201),
+	(13, 247202),
+	(13, 247203),
+	(13, 247204),
+	(13, 247205),
+	(13, 247206),
+	(13, 247207),
+	(13, 247208),
+	(13, 247209),
+	(13, 247210),
+	(13, 247211),
+	(13, 247212),
+	(13, 247213),
+	(13, 247214),
+	(13, 247215),
+	(13, 247216),
+	(13, 247217),
+	(13, 247218),
+	(13, 247219),
 	(1, 248572),
 	(1, 248575),
 	(1, 248581),
@@ -8843,7 +8861,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(77, 2000007),
 	(4, 2000008),
 	(23, 2000008);
-/*!40000 ALTER TABLE `game_event_creature` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

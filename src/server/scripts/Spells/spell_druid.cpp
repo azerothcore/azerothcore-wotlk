@@ -55,7 +55,6 @@ enum DruidSpells
     SPELL_DRUID_SURVIVAL_INSTINCTS          = 50322,
     SPELL_DRUID_SAVAGE_ROAR                 = 62071,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE       = 51178,
-    SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
     SPELL_DRUID_BEAR_FORM_PASSIVE           = 1178,
     SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE      = 9635,
     SPELL_DRUID_ENRAGE                      = 5229,
@@ -501,8 +500,8 @@ class spell_dru_glyph_of_starfire : public SpellScript
     }
 };
 
-/* 34246 - Increased Lifebloom Periodic
-   60779 - Idol of Lush Moss */
+// 34246 - Idol of the Emerald Queen
+// 60779 - Idol of Lush Moss
 class spell_dru_idol_lifebloom : public AuraScript
 {
     PrepareAuraScript(spell_dru_idol_lifebloom);
@@ -515,7 +514,7 @@ class spell_dru_idol_lifebloom : public AuraScript
             spellMod->op = SPELLMOD_DOT;
             spellMod->type = SPELLMOD_FLAT;
             spellMod->spellId = GetId();
-            spellMod->mask = GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
+            spellMod->mask = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
         }
         spellMod->value = aurEff->GetAmount() / 7;
     }
@@ -542,24 +541,6 @@ class spell_dru_innervate : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_innervate::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE);
-    }
-};
-
-// -5570 - Insect Swarm
-class spell_dru_insect_swarm : public AuraScript
-{
-    PrepareAuraScript(spell_dru_insect_swarm);
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (Unit* caster = GetCaster())
-            if (AuraEffect const* relicAurEff = caster->GetAuraEffect(SPELL_DRUID_ITEM_T8_BALANCE_RELIC, EFFECT_0))
-                amount += relicAurEff->GetAmount() / aurEff->GetTotalTicks();
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_insect_swarm::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1204,7 +1185,6 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_glyph_of_starfire);
     RegisterSpellScript(spell_dru_idol_lifebloom);
     RegisterSpellScript(spell_dru_innervate);
-    RegisterSpellScript(spell_dru_insect_swarm);
     RegisterSpellScript(spell_dru_lifebloom);
     RegisterSpellScript(spell_dru_living_seed);
     RegisterSpellScript(spell_dru_living_seed_proc);

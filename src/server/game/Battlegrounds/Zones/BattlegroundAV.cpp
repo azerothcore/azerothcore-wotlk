@@ -1579,7 +1579,7 @@ void BattlegroundAV::ResetBGSubclass()
 
 bool BattlegroundAV::IsBothMinesControlledByTeam(TeamId teamId) const
 {
-    for (auto mine : m_Mine_Owner)
+    for (auto& mine : m_Mine_Owner)
         if (mine != teamId)
             return false;
 

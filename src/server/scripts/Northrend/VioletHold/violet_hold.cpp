@@ -1184,6 +1184,36 @@ public:
     }
 };
 
+struct npc_violet_hold_defense_system : public ScriptedAI
+{
+    npc_violet_hold_defense_system(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        DoCast(RAND(SPELL_DEFENSE_SYSTEM_SPAWN_EFFECT, SPELL_DEFENSE_SYSTEM_VISUAL));
+        events.ScheduleEvent(EVENT_ARCANE_LIGHTNING, 4s);
+        events.ScheduleEvent(EVENT_ARCANE_LIGHTNING_INSTAKILL, 4s);
+        me->DespawnOrUnsummon(7s, 0s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ARCANE_LIGHTNING:
+                DoCastAOE(RAND(SPELL_ARCANE_LIGHTNING, SPELL_ARCANE_LIGHTNING_VISUAL));
+                events.RepeatEvent(2000);
+                break;
+            case EVENT_ARCANE_LIGHTNING_INSTAKILL:
+                DoCastAOE(SPELL_ARCANE_LIGHTNING_INSTAKILL);
+                events.RepeatEvent(1000);
+                break;
+        }
+    }
+};
+
 void AddSC_violet_hold()
 {
     new go_vh_activation_crystal();
@@ -1201,4 +1231,5 @@ void AddSC_violet_hold()
     new npc_azure_stalker();
 
     new spell_destroy_door_seal();
+    RegisterCreatureAI(npc_violet_hold_defense_system);
 }

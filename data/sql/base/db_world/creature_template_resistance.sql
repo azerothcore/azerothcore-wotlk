@@ -17,13 +17,13 @@
 -- Dumping structure for table acore_world.creature_template_resistance
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` mediumint unsigned NOT NULL,
+  `CreatureID` int unsigned NOT NULL,
   `School` tinyint unsigned NOT NULL,
   `Resistance` smallint DEFAULT NULL,
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`School`),
   CONSTRAINT `creature_template_resistance_chk_1` CHECK (((`School` >= 1) and (`School` <= 6)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.creature_template_resistance: ~2,225 rows (approximately)
 DELETE FROM `creature_template_resistance`;

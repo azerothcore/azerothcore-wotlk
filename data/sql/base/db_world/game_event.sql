@@ -22,17 +22,16 @@ CREATE TABLE IF NOT EXISTS `game_event` (
   `end_time` timestamp NULL DEFAULT '2000-01-01 17:00:00' COMMENT 'Absolute end date, the event will never start after',
   `occurence` bigint unsigned NOT NULL DEFAULT '5184000' COMMENT 'Delay in minutes between occurences of the event',
   `length` bigint unsigned NOT NULL DEFAULT '2592000' COMMENT 'Length in minutes of the event',
-  `holiday` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Client side holiday id',
+  `holiday` int unsigned NOT NULL DEFAULT '0' COMMENT 'Client side holiday id',
   `holidayStage` tinyint unsigned NOT NULL DEFAULT '0',
-  `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Description of the event displayed in console',
   `world_event` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '0 if normal event, 1 if world event',
   `announce` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '0 dont announce, 1 announce, 2 value from config',
   PRIMARY KEY (`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event: 83 rows
+-- Dumping data for table acore_world.game_event: ~83 rows (approximately)
 DELETE FROM `game_event`;
-/*!40000 ALTER TABLE `game_event` DISABLE KEYS */;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 	(1, '2021-06-22 03:01:00', '2030-12-31 15:00:00', 525600, 20160, 341, 1, 'Midsummer Fire Festival', 0, 2),
 	(2, '2021-12-16 04:00:00', '2030-12-31 15:00:00', 525600, 25920, 141, 1, 'Winter Veil', 0, 2),
@@ -103,21 +102,20 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 	(69, '2010-01-02 09:10:00', '2030-12-31 15:00:00', 60, 5, 0, 0, 'AT Event Trigger (Alliance Event)', 0, 2),
 	(70, '2021-09-17 06:00:00', '2030-12-31 15:00:00', 525600, 4320, 0, 0, 'Brewfest Building (Iron Forge)', 0, 2),
 	(71, '2013-01-06 10:01:00', '2030-12-31 15:00:00', 131040, 4320, 375, 1, 'Darkmoon Faire Building (Mulgore)', 0, 2),
+	(73, '2010-01-01 04:00:00', '2030-01-01 04:00:00', 60, 1, 0, 0, 'Hourly Bells', 0, 2),
+	(74, '2022-01-01 10:00:00', '2030-01-01 11:00:00', 1440, 60, 0, 0, 'Children of Goldshire', 0, 2),
+	(75, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Arena Season 1', 0, 2),
+	(76, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Arena Season 2', 0, 2),
+	(77, '2016-11-06 05:01:00', '2030-12-31 10:00:00', 131040, 4320, 376, 1, 'Darkmoon Faire Building (Terokkar Forest)', 0, 2),
+	(78, '2021-03-20 10:00:00', '2030-12-31 10:00:00', 525600, 262800, 0, 0, 'Summer seasonal fish', 0, 2),
+	(79, '2018-10-28 15:00:00', '2030-12-31 21:00:00', 1440, 360, 0, 0, 'Diurnal fishing event', 0, 2),
+	(80, '2018-10-28 03:00:00', '2030-12-31 09:00:00', 1440, 360, 0, 0, 'Nocturnal fishing event', 0, 2),
 	(85, '2011-03-22 04:00:00', '2030-12-31 10:00:00', 5184000, 35, 0, 0, 'Stitches Event', 0, 2),
 	(86, '2008-01-02 14:55:00', '2030-12-31 09:00:00', 240, 15, 0, 0, 'Perry Gatner', 0, 2),
 	(87, '2008-01-02 14:55:00', '2030-12-31 09:00:00', 5184000, 90, 0, 0, 'Scarlet Oracle', 0, 2),
-	(78, '2021-03-20 10:00:00', '2030-12-31 10:00:00', 525600, 262800, 0, 0, 'Summer seasonal fish', 0, 2),
-	(73, '2010-01-01 04:00:00', '2030-01-01 04:00:00', 60, 1, 0, 0, 'Hourly Bells', 0, 2),
-	(79, '2018-10-28 15:00:00', '2030-12-31 21:00:00', 1440, 360, 0, 0, 'Diurnal fishing event', 0, 2),
-	(80, '2018-10-28 03:00:00', '2030-12-31 09:00:00', 1440, 360, 0, 0, 'Nocturnal fishing event', 0, 2),
-	(74, '2022-01-01 10:00:00', '2030-01-01 11:00:00', 1440, 60, 0, 0, 'Children of Goldshire', 0, 2),
-	(77, '2016-11-06 05:01:00', '2030-12-31 10:00:00', 131040, 4320, 376, 1, 'Darkmoon Faire Building (Terokkar Forest)', 0, 2),
 	(88, '2016-10-28 21:00:00', '2030-12-31 02:00:00', 1440, 720, 0, 0, 'Evening', 0, 2),
 	(89, '2016-10-28 23:00:00', '2030-12-31 02:00:00', 1440, 600, 0, 0, 'Leprithus', 0, 2),
-	(90, '2016-10-30 17:00:00', '2030-12-31 10:00:00', 10080, 180, 0, 0, 'Stranglethorn Fishing Extravaganza - Turn-ins', 0, 2),
-	(75, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Arena Season 1', 0, 2),
-	(76, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Arena Season 2', 0, 2);
-/*!40000 ALTER TABLE `game_event` ENABLE KEYS */;
+	(90, '2016-10-30 17:00:00', '2030-12-31 10:00:00', 10080, 180, 0, 0, 'Stranglethorn Fishing Extravaganza - Turn-ins', 0, 2);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

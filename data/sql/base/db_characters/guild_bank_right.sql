@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `guild_bank_right` (
   `SlotPerDay` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`TabId`,`rid`),
   KEY `guildid_key` (`guildid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.guild_bank_right: ~0 rows (approximately)
 DELETE FROM `guild_bank_right`;
