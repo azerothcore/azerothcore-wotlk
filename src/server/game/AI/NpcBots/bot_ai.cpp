@@ -212,6 +212,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     regenTimer = 0;
     m_botSpellInfo = nullptr;
     waitTimer = 0;
+    _moveBehindTimer = 0;
     itemsAutouseTimer = 0;
     _usableItemSlotsMask = 0;
     evadeDelayTimer = 0;
@@ -1128,7 +1129,7 @@ void bot_ai::BotMovement(BotMovementType type, Position const* pos, Unit* target
     {
         case BOT_MOVE_CHASE:
             ASSERT(target);
-            mover->GetMotionMaster()->MoveChase(target, {}, ChaseAngle(target->GetRelativeAngle(me), float(M_PI / 8.0)));
+            mover->GetMotionMaster()->MoveChase(target, {}, ChaseAngle(target->GetRelativeAngle(me), float(target->IsPlayer() ? M_PI * 2.0 : M_PI / 8.0)));
             break;
         case BOT_MOVE_POINT:
             mover->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, pos->m_positionX, pos->m_positionY, pos->m_positionZ, speed, 0.0f, nullptr, generatePath));
@@ -5425,15 +5426,15 @@ void bot_ai::CheckAttackState()
 //Move behind current target if needed (avoid cleaves and dodges/parries, also rogues/ferals)
 void bot_ai::MoveBehind(Unit const* target) const
 {
-    if (HasBotCommandState(BOT_COMMAND_MASK_UNMOVING) || HasRole(BOT_ROLE_RANGED) || JumpingOrFalling() ||
+    if (_moveBehindTimer > lastdiff || HasBotCommandState(BOT_COMMAND_MASK_UNMOVING) || HasRole(BOT_ROLE_RANGED) || JumpingOrFalling() ||
         /*(me->isMoving() && target->GetTypeId() != TYPEID_PLAYER) ||*/
         me->GetVehicle() || (IsTank() && target->GetVictim() == me) || CCed(me, true) ||
         !target->IsWithinCombatRange(me, ATTACK_DISTANCE) || !target->HasInArc(float(M_PI), me))
         return;
 
-    bool targetMe = target->GetVictim() == me;
-    bool cced = CCed(target);
-    bool isPlayer = target->GetTypeId() == TYPEID_PLAYER;
+    const bool targetMe = target->GetVictim() == me;
+    const bool cced = CCed(target);
+    const bool isPlayer = target->GetTypeId() == TYPEID_PLAYER;
 
     if ((_botclass == BOT_CLASS_ROGUE || GetBotStance() == DRUID_CAT_FORM) ? (!targetMe || cced || isPlayer) : (!targetMe && (!cced || isPlayer)))
     {
@@ -5446,8 +5447,7 @@ void bot_ai::MoveBehind(Unit const* target) const
             return;
 
         BotMovement(BOT_MOVE_POINT, &position);
-        //me->GetMotionMaster()->MovePoint(me->GetMapId(), x, y, z);
-        const_cast<bot_ai*>(this)->waitTimer = 500;
+        const_cast<bot_ai*>(this)->_moveBehindTimer = urand(1000, (_botclass == BOT_CLASS_ROGUE || GetBotStance() == DRUID_CAT_FORM) ? 2000 : 4000);
     }
 }
 //MOUNT SUPPORT
@@ -17450,6 +17450,7 @@ void bot_ai::CommonTimers(uint32 diff)
     if (GC_Timer > diff)            GC_Timer -= diff;
     if (checkAurasTimer > diff)     checkAurasTimer -= diff;
     if (waitTimer > diff)           waitTimer -= diff;
+    if (_moveBehindTimer > diff)    _moveBehindTimer -= diff;
     if (itemsAutouseTimer > diff)   itemsAutouseTimer -= diff;
     if (evadeDelayTimer > diff)     evadeDelayTimer -= diff;
     if (roleTimer > diff)           roleTimer -= diff;

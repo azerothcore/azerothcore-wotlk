@@ -82,6 +82,7 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     m_botCommandState = BOT_COMMAND_FOLLOW;
     regenTimer = 0;
     waitTimer = 0;
+    _moveBehindTimer = 0;
     indoorsTimer = 0;
     outdoorsTimer = 0;
     GC_Timer = 0;
@@ -1693,18 +1694,15 @@ void bot_pet_ai::CheckAttackState()
 
 void bot_pet_ai::MoveBehind(Unit const* target) const
 {
-    if (HasBotCommandState(BOT_COMMAND_MASK_UNMOVING)) return;
-    if (!IsPetMelee() || CCed(me, true)) return;
-    if (JumpingOrFalling()) return;
+    if (_moveBehindTimer > lastdiff || HasBotCommandState(BOT_COMMAND_MASK_UNMOVING) || !IsPetMelee() || CCed(me, true) || JumpingOrFalling())
+        return;
 
-    if (target->GetVictim() != me && !CCed(target) &&
-        target->IsWithinCombatRange(me, ATTACK_DISTANCE) &&
-        target->HasInArc(float(M_PI), me))
+    if (target->GetVictim() != me && !CCed(target) && target->IsWithinCombatRange(me, ATTACK_DISTANCE) && target->HasInArc(float(M_PI), me))
     {
         float x,y,z;
         target->GetNearPoint(me, x, y, z, 0.f, me->GetCombatReach(), me->GetAbsoluteAngle(target));
         me->GetMotionMaster()->MovePoint(me->GetMapId(), x, y, z);
-        waitTimer = 500;
+        const_cast<bot_pet_ai*>(this)->_moveBehindTimer = urand(1000, 4000);
     }
 }
 bool bot_pet_ai::_canRegenerate() const
@@ -2574,6 +2572,7 @@ void bot_pet_ai::CommonTimers(uint32 diff)
     if (GC_Timer > diff)            GC_Timer -= diff;
     if (checkAurasTimer > diff)     checkAurasTimer -= diff;
     if (waitTimer > diff)           waitTimer -= diff;
+    if (_moveBehindTimer > diff)    _moveBehindTimer -= diff;
 
     if (_updateTimerMedium > diff)  _updateTimerMedium -= diff;
     if (_updateTimerEx1 > diff)     _updateTimerEx1 -= diff;

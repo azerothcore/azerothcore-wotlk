@@ -165,7 +165,8 @@ class bot_pet_ai : public CreatureAI
 
         //timers
         uint32 lastdiff, checkAurasTimer, regenTimer, _updateTimerMedium, _updateTimerEx1;
-        mutable uint32 waitTimer;
+        uint32 waitTimer;
+        uint32 _moveBehindTimer;
         uint32 indoorsTimer;
         uint32 outdoorsTimer;
 
