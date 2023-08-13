@@ -309,8 +309,17 @@ private:
         uint32 max_level = DEFAULT_MAX_LEVEL;
         if (bracketEntry && BotMgr::IsBotLevelCappedByConfigBG())
         {
+            uint32 max_expansion_level;
+            switch (sWorld->getIntConfig(CONFIG_EXPANSION))
+            {
+                case EXPANSION_CLASSIC:                max_expansion_level = 60;                break;
+                case EXPANSION_THE_BURNING_CRUSADE:    max_expansion_level = 70;                break;
+                case EXPANSION_WRATH_OF_THE_LICH_KING: max_expansion_level = 70;                break;
+                default:                               max_expansion_level = DEFAULT_MAX_LEVEL; break;
+            }
+
             max_level = std::min<uint32>(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), max_level);
-            max_level = std::min<uint32>(GetMaxLevelForExpansion(sWorld->getIntConfig(CONFIG_EXPANSION)), max_level);
+            max_level = std::min<uint32>(max_expansion_level, max_level);
         }
 
         if (bracketEntry)
