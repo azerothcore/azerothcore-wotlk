@@ -75,6 +75,7 @@ public:
             fcp->Sum = baseFcp->Sum;
             prisCp->Sum++;
 
+            fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 8));
             fc->UpdateCharPoints(iam.player, fcp);
             fc->UpdateCharPoints(iam.player, prisCp);
             fc->UpdateCharacterSpec(iam.player, spec);
