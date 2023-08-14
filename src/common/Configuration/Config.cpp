@@ -23,6 +23,7 @@
 #include "Util.h"
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <unordered_map>
 
