@@ -20,6 +20,7 @@
 
 #include <boost/filesystem.hpp>
 #include <cstdlib>
+#include <fstream>
 #include <string>
 
 std::string CreateConfigWithMap(std::map<std::string, std::string> const& map)
