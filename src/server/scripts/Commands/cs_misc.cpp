@@ -127,7 +127,7 @@ public:
             { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
             { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
-            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::No  },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes  },
             { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
             { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
             { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
