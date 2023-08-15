@@ -73,6 +73,12 @@ struct boss_harbinger_skyriss : public BossAI
         });
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        instance->DoRespawnCreature(DATA_WARDEN_MELLICHAR, true);
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
