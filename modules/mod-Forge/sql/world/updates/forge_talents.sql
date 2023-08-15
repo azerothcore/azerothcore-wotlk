@@ -1,26 +1,18 @@
+truncate acore_world.forge_talents; 
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (25,8000001,7,7,0,1,4,0,0,5),
-	 (647,8000001,8,1,0,1,4,0,0,5),
 	 (724,831,4,7,1,40,0,1,0,30),
-	 (822,8000001,1,8,1,1,4,1,0,5),
-	 (823,8000001,3,8,0,1,4,0,0,5),
-	 (905,8000001,13,1,0,1,4,0,0,5),
+	 (822,999900,1,10,1,1,4,1,0,0),
 	 (974,839,4,9,1,50,0,1,0,40),
-	 (1044,8000001,19,3,0,1,4,0,0,5),
 	 (1329,802,4,9,1,50,0,1,0,40),
-	 (2382,8000001,3,3,0,1,4,0,0,5);
-INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (2481,8000001,5,3,1,1,4,1,0,5),
-	 (3369,8000001,9,10,0,1,4,0,0,5),
+	 (2481,999900,1,4,1,1,4,1,0,0),
 	 (3674,827,4,9,1,50,0,1,0,40),
-	 (5227,8000001,5,1,1,1,4,1,0,5),
+	 (5227,999900,3,6,1,1,4,1,0,0),
 	 (5570,846,5,6,1,10,0,1,0,25),
 	 (5923,822,5,6,1,35,0,5,0,25),
-	 (5952,803,3,8,1,45,0,2,0,35),
-	 (6979,8000001,11,7,0,1,4,0,0,5),
-	 (7744,8000001,19,1,5,1,4,1,0,5),
-	 (9452,824,3,3,1,20,0,2,0,10);
+	 (5952,803,3,8,1,45,0,2,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (7744,999900,4,6,5,1,4,1,0,0),
+	 (9452,824,3,3,1,20,0,2,0,10),
 	 (9453,822,5,2,1,15,0,2,0,5),
 	 (9799,824,3,4,1,25,0,2,0,15),
 	 (10060,832,4,7,1,40,0,1,0,30),
@@ -28,10 +20,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (11070,842,4,1,1,10,0,5,0,0),
 	 (11071,842,3,1,1,10,0,3,0,0),
 	 (11078,841,3,1,1,10,0,2,0,0),
-	 (11083,841,6,3,1,20,0,2,0,10),
-	 (11094,841,4,4,1,25,0,2,0,15),
-	 (11095,841,3,4,1,25,0,3,0,15);
+	 (11083,841,6,3,1,20,0,2,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (11094,841,4,4,1,25,0,2,0,15),
+	 (11095,841,3,4,1,25,0,3,0,15),
 	 (11100,841,3,3,1,20,0,2,0,10),
 	 (11103,841,4,3,1,20,0,3,0,10),
 	 (11108,841,5,2,1,15,0,3,0,5),
@@ -39,10 +31,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (11115,841,4,5,1,30,0,3,0,20),
 	 (11119,841,3,2,1,15,0,5,0,5),
 	 (11124,841,5,6,1,35,0,5,0,25),
-	 (11129,841,4,7,1,40,0,1,0,30),
-	 (11151,842,3,3,1,20,0,3,0,10),
-	 (11160,842,4,4,1,25,0,3,0,15);
+	 (11129,841,4,7,1,40,0,1,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (11151,842,3,3,1,20,0,3,0,10),
+	 (11160,842,4,4,1,25,0,3,0,15),
 	 (11170,842,5,4,1,25,0,3,0,15),
 	 (11175,842,6,2,1,15,0,3,0,5),
 	 (11180,842,5,6,1,35,0,3,0,25),
@@ -50,10 +42,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (11189,842,4,2,1,15,0,1,0,5),
 	 (11190,842,5,5,1,30,0,3,0,20),
 	 (11207,842,3,2,1,15,0,3,0,5),
-	 (11210,840,3,1,1,10,0,2,0,0),
-	 (11213,840,5,2,1,15,0,5,0,5),
-	 (11222,840,4,1,1,10,0,3,0,0);
+	 (11210,840,3,1,1,10,0,2,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (11213,840,5,2,1,15,0,5,0,5),
+	 (11222,840,4,1,1,10,0,3,0,0),
 	 (11232,840,6,5,1,30,0,5,0,20),
 	 (11237,840,5,1,1,10,0,5,0,0),
 	 (11242,840,4,3,1,20,0,3,0,10),
@@ -61,10 +53,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (11252,840,3,4,1,25,0,2,0,15),
 	 (11255,840,4,4,1,25,0,2,0,15),
 	 (11366,841,5,3,1,20,0,1,0,10),
-	 (11426,842,4,7,1,40,0,1,0,30),
-	 (11958,842,4,5,1,30,0,1,0,20),
-	 (12042,840,4,7,1,40,0,1,0,30);
+	 (11426,842,4,7,1,40,0,1,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (11958,842,4,5,1,30,0,1,0,20),
+	 (12042,840,4,7,1,40,0,1,0,30),
 	 (12043,840,4,5,1,30,0,1,0,20),
 	 (12163,401,4,4,1,25,0,3,0,15),
 	 (12281,401,6,5,1,30,0,5,0,20),
@@ -72,10 +64,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (12284,401,5,5,1,30,0,5,0,20),
 	 (12285,401,3,2,1,15,0,2,0,5),
 	 (12286,401,5,1,1,10,0,2,0,0),
-	 (12287,403,5,1,1,10,0,3,0,0),
-	 (12289,401,5,6,1,35,0,3,0,25),
-	 (12290,401,3,3,1,20,0,2,0,10);
+	 (12287,403,5,1,1,10,0,3,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (12289,401,5,6,1,35,0,3,0,25),
+	 (12290,401,3,3,1,20,0,2,0,10),
 	 (12292,402,4,5,1,30,0,1,0,20),
 	 (12294,401,4,7,1,40,0,1,0,30),
 	 (12295,401,5,2,1,15,0,3,0,5),
@@ -83,10 +75,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (12297,403,5,2,1,15,0,5,0,5),
 	 (12298,403,4,1,1,10,0,5,0,0),
 	 (12299,403,6,3,1,20,0,5,0,10),
-	 (12300,401,4,2,1,15,0,3,14,5),
-	 (12301,403,3,1,1,10,0,3,0,0),
-	 (12308,403,5,4,1,25,0,3,0,15);
+	 (12300,401,4,2,1,15,0,3,14,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (12301,403,3,1,1,10,0,3,0,0),
+	 (12308,403,5,4,1,25,0,3,0,15),
 	 (12311,403,5,5,1,30,0,2,0,20),
 	 (12312,403,3,5,1,30,0,2,0,20),
 	 (12313,403,4,4,1,25,0,2,0,15),
@@ -94,10 +86,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (12318,402,6,3,1,20,0,5,0,10),
 	 (12319,402,5,6,1,35,0,5,0,25),
 	 (12320,402,5,1,1,10,0,5,0,0),
-	 (12321,402,4,1,1,10,0,2,0,0),
-	 (12322,402,5,2,1,15,0,5,0,5),
-	 (12323,402,4,3,1,20,0,1,0,10);
+	 (12321,402,4,1,1,10,0,2,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (12322,402,5,2,1,15,0,5,0,5),
+	 (12323,402,4,3,1,20,0,1,0,10),
 	 (12324,402,4,2,1,15,0,5,0,5),
 	 (12328,401,4,5,1,30,0,1,0,20),
 	 (12329,402,3,3,1,20,0,3,0,10),
@@ -105,10 +97,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (12700,401,3,5,1,30,0,5,0,20),
 	 (12797,403,4,3,1,20,0,2,0,10),
 	 (12809,403,4,5,1,30,0,1,0,20),
-	 (12834,401,6,3,1,20,0,3,0,10),
-	 (12862,401,6,7,1,40,0,2,0,30),
-	 (12975,403,3,3,1,20,0,1,0,10);
+	 (12834,401,6,3,1,20,0,3,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (12862,401,6,7,1,40,0,2,0,30),
+	 (12975,403,3,3,1,20,0,1,0,10),
 	 (13705,803,6,2,1,15,0,5,0,5),
 	 (13706,803,5,3,1,20,0,5,0,10),
 	 (13709,803,3,5,1,30,0,5,0,20),
@@ -116,10 +108,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (13713,803,4,2,1,15,0,3,0,5),
 	 (13715,803,5,1,1,10,0,5,0,0),
 	 (13732,803,4,1,1,10,0,2,0,0),
-	 (13733,802,6,2,1,15,0,3,0,5),
-	 (13741,803,3,1,1,10,0,3,0,0),
-	 (13742,803,3,3,1,20,0,2,0,10);
+	 (13733,802,6,2,1,15,0,3,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (13741,803,3,1,1,10,0,3,0,0),
+	 (13742,803,3,3,1,20,0,2,0,10),
 	 (13743,803,4,4,1,25,0,2,0,15),
 	 (13750,803,4,7,1,40,0,1,0,30),
 	 (13754,803,3,4,1,25,0,2,0,15),
@@ -127,10 +119,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (13958,804,4,1,1,10,0,3,0,0),
 	 (13960,803,5,5,1,30,0,5,0,20),
 	 (13975,804,5,2,1,15,0,4,0,5),
-	 (13976,804,4,4,1,25,0,4,0,15),
-	 (13981,804,3,3,1,20,0,3,0,10),
-	 (13983,804,3,4,1,25,0,4,0,15);
+	 (13976,804,4,4,1,25,0,4,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (13981,804,3,3,1,20,0,3,0,10),
+	 (13983,804,3,4,1,25,0,4,0,15),
 	 (14057,804,5,1,1,10,0,3,0,0),
 	 (14076,804,4,2,1,15,0,3,0,5),
 	 (14079,804,5,4,1,25,0,3,0,15),
@@ -138,10 +130,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (14113,802,5,4,1,25,0,5,0,15),
 	 (14128,802,5,3,1,20,0,5,0,10),
 	 (14138,802,5,1,1,10,0,5,0,0),
-	 (14144,802,4,1,1,10,0,2,0,0),
-	 (14156,802,3,2,1,15,0,3,0,5),
-	 (14158,802,5,6,1,35,0,2,0,25);
+	 (14144,802,4,1,1,10,0,2,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (14156,802,3,2,1,15,0,3,0,5),
+	 (14158,802,5,6,1,35,0,2,0,25),
 	 (14162,802,3,1,1,10,0,3,0,0),
 	 (14165,803,3,2,1,15,0,2,0,5),
 	 (14168,802,4,3,1,20,0,2,0,10),
@@ -149,10 +141,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (14174,802,5,5,1,30,0,3,0,20),
 	 (14177,802,4,5,1,30,0,1,0,20),
 	 (14179,804,3,1,1,10,0,5,0,0),
-	 (14183,804,4,7,1,40,0,2,0,30),
-	 (14185,804,4,5,1,30,0,2,0,20),
-	 (14186,802,4,6,1,35,0,5,0,25);
+	 (14183,804,4,7,1,40,0,2,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (14185,804,4,5,1,30,0,2,0,20),
+	 (14186,802,4,6,1,35,0,5,0,25),
 	 (14251,803,4,3,1,20,0,1,0,10),
 	 (14278,804,4,3,1,20,0,2,0,10),
 	 (14520,832,4,4,1,25,0,3,0,15),
@@ -160,10 +152,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (14522,832,4,1,1,10,0,5,0,0),
 	 (14523,832,3,2,1,15,0,3,0,5),
 	 (14531,832,6,2,1,15,0,2,0,5),
-	 (14747,832,4,2,1,15,0,3,0,5),
-	 (14748,832,5,3,1,20,0,3,0,10),
-	 (14749,832,5,2,1,15,0,2,0,5);
+	 (14747,832,4,2,1,15,0,3,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (14748,832,5,3,1,20,0,3,0,10),
+	 (14749,832,5,2,1,15,0,2,0,5),
 	 (14750,832,6,4,1,25,0,2,0,15),
 	 (14751,832,4,3,1,20,0,1,0,10),
 	 (14889,831,5,1,1,10,0,5,0,0),
@@ -171,10 +163,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (14898,831,5,6,1,35,0,5,0,25),
 	 (14901,831,5,5,1,30,0,5,0,20),
 	 (14908,831,4,1,1,10,0,3,0,0),
-	 (14909,831,5,4,1,25,0,2,0,15),
-	 (14910,833,3,6,1,35,0,2,0,25),
-	 (14911,831,3,5,1,30,0,2,0,20);
+	 (14909,831,5,4,1,25,0,2,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (14910,833,3,6,1,35,0,2,0,25),
+	 (14911,831,3,5,1,30,0,2,0,20),
 	 (14912,831,4,4,1,25,0,3,0,15),
 	 (14913,831,3,1,1,10,0,2,0,0),
 	 (14983,802,3,3,1,20,0,1,0,10),
@@ -182,10 +174,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (15257,833,6,4,1,25,0,3,0,15),
 	 (15259,833,5,1,1,10,0,5,0,0),
 	 (15260,833,5,2,1,15,0,3,0,5),
-	 (15270,833,3,1,1,10,0,3,0,0),
-	 (15273,833,4,3,1,20,0,5,0,10),
-	 (15274,833,4,4,1,25,0,2,0,15);
+	 (15270,833,3,1,1,10,0,3,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (15273,833,4,3,1,20,0,5,0,10),
+	 (15274,833,4,4,1,25,0,2,0,15),
 	 (15275,833,4,2,1,15,0,2,0,5),
 	 (15286,833,4,5,1,30,0,1,0,20),
 	 (15318,833,3,2,1,15,0,3,0,5),
@@ -193,10 +185,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (15392,833,3,3,1,20,0,2,0,10),
 	 (15407,833,5,3,1,20,0,1,0,10),
 	 (15473,833,4,7,1,40,0,1,0,30),
-	 (15487,833,3,5,1,30,0,1,0,20),
-	 (16035,837,5,1,1,10,0,5,0,0),
-	 (16038,837,3,2,1,15,0,3,0,5);
+	 (15487,833,3,5,1,30,0,1,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16035,837,5,1,1,10,0,5,0,0),
+	 (16038,837,3,2,1,15,0,3,0,5),
 	 (16039,837,4,1,1,10,0,5,0,0),
 	 (16040,837,3,3,1,20,0,5,0,10),
 	 (16041,837,4,5,1,30,0,1,0,20),
@@ -204,10 +196,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16089,837,5,3,1,20,0,5,0,10),
 	 (16164,837,4,3,1,20,0,1,0,10),
 	 (16166,837,4,7,1,40,0,1,0,30),
-	 (16173,839,5,1,1,10,0,5,0,0),
-	 (16176,839,6,3,1,20,0,3,0,10),
-	 (16178,839,5,6,1,35,0,5,0,25);
+	 (16173,839,5,1,1,10,0,5,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16176,839,6,3,1,20,0,3,0,10),
+	 (16178,839,5,6,1,35,0,5,0,25),
 	 (16179,839,5,2,1,15,0,5,0,5),
 	 (16180,839,3,3,1,20,0,3,0,10),
 	 (16181,839,4,3,1,20,0,3,0,10),
@@ -215,10 +207,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16184,839,3,2,1,15,0,2,0,5),
 	 (16187,839,4,4,1,25,0,3,0,15),
 	 (16188,839,5,5,1,30,0,1,0,20),
-	 (16190,839,4,7,1,40,0,1,0,30),
-	 (16194,839,5,4,1,25,0,5,0,15),
-	 (16252,838,5,4,1,25,0,5,0,15);
+	 (16190,839,4,7,1,40,0,1,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16194,839,5,4,1,25,0,5,0,15),
+	 (16252,838,5,4,1,25,0,5,0,15),
 	 (16254,838,6,3,1,20,0,3,0,10),
 	 (16255,838,4,2,1,15,0,5,0,5),
 	 (16256,838,4,4,1,25,0,5,0,15),
@@ -226,10 +218,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16259,838,3,1,1,10,0,3,0,0),
 	 (16261,838,6,2,1,15,0,3,0,5),
 	 (16262,838,5,2,1,15,0,2,0,5),
-	 (16266,838,3,3,1,20,0,3,0,10),
-	 (16268,838,4,5,1,30,0,1,0,20),
-	 (16462,401,4,1,1,10,0,5,0,0);
+	 (16266,838,3,3,1,20,0,3,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16268,838,4,5,1,30,0,1,0,20),
+	 (16462,401,4,1,1,10,0,5,0,0),
 	 (16487,402,5,3,1,20,0,3,0,10),
 	 (16493,401,5,3,1,20,0,2,0,10),
 	 (16511,804,6,5,1,30,0,2,0,20),
@@ -237,10 +229,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16538,403,5,6,1,35,0,5,0,25),
 	 (16544,837,3,4,1,25,0,2,0,15),
 	 (16578,837,5,6,1,35,0,5,0,25),
-	 (16757,842,3,4,1,25,0,2,0,15),
-	 (16814,846,5,1,1,10,0,1,0,0),
-	 (16819,846,1,4,1,10,0,2,0,15);
+	 (16757,842,3,4,1,25,0,2,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16814,846,5,1,1,10,0,1,0,0),
+	 (16819,846,1,4,1,10,0,2,0,15),
 	 (16821,846,6,3,1,10,0,2,0,10),
 	 (16833,848,5,2,1,10,0,3,0,5),
 	 (16836,846,4,4,1,10,0,3,0,15),
@@ -248,10 +240,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16850,846,5,5,1,10,0,3,0,20),
 	 (16858,847,5,1,1,10,0,5,0,0),
 	 (16864,848,4,3,1,10,0,1,0,10),
-	 (16880,846,5,4,1,10,0,3,0,15),
-	 (16896,846,5,7,1,10,0,3,0,30),
-	 (16909,846,4,5,1,10,0,5,0,20);
+	 (16880,846,5,4,1,10,0,3,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (16896,846,5,7,1,10,0,3,0,30),
+	 (16909,846,4,5,1,10,0,5,0,20),
 	 (16929,847,5,2,1,10,0,3,0,5),
 	 (16934,847,4,1,1,10,0,5,0,0),
 	 (16940,847,3,5,1,10,0,2,0,20),
@@ -259,10 +251,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (16947,847,3,2,1,10,0,3,0,5),
 	 (16966,847,3,4,1,10,0,2,0,15),
 	 (16972,847,4,4,1,10,0,3,0,15),
-	 (16998,847,4,2,1,10,0,2,0,5),
-	 (17002,847,3,3,1,10,0,2,0,10),
-	 (17003,847,4,6,1,10,0,5,0,25);
+	 (16998,847,4,2,1,10,0,2,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (17002,847,3,3,1,10,0,2,0,10),
+	 (17003,847,4,6,1,10,0,5,0,25),
 	 (17007,847,4,7,1,10,0,1,0,30),
 	 (17050,848,3,1,1,10,0,2,0,0),
 	 (17056,848,5,1,1,10,0,5,0,0),
@@ -270,10 +262,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (17069,848,3,2,1,10,0,3,0,5),
 	 (17074,848,5,6,1,10,0,5,0,25),
 	 (17104,848,4,5,1,10,0,4,0,20),
-	 (17106,848,3,3,1,10,0,3,0,10),
-	 (17111,848,5,4,1,10,0,3,0,15),
-	 (17116,848,3,5,1,10,0,1,0,20);
+	 (17106,848,3,3,1,10,0,3,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (17111,848,5,4,1,10,0,3,0,15),
+	 (17116,848,3,5,1,10,0,1,0,20),
 	 (17118,848,4,2,1,10,0,4,0,5),
 	 (17123,848,6,5,1,10,0,2,0,20),
 	 (17322,833,5,4,1,25,0,2,0,15),
@@ -281,10 +273,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (17485,838,5,1,1,10,0,5,0,0),
 	 (17778,845,5,2,1,15,0,3,0,5),
 	 (17783,843,4,3,1,20,0,3,0,10),
-	 (17788,845,5,1,1,10,0,5,0,0),
-	 (17793,845,4,1,1,10,0,5,0,0),
-	 (17804,843,6,2,1,15,0,2,0,5);
+	 (17788,845,5,1,1,10,0,5,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (17793,845,4,1,1,10,0,5,0,0),
+	 (17804,843,6,2,1,15,0,2,0,5),
 	 (17810,843,5,1,1,10,0,5,0,0),
 	 (17815,845,4,5,1,30,0,3,0,20),
 	 (17877,845,4,3,1,20,0,2,0,10),
@@ -292,10 +284,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (17927,845,6,4,1,25,0,3,0,15),
 	 (17959,845,5,3,1,20,0,5,0,10),
 	 (17962,845,5,6,1,35,0,2,0,25),
-	 (18094,843,4,4,1,25,0,2,0,15),
-	 (18096,845,5,7,1,40,0,4,0,30),
-	 (18119,845,3,2,1,15,0,3,0,5);
+	 (18094,843,4,4,1,25,0,2,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (18096,845,5,7,1,40,0,4,0,30),
+	 (18119,845,3,2,1,15,0,3,0,5),
 	 (18126,845,3,3,1,20,0,3,0,10),
 	 (18130,845,5,5,1,30,0,2,0,20),
 	 (18135,845,3,4,1,25,0,3,0,15),
@@ -303,10 +295,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (18179,843,3,2,1,15,0,2,0,5),
 	 (18182,843,5,2,1,15,0,2,0,5),
 	 (18213,843,4,2,1,15,0,2,0,5),
-	 (18218,843,3,4,1,25,0,2,0,15),
-	 (18220,843,5,7,1,40,0,1,0,30),
-	 (18223,843,5,5,1,30,0,1,0,20);
+	 (18218,843,3,4,1,25,0,2,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (18220,843,5,7,1,40,0,1,0,30),
+	 (18223,843,5,5,1,30,0,1,0,20),
 	 (18271,843,5,6,1,35,0,5,0,25),
 	 (18288,843,5,3,1,20,0,1,0,10),
 	 (18427,803,6,4,1,25,0,5,0,15),
@@ -314,10 +306,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (18462,840,5,4,1,25,0,3,0,15),
 	 (18530,831,5,2,1,15,0,5,0,5),
 	 (18551,832,4,5,1,30,0,5,0,20),
-	 (18562,848,4,7,1,10,0,1,0,30),
-	 (18692,844,3,1,1,10,0,2,0,0),
-	 (18694,844,4,1,1,10,0,4,0,0);
+	 (18562,848,4,7,1,10,0,1,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (18692,844,3,1,1,10,0,2,0,0),
+	 (18694,844,4,1,1,10,0,4,0,0),
 	 (18697,844,5,1,1,10,0,3,0,0),
 	 (18703,844,3,2,1,15,0,2,0,5),
 	 (18705,844,4,2,1,15,0,3,0,5),
@@ -325,10 +317,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (18709,844,5,4,1,25,0,2,0,15),
 	 (18731,844,5,2,1,15,0,3,0,5),
 	 (18754,844,3,3,1,20,0,3,0,10),
-	 (18767,844,5,5,1,30,0,2,0,20),
-	 (18769,844,4,4,1,25,0,5,0,15),
-	 (18827,843,3,1,1,10,0,2,0,0);
+	 (18767,844,5,5,1,30,0,2,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (18769,844,4,4,1,25,0,5,0,15),
+	 (18827,843,3,1,1,10,0,2,0,0),
 	 (19028,844,4,3,1,20,0,2,0,10),
 	 (19159,827,5,1,1,10,0,2,0,0),
 	 (19168,827,3,6,1,35,0,5,0,25),
@@ -336,10 +328,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (19236,831,3,3,1,20,0,1,0,10),
 	 (19255,827,3,3,1,20,0,5,0,10),
 	 (19286,827,6,3,1,20,0,2,0,10),
-	 (19290,827,3,2,1,15,0,3,0,5),
-	 (19295,827,5,3,1,20,0,3,0,10),
-	 (19306,827,5,5,1,30,0,1,0,20);
+	 (19290,827,3,2,1,15,0,3,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (19295,827,5,3,1,20,0,3,0,10),
+	 (19306,827,5,5,1,30,0,1,0,20),
 	 (19370,827,4,5,1,30,0,3,0,20),
 	 (19376,827,5,2,1,15,0,3,0,5),
 	 (19386,827,4,7,1,40,0,1,0,30),
@@ -347,10 +339,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (19416,826,5,4,1,25,0,5,0,15),
 	 (19421,826,4,2,1,15,0,3,0,5),
 	 (19426,826,5,1,1,10,0,5,0,0),
-	 (19434,826,5,3,1,20,0,1,0,10),
-	 (19454,826,4,3,1,20,0,3,0,10),
-	 (19461,826,5,5,1,30,0,3,0,20);
+	 (19434,826,5,3,1,20,0,1,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (19454,826,4,3,1,20,0,3,0,10),
+	 (19461,826,5,5,1,30,0,3,0,20),
 	 (19464,826,4,4,1,25,0,3,0,15),
 	 (19485,826,5,2,1,15,0,5,0,5),
 	 (19498,827,4,1,1,10,0,3,0,0),
@@ -358,10 +350,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (19506,826,4,7,1,40,0,1,0,30),
 	 (19507,826,6,6,1,35,0,3,0,25),
 	 (19549,825,4,2,1,15,0,3,0,5),
-	 (19552,825,4,1,1,10,0,5,0,0),
-	 (19559,825,3,3,1,20,0,2,0,10),
-	 (19572,825,4,4,1,25,0,2,0,15);
+	 (19552,825,4,1,1,10,0,5,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (19559,825,3,3,1,20,0,2,0,10),
+	 (19572,825,4,4,1,25,0,2,0,15),
 	 (19574,825,4,7,1,40,0,1,0,30),
 	 (19577,825,4,5,1,30,0,1,0,20),
 	 (19578,825,3,5,1,30,0,2,0,20),
@@ -369,10 +361,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (19590,825,6,5,1,30,0,2,0,20),
 	 (19598,825,5,4,1,25,0,5,0,15),
 	 (19609,825,5,2,1,15,0,3,0,5),
-	 (19616,825,5,3,1,20,0,5,0,10),
-	 (19621,825,5,6,1,35,0,5,0,25),
-	 (20042,824,5,2,1,15,0,2,0,5);
+	 (19616,825,5,3,1,20,0,5,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (19621,825,5,6,1,35,0,5,0,25),
+	 (20042,824,5,2,1,15,0,2,0,5),
 	 (20049,824,4,6,1,35,0,3,0,25),
 	 (20060,824,4,1,1,10,0,5,0,0),
 	 (20066,824,4,7,1,40,0,1,0,30),
@@ -380,10 +372,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (20101,824,5,1,1,10,0,5,0,0),
 	 (20111,824,3,5,1,30,0,3,0,20),
 	 (20117,824,4,3,1,20,0,5,0,10),
-	 (20127,823,3,8,1,45,0,3,0,35),
-	 (20138,823,5,4,1,25,0,3,0,15),
-	 (20143,823,5,3,1,20,0,5,0,10);
+	 (20127,823,3,8,1,45,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (20138,823,5,4,1,25,0,3,0,15),
+	 (20143,823,5,3,1,20,0,5,0,10),
 	 (20174,823,4,2,1,15,0,2,0,5),
 	 (20177,823,5,5,1,30,0,5,0,20),
 	 (20196,823,5,6,1,35,0,3,0,25),
@@ -391,10 +383,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (20210,822,4,3,1,20,0,5,0,10),
 	 (20216,822,4,5,1,30,0,1,0,20),
 	 (20224,822,5,1,1,10,0,5,0,0),
-	 (20234,822,5,3,1,20,0,2,0,10),
-	 (20237,822,3,2,1,15,0,3,0,5),
-	 (20243,403,4,9,1,50,0,1,0,40);
+	 (20234,822,5,3,1,20,0,2,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (20237,822,3,2,1,15,0,3,0,5),
+	 (20243,403,4,9,1,50,0,1,0,40),
 	 (20244,822,5,4,1,25,0,2,0,15),
 	 (20254,822,3,4,1,25,0,3,0,15),
 	 (20257,822,4,2,1,15,0,5,0,5),
@@ -402,43 +394,42 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (20335,824,4,2,1,15,0,3,0,5),
 	 (20359,822,5,5,1,30,0,3,0,20),
 	 (20375,824,5,3,1,20,0,1,0,10),
-	 (20468,823,4,3,1,20,0,3,0,10),
-	 (20473,822,4,7,1,40,0,1,0,30),
-	 (20487,823,4,4,1,25,0,2,0,15);
+	 (20468,823,4,3,1,20,0,3,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (20473,822,4,7,1,40,0,1,0,30),
+	 (20487,823,4,4,1,25,0,2,0,15),
 	 (20500,402,3,6,1,35,0,2,0,25),
 	 (20502,402,4,4,1,25,0,2,0,15),
 	 (20504,401,3,6,1,35,0,2,0,25),
-	 (20504,8000001,17,8,0,1,4,0,0,5),
-	 (20549,8000001,8,5,5,1,4,1,0,5),
-	 (20550,8000001,7,10,5,1,4,1,0,5),
-	 (20551,8000001,5,8,1,1,4,1,0,5),
-	 (20555,8000001,15,1,3,1,4,1,0,5),
-	 (20557,8000001,3,5,2,1,4,1,0,5),
-	 (20558,8000001,19,8,2,1,4,1,0,5);
+	 (20549,999900,7,7,5,1,4,1,0,0),
+	 (20550,999900,5,7,5,1,4,1,0,0),
+	 (20551,999900,6,7,1,1,4,1,0,0),
+	 (20555,999900,6,9,3,1,4,1,0,0),
+	 (20557,999900,2,9,2,1,4,1,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (20573,8000001,11,3,3,1,4,1,0,5),
-	 (20574,8000001,15,10,2,1,4,1,0,5),
-	 (20577,8000001,7,3,5,1,4,1,0,5),
-	 (20579,8000001,1,10,1,1,4,1,0,5),
-	 (20582,8000001,15,3,3,1,4,1,0,5),
-	 (20585,8000001,1,5,2,1,4,1,0,5),
-	 (20591,8000001,11,10,5,1,4,1,0,5),
-	 (20592,8000001,5,10,1,1,4,1,0,5),
-	 (20594,8000001,17,1,5,1,4,1,0,5),
-	 (20595,8000001,19,10,2,1,4,1,0,5);
+	 (20558,999900,7,9,2,1,4,1,0,0),
+	 (20573,999900,4,3,3,1,4,1,0,0),
+	 (20574,999900,7,3,2,1,4,1,0,0),
+	 (20577,999900,1,6,5,1,4,1,0,0),
+	 (20579,999900,2,6,1,1,4,1,0,0),
+	 (20582,999900,7,5,3,1,4,1,0,0),
+	 (20585,999900,6,5,2,1,4,1,0,0),
+	 (20591,999900,1,8,5,1,4,1,0,0),
+	 (20592,999900,2,8,1,1,4,1,0,0),
+	 (20594,999900,5,4,5,1,4,1,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (20596,8000001,3,10,1,1,4,1,0,5),
-	 (20597,8000001,17,6,2,1,4,1,0,5),
-	 (20598,8000001,9,8,5,1,4,1,0,5),
-	 (20599,8000001,1,1,4,1,4,1,0,5),
+	 (20595,999900,3,4,2,1,4,1,0,0),
+	 (20596,999900,2,4,1,1,4,1,0,0),
+	 (20597,999900,3,2,2,1,4,1,0,0),
+	 (20598,999900,4,2,5,1,4,1,0,0),
+	 (20599,999900,2,2,4,1,4,1,0,0),
 	 (20711,831,4,5,1,30,0,1,0,20),
 	 (20911,823,4,5,1,30,0,1,0,20),
 	 (20925,823,4,7,1,40,0,1,0,30),
-	 (21009,8000001,1,3,2,1,4,1,0,5),
-	 (23584,402,3,4,1,25,0,5,0,15),
-	 (23785,844,4,6,1,35,0,5,0,25);
+	 (21009,999900,4,5,2,1,4,1,0,0),
+	 (23584,402,3,4,1,25,0,5,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (23785,844,4,6,1,35,0,5,0,25),
 	 (23881,402,4,7,1,40,0,1,0,30),
 	 (23989,826,4,5,1,30,0,1,0,20),
 	 (24443,825,6,2,1,15,0,2,0,5),
@@ -446,21 +437,21 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (24968,848,4,4,1,10,0,5,0,15),
 	 (25956,824,3,2,1,15,0,2,0,5),
 	 (26022,824,6,3,1,20,0,2,0,10),
-	 (26290,8000001,17,10,2,1,4,1,0,5),
-	 (26297,8000001,13,5,5,1,4,1,0,5),
-	 (27789,831,3,4,1,25,0,2,0,15);
+	 (26290,999900,4,9,2,1,4,1,0,0),
+	 (26297,999900,3,9,5,1,4,1,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (27789,831,3,4,1,25,0,2,0,15),
 	 (27811,831,4,3,1,20,0,3,0,10),
 	 (27839,833,5,5,1,30,0,2,0,20),
 	 (27900,831,4,2,1,15,0,5,0,5),
 	 (28574,840,3,2,1,15,0,3,0,5),
-	 (28878,8000001,13,9,5,1,4,1,0,5),
+	 (28878,999900,6,11,5,1,4,1,0,0),
 	 (28996,837,4,2,1,15,0,3,0,5),
 	 (28999,837,3,5,1,30,0,2,0,20),
 	 (29062,837,6,4,1,25,0,3,0,15),
-	 (29074,841,6,4,1,25,0,3,0,15),
-	 (29082,838,5,6,1,35,0,3,0,25);
+	 (29074,841,6,4,1,25,0,3,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (29082,838,5,6,1,35,0,3,0,25),
 	 (29140,403,4,8,1,45,0,3,0,35),
 	 (29187,839,4,2,1,15,0,3,0,5),
 	 (29192,838,3,5,1,30,0,2,0,20),
@@ -469,9 +460,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (29441,840,4,2,1,15,0,2,0,5),
 	 (29447,840,6,4,1,25,0,3,0,15),
 	 (29590,402,3,5,1,30,0,3,0,20),
-	 (29593,403,3,7,1,40,0,2,0,30),
-	 (29598,403,5,3,1,20,0,2,0,10);
+	 (29593,403,3,7,1,40,0,2,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (29598,403,5,3,1,20,0,2,0,10),
 	 (29623,401,4,9,1,50,0,1,0,40),
 	 (29721,402,6,7,1,40,0,2,0,30),
 	 (29723,401,3,9,1,50,0,3,0,40),
@@ -480,9 +471,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (29801,402,4,9,1,50,0,1,0,40),
 	 (29834,401,3,7,1,40,0,2,0,30),
 	 (29836,401,5,9,1,50,0,2,0,40),
-	 (29888,402,5,5,1,30,0,2,0,20),
-	 (30054,843,3,8,1,45,0,2,0,35);
+	 (29888,402,5,5,1,30,0,2,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (30054,843,3,8,1,45,0,2,0,35),
 	 (30060,843,4,7,1,40,0,5,0,30),
 	 (30108,843,4,9,1,50,0,1,0,40),
 	 (30143,844,6,3,1,20,0,3,0,10),
@@ -491,9 +482,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (30242,844,4,8,1,45,0,5,0,35),
 	 (30283,845,3,9,1,50,0,2,0,40),
 	 (30288,845,6,7,1,40,0,5,0,30),
-	 (30293,845,4,7,1,40,0,4,0,30),
-	 (30299,845,3,6,1,35,0,4,0,25);
+	 (30293,845,4,7,1,40,0,4,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (30299,845,3,6,1,35,0,4,0,25),
 	 (30319,844,3,7,1,40,0,4,0,30),
 	 (30326,844,3,5,1,30,0,2,0,20),
 	 (30664,837,6,5,1,30,0,3,0,20),
@@ -502,9 +493,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (30706,837,4,9,1,50,0,1,0,40),
 	 (30798,838,4,7,1,40,0,1,0,30),
 	 (30802,838,3,6,1,35,0,3,0,25),
-	 (30812,838,3,9,1,50,0,3,0,40),
-	 (30816,838,3,7,1,40,0,3,0,30);
+	 (30812,838,3,9,1,50,0,3,0,40);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (30816,838,3,7,1,40,0,3,0,30),
 	 (30823,838,4,9,1,50,0,1,0,40),
 	 (30864,839,6,5,1,30,0,3,0,20),
 	 (30867,839,5,8,1,45,0,3,0,35),
@@ -513,9 +504,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (30892,804,3,2,1,15,0,3,0,5),
 	 (30894,804,3,5,1,30,0,3,0,20),
 	 (30902,804,5,6,1,35,0,5,0,25),
-	 (30919,803,4,6,1,35,0,2,0,25),
-	 (31122,803,3,7,1,40,0,3,0,30);
+	 (30919,803,4,6,1,35,0,2,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (31122,803,3,7,1,40,0,3,0,30),
 	 (31124,803,5,6,1,35,0,2,0,25),
 	 (31130,803,5,7,1,40,0,2,0,30),
 	 (31208,802,3,5,1,30,0,3,0,20),
@@ -524,9 +515,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (31221,804,3,6,1,35,0,4,0,25),
 	 (31226,802,3,9,1,50,0,3,0,40),
 	 (31228,804,5,7,1,40,0,4,0,30),
-	 (31234,802,5,8,1,45,0,3,0,35),
-	 (31244,802,6,5,1,30,0,2,0,20);
+	 (31234,802,5,8,1,45,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (31244,802,6,5,1,30,0,2,0,20),
 	 (31380,802,5,7,1,40,0,3,0,30),
 	 (31569,840,3,5,1,30,0,2,0,20),
 	 (31571,840,5,6,1,35,0,2,0,25),
@@ -535,9 +526,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (31584,840,5,8,1,45,0,5,0,35),
 	 (31589,840,4,9,1,50,0,1,0,40),
 	 (31638,841,3,5,1,30,0,3,0,20),
-	 (31641,841,3,6,1,35,0,2,0,25),
-	 (31656,841,5,8,1,45,0,3,0,35);
+	 (31641,841,3,6,1,35,0,2,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (31656,841,5,8,1,45,0,3,0,35),
 	 (31661,841,4,9,1,50,0,1,0,40),
 	 (31667,842,6,5,1,30,0,3,0,20),
 	 (31670,842,5,1,1,10,0,3,0,0),
@@ -546,9 +537,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (31682,842,4,8,1,45,0,2,0,35),
 	 (31687,842,4,9,1,50,0,1,0,40),
 	 (31785,823,3,7,1,40,0,2,0,30),
-	 (31821,822,3,3,1,20,0,1,0,10),
-	 (31822,822,3,5,1,30,0,2,0,20);
+	 (31821,822,3,3,1,20,0,1,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (31822,822,3,5,1,30,0,2,0,20),
 	 (31825,822,3,6,1,35,0,2,0,25),
 	 (31828,822,5,7,1,40,0,3,0,30),
 	 (31833,822,3,7,1,40,0,3,0,30),
@@ -557,9 +548,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (31844,823,3,2,1,15,0,3,0,5),
 	 (31848,823,3,6,1,35,0,2,0,25),
 	 (31850,823,5,7,1,40,0,3,0,30),
-	 (31858,823,5,8,1,45,0,3,0,35),
-	 (31866,824,6,4,1,25,0,3,0,15);
+	 (31858,823,5,8,1,45,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (31866,824,6,4,1,25,0,3,0,15),
 	 (31869,824,5,5,1,30,0,1,0,20),
 	 (31871,824,5,6,1,35,0,2,0,25),
 	 (31876,824,5,7,1,40,0,3,0,30),
@@ -568,9 +559,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (32043,824,5,4,1,25,0,3,0,15),
 	 (32381,843,6,4,1,25,0,3,0,15),
 	 (32385,843,3,5,1,30,0,5,0,20),
-	 (32477,843,5,8,1,45,0,3,0,35),
-	 (32601,803,4,9,1,50,0,1,0,40);
+	 (32477,843,5,8,1,45,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (32601,803,4,9,1,50,0,1,0,40),
 	 (33142,831,5,7,1,40,0,3,0,30),
 	 (33150,831,3,6,1,35,0,2,0,25),
 	 (33158,831,4,8,1,45,0,5,0,35),
@@ -579,20 +570,20 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (33191,833,5,8,1,45,0,3,0,35),
 	 (33201,832,3,5,1,30,0,2,0,20),
 	 (33206,832,4,9,1,50,0,1,0,40),
-	 (33213,833,6,5,1,30,0,3,0,20),
-	 (33221,833,5,7,1,40,0,5,0,30);
+	 (33213,833,6,5,1,30,0,3,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (33221,833,5,7,1,40,0,5,0,30),
 	 (33589,846,4,6,1,10,0,3,0,25),
 	 (33592,846,6,7,1,10,0,2,0,30),
 	 (33597,846,4,7,1,10,0,3,0,30),
 	 (33600,846,6,8,1,10,0,3,0,35),
 	 (33603,846,4,9,1,10,0,5,0,40),
-	 (33697,8000001,13,7,5,1,4,1,0,5),
+	 (33697,999900,6,3,5,1,4,1,0,0),
 	 (33831,846,5,9,1,10,0,1,0,40),
 	 (33851,847,6,7,1,10,0,3,0,30),
-	 (33853,847,5,6,1,10,0,3,0,25),
-	 (33859,847,5,8,1,10,0,3,0,35);
+	 (33853,847,5,6,1,10,0,3,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (33859,847,5,8,1,10,0,3,0,35),
 	 (33872,847,6,5,1,10,0,2,0,20),
 	 (33879,848,3,6,1,10,0,2,0,25),
 	 (33881,848,5,7,1,10,0,3,0,30),
@@ -601,9 +592,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (34151,848,3,7,1,10,0,3,0,30),
 	 (34293,841,3,7,1,40,0,3,0,30),
 	 (34297,847,5,7,1,10,0,2,0,30),
-	 (34453,825,3,6,1,35,0,2,0,25),
-	 (34455,825,3,7,1,40,0,3,0,30);
+	 (34453,825,3,6,1,35,0,2,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (34455,825,3,7,1,40,0,3,0,30),
 	 (34462,825,5,7,1,40,0,3,0,30),
 	 (34466,825,5,8,1,45,0,5,0,35),
 	 (34475,826,3,6,1,35,0,2,0,25),
@@ -612,9 +603,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (34490,826,4,9,1,50,0,1,0,40),
 	 (34491,827,5,6,1,35,0,3,0,25),
 	 (34494,827,6,2,1,15,0,2,0,5),
-	 (34497,827,5,7,1,40,0,3,0,30),
-	 (34500,827,3,7,1,40,0,3,0,30);
+	 (34497,827,5,7,1,40,0,3,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (34500,827,3,7,1,40,0,3,0,30),
 	 (34506,827,3,8,1,45,0,5,0,35),
 	 (34692,825,4,9,1,50,0,1,0,40),
 	 (34753,831,3,7,1,40,0,3,0,30),
@@ -623,97 +614,97 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (34914,833,4,9,1,50,0,1,0,40),
 	 (34935,845,3,5,1,30,0,4,0,20),
 	 (34948,826,6,3,1,20,0,2,0,10),
-	 (34950,826,3,3,1,20,0,2,0,10),
-	 (35029,825,3,2,1,15,0,2,0,5);
+	 (34950,826,3,3,1,20,0,2,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (35029,825,3,2,1,15,0,2,0,5),
 	 (35100,826,3,5,1,30,0,2,0,20),
 	 (35104,826,5,7,1,40,0,3,0,30),
 	 (35363,846,5,3,1,10,0,2,0,10),
 	 (35395,824,4,9,1,50,0,1,0,40),
 	 (35446,401,4,8,1,45,0,3,0,35),
 	 (35541,803,5,8,1,45,0,5,0,35),
-	 (35578,840,5,11,1,55,0,2,0,45),
+	 (35578,840,5,10,1,55,0,2,0,45),
 	 (35691,844,5,7,1,40,0,4,0,30),
-	 (36554,804,4,9,1,50,0,2,0,40),
-	 (37116,847,5,4,1,10,0,2,0,15);
+	 (36554,804,4,9,1,50,0,2,0,40);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (37116,847,5,4,1,10,0,2,0,15),
 	 (43338,838,5,3,1,20,0,1,0,10),
 	 (44378,840,4,8,1,45,0,2,0,35),
 	 (44394,840,5,7,1,40,0,3,0,30),
 	 (44397,840,5,3,1,20,0,3,0,10),
-	 (44400,840,4,11,1,55,0,3,0,45),
+	 (44400,840,4,10,1,55,0,3,0,45),
 	 (44404,840,5,9,1,50,0,5,0,40),
-	 (44425,840,4,12,1,60,0,1,0,50),
+	 (44425,840,4,11,1,60,0,1,0,50),
 	 (44442,841,3,9,1,50,0,2,0,40),
-	 (44445,841,5,9,1,50,0,3,0,40),
-	 (44449,841,4,11,1,55,0,5,0,45);
+	 (44445,841,5,9,1,50,0,3,0,40);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (44457,841,4,12,1,60,0,1,0,50),
+	 (44449,841,4,10,1,55,0,5,0,45),
+	 (44457,841,4,11,1,60,0,1,0,50),
 	 (44543,842,5,8,1,45,0,2,0,35),
 	 (44546,842,3,9,1,50,0,3,0,40),
 	 (44557,842,5,9,1,50,0,3,0,40),
-	 (44566,842,4,11,1,55,0,5,0,45),
-	 (44572,842,4,12,1,60,0,1,0,50),
+	 (44566,842,4,10,1,55,0,5,0,45),
+	 (44572,842,4,11,1,60,0,1,0,50),
 	 (44745,842,3,7,1,40,0,2,0,30),
 	 (45234,832,3,7,1,40,0,3,0,30),
-	 (46854,401,6,6,1,35,0,2,0,25),
-	 (46859,401,5,8,1,45,0,2,0,35);
+	 (46854,401,6,6,1,35,0,2,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (46859,401,5,8,1,45,0,2,0,35),
 	 (46865,401,5,7,1,40,0,2,0,30),
-	 (46867,401,4,11,1,55,0,5,0,45),
+	 (46867,401,4,10,1,55,0,5,0,45),
 	 (46908,402,3,7,1,40,0,3,0,30),
 	 (46910,402,3,8,1,45,0,2,0,35),
 	 (46913,402,5,9,1,50,0,3,0,40),
-	 (46917,402,4,12,1,60,0,1,0,50),
-	 (46924,401,4,12,1,60,0,1,0,50),
+	 (46917,402,4,11,1,60,0,1,0,50),
+	 (46924,401,4,11,1,60,0,1,0,50),
 	 (46945,403,5,8,1,45,0,2,0,35),
-	 (46951,403,4,11,1,55,0,3,0,45),
-	 (46968,403,4,12,1,60,0,1,0,50);
+	 (46951,403,4,10,1,55,0,3,0,45);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (46968,403,4,11,1,60,0,1,0,50),
 	 (47193,844,4,7,1,40,0,2,0,30),
 	 (47195,843,3,7,1,40,0,3,0,30),
 	 (47198,843,3,9,1,50,0,3,0,40),
-	 (47201,843,4,11,1,55,0,5,0,45),
+	 (47201,843,4,10,1,55,0,5,0,45),
 	 (47220,845,4,9,1,50,0,4,0,40),
 	 (47230,844,6,1,1,10,0,2,0,0),
-	 (47236,844,4,11,1,55,0,5,0,45),
+	 (47236,844,4,10,1,55,0,5,0,45),
 	 (47245,844,5,6,1,35,0,3,0,25),
-	 (47258,845,5,8,1,45,0,4,0,35),
-	 (47266,845,5,9,1,50,0,5,0,40);
+	 (47258,845,5,8,1,45,0,4,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (47266,845,5,9,1,50,0,5,0,40),
 	 (47294,403,5,9,1,50,0,3,0,40),
 	 (47507,832,5,8,1,45,0,2,0,35),
 	 (47509,832,3,9,1,50,0,3,0,40),
 	 (47516,832,5,9,1,50,0,2,0,40),
 	 (47535,832,4,8,1,45,0,3,0,35),
-	 (47540,832,4,12,1,60,0,1,0,50),
+	 (47540,832,4,11,1,60,0,1,0,50),
 	 (47558,831,5,9,1,50,0,3,0,40),
-	 (47562,831,4,11,1,55,0,5,0,45),
-	 (47569,833,3,8,1,45,0,2,0,35),
-	 (47573,833,5,11,1,55,0,5,0,45);
+	 (47562,831,4,10,1,55,0,5,0,45),
+	 (47569,833,3,8,1,45,0,2,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (47573,833,5,10,1,55,0,5,0,45),
 	 (47580,833,5,9,1,50,0,3,0,40),
-	 (47585,833,4,12,1,60,0,1,0,50),
+	 (47585,833,4,11,1,60,0,1,0,50),
 	 (47586,832,5,1,1,10,0,5,0,0),
-	 (47788,831,4,12,1,60,0,1,0,50),
-	 (48181,843,4,12,1,60,0,1,0,50),
+	 (47788,831,4,11,1,60,0,1,0,50),
+	 (48181,843,4,11,1,60,0,1,0,50),
 	 (48384,846,5,8,1,10,0,3,0,35),
 	 (48389,846,1,8,1,10,0,3,0,35),
 	 (48409,847,6,4,1,10,0,2,0,15),
-	 (48411,848,5,3,1,10,0,2,0,10),
-	 (48432,847,4,11,1,10,0,5,0,45);
+	 (48411,848,5,3,1,10,0,2,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (48438,848,4,12,1,10,0,1,0,50),
+	 (48432,847,4,10,1,10,0,5,0,45),
+	 (48438,848,4,11,1,10,0,1,0,50),
 	 (48483,847,6,8,1,10,0,3,0,35),
-	 (48488,846,6,11,1,10,0,2,0,45),
+	 (48488,846,6,10,1,10,0,2,0,45),
 	 (48492,847,3,9,1,10,0,3,0,40),
 	 (48496,848,5,8,1,10,0,3,0,35),
-	 (48505,846,5,12,1,10,0,1,0,50),
-	 (48506,846,1,11,1,10,0,3,0,45),
+	 (48505,846,5,11,1,10,0,1,0,50),
+	 (48506,846,1,10,1,10,0,3,0,45),
 	 (48516,846,6,9,1,10,0,3,0,40),
-	 (48532,847,5,9,1,10,0,3,0,40),
-	 (48535,848,5,9,1,10,0,3,0,40);
+	 (48532,847,5,9,1,10,0,3,0,40);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (48535,848,5,9,1,10,0,3,0,40),
 	 (48539,848,3,9,1,10,0,3,0,40),
 	 (48962,836,4,1,1,10,0,3,0,0),
 	 (48963,836,4,2,1,15,0,3,0,5),
@@ -722,9 +713,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (48978,834,3,2,1,15,0,5,0,5),
 	 (48979,834,3,1,1,10,0,2,0,0),
 	 (48982,834,3,3,1,20,0,1,0,10),
-	 (48985,834,3,4,1,25,0,3,0,15),
-	 (48987,834,4,3,1,20,0,5,0,10);
+	 (48985,834,3,4,1,25,0,3,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (48987,834,4,3,1,20,0,5,0,10),
 	 (48988,834,4,6,1,35,0,3,0,25),
 	 (48997,834,4,1,1,10,0,3,0,0),
 	 (49004,834,4,2,1,15,0,3,0,5),
@@ -733,42 +724,42 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (49013,836,3,3,1,20,0,3,0,10),
 	 (49015,834,6,4,1,25,0,3,0,15),
 	 (49016,834,4,7,1,40,0,1,0,30),
-	 (49018,834,4,8,1,45,0,3,0,35),
-	 (49023,834,5,9,1,50,0,3,0,40);
+	 (49018,834,4,8,1,45,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (49023,834,5,9,1,50,0,3,0,40),
 	 (49024,835,4,6,1,35,0,3,0,25),
 	 (49027,834,3,7,1,40,0,3,0,30),
-	 (49028,834,4,12,1,60,0,1,0,50),
+	 (49028,834,4,11,1,60,0,1,0,50),
 	 (49032,836,4,8,1,45,0,3,0,35),
 	 (49036,836,3,2,1,15,0,2,0,5),
 	 (49039,835,4,3,1,20,0,2,0,10),
 	 (49042,835,5,1,1,10,0,5,0,0),
 	 (49137,835,6,4,1,25,0,3,0,15),
-	 (49140,835,5,2,1,15,0,5,0,5),
-	 (49143,835,4,9,1,50,0,2,0,40);
+	 (49140,835,5,2,1,15,0,5,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (49143,835,4,9,1,50,0,2,0,40),
 	 (49145,834,5,4,1,25,0,3,0,15),
 	 (49146,836,4,4,1,25,0,2,0,15),
 	 (49149,835,5,4,1,25,0,3,0,15),
 	 (49158,836,5,3,1,20,0,1,0,10),
 	 (49175,835,3,1,1,10,0,3,0,0),
 	 (49182,834,5,1,1,10,0,5,0,0),
-	 (49184,835,4,12,1,60,0,2,0,50),
+	 (49184,835,4,11,1,60,0,2,0,50),
 	 (49186,835,4,5,1,30,0,4,0,20),
-	 (49188,835,5,6,1,35,0,4,0,25),
-	 (49189,834,3,9,1,50,0,3,0,40);
+	 (49188,835,5,6,1,35,0,4,0,25);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (49189,834,3,9,1,50,0,3,0,40),
 	 (49194,836,3,5,1,30,0,1,0,20),
 	 (49200,835,3,9,1,50,0,4,0,40),
-	 (49202,835,4,11,1,55,0,5,0,45),
+	 (49202,835,4,10,1,55,0,5,0,45),
 	 (49203,835,4,7,1,40,0,2,0,30),
-	 (49206,836,4,12,1,60,0,1,0,50),
+	 (49206,836,4,11,1,60,0,1,0,50),
 	 (49208,836,5,6,1,35,0,3,0,25),
 	 (49217,836,3,9,1,50,0,3,0,40),
 	 (49219,836,5,4,1,25,0,3,0,15),
-	 (49220,836,4,5,1,30,0,5,0,20),
-	 (49222,836,5,8,1,45,0,1,0,35);
+	 (49220,836,4,5,1,30,0,5,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (49222,836,5,8,1,45,0,1,0,35),
 	 (49223,836,5,5,1,30,0,2,0,20),
 	 (49224,836,4,6,1,35,0,3,0,25),
 	 (49226,835,6,2,1,15,0,3,0,5),
@@ -777,108 +768,108 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (49467,834,5,3,1,20,0,3,0,10),
 	 (49471,835,5,5,1,30,0,4,0,20),
 	 (49588,836,5,2,1,15,0,2,0,5),
-	 (49796,835,6,5,1,30,0,2,0,20),
-	 (50040,835,3,7,1,40,0,4,0,30);
+	 (49796,835,6,5,1,30,0,2,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (50117,836,4,11,1,55,0,5,0,45),
+	 (50040,835,3,7,1,40,0,4,0,30),
+	 (50117,836,4,10,1,55,0,5,0,45),
 	 (50187,835,5,9,1,50,0,4,0,40),
-	 (50334,847,4,12,1,10,0,1,0,50),
+	 (50334,847,4,11,1,10,0,1,0,50),
 	 (50365,834,5,7,1,40,0,2,0,30),
 	 (50384,835,5,7,1,40,0,3,0,30),
 	 (50391,836,5,7,1,40,0,2,0,30),
-	 (50516,846,4,11,1,10,0,1,0,45),
-	 (50613,8000001,6,5,5,1,4,1,0,5),
-	 (50685,403,4,2,1,15,0,3,0,5),
-	 (50720,403,4,7,1,40,0,1,0,30);
+	 (50516,846,4,10,1,10,0,1,0,45),
+	 (50613,999900,2,10,5,1,4,1,0,0),
+	 (50685,403,4,2,1,15,0,3,0,5);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (50796,845,4,11,1,55,0,2,0,45),
+	 (50720,403,4,7,1,40,0,1,0,30),
+	 (50796,845,4,10,1,55,0,2,0,45),
 	 (50880,835,3,3,1,20,0,5,0,10),
 	 (51052,836,4,7,1,40,0,1,0,30),
 	 (51099,836,4,9,1,50,0,3,0,40),
 	 (51123,835,4,4,1,25,0,5,0,15),
-	 (51179,848,5,11,1,10,0,5,0,45),
+	 (51179,848,5,10,1,10,0,5,0,45),
 	 (51271,835,5,8,1,45,0,2,0,35),
 	 (51459,836,4,3,1,20,0,5,0,10),
-	 (51466,837,4,8,1,45,0,2,0,35),
-	 (51468,835,5,3,1,20,0,4,0,10);
+	 (51466,837,4,8,1,45,0,2,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (51468,835,5,3,1,20,0,4,0,10),
 	 (51474,837,3,9,1,50,0,3,0,40),
 	 (51480,837,5,9,1,50,0,3,0,40),
 	 (51483,837,5,7,1,40,0,3,0,30),
-	 (51490,837,4,12,1,60,0,1,0,50),
+	 (51490,837,4,11,1,60,0,1,0,50),
 	 (51521,838,5,8,1,45,0,2,0,35),
 	 (51523,838,5,9,1,50,0,2,0,40),
 	 (51525,838,3,8,1,45,0,3,0,35),
-	 (51528,838,4,11,1,55,0,5,0,45),
-	 (51533,838,4,12,1,60,0,1,0,50),
-	 (51554,839,3,8,1,45,0,2,0,35);
+	 (51528,838,4,10,1,55,0,5,0,45),
+	 (51533,838,4,11,1,60,0,1,0,50);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (51554,839,3,8,1,45,0,2,0,35),
 	 (51556,839,3,9,1,50,0,3,0,40),
 	 (51560,839,5,9,1,50,0,2,0,40),
-	 (51562,839,4,11,1,55,0,5,0,45),
+	 (51562,839,4,10,1,55,0,5,0,45),
 	 (51625,802,3,7,1,40,0,3,0,30),
 	 (51627,802,5,9,1,50,0,3,0,40),
 	 (51632,802,4,2,1,15,0,2,0,5),
 	 (51634,802,3,8,1,45,0,3,0,35),
-	 (51662,802,4,12,1,60,0,1,0,50),
-	 (51664,802,4,11,1,55,0,5,0,45),
-	 (51672,803,3,9,1,50,0,2,0,40);
+	 (51662,802,4,11,1,60,0,1,0,50),
+	 (51664,802,4,10,1,55,0,5,0,45);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (51672,803,3,9,1,50,0,2,0,40),
 	 (51682,803,5,9,1,50,0,2,0,40),
-	 (51685,803,4,11,1,55,0,5,0,45),
-	 (51690,803,4,12,1,60,0,1,0,50),
+	 (51685,803,4,10,1,55,0,5,0,45),
+	 (51690,803,4,11,1,60,0,1,0,50),
 	 (51692,804,5,8,1,45,0,3,0,35),
 	 (51698,804,3,9,1,50,0,4,0,40),
-	 (51708,804,4,11,1,55,0,5,0,45),
-	 (51713,804,4,12,1,60,0,1,0,50),
+	 (51708,804,4,10,1,55,0,5,0,45),
+	 (51713,804,4,11,1,60,0,1,0,50),
 	 (51745,836,3,1,1,10,0,2,0,0),
-	 (51883,838,5,5,1,30,0,3,0,20),
-	 (51886,839,5,7,1,40,0,1,0,30);
+	 (51883,838,5,5,1,30,0,3,0,20);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (51886,839,5,7,1,40,0,1,0,30),
 	 (52143,836,6,6,1,35,0,1,0,25),
 	 (52783,827,3,1,1,10,0,5,0,0),
-	 (52795,832,4,11,1,55,0,5,0,45),
+	 (52795,832,4,10,1,55,0,5,0,45),
 	 (53137,834,5,6,1,35,0,2,0,25),
-	 (53209,826,4,12,1,60,0,1,0,50),
+	 (53209,826,4,11,1,60,0,1,0,50),
 	 (53215,826,3,9,1,50,0,3,0,40),
 	 (53221,826,5,9,1,50,0,3,0,40),
 	 (53228,826,5,8,1,45,0,2,0,35),
-	 (53234,826,3,7,1,40,0,3,0,30),
-	 (53241,826,4,11,1,55,0,5,0,45);
+	 (53234,826,3,7,1,40,0,3,0,30);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (53241,826,4,10,1,55,0,5,0,45),
 	 (53252,825,3,8,1,45,0,2,0,35),
 	 (53256,825,5,9,1,50,0,3,0,40),
 	 (53262,825,3,9,1,50,0,3,0,40),
 	 (53265,825,4,3,1,20,0,1,0,10),
-	 (53270,825,4,12,1,60,0,1,0,50),
-	 (53290,827,5,11,1,55,0,3,0,45),
+	 (53270,825,4,11,1,60,0,1,0,50),
+	 (53290,827,5,10,1,55,0,3,0,45),
 	 (53295,827,4,8,1,45,0,3,0,35),
 	 (53298,827,3,9,1,50,0,2,0,40),
-	 (53301,827,4,12,1,60,0,1,0,50),
-	 (53302,827,6,9,1,50,0,3,0,40);
+	 (53301,827,4,11,1,60,0,1,0,50);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (53302,827,6,9,1,50,0,3,0,40),
 	 (53375,824,5,8,1,45,0,2,0,35),
 	 (53379,824,3,9,1,50,0,3,0,40),
-	 (53380,824,4,11,1,55,0,3,0,45),
-	 (53385,824,4,12,1,60,0,1,0,50),
+	 (53380,824,4,10,1,55,0,3,0,45),
+	 (53385,824,4,11,1,60,0,1,0,50),
 	 (53486,824,3,7,1,40,0,2,0,30),
 	 (53501,824,5,9,1,50,0,3,0,40),
 	 (53527,823,3,4,1,25,0,2,0,15),
 	 (53551,822,3,8,1,45,0,3,0,35),
-	 (53556,822,5,11,1,55,0,2,0,45),
-	 (53563,822,4,12,1,60,0,1,0,50);
+	 (53556,822,5,10,1,55,0,2,0,45);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (53569,822,4,11,1,55,0,2,0,45),
+	 (53563,822,4,11,1,60,0,1,0,50),
+	 (53569,822,4,10,1,55,0,2,0,45),
 	 (53583,823,5,9,1,50,0,2,0,40),
 	 (53590,823,3,9,1,50,0,3,0,40),
-	 (53595,823,4,12,1,60,0,1,0,50),
+	 (53595,823,4,11,1,60,0,1,0,50),
 	 (53620,826,4,1,1,10,0,3,0,0),
 	 (53660,822,6,4,1,25,0,2,0,15),
 	 (53671,822,5,9,1,50,0,5,0,40),
-	 (53695,823,5,11,1,55,0,2,0,45),
-	 (53709,823,4,11,1,55,0,3,0,45),
-	 (53754,843,3,3,1,20,0,2,0,10);
+	 (53695,823,5,10,1,55,0,2,0,45),
+	 (53709,823,4,10,1,55,0,3,0,45);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (53754,843,3,3,1,20,0,2,0,10),
 	 (54037,843,3,6,1,35,0,2,0,25),
 	 (54117,845,4,8,1,45,0,3,0,35),
 	 (54347,844,3,9,1,50,0,4,0,40),
@@ -887,9 +878,9 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (54747,841,4,2,1,15,0,2,0,5),
 	 (55050,834,4,9,1,50,0,1,0,40),
 	 (55061,835,4,2,1,15,0,3,0,5),
-	 (55090,836,5,9,1,50,0,1,0,40),
-	 (55091,842,3,6,1,35,0,2,0,25);
+	 (55090,836,5,9,1,50,0,1,0,40);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (55091,842,3,6,1,35,0,2,0,25),
 	 (55107,834,5,2,1,15,0,2,0,5),
 	 (55129,836,5,1,1,10,0,5,0,0),
 	 (55198,839,5,3,1,20,0,1,0,10),
@@ -897,43 +888,43 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (55610,835,3,6,1,35,0,2,0,25),
 	 (55620,836,6,4,1,25,0,2,0,15),
 	 (55666,836,3,6,1,35,0,2,0,25),
-	 (56314,825,4,11,1,55,0,5,0,45),
-	 (56333,827,4,4,1,25,0,3,0,15),
-	 (56339,827,3,5,1,30,0,3,0,20);
+	 (56314,825,4,10,1,55,0,5,0,45),
+	 (56333,827,4,4,1,25,0,3,0,15);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (56339,827,3,5,1,30,0,3,0,20),
 	 (56342,827,6,4,1,25,0,3,0,15),
 	 (56636,401,5,4,1,25,0,3,0,15),
-	 (56927,402,4,11,1,55,0,5,0,45),
+	 (56927,402,4,10,1,55,0,5,0,45),
 	 (57470,832,3,8,1,45,0,2,0,35),
 	 (57499,403,3,9,1,50,0,1,0,40),
 	 (57810,846,5,2,1,10,0,5,0,5),
 	 (57849,846,6,6,1,10,0,3,0,25),
 	 (57865,846,6,4,1,10,0,1,0,15),
-	 (57873,847,3,8,1,10,0,3,0,35),
-	 (57878,847,3,6,1,10,0,3,0,25);
+	 (57873,847,3,8,1,10,0,3,0,35);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (57878,847,3,6,1,10,0,3,0,25),
 	 (58414,804,5,9,1,50,0,3,0,40),
 	 (58426,802,4,7,1,40,0,1,0,30),
 	 (58435,843,5,9,1,50,0,1,0,40),
-	 (58872,403,5,11,1,55,0,2,0,45),
-	 (58943,8000001,13,3,3,1,4,1,0,5),
-	 (58984,8000001,19,5,5,1,4,1,0,5),
-	 (58985,8000001,3,1,2,1,4,1,0,5),
+	 (58872,403,5,10,1,55,0,2,0,45),
+	 (58943,999900,5,9,3,1,4,1,0,0),
+	 (58984,999900,5,5,5,1,4,1,0,0),
+	 (58985,999900,1,2,2,1,4,1,0,0),
 	 (59088,403,3,4,1,25,0,2,0,15),
-	 (59224,8000001,15,8,2,1,4,1,0,5),
-	 (59547,8000001,9,3,5,1,4,1,0,5);
+	 (59224,999900,4,4,2,1,4,1,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (59672,844,4,12,1,60,0,2,0,50),
-	 (59672,845,4,12,1,60,0,2,0,50),
-	 (59752,8000001,17,3,5,1,4,1,0,5),
+	 (59547,999900,7,11,5,1,4,1,0,0),
+	 (59672,844,4,11,1,60,0,2,0,50),
+	 (59672,845,4,11,1,60,0,2,0,50),
+	 (59752,999900,5,11,5,1,4,1,0,0),
 	 (60103,838,4,8,1,45,0,1,0,35),
 	 (60970,402,3,9,1,50,0,1,0,40),
-	 (61154,834,4,11,1,55,0,5,0,45),
+	 (61154,834,4,10,1,55,0,5,0,45),
 	 (61216,402,3,1,1,10,0,3,0,0),
-	 (61295,839,4,12,1,60,0,1,0,50),
-	 (61336,847,4,3,1,10,0,1,0,10),
-	 (62097,837,4,11,1,55,0,5,0,45);
+	 (61295,839,4,11,1,60,0,1,0,50),
+	 (61336,847,4,3,1,10,0,1,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (62097,837,4,10,1,55,0,5,0,45),
 	 (62905,834,3,8,1,45,0,2,0,35),
 	 (63108,843,4,5,1,30,0,1,0,20),
 	 (63117,844,5,9,1,50,0,4,0,40),
@@ -941,10 +932,10 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (63349,845,4,2,1,15,0,3,0,5),
 	 (63370,837,3,8,1,45,0,2,0,35),
 	 (63373,838,6,6,1,35,0,2,0,25),
-	 (63410,848,3,11,1,10,0,2,0,45),
-	 (63503,847,5,11,1,10,0,1,0,45),
-	 (63504,832,5,7,1,40,0,3,0,30);
+	 (63410,848,3,10,1,10,0,2,0,45),
+	 (63503,847,5,10,1,10,0,1,0,45);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (63504,832,5,7,1,40,0,3,0,30),
 	 (63534,831,3,9,1,50,0,3,0,40),
 	 (63560,836,6,7,1,40,0,1,0,30),
 	 (63574,832,5,5,1,30,0,1,0,20),
@@ -953,25 +944,22 @@ INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,
 	 (63730,831,5,8,1,45,0,3,0,35),
 	 (64044,833,3,9,1,50,0,1,0,40),
 	 (64127,831,3,8,1,45,0,2,0,35),
-	 (64205,823,3,3,1,20,0,1,0,10),
-	 (64353,841,3,8,1,45,0,2,0,35);
+	 (64205,823,3,3,1,20,0,1,0,10);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
+	 (64353,841,3,8,1,45,0,2,0,35),
 	 (64976,401,3,8,1,45,0,1,0,35),
 	 (65139,848,4,9,1,10,0,1,0,40),
-	 (65222,8000001,11,5,5,1,4,1,0,5),
+	 (65222,999900,5,3,5,1,4,1,0,0),
 	 (65661,835,3,8,1,45,0,4,0,35),
 	 (66799,836,3,7,1,40,0,5,0,30),
-	 (1900000,1980000,4,5,3,1,3,10,0,5),
-	 (1900010,1980000,4,8,3,1,3,10,0,5),
-	 (1900020,1980000,4,2,1,1,3,6,0,5),
-	 (1900027,1980000,16,8,20,1,3,1,0,5),
-	 (1900028,1980000,16,5,20,1,3,1,0,5);
+	 (230229,1980000,4,1,1,1,3,1,0,0),
+	 (230230,1980000,7,3,1,1,3,1,0,0),
+	 (230231,1980000,1,3,1,1,3,1,0,0),
+	 (230233,1980000,6,5,1,1,3,1,0,0);
 INSERT INTO acore_world.forge_talents (spellid,talentTabId,columnIndex,rowIndex,rankCost,minLevel,talentType,numberRanks,preReqType,tabPointReq) VALUES
-	 (1900030,1980000,7,8,1,1,3,10,0,5),
-	 (1900040,1980000,10,8,5,1,3,10,0,5),
-	 (1900050,1980000,7,2,1,1,3,10,0,5),
-	 (1900060,1980000,10,2,3,1,3,10,0,5),
-	 (1900070,1980000,13,8,5,1,3,5,0,5),
-	 (1900075,1980000,13,5,10,1,3,1,0,5),
-	 (1900076,1980000,16,2,10,1,3,1,0,5),
-	 (1900077,1980000,7,5,5,1,3,10,0,5);
+	 (230235,1980000,2,5,1,1,3,1,0,0),
+	 (230236,1980000,2,7,1,1,3,1,0,0),
+	 (230237,1980000,4,4,1,1,3,1,0,0),
+	 (230238,1980000,4,10,1,1,3,1,0,0),
+	 (230239,1980000,4,8,1,1,3,1,0,0),
+	 (230240,1980000,6,7,1,1,3,1,0,0);
