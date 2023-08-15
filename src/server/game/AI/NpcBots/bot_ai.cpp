@@ -17514,26 +17514,9 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
             if (IsWanderer())
             {
                 outdoorsTimer = 0;
-
-                Position safePos;
-                if (me->GetMap()->GetEntry()->IsContinent())
+                if (me->GetMap()->GetEntry()->IsContinent() || me->GetMap()->IsBattleground())
                 {
-                    TeamId my_team = BotDataMgr::GetTeamIdForFaction(me->GetFaction());
-                    GraveyardStruct const* gy = sGraveyard->GetClosestGraveyard((Player*)me, my_team == TEAM_HORDE ? TEAM_HORDE : TEAM_ALLIANCE, false);
-                    if (gy)
-                    {
-                        safePos.Relocate(gy->x, gy->y, gy->z, me->GetOrientation());
-                        if (me->GetDistance(safePos) > 15.0f)
-                            BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(gy->Map), &safePos);
-                    }
-                    else
-                        safePos.Relocate(me);
-                }
-                else
-                    safePos.Relocate(me);
-
-                if (safePos.GetExactDist2d(homepos) > MAX_WANDER_NODE_DISTANCE || me->GetMap()->IsBattleground())
-                {
+                    Position safePos(*me);
                     WanderNode const* nextNode = GetNextTravelNode(&safePos, true);
                     if (!nextNode)
                     {
@@ -17544,6 +17527,8 @@ void bot_ai::UpdateReviveTimer(uint32 diff)
                     }
 
                     homepos.Relocate(nextNode);
+                    if (me->GetMap()->GetEntry()->IsContinent())
+                        BotMgr::TeleportBot(me, sMapMgr->CreateBaseMap(nextNode->GetMapId()), nextNode, true);
 
                     LOG_TRACE("npcbots", "Bot {} id {} class {} level {} died on the way from node {} to {} ('{}'), NEW {} ('{}'), {}, dist {} yd!",
                         me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_last ? _travel_node_last->GetWPId() : 0, _travel_node_cur->GetWPId(),
