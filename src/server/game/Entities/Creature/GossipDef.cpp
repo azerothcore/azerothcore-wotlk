@@ -462,7 +462,10 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         uint32 questXp;
         if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
         {
-            questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
+            if (player->HasAura(230230))
+                questXp = uint32(quest->XPValue(quest->GetQuestLevel()) * player->GetQuestRate());
+            else
+                questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
         }
         else
         {

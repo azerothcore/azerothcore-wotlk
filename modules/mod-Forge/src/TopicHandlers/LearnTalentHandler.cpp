@@ -39,7 +39,7 @@ public:
             fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
             ForgeCharacterPoint* curPoints = fc->GetSpecPoints(iam.player, tabType, spec->Id);
-            if (tab->ClassMask != iam.player->getClassMask())
+            if (~tab->ClassMask & iam.player->getClassMask())
             {
                 iam.player->SendForgeUIMsg(ForgeTopic::LEARN_TALENT_ERROR, "You are attempting to learn a talent from a another class; abuse of game systems will result in a ban.");
             }

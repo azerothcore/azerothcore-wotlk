@@ -10223,6 +10223,10 @@ void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 st
     GameobjectInstanceSavedStateList.push_back({ id, guid, state });
 }
 
+CacheTrainerSpellContainer ObjectMgr::getTrainerData(uint32 guid) {
+    return _cacheTrainerSpellStore;
+}
+
 void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
 {
     if (active)

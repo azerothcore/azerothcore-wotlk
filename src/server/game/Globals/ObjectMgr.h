@@ -1453,6 +1453,8 @@ public:
     uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
     void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
     void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+
+    CacheTrainerSpellContainer getTrainerData(uint32 guid);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
