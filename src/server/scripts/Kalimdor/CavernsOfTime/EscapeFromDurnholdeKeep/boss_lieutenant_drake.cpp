@@ -112,10 +112,6 @@ struct boss_lieutenant_drake : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-        if (InstanceScript* instance = me->GetInstanceScript())
-        {
-            instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
-        }
     }
 
     void MovementInform(uint32 type, uint32 point) override
