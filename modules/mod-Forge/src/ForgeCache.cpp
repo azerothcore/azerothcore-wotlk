@@ -705,13 +705,12 @@ public:
                                                 player->RemoveAura(rank.second);
 
 
-                                    if (!player->HasSpell(currentRank))
-                                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                        if (!player->HasSpell(currentRank))
                                             player->learnSpell(currentRank, false, false);
-                                        else
+                                    else
+                                        if (!player->HasAura(currentRank))
                                             player->AddAura(currentRank, player);
-
-                                    
                                 }
                             }
                         }
@@ -719,6 +718,51 @@ public:
             }
 
             player->SendInitialSpells();
+        }
+    }
+
+    void ApplyActivePerks(Player* player)
+    {
+        ForgeCharacterSpec* currentSpec;
+
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto perk : currentSpec->perks) {
+                auto currentRank = perk.second->rank;
+                auto spell = perk.second->spell;
+                auto spellInfo = sSpellMgr->GetSpellInfo(spell->spellId);
+
+                for (auto rank : spell->ranks)
+                    if (currentRank != rank.first)
+                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                        else
+                            player->RemoveAura(rank.second);
+
+                auto rankedSpell = spell->ranks[currentRank];
+                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                    if (!player->HasSpell(rankedSpell))
+                        player->learnSpell(rankedSpell, false, false);
+                    else
+                        if (!player->HasAura(rankedSpell))
+                            player->AddAura(rankedSpell, player);
+            }   
+        }
+    }
+
+    void RemoveActivePerks(Player* player) {
+        ForgeCharacterSpec* currentSpec;
+
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto perk : currentSpec->perks) {
+                auto rankedSpell = perk.second->spell->ranks[perk.second->rank];
+                auto spellInfo = sSpellMgr->GetSpellInfo(rankedSpell);
+                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                    player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
+                else
+                    player->RemoveAura(rankedSpell);
+            }
         }
     }
 
