@@ -64,14 +64,6 @@ public:
                     return;
                 }
 
-                if (fc->CountPerks(iam.player) >= 40)
-                {
-                    iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "You have reached the maximum number of perks.");
-                    spec->perkQueue.clear();
-                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
-                    return;
-                }
-
                 auto rankIt = spell->ranks.find(csp->rank);
                 if (rankIt != spell->ranks.end())
                     if (spell->isAura)
@@ -95,7 +87,14 @@ public:
 
                 cm->SendPerks(iam.player, specId);
 
-                cm->SendWithstandingSelect(iam.player, rolled);
+                if (fc->CountPerks(iam.player) < 40) {
+                    cm->SendWithstandingSelect(iam.player, rolled);
+                }
+                else {
+                    spec->perkQueue.clear();
+                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                    return;
+                }
 
                 iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected
                 iam.player->SendPlaySpellImpact(iam.player->GetGUID(), 362); // 113 EmoteSalute
