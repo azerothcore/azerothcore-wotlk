@@ -688,20 +688,30 @@ public:
 
                         for (auto spell : tab->Talents)
                         {
-                            if (playerLevel != 80 && modes.size() == 0 && talItt != currentSpec->Talents.end())
+                            if (modes.size() == 0 && talItt != currentSpec->Talents.end())
                             {
                                 auto spellItt = talItt->second.find(spell.first);
 
                                 if (spellItt != talItt->second.end())
                                 {
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+                                    auto spellInfo = sSpellMgr->GetSpellInfo(currentRank);
 
                                     for (auto rank : spell.second->Ranks)
                                         if (currentRank != rank.second)
-                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                            else
+                                                player->RemoveAura(rank.second);
+
 
                                     if (!player->HasSpell(currentRank))
-                                        player->learnSpell(currentRank, false, false);
+                                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                            player->learnSpell(currentRank, false, false);
+                                        else
+                                            player->AddAura(currentRank, player);
+
+                                    
                                 }
                             }
                         }
