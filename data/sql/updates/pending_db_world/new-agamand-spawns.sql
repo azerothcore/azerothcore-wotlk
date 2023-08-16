@@ -51,8 +51,8 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 DELETE FROM `creature` WHERE `id1` = 1658; -- dargol
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (45038, 1658, 0, 0, 0, 0, 0, 1, 1, 0, 3043.631, 646.9064, 59.14341, 1.553343057632446289, 300, 0, 0, 273, 0, 0, 0, 0, 0, '', 50664);
--- wp data for GUID 45209 rotting ancestor
-SET @NPC := 45209 * 10;
+
+SET @NPC := 45209 * 10; -- wp data for GUID 45209 rotting ancestor
 DELETE FROM `waypoint_data` WHERE `id` = @NPC;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (@NPC, 1, 3032.486, 653.2628, 58.150436, NULL, 0, 0, 0, 100, 0),
