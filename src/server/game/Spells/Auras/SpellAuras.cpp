@@ -2011,6 +2011,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             if (aurApp->GetBase()->GetId() == eff.MiscValue)
                 ProcessTriggerSpellOnStacks(aurApp->GetBase(), eff.MiscValueB, eff.TriggerSpell, eff.TargetA.GetTarget(), eff.Amplitude, caster, aurEff->GetBase()->GetEffect(aurEff->GetEffIndex()));
         }
+
     }
 }
 

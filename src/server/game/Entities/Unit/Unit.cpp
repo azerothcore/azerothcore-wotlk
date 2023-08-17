@@ -1928,7 +1928,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         {
             if (tDamage.second > 0)
             {
-                SpellInfo const* i_spellProto = sSpellMgr->GetSpellInfo(1129999);
+                SpellInfo const* i_spellProto = sSpellMgr->GetSpellInfo(4129999);
 
                 uint32 damage = tDamage.second > 0 ? tDamage.second : 0;
                 uint32 absorb = 0;
