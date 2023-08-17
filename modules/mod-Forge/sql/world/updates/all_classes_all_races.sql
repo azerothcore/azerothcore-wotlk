@@ -20,7 +20,7 @@ INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(6, 1, 1, 215, -2917.58, -257.98, 52.9968, 0.0);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(7, 1, 0, 1, -6240.32, 331.033, 382.758, 0.0);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(8, 1, 1, 14, -618.518, -4251.67, 38.718, 0.0);
-INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(10, 1, 530, 3431, 10349.6, -6357.29, 33.4026, 5.31S605);
+INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(10, 1, 530, 3431, 10349.6, -6357.29, 33.4026, 5.31605);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(11, 1, 530, 3526, -3961.64, -13931.2, 100.615, 2.08364);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(1, 2, 0, 12, -8949.95, -132.493, 83.5312, 0.0);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(2, 2, 1, 14, -618.518, -4251.67, 38.718, 0.0);
@@ -112,4 +112,3 @@ INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(8, 11, 1, 14, -618.518, -4251.67, 38.718, 0.0);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(10, 11, 530, 3431, 10349.6, -6357.29, 33.4026, 5.31605);
 INSERT INTO acore_world.playercreateinfo (race, class, `map`, `zone`, position_x, position_y, position_z, orientation) VALUES(11, 11, 530, 3526, -3961.64, -13931.2, 100.615, 2.08364);
-
