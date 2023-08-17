@@ -1474,7 +1474,7 @@ private:
 
             if (tabItt == TalentTabs.end())
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading talents, invaild tab id: " + std::to_string(newTalent->TalentTabId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading talents, invalid tab id: " + std::to_string(newTalent->TalentTabId));
             }
             else
                 tabItt->second->Talents[newTalent->SpellId] = newTalent;
@@ -1506,7 +1506,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentPrereqs, invaild req id: " + std::to_string(newTalent->reqId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentPrereqs, invalid req id: " + std::to_string(newTalent->reqId));
             }
 
         } while (preReqTalents->NextRow());
@@ -1533,7 +1533,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentExclusiveness, invaild exclusiveSpellId id: " + std::to_string(exclusiveSpellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentExclusiveness, invalid exclusiveSpellId id: " + std::to_string(exclusiveSpellId));
             }
 
         } while (exclTalents->NextRow());
@@ -1563,7 +1563,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentRanks, invaild talentTabId id: " + std::to_string(talentTabId) + " Rank: " + std::to_string(rank) + " SpellId: " + std::to_string(spellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentRanks, invalid talentTabId id: " + std::to_string(talentTabId) + " Rank: " + std::to_string(rank) + " SpellId: " + std::to_string(spellId));
             }
 
         } while (talentRanks->NextRow());
@@ -1591,7 +1591,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentUnlearn, invaild talentTabId id: " + std::to_string(talentTabId) + " ExclusiveSpell: " + std::to_string(exclusiveSpellId) + " SpellId: " + std::to_string(spellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentUnlearn, invalid talentTabId id: " + std::to_string(talentTabId) + " ExclusiveSpell: " + std::to_string(exclusiveSpellId) + " SpellId: " + std::to_string(spellId));
             }
 
         } while (exclTalents->NextRow());
