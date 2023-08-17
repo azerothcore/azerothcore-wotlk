@@ -23,7 +23,7 @@ enum Yells
 {
     SAY_AGGRO                       = 0,
     SAY_SUMMON                      = 1,
-    SAY_SUMMON_BUBBLE                = 2,
+    SAY_SUMMON_BUBBLE               = 2,
     SAY_SLAY                        = 3,
     SAY_DEATH                       = 4,
     EMOTE_WATERY_GRAVE              = 5,
