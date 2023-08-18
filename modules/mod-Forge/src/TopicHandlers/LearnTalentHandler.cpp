@@ -223,10 +223,7 @@ public:
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
-                else
-                    iam.player->RemoveAura(ranksItt->second);
+                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
             }
 
             ct->CurrentRank++;
@@ -235,10 +232,7 @@ public:
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    iam.player->learnSpell(ranksItt->second);
-                else
-                    iam.player->AddAura(ranksItt->second, iam.player);
+                iam.player->learnSpell(ranksItt->second);
             }
 
             fc->UpdateCharPoints(iam.player, curPoints);

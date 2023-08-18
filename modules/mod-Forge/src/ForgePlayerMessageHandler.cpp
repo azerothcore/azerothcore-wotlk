@@ -47,6 +47,8 @@ public:
         player->SetSpecsCount(0);
         fc->AddCharacterSpecSlot(player);
         fc->UpdateCharacters(player->GetSession()->GetAccountId(), player);
+
+        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 17));
     }
 
     void OnLogin(Player* player) override
@@ -102,7 +104,6 @@ public:
         if (fc->TryGetCharacterActiveSpec(player, spec))
         {
             uint8 currentLevel = player->getLevel();
-            uint32 levelMod = fc->GetConfig("levelMod", 2);
             uint8 levelDiff = currentLevel - oldlevel;
 
             if (currentLevel == fc->GetConfig("MaxLevel", 80))
@@ -122,29 +123,6 @@ public:
 
             if (player->HasAura(230229))
                 LearnSpellsForLevel(player, oldlevel, player->GetLevel());
-
-            if (currentLevel == 80)
-            {
-                for (auto charTabType : fc->TALENT_POINT_TYPES)
-                {
-                    if (ACCOUNT_WIDE_TYPE != charTabType)
-                        continue;
-
-                    std::list<ForgeTalentTab*> tabs;
-                    if (fc->TryGetForgeTalentTabs(player, charTabType, tabs))
-                        for (auto* tab : tabs)
-                        {
-                            auto talItt = spec->Talents.find(tab->Id);
-
-                            for (auto spell : tab->Talents)
-                            {
-                                for (auto rank : spell.second->Ranks)
-                                    player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                            }
-                        }
-                }
-                
-            }
 
             auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
             if (missing > 0)

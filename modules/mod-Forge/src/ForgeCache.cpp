@@ -694,21 +694,18 @@ public:
                                 if (spellItt != talItt->second.end())
                                 {
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
-                                    auto spellInfo = sSpellMgr->GetSpellInfo(currentRank);
 
-                                    for (auto rank : spell.second->Ranks)
-                                        if (currentRank != rank.second)
-                                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                    if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                        for (auto rank : spell.second->Ranks) {
+                                            if (currentRank != rank.second) {
                                                 player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                            else
-                                                player->RemoveAura(rank.second);
-
-                                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                                        if (!player->HasSpell(currentRank))
-                                            player->learnSpell(currentRank, false, false);
-                                    else
-                                        if (!player->HasAura(currentRank))
-                                            player->AddAura(currentRank, player);
+                                            }
+                                            else {
+                                                if (!player->HasSpell(currentRank))
+                                                    player->learnSpell(currentRank, false, false);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -728,22 +725,25 @@ public:
             for (auto perk : currentSpec->perks) {
                 auto currentRank = perk.second->rank;
                 auto spell = perk.second->spell;
-                auto spellInfo = sSpellMgr->GetSpellInfo(spell->spellId);
-
-                for (auto rank : spell->ranks)
-                    if (currentRank != rank.first)
-                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                        else
-                            player->RemoveAura(rank.second);
-
-                auto rankedSpell = spell->ranks[currentRank];
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    if (!player->HasSpell(rankedSpell))
-                        player->learnSpell(rankedSpell, false, false);
-                    else
-                        if (!player->HasAura(rankedSpell))
-                            player->AddAura(rankedSpell, player);
+                
+                if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                    for (auto rank : spell->ranks)
+                        if (currentRank != rank.first) {
+                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                            else
+                                player->RemoveAura(rank.second);
+                        }
+                        else {
+                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                if (!player->HasSpell(currentRank))
+                                    player->learnSpell(currentRank, false, false);
+                                else
+                                    if (!player->HasAura(currentRank))
+                                        player->AddAura(currentRank, player);
+                        }
+                    
+                }
             }   
         }
     }
@@ -755,11 +755,12 @@ public:
         {
             for (auto perk : currentSpec->perks) {
                 auto rankedSpell = perk.second->spell->ranks[perk.second->rank];
-                auto spellInfo = sSpellMgr->GetSpellInfo(rankedSpell);
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
-                else
-                    player->RemoveAura(rankedSpell);
+                if (auto spellInfo = sSpellMgr->GetSpellInfo(rankedSpell)) {
+                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                        player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
+                    else
+                        player->RemoveAura(rankedSpell);
+                }
             }
         }
     }
@@ -786,13 +787,11 @@ public:
                                 if (spellItt != talItt->second.end())
                                 {
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
-                                    auto spellInfo = sSpellMgr->GetSpellInfo(currentRank);
 
-                                    for (auto rank : spell.second->Ranks)
-                                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                    if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                        for (auto rank : spell.second->Ranks)
                                             player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                        else
-                                            player->RemoveAura(rank.second);
+                                    }
                                 }
                             }
                         }
