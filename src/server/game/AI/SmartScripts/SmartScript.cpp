@@ -2893,18 +2893,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_FOLLOW_GROUP:
         {
-            // stop/start
-            // follow type
-            // dist
-            // for (WorldObject* target : targets)
-            // {
-            //     if (target->ToCreature()->IsAlive())
-            //     {
-            //         target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle);
-            //     }
-            // }
-
-            if (!e.action.followGroup.state)
+            if (!e.action.followGroup.followState)
             {
                 for (WorldObject* target : targets)
                     if (IsUnit(target))
@@ -2913,22 +2902,82 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
             }
 
-            uint8 followMembers = 0;
+            uint8 membCount = targets.size();
             uint8 itr = 0;
-            for (WorldObject* target : targets)
-                followMembers++;
-
-            float stepAngle = 0.f;
-            float startAngle = 0.f;
-            float dist = float(e.action.followGroup.dist);
-            switch (e.action.followGroup.type)
+            float dist = float(e.action.followGroup.dist / 100);
+            switch (e.action.followGroup.followType)
             {
-                case FOLLOW_TYPE_CROSS:
+                case FOLLOW_TYPE_CIRCLE:
                 {
-                    stepAngle = x;
-                    startAngle = y;
-                    stepDist = z;
-                    
+                    float angle = (membCount > 4 ? (M_PI * 2)/membCount : (M_PI / 2)); // 90 degrees is the maximum angle
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle * itr);
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_SEMI_CIRCLE_BEHIND:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, (M_PI / 2.0f) + (M_PI / membCount) * (itr - 1));
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_SEMI_CIRCLE_FRONT:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, (M_PI + (M_PI / 2.0f) + (M_PI / membCount) * (itr - 1)));
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_LINE:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? M_PI : 0.f);
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_COLUMN:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? (M_PI * 1.5f) : (M_PI / 2));
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_ANGULAR:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            itr++;
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? M_PI + (M_PI / 4) : M_PI - (M_PI / 4));
+                        }
+                    }
                     break;
                 }
                 default:
