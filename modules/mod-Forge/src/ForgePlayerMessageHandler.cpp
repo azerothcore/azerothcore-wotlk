@@ -77,6 +77,7 @@ public:
 
     void OnLogout(Player* player) override
     {
+        fc->RemoveAccountBoundTalents(player);
         fc->RemoveActivePerks(player);
     }
 

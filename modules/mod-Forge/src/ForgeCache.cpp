@@ -691,7 +691,6 @@ public:
                             if (modes.size() == 0 && talItt != currentSpec->Talents.end())
                             {
                                 auto spellItt = talItt->second.find(spell.first);
-
                                 if (spellItt != talItt->second.end())
                                 {
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
@@ -703,7 +702,6 @@ public:
                                                 player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                             else
                                                 player->RemoveAura(rank.second);
-
 
                                     if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
                                         if (!player->HasSpell(currentRank))
@@ -763,6 +761,45 @@ public:
                 else
                     player->RemoveAura(rankedSpell);
             }
+        }
+    }
+
+    void RemoveAccountBoundTalents(Player* player) {
+        ForgeCharacterSpec* currentSpec;
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto charTabType : TALENT_POINT_TYPES)
+            {
+                if (ACCOUNT_WIDE_TYPE != charTabType)
+                    continue;
+
+                std::list<ForgeTalentTab*> tabs;
+                if (TryGetForgeTalentTabs(player, charTabType, tabs))
+                    for (auto* tab : tabs)
+                    {
+                        auto talItt = currentSpec->Talents.find(tab->Id);
+                        for (auto spell : tab->Talents)
+                        {
+                            if (talItt != currentSpec->Talents.end())
+                            {
+                                auto spellItt = talItt->second.find(spell.first);
+                                if (spellItt != talItt->second.end())
+                                {
+                                    uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+                                    auto spellInfo = sSpellMgr->GetSpellInfo(currentRank);
+
+                                    for (auto rank : spell.second->Ranks)
+                                        if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                        else
+                                            player->RemoveAura(rank.second);
+                                }
+                            }
+                        }
+                    }
+            }
+
+            player->SendInitialSpells();
         }
     }
 
