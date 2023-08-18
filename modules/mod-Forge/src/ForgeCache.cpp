@@ -1334,68 +1334,48 @@ private:
             newPerk->tags = perkFields[8].Get<std::string>();
             //newPerk->rank = perkFields[9].Get<uint8>();
 
-            switch (newPerk->allowableClass) {
-                case CLASSMASK_CASTER:
-                    Perks[CLASS_PRIEST].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_MAGE].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                case CLASSMASK_PETCLASS:
-                    Perks[CLASS_HUNTER].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    break;
-                case CLASSMASK_MELEE:
+            auto val = newPerk->allowableClass;
+            if (val > 0) {
+                if (val & (1 << (CLASS_WARRIOR - 1)))
                     Perks[CLASS_WARRIOR].push_back(newPerk);
+
+                if (val & (1 << (CLASS_PALADIN - 1)))
                     Perks[CLASS_PALADIN].push_back(newPerk);
-                    Perks[CLASS_ROGUE].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_WARRIOR - 1)):
-                    Perks[CLASS_WARRIOR].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_PALADIN - 1)):
-                    Perks[CLASS_PALADIN].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_HUNTER - 1)):
+
+                if (val & (1 << (CLASS_HUNTER - 1)))
                     Perks[CLASS_HUNTER].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_ROGUE - 1)):
+
+                if (val & (1 << (CLASS_ROGUE - 1)))
                     Perks[CLASS_ROGUE].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_PRIEST - 1)):
+
+                if (val & (1 << (CLASS_PRIEST - 1)))
                     Perks[CLASS_PRIEST].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_DEATH_KNIGHT - 1)):
+
+                if (val & (1 << (CLASS_DEATH_KNIGHT - 1)))
                     Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_SHAMAN - 1)):
+
+                if (val & (1 << (CLASS_SHAMAN - 1)))
                     Perks[CLASS_SHAMAN].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_MAGE - 1)):
+
+                if (val & (1 << (CLASS_MAGE - 1)))
                     Perks[CLASS_MAGE].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_WARLOCK - 1)):
+
+                if (val & (1 << (CLASS_WARLOCK - 1)))
                     Perks[CLASS_WARLOCK].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_DRUID - 1)):
+
+                if (val & (1 << (CLASS_DRUID - 1)))
                     Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                default:
-                    Perks[CLASS_WARRIOR].push_back(newPerk);
-                    Perks[CLASS_PALADIN].push_back(newPerk);
-                    Perks[CLASS_HUNTER].push_back(newPerk);
-                    Perks[CLASS_ROGUE].push_back(newPerk);
-                    Perks[CLASS_PRIEST].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_MAGE].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
+            } else {
+                Perks[CLASS_WARRIOR].push_back(newPerk);
+                Perks[CLASS_PALADIN].push_back(newPerk);
+                Perks[CLASS_HUNTER].push_back(newPerk);
+                Perks[CLASS_ROGUE].push_back(newPerk);
+                Perks[CLASS_PRIEST].push_back(newPerk);
+                Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                Perks[CLASS_SHAMAN].push_back(newPerk);
+                Perks[CLASS_MAGE].push_back(newPerk);
+                Perks[CLASS_WARLOCK].push_back(newPerk);
+                Perks[CLASS_DRUID].push_back(newPerk);
             }
 
             AllPerks[newPerk->spellId] = newPerk;
