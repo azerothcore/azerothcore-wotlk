@@ -6222,7 +6222,10 @@ void Spell::EffectGrantXP(SpellEffIndex effIndex)
 
     if (Player* player = unitTarget->ToPlayer())
         if (player->GetLevel() < 80) {
-            auto amount = player->GetLevel() * m_spellInfo->GetEffect(effIndex).BasePoints;
+            uint32 curXP = player->GetUInt32Value(PLAYER_XP);
+            uint32 nextLvlXP = player->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+            auto amount = nextLvlXP-curXP;
+            
             player->GiveXP(amount, unitTarget);
         }
 }
