@@ -12,27 +12,27 @@ SET @RP_TEXTS_GROUP_ID := 0;
 
 SET @SAVE_THIS_WORLD_ID := 0;
 SET @SAVE_THIS_WORLD_BROADCAST_ID := 12381;
-SET @SAVE_THIS_WORLD_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@SAVE_THIS_WORLD_BROADCAST_ID);
+SET @SAVE_THIS_WORLD_TEXT := 'Have you come to save this world? To cleanse it?';
 
 SET @IT_BEGINS_ID := 1;
 SET @IT_BEGINS_BROADCAST_ID := 12383;
-SET @IT_BEGINS_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@IT_BEGINS_BROADCAST_ID);
+SET @IT_BEGINS_TEXT := 'And so it begins...';
 
 SET @ASHBRINGER_ID := 2;
 SET @ASHBRINGER_BROADCAST_ID := 12378;
-SET @ASHBRINGER_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@ASHBRINGER_BROADCAST_ID);
+SET @ASHBRINGER_TEXT := 'Ashbringer...';
 
 SET @KNEEL_BEFORE_ID := 3;
 SET @KNEEL_BEFORE_BROADCAST_ID := 12379;
-SET @KNEEL_BEFORE_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@KNEEL_BEFORE_BROADCAST_ID);
+SET @KNEEL_BEFORE_TEXT := 'Kneel! Kneel before the Ashbringer!';
 
 SET @INFIDELS_ID := 4;
 SET @INFIDELS_BROADCAST_ID := 12382;
-SET @INFIDELS_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@INFIDELS_BROADCAST_ID);
+SET @INFIDELS_TEXT := 'My $g Lord:Lady;, please allow me to live long enough to see you purge this world of the infidels.';
 
 SET @TAKE_ME_ID := 5;
 SET @TAKE_ME_BROADCAST_ID := 12384;
-SET @TAKE_ME_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@TAKE_ME_BROADCAST_ID);
+SET @TAKE_ME_TEXT := 'Take me with you, $g sir:ma''am;.';
 
 -- --
 -- Separate Wizard's combat texts from event texts and add missing event texts.
@@ -121,7 +121,7 @@ UPDATE `creature_text`
 
 SET @UNWORTHY_ID := 6;
 SET @UNWORTHY_BROADCAST_ID := 12380;
-SET @UNWORTHY_TEXT := (SELECT `FemaleText` FROM `broadcast_text` WHERE `ID`=@UNWORTHY_BROADCAST_ID);
+SET @UNWORTHY_TEXT := 'I am unworthy, $g sir:ma''am;.';
 
 -- For reapplicability
 DELETE FROM `creature_text`
@@ -153,19 +153,20 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 
 SET @MOGRAINE_ID := 3976;
 SET @MOGRAINE_BROADCAST_ID := 12389;
+SET @MOGRAINE_BOW_DOWN_TEXT := 'Bow down! Kneel before the Ashbringer! A new dawn approaches, brothers and sisters! Our message will be delivered to the filth of this world through the chosen one!';
 
 -- For reapplicability
 DELETE FROM `creature_text`
     WHERE `GroupID` = 6 AND `ID` = 0 AND `CreatureID` = @MOGRAINE_ID;
 
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-     (@MOGRAINE_ID, 6, 0, (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_BROADCAST_ID), 14, 0, 100.0, 0, 0, 0, @MOGRAINE_BROADCAST_ID, 3,'Ashbringer event intro yell');
+     (@MOGRAINE_ID, 6, 0, @MOGRAINE_BOW_DOWN_TEXT, 14, 0, 100.0, 0, 0, 0, @MOGRAINE_BROADCAST_ID, 3,'Ashbringer event intro yell');
 
 -- --
 -- Commander Mograine's talk upon being approached by player
 
 SET @MOGRAINE_APPROACH_BROADCAST_ID := 12390;
-SET @MOGRAINE_APPROACH_TEXT := (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_APPROACH_BROADCAST_ID);
+SET @MOGRAINE_APPROACH_TEXT := 'You hold my father''s blade, $n. My soldiers are yours to control, my $g Lord:Lady;. Take them... Lead them... The impure must be purged. They must be cleansed of their taint.';
 
 UPDATE `creature_text`
     SET `Text` = @MOGRAINE_APPROACH_TEXT, `BroadcastTextId` = @MOGRAINE_APPROACH_BROADCAST_ID, `Emote` = 1
@@ -197,14 +198,8 @@ UPDATE `smart_scripts`
 -- Add missing texts
 
 SET @TAINT_SCOURGE_ID = 0;
-SET @TAINT_SCOURGE_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
-                                    WHERE `CreatureID` = @WIZARD_ID
-                                    AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                                    AND `ID` = @TAINT_SCOURGE_ID);
-SET @TAINT_SCOURGE_TEXT = (SELECT `Text` FROM `creature_text`
-                            WHERE `CreatureID` = @WIZARD_ID
-                            AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                            AND `ID` = @TAINT_SCOURGE_ID);
+SET @TAINT_SCOURGE_BROADCAST_ID = 2625;
+SET @TAINT_SCOURGE_TEXT = 'You carry the taint of the Scourge.  Prepare to enter the Twisting Nether.';
 
 DELETE FROM `creature_text`
     WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @TAINT_SCOURGE_ID
@@ -220,14 +215,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
      (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @TAINT_SCOURGE_ID, @TAINT_SCOURGE_TEXT, 12, 7, 25.0, 0, 0, 0, @TAINT_SCOURGE_BROADCAST_ID, 0, 'Scarlet Monk');
 
 SET @NO_ESCAPE_ID = 1;
-SET @NO_ESCAPE_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
-                                WHERE `CreatureID` = @WIZARD_ID
-                                AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                                AND `ID` = @NO_ESCAPE_ID);
-SET @NO_ESCAPE_TEXT = (SELECT `Text` FROM `creature_text`
-                        WHERE `CreatureID` = @WIZARD_ID
-                        AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                        AND `ID` = @NO_ESCAPE_ID);
+SET @NO_ESCAPE_BROADCAST_ID = 2626;
+SET @NO_ESCAPE_TEXT = 'There is no escape for you.  The Crusade shall destroy all who carry the Scourge''s taint.';
 
 DELETE FROM `creature_text`
     WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @NO_ESCAPE_ID
@@ -243,14 +232,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
      (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @NO_ESCAPE_ID, @NO_ESCAPE_TEXT, 12, 7, 25.0, 0, 0, 0, @NO_ESCAPE_BROADCAST_ID, 0, 'Scarlet Monk');
 
 SET @LIGHT_CONDEMNS_ID = 2;
-SET @LIGHT_CONDEMNS_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
-                                        WHERE `CreatureID` = @WIZARD_ID
-                                        AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                                        AND `ID` = @LIGHT_CONDEMNS_ID);
-SET @LIGHT_CONDEMNS_TEXT = (SELECT `Text` FROM `creature_text`
-                                WHERE `CreatureID` = @WIZARD_ID
-                                AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                                AND `ID` = @LIGHT_CONDEMNS_ID);
+SET @LIGHT_CONDEMNS_BROADCAST_ID = 2627;
+SET @LIGHT_CONDEMNS_TEXT = 'The Light condemns all who harbor evil.  Now you will die!';
 
 DELETE FROM `creature_text`
     WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @LIGHT_CONDEMNS_ID
@@ -266,14 +249,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
      (@MONK_ID, @COMBAT_TEXTS_GROUP_ID, @LIGHT_CONDEMNS_ID, @LIGHT_CONDEMNS_TEXT, 12, 7, 25.0, 0, 0, 0, @LIGHT_CONDEMNS_BROADCAST_ID, 0, 'Scarlet Monk');
 
 SET @SMITE_WICKED_ID = 3;
-SET @SMITE_WICKED_BROADCAST_ID = (SELECT `BroadcastTextId` FROM `creature_text`
-                                    WHERE `CreatureID` = @WIZARD_ID
-                                    AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                                    AND `ID` = @SMITE_WICKED_ID);
-SET @SMITE_WICKED_TEXT = (SELECT `Text` FROM `creature_text`
-                            WHERE `CreatureID` = @WIZARD_ID
-                            AND `GroupID` = @COMBAT_TEXTS_GROUP_ID
-                            AND `ID` = @SMITE_WICKED_ID);
+SET @SMITE_WICKED_BROADCAST_ID = 2628;
+SET @SMITE_WICKED_TEXT = 'The Scarlet Crusade shall smite the wicked and drive evil from these lands!';
 
 DELETE FROM `creature_text`
     WHERE `GroupID` = @COMBAT_TEXTS_GROUP_ID AND `ID` = @SMITE_WICKED_ID
@@ -310,7 +287,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 SET @MOGRAINE_UNWORTHY_GROUP_ID = 1;
 SET @MOGRAINE_UNWORTHY_BROADCAST_ID = 6197;
-SET @MOGRAINE_UNWORTHY_TEXT = (SELECT `MaleText` FROM `broadcast_text` WHERE `ID`=@MOGRAINE_UNWORTHY_BROADCAST_ID);
+SET @MOGRAINE_UNWORTHY_TEXT = 'Unworthy.';
 
 UPDATE `creature_text`
     SET `Text` = @MOGRAINE_UNWORTHY_TEXT, `BroadcastTextId` = @MOGRAINE_UNWORTHY_BROADCAST_ID
@@ -395,8 +372,7 @@ UPDATE `creature_text`
 
 -- 1
 SET @CURSE_LIFTED_BROADCAST_ID := 12480;
-SET @CURSE_LIFTED_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                            WHERE `ID`=@CURSE_LIFTED_BROADCAST_ID);
+SET @CURSE_LIFTED_TEXT := 'At last, the curse is lifted. Thank you, hero.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@CURSE_LIFTED_TEXT, BroadcastTextID0=@CURSE_LIFTED_BROADCAST_ID
@@ -404,8 +380,7 @@ UPDATE acore_world.npc_text
 
 -- 2
 SET @YOU_DONT_KNOW_BROADCAST_ID := 12482;
-SET @YOU_DONT_KNOW_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@YOU_DONT_KNOW_BROADCAST_ID);
+SET @YOU_DONT_KNOW_TEXT := 'You mean, you don''t know? The sword that you carry on your back - it is known as Ashbringer; named after its original owner.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@YOU_DONT_KNOW_TEXT, BroadcastTextID0=@YOU_DONT_KNOW_BROADCAST_ID
@@ -413,8 +388,7 @@ UPDATE acore_world.npc_text
 
 -- 3
 SET @AYE_HIGHLORD_BROADCAST_ID := 12484;
-SET @AYE_HIGHLORD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                            WHERE `ID`=@AYE_HIGHLORD_BROADCAST_ID);
+SET @AYE_HIGHLORD_TEXT := 'Aye, the Highlord Mograine: A founder of the original order of the Scarlet Crusade. A knight of unwavering faith and purity; Mograine would be betrayed by his own son and slain by Kel''Thuzad''s forces inside Stratholme. It is how I ended up here...';
 
 UPDATE acore_world.npc_text
     SET text0_0=@AYE_HIGHLORD_TEXT, BroadcastTextID0=@AYE_HIGHLORD_BROADCAST_ID
@@ -422,8 +396,7 @@ UPDATE acore_world.npc_text
 
 -- 4
 SET @CRUSADE_WAS_NOBLE_BROADCAST_ID := 12486;
-SET @CRUSADE_WAS_NOBLE_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                    WHERE `ID`=@CRUSADE_WAS_NOBLE_BROADCAST_ID);
+SET @CRUSADE_WAS_NOBLE_TEXT := 'It was High General Abbendis, High Inquisitor Isillien, and Highlord Mograine that formed the Crusade. In its infancy, the Crusade was a noble order. The madness and insane zealotry that you see now did not exist. It was not until the one known as the Grand Crusader appeared that the wheels of corruption were set in motion.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@CRUSADE_WAS_NOBLE_TEXT, BroadcastTextID0=@CRUSADE_WAS_NOBLE_BROADCAST_ID
@@ -431,8 +404,7 @@ UPDATE acore_world.npc_text
 
 -- 5
 SET @HIGHLORD_LYNCHPIN_BROADCAST_ID := 12488;
-SET @HIGHLORD_LYNCHPIN_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                    WHERE `ID`=@HIGHLORD_LYNCHPIN_BROADCAST_ID);
+SET @HIGHLORD_LYNCHPIN_TEXT := 'The Highlord was the lynchpin of the Crusade. Aye, Mograine was called the Ashbringer because of his exploits versus the armies of the Lich King. With only blade and faith, Mograine would walk into whole battalions of undead and emerge unscathed - the ashes of his foes being the only indication that he had been there at all. Do you not understand? The very face of death feared him! It trembled in his presence!';
 
 UPDATE acore_world.npc_text
     SET text0_0=@HIGHLORD_LYNCHPIN_TEXT, BroadcastTextID0=@HIGHLORD_LYNCHPIN_BROADCAST_ID
@@ -440,8 +412,7 @@ UPDATE acore_world.npc_text
 
 -- 6
 SET @ONLY_WAY_BROADCAST_ID := 12490;
-SET @ONLY_WAY_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                        WHERE `ID`=@ONLY_WAY_BROADCAST_ID);
+SET @ONLY_WAY_TEXT := 'The only way a hero can die, $r: Through tragedy. The Grand Crusader struck a deal with Kel''Thuzad himself! An ambush would be staged that would result in the death of Mograine. The type of betrayal that could only be a result of the actions of one''s most trusted and loved companions.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@ONLY_WAY_TEXT, BroadcastTextID0=@ONLY_WAY_BROADCAST_ID
@@ -449,8 +420,7 @@ UPDATE acore_world.npc_text
 
 -- 7
 SET @FAIRBANKS_NODS_BROADCAST_ID := 12492;
-SET @FAIRBANKS_NODS_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@FAIRBANKS_NODS_BROADCAST_ID);
+SET @FAIRBANKS_NODS_TEXT := '<High Inquisitor Fairbanks nods.>$B$BAye, the lesser Mograine, the one known as the Scarlet Commander, through - what I suspect - the dealings of the Grand Crusader. He led his father to the ambush like a lamb to the slaughter.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@FAIRBANKS_NODS_TEXT, BroadcastTextID0=@FAIRBANKS_NODS_BROADCAST_ID
@@ -458,8 +428,7 @@ UPDATE acore_world.npc_text
 
 -- 8
 SET @FAIRBANKS_TABARD_BROADCAST_ID := 12494;
-SET @FAIRBANKS_TABARD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@FAIRBANKS_TABARD_BROADCAST_ID);
+SET @FAIRBANKS_TABARD_TEXT := '<High Inquisitor Fairbanks lifts up his tabard revealing several gruesome scars.>$B$BBecause I was there... I was the Highlord''s most trusted advisor. I should have known... I felt that something was amiss yet I allowed it to happen. Would you believe that there were a thousand or more Scourge?';
 
 UPDATE acore_world.npc_text
     SET text0_0=@FAIRBANKS_TABARD_TEXT, BroadcastTextID0=@FAIRBANKS_TABARD_BROADCAST_ID
@@ -467,8 +436,7 @@ UPDATE acore_world.npc_text
 
 -- 9
 SET @ASHBRINGER_FOOL_BROADCAST_ID := 12496;
-SET @ASHBRINGER_FOOL_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@ASHBRINGER_FOOL_BROADCAST_ID);
+SET @ASHBRINGER_FOOL_TEXT := 'This was the Ashbringer, fool! As the Scourge began to materialize around us, Mograine''s blade began to glow... to hum... the younger Mograine would take that as a sign to make his escape. They descended upon us with a hunger the likes of which I had never seen. Yet...';
 
 UPDATE acore_world.npc_text
     SET text0_0=@ASHBRINGER_FOOL_TEXT, BroadcastTextID0=@ASHBRINGER_FOOL_BROADCAST_ID
@@ -476,8 +444,7 @@ UPDATE acore_world.npc_text
 
 -- 10
 SET @NOT_ENOUGH_BROADCAST_ID := 12498;
-SET @NOT_ENOUGH_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                            WHERE `ID`=@NOT_ENOUGH_BROADCAST_ID);
+SET @NOT_ENOUGH_TEXT := 'It was not enough.$B$B<Fairbanks smirks briefly, lost in a memory.>$B$BA thousand came and a thousand died. By the Light! By the might of Mograine! He would smite them down as fast as they could come. Through the chaos, I noticed that the lesser Mograine was still there, off in the distance. I called to him, "Help us, Renault! Help your father, boy!"';
 
 UPDATE acore_world.npc_text
     SET text0_0=@NOT_ENOUGH_TEXT, BroadcastTextID0=@NOT_ENOUGH_BROADCAST_ID
@@ -485,8 +452,7 @@ UPDATE acore_world.npc_text
 
 -- 11
 SET @FAIRBANKS_SHAKES_HEAD_BROADCAST_ID := 12500;
-SET @FAIRBANKS_SHAKES_HEAD_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                        WHERE `ID`=@FAIRBANKS_SHAKES_HEAD_BROADCAST_ID);
+SET @FAIRBANKS_SHAKES_HEAD_TEXT := '<High Inquisitor Fairbanks shakes his head.>$B$BNo... He stood in the background, watching as the legion of undead descended upon us. Soon after, my powers were exhausted. I was the first to fall... Surely they would tear me limb from limb as I lay there unconscious; but they ignored me completely, focusing all of their attention on the Highlord. ';
 
 UPDATE acore_world.npc_text
     SET text0_0=@FAIRBANKS_SHAKES_HEAD_TEXT, BroadcastTextID0=@FAIRBANKS_SHAKES_HEAD_BROADCAST_ID
@@ -494,8 +460,7 @@ UPDATE acore_world.npc_text
 
 -- 12
 SET @FEIGN_DEATH_BROADCAST_ID := 12502;
-SET @FEIGN_DEATH_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                            WHERE `ID`=@FEIGN_DEATH_BROADCAST_ID);
+SET @FEIGN_DEATH_TEXT := 'It was all I could do to feign death as the corpses of the Scourge piled upon me. There was darkness and only the muffled sounds of the battle above me. The clashing of iron, the gnashing and grinding... gruesome, terrible sounds. And then there was silence. He called to me! "Fairbanks! Fairbanks where are you? Talk to me Fairbanks!" And then came the sound of incredulousness. The bite of betrayal, $r...';
 
 UPDATE acore_world.npc_text
     SET text0_0=@FEIGN_DEATH_TEXT, BroadcastTextID0=@FEIGN_DEATH_BROADCAST_ID
@@ -503,8 +468,7 @@ UPDATE acore_world.npc_text
 
 -- 13
 SET @BOY_PICKED_UP_BROADCAST_ID := 12504;
-SET @BOY_PICKED_UP_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@BOY_PICKED_UP_BROADCAST_ID);
+SET @BOY_PICKED_UP_TEXT := 'The boy had picked up the Ashbringer and driven it through his father''s heart as his back was turned. His last words will haunt me forever: "What have you done, Renault? Why would you do this?"';
 
 UPDATE acore_world.npc_text
     SET text0_0=@BOY_PICKED_UP_TEXT, BroadcastTextID0=@BOY_PICKED_UP_BROADCAST_ID
@@ -512,8 +476,7 @@ UPDATE acore_world.npc_text
 
 -- 14
 SET @BLADE_AND_MOGRAINE_BROADCAST_ID := 12506;
-SET @BLADE_AND_MOGRAINE_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                    WHERE `ID`=@BLADE_AND_MOGRAINE_BROADCAST_ID);
+SET @BLADE_AND_MOGRAINE_TEXT := 'The blade and Mograine were a singular entity. Do you understand? This act corrupted the blade and lead to Mograine''s own corruption as a death knight of Kel''Thuzad. I swore that if I lived, I would expose the perpetrators of this heinous crime. For two days I remained under the rot and contagion of Scourge - gathering as much strength as possible to escape the razed city.\n';
 
 UPDATE acore_world.npc_text
     SET text0_0=@BLADE_AND_MOGRAINE_TEXT, BroadcastTextID0=@BLADE_AND_MOGRAINE_BROADCAST_ID
@@ -521,8 +484,7 @@ UPDATE acore_world.npc_text
 
 -- 15
 SET @DISMAY_LESSER_BROADCAST_ID := 12508;
-SET @DISMAY_LESSER_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@DISMAY_LESSER_BROADCAST_ID);
+SET @DISMAY_LESSER_TEXT := 'Aye, I did. Much to the dismay of the lesser Mograine, I made my way back to the Scarlet Monastery. I shouted and screamed. I told the tale to any that would listen. And I would be murdered in cold blood for my actions, dragged to this chamber - the dark secret of the order. But some did listen... some heard my words. Thus was born the Argent Dawn...';
 
 UPDATE acore_world.npc_text
     SET text0_0=@DISMAY_LESSER_TEXT, BroadcastTextID0=@DISMAY_LESSER_BROADCAST_ID
@@ -530,8 +492,7 @@ UPDATE acore_world.npc_text
 
 -- 16
 SET @BLADE_BEYOND_SAVING_BROADCAST_ID := 12510;
-SET @BLADE_BEYOND_SAVING_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                    WHERE `ID`=@BLADE_BEYOND_SAVING_BROADCAST_ID);
+SET @BLADE_BEYOND_SAVING_TEXT := 'I''m afraid that the blade which you hold in your hands is beyond saving. The hatred runs too deep. But do not lose hope, $c. Where one chapter has ended, a new one begins.$B$BFind his son - a more devout and pious man you may never meet. It is rumored that he is able to build the Ashbringer anew, without requiring the old, tainted blade.';
 
 UPDATE acore_world.npc_text
     SET text0_0=@BLADE_BEYOND_SAVING_TEXT, BroadcastTextID0=@BLADE_BEYOND_SAVING_BROADCAST_ID
@@ -539,8 +500,7 @@ UPDATE acore_world.npc_text
 
 -- 17
 SET @THE_OTHER_LIVES_BROADCAST_ID := 12512;
-SET @THE_OTHER_LIVES_TEXT := (SELECT `MaleText` FROM `broadcast_text`
-                                WHERE `ID`=@THE_OTHER_LIVES_BROADCAST_ID);
+SET @THE_OTHER_LIVES_TEXT := '<High Inquisitor Fairbanks shakes his head.>$B$BNo, $r; only one of his sons is dead. The other lives...$B$B<High Inquisitor Fairbanks points to the sky.>$B$BThe Outland... Find him there... ';
 
 UPDATE acore_world.npc_text
     SET text0_0=@THE_OTHER_LIVES_TEXT, BroadcastTextID0=@THE_OTHER_LIVES_BROADCAST_ID
@@ -553,8 +513,7 @@ UPDATE acore_world.npc_text
 -- 1
 SET @WHATS_GOING_ON_MENU_ID := 5873;
 SET @WHATS_GOING_ON_BROADCAST_ID := 12481;
-SET @WHATS_GOING_ON_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@WHATS_GOING_ON_BROADCAST_ID);
+SET @WHATS_GOING_ON_TEXT := 'Curse? What''s going on here, Fairbanks?';
 
 DELETE FROM `gossip_menu_option`
     WHERE `MenuID` = @WHATS_GOING_ON_MENU_ID AND `OptionID` = 0;
@@ -565,8 +524,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 2
 SET @MOGRAINE_QUESTION_GOSSIP_MENU_ID := 5874;
 SET @MOGRAINE_QUESTION_GOSSIP_BROADCAST_ID := 12483;
-SET @MOGRAINE_QUESTION_GOSSIP_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                        WHERE `ID`=@MOGRAINE_QUESTION_GOSSIP_BROADCAST_ID);
+SET @MOGRAINE_QUESTION_GOSSIP_TEXT := 'Mograine?';
 
 DELETE FROM `gossip_menu_option`
     WHERE `MenuID` = @MOGRAINE_QUESTION_GOSSIP_MENU_ID AND `OptionID` = 0;
@@ -577,8 +535,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 3
 SET @WDYM_MENU_ID := 5875;
 SET @WDYM_BROADCAST_ID := 12485;
-SET @WDYM_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                    WHERE `ID`=@WDYM_BROADCAST_ID);
+SET @WDYM_TEXT := 'What do you mean?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @WDYM_MENU_ID AND `OptionID` = 0;
@@ -589,8 +546,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 4
 SET @DONT_UNDERSTAND_MENU_ID := 5876;
 SET @DONT_UNDERSTAND_BROADCAST_ID := 12487;
-SET @DONT_UNDERSTAND_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@DONT_UNDERSTAND_BROADCAST_ID);
+SET @DONT_UNDERSTAND_TEXT := 'I still do not fully understand.';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @DONT_UNDERSTAND_MENU_ID AND `OptionID` = 0;
@@ -601,8 +557,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 5
 SET @INCREDIBLE_STORY_MENU_ID := 5877;
 SET @INCREDIBLE_STORY_BROADCAST_ID := 12489;
-SET @INCREDIBLE_STORY_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@INCREDIBLE_STORY_BROADCAST_ID);
+SET @INCREDIBLE_STORY_TEXT := 'Incredible story. So how did he die?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @INCREDIBLE_STORY_MENU_ID AND `OptionID` = 0;
@@ -613,8 +568,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 6
 SET @YOU_MEAN_MENU_ID := 5878;
 SET @YOU_MEAN_BROADCAST_ID := 12491;
-SET @YOU_MEAN_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                         WHERE `ID`=@YOU_MEAN_BROADCAST_ID);
+SET @YOU_MEAN_TEXT := 'You mean...';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @YOU_MEAN_MENU_ID AND `OptionID` = 0;
@@ -625,8 +579,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 7
 SET @HOW_DO_YOU_KNOW_MENU_ID := 5879;
 SET @HOW_DO_YOU_KNOW_BROADCAST_ID := 12493;
-SET @HOW_DO_YOU_KNOW_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@HOW_DO_YOU_KNOW_BROADCAST_ID);
+SET @HOW_DO_YOU_KNOW_TEXT := 'How do you know all of this?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @HOW_DO_YOU_KNOW_MENU_ID AND `OptionID` = 0;
@@ -637,8 +590,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 8
 SET @A_THOUSAND_MENU_ID := 5880;
 SET @A_THOUSAND_BROADCAST_ID := 12495;
-SET @A_THOUSAND_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                            WHERE `ID`=@A_THOUSAND_BROADCAST_ID);
+SET @A_THOUSAND_TEXT := 'A thousand? For one man?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @A_THOUSAND_MENU_ID AND `OptionID` = 0;
@@ -649,8 +601,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 9
 SET @YET_WHAT_MENU_ID := 5881;
 SET @YET_WHAT_BROADCAST_ID := 12497;
-SET @YET_WHAT_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                         WHERE `ID`=@YET_WHAT_BROADCAST_ID);
+SET @YET_WHAT_TEXT := 'Yet? Yet what??';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @YET_WHAT_MENU_ID AND `OptionID` = 0;
@@ -661,8 +612,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 10
 SET @DID_HE_MENU_ID := 5882;
 SET @DID_HE_BROADCAST_ID := 12499;
-SET @DID_HE_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                        WHERE `ID`=@DID_HE_BROADCAST_ID);
+SET @DID_HE_TEXT := 'And did he?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @DID_HE_MENU_ID AND `OptionID` = 0;
@@ -673,8 +623,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 11
 SET @CONTINUE_PLEASE_MENU_ID := 5883;
 SET @CONTINUE_PLEASE_BROADCAST_ID := 12501;
-SET @CONTINUE_PLEASE_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@CONTINUE_PLEASE_BROADCAST_ID);
+SET @CONTINUE_PLEASE_TEXT := 'Continue please, Fairbanks.';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @CONTINUE_PLEASE_MENU_ID AND `OptionID` = 0;
@@ -685,8 +634,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 12
 SET @YOU_MEAN_MENU_ID := 5884;
 SET @YOU_MEAN_BROADCAST_ID := 12503;
-SET @YOU_MEAN_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                        WHERE `ID`=@YOU_MEAN_BROADCAST_ID);
+SET @YOU_MEAN_TEXT := 'You mean...';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @YOU_MEAN_MENU_ID AND `OptionID` = 0;
@@ -697,8 +645,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 13
 SET @YOU_WERE_RIGHT_MENU_ID := 5885;
 SET @YOU_WERE_RIGHT_BROADCAST_ID := 12505;
-SET @YOU_WERE_RIGHT_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@YOU_WERE_RIGHT_BROADCAST_ID);
+SET @YOU_WERE_RIGHT_TEXT := 'You were right, Fairbanks. That is tragic.';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @YOU_WERE_RIGHT_MENU_ID AND `OptionID` = 0;
@@ -709,8 +656,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 14
 SET @AND_YOU_DID_MENU_ID := 5886;
 SET @AND_YOU_DID_BROADCAST_ID := 12507;
-SET @AND_YOU_DID_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                            WHERE `ID`=@AND_YOU_DID_BROADCAST_ID);
+SET @AND_YOU_DID_TEXT := 'And you did...';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @AND_YOU_DID_MENU_ID AND `OptionID` = 0;
@@ -721,8 +667,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 15
 SET @BLADE_REDEMPTION_MENU_ID := 5887;
 SET @BLADE_REDEMPTION_BROADCAST_ID := 12509;
-SET @BLADE_REDEMPTION_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                                WHERE `ID`=@BLADE_REDEMPTION_BROADCAST_ID);
+SET @BLADE_REDEMPTION_TEXT := 'You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @BLADE_REDEMPTION_MENU_ID AND `OptionID` = 0;
@@ -733,8 +678,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 -- 16
 SET @BUT_SON_DEAD_MENU_ID := 5888;
 SET @BUT_SON_DEAD_BROADCAST_ID := 12511;
-SET @BUT_SON_DEAD_TEXT := (SELECT `FemaleText` FROM `broadcast_text`
-                            WHERE `ID`=@BUT_SON_DEAD_BROADCAST_ID);
+SET @BUT_SON_DEAD_TEXT := 'But his son is dead.';
 
 DELETE FROM `gossip_menu_option`
    WHERE `MenuID` = @BUT_SON_DEAD_MENU_ID AND `OptionID` = 0;
