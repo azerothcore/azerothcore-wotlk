@@ -358,7 +358,8 @@ public:
             switch (uiSteps)
             {
                 case 1:
-                    me->SetFacingTo(3.13f);
+                    if (GameObject* chapelDoor = me->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
+                        me->SetFacingToObject(chapelDoor);
                     return 2 * IN_MILLISECONDS;
                 case 2:
                     me->SetSheath(SHEATH_STATE_UNARMED);
