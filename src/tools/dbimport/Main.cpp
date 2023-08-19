@@ -62,6 +62,8 @@ int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    std::vector<std::string> overriddenKeys = sConfigMgr->OverrideWithEnvVariablesIfAny();
+
     // Init logging
     sLog->Initialize();
 
@@ -77,6 +79,9 @@ int main(int argc, char** argv)
             LOG_INFO("dbimport", "> Using Boost version:            {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         }
     );
+
+    for (std::string const& key : overriddenKeys)
+        LOG_INFO("dbimport", "Configuration field {} was overridden with environment variable.", key);
 
     OpenSSLCrypto::threadsSetup();
 
