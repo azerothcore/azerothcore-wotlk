@@ -199,7 +199,6 @@ public:
                     player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
                     player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
 
-
                     ScarletList.push_back(commanderMograine);
 
                     if (!ScarletList.empty())
