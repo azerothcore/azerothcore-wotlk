@@ -233,37 +233,32 @@ enum ScarletMonasteryTrashMisc
     SPELL_FORGIVENESS = 28697,
 };
 
-class npc_scarlet_guard : public CreatureScript
+struct npc_scarlet_guard : public ScriptedAI
 {
-public:
-    npc_scarlet_guard() : CreatureScript("npc_scarlet_guard") { }
+    npc_scarlet_guard(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_scarlet_guardAI : public SmartAI
+    void Reset() override
     {
-        npc_scarlet_guardAI(Creature* creature) : SmartAI(creature) { }
+        SayAshbringer = false;
+    }
 
-        void Reset() override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who && who->GetDistance2d(me) < 12.0f)
         {
-            SayAshbringer = false;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who && who->GetDistance2d(me) < 12.0f)
+            if (Player* player = who->ToPlayer())
             {
-                if (Player* player = who->ToPlayer())
+                if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                 {
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
-                    {
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->GetMotionMaster()->Clear(); // stop patrolling
-                        me->GetMotionMaster()->MoveIdle();
-                        me->StopMoving();
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->SetFacingToObject(player);
-                        Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->GetMotionMaster()->Clear();  // stop patrolling
+                    me->GetMotionMaster()->MoveIdle();
+                    me->StopMoving();
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetFacingToObject(player);
+                    Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
 
-                        me->m_Events.AddEventAtOffset([this, player]()
+                    me->m_Events.AddEventAtOffset([this, player]()
                         {
                             me->SetSheath(SHEATH_STATE_UNARMED);
                             me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -273,23 +268,19 @@ public:
                                 Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
                                 Talk(SAY_WELCOME, player, delayTalk);
                             }
-                        }, delayKneel);
+                        },
+                        delayKneel);
 
-                        SayAshbringer = true;
-                    }
+                    SayAshbringer = true;
                 }
             }
-
-            SmartAI::MoveInLineOfSight(who);
         }
-    private:
-        bool SayAshbringer = false;
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
+        ScriptedAI::MoveInLineOfSight(who);
     }
+
+private:
+    bool SayAshbringer = false;
 };
 
 enum MograineEvents
@@ -893,7 +884,7 @@ public:
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
-    new npc_scarlet_guard();
+    RegisterScarletMonestaryCreatureAI(npc_scarlet_guard);
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();
