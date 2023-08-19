@@ -1,3 +1,4 @@
+-- DB update 2023_08_19_00 -> 2023_08_19_01
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_q10651_q10692_book_of_fel_names';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
