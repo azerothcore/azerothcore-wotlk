@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 for i in ./*; do
     if [ -d $i ]; then
