@@ -210,7 +210,8 @@ public:
                     }
 
                     commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
-                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f)) {
+                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
+                    {
                         instance->DoUseDoorOrButton(chapelDoor->GetGUID());
                     }
                     return true;
@@ -267,7 +268,8 @@ public:
                             me->SetSheath(SHEATH_STATE_UNARMED);
                             me->SetStandState(UNIT_STAND_STATE_KNEEL);
 
-                            if (urand(0, 1)) {
+                            if (urand(0, 1))
+                            {
                                 Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
                                 Talk(SAY_WELCOME, player, delayTalk);
                             }
@@ -499,9 +501,8 @@ public:
         void KilledUnit(Unit* /*victim*/) override
         {
             // Don't yell on death during Ashbringer event
-            if (!SayAshbringer) {
+            if (!SayAshbringer)
                 Talk(SAY_MO_KILL);
-            }
         }
 
         void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
