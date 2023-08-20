@@ -393,15 +393,14 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         {
             // I assume SetCharmedBy should always be true.
             // If not, let's log some debug info.
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy()!");
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). not null: {}", _me ? 1 : 0);
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). not null: {}", _me ? 1 : 0);
             if (!_me)
                 return false;
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). Is: {}!", _me->IsInWorld());
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). Is2: {}!", _me->IsDuringRemoveFromWorld());
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). Unit {}!", _me->GetName());
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). typeid: {}!", _me->GetTypeId());
-            LOG_INFO("server", "Crash recovered in Unit::SetCharmedBy(). Unit {}, typeid: {}, in world: {}, duringremove: {} has wrong CharmType! Charmer {}, typeid: {}, in world: {}, duringremove: {}.", _me->GetName(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Is: {}!", _me->IsInWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Is2: {}!", _me->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Unit {}!", _me->GetName());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). typeid: {}!", _me->GetTypeId());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Unit {}, typeid: {}, in world: {}, duringremove: {} has wrong CharmType! Charmer {}, typeid: {}, in world: {}, duringremove: {}.", _me->GetName(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
     }
