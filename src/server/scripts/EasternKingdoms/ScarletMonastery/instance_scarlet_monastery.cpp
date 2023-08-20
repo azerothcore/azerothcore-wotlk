@@ -349,8 +349,7 @@ public:
             switch (uiSteps)
             {
                 case 1:
-                    if (GameObject* chapelDoor = me->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
-                        me->SetFacingToObject(chapelDoor);
+                    me->SetFacingToObject(playerWhoStartedAshbringer);
                     return 2 * IN_MILLISECONDS;
                 case 2:
                     me->SetSheath(SHEATH_STATE_UNARMED);
@@ -368,6 +367,7 @@ public:
                     mograine->AI()->Talk(0);
                     return 4 * IN_MILLISECONDS;
                 case 6:
+                    me->SetFacingToObject(mograine);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     Talk(4, 2s);
