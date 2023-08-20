@@ -223,24 +223,25 @@ void SmartAIMgr::LoadSmartAIFromDB()
         temp.event.raw.param3 = fields[10].Get<uint32>();
         temp.event.raw.param4 = fields[11].Get<uint32>();
         temp.event.raw.param5 = fields[12].Get<uint32>();
+        temp.event.raw.param6 = fields[13].Get<uint32>();
 
-        temp.action.type = (SMART_ACTION)fields[13].Get<uint8>();
-        temp.action.raw.param1 = fields[14].Get<uint32>();
-        temp.action.raw.param2 = fields[15].Get<uint32>();
-        temp.action.raw.param3 = fields[16].Get<uint32>();
-        temp.action.raw.param4 = fields[17].Get<uint32>();
-        temp.action.raw.param5 = fields[18].Get<uint32>();
-        temp.action.raw.param6 = fields[19].Get<uint32>();
+        temp.action.type = (SMART_ACTION)fields[14].Get<uint8>();
+        temp.action.raw.param1 = fields[15].Get<uint32>();
+        temp.action.raw.param2 = fields[16].Get<uint32>();
+        temp.action.raw.param3 = fields[17].Get<uint32>();
+        temp.action.raw.param4 = fields[18].Get<uint32>();
+        temp.action.raw.param5 = fields[19].Get<uint32>();
+        temp.action.raw.param6 = fields[20].Get<uint32>();
 
-        temp.target.type = (SMARTAI_TARGETS)fields[20].Get<uint8>();
-        temp.target.raw.param1 = fields[21].Get<uint32>();
-        temp.target.raw.param2 = fields[22].Get<uint32>();
-        temp.target.raw.param3 = fields[23].Get<uint32>();
-        temp.target.raw.param4 = fields[24].Get<uint32>();
-        temp.target.x = fields[25].Get<float>();
-        temp.target.y = fields[26].Get<float>();
-        temp.target.z = fields[27].Get<float>();
-        temp.target.o = fields[28].Get<float>();
+        temp.target.type = (SMARTAI_TARGETS)fields[21].Get<uint8>();
+        temp.target.raw.param1 = fields[22].Get<uint32>();
+        temp.target.raw.param2 = fields[23].Get<uint32>();
+        temp.target.raw.param3 = fields[24].Get<uint32>();
+        temp.target.raw.param4 = fields[25].Get<uint32>();
+        temp.target.x = fields[26].Get<float>();
+        temp.target.y = fields[27].Get<float>();
+        temp.target.z = fields[28].Get<float>();
+        temp.target.o = fields[29].Get<float>();
 
         //check target
         if (!IsTargetValid(temp))
@@ -977,6 +978,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
                     return false;
 
+                if (!IsMinMaxValid(e, e.event.areaRange.rangeMin, e.event.areaRange.rangeMax))
+                    return false;
+
                 break;
             case SMART_EVENT_SPELLHIT:
             case SMART_EVENT_SPELLHIT_TARGET:
@@ -1072,6 +1076,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
 
                 if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
+                    return false;
+
+                if (!IsMinMaxValid(e, e.event.areaCasting.rangeMin, e.event.areaCasting.rangeMax))
                     return false;
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
