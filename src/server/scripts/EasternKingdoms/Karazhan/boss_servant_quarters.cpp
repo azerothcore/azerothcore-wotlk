@@ -40,29 +40,10 @@ struct boss_servant_quarters : public BossAI
     void Reset() override
     {
         _scheduler.CancelAll();
-        me->SetVisible(false);
-        me->SetReactState(REACT_PASSIVE);
-        me->SetFaction(FACTION_FRIENDLY);
-        _scheduler.Schedule(5s, [this](TaskContext context)
-        {
-            if (instance->GetBossState(DATA_SERVANT_QUARTERS) == DONE)
-            {
-                me->SetVisible(true);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RestoreFaction();
-            }
-            else
-            {
-                context.Repeat(5s);
-            }
-        });
+
         if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
         {
             DoCastSelf(SPELL_SNEAK, true);
-        }
-        if (instance->GetData(DATA_SELECTED_RARE) != me->GetEntry())
-        {
-            me->DespawnOrUnsummon(1);
         }
     }
 
