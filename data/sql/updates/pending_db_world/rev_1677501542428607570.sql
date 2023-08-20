@@ -374,7 +374,7 @@ UPDATE `creature_text`
 SET @CURSE_LIFTED_BROADCAST_ID := 12480;
 SET @CURSE_LIFTED_TEXT := 'At last, the curse is lifted. Thank you, hero.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@CURSE_LIFTED_TEXT, BroadcastTextID0=@CURSE_LIFTED_BROADCAST_ID
     WHERE ID=100100;
 
@@ -382,7 +382,7 @@ UPDATE acore_world.npc_text
 SET @YOU_DONT_KNOW_BROADCAST_ID := 12482;
 SET @YOU_DONT_KNOW_TEXT := 'You mean, you don''t know? The sword that you carry on your back - it is known as Ashbringer; named after its original owner.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@YOU_DONT_KNOW_TEXT, BroadcastTextID0=@YOU_DONT_KNOW_BROADCAST_ID
     WHERE ID=100101;
 
@@ -390,7 +390,7 @@ UPDATE acore_world.npc_text
 SET @AYE_HIGHLORD_BROADCAST_ID := 12484;
 SET @AYE_HIGHLORD_TEXT := 'Aye, the Highlord Mograine: A founder of the original order of the Scarlet Crusade. A knight of unwavering faith and purity; Mograine would be betrayed by his own son and slain by Kel''Thuzad''s forces inside Stratholme. It is how I ended up here...';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@AYE_HIGHLORD_TEXT, BroadcastTextID0=@AYE_HIGHLORD_BROADCAST_ID
     WHERE ID=100102;
 
@@ -398,7 +398,7 @@ UPDATE acore_world.npc_text
 SET @CRUSADE_WAS_NOBLE_BROADCAST_ID := 12486;
 SET @CRUSADE_WAS_NOBLE_TEXT := 'It was High General Abbendis, High Inquisitor Isillien, and Highlord Mograine that formed the Crusade. In its infancy, the Crusade was a noble order. The madness and insane zealotry that you see now did not exist. It was not until the one known as the Grand Crusader appeared that the wheels of corruption were set in motion.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@CRUSADE_WAS_NOBLE_TEXT, BroadcastTextID0=@CRUSADE_WAS_NOBLE_BROADCAST_ID
     WHERE ID=100103;
 
@@ -406,7 +406,7 @@ UPDATE acore_world.npc_text
 SET @HIGHLORD_LYNCHPIN_BROADCAST_ID := 12488;
 SET @HIGHLORD_LYNCHPIN_TEXT := 'The Highlord was the lynchpin of the Crusade. Aye, Mograine was called the Ashbringer because of his exploits versus the armies of the Lich King. With only blade and faith, Mograine would walk into whole battalions of undead and emerge unscathed - the ashes of his foes being the only indication that he had been there at all. Do you not understand? The very face of death feared him! It trembled in his presence!';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@HIGHLORD_LYNCHPIN_TEXT, BroadcastTextID0=@HIGHLORD_LYNCHPIN_BROADCAST_ID
     WHERE ID=100104;
 
@@ -414,7 +414,7 @@ UPDATE acore_world.npc_text
 SET @ONLY_WAY_BROADCAST_ID := 12490;
 SET @ONLY_WAY_TEXT := 'The only way a hero can die, $r: Through tragedy. The Grand Crusader struck a deal with Kel''Thuzad himself! An ambush would be staged that would result in the death of Mograine. The type of betrayal that could only be a result of the actions of one''s most trusted and loved companions.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@ONLY_WAY_TEXT, BroadcastTextID0=@ONLY_WAY_BROADCAST_ID
     WHERE ID=100105;
 
@@ -422,7 +422,7 @@ UPDATE acore_world.npc_text
 SET @FAIRBANKS_NODS_BROADCAST_ID := 12492;
 SET @FAIRBANKS_NODS_TEXT := '<High Inquisitor Fairbanks nods.>$B$BAye, the lesser Mograine, the one known as the Scarlet Commander, through - what I suspect - the dealings of the Grand Crusader. He led his father to the ambush like a lamb to the slaughter.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@FAIRBANKS_NODS_TEXT, BroadcastTextID0=@FAIRBANKS_NODS_BROADCAST_ID
     WHERE ID=100106;
 
@@ -430,7 +430,7 @@ UPDATE acore_world.npc_text
 SET @FAIRBANKS_TABARD_BROADCAST_ID := 12494;
 SET @FAIRBANKS_TABARD_TEXT := '<High Inquisitor Fairbanks lifts up his tabard revealing several gruesome scars.>$B$BBecause I was there... I was the Highlord''s most trusted advisor. I should have known... I felt that something was amiss yet I allowed it to happen. Would you believe that there were a thousand or more Scourge?';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@FAIRBANKS_TABARD_TEXT, BroadcastTextID0=@FAIRBANKS_TABARD_BROADCAST_ID
     WHERE ID=100107;
 
@@ -438,7 +438,7 @@ UPDATE acore_world.npc_text
 SET @ASHBRINGER_FOOL_BROADCAST_ID := 12496;
 SET @ASHBRINGER_FOOL_TEXT := 'This was the Ashbringer, fool! As the Scourge began to materialize around us, Mograine''s blade began to glow... to hum... the younger Mograine would take that as a sign to make his escape. They descended upon us with a hunger the likes of which I had never seen. Yet...';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@ASHBRINGER_FOOL_TEXT, BroadcastTextID0=@ASHBRINGER_FOOL_BROADCAST_ID
     WHERE ID=100108;
 
@@ -446,7 +446,7 @@ UPDATE acore_world.npc_text
 SET @NOT_ENOUGH_BROADCAST_ID := 12498;
 SET @NOT_ENOUGH_TEXT := 'It was not enough.$B$B<Fairbanks smirks briefly, lost in a memory.>$B$BA thousand came and a thousand died. By the Light! By the might of Mograine! He would smite them down as fast as they could come. Through the chaos, I noticed that the lesser Mograine was still there, off in the distance. I called to him, "Help us, Renault! Help your father, boy!"';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@NOT_ENOUGH_TEXT, BroadcastTextID0=@NOT_ENOUGH_BROADCAST_ID
     WHERE ID=100109;
 
@@ -454,7 +454,7 @@ UPDATE acore_world.npc_text
 SET @FAIRBANKS_SHAKES_HEAD_BROADCAST_ID := 12500;
 SET @FAIRBANKS_SHAKES_HEAD_TEXT := '<High Inquisitor Fairbanks shakes his head.>$B$BNo... He stood in the background, watching as the legion of undead descended upon us. Soon after, my powers were exhausted. I was the first to fall... Surely they would tear me limb from limb as I lay there unconscious; but they ignored me completely, focusing all of their attention on the Highlord. ';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@FAIRBANKS_SHAKES_HEAD_TEXT, BroadcastTextID0=@FAIRBANKS_SHAKES_HEAD_BROADCAST_ID
     WHERE ID=100110;
 
@@ -462,7 +462,7 @@ UPDATE acore_world.npc_text
 SET @FEIGN_DEATH_BROADCAST_ID := 12502;
 SET @FEIGN_DEATH_TEXT := 'It was all I could do to feign death as the corpses of the Scourge piled upon me. There was darkness and only the muffled sounds of the battle above me. The clashing of iron, the gnashing and grinding... gruesome, terrible sounds. And then there was silence. He called to me! "Fairbanks! Fairbanks where are you? Talk to me Fairbanks!" And then came the sound of incredulousness. The bite of betrayal, $r...';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@FEIGN_DEATH_TEXT, BroadcastTextID0=@FEIGN_DEATH_BROADCAST_ID
     WHERE ID=100111;
 
@@ -470,7 +470,7 @@ UPDATE acore_world.npc_text
 SET @BOY_PICKED_UP_BROADCAST_ID := 12504;
 SET @BOY_PICKED_UP_TEXT := 'The boy had picked up the Ashbringer and driven it through his father''s heart as his back was turned. His last words will haunt me forever: "What have you done, Renault? Why would you do this?"';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@BOY_PICKED_UP_TEXT, BroadcastTextID0=@BOY_PICKED_UP_BROADCAST_ID
     WHERE ID=100112;
 
@@ -478,7 +478,7 @@ UPDATE acore_world.npc_text
 SET @BLADE_AND_MOGRAINE_BROADCAST_ID := 12506;
 SET @BLADE_AND_MOGRAINE_TEXT := 'The blade and Mograine were a singular entity. Do you understand? This act corrupted the blade and lead to Mograine''s own corruption as a death knight of Kel''Thuzad. I swore that if I lived, I would expose the perpetrators of this heinous crime. For two days I remained under the rot and contagion of Scourge - gathering as much strength as possible to escape the razed city.\n';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@BLADE_AND_MOGRAINE_TEXT, BroadcastTextID0=@BLADE_AND_MOGRAINE_BROADCAST_ID
     WHERE ID=100113;
 
@@ -486,7 +486,7 @@ UPDATE acore_world.npc_text
 SET @DISMAY_LESSER_BROADCAST_ID := 12508;
 SET @DISMAY_LESSER_TEXT := 'Aye, I did. Much to the dismay of the lesser Mograine, I made my way back to the Scarlet Monastery. I shouted and screamed. I told the tale to any that would listen. And I would be murdered in cold blood for my actions, dragged to this chamber - the dark secret of the order. But some did listen... some heard my words. Thus was born the Argent Dawn...';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@DISMAY_LESSER_TEXT, BroadcastTextID0=@DISMAY_LESSER_BROADCAST_ID
     WHERE ID=100114;
 
@@ -494,7 +494,7 @@ UPDATE acore_world.npc_text
 SET @BLADE_BEYOND_SAVING_BROADCAST_ID := 12510;
 SET @BLADE_BEYOND_SAVING_TEXT := 'I''m afraid that the blade which you hold in your hands is beyond saving. The hatred runs too deep. But do not lose hope, $c. Where one chapter has ended, a new one begins.$B$BFind his son - a more devout and pious man you may never meet. It is rumored that he is able to build the Ashbringer anew, without requiring the old, tainted blade.';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@BLADE_BEYOND_SAVING_TEXT, BroadcastTextID0=@BLADE_BEYOND_SAVING_BROADCAST_ID
     WHERE ID=100115;
 
@@ -502,7 +502,7 @@ UPDATE acore_world.npc_text
 SET @THE_OTHER_LIVES_BROADCAST_ID := 12512;
 SET @THE_OTHER_LIVES_TEXT := '<High Inquisitor Fairbanks shakes his head.>$B$BNo, $r; only one of his sons is dead. The other lives...$B$B<High Inquisitor Fairbanks points to the sky.>$B$BThe Outland... Find him there... ';
 
-UPDATE acore_world.npc_text
+UPDATE npc_text
     SET text0_0=@THE_OTHER_LIVES_TEXT, BroadcastTextID0=@THE_OTHER_LIVES_BROADCAST_ID
     WHERE ID=100116;
 
