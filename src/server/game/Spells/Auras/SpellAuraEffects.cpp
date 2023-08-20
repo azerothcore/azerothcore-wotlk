@@ -533,8 +533,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     item2 = caster->ToPlayer()->GetShield();
 
                 if ((item1 && item2
-                    && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
-                    || (item1 && item2 && item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                    && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)))
                 {
                     amount = -10;
                 }
