@@ -528,7 +528,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             {
                 Item* item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
                 Item* item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
-                
+
                 if (!item2)
                     item2 = caster->ToPlayer()->GetShield();
 
