@@ -108,16 +108,6 @@ struct boss_void_reaver : public BossAI
         return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-
     private:
         bool _recentlySpoken;
 };
