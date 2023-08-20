@@ -113,7 +113,6 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
 AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 void ShutdownCLIThread(std::thread* cliThread);
 void AuctionListingRunnable();
-void ShutdownAuctionListingThread(std::thread* thread);
 void WorldUpdateLoop();
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& cfg_service);
 
@@ -185,6 +184,8 @@ int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    std::vector<std::string> overriddenKeys = sConfigMgr->OverrideWithEnvVariablesIfAny();
+
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
     // Init all logs
@@ -203,6 +204,9 @@ int main(int argc, char** argv)
             LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
+
+    for (std::string const& key : overriddenKeys)
+        LOG_INFO("server.worldserver", "Configuration field {} was overridden with environment variable.", key);
 
     OpenSSLCrypto::threadsSetup();
 
@@ -398,9 +402,9 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
-    // Launch CliRunnable thread
-    std::shared_ptr<std::thread> auctionLisingThread;
-    auctionLisingThread.reset(new std::thread(AuctionListingRunnable),
+    // Launch auction listing thread
+    std::shared_ptr<std::thread> auctionListingThread;
+    auctionListingThread.reset(new std::thread(AuctionListingRunnable),
         [](std::thread* thr)
     {
         thr->join();
@@ -717,57 +721,47 @@ void AuctionListingRunnable()
 
     while (!World::IsStopped())
     {
-        if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
+        Milliseconds diff = AsyncAuctionListingMgr::GetDiff();
+        AsyncAuctionListingMgr::ResetDiff();
+
+        if (!AsyncAuctionListingMgr::GetTempList().empty() || !AsyncAuctionListingMgr::GetList().empty())
         {
-            uint32 diff = AsyncAuctionListingMgr::GetDiff();
-            AsyncAuctionListingMgr::ResetDiff();
-
-            if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
 
+                for (auto const& delayEvent: AsyncAuctionListingMgr::GetTempList())
+                    AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
+
+                AsyncAuctionListingMgr::GetTempList().clear();
+            }
+
+            for (auto& itr: AsyncAuctionListingMgr::GetList())
+            {
+                if (itr._pickupTimer <= diff)
                 {
-                    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-
-                    for (auto const& delayEvent : AsyncAuctionListingMgr::GetTempList())
-                        AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
-
-                    AsyncAuctionListingMgr::GetTempList().clear();
+                    itr._pickupTimer = Milliseconds::zero();
                 }
-
-                for (auto& itr : AsyncAuctionListingMgr::GetList())
+                else
                 {
-                    if (itr._msTimer <= diff)
-                        itr._msTimer = 0;
-                    else
-                        itr._msTimer -= diff;
+                    itr._pickupTimer -= diff;
                 }
+            }
 
-                for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-                {
-                    if ((*itr)._msTimer != 0)
-                        continue;
+            for (auto itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
+            {
+                if ((*itr)._pickupTimer != Milliseconds::zero())
+                    continue;
 
-                    if ((*itr).Execute())
-                        AsyncAuctionListingMgr::GetList().erase(itr);
+                if ((*itr).Execute())
+                    AsyncAuctionListingMgr::GetList().erase(itr);
 
-                    break;
-                }
+                break;
             }
         }
         std::this_thread::sleep_for(1ms);
     }
 
     LOG_INFO("server", "Auction House Listing thread exiting without problems.");
-}
-
-void ShutdownAuctionListingThread(std::thread* thread)
-{
-    if (thread)
-    {
-        thread->join();
-        delete thread;
-    }
 }
 
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& configService)
@@ -779,7 +773,7 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [
         ("dry-run,d", "Dry run")
         ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG))), "use <arg> as configuration file");
 
-#if AC_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     options_description win("Windows platform specific options");
     win.add_options()
         ("service,s", value<std::string>(&configService)->default_value(""), "Windows service options: [install | uninstall]");
