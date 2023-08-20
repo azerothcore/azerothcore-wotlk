@@ -21,6 +21,8 @@
 #include "SmartAI.h"
 #include "scarletmonastery.h"
 
+Position HighlordMograineSpawn = Position(1065.130737, 1399.350586, 30.763723, 6.282961);
+
 enum AshbringerEventMisc
 {
     AURA_OF_ASHBRINGER              =   28282,
@@ -227,7 +229,8 @@ enum ScarletMonasteryTrashMisc
     SAY_WELCOME = 0,
     AURA_ASHBRINGER = 28282,
     //FACTION_FRIENDLY_TO_ALL = 35,
-    NPC_HIGHLORD_MOGRAINE = 16440,
+    NPC_HIGHLORD_MOGRAINE = 16062,
+    MODEL_HIGHLORD_MOGRAINE = 16180,
     SPELL_COSMETIC_CHAIN = 45537,
     SPELL_COSMETIC_EXPLODE = 45935,
     SPELL_FORGIVENESS = 28697,
@@ -359,8 +362,8 @@ public:
                     Talk(3, playerWhoStartedAshbringer);
                     return 10 * IN_MILLISECONDS;
                 case 4:
-                    me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1065.130737f, 1399.350586f, 30.763723f, 6.282961f, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetName("Highlord Mograine");
-                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetFaction(FACTION_FRIENDLY);
+                    me->SummonCreature(NPC_HIGHLORD_MOGRAINE, HighlordMograineSpawn, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetFaction(FACTION_FRIENDLY);
+                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
                     return 35 * IN_MILLISECONDS;
                 case 5:
                     mograine->StopMovingOnCurrentPos();

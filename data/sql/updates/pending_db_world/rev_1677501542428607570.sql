@@ -685,3 +685,27 @@ DELETE FROM `gossip_menu_option`
 
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
     (@BUT_SON_DEAD_MENU_ID,0,0,@BUT_SON_DEAD_TEXT,@BUT_SON_DEAD_BROADCAST_ID,1,1,0,0,0,0,'',0,0);
+
+-- Move Highlord Mograine's dialogue and SmartAI scripts to the correct NPC
+SET @OLD_HIGHLORD_MOGRAINE_ID := 16440;
+SET @NEW_HIGHLORD_MOGRAINE_ID := 16062;
+
+DELETE FROM creature_text
+    WHERE (CreatureID IN (@OLD_HIGHLORD_MOGRAINE_ID, @NEW_HIGHLORD_MOGRAINE_ID)) AND ID = 0 AND
+    GroupID IN (0, 1, 2);
+
+INSERT INTO creature_text (CreatureID,GroupID,ID,Text,`Type`,`Language`,Probability,Emote,Duration,Sound,BroadcastTextId,TextRange,comment) VALUES
+	 (@NEW_HIGHLORD_MOGRAINE_ID,0,0,'Renault...',12,0,100.0,25,0,0,12469,0,'mograine MOGRAINE_ONE'),
+	 (@NEW_HIGHLORD_MOGRAINE_ID,1,0,'Did you think that your betrayal would be forgotten? Lost in the carefully planned cover up of my death? Blood of my blood, the blade felt your cruelty long after my heart had stopped beating. And in death, I knew what you had done. But now, the chains of Kel''thuzad hold me no more. I come to serve justice. I AM ASHBRINGER.',12,0,100.0,1,0,0,12471,0,'mograine MOGRAINE_TWO'),
+	 (@NEW_HIGHLORD_MOGRAINE_ID,2,0,'You are forgiven...',12,0,100.0,0,0,0,12473,0,'mograine MOGRAINE_THREE');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = @NEW_HIGHLORD_MOGRAINE_ID);
+
+DELETE FROM smart_scripts
+    WHERE entryorguid in (@OLD_HIGHLORD_MOGRAINE_ID, @NEW_HIGHLORD_MOGRAINE_ID);
+
+INSERT INTO smart_scripts (entryorguid,source_type,id,link,event_type,event_phase_mask,event_chance,event_flags,event_param1,event_param2,event_param3,event_param4,event_param5,event_param6,action_type,action_param1,action_param2,action_param3,action_param4,action_param5,action_param6,target_type,target_param1,target_param2,target_param3,target_param4,target_x,target_y,target_z,target_o,comment) VALUES
+	 (@NEW_HIGHLORD_MOGRAINE_ID,0,0,1,25,0,100,513,0,0,0,0,0,0,53,0,16440,0,0,0,0,1,0,0,0,0,0.0,0.0,0.0,0.0,'Highlord Mograine - On Reset - Start Waypoint (No Repeat)'),
+	 (@NEW_HIGHLORD_MOGRAINE_ID,0,1,0,61,0,100,0,0,0,0,0,0,0,54,5000,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0.0,0.0,'Highlord Mograine - On Reset - Pause Waypoint (No Repeat)'),
+	 (@NEW_HIGHLORD_MOGRAINE_ID,0,2,3,40,0,100,0,5,0,0,0,0,0,103,1,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0.0,0.0,'Highlord Mograine - On Waypoint 5 Reached - Set Rooted On'),
+	 (@NEW_HIGHLORD_MOGRAINE_ID,0,3,0,61,0,100,0,0,0,0,0,0,0,66,0,0,0,0,0,0,19,3976,0,0,0,0.0,0.0,0.0,0.0,'Highlord Mograine - On Waypoint 5 Reached - Set Orientation Closest Creature ''Scarlet Commander Mograine''');
