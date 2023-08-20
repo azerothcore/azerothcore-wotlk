@@ -1,13 +1,13 @@
 -- Hearts of the Pure Rp -------------
 
--- The orientation of the initial NPC This is roughly towards the coordinates that need to be sniffed
-UPDATE `creature` SET `orientation`=4.41048 WHERE `guid`=41833;
+-- The orientation of the initial NPC This is roughly towards the coordinates that need to be sniffed 
+-- UPDATE `creature` SET `orientation`=4.41048 WHERE `guid`=41833;
 
 -- 3 emoticons when preparing for a task
 DELETE FROM `quest_details` WHERE `ID`=1476;
 -- EMOTE_ONESHOT_QUESTION && EMOTE_ONESHOT_LAUGH && EMOTE_ONESHOT_TALK
 INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES
-(1476, 6, 11, 1, 0, 200, 0, 0, 0, 0);
+(1476, 6, 11, 1, 0, 0, 0, 0, 0, 0);
 
 
 
@@ -25,14 +25,12 @@ UPDATE `creature_text` SET `Emote`=11 WHERE `CreatureID`=5693 AND `GroupID`=4 AN
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5692;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5692);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(5692, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33555200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Update unit_flags unselectable');
+(5692, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 256|512|33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Comar Villard Projection - Just_Summoned - set_unit_flag');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5691;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5691);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(5691, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 33555200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Update unit_flags unselectable');
-
-
+(5691, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 18, 256|512|33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Comar Villard Projection - Just_Summoned - set_unit_flag');
 
 -- SmatAI Start-------------------------------------
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5693;
