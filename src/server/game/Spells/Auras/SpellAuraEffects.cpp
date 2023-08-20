@@ -528,11 +528,13 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             {
                 Item* item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
                 Item* item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
-                Item* shield = caster->ToPlayer()->GetShield();
+                
+                if (!item2)
+                    item2 = caster->ToPlayer()->GetShield();
 
                 if ((item1 && item2
                     && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
-                    || (item1 && shield && item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                    || (item1 && item2 && item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
                 {
                     amount = -10;
                 }
