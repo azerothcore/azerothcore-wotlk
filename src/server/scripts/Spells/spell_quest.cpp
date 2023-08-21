@@ -2451,7 +2451,7 @@ class spell_q4735_collect_rookery_egg : public SpellScript
     }
 };
 
-enum book
+enum BookOfFelNames
 {
     SPELL_METAMORPHOSIS   = 36298
 };
@@ -2462,7 +2462,8 @@ class spell_q10651_q10692_book_of_fel_names : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        GetHitUnit()->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+        if (GetHitUnit()->HasAura(SPELL_METAMORPHOSIS))
+            GetHitUnit()->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
     }
 
     void Register() override
