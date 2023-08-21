@@ -3,7 +3,9 @@ set -euo pipefail
 
 for i in ./*; do
     if [[ -d "$i" ]]; then
-        git -C "$i" config pull.rebase false
-        git -C "$i" pull origin "$(git rev-parse --abbrev-ref HEAD)"
+        cd $i || exit
+        git config pull.rebase false
+        git pull origin "$(git rev-parse --abbrev-ref HEAD)"
+        cd ..
     fi
 done
