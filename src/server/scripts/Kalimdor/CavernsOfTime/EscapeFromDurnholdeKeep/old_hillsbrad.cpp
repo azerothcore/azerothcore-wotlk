@@ -258,7 +258,6 @@ public:
             switch (param)
             {
                 case ENCOUNTER_PROGRESS_BARRELS:
-                case ENCOUNTER_PROGRESS_DRAKE_KILLED:
                     events.ScheduleEvent(EVENT_OPEN_DOORS, 0);
                     events.ScheduleEvent(EVENT_START_WP, 3000);
                     break;

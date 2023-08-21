@@ -1222,11 +1222,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_INFERNAL:
                         {
-                            float highAmt = petlevel / 11.0f;
-                            float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
-
+                            if (pInfo)
+                            {
+                                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
+                                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+                            }
                             AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
                             AddAura(SPELL_INFERNAL_SCALING_01, this);
