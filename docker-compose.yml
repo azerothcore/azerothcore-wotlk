@@ -121,9 +121,9 @@ services:
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
-      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;password;acore_world"
-      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;password;acore_characters"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
       AC_CLOSE_IDLE_CONNECTIONS: "0"
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
@@ -148,9 +148,9 @@ services:
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
-      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;password;acore_world"
-      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;password;acore_characters"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
       AC_CLOSE_IDLE_CONNECTIONS: "0"
     volumes:
       # read-only binaries compiled by ac-dev-server
@@ -183,9 +183,9 @@ services:
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
-      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;password;acore_world"
-      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;password;acore_characters"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
       AC_CLOSE_IDLE_CONNECTIONS: "0"
     user: ${DOCKER_USER:-root}
     privileged: true
@@ -221,7 +221,7 @@ services:
     environment:
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
       AC_TEMP_DIR: "/azerothcore/env/dist/temp"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
       AC_SQLDRIVER_LOG_FILE: "SQLDriver.log"
       AC_SQLDRIVER_QUERY_LOGGING: "1"
     user: ${DOCKER_USER:-root}
@@ -290,9 +290,9 @@ services:
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
-      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;password;acore_world"
-      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;password;acore_characters"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
       AC_CLOSE_IDLE_CONNECTIONS: "0"
     user: ${DOCKER_USER:-root}
     privileged: true
@@ -325,7 +325,7 @@ services:
     environment:
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
       AC_TEMP_DIR: "/azerothcore/env/dist/temp"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
       AC_SQLDRIVER_LOG_FILE: "SQLDriver.log"
       AC_SQLDRIVER_QUERY_LOGGING: "1"
     user: ${DOCKER_USER:-root}
@@ -377,9 +377,9 @@ services:
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
-      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;password;acore_auth"
-      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;password;acore_world"
-      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;password;acore_characters"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
       AC_CLOSE_IDLE_CONNECTIONS: "0"
     profiles: [prod, prod-app, db-import-prod]
 
