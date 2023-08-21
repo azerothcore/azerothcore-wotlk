@@ -73,13 +73,22 @@ public:
         //    }
         //}
 
-        fc->ApplyAccountBoundTalents(player);
+
+        ForgeCharacterSpec* spec;
+        if (fc->TryGetCharacterActiveSpec(player, spec)) {
+            auto talentsToDate = std::max(0, player->GetLevel() - 10) - fc->GetCommonCharacterPoint(player, TALENT_TREE)->Sum;
+            if (talentsToDate > 0) {
+                fc->AddCharacterPointsToAllSpecs(player, TALENT_TREE, talentsToDate);
+            }
+        }
+
+        fc->ApplyTalents(player);
         fc->ApplyActivePerks(player);
     }
 
     void OnLogout(Player* player) override
     {
-        fc->RemoveAccountBoundTalents(player);
+        fc->RemoveTalents(player);
         fc->RemoveActivePerks(player);
     }
 

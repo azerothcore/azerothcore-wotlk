@@ -666,7 +666,7 @@ public:
         CharacterDatabase.CommitTransaction(trans);
     }
 
-    void ApplyAccountBoundTalents(Player* player)
+    void ApplyTalents(Player* player)
     {
         ForgeCharacterSpec* currentSpec;
 
@@ -677,7 +677,7 @@ public:
 
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE)
                     continue;
 
                 std::list<ForgeTalentTab*> tabs;
@@ -702,7 +702,7 @@ public:
                                             }
                                             else {
                                                 if (!player->HasSpell(currentRank))
-                                                    player->learnSpell(currentRank, false, false);
+                                                    player->learnSpell(currentRank, true, false);
                                             }
                                         }
                                     }
@@ -761,13 +761,13 @@ public:
         }
     }
 
-    void RemoveAccountBoundTalents(Player* player) {
+    void RemoveTalents(Player* player) {
         ForgeCharacterSpec* currentSpec;
         if (TryGetCharacterActiveSpec(player, currentSpec))
         {
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE)
                     continue;
 
                 std::list<ForgeTalentTab*> tabs;

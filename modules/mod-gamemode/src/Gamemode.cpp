@@ -62,7 +62,7 @@ void Gamemode::SetGameMode(Player* player, std::vector<GameModeType> gamemodeIds
     if (Group* group = player->GetGroup())
         group->RemoveMember(player->GetGUID());
 
-    sForgeCache->ApplyAccountBoundTalents(player);
+    sForgeCache->ApplyTalents(player);
 }
 
 void Gamemode::OnDeath(Player* player, Creature* killer)

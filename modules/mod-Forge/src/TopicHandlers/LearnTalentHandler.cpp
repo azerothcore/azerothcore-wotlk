@@ -232,7 +232,7 @@ public:
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                iam.player->learnSpell(ranksItt->second);
+                iam.player->learnSpell(ranksItt->second, true);
             }
 
             fc->UpdateCharPoints(iam.player, curPoints);
