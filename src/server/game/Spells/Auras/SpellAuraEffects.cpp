@@ -635,9 +635,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     if (m_amplitude <= 0)
         m_amplitude = 1000;
 
-    float dmgRatio;
-    m_tickCount = GetTotalTicks(dmgRatio);
-    m_dmgRatio = 1 + dmgRatio;
+    m_tickCount = GetTotalTicks();
 
     Player* modOwner = caster ? caster->GetSpellModOwner() : nullptr;
 
@@ -650,7 +648,13 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
 
         if (caster)
         {
-            if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+            // Haste modifies periodic time of channeled spells
+            if (m_spellInfo->IsChanneled())
+            {
+                if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)
+                    caster->ModSpellCastTime(m_spellInfo, m_amplitude);
+            }
+            else if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)
                 m_amplitude = int32(m_amplitude * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
         }
     }
@@ -658,7 +662,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     if (load) // aura loaded from db
     {
         m_tickNumber = m_amplitude ? GetBase()->GetDuration() / m_amplitude : 0;
-        m_periodicTimer = m_amplitude ? GetBase()->GetMaxDuration() / m_tickCount : 0;
+        m_periodicTimer = m_amplitude ? GetBase()->GetMaxDuration() % m_amplitude : 0;
         if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
             ++m_tickNumber;
     }
@@ -678,7 +682,8 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
             if (m_amplitude)
             {
                 if (!GetSpellInfo()->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
-                    m_periodicTimer += GetBase()->GetMaxDuration() / m_tickCount;
+                    m_periodicTimer += m_amplitude;
+
                 else if (caster && caster->IsTotem()) // for totems only ;d
                 {
                     m_periodicTimer = 100; // make it ALMOST instant
@@ -7116,49 +7121,7 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
 int32 AuraEffect::GetTotalTicks(float& dmgRatio) const
 {
-     return GetTotalTicks(dmgRatio, false);
-}
-
-int32 AuraEffect::GetTotalTicks(float& dmgRatio, bool noHaste) const
-{
-    uint32 totalTicks = 1;
-    dmgRatio = 0;
-
-    if (m_amplitude)
-    {
-        bool applyHaste = false;
-        switch (GetAuraType())
-        {
-            case SPELL_AURA_PERIODIC_DAMAGE:
-            case SPELL_AURA_PERIODIC_HEAL:
-            case SPELL_AURA_PERIODIC_LEECH:
-            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
-                applyHaste = true;
-                break;
-            default:
-                break;
-        }
-
-        if (GetCaster()->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-            applyHaste = true;
-
-        if (noHaste)
-            applyHaste = false;
-
-        auto max = GetBase()->GetMaxDuration();
-
-        if (applyHaste)
-            totalTicks = GetBase()->GetSpellInfo()->CalculateTicks(m_amplitude, max, GetCaster(), dmgRatio);
-        else
-            totalTicks = max / m_amplitude;
-
-        if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
-        {
-            ++totalTicks;
-        }
-    }
-
-    return totalTicks;
+     return GetTotalTicks();
 }
 
 uint32 AuraEffect::GetTriggerSpell() const

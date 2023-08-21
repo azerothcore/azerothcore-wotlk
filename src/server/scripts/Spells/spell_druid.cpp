@@ -539,7 +539,7 @@ class spell_dru_innervate : public AuraScript
         float f;
 
         if (Unit* caster = GetCaster())
-            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks(f, true));
+            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks());
         else
             amount = 0;
     }
