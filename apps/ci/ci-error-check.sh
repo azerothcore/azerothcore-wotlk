@@ -6,7 +6,7 @@ echo "Checking Startup Errors"
 echo
 
 if [[ -s ${ERRORS_FILE} ]]; then
-     printf "The StartupErrors.log file contains startup errors:\n\n";
+     printf "The Errors.log file contains startup errors:\n\n";
      cat ${ERRORS_FILE};
      printf "\nPlease solve the startup errors listed above!\n";
      exit 1;
