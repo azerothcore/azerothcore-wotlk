@@ -1,3 +1,4 @@
+-- DB update 2023_08_20_00 -> 2023_08_21_00
 DELETE FROM `pet_levelstats` WHERE `creature_entry` IN (416,1860,1863,417,17252,89);
 INSERT INTO `pet_levelstats` (`creature_entry`,`level`,`hp`,`mana`,`armor`,`str`,`agi`,`sta`,`inte`,`spi`,`min_dmg`,`max_dmg`) VALUES
 -- Imp
