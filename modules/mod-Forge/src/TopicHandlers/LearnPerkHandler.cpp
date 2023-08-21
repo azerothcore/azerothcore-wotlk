@@ -66,19 +66,13 @@ public:
 
                 auto rankIt = spell->ranks.find(csp->rank);
                 if (rankIt != spell->ranks.end())
-                    if (spell->isAura)
-                        iam.player->RemoveAura(rankIt->second);
-                    else
-                        iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
+                    iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
 
                 csp->rank++;
 
                 rankIt = spell->ranks.find(csp->rank);
                 if (rankIt != spell->ranks.end())
-                    if (spell->isAura)
-                        iam.player->AddAura(rankIt->second, iam.player);
-                    else
-                        iam.player->learnSpell(rankIt->second);
+                    iam.player->learnSpell(rankIt->second, true);
 
                 fc->LearnCharacterPerkInternal(iam.player, spec, csp);
 

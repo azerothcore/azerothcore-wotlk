@@ -723,24 +723,20 @@ public:
         if (TryGetCharacterActiveSpec(player, currentSpec))
         {
             for (auto perk : currentSpec->perks) {
-                auto currentRank = perk.second->rank;
+                auto currentRank = perk.second->spell->ranks[perk.second->rank];
                 auto spell = perk.second->spell;
                 
                 if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
                     for (auto rank : spell->ranks)
-                        if (currentRank != rank.first) {
+                        if (currentRank != rank.second) {
                             if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
                                 player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                             else
                                 player->RemoveAura(rank.second);
                         }
                         else {
-                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                                if (!player->HasSpell(currentRank))
-                                    player->learnSpell(currentRank, false, false);
-                                else
-                                    if (!player->HasAura(currentRank))
-                                        player->AddAura(currentRank, player);
+                            if (!player->HasSpell(currentRank))
+                                player->learnSpell(currentRank, true);
                         }
                     
                 }

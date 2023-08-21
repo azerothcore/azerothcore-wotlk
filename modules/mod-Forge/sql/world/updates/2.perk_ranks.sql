@@ -173,7 +173,6 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (600612,1,600612);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (600614,1,600614),
-	 (600618,1,600618),
 	 (600620,1,600620),
 	 (600626,1,600626),
 	 (600628,1,600628),

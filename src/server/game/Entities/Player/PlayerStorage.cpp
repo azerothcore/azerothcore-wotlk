@@ -7211,6 +7211,9 @@ void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
         if (!itr->second->CanBeSaved())
             continue;
 
+        if(itr->second->GetId() > 500000)
+            continue;
+
         Aura* aura = itr->second;
         if( !logout && aura->GetDuration() < 60 * IN_MILLISECONDS )
             continue;
