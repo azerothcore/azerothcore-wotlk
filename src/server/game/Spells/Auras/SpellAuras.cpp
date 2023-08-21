@@ -1555,49 +1555,49 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // Can't proc on self
                     if (GetCasterGUID() == target->GetGUID())
                         break;
-                    if (caster->GetAuraEffectDummy(1150043)){
-                        caster->CastSpell(target, 1150007, true);
-                    }
 
                     AuraEffect* aurEff = nullptr;
                     // Ebon Plaguebringer / Crypt Fever
                     Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                    uint32 spellId;
                     for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
                     {
-                        aurEff = *itr;
-                        if (aurEff->GetMiscValue() == 7282)
+                        if ((*itr)->GetMiscValue() == 7282)
                         {
-                            if((*itr)->GetSpellInfo()->SpellIconID == 264){
-                                switch (aurEff->GetId()){
-                                    case 1150039:
-                                        spellId = 1150067;
-                                        break;
-                                    case 1150038:
-                                        spellId = 1150066;
-                                        break;
-                                    case 1150027:
-                                        spellId = 1150065;
-                                        break;
-                                    default:
-                                        LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever ({}) found", aurEff->GetId());
-                                }
-                                caster->CastSpell(target, spellId, true, 0, GetEffect(0));
-                            }
-                        }
-                        else if(aurEff->GetMiscValue() == 1150061) {
-                            switch (aurEff->GetId()) {
-                            case 1150061:
-                                spellId = 1150068;
+                            aurEff = *itr;
+                            // Ebon Plaguebringer - end search if found
+                            if ((*itr)->GetSpellInfo()->SpellIconID == 1766)
                                 break;
-                            case 1150062:
-                                spellId = 1150069;
-                                break;
-                            default:
-                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Scarlet Fever ({}) found", aurEff->GetId());
-                            }
-                            caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                         }
+                    }
+                    if (aurEff)
+                    {
+                        uint32 spellId = 0;
+                        switch (aurEff->GetId())
+                        {
+                            // Ebon Plague
+                        case 51161:
+                            spellId = 51735;
+                            break;
+                        case 51160:
+                            spellId = 51734;
+                            break;
+                        case 51099:
+                            spellId = 51726;
+                            break;
+                            // Crypt Fever
+                        case 49632:
+                            spellId = 50510;
+                            break;
+                        case 49631:
+                            spellId = 50509;
+                            break;
+                        case 49032:
+                            spellId = 50508;
+                            break;
+                        default:
+                            LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
+                        }
+                        caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
                 }
                 // Unholy blight
