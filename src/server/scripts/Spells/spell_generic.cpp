@@ -4211,38 +4211,8 @@ class spell_gen_gift_of_naaru : public AuraScript
 
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (!GetCaster())
-            return;
-
-        float heal = 0.0f;
-        switch (GetSpellInfo()->SpellFamilyName)
-        {
-            case SPELLFAMILY_MAGE:
-            case SPELLFAMILY_WARLOCK:
-            case SPELLFAMILY_PRIEST:
-                heal = 1.885f * float(GetCaster()->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()));
-                break;
-            case SPELLFAMILY_PALADIN:
-            case SPELLFAMILY_SHAMAN:
-                heal = std::max(1.885f * float(GetCaster()->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask())), 1.1f * float(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK)));
-                break;
-            case SPELLFAMILY_WARRIOR:
-            case SPELLFAMILY_HUNTER:
-            case SPELLFAMILY_DEATHKNIGHT:
-                heal = 1.1f * float(std::max(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), GetCaster()->GetTotalAttackPowerValue(RANGED_ATTACK)));
-                break;
-            case SPELLFAMILY_GENERIC:
-            default:
-                break;
-        }
-        float f;
-
-        int32 healTick = floor(heal / aurEff->GetTotalTicks());
-
-        if (f != 0)
-            healTick += healTick * f;
-            
-        amount += int32(std::max(healTick, 0));
+        if (auto* caster = GetCaster())
+            amount = CalculatePct(caster->GetMaxHealth(), GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster));
     }
 
     void Register() override
