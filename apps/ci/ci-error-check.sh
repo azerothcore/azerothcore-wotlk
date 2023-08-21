@@ -13,7 +13,6 @@ if [[ -s ${ERRORS_FILE} ]]; then
 else
      echo "> No startup errors found in Errors.log";
 fi
-done
 
 echo
 echo "Done"
