@@ -58,20 +58,20 @@ public:
 
         uint32 count = 1;
 
-        for (auto const& [accID, session] : sWorld->GetAllSessions())
-        {
-            Player* _player = session->GetPlayer();
-            if (!_player || _player == player)
-            {
-                continue;
-            }
+        //for (auto const& [accID, session] : sWorld->GetAllSessions())
+        //{
+        //    Player* _player = session->GetPlayer();
+        //    if (!_player || _player == player)
+        //    {
+        //        continue;
+        //    }
 
-            // If Remote Address matches, remove the player from the world
-            if (player->GetSession()->GetRemoteAddress() == _player->GetSession()->GetRemoteAddress() && ++count > 1)
-            {
-                player->GetSession()->KickPlayer();
-            }
-        }
+        //    // If Remote Address matches, remove the player from the world
+        //    if (player->GetSession()->GetRemoteAddress() == _player->GetSession()->GetRemoteAddress() && ++count > 1)
+        //    {
+        //        player->GetSession()->KickPlayer();
+        //    }
+        //}
 
         fc->ApplyAccountBoundTalents(player);
         fc->ApplyActivePerks(player);
