@@ -399,6 +399,7 @@ ObjectMgr::~ObjectMgr()
         itr->second.Clear();
 
     _cacheTrainerSpellStore.clear();
+    _cacheTrainerSpellByClass.clear();
 
     for (DungeonEncounterContainer::iterator itr = _dungeonEncounterStore.begin(); itr != _dungeonEncounterStore.end(); ++itr)
         for (DungeonEncounterList::iterator encounterItr = itr->second.begin(); encounterItr != itr->second.end(); ++encounterItr)
@@ -9071,6 +9072,14 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
         }
     }
 
+    if (spell == 33388 || spell == 33391) {
+        _cacheTrainerSpellByClass[CLASS_DRUID + 3][spell] = trainerSpell;
+    }
+
+    if (data.trainerType == 0) {
+        _cacheTrainerSpellByClass[cInfo->trainer_class][spell] = trainerSpell;
+    }
+
     return;
 }
 
@@ -10223,8 +10232,8 @@ void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 st
     GameobjectInstanceSavedStateList.push_back({ id, guid, state });
 }
 
-CacheTrainerSpellContainer ObjectMgr::getTrainerData(uint32 guid) {
-    return _cacheTrainerSpellStore;
+CacheTrainerSpellByClassContainer ObjectMgr::getTrainerSpellsForClass() {
+    return _cacheTrainerSpellByClass;
 }
 
 void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const

@@ -100,7 +100,6 @@ public:
                     sfp->Sum += refund;
                     sfp->Max -= refund;
 
-                    auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
                     iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
 
                     iam.player->UpdateAllStats();

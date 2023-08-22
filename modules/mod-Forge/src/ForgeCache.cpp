@@ -677,14 +677,23 @@ public:
 
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != TALENT_TREE
+                    && charTabType != RACIAL_TREE)
                     continue;
 
-                ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
-                    sfp->Max = std::max(player->GetLevel() - 9, 0);
-                    auto points = std::max(player->GetLevel() - 9, 0);
+                    ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
+                    auto points = 0;
+                    if (charTabType == TALENT_TREE)
+                        sfp->Max = std::max(player->GetLevel() - 9, 0);
+                    else if (charTabType == PRESTIGE_TREE)
+                        sfp->Max = GetSpecPoints(player, PRESTIGE_COUNT, currentSpec->Id)->Sum;
+                    else
+                        sfp->Max = 17;
+
+                    points = sfp->Max;
+
 
                     for (auto* tab : tabs)
                     {
@@ -692,24 +701,26 @@ public:
 
                         for (auto spell : tab->Talents)
                         {
-                            if (modes.size() == 0 && talItt != currentSpec->Talents.end() && points > 0)
+                            if (modes.size() == 0 && talItt != currentSpec->Talents.end())
                             {
                                 auto spellItt = talItt->second.find(spell.first);
                                 if (spellItt != talItt->second.end())
                                 {
-                                    uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+                                    if (spellItt->second->CurrentRank > 0) {
+                                        uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
-                                    if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                        for (auto rank : spell.second->Ranks) {
-                                            if (currentRank != rank.second) {
-                                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                            }
-                                            else {
-                                                if (!player->HasSpell(currentRank)) {
-                                                    player->learnSpell(currentRank, true, false);
-                                                    points -= spellItt->second->CurrentRank;
+                                        if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                                for (auto rank : spell.second->Ranks) {
+                                                    if (spellInfo->IsPassive() && (currentRank != rank.second || points == 0)) {
+                                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                                    } else {
+                                                        if (!player->HasSpell(currentRank)) {
+                                                            player->learnSpell(currentRank, true, false);
+                                                        }
+                                                        points -= spellItt->second->CurrentRank * spell.second->RankCost;
+                                                    }
+                                                    UpdateCharacterSpec(player, currentSpec);
                                                 }
-                                            }
                                         }
                                     }
                                 }
@@ -720,7 +731,6 @@ public:
                     UpdateCharPoints(player, sfp);
                 }
             }
-
             player->SendInitialSpells();
         }
     }
@@ -737,17 +747,11 @@ public:
                 
                 if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
                     for (auto rank : spell->ranks)
-                        if (currentRank != rank.second) {
-                            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                            else
-                                player->RemoveAura(rank.second);
-                        }
-                        else {
+                        if (currentRank != rank.second)
+                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                        else
                             if (!player->HasSpell(currentRank))
                                 player->learnSpell(currentRank, true);
-                        }
-                    
                 }
             }   
         }
@@ -761,10 +765,7 @@ public:
             for (auto perk : currentSpec->perks) {
                 auto rankedSpell = perk.second->spell->ranks[perk.second->rank];
                 if (auto spellInfo = sSpellMgr->GetSpellInfo(rankedSpell)) {
-                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                        player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
-                    else
-                        player->RemoveAura(rankedSpell);
+                    player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
                 }
             }
         }
@@ -776,7 +777,7 @@ public:
         {
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE && charTabType != RACIAL_TREE)
                     continue;
 
                 std::list<ForgeTalentTab*> tabs;
@@ -794,8 +795,9 @@ public:
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
                                     if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                        for (auto rank : spell.second->Ranks)
-                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                        if (spellInfo->IsPassive())
+                                            for (auto rank : spell.second->Ranks)
+                                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                     }
                                 }
                             }

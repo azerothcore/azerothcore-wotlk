@@ -51,6 +51,15 @@ public:
         fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 17));
     }
 
+    void OnFirstLogin(Player* player) override
+    {
+        if (!player)
+            return;
+
+        fc->ApplyTalents(player);
+        fc->ApplyActivePerks(player);
+    }
+
     void OnLogin(Player* player) override
     {
         if (!player)
@@ -104,8 +113,7 @@ public:
                 cm->SendTalents(player);
             }
 
-            if (player->HasAura(230229))
-                LearnSpellsForLevel(player, oldlevel, player->GetLevel());
+            LearnSpellsForLevel(player, oldlevel, player->GetLevel());
 
             auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
             if (missing > 0)
@@ -216,93 +224,61 @@ private:
     }
 
     void LearnSpellsForLevel(Player* player, uint8 oldlevel, uint8 newlevel) {
-        auto trainer = 0;
-        switch (player->getClass()) {
-            case CLASS_WARRIOR:
-                trainer = 17504;
-                break;
-            case CLASS_PALADIN:
-                trainer = 35281;
-                break;
-            case CLASS_HUNTER:
-                trainer = 17505;
-                break;
-            case CLASS_ROGUE:
-                trainer = 16686;
-                break;
-            case CLASS_PRIEST:
-                trainer = 17511;
-                break;
-            case CLASS_DEATH_KNIGHT:
-                trainer = 31084;
-                break;
-            case CLASS_SHAMAN:
-                trainer = 23127;
-                break;
-            case CLASS_MAGE:
-                trainer = 28958;
-                break;
-            case CLASS_WARLOCK:
-                trainer = 23534;
-                break;
-            case CLASS_DRUID:
-                trainer = 16721;
-                break;
-        }
 
         // remove fake death
         if (player->HasUnitState(UNIT_STATE_DIED))
             player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-        auto spells = sObjectMgr->getTrainerData(trainer);
-        
+        auto spells = sObjectMgr->getTrainerSpellsForClass();
         if (!spells.empty()) {
-            auto spellItt = spells.find(trainer);
-            if (spellItt != spells.end()) {
-                TrainerSpellData trainerSpells = spellItt->second;
-                for (TrainerSpellMap::const_iterator itr = trainerSpells.spellList.begin(); itr != trainerSpells.spellList.end(); ++itr)
+            LearnSpellsForClass(player, CLASS_DRUID+3, newlevel, spells);
+            LearnSpellsForClass(player, player->getClass(), newlevel, spells);
+        }
+    }
+
+    void LearnSpellsForClass(Player* player, uint8 search, uint8 newLevel, CacheTrainerSpellByClassContainer pool) {
+        auto classSpells = pool.find(search);
+        if (classSpells != pool.end()) {
+            for (auto spell : classSpells->second)
+            {
+                TrainerSpell const* tSpell = &spell.second;
+
+                if (player->HasSpell(tSpell->spell))
+                    continue;
+
+                bool valid = true;
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
-                    TrainerSpell const* tSpell = &itr->second;
-
-                    if(player->HasSpell(tSpell->spell))
+                    if (!tSpell->learnedSpell[i])
                         continue;
-
-                    bool valid = true;
-                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (!player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
                     {
-                        if (!tSpell->learnedSpell[i])
-                            continue;
-                        if (!player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
-                        {
-                            valid = false;
-                            break;
-                        }
+                        valid = false;
+                        break;
                     }
-
-                    if (player->GetLevel() < tSpell->reqLevel)
-                        continue;
-
-                    if (!valid)
-                        continue;
-
-                    if (tSpell->reqSpell && !player->HasSpell(tSpell->reqSpell))
-                    {
-                        continue;
-                    }
-
-                    if (player->GetTrainerSpellState(tSpell) != TRAINER_SPELL_GREEN)
-                        return;
-
-                    // learn explicitly or cast explicitly
-                    if (tSpell->IsCastable())
-                        player->CastSpell(player, tSpell->spell, true);
-                    else
-                        player->learnSpell(tSpell->spell);
                 }
+
+                if (newLevel < tSpell->reqLevel)
+                    continue;
+
+                if (!valid)
+                    continue;
+
+                if (tSpell->reqSpell && !player->HasSpell(tSpell->reqSpell))
+                {
+                    continue;
+                }
+
+                if (player->GetTrainerSpellState(tSpell) != TRAINER_SPELL_GREEN)
+                    continue;
+
+                // learn explicitly or cast explicitly
+                if (tSpell->IsCastable())
+                    player->CastSpell(player, tSpell->spell, true);
+                else
+                    player->learnSpell(tSpell->spell);
             }
         }
-        
-        // for learn HandleTrainerBuySpellOpcode
     }
 };
 

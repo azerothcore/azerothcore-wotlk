@@ -12713,7 +12713,7 @@ float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemp
 
 bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
 {
-    uint32 racemask  = getRaceMask();
+    //uint32 racemask  = getRaceMask();
     uint32 classmask = getClassMask();
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spell_id);
@@ -12723,8 +12723,8 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         // skip wrong race skills
-        if (_spell_idx->second->RaceMask && (_spell_idx->second->RaceMask & racemask) == 0)
-            continue;
+        /*if (_spell_idx->second->RaceMask && (_spell_idx->second->RaceMask & racemask) == 0)
+            continue;*/
 
         // skip wrong class skills
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
