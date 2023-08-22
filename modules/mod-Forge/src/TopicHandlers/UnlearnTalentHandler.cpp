@@ -100,6 +100,11 @@ public:
                     sfp->Sum += refund;
                     sfp->Max -= refund;
 
+                    auto spellInfo = sSpellMgr->GetSpellInfo(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank]);
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                            iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+
                     iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
 
                     iam.player->UpdateAllStats();

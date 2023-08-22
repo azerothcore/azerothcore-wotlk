@@ -15633,7 +15633,7 @@ void Player::ActivateSpec(uint8 spec)
     SetPower(pw, 0);
 
     // xinef: remove titan grip if player had it set and does not have appropriate talent
-    if (!HasTalent(46917, GetActiveSpec()) && m_canTitanGrip)
+    if (!HasSpell(46917) && m_canTitanGrip)
         SetCanTitanGrip(false);
     // xinef: remove dual wield if player does not have dual wield spell (shamans)
     if (!HasSpell(674) && m_canDualWield)
@@ -15650,7 +15650,7 @@ void Player::ActivateSpec(uint8 spec)
     for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
         Aura* aura = *iter;
-        if (!HasActiveSpell(aura->GetId()) && !HasTalent(aura->GetId(), GetActiveSpec()) && !aura->GetCastItemGUID())
+        if (!HasActiveSpell(aura->GetId()) && !HasSpell(aura->GetId()) && !aura->GetCastItemGUID())
         {
             aura->Remove();
             iter = scAuras.begin();
@@ -16432,7 +16432,7 @@ uint32 Player::GetSpec(int8 spec)
                 int8 curtalent_maxrank = -1;
                 for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                 {
-                    if (talentInfo->RankID[rank] && HasTalent(talentInfo->RankID[rank], specIdx))
+                    if (talentInfo->RankID[rank] && HasSpell(talentInfo->RankID[rank]))
                     {
                         curtalent_maxrank = rank;
                         break;

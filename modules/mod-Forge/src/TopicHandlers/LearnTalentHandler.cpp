@@ -230,17 +230,12 @@ public:
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                bool learnSpell = false;
 
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                        if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell)) {
-                            learnSpell = true;
-                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-                        }
-                if (!learnSpell)
-                    iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                        iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
 
+                iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
             }
 
             fc->UpdateCharPoints(iam.player, curPoints);
