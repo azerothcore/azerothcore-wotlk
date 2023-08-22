@@ -523,7 +523,8 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 range;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } areaCasting;
 
         struct
@@ -532,7 +533,8 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 range;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } areaRange;
 
         struct
@@ -542,6 +544,7 @@ struct SmartEvent
             uint32 param3;
             uint32 param4;
             uint32 param5;
+            uint32 param6;
         } raw;
     };
 

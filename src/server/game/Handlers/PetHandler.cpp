@@ -530,7 +530,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, nullptr, tempspellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, ObjectGuid::Empty, tempspellIsPositive);
                         }
                     }
                     else if (haspositiveeffect)
@@ -566,7 +566,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, victim, tmpSpellIsPositive);
+                            ObjectGuid oldTarget = ObjectGuid::Empty;
+                            if (victim)
+                                oldTarget = victim->GetGUID();
+
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, oldTarget, tmpSpellIsPositive);
                         }
                     }
                 }

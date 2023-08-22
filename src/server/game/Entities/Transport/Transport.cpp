@@ -39,6 +39,8 @@ MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMo
 
 MotionTransport::~MotionTransport()
 {
+    HashMapHolder<MotionTransport>::Remove(this);
+
     ASSERT(_passengers.empty());
     UnloadStaticPassengers();
 }
