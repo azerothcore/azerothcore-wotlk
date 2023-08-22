@@ -1154,6 +1154,10 @@ void WorldObject::SetPositionDataUpdate()
     // Calls immediately for charmed units
     if (GetTypeId() == TYPEID_UNIT && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
         UpdatePositionData();
+    //npcbot
+    else if (IsNPCBotOrPet() && ToUnit()->IsControlledByPlayer())
+        UpdatePositionData();
+    //end npcbot
 }
 
 void WorldObject::UpdatePositionData()

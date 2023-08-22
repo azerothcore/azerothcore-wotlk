@@ -3163,6 +3163,10 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             {
                 unit->IncrDiminishing(m_diminishGroup);
             }
+            //npcbot
+            else if (m_caster->IsNPCBotOrPet())
+                unit->IncrDiminishing(m_diminishGroup);
+            //end npcbot
         }
     }
 
