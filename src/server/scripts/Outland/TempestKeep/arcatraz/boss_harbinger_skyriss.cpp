@@ -77,6 +77,7 @@ struct boss_harbinger_skyriss : public BossAI
     {
         BossAI::EnterEvadeMode(why);
         instance->DoRespawnCreature(DATA_WARDEN_MELLICHAR, true);
+        me->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
