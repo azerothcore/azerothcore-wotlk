@@ -18142,8 +18142,11 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                             {
                                 if (!member->IsAlive())
                                     continue;
-                                if (member->IsPlayer() && (member->IsWithinDist2d(me, 40.0f) || member->ToPlayer()->GetTarget() == boss->GetGUID()))
-                                    ++ready_count;
+                                if (member->IsPlayer())
+                                {
+                                    if (member->IsWithinDist2d(me, 40.0f) || member->ToPlayer()->GetTarget() == boss->GetGUID())
+                                        ++ready_count;
+                                }
                                 else if (member->ToCreature()->GetBotAI()->_travel_node_cur == bossWP || member->GetVictim() == boss ||
                                     (!member->GetVictim() && member->IsWithinDist2d(me, 30.0f)))
                                     ++ready_count;
