@@ -101,10 +101,7 @@ public:
                     sfp->Max -= refund;
 
                     auto spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                    if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                        iam.player->RemoveOwnedAura(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank]);
-                    else
-                        iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
+                    iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
 
                     iam.player->UpdateAllStats();
                     spellItt->second->CurrentRank = 0;
@@ -149,6 +146,9 @@ private:
                     }
                 }
             }
+            ForgeCharacterPoint* sfp = fc->GetSpecPoints(player, TALENT_TREE, spec->Id);
+            sfp->Sum = std::max(player->GetLevel() - 9, 0);
+            fc->UpdateCharPoints(player, sfp);
             cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);
             cm->SendTalents(player);

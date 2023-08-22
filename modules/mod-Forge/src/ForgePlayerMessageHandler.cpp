@@ -56,32 +56,6 @@ public:
         if (!player)
             return;
 
-        uint32 count = 1;
-
-        //for (auto const& [accID, session] : sWorld->GetAllSessions())
-        //{
-        //    Player* _player = session->GetPlayer();
-        //    if (!_player || _player == player)
-        //    {
-        //        continue;
-        //    }
-
-        //    // If Remote Address matches, remove the player from the world
-        //    if (player->GetSession()->GetRemoteAddress() == _player->GetSession()->GetRemoteAddress() && ++count > 1)
-        //    {
-        //        player->GetSession()->KickPlayer();
-        //    }
-        //}
-
-
-        ForgeCharacterSpec* spec;
-        if (fc->TryGetCharacterActiveSpec(player, spec)) {
-            auto talentsToDate = std::max(0, player->GetLevel() - 10) - fc->GetCommonCharacterPoint(player, TALENT_TREE)->Sum;
-            if (talentsToDate > 0) {
-                fc->AddCharacterPointsToAllSpecs(player, TALENT_TREE, talentsToDate);
-            }
-        }
-
         fc->ApplyTalents(player);
         fc->ApplyActivePerks(player);
     }

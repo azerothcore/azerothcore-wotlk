@@ -680,15 +680,19 @@ public:
                 if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE)
                     continue;
 
+                ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
                 std::list<ForgeTalentTab*> tabs;
-                if (TryGetForgeTalentTabs(player, charTabType, tabs))
+                if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
+                    sfp->Max = std::max(player->GetLevel() - 9, 0);
+                    auto points = std::max(player->GetLevel() - 9, 0);
+
                     for (auto* tab : tabs)
                     {
                         auto talItt = currentSpec->Talents.find(tab->Id);
 
                         for (auto spell : tab->Talents)
                         {
-                            if (modes.size() == 0 && talItt != currentSpec->Talents.end())
+                            if (modes.size() == 0 && talItt != currentSpec->Talents.end() && points > 0)
                             {
                                 auto spellItt = talItt->second.find(spell.first);
                                 if (spellItt != talItt->second.end())
@@ -701,8 +705,10 @@ public:
                                                 player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                             }
                                             else {
-                                                if (!player->HasSpell(currentRank))
+                                                if (!player->HasSpell(currentRank)) {
                                                     player->learnSpell(currentRank, true, false);
+                                                    points -= spellItt->second->CurrentRank;
+                                                }
                                             }
                                         }
                                     }
@@ -710,6 +716,10 @@ public:
                             }
                         }
                     }
+                    LOG_INFO("server.world", "points: {}", points);
+                    sfp->Sum = points;
+                    UpdateCharPoints(player, sfp);
+                }
             }
 
             player->SendInitialSpells();
