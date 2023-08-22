@@ -716,7 +716,6 @@ public:
                             }
                         }
                     }
-                    LOG_INFO("server.world", "points: {}", points);
                     sfp->Sum = points;
                     UpdateCharPoints(player, sfp);
                 }
