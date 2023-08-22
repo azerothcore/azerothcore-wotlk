@@ -1,4 +1,4 @@
-truncate acore_world.npc_trainer;
+TRUNCATE acore_world.npc_trainer;
 INSERT INTO acore_world.npc_trainer (ID,SpellID,MoneyCost,ReqSkillLine,ReqSkillRank,ReqLevel,ReqSpell) VALUES
 	 (198,-200007,0,0,0,0,0),
 	 (328,-200008,0,0,0,0,0),
