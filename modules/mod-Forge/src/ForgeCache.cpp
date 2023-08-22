@@ -683,7 +683,6 @@ public:
 
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
-<<<<<<< HEAD
                     ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
                     auto points = 0;
                     if (charTabType == TALENT_TREE)
@@ -694,16 +693,6 @@ public:
                         sfp->Max = 17;
 
                     points = sfp->Max;
-
-=======
-                    auto points = 0;
-                    if (charTabType == TALENT_TREE)
-                        sfp->Max = std::max(player->GetLevel() - 9, 0);
-                    else
-                        sfp->Max = GetSpecPoints(player, PRESTIGE_COUNT, currentSpec->Id)->Sum;
-
-                    auto points = sfp->Max;
->>>>>>> 849676ce97d443b750445990ca0eef70ede4144b
 
                     for (auto* tab : tabs)
                     {
@@ -725,7 +714,14 @@ public:
                                                         player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                                     } else {
                                                         if (!player->HasSpell(currentRank)) {
-                                                            player->learnSpell(currentRank, true, false);
+                                                            if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                                                player->learnSpell(currentRank, true, false);
+                                                            else {
+                                                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+
+                                                                        player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                                                            }
                                                         }
                                                         points -= spellItt->second->CurrentRank * spell.second->RankCost;
                                                     }

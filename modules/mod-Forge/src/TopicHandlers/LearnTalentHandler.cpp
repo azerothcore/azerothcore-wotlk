@@ -231,11 +231,14 @@ public:
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
 
-                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                        iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-
-                iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                    iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                else {
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL) {
+                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                        }
+                }
             }
 
             fc->UpdateCharPoints(iam.player, curPoints);
