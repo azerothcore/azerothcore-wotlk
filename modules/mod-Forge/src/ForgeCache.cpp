@@ -683,8 +683,13 @@ public:
                 ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
-                    sfp->Max = std::max(player->GetLevel() - 9, 0);
-                    auto points = std::max(player->GetLevel() - 9, 0);
+                    auto points = 0;
+                    if (charTabType == TALENT_TREE)
+                        sfp->Max = std::max(player->GetLevel() - 9, 0);
+                    else
+                        sfp->Max = GetSpecPoints(player, PRESTIGE_COUNT, currentSpec->Id)->Sum;
+
+                    auto points = sfp->Max;
 
                     for (auto* tab : tabs)
                     {

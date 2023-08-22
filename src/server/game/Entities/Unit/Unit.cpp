@@ -11875,123 +11875,121 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
         switch ((*i)->GetMiscValue())
         {
-            case 4418: // Increased Shock Damage
-            case 4554: // Increased Lightning Damage
-            case 4555: // Improved Moonfire
-            case 5142: // Increased Lightning Damage
-            case 5147: // Improved Consecration / Libram of Resurgence
-            case 5148: // Idol of the Shooting Star
-            case 6008: // Increased Lightning Damage
-            case 8627: // Totem of Hex
-            {
-                DoneAdvertisedBenefit += (*i)->GetAmount();
-                break;
-            }
+        case 4418: // Increased Shock Damage
+        case 4554: // Increased Lightning Damage
+        case 4555: // Improved Moonfire
+        case 5142: // Increased Lightning Damage
+        case 5147: // Improved Consecration / Libram of Resurgence
+        case 5148: // Idol of the Shooting Star
+        case 6008: // Increased Lightning Damage
+        case 8627: // Totem of Hex
+        {
+            DoneAdvertisedBenefit += (*i)->GetAmount();
+            break;
+        }
         }
     }
 
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_DRUID:
+    case SPELLFAMILY_DRUID:
+    {
+        // Insect Swarm vs Item - Druid T8 Balance Relic
+        if (spellProto->SpellFamilyFlags[0] & 0x00200000)
         {
-            // Insect Swarm vs Item - Druid T8 Balance Relic
-            if (spellProto->SpellFamilyFlags[0] & 0x00200000)
+            if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
             {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
+                DoneAdvertisedBenefit += relicAurEff->GetAmount();
             }
-
-            // Nourish vs Idol of the Flourishing Life
-            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-            break;
         }
-        case SPELLFAMILY_DEATHKNIGHT:
+
+        // Nourish vs Idol of the Flourishing Life
+        if (spellProto->SpellFamilyFlags[1] & 0x02000000)
         {
-            // Sigil of the Vengeful Heart
-            if (spellProto->SpellFamilyFlags[0] & 0x2000)
+            if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
             {
-                if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
-                {
-                    AddPct(DoneTotal, aurEff->GetAmount());
-                }
+                DoneAdvertisedBenefit += relicAurEff->GetAmount();
             }
-
-            // Impurity
-            if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
-            {
-                AddPct(ApCoeffMod, aurEff->GetAmount());
-            }
-
-            // Blood Boil - bonus for diseased targets
-            if ((spellProto->SpellFamilyFlags[0] & 0x00040000) && victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
-            {
-                DoneTotal += 95;
-                ApCoeffMod = 1.5835f;
-            }
-            break;
         }
-        default:
-            break;
+        break;
+    }
+    case SPELLFAMILY_DEATHKNIGHT:
+    {
+        // Sigil of the Vengeful Heart
+        if (spellProto->SpellFamilyFlags[0] & 0x2000)
+        {
+            if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
+            {
+                AddPct(DoneTotal, aurEff->GetAmount());
+            }
+        }
+
+        // Impurity
+        if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+        {
+            AddPct(ApCoeffMod, aurEff->GetAmount());
+        }
+
+        // Blood Boil - bonus for diseased targets
+        if ((spellProto->SpellFamilyFlags[0] & 0x00040000) && victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
+        {
+            DoneTotal += 95;
+            ApCoeffMod = 1.5835f;
+        }
+        break;
+    }
+    default:
+        break;
     }
 
     // Done fixed damage bonus auras
     DoneAdvertisedBenefit += SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
 
     // Check for table values
-    auto spellInfo = &spellProto->Effects[effIndex];
-    if (spellInfo) {
-        float coeff = spellProto->Effects[effIndex].BonusMultiplier;
-        SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id);
-        if (bonus)
+    float coeff = 0;
+    SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id);
+    if (bonus)
+    {
+        if (damagetype == DOT)
         {
-            if (damagetype == DOT)
+            coeff = bonus->dot_damage;
+            if (bonus->ap_dot_bonus > 0)
             {
-                coeff = bonus->dot_damage;
-                if (bonus->ap_dot_bonus > 0)
-                {
-                    WeaponAttackType attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
-                    float APbonus = float(victim->GetTotalAuraModifier(attType == BASE_ATTACK ? SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS : SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS));
-                    APbonus += GetTotalAttackPowerValue(attType);
-                    DoneTotal += int32(bonus->ap_dot_bonus * stack * ApCoeffMod * APbonus);
-                }
-            }
-            else
-            {
-                coeff = bonus->direct_damage;
-                if (bonus->ap_bonus > 0)
-                {
-                    WeaponAttackType attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
-                    float APbonus = float(victim->GetTotalAuraModifier(attType == BASE_ATTACK ? SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS : SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS));
-                    APbonus += GetTotalAttackPowerValue(attType);
-                    DoneTotal += int32(bonus->ap_bonus * stack * ApCoeffMod * APbonus);
-                }
+                WeaponAttackType attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
+                float APbonus = float(victim->GetTotalAuraModifier(attType == BASE_ATTACK ? SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS : SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS));
+                APbonus += GetTotalAttackPowerValue(attType);
+                DoneTotal += int32(bonus->ap_dot_bonus * stack * ApCoeffMod * APbonus);
             }
         }
-
-        // Default calculation
-        if (coeff && DoneAdvertisedBenefit)
+        else
         {
-            float factorMod = CalculateLevelPenalty(spellProto) * stack;
-
-            if (Player* modOwner = GetSpellModOwner())
+            coeff = bonus->direct_damage;
+            if (bonus->ap_bonus > 0)
             {
-                coeff *= 100.0f;
-                modOwner->ApplySpellMod(spellProto, SPELLMOD_BONUS_MULTIPLIER, coeff);
-                coeff /= 100.0f;
+                WeaponAttackType attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
+                float APbonus = float(victim->GetTotalAuraModifier(attType == BASE_ATTACK ? SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS : SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS));
+                APbonus += GetTotalAttackPowerValue(attType);
+                DoneTotal += int32(bonus->ap_bonus * stack * ApCoeffMod * APbonus);
             }
-
-            DoneTotal += int32(DoneAdvertisedBenefit * coeff * factorMod);
         }
     }
+
+    // Default calculation
+    if (DoneAdvertisedBenefit)
+    {
+        float factorMod = CalculateLevelPenalty(spellProto) * stack;
+
+        if (Player* modOwner = GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto, SPELLMOD_BONUS_MULTIPLIER, coeff);
+            coeff /= 100.0f;
+        }
+
+        DoneTotal += int32(DoneAdvertisedBenefit * coeff * factorMod);
+    }
+
 
     float tmpDamage = (float(pdamage) + DoneTotal) * DoneTotalMod;
     // apply spellmod to Done damage (flat and pct)
