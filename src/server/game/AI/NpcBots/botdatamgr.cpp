@@ -1505,7 +1505,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
                 bgTypeId, bracketEntry, atype, false, gqinfo->ArenaTeamRating, ammr);
 
-            seconds_delay += std::max<uint32>(1u, uint32((MINUTE / 2) / std::min<uint32>(needed_bots_count_a, needed_bots_count_h)));
+            seconds_delay = std::min<uint32>(uint32(MINUTE * 2), seconds_delay + std::max<uint32>(1u, uint32((MINUTE / 2) / std::max<uint32>(needed_bots_count_a, needed_bots_count_h))));
 
             BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
                 botBGJoinEvents[groupLeader->GetGUID()].CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M)).count()));
