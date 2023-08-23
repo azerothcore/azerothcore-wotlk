@@ -98,11 +98,6 @@ public:
             uint8 currentLevel = player->getLevel();
             uint8 levelDiff = currentLevel - oldlevel;
 
-            if (currentLevel == fc->GetConfig("MaxLevel", 80))
-            {
-                fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::PRESTIGE_TREE, fc->GetConfig("PrestigePointsAtMaxLevel", 1));
-            }
-
             if (currentLevel >= 10)
             {
                 uint8 amount = (oldlevel < 9) ? levelDiff - (9 - oldlevel) : levelDiff;

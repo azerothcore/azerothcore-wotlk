@@ -88,6 +88,8 @@ public:
             fc->UpdateCharPoints(iam.player, prisCp);
             fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);
+
+            fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
         }
 
         iam.player->SetUInt32Value(PLAYER_XP, 0);
