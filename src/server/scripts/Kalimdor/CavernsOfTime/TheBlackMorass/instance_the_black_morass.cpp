@@ -31,7 +31,7 @@ const Position PortalLocation[4] =
     { -1930.9106f, 7183.5970f, 23.007639f, 3.59537f }
 };
 
-ObjectData const creatureData[1] =
+ObjectData const creatureData[] =
 {
     { NPC_MEDIVH, DATA_MEDIVH },
     { 0,          0           }
