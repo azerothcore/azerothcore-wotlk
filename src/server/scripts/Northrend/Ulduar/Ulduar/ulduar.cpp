@@ -175,6 +175,7 @@ public:
         return new spell_ulduar_energy_sap_AuraScript();
     }
 };
+
 struct npc_ulduar_snow_mound : public ScriptedAI
 {
     npc_ulduar_snow_mound(Creature* creature) : ScriptedAI(creature)
