@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_eye.h"
-#include "TaskScheduler.h"
 
 enum voidReaver
 {
@@ -80,17 +79,17 @@ struct boss_void_reaver : public BossAI
         Talk(SAY_AGGRO);
         me->CallForHelp(105.0f);
 
-        scheduler.Schedule(600s, [this](TaskContext context)
+        scheduler.Schedule(10min, [this](TaskContext context)
         {
             DoCastSelf(SPELL_BERSERK);
         }).Schedule(15s, [this](TaskContext context)
         {
             Talk(SAY_POUNDING);
             DoCastSelf(SPELL_POUNDING, false);
+            scheduler.DelayAll(3s);
             context.Repeat(15s);
         }).Schedule(3s, [this](TaskContext context)
         {
-            // TODO: Getting double orbs after SPELL_POUNDING
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
             else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
