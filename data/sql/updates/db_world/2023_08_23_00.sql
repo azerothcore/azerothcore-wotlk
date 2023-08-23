@@ -1,3 +1,4 @@
+-- DB update 2023_08_21_01 -> 2023_08_23_00
 -- Giselda the Crone
 DELETE FROM `creature_text` WHERE `CreatureID` = 18391;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
