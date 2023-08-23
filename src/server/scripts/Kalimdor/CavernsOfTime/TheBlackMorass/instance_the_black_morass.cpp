@@ -33,7 +33,8 @@ const Position PortalLocation[4] =
 
 ObjectData const creatureData[1] =
 {
-    { NPC_MEDIVH, DATA_MEDIVH }
+    { NPC_MEDIVH, DATA_MEDIVH },
+    { 0,          0           }
 };
 
 class instance_the_black_morass : public InstanceMapScript
