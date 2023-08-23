@@ -32,6 +32,11 @@ enum voidReaver
     SPELL_BERSERK               = 26662
 };
 
+enum Groups
+{
+    GROUP_ARCANE_ORB            = 1
+};
+
 struct boss_void_reaver : public BossAI
 {
     boss_void_reaver(Creature* creature) : BossAI(creature, DATA_REAVER)
@@ -85,10 +90,10 @@ struct boss_void_reaver : public BossAI
         }).Schedule(15s, [this](TaskContext context)
         {
             Talk(SAY_POUNDING);
-            DoCastSelf(SPELL_POUNDING, false);
-            scheduler.DelayAll(3s);
+            DoCastSelf(SPELL_POUNDING);
+            scheduler.DelayGroup(GROUP_ARCANE_ORB, 3s);
             context.Repeat(15s);
-        }).Schedule(3s, [this](TaskContext context)
+        }).Schedule(3s, GROUP_ARCANE_ORB, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
