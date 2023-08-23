@@ -2986,6 +2986,48 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_SET_ORIENTATION_TARGET:
+        {
+            switch (e.action.orientationTarget.type)
+            {
+                case 0: // Reset
+                {
+                    for (WorldObject* target : targets)
+                        target->ToCreature()->SetFacingTo((target->ToCreature()->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->ToCreature()->GetTransGUID() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition()).GetOrientation());
+
+                    break;
+                }
+                case 1: // Target target.o
+                {
+                    for (WorldObject* target : targets)
+                        target->ToCreature()->SetFacingTo(e.target.o);
+
+                    break;
+                }
+                case 2: // Target source
+                {
+                    for (WorldObject* target : targets)
+                        target->ToCreature()->SetFacingToObject(me);
+
+                    break;
+                }
+                case 3: // Target parameters
+                {
+                    ObjectVector facingTargets;
+                    GetTargets(facingTargets, CreateSmartEvent(SMART_EVENT_UPDATE_IC, 0, 0, 0, 0, 0, 0, 0, SMART_ACTION_NONE, 0, 0, 0, 0, 0, 0, (SMARTAI_TARGETS)e.action.orientationTarget.targetType, e.action.orientationTarget.targetParam1, e.action.orientationTarget.targetParam2, e.action.orientationTarget.targetParam3, e.action.orientationTarget.targetParam4, 0), unit);
+
+                    for (WorldObject* facingTarget : facingTargets)
+                        for (WorldObject* target : targets)
+                            target->ToCreature()->SetFacingToObject(facingTarget);
+
+                    break;
+                }
+                default:
+                    break;
+            }
+            
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;

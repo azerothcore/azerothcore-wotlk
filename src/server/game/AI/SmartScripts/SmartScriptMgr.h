@@ -743,8 +743,9 @@ enum SMART_ACTION
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
     SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
+    SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
 
-    SMART_ACTION_AC_END                             = 231,    // placeholder
+    SMART_ACTION_AC_END                             = 232,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1453,6 +1454,16 @@ struct SmartAction
             uint32 followType;
             uint32 dist;
         } followGroup;
+
+        struct
+        {
+            uint32 type;
+            uint32 targetType;
+            uint32 targetParam1;
+            uint32 targetParam2;
+            uint32 targetParam3;
+            uint32 targetParam4;
+        } orientationTarget;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
