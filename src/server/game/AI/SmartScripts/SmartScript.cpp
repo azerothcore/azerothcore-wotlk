@@ -4513,6 +4513,39 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             RecalcTimer(e, 1200, 1200);
             break;
         }
+        case SMART_EVENT_IS_BEHIND_ME:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.behindMe.rangeMin, (float)e.event.behindMe.rangeMax)) || !me->HasInArc(M_PI*1.5f, target))
+                        continue;
+
+                    ProcessAction(e, target);
+                    RecalcTimer(e, e.event.behindMe.repeatMin, e.event.behindMe.repeatMax);
+                    return;
+                }
+            }
+
+            RecalcTimer(e, 1200, 1200);
+            break;
+        }
+        case SMART_EVENT_VICTIM_NOT_ATTACKING:
+        {
+            if (!me || !me->IsEngaged())
+                return;
+
+            if (Unit* victim = me->GetVictim())
+                if (victim->GetVictim()->GetGUID() != me->GetGUID())
+                    ProcessTimedAction(e, e.event.victimPassive.repeatMin, e.event.victimPassive.repeatMax);
+
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessEvent: Unhandled Event type {}", e.GetEventType());
             break;
