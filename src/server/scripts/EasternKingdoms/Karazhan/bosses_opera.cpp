@@ -457,7 +457,7 @@ struct boss_strawman : public ScriptedAI
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
-            }).Schedule(2s, [this](TaskContext)
+            }).Schedule(2s, [this](TaskContext context)
             {
                 me->Yell("~heartbeat~", LANG_UNIVERSAL);
                 context.Repeat(4s);
