@@ -599,10 +599,13 @@ void SmartAI::MovepointReached(uint32 id)
     mWPReached = true;
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_REACHED, nullptr, mCurrentWPID);
 
+    if (mLastWP->delay)
+        SetWPPauseTimer(mLastWP->delay);
+
     if (mLastWP)
     {
         me->SetPosition(mLastWP->x, mLastWP->y, mLastWP->z, me->GetOrientation());
-        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+        me->SetHomePosition(me->GetPosition());
     }
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
