@@ -1408,7 +1408,7 @@ INSERT INTO acore_world.npc_trainer (ID,SpellID,MoneyCost,ReqSkillLine,ReqSkillR
 	 (31084,48778,0,0,0,40,0),
 	 (31084,50977,0,0,0,0,0);
 INSERT INTO acore_world.npc_trainer (ID,SpellID,MoneyCost,ReqSkillLine,ReqSkillRank,ReqLevel,ReqSpell) VALUES
-	 (31084,53431,0,0,0,10,0),
+	 (31084,53431,0,0,0,55,0),
 	 (31238,-202012,0,0,0,0,0),
 	 (31238,-202011,0,0,0,0,0),
 	 (31238,-202010,0,0,0,0,0),
