@@ -9111,6 +9111,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
+    if(procSpell)
+        if (procSpell->SpellFamilyName == SPELLFAMILY_PERK)
+            return false;
+
     // Try handle unknown trigger spells
     //if (sSpellMgr->GetSpellInfo(trigger_spell_id) == nullptr)
     {
@@ -10030,6 +10034,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             return false;
 
         AddSpellCooldown(triggerEntry->Id, 0, cooldown);
+    }
+
+    if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_PERK)
+    {
+
+        ToPlayer()->AddSpellCooldown(trigger_spell_id, 0, 3.1 * IN_MILLISECONDS);
     }
 
     if(basepoints0)
@@ -16854,10 +16864,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
                             // Don`t drop charge or add cooldown for not started trigger
-                            if ((procSpellInfo->SpellFamilyName != SPELLFAMILY_PERK))
-                                if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
-                                    takeCharges = true;
-                                break;
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
+                                takeCharges = true;
+                            break;
                         }
                     case SPELL_AURA_PROC_TRIGGER_DAMAGE:
                         {
