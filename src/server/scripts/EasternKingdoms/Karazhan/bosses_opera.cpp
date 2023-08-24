@@ -142,6 +142,19 @@ void DespawnAll(InstanceScript* instance)
     }
 }
 
+void DoActions(InstanceScript* instance)
+{
+    uint32 datas[3] = {DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
+
+    for (uint32 data : datas)
+    {
+        if (Creature* actionCreature = instance->GetCreature(data))
+        {
+            actionCreature->AI()->DoAction(ACTION_RELEASE);
+        }
+    }
+}
+
 void ActivateUnit(uint32 unitData, InstanceScript* instance)
 {
     std::chrono::milliseconds releaseTimer;
@@ -171,19 +184,6 @@ void ActivateUnit(uint32 unitData, InstanceScript* instance)
         unit->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         unit->SetImmuneToPC(false);
         unit->SetInCombatWithZone();
-    }
-}
-
-void DoActions(InstanceScript* instance)
-{
-    uint32 datas[3] = {DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
-
-    for (uint32 data : datas)
-    {
-        if (Creature* actionCreature = instance->GetCreature(data))
-        {
-            actionCreature->AI()->DoAction(ACTION_RELEASE);
-        }
     }
 }
 
