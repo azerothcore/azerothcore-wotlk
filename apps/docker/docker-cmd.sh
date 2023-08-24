@@ -87,7 +87,7 @@ while [[ $# -gt 0 ]]; do
 
         build:nocache)
             set -x
-            docker compose --profile local --profile dev --profile dev-build --no-cache
+            docker compose --profile local --profile dev --profile dev-build build --no-cache
             docker image prune -f
             docker compose run --rm --no-deps ac-dev-build /bin/bash /azerothcore/apps/docker/docker-build-dev.sh
             set +x
