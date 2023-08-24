@@ -137,13 +137,43 @@ void DespawnAll(InstanceScript* instance)
     }
 }
 
+void ActivateUnit(uint32 unitData, InstanceScript* instance)
+{
+    std::chrono::milliseconds releaseTimer;
+
+    switch (unitData)
+    {
+        case DATA_DOROTHEE:
+            releaseTimer = 12000ms;
+            break;
+        case DATA_ROAR:
+            releaseTimer = 16670ms;
+            break;
+        case DATA_STRAWMAN:
+            releaseTimer = 26300ms;
+            break;
+        case DATA_TINHEAD:
+            releaseTimer = 34470ms;
+        default:
+            releaseTimer = 0ms;
+            break;
+    }
+
+    if (Creature* unit = instance->GetCreature(unitData))
+    {
+        unit->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        unit->SetImmuneToPC(false);
+        unit->SetInCombatWithZone();
+    }
+}
+
 struct boss_dorothee : public ScriptedAI
 {
     boss_dorothee(Creature* creature) : ScriptedAI(creature)
     {
         SetCombatMovement(false);
         //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
-        Initialize();
+
         instance = creature->GetInstanceScript();
 
         _scheduler.SetValidator([this]
@@ -152,47 +182,15 @@ struct boss_dorothee : public ScriptedAI
         });
     }
 
-    void ScheduleActivation()
-    {
-        _scheduler.Schedule(16670ms, [this](TaskContext)
-        {
-            if (Creature* roar = instance->GetCreature(DATA_ROAR))
-            {
-                roar->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                roar->SetImmuneToPC(false);
-                roar->SetInCombatWithZone();
-            }
-        }).Schedule(26300ms, [this](TaskContext)
-        {
-            if (Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
-            {
-                strawman->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                strawman->SetImmuneToPC(false);
-                strawman->SetInCombatWithZone();
-            }
-        }).Schedule(34470ms, [this](TaskContext)
-        {
-            if (Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
-            {
-                tinhead->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                tinhead->SetImmuneToPC(false);
-                tinhead->SetInCombatWithZone();
-            }
-        });
-    }
-
-    void Initialize()
-    {
-        titoDied = false;
-        _startIntro = false;
-    }
-
     InstanceScript* instance;
     bool titoDied;
 
     void Reset() override
     {
-        Initialize();
+        titoDied = false;
+        _startIntro = false;
+
+        ActivateUnit(DATA_DOROTHEE, instance);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -270,13 +268,7 @@ struct boss_dorothee : public ScriptedAI
 
         if (!_startIntro)
         {
-            ScheduleActivation();
-            _scheduler.Schedule(12s, [this](TaskContext)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToPC(false);
-                me->SetInCombatWithZone();
-            });
+            //keep this code for if things go wrong
             _startIntro = true;
         }
         DoMeleeAttackIfReady();
@@ -347,7 +339,10 @@ struct boss_roar : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override { }
+    void Reset() override
+    {
+        ActivateUnit(DATA_ROAR, instance);
+    }
 
     void MoveInLineOfSight(Unit* who) override
 
@@ -441,7 +436,10 @@ struct boss_strawman : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override { }
+    void Reset() override
+    {
+        ActivateUnit(DATA_STRAWMAN, instance);
+    }
 
     void AttackStart(Unit* who) override
     {
@@ -544,6 +542,8 @@ struct boss_tinhead : public ScriptedAI
     void Reset() override
     {
         _rustCount = 0;
+
+        ActivateUnit(DATA_TINHEAD, instance);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
