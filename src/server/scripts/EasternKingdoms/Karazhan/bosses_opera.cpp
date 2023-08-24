@@ -144,7 +144,7 @@ void DespawnAll(InstanceScript* instance)
 
 void DoActions(InstanceScript* instance)
 {
-    uint32 datas[3] = {DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
+    uint32 datas[4] = {DATA_DOROTHEE, DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
 
     for (uint32 data : datas)
     {
@@ -152,38 +152,6 @@ void DoActions(InstanceScript* instance)
         {
             actionCreature->AI()->DoAction(ACTION_RELEASE);
         }
-    }
-}
-
-void ActivateUnit(uint32 unitData, InstanceScript* instance)
-{
-    std::chrono::milliseconds releaseTimer;
-
-    switch (unitData)
-    {
-        case DATA_DOROTHEE:
-            releaseTimer = 12000ms;
-            //set action to activate timers of the others
-            DoActions(instance);
-            break;
-        case DATA_ROAR:
-            releaseTimer = 16670ms;
-            break;
-        case DATA_STRAWMAN:
-            releaseTimer = 26300ms;
-            break;
-        case DATA_TINHEAD:
-            releaseTimer = 34470ms;
-        default:
-            releaseTimer = 0ms;
-            break;
-    }
-
-    if (Creature* unit = instance->GetCreature(unitData))
-    {
-        unit->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        unit->SetImmuneToPC(false);
-        unit->SetInCombatWithZone();
     }
 }
 
@@ -204,6 +172,19 @@ struct boss_dorothee : public ScriptedAI
 
     InstanceScript* instance;
     bool titoDied;
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            _scheduler.Schedule(12s, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+        }
+    }
 
     void Reset() override
     {
@@ -286,10 +267,8 @@ struct boss_dorothee : public ScriptedAI
 
         if (!_startIntro)
         {
-            ActivateUnit(DATA_DOROTHEE, instance);
+            DoActions(instance);
             _startIntro = true;
-
-            ActivateUnit(DATA_DOROTHEE, instance);
         }
         DoMeleeAttackIfReady();
 
@@ -363,7 +342,12 @@ struct boss_roar : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
-            ActivateUnit(DATA_ROAR, instance);
+            _scheduler.Schedule(16670ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
         }
     }
 
@@ -465,7 +449,12 @@ struct boss_strawman : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
-            ActivateUnit(DATA_STRAWMAN, instance);
+            _scheduler.Schedule(26300ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
         }
     }
 
@@ -573,7 +562,12 @@ struct boss_tinhead : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
-            ActivateUnit(DATA_TINHEAD, instance);
+            _scheduler.Schedule(34470ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
         }
     }
 
