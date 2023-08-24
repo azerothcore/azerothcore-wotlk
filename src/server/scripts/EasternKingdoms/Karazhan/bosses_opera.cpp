@@ -452,11 +452,15 @@ struct boss_strawman : public ScriptedAI
         if (action == ACTION_RELEASE)
         {
             me->Yell("I have been activated!", LANG_UNIVERSAL);
-            _scheduler.Schedule(26300ms, [this](TaskContext)
+            _releaseScheduler.Schedule(26300ms, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
+            }).Schedule(2s, [this](TaskContext)
+            {
+                me->Yell("~heartbeat~", LANG_UNIVERSAL);
+                context.Repeat(4s);
             });
         }
     }
@@ -540,11 +544,13 @@ struct boss_strawman : public ScriptedAI
             return;
 
         _scheduler.Update(diff);
+        _releaseScheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
 private:
     TaskScheduler _scheduler;
+    TaskScheduler _releaseScheduler;
 };
 
 struct boss_tinhead : public ScriptedAI
