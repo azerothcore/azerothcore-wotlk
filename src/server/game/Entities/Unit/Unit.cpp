@@ -16854,9 +16854,10 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
                             // Don`t drop charge or add cooldown for not started trigger
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
-                                takeCharges = true;
-                            break;
+                            if ((procSpellInfo->SpellFamilyName != SPELLFAMILY_PERK))
+                                if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
+                                    takeCharges = true;
+                                break;
                         }
                     case SPELL_AURA_PROC_TRIGGER_DAMAGE:
                         {
