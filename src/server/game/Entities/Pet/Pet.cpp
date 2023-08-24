@@ -48,7 +48,7 @@ Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID
     m_loading(false),
     m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL),
     m_tempspellTarget(nullptr),
-    m_tempoldTarget(nullptr),
+    m_tempoldTarget(),
     m_tempspellIsPositive(false),
     m_tempspell(0)
 {
@@ -710,7 +710,11 @@ void Pet::Update(uint32 diff)
                 if (m_tempspell)
                 {
                     Unit* tempspellTarget = m_tempspellTarget;
-                    Unit* tempoldTarget = m_tempoldTarget;
+                    Unit* tempoldTarget = nullptr;
+
+                    if (!m_tempoldTarget.IsEmpty())
+                        tempoldTarget = ObjectAccessor::GetUnit(*this, m_tempoldTarget);
+
                     bool tempspellIsPositive = m_tempspellIsPositive;
                     uint32 tempspell = m_tempspell;
                     Unit* charmer = GetCharmerOrOwner();
@@ -783,7 +787,7 @@ void Pet::Update(uint32 diff)
                                         }
                                     }
 
-                                    m_tempoldTarget = nullptr;
+                                    m_tempoldTarget = ObjectGuid::Empty;
                                     m_tempspellIsPositive = false;
                                 }
                             }
@@ -793,7 +797,7 @@ void Pet::Update(uint32 diff)
                     {
                         m_tempspell = 0;
                         m_tempspellTarget = nullptr;
-                        m_tempoldTarget = nullptr;
+                        m_tempoldTarget = ObjectGuid::Empty;
                         m_tempspellIsPositive = false;
 
                         Unit* victim = charmer->GetVictim();
@@ -1218,11 +1222,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_INFERNAL:
                         {
-                            float highAmt = petlevel / 11.0f;
-                            float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
-
+                            if (pInfo)
+                            {
+                                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
+                                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+                            }
                             AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
                             AddAura(SPELL_INFERNAL_SCALING_01, this);
@@ -2414,7 +2418,7 @@ void Pet::SetDisplayId(uint32 modelId)
                 player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
 
-void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive)
+void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive)
 {
     if (!spellid)
         return;
@@ -2426,7 +2430,7 @@ void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarg
     m_tempspell = spellid;
     m_tempspellIsPositive = spellIsPositive;
 
-    if (oldTarget)
+    if (!oldTarget.IsEmpty())
         m_tempoldTarget = oldTarget;
 }
 
@@ -2435,7 +2439,7 @@ void Pet::ClearCastWhenWillAvailable()
     m_tempspellIsPositive = false;
     m_tempspell = 0;
     m_tempspellTarget = nullptr;
-    m_tempoldTarget = nullptr;
+    m_tempoldTarget = ObjectGuid::Empty;
 }
 
 void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)

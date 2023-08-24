@@ -645,7 +645,10 @@ enum AcoreStrings
 
     // End Level 3 list, continued at 1100
 
-    // 600-704 - free
+    LANG_EVENT_STARTED                  = 600,
+    LANG_EVENT_STOPPED                  = 601,
+
+    // 602-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
