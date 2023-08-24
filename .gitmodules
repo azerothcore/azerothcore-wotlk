@@ -1,6 +1,0 @@
-[submodule "deps/git-subrepo"]
-	path = deps/git-subrepo
-	url = https://github.com/ingydotnet/git-subrepo.git
-[submodule "modules/mod-playerbots"]
-	path = modules/mod-playerbots
-	url = https://github.com/liyunfan1223/mod-playerbots.git

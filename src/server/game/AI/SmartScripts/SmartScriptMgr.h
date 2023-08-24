@@ -523,7 +523,8 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 range;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } areaCasting;
 
         struct
@@ -532,7 +533,8 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 range;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } areaRange;
 
         struct
@@ -542,6 +544,7 @@ struct SmartEvent
             uint32 param3;
             uint32 param4;
             uint32 param5;
+            uint32 param6;
         } raw;
     };
 
@@ -739,8 +742,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_SCALE                          = 227,    // scale
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
+    SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
 
-    SMART_ACTION_AC_END                             = 230,    // placeholder
+    SMART_ACTION_AC_END                             = 231,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1442,6 +1446,13 @@ struct SmartAction
         {
             uint32 visualId;
         } spellVisual;
+
+        struct
+        {
+            uint32 followState;
+            uint32 followType;
+            uint32 dist;
+        } followGroup;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1878,6 +1889,16 @@ enum SmartCastFlags
     SMARTCAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
     SMARTCAST_COMBAT_MOVE            = 0x40,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
     SMARTCAST_THREATLIST_NOT_SINGLE  = 0x80                      //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+};
+
+enum SmartFollowType
+{
+    FOLLOW_TYPE_CIRCLE                     = 1,                  // 360 degrees around leader, 90 degrees is the maximum angle
+    FOLLOW_TYPE_SEMI_CIRCLE_BEHIND         = 2,                  // 180 degrees behind leader
+    FOLLOW_TYPE_SEMI_CIRCLE_FRONT          = 3,                  // 180 degrees in front of leader
+    FOLLOW_TYPE_LINE                       = 4,                  // front -> back -> front -> back
+    FOLLOW_TYPE_COLUMN                     = 5,                  // left -> right -> left -> right
+    FOLLOW_TYPE_ANGULAR                    = 6                   // geese-like formation 135 and 225 degrees behind leader
 };
 
 // one line in DB is one event

@@ -18,6 +18,9 @@ LABEL description="AC base image for dev containers"
 
 ENV DOCKER=1
 
+# Ensure ac-dev-server can properly pull versions
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+
 # set timezone environment variable
 ENV TZ=Etc/UTC
 
@@ -34,14 +37,17 @@ RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sud
   libncurses5-dev ccache \
   && rm -rf /var/lib/apt/lists/*
 
+# Ensure git will work with the AzerothCore source directory
+RUN git config --global --add safe.directory /azerothcore
+
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # must be created to set the correct permissions on them
 RUN mkdir -p /azerothcore/env/dist/bin
@@ -94,11 +100,6 @@ USER $DOCKER_USER
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
-# Needed if we use the dev image without linking any external folder (e.g. acore-docker)
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
-
 #================================================================
 #
 # SERVICE BASE: prepare the OS for the production-ready services
@@ -122,10 +123,10 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # install the required dependencies to run the server
 RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools libgoogle-perftools-dev net-tools \
@@ -205,9 +206,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER ./modules /azerothcore/modules
 # check if we have ccache files available outside
 RUN rm -rf /azerothcore/var/ccache/*
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/dbimport.conf.dockerdist /azerothcore/env/dist/etc/dbimport.conf.dockerdist
 
 # install eluna
 RUN git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna.git /azerothcore/modules/mod-eluna
@@ -279,10 +277,10 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # ENV DATAPATH=/azerothcore/env/dist/data-temp
 ENV DATAPATH=/azerothcore/env/dist/data
@@ -321,10 +319,10 @@ RUN apt-get update && apt-get install -y libmysqlclient-dev libssl-dev libbz2-de
     sudo && rm -rf /var/lib/apt/lists/* ;
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID acore && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
-    passwd -d acore && \
-    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN mkdir -p /azerothcore/env/client/
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
