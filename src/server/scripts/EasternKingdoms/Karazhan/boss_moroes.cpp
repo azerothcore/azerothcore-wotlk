@@ -209,9 +209,37 @@ struct boss_moroes : public BossAI
         return Acore::Containers::SelectRandomContainerElement(guestList);
     }
 
+    bool CheckGuestsInRoom()
+    {
+        for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
+        {
+            if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+            {
+                if ((summon->GetPositionX()) < -11028.f || (summon->GetPositionY()) < -1955.f) //boundaries of the two doors
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+
+        if (!CheckGuestsInRoom())
+        {
+            EnterEvadeMode();
+            for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
+            {
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+                {
+                    summon->AI()->EnterEvadeMode();
+                }
+            }
+            return;
+        }
 
         if (!UpdateVictim())
             return;
