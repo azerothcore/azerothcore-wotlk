@@ -97,6 +97,11 @@ enum Creatures
     CREATURE_CRONE          = 18168,
 };
 
+enum OZActions
+{
+    ACTION_RELEASE          = 1,
+};
+
 void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
 {
     instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, SPECIAL);  // Increment DeathCount
@@ -145,6 +150,8 @@ void ActivateUnit(uint32 unitData, InstanceScript* instance)
     {
         case DATA_DOROTHEE:
             releaseTimer = 12000ms;
+            //set action to activate timers of the others
+            DoActions(instance);
             break;
         case DATA_ROAR:
             releaseTimer = 16670ms;
@@ -164,6 +171,19 @@ void ActivateUnit(uint32 unitData, InstanceScript* instance)
         unit->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         unit->SetImmuneToPC(false);
         unit->SetInCombatWithZone();
+    }
+}
+
+void DoActions(InstanceScript* instance)
+{
+    uint32 datas[3] = {DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
+
+    for (uint32 data : datas)
+    {
+        if (Creature* actionCreature = instance->GetCreature(data))
+        {
+            actionCreature->AI()->DoAction(ACTION_RELEASE);
+        }
     }
 }
 
@@ -189,8 +209,6 @@ struct boss_dorothee : public ScriptedAI
     {
         titoDied = false;
         _startIntro = false;
-
-        ActivateUnit(DATA_DOROTHEE, instance);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -268,8 +286,10 @@ struct boss_dorothee : public ScriptedAI
 
         if (!_startIntro)
         {
-            //keep this code for if things go wrong
+            ActivateUnit(DATA_DOROTHEE, instance);
             _startIntro = true;
+
+            ActivateUnit(DATA_DOROTHEE, instance);
         }
         DoMeleeAttackIfReady();
 
@@ -339,10 +359,15 @@ struct boss_roar : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override
+    void DoAction(int32 action) override
     {
-        ActivateUnit(DATA_ROAR, instance);
+        if (action == ACTION_RELEASE)
+        {
+            ActivateUnit(DATA_ROAR, instance);
+        }
     }
+
+    void Reset() override { }
 
     void MoveInLineOfSight(Unit* who) override
 
@@ -436,10 +461,15 @@ struct boss_strawman : public ScriptedAI
 
     InstanceScript* instance;
 
-    void Reset() override
+    void DoAction(int32 action) override
     {
-        ActivateUnit(DATA_STRAWMAN, instance);
+        if (action == ACTION_RELEASE)
+        {
+            ActivateUnit(DATA_STRAWMAN, instance);
+        }
     }
+
+    void Reset() override { }
 
     void AttackStart(Unit* who) override
     {
@@ -539,11 +569,17 @@ struct boss_tinhead : public ScriptedAI
 
     InstanceScript* instance;
 
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            ActivateUnit(DATA_TINHEAD, instance);
+        }
+    }
+
     void Reset() override
     {
         _rustCount = 0;
-
-        ActivateUnit(DATA_TINHEAD, instance);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
