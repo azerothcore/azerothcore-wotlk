@@ -177,7 +177,8 @@ struct boss_dorothee : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
-            _scheduler.Schedule(12s, [this](TaskContext)
+            me->Yell("I have been activated!", LANG_UNIVERSAL);
+            _scheduler.Schedule(12700ms, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
@@ -342,6 +343,7 @@ struct boss_roar : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
+            me->Yell("I have been activated!", LANG_UNIVERSAL);
             _scheduler.Schedule(16670ms, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -449,6 +451,7 @@ struct boss_strawman : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
+            me->Yell("I have been activated!", LANG_UNIVERSAL);
             _scheduler.Schedule(26300ms, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -562,6 +565,7 @@ struct boss_tinhead : public ScriptedAI
     {
         if (action == ACTION_RELEASE)
         {
+            me->Yell("I have been activated!", LANG_UNIVERSAL);
             _scheduler.Schedule(34470ms, [this](TaskContext)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
