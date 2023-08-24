@@ -1,3 +1,4 @@
+-- DB update 2023_08_24_00 -> 2023_08_24_01
 --
 SET @GUID := 137481;
 DELETE FROM `creature_addon` WHERE `guid` IN (@GUID, @GUID+1, @GUID+2, @GUID+3);
