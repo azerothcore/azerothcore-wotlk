@@ -1,3 +1,4 @@
+-- DB update 2023_08_24_01 -> 2023_08_24_02
 --
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 488000 AND `source_type` = 9;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 4880 AND `source_type` = 0;
