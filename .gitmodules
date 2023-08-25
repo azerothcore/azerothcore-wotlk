@@ -1,0 +1,3 @@
+[submodule "modules/mod-anticheat"]
+	path = modules/mod-anticheat
+	url = https://github.com/azerothcore/mod-anticheat.git
