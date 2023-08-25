@@ -37,7 +37,7 @@ EndContentData */
 ## npc_shenthul
 ######*/
 
-enum Shenthul
+enum Shenthul : uint32
 {
     QUEST_SHATTERED_SALUTE  = 2460
 };
@@ -134,10 +134,8 @@ public:
 ## npc_thrall_warchief
 ######*/
 
-enum ThrallWarchief
+enum ThrallWarchief : uint32
 {
-    QUEST_6566                     = 6566,
-
     SPELL_CHAIN_LIGHTNING          = 16033,
     SPELL_SHOCK                    = 16034,
 
@@ -153,18 +151,16 @@ enum ThrallWarchief
     AREA_ORGRIMMAR                 = 1637,
     AREA_RAZOR_HILL                = 362,
     AREA_CAMP_TAURAJO              = 378,
-    AREA_CROSSROADS                = 380
+    AREA_CROSSROADS                = 380,
+
+    // What the Wind Carries (ID: 6566)
+    QUEST_WHAT_THE_WIND_CARRIES     = 6566,
+    GOSSIP_MENU_THRALL              = 3664,
+    GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
+    GOSSIP_OPTION_DEFAULT           = 0
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
-
-#define GOSSIP_HTW "Please share your wisdom with me, Warchief."
-#define GOSSIP_STW1 "What discoveries?"
-#define GOSSIP_STW2 "Usurper?"
-#define GOSSIP_STW3 "With all due respect, Warchief - why not allow them to be destroyed? Does this not strengthen our position?"
-#define GOSSIP_STW4 "I... I did not think of it that way, Warchief."
-#define GOSSIP_STW5 "I live only to serve, Warchief! My life is empty and meaningless without your guidance."
-#define GOSSIP_STW6 "Of course, Warchief!"
 
 /// @todo verify abilities/timers
 class npc_thrall_warchief : public CreatureScript
@@ -175,47 +171,37 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        switch (action)
+
+        uint32 DiscussionOrder = action - GOSSIP_ACTION_INFO_DEF;
+
+        if (DiscussionOrder>= 1 && DiscussionOrder <= 6)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 5733, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 5734, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 5735, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 5736, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, 5737, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+6:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                SendGossipMenuFor(player, 5738, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+7:
-                CloseGossipMenuFor(player);
-                player->AreaExploredOrEventHappens(QUEST_6566);
-                break;
+            uint32 NextAction = GOSSIP_ACTION_INFO_DEF + DiscussionOrder + 1;
+            uint32 GossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + DiscussionOrder - 1;
+
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, NextAction);
+            SendGossipMenuFor(player, GossipResponse, creature->GetGUID());
         }
+        else if (DiscussionOrder == 7)
+        {
+            CloseGossipMenuFor(player);
+            player->AreaExploredOrEventHappens(QUEST_WHAT_THE_WIND_CARRIES);
+        }
+
         return true;
     }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
 
-        if (player->GetQuestStatus(QUEST_6566) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HTW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        if (player->GetQuestStatus(QUEST_WHAT_THE_WIND_CARRIES) == QUEST_STATUS_INCOMPLETE)
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
