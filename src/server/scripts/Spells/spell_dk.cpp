@@ -79,6 +79,10 @@ enum DeathKnightSpells
     SPELL_DK_RAISE_ALLY                         = 46619,
     SPELL_DK_THRASH                             = 47480,
     SPELL_GHOUL_FRENZY                          = 62218,
+
+
+    // perk
+    PERK_FREE_GHOUL                             = 160001
 };
 
 enum DeathKnightSpellIcons
@@ -1893,7 +1897,8 @@ class spell_dk_raise_dead : public SpellScript
         /// @workaround: there is no access to castresult of other spells, check it manually
         SpellInfo const* reagentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT);
         Player* player = GetCaster()->ToPlayer();
-        if (!player->CanNoReagentCast(reagentSpell))
+
+        if (!player->CanNoReagentCast(reagentSpell) && !player->HasSpell(PERK_FREE_GHOUL))
         {
             for (uint32 i = 0; i < MAX_SPELL_REAGENTS; i++)
             {
