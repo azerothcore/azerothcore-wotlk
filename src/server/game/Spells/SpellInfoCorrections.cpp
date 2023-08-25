@@ -57,6 +57,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Has Brewfest Mug
+    ApplySpellFix({ 42533 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(347); // 15 min
+    });
+
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellInfo* spellInfo)
     {
