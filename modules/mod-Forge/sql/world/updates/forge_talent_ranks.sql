@@ -592,1883 +592,1883 @@ INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spe
 	 (16252,838,4,16308);
 INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16252,838,5,16309),
-	 (16254,838,1,16254),
-	 (16254,838,2,16271),
-	 (16254,838,3,16272),
 	 (16255,838,1,16255),
 	 (16255,838,2,16302),
 	 (16255,838,3,16303),
 	 (16255,838,4,16304),
 	 (16255,838,5,16305),
-	 (16256,838,1,16256);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16256,838,1,16256),
 	 (16256,838,2,16281),
 	 (16256,838,3,16282),
-	 (16256,838,4,16283),
+	 (16256,838,4,16283);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16256,838,5,16284),
 	 (16258,838,1,16258),
 	 (16258,838,2,16293),
 	 (16259,838,1,16259),
 	 (16259,838,2,16295),
 	 (16259,838,3,52456),
-	 (16261,838,1,16261);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16261,838,1,16261),
 	 (16261,838,2,16290),
 	 (16261,838,3,51881),
-	 (16262,838,1,16262),
+	 (16262,838,1,16262);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16262,838,2,16287),
 	 (16266,838,1,16266),
 	 (16266,838,2,29079),
 	 (16266,838,3,29080),
 	 (16268,838,1,16268),
 	 (16462,401,1,16462),
-	 (16462,401,2,16463);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16462,401,2,16463),
 	 (16462,401,3,16464),
 	 (16462,401,4,16465),
-	 (16462,401,5,16466),
+	 (16462,401,5,16466);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16487,402,1,16487),
 	 (16487,402,2,16489),
 	 (16487,402,3,16492),
 	 (16493,401,1,16493),
 	 (16493,401,2,16494),
 	 (16511,804,1,16511),
-	 (16513,802,1,16513);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16513,802,1,16513),
 	 (16513,802,2,16514),
 	 (16513,802,3,16515),
-	 (16538,403,1,16538),
+	 (16538,403,1,16538);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16538,403,2,16539),
 	 (16538,403,3,16540),
 	 (16538,403,4,16541),
 	 (16538,403,5,16542),
 	 (16578,837,1,16578),
 	 (16578,837,2,16579),
-	 (16578,837,3,16580);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16578,837,3,16580),
 	 (16578,837,4,16581),
 	 (16578,837,5,16582),
-	 (16757,842,1,16757),
+	 (16757,842,1,16757);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16757,842,2,16758),
 	 (16814,846,1,16814),
 	 (16814,846,2,16815),
 	 (16814,846,3,16816),
 	 (16814,846,4,16817),
 	 (16814,846,5,16818),
-	 (16819,846,1,16819);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16819,846,1,16819),
 	 (16819,846,2,16820),
 	 (16821,846,1,16821),
-	 (16821,846,2,16822),
+	 (16821,846,2,16822);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16833,848,1,16833),
 	 (16833,848,2,16834),
 	 (16833,848,3,16835),
 	 (16836,846,1,16836),
 	 (16836,846,2,16839),
 	 (16836,846,3,16840),
-	 (16845,846,1,16845);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16845,846,1,16845),
 	 (16845,846,2,16846),
 	 (16845,846,3,16847),
-	 (16850,846,1,16850),
+	 (16850,846,1,16850);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16850,846,2,16923),
 	 (16850,846,3,16924),
 	 (16858,847,1,16858),
 	 (16858,847,2,16859),
 	 (16858,847,3,16860),
 	 (16858,847,4,16861),
-	 (16858,847,5,16862);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16858,847,5,16862),
 	 (16864,848,1,16864),
 	 (16880,846,1,16880),
-	 (16880,846,2,61345),
+	 (16880,846,2,61345);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16880,846,3,61346),
 	 (16896,846,1,16896),
 	 (16896,846,2,16897),
 	 (16896,846,3,16899),
 	 (16909,846,1,16909),
 	 (16909,846,2,16910),
-	 (16909,846,3,16911);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16909,846,3,16911),
 	 (16909,846,4,16912),
 	 (16909,846,5,16913),
-	 (16929,847,1,16929),
+	 (16929,847,1,16929);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16929,847,2,16930),
 	 (16929,847,3,16931),
 	 (16934,847,1,16934),
 	 (16934,847,2,16935),
 	 (16934,847,3,16936),
 	 (16934,847,4,16937),
-	 (16934,847,5,16938);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16934,847,5,16938),
 	 (16940,847,1,16940),
 	 (16940,847,2,16941),
-	 (16942,847,1,16942),
+	 (16942,847,1,16942);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16942,847,2,16943),
 	 (16942,847,3,16944),
 	 (16947,847,1,16947),
 	 (16947,847,2,16948),
 	 (16947,847,3,16949),
 	 (16966,847,1,16966),
-	 (16966,847,2,16968);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (16966,847,2,16968),
 	 (16972,847,1,16972),
 	 (16972,847,2,16974),
-	 (16972,847,3,16975),
+	 (16972,847,3,16975);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (16998,847,1,16998),
 	 (16998,847,2,16999),
 	 (17002,847,1,17002),
 	 (17002,847,2,24866),
 	 (17003,847,1,17003),
 	 (17003,847,2,17004),
-	 (17003,847,3,17005);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17003,847,3,17005),
 	 (17003,847,4,17006),
 	 (17003,847,5,24894),
-	 (17007,847,1,17007),
+	 (17007,847,1,17007);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17050,848,1,17050),
 	 (17050,848,2,17051),
 	 (17056,848,1,17056),
 	 (17056,848,2,17058),
 	 (17056,848,3,17059),
 	 (17056,848,4,17060),
-	 (17056,848,5,17061);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17056,848,5,17061),
 	 (17063,848,1,17063),
 	 (17063,848,2,17065),
-	 (17063,848,3,17066),
+	 (17063,848,3,17066);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17069,848,1,17069),
 	 (17069,848,2,17070),
 	 (17069,848,3,17071),
 	 (17069,848,4,17072),
 	 (17069,848,5,17073),
 	 (17074,848,1,17074),
-	 (17074,848,2,17075);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17074,848,2,17075),
 	 (17074,848,3,17076),
 	 (17074,848,4,17077),
-	 (17074,848,5,17078),
+	 (17074,848,5,17078);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17104,848,1,17104),
 	 (17104,848,2,24943),
 	 (17104,848,3,24944),
 	 (17104,848,4,24945),
 	 (17104,848,5,24946),
 	 (17106,848,1,17106),
-	 (17106,848,2,17107);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17106,848,2,17107),
 	 (17106,848,3,17108),
 	 (17111,848,1,17111),
-	 (17111,848,2,17112),
+	 (17111,848,2,17112);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17111,848,3,17113),
 	 (17116,848,1,17116),
 	 (17118,848,1,17118),
 	 (17118,848,2,17119),
 	 (17118,848,3,17120),
 	 (17123,848,1,17123),
-	 (17123,848,2,17124);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17123,848,2,17124),
 	 (17322,833,1,17322),
 	 (17322,833,2,17323),
-	 (17364,838,1,17364),
+	 (17364,838,1,17364);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17485,838,1,17485),
 	 (17485,838,2,17486),
 	 (17485,838,3,17487),
 	 (17485,838,4,17488),
 	 (17485,838,5,17489),
 	 (17778,845,1,17778),
-	 (17778,845,2,17779);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17778,845,2,17779),
 	 (17778,845,3,17780),
 	 (17783,843,1,17783),
-	 (17783,843,2,17784),
+	 (17783,843,2,17784);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17783,843,3,17785),
 	 (17788,845,1,17788),
 	 (17788,845,2,17789),
 	 (17788,845,3,17790),
 	 (17788,845,4,17791),
 	 (17788,845,5,17792),
-	 (17793,845,1,17793);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17793,845,1,17793),
 	 (17793,845,2,17796),
 	 (17793,845,3,17801),
-	 (17793,845,4,17802),
+	 (17793,845,4,17802);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17793,845,5,17803),
 	 (17804,843,1,17804),
 	 (17804,843,2,17805),
 	 (17810,843,1,17810),
 	 (17810,843,2,17811),
 	 (17810,843,3,17812),
-	 (17810,843,4,17813);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17810,843,4,17813),
 	 (17810,843,5,17814),
 	 (17815,845,1,17815),
-	 (17815,845,2,17833),
+	 (17815,845,2,17833);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17815,845,3,17834),
 	 (17877,845,1,17877),
 	 (17917,845,1,17917),
 	 (17917,845,2,17918),
 	 (17927,845,1,17927),
 	 (17927,845,2,17929),
-	 (17927,845,3,17930);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (17927,845,3,17930),
 	 (17959,845,1,17959),
 	 (17959,845,2,59738),
-	 (17959,845,3,59739),
+	 (17959,845,3,59739);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (17959,845,4,59740),
 	 (17959,845,5,59741),
 	 (17962,845,1,17962),
 	 (18094,843,1,18094),
 	 (18094,843,2,18095),
 	 (18096,845,1,18096),
-	 (18096,845,2,18073);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18096,845,2,18073),
 	 (18096,845,3,63245),
 	 (18119,845,1,18119),
-	 (18119,845,2,18120),
+	 (18119,845,2,18120);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18126,845,1,18126),
 	 (18126,845,2,18127),
 	 (18130,845,1,18130),
 	 (18135,845,1,18135),
 	 (18135,845,2,18136),
 	 (18174,843,1,18174),
-	 (18174,843,2,18175);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18174,843,2,18175),
 	 (18174,843,3,18176),
 	 (18179,843,1,18179),
-	 (18179,843,2,18180),
+	 (18179,843,2,18180);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18182,843,1,18182),
 	 (18182,843,2,18183),
 	 (18213,843,1,18213),
 	 (18213,843,2,18372),
 	 (18218,843,1,18218),
 	 (18218,843,2,18219),
-	 (18220,843,1,18220);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18220,843,1,18220),
 	 (18223,843,1,18223),
 	 (18271,843,1,18271),
-	 (18271,843,2,18272),
+	 (18271,843,2,18272);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18271,843,3,18273),
 	 (18271,843,4,18274),
 	 (18271,843,5,18275),
 	 (18288,843,1,18288),
 	 (18427,803,1,18427),
 	 (18427,803,2,18428),
-	 (18427,803,3,18429);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18427,803,3,18429),
 	 (18427,803,4,61330),
 	 (18427,803,5,61331),
-	 (18459,841,1,18459),
+	 (18459,841,1,18459);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18459,841,2,18460),
 	 (18459,841,3,54734),
 	 (18462,840,1,18462),
 	 (18462,840,2,18463),
 	 (18462,840,3,18464),
 	 (18530,831,1,18530),
-	 (18530,831,2,18531);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18530,831,2,18531),
 	 (18530,831,3,18533),
 	 (18530,831,4,18534),
-	 (18530,831,5,18535),
+	 (18530,831,5,18535);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18551,832,1,18551),
 	 (18551,832,2,18552),
 	 (18551,832,3,18553),
 	 (18551,832,4,18554),
 	 (18551,832,5,18555),
 	 (18562,848,1,18562),
-	 (18692,844,1,18692);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18692,844,1,18692),
 	 (18692,844,2,18693),
 	 (18694,844,1,18694),
-	 (18694,844,2,18695),
+	 (18694,844,2,18695);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18694,844,3,18696),
 	 (18697,844,1,18697),
 	 (18697,844,2,18698),
 	 (18697,844,3,18699),
 	 (18703,844,1,18703),
 	 (18703,844,2,18704),
-	 (18705,844,1,18705);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18705,844,1,18705),
 	 (18705,844,2,18706),
 	 (18705,844,3,18707),
-	 (18708,844,1,18708),
+	 (18708,844,1,18708);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18709,844,1,18709),
 	 (18709,844,2,18710),
 	 (18731,844,1,18731),
 	 (18731,844,2,18743),
 	 (18731,844,3,18744),
 	 (18754,844,1,18754),
-	 (18754,844,2,18755);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18754,844,2,18755),
 	 (18754,844,3,18756),
 	 (18767,844,1,18767),
-	 (18767,844,2,18768),
+	 (18767,844,2,18768);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (18769,844,1,18769),
 	 (18769,844,2,18770),
 	 (18769,844,3,18771),
 	 (18769,844,4,18772),
 	 (18769,844,5,18773),
 	 (18827,843,1,18827),
-	 (18827,843,2,18829);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (18827,843,2,18829),
 	 (19028,844,1,19028),
 	 (19159,827,1,19159),
-	 (19159,827,2,19160),
+	 (19159,827,2,19160);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19168,827,1,19168),
 	 (19168,827,2,19180),
 	 (19168,827,3,19181),
 	 (19168,827,4,24296),
 	 (19168,827,5,24297),
 	 (19184,827,1,19184),
-	 (19184,827,2,19387);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19184,827,2,19387),
 	 (19184,827,3,19388),
 	 (19236,831,1,19236),
-	 (19255,827,1,19255),
+	 (19255,827,1,19255);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19255,827,2,19256),
 	 (19255,827,3,19257),
 	 (19255,827,4,19258),
 	 (19255,827,5,19259),
 	 (19286,827,1,19286),
 	 (19286,827,2,19287),
-	 (19290,827,1,19290);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19290,827,1,19290),
 	 (19290,827,2,19294),
 	 (19290,827,3,24283),
-	 (19295,827,1,19295),
+	 (19295,827,1,19295);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19295,827,2,19297),
 	 (19295,827,3,19298),
 	 (19306,827,1,19306),
 	 (19370,827,1,19370),
 	 (19370,827,2,19371),
 	 (19370,827,3,19373),
-	 (19376,827,1,19376);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19376,827,1,19376),
 	 (19376,827,2,63457),
 	 (19376,827,3,63458),
-	 (19386,827,1,19386),
+	 (19386,827,1,19386);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19407,826,1,19407),
 	 (19407,826,2,19412),
 	 (19416,826,1,19416),
 	 (19416,826,2,19417),
 	 (19416,826,3,19418),
 	 (19416,826,4,19419),
-	 (19416,826,5,19420);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19416,826,5,19420),
 	 (19421,826,1,19421),
 	 (19421,826,2,19422),
-	 (19421,826,3,19423),
+	 (19421,826,3,19423);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19426,826,1,19426),
 	 (19426,826,2,19427),
 	 (19426,826,3,19429),
 	 (19426,826,4,19430),
 	 (19426,826,5,19431),
 	 (19434,826,1,19434),
-	 (19454,826,1,19454);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19454,826,1,19454),
 	 (19454,826,2,19455),
 	 (19454,826,3,19456),
-	 (19461,826,1,19461),
+	 (19461,826,1,19461);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19461,826,2,19462),
 	 (19461,826,3,24691),
 	 (19464,826,1,19464),
 	 (19464,826,2,19465),
 	 (19464,826,3,19466),
 	 (19485,826,1,19485),
-	 (19485,826,2,19487);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19485,826,2,19487),
 	 (19485,826,3,19488),
 	 (19485,826,4,19489),
-	 (19485,826,5,19490),
+	 (19485,826,5,19490);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19498,827,1,19498),
 	 (19498,827,2,19499),
 	 (19498,827,3,19500),
 	 (19503,827,1,19503),
 	 (19506,826,1,19506),
 	 (19507,826,1,19507),
-	 (19507,826,2,19508);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19507,826,2,19508),
 	 (19507,826,3,19509),
 	 (19549,825,1,19549),
-	 (19549,825,2,19550),
+	 (19549,825,2,19550);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19549,825,3,19551),
 	 (19552,825,1,19552),
 	 (19552,825,2,19553),
 	 (19552,825,3,19554),
 	 (19552,825,4,19555),
 	 (19552,825,5,19556),
-	 (19559,825,1,19559);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19559,825,1,19559),
 	 (19559,825,2,19560),
 	 (19572,825,1,19572),
-	 (19572,825,2,19573),
+	 (19572,825,2,19573);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19574,825,1,19574),
 	 (19577,825,1,19577),
 	 (19578,825,1,19578),
 	 (19578,825,2,20895),
 	 (19583,825,1,19583),
 	 (19583,825,2,19584),
-	 (19583,825,3,19585);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19583,825,3,19585),
 	 (19583,825,4,19586),
 	 (19583,825,5,19587),
-	 (19590,825,1,19590),
+	 (19590,825,1,19590);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19590,825,2,19592),
 	 (19598,825,1,19598),
 	 (19598,825,2,19599),
 	 (19598,825,3,19600),
 	 (19598,825,4,19601),
 	 (19598,825,5,19602),
-	 (19609,825,1,19609);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19609,825,1,19609),
 	 (19609,825,2,19610),
 	 (19609,825,3,19612),
-	 (19616,825,1,19616),
+	 (19616,825,1,19616);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (19616,825,2,19617),
 	 (19616,825,3,19618),
 	 (19616,825,4,19619),
 	 (19616,825,5,19620),
 	 (19621,825,1,19621),
 	 (19621,825,2,19622),
-	 (19621,825,3,19623);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (19621,825,3,19623),
 	 (19621,825,4,19624),
 	 (19621,825,5,19625),
-	 (20042,824,1,20042),
+	 (20042,824,1,20042);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20042,824,2,20045),
 	 (20049,824,1,20049),
 	 (20049,824,2,20056),
 	 (20049,824,3,20057),
 	 (20060,824,1,20060),
 	 (20060,824,2,20061),
-	 (20060,824,3,20062);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20060,824,3,20062),
 	 (20060,824,4,20063),
 	 (20060,824,5,20064),
-	 (20066,824,1,20066),
+	 (20066,824,1,20066);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20096,823,1,20096),
 	 (20096,823,2,20097),
 	 (20096,823,3,20098),
 	 (20096,823,4,20099),
 	 (20096,823,5,20100),
 	 (20101,824,1,20101),
-	 (20101,824,2,20102);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20101,824,2,20102),
 	 (20101,824,3,20103),
 	 (20101,824,4,20104),
-	 (20101,824,5,20105),
+	 (20101,824,5,20105);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20111,824,1,20111),
 	 (20111,824,2,20112),
 	 (20111,824,3,20113),
 	 (20117,824,1,20117),
 	 (20117,824,2,20118),
 	 (20117,824,3,20119),
-	 (20117,824,4,20120);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20117,824,4,20120),
 	 (20117,824,5,20121),
 	 (20127,823,1,20127),
-	 (20127,823,2,20130),
+	 (20127,823,2,20130);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20127,823,3,20135),
 	 (20138,823,1,20138),
 	 (20138,823,2,20139),
 	 (20138,823,3,20140),
 	 (20143,823,1,20143),
 	 (20143,823,2,20144),
-	 (20143,823,3,20145);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20143,823,3,20145),
 	 (20143,823,4,20146),
 	 (20143,823,5,20147),
-	 (20174,823,1,20174),
+	 (20174,823,1,20174);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20174,823,2,20175),
 	 (20177,823,1,20177),
 	 (20177,823,2,20179),
 	 (20177,823,3,20181),
 	 (20177,823,4,20180),
 	 (20177,823,5,20182),
-	 (20196,823,1,20196);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20196,823,1,20196),
 	 (20196,823,2,20197),
 	 (20196,823,3,20198),
-	 (20205,822,1,20205),
+	 (20205,822,1,20205);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20205,822,2,20206),
 	 (20205,822,3,20207),
 	 (20205,822,4,20209),
 	 (20205,822,5,20208),
 	 (20210,822,1,20210),
 	 (20210,822,2,20212),
-	 (20210,822,3,20213);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20210,822,3,20213),
 	 (20210,822,4,20214),
 	 (20210,822,5,20215),
-	 (20216,822,1,20216),
+	 (20216,822,1,20216);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20224,822,1,20224),
 	 (20224,822,2,20225),
 	 (20224,822,3,20330),
 	 (20224,822,4,20331),
 	 (20224,822,5,20332),
 	 (20234,822,1,20234),
-	 (20234,822,2,20235);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20234,822,2,20235),
 	 (20237,822,1,20237),
 	 (20237,822,2,20238),
-	 (20237,822,3,20239),
+	 (20237,822,3,20239);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20243,403,1,20243),
 	 (20244,822,1,20244),
 	 (20244,822,2,20245),
 	 (20254,822,1,20254),
 	 (20254,822,2,20255),
 	 (20254,822,3,20256),
-	 (20257,822,1,20257);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20257,822,1,20257),
 	 (20257,822,2,20258),
 	 (20257,822,3,20259),
-	 (20257,822,4,20260),
+	 (20257,822,4,20260);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20257,822,5,20261),
 	 (20262,823,1,20262),
 	 (20262,823,2,20263),
 	 (20262,823,3,20264),
 	 (20262,823,4,20265),
 	 (20262,823,5,20266),
-	 (20335,824,1,20335);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20335,824,1,20335),
 	 (20335,824,2,20336),
 	 (20335,824,3,20337),
-	 (20359,822,1,20359),
+	 (20359,822,1,20359);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20359,822,2,20360),
 	 (20359,822,3,20361),
 	 (20375,824,1,20375),
 	 (20468,823,1,20468),
 	 (20468,823,2,20469),
 	 (20468,823,3,20470),
-	 (20473,822,1,20473);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20473,822,1,20473),
 	 (20487,823,1,20487),
 	 (20487,823,2,20488),
-	 (20500,402,1,20500),
+	 (20500,402,1,20500);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (20500,402,2,20501),
 	 (20502,402,1,20502),
 	 (20502,402,2,20503),
 	 (20504,401,1,20504),
 	 (20504,401,2,20505),
 	 (20711,831,1,20711),
-	 (20911,823,1,20911);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (20911,823,1,20911),
 	 (20925,823,1,20925),
 	 (23584,402,1,23584),
-	 (23584,402,2,23585),
+	 (23584,402,2,23585);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (23584,402,3,23586),
 	 (23584,402,4,23587),
 	 (23584,402,5,23588),
 	 (23785,844,1,23785),
 	 (23785,844,2,23822),
 	 (23785,844,3,23823),
-	 (23785,844,4,23824);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (23785,844,4,23824),
 	 (23785,844,5,23825),
 	 (23881,402,1,23881),
-	 (23989,826,1,23989),
+	 (23989,826,1,23989);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (24443,825,1,24443),
 	 (24443,825,2,19575),
 	 (24858,846,1,24858),
 	 (24968,848,1,24968),
 	 (24968,848,2,24969),
 	 (24968,848,3,24970),
-	 (24968,848,4,24971);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (24968,848,4,24971),
 	 (24968,848,5,24972),
 	 (25956,824,1,25956),
-	 (25956,824,2,25957),
+	 (25956,824,2,25957);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (26022,824,1,26022),
 	 (26022,824,2,26023),
 	 (27789,831,1,27789),
 	 (27789,831,2,27790),
 	 (27811,831,1,27811),
 	 (27811,831,2,27815),
-	 (27811,831,3,27816);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (27811,831,3,27816),
 	 (27839,833,1,27839),
 	 (27839,833,2,27840),
-	 (27900,831,1,27900),
+	 (27900,831,1,27900);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (27900,831,2,27901),
 	 (27900,831,3,27902),
 	 (27900,831,4,27903),
 	 (27900,831,5,27904),
 	 (28574,840,1,28574),
 	 (28574,840,2,54658),
-	 (28574,840,3,54659);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (28574,840,3,54659),
 	 (28996,837,1,28996),
 	 (28996,837,2,28997),
-	 (28996,837,3,28998),
+	 (28996,837,3,28998);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (28999,837,1,28999),
 	 (28999,837,2,29000),
 	 (29062,837,1,29062),
 	 (29062,837,2,29064),
 	 (29062,837,3,29065),
 	 (29074,841,1,29074),
-	 (29074,841,2,29075);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29074,841,2,29075),
 	 (29074,841,3,29076),
 	 (29082,838,1,29082),
-	 (29082,838,2,29084),
+	 (29082,838,2,29084);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (29082,838,3,29086),
 	 (29140,403,1,29140),
 	 (29140,403,2,29143),
 	 (29140,403,3,29144),
 	 (29187,839,1,29187),
 	 (29187,839,2,29189),
-	 (29187,839,3,29191);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29187,839,3,29191),
 	 (29192,838,1,29192),
 	 (29192,838,2,29193),
-	 (29206,839,1,29206),
+	 (29206,839,1,29206);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (29206,839,2,29205),
 	 (29206,839,3,29202),
 	 (29438,842,1,29438),
 	 (29438,842,2,29439),
 	 (29438,842,3,29440),
 	 (29441,840,1,29441),
-	 (29441,840,2,29444);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29441,840,2,29444),
 	 (29447,840,1,29447),
 	 (29447,840,2,55339),
-	 (29447,840,3,55340),
+	 (29447,840,3,55340);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (29590,402,1,29590),
 	 (29590,402,2,29591),
 	 (29590,402,3,29592),
 	 (29593,403,1,29593),
 	 (29593,403,2,29594),
 	 (29598,403,1,29598),
-	 (29598,403,2,29599);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29598,403,2,29599),
 	 (29623,401,1,29623),
 	 (29721,402,1,29721),
-	 (29721,402,2,29776),
+	 (29721,402,2,29776);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (29723,401,1,29723),
 	 (29723,401,2,29725),
 	 (29723,401,3,29724),
 	 (29759,402,1,29759),
 	 (29759,402,2,29760),
 	 (29759,402,3,29761),
-	 (29759,402,4,29762);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29759,402,4,29762),
 	 (29759,402,5,29763),
 	 (29787,403,1,29787),
-	 (29787,403,2,29790),
+	 (29787,403,2,29790);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (29787,403,3,29792),
 	 (29801,402,1,29801),
 	 (29834,401,1,29834),
 	 (29834,401,2,29838),
 	 (29836,401,1,29836),
 	 (29836,401,2,29859),
-	 (29888,402,1,29888);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (29888,402,1,29888),
 	 (29888,402,2,29889),
 	 (30054,843,1,30054),
-	 (30054,843,2,30057),
+	 (30054,843,2,30057);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30060,843,1,30060),
 	 (30060,843,2,30061),
 	 (30060,843,3,30062),
 	 (30060,843,4,30063),
 	 (30060,843,5,30064),
 	 (30108,843,1,30108),
-	 (30143,844,1,30143);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30143,844,1,30143),
 	 (30143,844,2,30144),
 	 (30143,844,3,30145),
-	 (30146,844,1,30146),
+	 (30146,844,1,30146);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30160,837,1,30160),
 	 (30160,837,2,29179),
 	 (30160,837,3,29180),
 	 (30242,844,1,30242),
 	 (30242,844,2,30245),
 	 (30242,844,3,30246),
-	 (30242,844,4,30247);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30242,844,4,30247),
 	 (30242,844,5,30248),
 	 (30283,845,1,30283),
-	 (30288,845,1,30288),
+	 (30288,845,1,30288);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30288,845,2,30289),
 	 (30288,845,3,30290),
 	 (30288,845,4,30291),
 	 (30288,845,5,30292),
 	 (30293,845,1,30293),
 	 (30293,845,2,30295),
-	 (30293,845,3,30296);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30293,845,3,30296),
 	 (30299,845,1,30299),
 	 (30299,845,2,30301),
-	 (30299,845,3,30302),
+	 (30299,845,3,30302);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30319,844,1,30319),
 	 (30319,844,2,30320),
 	 (30319,844,3,30321),
 	 (30326,844,1,30326),
 	 (30664,837,1,30664),
 	 (30664,837,2,30665),
-	 (30664,837,3,30666);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30664,837,3,30666),
 	 (30672,837,1,30672),
 	 (30672,837,2,30673),
-	 (30672,837,3,30674),
+	 (30672,837,3,30674);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30675,837,1,30675),
 	 (30675,837,2,30678),
 	 (30675,837,3,30679),
 	 (30706,837,1,30706),
-	 (30798,838,1,30798),
 	 (30802,838,1,30802),
-	 (30802,838,2,30808);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30802,838,2,30808),
 	 (30802,838,3,30809),
 	 (30812,838,1,30812),
 	 (30812,838,2,30813),
-	 (30812,838,3,30814),
+	 (30812,838,3,30814);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30816,838,1,30816),
 	 (30816,838,2,30818),
 	 (30816,838,3,30819),
 	 (30823,838,1,30823),
 	 (30864,839,1,30864),
-	 (30864,839,2,30865);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30864,839,2,30865),
 	 (30864,839,3,30866),
 	 (30867,839,1,30867),
 	 (30867,839,2,30868),
-	 (30867,839,3,30869),
+	 (30867,839,3,30869);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30872,839,1,30872),
 	 (30872,839,2,30873),
 	 (30881,839,1,30881),
 	 (30881,839,2,30883),
 	 (30881,839,3,30884),
-	 (30881,839,4,30885);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30881,839,4,30885),
 	 (30881,839,5,30886),
 	 (30892,804,1,30892),
 	 (30892,804,2,30893),
-	 (30894,804,1,30894),
+	 (30894,804,1,30894);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (30894,804,2,30895),
 	 (30902,804,1,30902),
 	 (30902,804,2,30903),
 	 (30902,804,3,30904),
 	 (30902,804,4,30905),
-	 (30902,804,5,30906);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (30902,804,5,30906),
 	 (30919,803,1,30919),
 	 (30919,803,2,30920),
 	 (31122,803,1,31122),
-	 (31122,803,2,31123),
+	 (31122,803,2,31123);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31122,803,3,61329),
 	 (31124,803,1,31124),
 	 (31124,803,2,31126),
 	 (31130,803,1,31130),
 	 (31130,803,2,31131),
-	 (31208,802,1,31208);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31208,802,1,31208),
 	 (31208,802,2,31209),
 	 (31211,804,1,31211),
 	 (31211,804,2,31212),
-	 (31211,804,3,31213),
+	 (31211,804,3,31213);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31216,804,1,31216),
 	 (31216,804,2,31217),
 	 (31216,804,3,31218),
 	 (31216,804,4,31219),
 	 (31216,804,5,31220),
-	 (31221,804,1,31221);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31221,804,1,31221),
 	 (31221,804,2,31222),
 	 (31221,804,3,31223),
 	 (31226,802,1,31226),
-	 (31226,802,2,31227),
+	 (31226,802,2,31227);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31226,802,3,58410),
 	 (31228,804,1,31228),
 	 (31228,804,2,31229),
 	 (31228,804,3,31230),
 	 (31234,802,1,31234),
-	 (31234,802,2,31235);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31234,802,2,31235),
 	 (31234,802,3,31236),
 	 (31244,802,1,31244),
 	 (31244,802,2,31245),
-	 (31380,802,1,31380),
+	 (31380,802,1,31380);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31380,802,2,31382),
 	 (31380,802,3,31383),
 	 (31569,840,1,31569),
 	 (31569,840,2,31570),
 	 (31571,840,1,31571),
-	 (31571,840,2,31572);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31571,840,2,31572),
 	 (31574,840,1,31574),
 	 (31574,840,2,31575),
 	 (31574,840,3,54354),
-	 (31579,840,1,31579),
+	 (31579,840,1,31579);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31579,840,2,31582),
 	 (31579,840,3,31583),
 	 (31584,840,1,31584),
 	 (31584,840,2,31585),
 	 (31584,840,3,31586),
-	 (31584,840,4,31587);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31584,840,4,31587),
 	 (31584,840,5,31588),
 	 (31589,840,1,31589),
 	 (31638,841,1,31638),
-	 (31638,841,2,31639),
+	 (31638,841,2,31639);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31638,841,3,31640),
 	 (31641,841,1,31641),
 	 (31641,841,2,31642),
 	 (31656,841,1,31656),
 	 (31656,841,2,31657),
-	 (31656,841,3,31658);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31656,841,3,31658),
 	 (31661,841,1,31661),
 	 (31667,842,1,31667),
 	 (31667,842,2,31668),
-	 (31667,842,3,31669),
+	 (31667,842,3,31669);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31670,842,1,31670),
 	 (31670,842,2,31672),
 	 (31670,842,3,55094),
 	 (31674,842,1,31674),
 	 (31674,842,2,31675),
-	 (31674,842,3,31676);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31674,842,3,31676),
 	 (31674,842,4,31677),
 	 (31674,842,5,31678),
 	 (31679,841,1,31679),
-	 (31679,841,2,31680),
+	 (31679,841,2,31680);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31682,842,1,31682),
 	 (31682,842,2,31683),
 	 (31687,842,1,31687),
 	 (31785,823,1,31785),
 	 (31785,823,2,33776),
-	 (31821,822,1,31821);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31821,822,1,31821),
 	 (31822,822,1,31822),
 	 (31822,822,2,31823),
 	 (31825,822,1,31825),
-	 (31825,822,2,31826),
+	 (31825,822,2,31826);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31828,822,1,31828),
 	 (31828,822,2,31829),
 	 (31828,822,3,31830),
 	 (31833,822,1,31833),
 	 (31833,822,2,31835),
-	 (31833,822,3,31836);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31833,822,3,31836),
 	 (31837,822,1,31837),
 	 (31837,822,2,31838),
 	 (31837,822,3,31839),
-	 (31837,822,4,31840),
+	 (31837,822,4,31840);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31837,822,5,31841),
 	 (31842,822,1,31842),
 	 (31844,823,1,31844),
 	 (31844,823,2,31845),
 	 (31844,823,3,53519),
-	 (31848,823,1,31848);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31848,823,1,31848),
 	 (31848,823,2,31849),
 	 (31850,823,1,31850),
 	 (31850,823,2,31851),
-	 (31850,823,3,31852),
+	 (31850,823,3,31852);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31858,823,1,31858),
 	 (31858,823,2,31859),
 	 (31858,823,3,31860),
 	 (31866,824,1,31866),
 	 (31866,824,2,31867),
-	 (31866,824,3,31868);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31866,824,3,31868),
 	 (31869,824,1,31869),
 	 (31871,824,1,31871),
 	 (31871,824,2,31872),
-	 (31876,824,1,31876),
+	 (31876,824,1,31876);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (31876,824,2,31877),
 	 (31876,824,3,31878),
 	 (31879,824,1,31879),
 	 (31879,824,2,31880),
 	 (31879,824,3,31881),
-	 (31935,823,1,31935);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (31935,823,1,31935),
 	 (32043,824,1,32043),
 	 (32043,824,2,35396),
 	 (32043,824,3,35397),
-	 (32381,843,1,32381),
+	 (32381,843,1,32381);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (32381,843,2,32382),
 	 (32381,843,3,32383),
 	 (32385,843,1,32385),
 	 (32385,843,2,32387),
 	 (32385,843,3,32392),
-	 (32385,843,4,32393);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (32385,843,4,32393),
 	 (32385,843,5,32394),
 	 (32477,843,1,32477),
 	 (32477,843,2,32483),
-	 (32477,843,3,32484),
+	 (32477,843,3,32484);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (32601,803,1,32601),
 	 (33142,831,1,33142),
 	 (33142,831,2,33145),
 	 (33142,831,3,33146),
 	 (33150,831,1,33150),
-	 (33150,831,2,33154);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33150,831,2,33154),
 	 (33158,831,1,33158),
 	 (33158,831,2,33159),
 	 (33158,831,3,33160),
-	 (33158,831,4,33161),
+	 (33158,831,4,33161);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33158,831,5,33162),
 	 (33167,832,1,33167),
 	 (33167,832,2,33171),
 	 (33167,832,3,33172),
 	 (33186,832,1,33186),
-	 (33186,832,2,33190);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33186,832,2,33190),
 	 (33191,833,1,33191),
 	 (33191,833,2,33192),
 	 (33191,833,3,33193),
-	 (33201,832,1,33201),
+	 (33201,832,1,33201);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33201,832,2,33202),
 	 (33206,832,1,33206),
 	 (33213,833,1,33213),
 	 (33213,833,2,33214),
 	 (33213,833,3,33215),
-	 (33221,833,1,33221);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33221,833,1,33221),
 	 (33221,833,2,33222),
 	 (33221,833,3,33223),
 	 (33221,833,4,33224),
-	 (33221,833,5,33225),
+	 (33221,833,5,33225);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33589,846,1,33589),
 	 (33589,846,2,33590),
 	 (33589,846,3,33591),
 	 (33592,846,1,33592),
 	 (33592,846,2,33596),
-	 (33597,846,1,33597);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33597,846,1,33597),
 	 (33597,846,2,33599),
 	 (33597,846,3,33956),
 	 (33600,846,1,33600),
-	 (33600,846,2,33601),
+	 (33600,846,2,33601);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33600,846,3,33602),
 	 (33603,846,1,33603),
 	 (33603,846,2,33604),
 	 (33603,846,3,33605),
 	 (33603,846,4,33606),
-	 (33603,846,5,33607);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33603,846,5,33607),
 	 (33831,846,1,33831),
 	 (33851,847,1,33851),
 	 (33851,847,2,33852),
-	 (33851,847,3,33957),
+	 (33851,847,3,33957);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33853,847,1,33853),
 	 (33853,847,2,33855),
 	 (33853,847,3,33856),
 	 (33859,847,1,33859),
 	 (33859,847,2,33866),
-	 (33859,847,3,33867);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33859,847,3,33867),
 	 (33872,847,1,33872),
 	 (33872,847,2,33873),
 	 (33879,848,1,33879),
-	 (33879,848,2,33880),
+	 (33879,848,2,33880);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (33881,848,1,33881),
 	 (33881,848,2,33882),
 	 (33881,848,3,33883),
 	 (33886,848,1,33886),
 	 (33886,848,2,33887),
-	 (33886,848,3,33888);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (33886,848,3,33888),
 	 (33886,848,4,33889),
 	 (33886,848,5,33890),
 	 (33917,847,1,33917),
-	 (34151,848,1,34151),
+	 (34151,848,1,34151);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34151,848,2,34152),
 	 (34151,848,3,34153),
 	 (34293,841,1,34293),
 	 (34293,841,2,34295),
 	 (34293,841,3,34296),
-	 (34297,847,1,34297);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34297,847,1,34297),
 	 (34297,847,2,34300),
 	 (34453,825,1,34453),
 	 (34453,825,2,34454),
-	 (34455,825,1,34455),
+	 (34455,825,1,34455);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34455,825,2,34459),
 	 (34455,825,3,34460),
 	 (34462,825,1,34462),
 	 (34462,825,2,34464),
 	 (34462,825,3,34465),
-	 (34466,825,1,34466);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34466,825,1,34466),
 	 (34466,825,2,34467),
 	 (34466,825,3,34468),
 	 (34466,825,4,34469),
-	 (34466,825,5,34470),
+	 (34466,825,5,34470);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34475,826,1,34475),
 	 (34475,826,2,34476),
 	 (34482,826,1,34482),
 	 (34482,826,2,34483),
 	 (34482,826,3,34484),
-	 (34485,826,1,34485);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34485,826,1,34485),
 	 (34485,826,2,34486),
 	 (34485,826,3,34487),
 	 (34485,826,4,34488),
-	 (34485,826,5,34489),
+	 (34485,826,5,34489);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34490,826,1,34490),
 	 (34491,827,1,34491),
 	 (34491,827,2,34492),
 	 (34491,827,3,34493),
 	 (34494,827,1,34494),
-	 (34494,827,2,34496);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34494,827,2,34496),
 	 (34497,827,1,34497),
 	 (34497,827,2,34498),
 	 (34497,827,3,34499),
-	 (34500,827,1,34500),
+	 (34500,827,1,34500);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34500,827,2,34502),
 	 (34500,827,3,34503),
 	 (34506,827,1,34506),
 	 (34506,827,2,34507),
 	 (34506,827,3,34508),
-	 (34506,827,4,34838);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34506,827,4,34838),
 	 (34506,827,5,34839),
 	 (34692,825,1,34692),
 	 (34753,831,1,34753),
-	 (34753,831,2,34859),
+	 (34753,831,2,34859);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34753,831,3,34860),
 	 (34861,831,1,34861),
 	 (34908,832,1,34908),
 	 (34908,832,2,34909),
 	 (34908,832,3,34910),
-	 (34914,833,1,34914);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (34914,833,1,34914),
 	 (34935,845,1,34935),
 	 (34935,845,2,34938),
 	 (34935,845,3,34939),
-	 (34948,826,1,34948),
+	 (34948,826,1,34948);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (34948,826,2,34949),
 	 (34950,826,1,34950),
 	 (34950,826,2,34954),
 	 (35029,825,1,35029),
 	 (35029,825,2,35030),
-	 (35100,826,1,35100);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (35100,826,1,35100),
 	 (35100,826,2,35102),
 	 (35104,826,1,35104),
 	 (35104,826,2,35110),
-	 (35104,826,3,35111),
+	 (35104,826,3,35111);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (35363,846,1,35363),
 	 (35363,846,2,35364),
 	 (35395,824,1,35395),
 	 (35446,401,1,35446),
 	 (35446,401,2,35448),
-	 (35446,401,3,35449);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (35446,401,3,35449),
 	 (35541,803,1,35541),
 	 (35541,803,2,35550),
 	 (35541,803,3,35551),
-	 (35541,803,4,35552),
+	 (35541,803,4,35552);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (35541,803,5,35553),
 	 (35578,840,1,35578),
 	 (35578,840,2,35581),
 	 (35691,844,1,35691),
 	 (35691,844,2,35692),
-	 (35691,844,3,35693);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (35691,844,3,35693),
 	 (36554,804,1,36554),
 	 (37116,847,1,37116),
 	 (37116,847,2,37117),
-	 (43338,838,1,43338),
+	 (43338,838,1,43338);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (44378,840,1,44378),
 	 (44378,840,2,44379),
 	 (44394,840,1,44394),
 	 (44394,840,2,44395),
 	 (44394,840,3,44396),
-	 (44397,840,1,44397);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (44397,840,1,44397),
 	 (44397,840,2,44398),
 	 (44397,840,3,44399),
 	 (44400,840,1,44400),
-	 (44400,840,2,44402),
+	 (44400,840,2,44402);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (44400,840,3,44403),
 	 (44404,840,1,44404),
 	 (44404,840,2,54486),
 	 (44404,840,3,54488),
 	 (44404,840,4,54489),
-	 (44404,840,5,54490);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (44404,840,5,54490),
 	 (44425,840,1,44425),
 	 (44442,841,1,44442),
 	 (44442,841,2,44443),
-	 (44445,841,1,44445),
+	 (44445,841,1,44445);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (44445,841,2,44446),
 	 (44445,841,3,44448),
 	 (44449,841,1,44449),
 	 (44449,841,2,44469),
 	 (44449,841,3,44470),
-	 (44449,841,4,44471);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (44449,841,4,44471),
 	 (44449,841,5,44472),
 	 (44457,841,1,44457),
 	 (44543,842,1,44543),
-	 (44543,842,2,44545),
+	 (44543,842,2,44545);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (44546,842,1,44546),
 	 (44546,842,2,44548),
 	 (44546,842,3,44549),
 	 (44557,842,1,44557),
 	 (44557,842,2,44560),
-	 (44557,842,3,44561);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (44557,842,3,44561),
 	 (44566,842,1,44566),
 	 (44566,842,2,44567),
 	 (44566,842,3,44568),
-	 (44566,842,4,44570),
+	 (44566,842,4,44570);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (44566,842,5,44571),
 	 (44572,842,1,44572),
 	 (44745,842,1,44745),
 	 (44745,842,2,54787),
 	 (45234,832,1,45234),
-	 (45234,832,2,45243);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (45234,832,2,45243),
 	 (45234,832,3,45244),
 	 (46854,401,1,46854),
 	 (46854,401,2,46855),
-	 (46859,401,1,46859),
+	 (46859,401,1,46859);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (46859,401,2,46860),
 	 (46865,401,1,46865),
 	 (46865,401,2,46866),
 	 (46867,401,1,46867),
 	 (46867,401,2,56611),
-	 (46867,401,3,56612);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (46867,401,3,56612),
 	 (46867,401,4,56613),
 	 (46867,401,5,56614),
 	 (46908,402,1,46908),
-	 (46908,402,2,46909),
+	 (46908,402,2,46909);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (46908,402,3,56924),
 	 (46910,402,1,46910),
 	 (46910,402,2,46911),
 	 (46913,402,1,46913),
 	 (46913,402,2,46914),
-	 (46913,402,3,46915);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (46913,402,3,46915),
 	 (46917,402,1,46917),
 	 (46924,401,1,46924),
 	 (46945,403,1,46945),
-	 (46945,403,2,46949),
+	 (46945,403,2,46949);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (46951,403,1,46951),
 	 (46951,403,2,46952),
 	 (46951,403,3,46953),
 	 (46968,403,1,46968),
 	 (47193,844,1,47193),
-	 (47195,843,1,47195);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47195,843,1,47195),
 	 (47195,843,2,47196),
 	 (47195,843,3,47197),
 	 (47198,843,1,47198),
-	 (47198,843,2,47199),
+	 (47198,843,2,47199);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47198,843,3,47200),
 	 (47201,843,1,47201),
 	 (47201,843,2,47202),
 	 (47201,843,3,47203),
 	 (47201,843,4,47204),
-	 (47201,843,5,47205);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47201,843,5,47205),
 	 (47220,845,1,47220),
 	 (47220,845,2,47221),
 	 (47220,845,3,47223),
-	 (47230,844,1,47230),
+	 (47230,844,1,47230);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47230,844,2,47231),
 	 (47236,844,1,47236),
 	 (47236,844,2,47237),
 	 (47236,844,3,47238),
 	 (47236,844,4,47239),
-	 (47236,844,5,47240);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47236,844,5,47240),
 	 (47245,844,1,47245),
 	 (47245,844,2,47246),
 	 (47245,844,3,47247),
-	 (47258,845,1,47258),
+	 (47258,845,1,47258);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47258,845,2,47259),
 	 (47258,845,3,47260),
 	 (47266,845,1,47266),
 	 (47266,845,2,47267),
 	 (47266,845,3,47268),
-	 (47266,845,4,47269);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47266,845,4,47269),
 	 (47266,845,5,47270),
 	 (47294,403,1,47294),
 	 (47294,403,2,47295),
-	 (47294,403,3,47296),
+	 (47294,403,3,47296);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47507,832,1,47507),
 	 (47507,832,2,47508),
 	 (47509,832,1,47509),
 	 (47509,832,2,47511),
 	 (47509,832,3,47515),
-	 (47516,832,1,47516);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47516,832,1,47516),
 	 (47516,832,2,47517),
 	 (47535,832,1,47535),
 	 (47535,832,2,47536),
-	 (47535,832,3,47537),
+	 (47535,832,3,47537);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47540,832,1,47540),
 	 (47558,831,1,47558),
 	 (47558,831,2,47559),
 	 (47558,831,3,47560),
 	 (47562,831,1,47562),
-	 (47562,831,2,47564);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47562,831,2,47564),
 	 (47562,831,3,47565),
 	 (47562,831,4,47566),
 	 (47562,831,5,47567),
-	 (47569,833,1,47569),
+	 (47569,833,1,47569);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47569,833,2,47570),
 	 (47573,833,1,47573),
 	 (47573,833,2,47577),
 	 (47573,833,3,47578),
 	 (47573,833,4,51166),
-	 (47573,833,5,51167);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47573,833,5,51167),
 	 (47580,833,1,47580),
 	 (47580,833,2,47581),
 	 (47580,833,3,47582),
-	 (47585,833,1,47585),
+	 (47585,833,1,47585);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (47586,832,1,47586),
 	 (47586,832,2,47587),
 	 (47586,832,3,47588),
 	 (47586,832,4,52802),
 	 (47586,832,5,52803),
-	 (47788,831,1,47788);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (47788,831,1,47788),
 	 (48181,843,1,48181),
 	 (48384,846,1,48384),
 	 (48384,846,2,48395),
-	 (48384,846,3,48396),
+	 (48384,846,3,48396);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48389,846,1,48389),
 	 (48389,846,2,48392),
 	 (48389,846,3,48393),
 	 (48409,847,1,48409),
 	 (48409,847,2,48410),
-	 (48411,848,1,48411);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48411,848,1,48411),
 	 (48411,848,2,48412),
 	 (48432,847,1,48432),
 	 (48432,847,2,48433),
-	 (48432,847,3,48434),
+	 (48432,847,3,48434);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48432,847,4,51268),
 	 (48432,847,5,51269),
 	 (48438,848,1,48438),
 	 (48483,847,1,48483),
 	 (48483,847,2,48484),
-	 (48483,847,3,48485);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48483,847,3,48485),
 	 (48488,846,1,48488),
 	 (48488,846,2,48514),
 	 (48492,847,1,48492),
-	 (48492,847,2,48494),
+	 (48492,847,2,48494);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48492,847,3,48495),
 	 (48496,848,1,48496),
 	 (48496,848,2,48499),
 	 (48496,848,3,48500),
 	 (48505,846,1,48505),
-	 (48506,846,1,48506);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48506,846,1,48506),
 	 (48506,846,2,48510),
 	 (48506,846,3,48511),
 	 (48516,846,1,48516),
-	 (48516,846,2,48521),
+	 (48516,846,2,48521);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48516,846,3,48525),
 	 (48532,847,1,48532),
 	 (48532,847,2,48489),
 	 (48532,847,3,48491),
 	 (48535,848,1,48535),
-	 (48535,848,2,48536);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48535,848,2,48536),
 	 (48535,848,3,48537),
 	 (48539,848,1,48539),
 	 (48539,848,2,48544),
-	 (48539,848,3,48545),
+	 (48539,848,3,48545);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48962,836,1,48962),
 	 (48962,836,2,49567),
 	 (48962,836,3,49568),
 	 (48963,836,1,48963),
 	 (48963,836,2,49564),
-	 (48963,836,3,49565);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48963,836,3,49565),
 	 (48965,836,1,48965),
 	 (48965,836,2,49571),
 	 (48965,836,3,49572),
-	 (48977,834,1,48977),
+	 (48977,834,1,48977);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48977,834,2,49394),
 	 (48977,834,3,49395),
 	 (48978,834,1,48978),
 	 (48978,834,2,49390),
 	 (48978,834,3,49391),
-	 (48978,834,4,49392);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48978,834,4,49392),
 	 (48978,834,5,49393),
 	 (48979,834,1,48979),
 	 (48979,834,2,49483),
-	 (48982,834,1,48982),
+	 (48982,834,1,48982);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48985,834,1,48985),
 	 (48985,834,2,49488),
 	 (48985,834,3,49489),
 	 (48987,834,1,48987),
 	 (48987,834,2,49477),
-	 (48987,834,3,49478);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (48987,834,3,49478),
 	 (48987,834,4,49479),
 	 (48987,834,5,49480),
 	 (48988,834,1,48988),
-	 (48988,834,2,49503),
+	 (48988,834,2,49503);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (48988,834,3,49504),
 	 (48997,834,1,48997),
 	 (48997,834,2,49490),
 	 (48997,834,3,49491),
 	 (49004,834,1,49004),
-	 (49004,834,2,49508);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49004,834,2,49508),
 	 (49004,834,3,49509),
 	 (49005,834,1,49005),
 	 (49006,834,1,49006),
-	 (49006,834,2,49526),
+	 (49006,834,2,49526);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49006,834,3,50029),
 	 (49013,836,1,49013),
 	 (49013,836,2,55236),
 	 (49013,836,3,55237),
 	 (49015,834,1,49015),
-	 (49015,834,2,50154);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49015,834,2,50154),
 	 (49015,834,3,55136),
 	 (49016,834,1,49016),
 	 (49018,834,1,49018),
-	 (49018,834,2,49529),
+	 (49018,834,2,49529);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49018,834,3,49530),
 	 (49023,834,1,49023),
 	 (49023,834,2,49533),
 	 (49023,834,3,49534),
 	 (49024,835,1,49024),
-	 (49024,835,2,49538);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49024,835,2,49538),
 	 (49027,834,1,49027),
 	 (49027,834,2,49542),
 	 (49027,834,3,49543),
-	 (49028,834,1,49028),
+	 (49028,834,1,49028);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49032,836,1,49032),
 	 (49032,836,2,49631),
 	 (49032,836,3,49632),
 	 (49036,836,1,49036),
 	 (49036,836,2,49562),
-	 (49039,835,1,49039);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49039,835,1,49039),
 	 (49042,835,1,49042),
 	 (49042,835,2,49786),
 	 (49042,835,3,49787),
-	 (49042,835,4,49788),
+	 (49042,835,4,49788);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49042,835,5,49789),
 	 (49137,835,1,49137),
 	 (49137,835,2,49657),
 	 (49140,835,1,49140),
 	 (49140,835,2,49661),
-	 (49140,835,3,49662);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49140,835,3,49662),
 	 (49140,835,4,49663),
 	 (49140,835,5,49664),
 	 (49143,835,1,49143),
-	 (49145,834,1,49145),
+	 (49145,834,1,49145);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49145,834,2,49495),
 	 (49145,834,3,49497),
 	 (49146,836,1,49146),
 	 (49146,836,2,51267),
 	 (49149,835,1,49149),
-	 (49149,835,2,50115);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49149,835,2,50115),
 	 (49158,836,1,49158),
 	 (49175,835,1,49175),
 	 (49175,835,2,50031),
-	 (49175,835,3,51456),
+	 (49175,835,3,51456);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49182,834,1,49182),
 	 (49182,834,2,49500),
 	 (49182,834,3,49501),
 	 (49182,834,4,55225),
 	 (49182,834,5,55226),
-	 (49184,835,1,49184);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49184,835,1,49184),
 	 (49186,835,1,49186),
 	 (49186,835,2,51108),
 	 (49186,835,3,51109),
-	 (49188,835,1,49188),
+	 (49188,835,1,49188);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49188,835,2,56822),
 	 (49188,835,3,59057),
 	 (49189,834,1,49189),
 	 (49189,834,2,50149),
 	 (49189,834,3,50150),
-	 (49194,836,1,49194);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49194,836,1,49194),
 	 (49200,835,1,49200),
 	 (49200,835,2,50151),
 	 (49200,835,3,50152),
-	 (49202,835,1,49202),
+	 (49202,835,1,49202);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49202,835,2,50127),
 	 (49202,835,3,50128),
 	 (49202,835,4,50129),
 	 (49202,835,5,50130),
 	 (49203,835,1,49203),
-	 (49206,836,1,49206);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49206,836,1,49206),
 	 (49208,836,1,49208),
 	 (49208,836,2,56834),
 	 (49208,836,3,56835),
-	 (49217,836,1,49217),
+	 (49217,836,1,49217);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49217,836,2,49654),
 	 (49217,836,3,49655),
 	 (49219,836,1,49219),
 	 (49219,836,2,49627),
 	 (49219,836,3,49628),
-	 (49220,836,1,49220);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49220,836,1,49220),
 	 (49220,836,2,49633),
 	 (49220,836,3,49635),
 	 (49220,836,4,49636),
-	 (49220,836,5,49638),
+	 (49220,836,5,49638);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49222,836,1,49222),
 	 (49223,836,1,49223),
 	 (49223,836,2,49599),
 	 (49224,836,1,49224),
 	 (49224,836,2,49610),
-	 (49224,836,3,49611);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49224,836,3,49611),
 	 (49226,835,1,49226),
 	 (49226,835,2,50137),
 	 (49226,835,3,50138),
-	 (49377,847,1,49377),
+	 (49377,847,1,49377);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49455,835,1,49455),
 	 (49455,835,2,50147),
 	 (49467,834,1,49467),
 	 (49467,834,2,50033),
 	 (49467,834,3,50034),
-	 (49471,835,1,49471);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (49471,835,1,49471),
 	 (49471,835,2,49790),
 	 (49471,835,3,49791),
 	 (49588,836,1,49588),
-	 (49588,836,2,49589),
+	 (49588,836,2,49589);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (49796,835,1,49796),
 	 (50040,835,1,50040),
 	 (50040,835,2,50041),
 	 (50040,835,3,50043),
 	 (50117,836,1,50117),
-	 (50117,836,2,50118);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (50117,836,2,50118),
 	 (50117,836,3,50119),
 	 (50117,836,4,50120),
 	 (50117,836,5,50121),
-	 (50187,835,1,50187),
+	 (50187,835,1,50187);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (50187,835,2,50190),
 	 (50187,835,3,50191),
 	 (50334,847,1,50334),
 	 (50365,834,1,50365),
 	 (50365,834,2,50371),
-	 (50384,835,1,50384);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (50384,835,1,50384),
 	 (50384,835,2,50385),
 	 (50391,836,1,50391),
 	 (50391,836,2,50392),
-	 (50516,846,1,50516),
+	 (50516,846,1,50516);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (50685,403,1,50685),
 	 (50685,403,2,50686),
 	 (50685,403,3,50687),
 	 (50720,403,1,50720),
 	 (50796,845,1,50796),
-	 (50880,835,1,50880);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (50880,835,1,50880),
 	 (50880,835,2,50884),
 	 (50880,835,3,50885),
 	 (50880,835,4,50886),
-	 (50880,835,5,50887),
+	 (50880,835,5,50887);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51052,836,1,51052),
 	 (51099,836,1,51099),
 	 (51099,836,2,51160),
 	 (51099,836,3,51161),
 	 (51123,835,1,51123),
-	 (51123,835,2,51127);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51123,835,2,51127),
 	 (51123,835,3,51128),
 	 (51123,835,4,51129),
 	 (51123,835,5,51130),
-	 (51179,848,1,51179),
+	 (51179,848,1,51179);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51179,848,2,51180),
 	 (51179,848,3,51181),
 	 (51179,848,4,51182),
 	 (51179,848,5,51183),
 	 (51271,835,1,51271),
-	 (51459,836,1,51459);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51459,836,1,51459),
 	 (51459,836,2,51462),
 	 (51459,836,3,51463),
 	 (51459,836,4,51464),
-	 (51459,836,5,51465),
+	 (51459,836,5,51465);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51466,837,1,51466),
 	 (51466,837,2,51470),
 	 (51468,835,1,51468),
 	 (51468,835,2,51472),
 	 (51468,835,3,51473),
-	 (51474,837,1,51474);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51474,837,1,51474),
 	 (51474,837,2,51478),
 	 (51474,837,3,51479),
 	 (51480,837,1,51480),
-	 (51480,837,2,51481),
+	 (51480,837,2,51481);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51480,837,3,51482),
 	 (51483,837,1,51483),
 	 (51483,837,2,51485),
 	 (51483,837,3,51486),
 	 (51490,837,1,51490),
-	 (51521,838,1,51521);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51521,838,1,51521),
 	 (51521,838,2,51522),
 	 (51523,838,1,51523),
 	 (51523,838,2,51524),
-	 (51525,838,1,51525),
+	 (51525,838,1,51525);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51525,838,2,51526),
 	 (51525,838,3,51527),
 	 (51528,838,1,51528),
 	 (51528,838,2,51529),
 	 (51528,838,3,51530),
-	 (51528,838,4,51531);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51528,838,4,51531),
 	 (51528,838,5,51532),
 	 (51533,838,1,51533),
 	 (51554,839,1,51554),
-	 (51554,839,2,51555),
+	 (51554,839,2,51555);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51556,839,1,51556),
 	 (51556,839,2,51557),
 	 (51556,839,3,51558),
 	 (51560,839,1,51560),
 	 (51560,839,2,51561),
-	 (51562,839,1,51562);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51562,839,1,51562),
 	 (51562,839,2,51563),
 	 (51562,839,3,51564),
 	 (51562,839,4,51565),
-	 (51562,839,5,51566),
+	 (51562,839,5,51566);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51625,802,1,51625),
 	 (51625,802,2,51626),
 	 (51627,802,1,51627),
 	 (51627,802,2,51628),
 	 (51627,802,3,51629),
-	 (51632,802,1,51632);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51632,802,1,51632),
 	 (51632,802,2,51633),
 	 (51634,802,1,51634),
 	 (51634,802,2,51635),
-	 (51634,802,3,51636),
+	 (51634,802,3,51636);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51662,802,1,51662),
 	 (51664,802,1,51664),
 	 (51664,802,2,51665),
 	 (51664,802,3,51667),
 	 (51664,802,4,51668),
-	 (51664,802,5,51669);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51664,802,5,51669),
 	 (51672,803,1,51672),
 	 (51672,803,2,51674),
 	 (51682,803,1,51682),
-	 (51682,803,2,58413),
+	 (51682,803,2,58413);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51685,803,1,51685),
 	 (51685,803,2,51686),
 	 (51685,803,3,51687),
 	 (51685,803,4,51688),
 	 (51685,803,5,51689),
-	 (51690,803,1,51690);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51690,803,1,51690),
 	 (51692,804,1,51692),
 	 (51692,804,2,51696),
 	 (51698,804,1,51698),
-	 (51698,804,2,51700),
+	 (51698,804,2,51700);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51698,804,3,51701),
 	 (51708,804,1,51708),
 	 (51708,804,2,51709),
 	 (51708,804,3,51710),
 	 (51708,804,4,51711),
-	 (51708,804,5,51712);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (51708,804,5,51712),
 	 (51713,804,1,51713),
 	 (51745,836,1,51745),
 	 (51745,836,2,51746),
-	 (51883,838,1,51883),
+	 (51883,838,1,51883);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (51883,838,2,51884),
 	 (51883,838,3,51885),
 	 (51886,839,1,51886),
 	 (52143,836,1,52143),
 	 (52783,827,1,52783),
-	 (52783,827,2,52785);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (52783,827,2,52785),
 	 (52783,827,3,52786),
 	 (52783,827,4,52787),
 	 (52783,827,5,52788),
-	 (52795,832,1,52795),
+	 (52795,832,1,52795);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (52795,832,2,52797),
 	 (52795,832,3,52798),
 	 (52795,832,4,52799),
 	 (52795,832,5,52800),
 	 (53137,834,1,53137),
-	 (53137,834,2,53138);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53137,834,2,53138),
 	 (53209,826,1,53209),
 	 (53215,826,1,53215),
 	 (53215,826,2,53216),
-	 (53215,826,3,53217),
+	 (53215,826,3,53217);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53221,826,1,53221),
 	 (53221,826,2,53222),
 	 (53221,826,3,53224),
 	 (53228,826,1,53228),
 	 (53228,826,2,53232),
-	 (53234,826,1,53234);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53234,826,1,53234),
 	 (53234,826,2,53237),
 	 (53234,826,3,53238),
 	 (53241,826,1,53241),
-	 (53241,826,2,53243),
+	 (53241,826,2,53243);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53241,826,3,53244),
 	 (53241,826,4,53245),
 	 (53241,826,5,53246),
 	 (53252,825,1,53252),
 	 (53252,825,2,53253),
-	 (53256,825,1,53256);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53256,825,1,53256),
 	 (53256,825,2,53259),
 	 (53256,825,3,53260),
 	 (53262,825,1,53262),
-	 (53262,825,2,53263),
+	 (53262,825,2,53263);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53262,825,3,53264),
 	 (53265,825,1,53265),
 	 (53270,825,1,53270),
 	 (53290,827,1,53290),
 	 (53290,827,2,53291),
-	 (53290,827,3,53292);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53290,827,3,53292),
 	 (53295,827,1,53295),
 	 (53295,827,2,53296),
 	 (53295,827,3,53297),
-	 (53298,827,1,53298),
+	 (53298,827,1,53298);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53298,827,2,53299),
 	 (53301,827,1,53301),
 	 (53302,827,1,53302),
 	 (53302,827,2,53303),
 	 (53302,827,3,53304),
-	 (53375,824,1,53375);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53375,824,1,53375),
 	 (53375,824,2,53376),
 	 (53379,824,1,53379),
 	 (53379,824,2,53484),
-	 (53379,824,3,53648),
+	 (53379,824,3,53648);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53380,824,1,53380),
 	 (53380,824,2,53381),
 	 (53380,824,3,53382),
 	 (53385,824,1,53385),
 	 (53486,824,1,53486),
-	 (53486,824,2,53488);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53486,824,2,53488),
 	 (53501,824,1,53501),
 	 (53501,824,2,53502),
 	 (53501,824,3,53503),
-	 (53527,823,1,53527),
+	 (53527,823,1,53527);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53527,823,2,53530),
 	 (53551,822,1,53551),
 	 (53551,822,2,53552),
 	 (53551,822,3,53553),
 	 (53556,822,1,53556),
-	 (53556,822,2,53557);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53556,822,2,53557),
 	 (53563,822,1,53563),
 	 (53569,822,1,53569),
 	 (53569,822,2,53576),
-	 (53583,823,1,53583),
+	 (53583,823,1,53583);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53583,823,2,53585),
 	 (53590,823,1,53590),
 	 (53590,823,2,53591),
 	 (53590,823,3,53592),
 	 (53595,823,1,53595),
-	 (53620,826,1,53620);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53620,826,1,53620),
 	 (53620,826,2,53621),
 	 (53620,826,3,53622),
 	 (53660,822,1,53660),
-	 (53660,822,2,53661),
+	 (53660,822,2,53661);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53671,822,1,53671),
 	 (53671,822,2,53673),
 	 (53671,822,3,54151),
 	 (53671,822,4,54154),
 	 (53671,822,5,54155),
-	 (53695,823,1,53695);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (53695,823,1,53695),
 	 (53695,823,2,53696),
 	 (53709,823,1,53709),
 	 (53709,823,2,53710),
-	 (53709,823,3,53711),
+	 (53709,823,3,53711);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (53754,843,1,53754),
 	 (53754,843,2,53759),
 	 (54037,843,1,54037),
 	 (54037,843,2,54038),
 	 (54117,845,1,54117),
-	 (54117,845,2,54118);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (54117,845,2,54118),
 	 (54347,844,1,54347),
 	 (54347,844,2,54348),
 	 (54347,844,3,54349),
-	 (54639,835,1,54639),
+	 (54639,835,1,54639);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (54639,835,2,54638),
 	 (54639,835,3,54637),
 	 (54646,840,1,54646),
 	 (54747,841,1,54747),
 	 (54747,841,2,54749),
-	 (55050,834,1,55050);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (55050,834,1,55050),
 	 (55061,835,1,55061),
 	 (55061,835,2,55062),
 	 (55090,836,1,55090),
-	 (55091,842,1,55091),
+	 (55091,842,1,55091);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (55091,842,2,55092),
 	 (55107,834,1,55107),
 	 (55107,834,2,55108),
 	 (55129,836,1,55129),
 	 (55129,836,2,55130),
-	 (55129,836,3,55131);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (55129,836,3,55131),
 	 (55129,836,4,55132),
 	 (55129,836,5,55133),
 	 (55198,839,1,55198),
-	 (55233,834,1,55233),
+	 (55233,834,1,55233);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (55610,835,1,55610),
 	 (55620,836,1,55620),
 	 (55620,836,2,55623),
 	 (55666,836,1,55666),
 	 (55666,836,2,55667),
-	 (56314,825,1,56314);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (56314,825,1,56314),
 	 (56314,825,2,56315),
 	 (56314,825,3,56316),
 	 (56314,825,4,56317),
-	 (56314,825,5,56318),
+	 (56314,825,5,56318);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (56333,827,1,56333),
 	 (56333,827,2,56336),
 	 (56333,827,3,56337),
 	 (56339,827,1,56339),
 	 (56339,827,2,56340),
-	 (56339,827,3,56341);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (56339,827,3,56341),
 	 (56342,827,1,56342),
 	 (56342,827,2,56343),
 	 (56342,827,3,56344),
-	 (56636,401,1,56636),
+	 (56636,401,1,56636);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (56636,401,2,56637),
 	 (56636,401,3,56638),
 	 (56927,402,1,56927),
 	 (56927,402,2,56929),
 	 (56927,402,3,56930),
-	 (56927,402,4,56931);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (56927,402,4,56931),
 	 (56927,402,5,56932),
 	 (57470,832,1,57470),
 	 (57470,832,2,57472),
-	 (57499,403,1,57499),
+	 (57499,403,1,57499);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (57810,846,1,57810),
 	 (57810,846,2,57811),
 	 (57810,846,3,57812),
 	 (57810,846,4,57813),
 	 (57810,846,5,57814),
-	 (57849,846,1,57849);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (57849,846,1,57849),
 	 (57849,846,2,57850),
 	 (57849,846,3,57851),
 	 (57865,846,1,57865),
-	 (57873,847,1,57873),
+	 (57873,847,1,57873);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (57873,847,2,57876),
 	 (57873,847,3,57877),
 	 (57878,847,1,57878),
 	 (57878,847,2,57880),
 	 (57878,847,3,57881),
-	 (58414,804,1,58414);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (58414,804,1,58414),
 	 (58414,804,2,58415),
 	 (58426,802,1,58426),
 	 (58435,843,1,58435),
-	 (58872,403,1,58872),
+	 (58872,403,1,58872);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (58872,403,2,58874),
 	 (59088,403,1,59088),
 	 (59088,403,2,59089),
 	 (59672,844,1,59672),
 	 (60103,838,1,60103),
-	 (60970,402,1,60970);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (60970,402,1,60970),
 	 (61154,834,1,61154),
 	 (61154,834,2,61155),
 	 (61154,834,3,61156),
-	 (61154,834,4,61157),
+	 (61154,834,4,61157);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (61154,834,5,61158),
 	 (61216,402,1,61216),
 	 (61216,402,2,61221),
 	 (61216,402,3,61222),
 	 (61295,839,1,61295),
-	 (61336,847,1,61336);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (61336,847,1,61336),
 	 (62097,837,1,62097),
 	 (62097,837,2,62098),
 	 (62097,837,3,62099),
-	 (62097,837,4,62100),
+	 (62097,837,4,62100);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (62097,837,5,62101),
 	 (62905,834,1,62905),
 	 (62905,834,2,62908),
 	 (63108,843,1,63108),
 	 (63117,844,1,63117),
-	 (63117,844,2,63121);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (63117,844,2,63121),
 	 (63117,844,3,63123),
 	 (63156,844,1,63156),
 	 (63156,844,2,63158),
-	 (63349,845,1,63349),
+	 (63349,845,1,63349);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (63349,845,2,63350),
 	 (63349,845,3,63351),
 	 (63370,837,1,63370),
 	 (63370,837,2,63372),
 	 (63373,838,1,63373),
-	 (63373,838,2,63374);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (63373,838,2,63374),
 	 (63410,848,1,63410),
 	 (63410,848,2,63411),
 	 (63503,847,1,63503),
-	 (63504,832,1,63504),
+	 (63504,832,1,63504);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (63504,832,2,63505),
 	 (63504,832,3,63506),
 	 (63534,831,1,63534),
 	 (63534,831,2,63542),
 	 (63534,831,3,63543),
-	 (63560,836,1,63560);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (63560,836,1,63560),
 	 (63574,832,1,63574),
 	 (63625,833,1,63625),
 	 (63625,833,2,63626),
-	 (63625,833,3,63627),
+	 (63625,833,3,63627);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (63646,823,1,63646),
 	 (63646,823,2,63647),
 	 (63646,823,3,63648),
 	 (63646,823,4,63649),
 	 (63646,823,5,63650),
-	 (63730,831,1,63730);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (63730,831,1,63730),
 	 (63730,831,2,63733),
 	 (63730,831,3,63737),
 	 (64044,833,1,64044),
-	 (64127,831,1,64127),
+	 (64127,831,1,64127);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (64127,831,2,64129),
 	 (64205,823,1,64205),
 	 (64353,841,1,64353),
 	 (64353,841,2,64357),
 	 (64976,401,1,64976),
-	 (65139,848,1,65139);
-INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
+	 (65139,848,1,65139),
 	 (65661,835,1,65661),
 	 (65661,835,2,66191),
 	 (65661,835,3,66192),
-	 (66799,836,1,66799),
+	 (66799,836,1,66799);
+INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES
 	 (66799,836,2,66814),
 	 (66799,836,3,66815),
 	 (66799,836,4,66816),
 	 (66799,836,5,66817),
+	 (110001,838,1,110001),
+	 (110001,838,2,110002),
+	 (110001,838,3,110003),
+	 (110005,838,1,110005),
 	 (230230,1980000,1,230230),
 	 (230231,1980000,1,230231);
 INSERT INTO acore_world.forge_talent_ranks (talentSpellId,talentTabId,`rank`,spellId) VALUES

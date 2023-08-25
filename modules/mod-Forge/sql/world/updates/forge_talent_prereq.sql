@@ -53,10 +53,10 @@ INSERT INTO acore_world.forge_talent_prereq (spellid,talentTabId,reqTalent,reqTa
 	 (51886,839,16178,839,5),
 	 (51560,839,974,839,1),
 	 (16256,838,16255,838,5),
-	 (30816,838,30798,838,1);
+	 (30816,838,60103,838,1);
 INSERT INTO acore_world.forge_talent_prereq (spellid,talentTabId,reqTalent,reqTalentTabId,reqRank) VALUES
-	 (30798,838,16268,838,1),
-	 (60103,838,30798,838,1),
+	 (60103,838,16268,838,1),
+	 (110005,838,60103,838,1),
 	 (51521,838,17364,838,1),
 	 (37116,847,16942,847,3),
 	 (48409,847,16942,847,3),
