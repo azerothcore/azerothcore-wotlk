@@ -1,3 +1,4 @@
+-- DB update 2023_08_25_01 -> 2023_08_25_02
 -- 
 DELETE FROM `creature` WHERE `guid` IN (31929, 31932, 31933, 32020, 38237, 38239, 38240, 38244, 38246, 38247, 38440, 43732, 43911, 43912, 45021, 45023, 45028, 45029, 45032, 45035, 45042, 45209, 31930, 38236, 38243, 38245, 38441, 38442, 38444, 43736, 43910, 45024, 45025, 45030, 45041, 45043, 45044, 45045, 45046, 45100, 45101, 45206, 45207, 45038);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
