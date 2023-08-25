@@ -211,16 +211,14 @@ struct boss_moroes : public BossAI
 
     bool CheckGuestsInRoom()
     {
-        for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
+        summons.DoForAllSummons([](WorldObject* summon)
         {
-            if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+            if ((summon->ToCreature()->GetPositionX()) < -11028.f || (summon->ToCreature()->GetPositionY()) < -1955.f) //boundaries of the two doors
             {
-                if ((summon->GetPositionX()) < -11028.f || (summon->GetPositionY()) < -1955.f) //boundaries of the two doors
-                {
-                    return false;
-                }
+                return false;
             }
-        }
+        });
+
         return true;
     }
 
@@ -231,13 +229,10 @@ struct boss_moroes : public BossAI
         if (!CheckGuestsInRoom())
         {
             EnterEvadeMode();
-            for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
+            summons.DoForAllSummons([](WorldObject* summon)
             {
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                {
-                    summon->AI()->EnterEvadeMode();
-                }
-            }
+                summon->ToCreature()->AI()->EnterEvadeMode();
+            });
             return;
         }
 
