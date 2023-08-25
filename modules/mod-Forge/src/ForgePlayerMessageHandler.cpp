@@ -103,7 +103,7 @@ public:
                 cm->SendTalents(player);
             }
 
-            LearnSpellsForLevel(player, oldlevel, player->GetLevel());
+            LearnSpellsForLevel(player, player->GetLevel());
 
             auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
             if (missing > 0)

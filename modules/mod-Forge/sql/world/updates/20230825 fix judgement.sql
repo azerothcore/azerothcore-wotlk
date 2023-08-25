@@ -1,2 +1,1 @@
-update acore_world.spell_script_names
-	set ScriptName = 'spell_pal_judgement' where spell_id in (20271, 53407, 53408);
+DELETE FROM acore_characters.forge_character_talents WHERE tabId < 999900;
