@@ -947,38 +947,6 @@ class spell_sha_item_t10_elemental_2p_bonus : public AuraScript
     }
 };
 
-// 60103 - Lava Lash
-class spell_sha_lava_lash : public SpellScript
-{
-    PrepareSpellScript(spell_sha_lava_lash)
-
-    bool Load() override
-    {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        if (Player* caster = GetCaster()->ToPlayer())
-        {
-            int32 damage = GetEffectValue();
-            int32 hitDamage = GetHitDamage();
-            if (caster->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-            {
-                // Damage is increased by 25% if your off-hand weapon is enchanted with Flametongue.
-                if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0x200000, 0, 0))
-                    AddPct(hitDamage, damage);
-                SetHitDamage(hitDamage);
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_sha_lava_lash::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-    }
-};
-
 // 52031, 52033, 52034, 52035, 52036, 58778, 58779, 58780 - Mana Spring Totem
 class spell_sha_mana_spring_totem : public SpellScript
 {
@@ -1133,7 +1101,6 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_item_lightning_shield_trigger);
     RegisterSpellScript(spell_sha_item_mana_surge);
     RegisterSpellScript(spell_sha_item_t10_elemental_2p_bonus);
-    RegisterSpellScript(spell_sha_lava_lash);
     RegisterSpellScript(spell_sha_mana_spring_totem);
     RegisterSpellScript(spell_sha_mana_tide_totem);
     RegisterSpellScript(spell_sha_sentry_totem);

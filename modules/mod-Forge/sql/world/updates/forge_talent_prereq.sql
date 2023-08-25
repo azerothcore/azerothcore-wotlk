@@ -1,3 +1,4 @@
+truncate acore_world.forge_talent_prereq;
 INSERT INTO acore_world.forge_talent_prereq (spellid,talentTabId,reqTalent,reqTalentTabId,reqRank) VALUES
 	 (11113,841,11366,841,1),
 	 (11129,841,11115,841,3),

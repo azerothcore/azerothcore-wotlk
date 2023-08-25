@@ -1782,6 +1782,7 @@ public:
     SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     SpellCastResult CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     Aura* AddAura(uint32 spellId, Unit* target);
+    Aura* AddAuraForTarget(Aura* aura, Unit* target);
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id);
