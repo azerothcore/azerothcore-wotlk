@@ -30,15 +30,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- AshbringerEvent
 (4294, 0, 5, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - spellhit_target - AshbringerEvent');
 
+-- AshbringerEvent Timed Actionlis
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 429400);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(429400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script - Set_Faction Friend'),
-(429400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script - stop movement'),
-(429400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script - Set Facing player'),
-(429400, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(429400, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer  - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(429400, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(429400, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - On Script - Talk 0');
+(429400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script - Set_Faction Friend'),
+(429400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script - stop movement'),
+(429400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script - Set Facing player'),
+(429400, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script - SetStandState UNIT_STAND_STATE_STAND'),
+(429400, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent  - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
+(429400, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
+(429400, 9, 6, 0, 0, 0, @AE_Probability, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - On Script - Talk 0');
 
 -- ------------------------------Scarlet Myrmidon-----------------------------
 -- Scarlet Myrmidon say
@@ -66,17 +67,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4295, 0, 1, 2, 2, 0, 100, 1, 0, 40, 0, 0, 0, 0, 11, 8269, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - Between 0-40% Health - Cast Frenzy'),
 (4295, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - Between 0-40% Health - Say Line 2'),
 -- AshbringerEvent
-(4295, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429500, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 429500);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(429500, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script - Set_Faction Friend'),
-(429500, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script - stop movement'),
-(429500, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script - Set Facing player'),
-(429500, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon -  - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(429500, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(429500, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(429500, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - On Script - Talk 0');
+(4295, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Myrmidon - spellhit_target - AshbringerEvent');
 
 
 -- ------------------------------Scarlet Defender -----------------------------
@@ -107,16 +98,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4298, 0, 3, 0, 13, 0, 100, 0, 8000, 11000, 0, 0, 0, 0, 11, 11972, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - Victim Casting - Cast Shield Bash'),
 (4298, 0, 4, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - Between 0-15% Health - Flee For Assist'),
 -- AshbringerEvent
-(4298, 0, 5, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429800, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 429800);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(429800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Script - Set_Faction Friend'),
-(429800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Script - stop movement'),
-(429800, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Script - Set Facing player'),
-(429800, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender -  - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(429800, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(429800, 9, 5, 0, 0, 0, @AE_Probability, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - On Script - Talk 0');
+(4298, 0, 5, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Defender - spellhit_target - AshbringerEvent');
 
 -- ------------------------------Scarlet Chaplain -----------------------------
 -- Scarlet Chaplain say--
@@ -148,17 +130,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4299, 0, 5, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - Between 0-15% Health - Flee For Assist'),
 
 -- AshbringerEvent
-(4299, 0, 6, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 429900);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(429900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script - Set_Faction Friend'),
-(429900, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script - stop movement'),
-(429900, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script - Set Facing player'),
-(429900, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(429900, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(429900, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(429900, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - On Script - Talk 0');
+(4299, 0, 6, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Chaplain - spellhit_target - AshbringerEvent');
 
 -- ------------------------------Scarlet Wizard -----------------------------
 -- Scarlet Wizard say---
@@ -182,21 +154,11 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 4300);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (4300, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Aggro - Say Line 1'),
-(4300, 0, 1, 0, 106, 0, 100, 0, 2000, 6000, 7000, 11000, 10, 0, 11, 4863, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - In Combat - Cast Arcane Explosion'),
+(4300, 0, 1, 0, 106, 0, 100, 0, 2000, 6000, 7000, 11000, 0, 10, 11, 8439, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - In Combat - Cast Arcane Explosion'),
 (4300, 0, 2, 0, 0, 0, 100, 0, 1000, 5000, 30000, 30000, 0, 0, 11, 2601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - In Combat - Cast Fire Shield III'),
 (4300, 0, 3, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - Between 0-15% Health - Flee For Assist'),
 -- AshbringerEvent
-(4300, 0, 4, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 430000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 430000);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(430000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script - Set_Faction Friend'),
-(430000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script - stop movement'),
-(430000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script - Set Facing player'),
-(430000, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(430000, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(430000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(430000, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - On Script - Talk 0');
+(4300, 0, 4, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Wizard - spellhit_target - AshbringerEvent');
 
 -- ------------------------------Scarlet Centurion -----------------------------
 -- Scarlet Centurion  say--
@@ -224,17 +186,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4301, 0, 1, 0, 0, 0, 100, 0, 2000, 6000, 50000, 70000, 0, 0, 11, 31403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - In Combat - Cast Battle Shout'),
 (4301, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - Between 0-15% Health - Flee For Assist'),
 -- AshbringerEvent
-(4301, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 430100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 430100);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(430100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script - Set_Faction Friend'),
-(430100, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script - stop movement'),
-(430100, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script - Set Facing player'),
-(430100, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(430100, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(430100, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(430100, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - On Script - Talk 0');
+(4301, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Centurion - spellhit_target - AshbringerEvent');
 
 -- ------------------------------Scarlet Champion-- ------------------------------
 -- Scarlet Champion say--
@@ -262,17 +214,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4302, 0, 1, 0, 0, 0, 100, 0, 1000, 5000, 6000, 9000, 0, 0, 11, 17143, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - In Combat - Cast Holy Strike'),
 (4302, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - Between 0-15% Health - Flee For Assist'),
 -- AshbringerEvent
-(4302, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 430200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - spellhit_target - AshbringerEvent');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 430200);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(430200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script - Set_Faction Friend'),
-(430200, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script - stop movement'),
-(430200, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script - Set Facing player'),
-(430200, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(430200, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(430200, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(430200, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - On Script - Talk 0');
+(4302, 0, 3, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Champion - spellhit_target - AshbringerEvent');
 
 -- ------------------------------Scarlet Abbot -------
 -- Scarlet Abbot say--
@@ -303,17 +245,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4303, 0, 3, 4, 2, 0, 100, 1, 0, 40, 0, 0, 0, 0, 11, 8269, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - Between 0-40% Health - Cast Frenzy'),
 (4303, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - Between 0-40% Health - Say Line 2'),
 -- AshbringerEvent
-(4303, 0, 5, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 430300, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - spellhit_target - AshbringerEvent');
+(4303, 0, 5, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - spellhit_target - AshbringerEvent');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 430300);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(430300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script - Set_Faction Friend'),
-(430300, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script - stop movement'),
-(430300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script - Set Facing player'),
-(430300, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(430300, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(430300, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(430300, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Abbot - On Script - Talk 0');
 
 -- ------------------------------Scarlet Monk -------
 -- Scarlet Monk say --
@@ -342,14 +275,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4540, 0, 2, 0, 13, 0, 100, 0, 7000, 7000, 0, 0, 0, 0, 11, 11978, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - Victim Casting - Cast Kick'),
 (4540, 0, 3, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - Between 0-15% Health - Flee For Assist'),
 -- AshbringerEvent
-(4540, 0, 4, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 454000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - spellhit_target - AshbringerEvent');
--- AshbringerEvent
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 454000);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(454000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script - Set_Faction Friend'),
-(454000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script - stop movement'),
-(454000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk- On Script - Set Facing player'),
-(454000, 9, 3, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script - SetStandState UNIT_STAND_STATE_STAND'),
-(454000, 9, 4, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script -  SetSheath  SHEATH_STATE_UNARMED'),
-(454000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script -  SetSheath  UNIT_STAND_STATE_KNEEL'),
-(454000, 9, 6, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - On Script - Talk 0');
+(4540, 0, 4, 0, 8, 0, 100, 769, 28441, 0, 0, 0, 0, 0, 80, 429400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monk - spellhit_target - AshbringerEvent');
