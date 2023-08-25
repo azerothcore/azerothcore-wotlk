@@ -67,6 +67,7 @@ public:
 
         fc->ApplyTalents(player);
         fc->ApplyActivePerks(player);
+        LearnSpellsForLevel(player, player->GetLevel());
     }
 
     void OnDelete(ObjectGuid guid, uint32 accountId) override
@@ -212,7 +213,7 @@ private:
         return false;
     }
 
-    void LearnSpellsForLevel(Player* player, uint8 oldlevel, uint8 newlevel) {
+    void LearnSpellsForLevel(Player* player, uint8 newlevel) {
 
         // remove fake death
         if (player->HasUnitState(UNIT_STATE_DIED))
