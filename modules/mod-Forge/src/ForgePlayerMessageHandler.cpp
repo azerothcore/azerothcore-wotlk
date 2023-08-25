@@ -69,12 +69,6 @@ public:
         fc->ApplyActivePerks(player);
     }
 
-    void OnLogout(Player* player) override
-    {
-        fc->RemoveTalents(player);
-        fc->RemoveActivePerks(player);
-    }
-
     void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         fc->DeleteCharacter(guid, accountId);
