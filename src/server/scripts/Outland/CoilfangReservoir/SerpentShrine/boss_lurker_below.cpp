@@ -132,7 +132,7 @@ struct boss_the_lurker_below : public BossAI
         }).Schedule(spoutTimer, [this](TaskContext context)
         {
             Talk(EMOTE_TAKE_BREATH);
-            DoCastSelf(SPELL_SPOUT_VISUAL, TRIGGERED_IGNORE_SET_FACING);
+            me->CastSpell(me, SPELL_SPOUT_VISUAL, TRIGGERED_IGNORE_SET_FACING);
             me->SetReactState(REACT_PASSIVE);
             me->SetFacingToObject(me->GetVictim());
             me->SetTarget();
