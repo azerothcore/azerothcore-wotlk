@@ -36,6 +36,7 @@ ObjectData const creatureData[] =
     { NPC_YEGGETH,   DATA_YEGGETH   },
     { NPC_PAKKON,    DATA_PAKKON    },
     { NPC_ZERRAN,    DATA_ZERRAN    },
+    { 0,             0              }
 };
 
 enum RajaxxWaveEvent
