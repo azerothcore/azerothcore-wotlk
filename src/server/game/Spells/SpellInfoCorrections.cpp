@@ -598,6 +598,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY; // just a marker
     });
 
+    ApplySpellFix({
+        6940, // Hand of Sacrifice
+        64205 // Divine Sacrifice
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_DONT_CAUSE_SPELL_PUSHBACK;
+    });
+
     // Seal of Command trigger
     ApplySpellFix({ 20424 }, [](SpellInfo* spellInfo)
     {
