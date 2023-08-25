@@ -211,15 +211,18 @@ struct boss_moroes : public BossAI
 
     bool CheckGuestsInRoom()
     {
-        summons.DoForAllSummons([](WorldObject* summon)
+        bool guestsInRoom = true;
+        summons.DoForAllSummons([&guestsInRoom](WorldObject* summon)
         {
             if ((summon->ToCreature()->GetPositionX()) < -11028.f || (summon->ToCreature()->GetPositionY()) < -1955.f) //boundaries of the two doors
             {
+                guestsInRoom = false;
                 return false;
             }
+            return true;
         });
 
-        return true;
+        return guestsInRoom;
     }
 
     void UpdateAI(uint32 diff) override
