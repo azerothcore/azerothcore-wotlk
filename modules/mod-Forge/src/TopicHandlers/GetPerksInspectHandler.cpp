@@ -21,11 +21,10 @@ public:
         if (iam.message.empty())
             return;
 
-        Unit* target = iam.player->GetTargetUnit();
-        if (target == nullptr || !target->IsPlayer())
+        Player* targetPlayer = iam.player->GetSelectedPlayer();
+
+        if (targetPlayer == nullptr)
             return;
-        
-        Player* targetPlayer = target->ToPlayer();
 
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(targetPlayer, spec))
