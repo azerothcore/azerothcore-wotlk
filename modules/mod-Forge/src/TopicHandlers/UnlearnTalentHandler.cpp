@@ -142,6 +142,9 @@ private:
                                 HandleMessage(*msg);
                             }
                         }
+
+                        if (spec->PointsSpent[tab.first] > 0)
+                            spec->PointsSpent[tab.first] = 0;
                     }
                     else {
                         continue;
