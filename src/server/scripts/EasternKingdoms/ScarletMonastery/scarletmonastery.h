@@ -30,6 +30,4 @@ inline AI* GetScarletMonasteryAI(T* obj)
     return GetInstanceAI<AI>(obj, ScarletMonasteryScriptName);
 }
 
-#define RegisterScarletMonestaryCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetScarletMonasteryAI)
-
 #endif
