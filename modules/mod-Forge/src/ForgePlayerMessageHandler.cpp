@@ -20,6 +20,7 @@
 #include <UpdateSpecHandler.cpp>
 #include <GetTalentsHandler.cpp>
 #include <GetPerksHandler.cpp>
+#include <GetPerksInspectHandler.cpp>
 #include <LearnPerkHandler.cpp>
 #include <GetPerkSelectionHandler.cpp>
 #include <RerollPerkHandler.cpp>
@@ -303,6 +304,7 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new LearnPerkHandler(cache, cm));
     sTopicRouter->AddHandler(new GetPerkSelectionHandler(cache, cm));
     sTopicRouter->AddHandler(new RerollPerkHandler(cache, cm));
+    sTopicRouter->AddHandler(new GetPerksInspectHandler(cache, cm));
 
     new UseSkillBook();
     new ForgeCacheCommands();
