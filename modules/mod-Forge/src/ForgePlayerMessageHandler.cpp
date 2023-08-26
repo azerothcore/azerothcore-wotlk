@@ -52,21 +52,29 @@ public:
         fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 17));
     }
 
-    void OnFirstLogin(Player* player) override
-    {
-        if (!player)
-            return;
-
-        fc->ApplyTalents(player);
-        fc->ApplyActivePerks(player);
-    }
-
     void OnLogin(Player* player) override
     {
         if (!player)
             return;
 
-        fc->ApplyTalents(player);
+        
+        if (fc->IsFlaggedReset(player->GetGUID().GetCounter())) {
+            ForgeCharacterSpec* spec;
+            if (fc->TryGetCharacterActiveSpec(player, spec))
+            {
+                ForgeAddonMessage msg;
+                msg.topic = "2";
+                msg.player = player;
+                std::string message = "-1;"+std::to_string(spec->Id);
+                msg.message = message;
+                sTopicRouter->Route(msg, message);
+
+                fc->ClearResetFlag(player->GetGUID().GetCounter());
+            }
+        }
+        else {
+            fc->ApplyTalents(player);
+        }
         fc->ApplyActivePerks(player);
         LearnSpellsForLevel(player, player->GetLevel());
     }
@@ -175,35 +183,35 @@ public:
         }
     }
 
-    /*void OnGiveXP(Player* player, uint32& amount, Unit* victim) override
+    void OnGiveXP(Player* player, uint32& amount, Unit* victim, uint8 source) override
     {
         if (Gamemode::HasGameMode(player, GameModeType::CLASSIC))
             return;
 
         if (player->getLevel() <= 9)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.1-9", 2);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.1-9", 5);
 
         else if (player->getLevel() <= 19)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.10-19", 2);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.10-19", 5);
 
         else if (player->getLevel() <= 29)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.20-29", 3);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.20-29", 6);
 
         else if (player->getLevel() <= 39)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.30-39", 3);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.30-39", 6);
 
         else if (player->getLevel() <= 49)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.40-49", 3);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.40-49", 7);
 
         else if (player->getLevel() <= 59)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.50-59", 3);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.50-59", 7);
 
         else if (player->getLevel() <= 69)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.60-69", 4);
+            amount *= fc->GetConfig("Dynamic.XP.Rate.60-69", 8);
 
         else if (player->getLevel() <= 79)
-            amount *= fc->GetConfig("Dynamic.XP.Rate.70-79", 4);
-    }*/
+            amount *= fc->GetConfig("Dynamic.XP.Rate.70-79", 9);
+    }
 
 private:
     TopicRouter* Router;

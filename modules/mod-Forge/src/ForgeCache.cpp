@@ -683,13 +683,10 @@ public:
 
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
-                    ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
-                    auto points = 0;
 
                     for (auto* tab : tabs)
                     {
                         auto talItt = currentSpec->Talents.find(tab->Id);
-                        if (points < sfp->Max)
                             for (auto spell : tab->Talents)
                             {
                                 if (modes.size() == 0 && talItt != currentSpec->Talents.end())
@@ -701,35 +698,32 @@ public:
                                             uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
                                             if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                                    for (auto rank : spell.second->Ranks) {
-                                                        if (spellInfo->IsPassive() && currentRank != rank.second) {
-                                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                                        } else {
-                                                            if (!player->HasSpell(currentRank)) {
-                                                                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                                                    player->learnSpell(currentRank, true, false);
-                                                                else {
-                                                                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                                                                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-
-                                                                            player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-                                                                }
-                                                            }
-                                                            points += spellItt->second->CurrentRank * spell.second->RankCost;
-                                                        }
-                                                        UpdateCharacterSpec(player, currentSpec);
+                                                for (auto rank : spell.second->Ranks) {
+                                                    if (spellInfo->IsPassive() && currentRank != rank.second) {
+                                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                                     }
+                                                    else {
+                                                        if (!player->HasSpell(currentRank)) {
+                                                            if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                                                player->learnSpell(currentRank, true, false);
+                                                            else {
+                                                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+
+                                                                        player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    LOG_INFO("server.world", "proints {}", points);
-                    sfp->Sum = sfp->Max - points;
-                    UpdateCharPoints(player, sfp);
                 }
             }
+            UpdateCharacterSpec(player, currentSpec);
             player->SendInitialSpells();
         }
     }
@@ -1139,6 +1133,21 @@ public:
         } while (totalPerks < maxPerks);
     }
 
+    bool IsFlaggedReset(uint32 guid) {
+        auto flagged = std::find(FlaggedForReset.begin(), FlaggedForReset.end(), guid);
+        if (flagged != FlaggedForReset.end()) {
+            return true;
+        }
+        return false;
+    }
+
+    void ClearResetFlag(uint32 guid) {
+        FlaggedForReset.erase(std::remove(FlaggedForReset.begin(), FlaggedForReset.end(), guid), FlaggedForReset.end());
+        auto trans = WorldDatabase.BeginTransaction();
+        trans->Append("delete from forge_talent_flagged_reset where guid = {}", guid);
+        WorldDatabase.CommitTransaction(trans);
+    }
+
     std::vector<uint32> RACE_LIST;
     std::vector<uint32> CLASS_LIST;
     std::vector<CharacterPointType> TALENT_POINT_TYPES;
@@ -1170,12 +1179,15 @@ private:
     // Race, class
     std::unordered_map<uint8, std::unordered_map<uint8, std::vector<ClassSpecDetail*>>> ClassSpecDetails;
 
-
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
+
+    // Flagged for spec reset
+    std::vector<uint32 /*guid*/> FlaggedForReset;
 
     // Perks
     std::unordered_map<uint32, std::vector<Perk*>> Perks;
     std::unordered_map<uint32, Perk*> AllPerks;
+
 
     void BuildForgeCache()
     {
@@ -1219,6 +1231,7 @@ private:
         AddCharacterPerks();
         AddCharacterQueuedPerks();
         AddCharacterPrestigePerks();
+        LoadCharacterResetFlags();
     }
 
     void GetCharacters()
@@ -1850,6 +1863,22 @@ private:
             }
             
         } while (pointsQuery->NextRow());
+    }
+
+
+    void LoadCharacterResetFlags()
+    {
+        QueryResult flags = WorldDatabase.Query("select guid from forge_talent_flagged_reset order by guid asc");
+        if (!flags)
+            return;
+
+        do
+        {
+            Field* flagField = flags->Fetch();
+            uint32 guid = flagField[0].Get<uint32>();
+
+            FlaggedForReset.push_back(guid);
+        } while (flags->NextRow());
     }
 
     void AddCharacterClassSpecs()
