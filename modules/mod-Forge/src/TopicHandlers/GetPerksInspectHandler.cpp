@@ -28,7 +28,7 @@ public:
         Player* targetPlayer = target->ToPlayer();
 
         ForgeCharacterSpec* spec;
-        if (fc->TryGetCharacterActiveSpec(iam.player, spec))
+        if (fc->TryGetCharacterActiveSpec(targetPlayer, spec))
         {
             std::vector<CharacterSpecPerk*> specVec;
             fc->TryGetCharacterPerks(targetPlayer, spec->Id, specVec);
