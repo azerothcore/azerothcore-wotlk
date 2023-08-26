@@ -685,55 +685,48 @@ public:
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
                     ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
                     auto points = 0;
-                    if (charTabType == TALENT_TREE)
-                        sfp->Max = std::max(player->GetLevel() - 9, 0);
-                    else if (charTabType == PRESTIGE_TREE)
-                        sfp->Max = GetSpecPoints(player, PRESTIGE_COUNT, currentSpec->Id)->Sum;
-                    else
-                        sfp->Max = 17;
-
-                    points = sfp->Max;
 
                     for (auto* tab : tabs)
                     {
                         auto talItt = currentSpec->Talents.find(tab->Id);
-
-                        for (auto spell : tab->Talents)
-                        {
-                            if (modes.size() == 0 && talItt != currentSpec->Talents.end())
+                        if (points < sfp->Max)
+                            for (auto spell : tab->Talents)
                             {
-                                auto spellItt = talItt->second.find(spell.first);
-                                if (spellItt != talItt->second.end())
+                                if (modes.size() == 0 && talItt != currentSpec->Talents.end())
                                 {
-                                    if (spellItt->second->CurrentRank > 0) {
-                                        uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+                                    auto spellItt = talItt->second.find(spell.first);
+                                    if (spellItt != talItt->second.end())
+                                    {
+                                        if (spellItt->second->CurrentRank > 0) {
+                                            uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
-                                        if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                                for (auto rank : spell.second->Ranks) {
-                                                    if (spellInfo->IsPassive() && (currentRank != rank.second || points == 0)) {
-                                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                                    } else {
-                                                        if (!player->HasSpell(currentRank)) {
-                                                            if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                                                player->learnSpell(currentRank, true, false);
-                                                            else {
-                                                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                                                                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                                            if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                                    for (auto rank : spell.second->Ranks) {
+                                                        if (spellInfo->IsPassive() && currentRank != rank.second) {
+                                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                                        } else {
+                                                            if (!player->HasSpell(currentRank)) {
+                                                                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                                                    player->learnSpell(currentRank, true, false);
+                                                                else {
+                                                                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
 
-                                                                        player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                                                                            player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                                                                }
                                                             }
+                                                            points += spellItt->second->CurrentRank * spell.second->RankCost;
                                                         }
-                                                        points -= spellItt->second->CurrentRank * spell.second->RankCost;
+                                                        UpdateCharacterSpec(player, currentSpec);
                                                     }
-                                                    UpdateCharacterSpec(player, currentSpec);
-                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    sfp->Sum = points;
+                    LOG_INFO("server.world", "proints {}", points);
+                    sfp->Sum = sfp->Max - points;
                     UpdateCharPoints(player, sfp);
                 }
             }
