@@ -39,7 +39,7 @@ public:
             fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
             ForgeCharacterPoint* curPoints = fc->GetSpecPoints(iam.player, tabType, spec->Id);
-            if (tab->ClassMask != iam.player->getClassMask())
+            if (~tab->ClassMask & iam.player->getClassMask())
             {
                 iam.player->SendForgeUIMsg(ForgeTopic::LEARN_TALENT_ERROR, "You are attempting to learn a talent from a another class; abuse of game systems will result in a ban.");
             }
@@ -221,24 +221,24 @@ public:
 
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
-            if (ranksItt != ft->Ranks.end()) {
-                auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
-                else
-                    iam.player->RemoveAura(ranksItt->second);
-            }
-
+            if (ranksItt != ft->Ranks.end()) 
+                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+            
             ct->CurrentRank++;
 
             ranksItt = ft->Ranks.find(ct->CurrentRank);
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
-                    iam.player->learnSpell(ranksItt->second);
-                else
-                    iam.player->AddAura(ranksItt->second, iam.player);
+
+                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                    iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                else {
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL) {
+                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                        }
+                }
             }
 
             fc->UpdateCharPoints(iam.player, curPoints);

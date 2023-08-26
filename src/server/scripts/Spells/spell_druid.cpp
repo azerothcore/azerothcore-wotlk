@@ -174,7 +174,7 @@ class spell_dru_feral_swiftness : public AuraScript
     void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
         if (Player* player = GetTarget()->ToPlayer())
-            if (uint8 rank = player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R1, player->GetActiveSpec()) ? 1 : (player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R2, player->GetActiveSpec()) ? 2 : 0))
+            if (uint8 rank = player->HasSpell(SPELL_DRUID_FERAL_SWIFTNESS_R1) ? 1 : (player->HasSpell(SPELL_DRUID_FERAL_SWIFTNESS_R2) ? 2 : 0))
                 player->CastSpell(player, rank == 1 ? SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1 : SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2, true, nullptr, aurEff, GetCasterGUID());
     }
 
@@ -539,7 +539,7 @@ class spell_dru_innervate : public AuraScript
         float f;
 
         if (Unit* caster = GetCaster())
-            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks(f, true));
+            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks());
         else
             amount = 0;
     }

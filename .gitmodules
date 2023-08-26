@@ -1,3 +1,3 @@
-[submodule "deps/git-subrepo"]
-	path = deps/git-subrepo
-	url = https://github.com/ingydotnet/git-subrepo.git
+[submodule "modules/mod-anticheat"]
+	path = modules/mod-anticheat
+	url = https://github.com/azerothcore/mod-anticheat.git

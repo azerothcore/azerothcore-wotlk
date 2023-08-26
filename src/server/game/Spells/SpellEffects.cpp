@@ -3332,9 +3332,6 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
     }
-
-    if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
-        unitTarget->ToCreature()->AI()->AttackStart(m_caster);
 }
 
 void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
@@ -3466,9 +3463,31 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Stormstrike
                 if (AuraEffect* aurEff = m_caster->IsScriptOverriden(m_spellInfo, 5634))
                     m_caster->CastSpell(m_caster, 38430, true, nullptr, aurEff);
-                // Lava lash damage increased by Flametongue weapon
-                if (m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 688, EFFECT_0))
-                    AddPct(totalDamagePercentMod, 25.0f);
+
+                switch (m_spellInfo->Id)
+                {
+                    // Lava lash
+                case 60103:
+                    if (Player* caster = m_caster->ToPlayer())
+                    {
+                        int32 flameTongueMultip = m_spellInfo->Effects[EFFECT_1].BasePoints;
+                        if (caster->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                            // Damage is increased by 25% if your off-hand weapon is enchanted with Flametongue.
+                            if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0x200000, 0, 0))
+                                AddPct(totalDamagePercentMod, flameTongueMultip);
+
+                        if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 3741, EFFECT_1))
+                            if (Aura* searing = unitTarget->GetAura(110004, caster->GetGUID()))
+                            {
+                                AddPct(totalDamagePercentMod, aur->GetAmount() * searing->GetStackAmount());
+                                searing->Remove();
+                            }
+
+                        if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0, 0, GetCaster()->GetGUID()))
+                            caster->CastSpell(unitTarget, 110006, true);
+                    }
+                    break;
+                }
                 break;
             }
         case SPELLFAMILY_DRUID:
@@ -6222,7 +6241,10 @@ void Spell::EffectGrantXP(SpellEffIndex effIndex)
 
     if (Player* player = unitTarget->ToPlayer())
         if (player->GetLevel() < 80) {
-            auto amount = player->GetLevel() * m_spellInfo->GetEffect(effIndex).BasePoints;
+            uint32 curXP = player->GetUInt32Value(PLAYER_XP);
+            uint32 nextLvlXP = player->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+            auto amount = nextLvlXP-curXP;
+            
             player->GiveXP(amount, unitTarget);
         }
 }

@@ -1928,7 +1928,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         {
             if (tDamage.second > 0)
             {
-                SpellInfo const* i_spellProto = sSpellMgr->GetSpellInfo(1129999);
+                SpellInfo const* i_spellProto = sSpellMgr->GetSpellInfo(4129999);
 
                 uint32 damage = tDamage.second > 0 ? tDamage.second : 0;
                 uint32 absorb = 0;
@@ -4856,6 +4856,14 @@ void Unit::RemoveAura(AuraApplication* aurApp, AuraRemoveMode mode)
     {
         if (aurApp == iter->second)
         {
+            // Prevent Arena Preparation aura from being removed by player actions
+            // It's an invisibility spell so any interaction/spell cast etc. removes it.
+            // Should only be removed by the arena script, once the match starts.
+            if (aurApp->GetBase()->HasEffectType(SPELL_AURA_ARENA_PREPARATION))
+            {
+                return;
+            }
+
             RemoveAura(iter, mode);
             return;
         }
@@ -9103,6 +9111,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
+    if(procSpell)
+        if (procSpell->SpellFamilyName == SPELLFAMILY_PERK)
+            return false;
+
     // Try handle unknown trigger spells
     //if (sSpellMgr->GetSpellInfo(trigger_spell_id) == nullptr)
     {
@@ -10022,6 +10034,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             return false;
 
         AddSpellCooldown(triggerEntry->Id, 0, cooldown);
+    }
+
+    if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_PERK)
+    {
+
+        ToPlayer()->AddSpellCooldown(trigger_spell_id, 0, 3.1 * IN_MILLISECONDS);
     }
 
     if(basepoints0)
@@ -11867,79 +11885,79 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
         switch ((*i)->GetMiscValue())
         {
-            case 4418: // Increased Shock Damage
-            case 4554: // Increased Lightning Damage
-            case 4555: // Improved Moonfire
-            case 5142: // Increased Lightning Damage
-            case 5147: // Improved Consecration / Libram of Resurgence
-            case 5148: // Idol of the Shooting Star
-            case 6008: // Increased Lightning Damage
-            case 8627: // Totem of Hex
-            {
-                DoneAdvertisedBenefit += (*i)->GetAmount();
-                break;
-            }
+        case 4418: // Increased Shock Damage
+        case 4554: // Increased Lightning Damage
+        case 4555: // Improved Moonfire
+        case 5142: // Increased Lightning Damage
+        case 5147: // Improved Consecration / Libram of Resurgence
+        case 5148: // Idol of the Shooting Star
+        case 6008: // Increased Lightning Damage
+        case 8627: // Totem of Hex
+        {
+            DoneAdvertisedBenefit += (*i)->GetAmount();
+            break;
+        }
         }
     }
 
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_DRUID:
+    case SPELLFAMILY_DRUID:
+    {
+        // Insect Swarm vs Item - Druid T8 Balance Relic
+        if (spellProto->SpellFamilyFlags[0] & 0x00200000)
         {
-            // Insect Swarm vs Item - Druid T8 Balance Relic
-            if (spellProto->SpellFamilyFlags[0] & 0x00200000)
+            if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
             {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
+                DoneAdvertisedBenefit += relicAurEff->GetAmount();
             }
-
-            // Nourish vs Idol of the Flourishing Life
-            if (spellProto->SpellFamilyFlags[1] & 0x02000000)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-            break;
         }
-        case SPELLFAMILY_DEATHKNIGHT:
+
+        // Nourish vs Idol of the Flourishing Life
+        if (spellProto->SpellFamilyFlags[1] & 0x02000000)
         {
-            // Sigil of the Vengeful Heart
-            if (spellProto->SpellFamilyFlags[0] & 0x2000)
+            if (AuraEffect const* relicAurEff = GetAuraEffect(64949, EFFECT_0))
             {
-                if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
-                {
-                    AddPct(DoneTotal, aurEff->GetAmount());
-                }
+                DoneAdvertisedBenefit += relicAurEff->GetAmount();
             }
-
-            // Impurity
-            if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
-            {
-                AddPct(ApCoeffMod, aurEff->GetAmount());
-            }
-
-            // Blood Boil - bonus for diseased targets
-            if ((spellProto->SpellFamilyFlags[0] & 0x00040000) && victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
-            {
-                DoneTotal += 95;
-                ApCoeffMod = 1.5835f;
-            }
-            break;
         }
-        default:
-            break;
+        break;
+    }
+    case SPELLFAMILY_DEATHKNIGHT:
+    {
+        // Sigil of the Vengeful Heart
+        if (spellProto->SpellFamilyFlags[0] & 0x2000)
+        {
+            if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
+            {
+                AddPct(DoneTotal, aurEff->GetAmount());
+            }
+        }
+
+        // Impurity
+        if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+        {
+            AddPct(ApCoeffMod, aurEff->GetAmount());
+        }
+
+        // Blood Boil - bonus for diseased targets
+        if ((spellProto->SpellFamilyFlags[0] & 0x00040000) && victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, GetGUID()))
+        {
+            DoneTotal += 95;
+            ApCoeffMod = 1.5835f;
+        }
+        break;
+    }
+    default:
+        break;
     }
 
     // Done fixed damage bonus auras
     DoneAdvertisedBenefit += SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
 
     // Check for table values
-    float coeff = spellProto->Effects[effIndex].BonusMultiplier;
+    float coeff = 0;
     SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id);
     if (bonus)
     {
@@ -11968,7 +11986,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     }
 
     // Default calculation
-    if (coeff && DoneAdvertisedBenefit)
+    if (DoneAdvertisedBenefit)
     {
         float factorMod = CalculateLevelPenalty(spellProto) * stack;
 
@@ -11981,6 +11999,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
         DoneTotal += int32(DoneAdvertisedBenefit * coeff * factorMod);
     }
+
 
     float tmpDamage = (float(pdamage) + DoneTotal) * DoneTotalMod;
     // apply spellmod to Done damage (flat and pct)
@@ -14913,6 +14932,8 @@ void Unit::TauntApply(Unit* taunter)
         return;
 
     SetInFront(taunter);
+    SetGuidValue(UNIT_FIELD_TARGET, taunter->GetGUID());
+
     if (creature->IsAIEnabled)
         creature->AI()->AttackStart(taunter);
 
@@ -14951,6 +14972,7 @@ void Unit::TauntFadeOut(Unit* taunter)
 
     if (target && target != taunter)
     {
+        SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
         SetInFront(target);
         if (creature->IsAIEnabled)
             creature->AI()->AttackStart(target);
@@ -15204,33 +15226,17 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32& castTime, Spell* 
     if (!spellInfo || castTime < 0)
         return;
 
-    if (spellInfo->IsChanneled() && spellInfo->HasAura(SPELL_AURA_MOUNTED))
-        return;
-
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
         /// @todo:(MadAgos) Eventually check and delete the bool argument
         modOwner->ApplySpellMod(spellInfo, SPELLMOD_CASTING_TIME, castTime, spell, bool(modOwner != this && !IsPet()));
 
-    switch (spellInfo->DmgClass)
-    {
-        case SPELL_DAMAGE_CLASS_NONE:
-            if (spellInfo->AttributesEx5 & SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC) // required double check
-                castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-            else if (spellInfo->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
-                castTime = 500;
-            break;
-        case SPELL_DAMAGE_CLASS_MELEE:
-            break; // no known cases
-        case SPELL_DAMAGE_CLASS_MAGIC:
-            castTime = CanInstantCast() ? 0 : int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-            break;
-        case SPELL_DAMAGE_CLASS_RANGED:
-            castTime = int32(float(castTime) * m_modAttackSpeedPct[RANGED_ATTACK]);
-            break;
-        default:
-            break;
-    }
+    if (!(spellInfo->Attributes & (SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_IS_TRADESKILL)) && ((GetTypeId() == TYPEID_PLAYER && spellInfo->SpellFamilyName) || GetTypeId() == TYPEID_UNIT))
+        castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
+    else if (!(spellInfo->AttributesEx2 & SPELL_ATTR2_AUTO_REPEAT))
+        castTime = int32(float(castTime) * m_modAttackSpeedPct[RANGED_ATTACK]);
+    else if (spellInfo->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
+        castTime = 500;
 }
 
 DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)
@@ -16922,11 +16928,11 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         }
                     case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
+                        
                         // Skip melee hits or instant cast spells
                         // xinef: check channeled spells which are affected by haste also
                         if (procSpellInfo && (procSpellInfo->SpellFamilyName || GetTypeId() != TYPEID_PLAYER) &&
-                                (procSpellInfo->CalcCastTime() > 0 /*||
-                        (procSpell->IsChanneled() && procSpell->GetDuration() > 0 && (HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, procSpell) || procSpell->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)))*/))
+                                (procSpellInfo->CalcCastTime() > 0))
                             takeCharges = true;
                         break;
                     case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
@@ -19530,6 +19536,24 @@ Aura* Unit::AddAura(uint32 spellId, Unit* target)
         return nullptr;
 
     return AddAura(spellInfo, MAX_EFFECT_MASK, target);
+}
+
+Aura* Unit::AddAuraForTarget(Aura* aura, Unit* target)
+{
+    if (!target)
+        return NULL;
+
+    if (Aura* newAura = AddAura(aura->GetSpellInfo(), aura->GetEffectMask(), target))
+    {
+        newAura->SetMaxDuration(aura->GetDuration());
+        newAura->SetDuration(aura->GetDuration());
+        for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (aura->GetEffectMask() & (1 << i) && newAura->GetEffectMask() & (1 << i))
+                newAura->GetEffect(i)->SetAmount(aura->GetEffect(i)->GetAmount());
+
+        return newAura;
+    }
+    return NULL;
 }
 
 Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)

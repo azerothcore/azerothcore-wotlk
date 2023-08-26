@@ -465,7 +465,7 @@ class spell_hun_chimera_shot : public SpellScript
                     else if (familyFlag[1] & 0x00000080)
                     {
                         float f;
-                        int32 TickCount = aura->GetEffect(0)->GetTotalTicks(f, true);
+                        int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
 
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_VIPER;
 

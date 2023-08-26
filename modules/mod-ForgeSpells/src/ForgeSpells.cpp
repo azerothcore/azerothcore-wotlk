@@ -361,7 +361,7 @@ void AddForgeSpellsScripts()
     sTopicRouter->AddHandler(new GetToolTipsHandler(pc));
     new ForgeSpellStartup(pc);
 
-    (new LoadDKSpells())->Load();
+    //(new LoadDKSpells())->Load();
     (new LoadDruidSpells())->Load();
     (new LoadHunterSpells())->Load();
     (new LoadMageSpells())->Load();

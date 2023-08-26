@@ -3195,9 +3195,29 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
                     duration = m_originalCaster->ModSpellDuration(aurSpellInfo, unit, duration, positive, effectMask);
 
-                    // xinef: haste affects duration of those spells twice
-                    // if (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, aurSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-                    //     duration = int32(duration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+                    if (duration > 0) {
+                        // hater: haste effects amplitude
+                        if (m_spellInfo->IsChanneled())
+                        {
+                            if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)
+                                m_originalCaster->ModSpellCastTime(aurSpellInfo, duration, this);
+                        }
+                        else if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC) {
+                            auto baseDuration = duration;
+                            duration = 0;
+                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                if (AuraEffect const* eff = m_spellAura->GetEffect(i))
+                                    if (int32 amplitude = eff->GetAmplitude())  // amplitude is hastened by UNIT_MOD_CAST_SPEED
+                                    {
+                                        int32 ticks = std::max(int32(floor((float(baseDuration) / float(amplitude)) + 0.5f)), 1);
+                                        duration = std::max(ticks * amplitude, duration);
+                                    }
+
+                            // if there is no periodic effect
+                            if (!duration)
+                                duration = int32(baseDuration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+                        }
+                    }
 
                     if (m_spellValue->AuraDuration != 0)
                     {
@@ -3220,6 +3240,14 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
                     m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
                     m_spellAura->_RegisterForTargets();
+
+                    if (m_spellInfo->IsChanneled() && !m_spellInfo->IsPositive())
+                        for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+                            {
+                                SendChannelStart(duration);
+                                break;
+                            }
                 }
             }
         }
@@ -4104,25 +4132,31 @@ void Spell::_cast(bool skipCheck)
 
 void Spell::handle_immediate()
 {
+    bool isApplyingAura = false;
     // start channeling if applicable
     if (m_spellInfo->IsChanneled())
     {
         int32 duration = m_spellInfo->GetDuration();
         if (duration > 0)
         {
+            if (!m_spellInfo->IsPositive())
+                for (auto i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+                        isApplyingAura = true;
+
             // First mod_duration then haste - see Missile Barrage
             // Apply duration mod
             if (Player* modOwner = m_caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
 
             // Apply haste mods
-            if (m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-                duration = int32(duration * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+            if (m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+                m_caster->ModSpellCastTime(m_spellInfo, duration, this);
 
             m_spellState = SPELL_STATE_CASTING;
             m_caster->AddInterruptMask(m_spellInfo->ChannelInterruptFlags);
-            m_channeledDuration = duration;
-            SendChannelStart(duration);
+            if(!isApplyingAura)
+                SendChannelStart(duration);
         }
         else if (duration == -1)
         {

@@ -47,6 +47,17 @@ public:
         player->SetSpecsCount(0);
         fc->AddCharacterSpecSlot(player);
         fc->UpdateCharacters(player->GetSession()->GetAccountId(), player);
+
+        fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 17));
+    }
+
+    void OnFirstLogin(Player* player) override
+    {
+        if (!player)
+            return;
+
+        fc->ApplyTalents(player);
+        fc->ApplyActivePerks(player);
     }
 
     void OnLogin(Player* player) override
@@ -54,24 +65,9 @@ public:
         if (!player)
             return;
 
-        uint32 count = 1;
-
-        for (auto const& [accID, session] : sWorld->GetAllSessions())
-        {
-            Player* _player = session->GetPlayer();
-            if (!_player || _player == player)
-            {
-                continue;
-            }
-
-            // If Remote Address matches, remove the player from the world
-            if (player->GetSession()->GetRemoteAddress() == _player->GetSession()->GetRemoteAddress() && ++count > 1)
-            {
-                player->GetSession()->KickPlayer();
-            }
-        }
-
-        fc->ApplyAccountBoundTalents(player);
+        fc->ApplyTalents(player);
+        fc->ApplyActivePerks(player);
+        LearnSpellsForLevel(player, player->GetLevel());
     }
 
     void OnDelete(ObjectGuid guid, uint32 accountId) override
@@ -95,30 +91,11 @@ public:
         if (fc->TryGetCharacterActiveSpec(player, spec))
         {
             uint8 currentLevel = player->getLevel();
-            uint32 levelMod = fc->GetConfig("levelMod", 2);
             uint8 levelDiff = currentLevel - oldlevel;
-
-            if (currentLevel == fc->GetConfig("MaxLevel", 80))
-            {
-                fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::PRESTIGE_TREE, fc->GetConfig("PrestigePointsAtMaxLevel", 5));
-            }
 
             if (currentLevel >= 10)
             {
                 uint8 amount = (oldlevel < 9) ? levelDiff - (9 - oldlevel) : levelDiff;
-
-                /*
-                if (levelDiff < levelMod && currentLevel % levelMod == 0)
-                {
-                    uint32 scrapEarned = fc->GetConfig("scrapsPerLevelMod", 1);
-                    player->AddItem(FORGE_SCRAP, scrapEarned);
-                }
-                else if (levelDiff > 1 && levelDiff >= levelMod) // someone added levels, protect div by zero, dont allow 1 as its been evaluated. check if its enough levels
-                {
-                    uint32 pointsMultiplier = levelDiff / levelMod;
-                    uint32 scrapEarned = fc->GetConfig("scrapsPerLevelMod", 1) * pointsMultiplier;
-                    player->AddItem(FORGE_SCRAP, scrapEarned);
-                }*/
 
                 fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::TALENT_TREE, amount);
 
@@ -126,28 +103,7 @@ public:
                 cm->SendTalents(player);
             }
 
-            if (currentLevel == 80)
-            {
-                for (auto charTabType : fc->TALENT_POINT_TYPES)
-                {
-                    if (ACCOUNT_WIDE_TYPE != charTabType)
-                        continue;
-
-                    std::list<ForgeTalentTab*> tabs;
-                    if (fc->TryGetForgeTalentTabs(player, charTabType, tabs))
-                        for (auto* tab : tabs)
-                        {
-                            auto talItt = spec->Talents.find(tab->Id);
-
-                            for (auto spell : tab->Talents)
-                            {
-                                for (auto rank : spell.second->Ranks)
-                                    player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                            }
-                        }
-                }
-                
-            }
+            LearnSpellsForLevel(player, player->GetLevel());
 
             auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
             if (missing > 0)
@@ -179,6 +135,7 @@ public:
         }
     }
 
+    /*
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid) override
     {
         OnAddItem(player, item->GetTemplate()->ItemId, count);
@@ -189,6 +146,7 @@ public:
     {
         
     }
+    */
 
     void OnCreateItem(Player* player, Item* item, uint32 count) override
     {
@@ -198,6 +156,22 @@ public:
     void OnQuestRewardItem(Player* player, Item* item, uint32 count) override
     {
         OnAddItem(player, item->GetTemplate()->ItemId, count);
+    }
+
+    void OnCreatureKill(Player* player, Creature* victim) {
+        if (player->IsOutdoors() && player->HasAura(230236)) {
+            auto pl_level = player->GetLevel();
+            auto level = pl_level - 9;;
+            if (pl_level <= 5)
+                level = 0;
+            else if (pl_level <= 39)
+                level = pl_level - 5 - pl_level / 10;
+            else if (pl_level <= 59)
+                level = pl_level - 1 - pl_level / 5;
+
+            if (victim->GetLevel() > level)
+                player->CastSpell(player, 230234, true);
+        }
     }
 
     /*void OnGiveXP(Player* player, uint32& amount, Unit* victim) override
@@ -239,6 +213,64 @@ private:
     bool GetPrestigeStatus(Player* player)
     {
         return false;
+    }
+
+    void LearnSpellsForLevel(Player* player, uint8 newlevel) {
+
+        // remove fake death
+        if (player->HasUnitState(UNIT_STATE_DIED))
+            player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+
+        auto spells = sObjectMgr->getTrainerSpellsForClass();
+        if (!spells.empty()) {
+            LearnSpellsForClass(player, CLASS_DRUID+3, newlevel, spells);
+            LearnSpellsForClass(player, player->getClass(), newlevel, spells);
+        }
+    }
+
+    void LearnSpellsForClass(Player* player, uint8 search, uint8 newLevel, CacheTrainerSpellByClassContainer pool) {
+        auto classSpells = pool.find(search);
+        if (classSpells != pool.end()) {
+            for (auto spell : classSpells->second)
+            {
+                TrainerSpell const* tSpell = &spell.second;
+
+                if (player->HasSpell(tSpell->spell))
+                    continue;
+
+                bool valid = true;
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (!tSpell->learnedSpell[i])
+                        continue;
+                    if (!player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (newLevel < tSpell->reqLevel)
+                    continue;
+
+                if (!valid)
+                    continue;
+
+                if (tSpell->reqSpell && !player->HasSpell(tSpell->reqSpell))
+                {
+                    continue;
+                }
+
+                if (player->GetTrainerSpellState(tSpell) != TRAINER_SPELL_GREEN)
+                    continue;
+
+                // learn explicitly or cast explicitly
+                if (tSpell->IsCastable())
+                    player->CastSpell(player, tSpell->spell, true);
+                else
+                    player->learnSpell(tSpell->spell);
+            }
+        }
     }
 };
 

@@ -670,6 +670,7 @@ typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingCo
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
+typedef std::unordered_map<uint8 /*classid*/, std::unordered_map<uint32 /*spellid*/, TrainerSpell>> CacheTrainerSpellByClassContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 typedef std::vector<uint32> CreatureCustomIDsContainer;
@@ -1453,6 +1454,8 @@ public:
     uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
     void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
     void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+
+    CacheTrainerSpellByClassContainer getTrainerSpellsForClass();
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1613,6 +1616,7 @@ private:
 
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
+    CacheTrainerSpellByClassContainer _cacheTrainerSpellByClass;
 
     ServerMailContainer _serverMailStore;
 

@@ -1,0 +1,1 @@
+DELETE FROM acore_characters.forge_character_talents WHERE tabId < 999900;

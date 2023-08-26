@@ -666,7 +666,7 @@ public:
         CharacterDatabase.CommitTransaction(trans);
     }
 
-    void ApplyAccountBoundTalents(Player* player)
+    void ApplyTalents(Player* player)
     {
         ForgeCharacterSpec* currentSpec;
 
@@ -677,7 +677,106 @@ public:
 
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != TALENT_TREE
+                    && charTabType != RACIAL_TREE)
+                    continue;
+
+                std::list<ForgeTalentTab*> tabs;
+                if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
+                    ForgeCharacterPoint* sfp = GetSpecPoints(player, charTabType, currentSpec->Id);
+                    auto points = 0;
+
+                    for (auto* tab : tabs)
+                    {
+                        auto talItt = currentSpec->Talents.find(tab->Id);
+                        if (points < sfp->Max)
+                            for (auto spell : tab->Talents)
+                            {
+                                if (modes.size() == 0 && talItt != currentSpec->Talents.end())
+                                {
+                                    auto spellItt = talItt->second.find(spell.first);
+                                    if (spellItt != talItt->second.end())
+                                    {
+                                        if (spellItt->second->CurrentRank > 0) {
+                                            uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+
+                                            if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                                    for (auto rank : spell.second->Ranks) {
+                                                        if (spellInfo->IsPassive() && currentRank != rank.second) {
+                                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                                        } else {
+                                                            if (!player->HasSpell(currentRank)) {
+                                                                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                                                    player->learnSpell(currentRank, true, false);
+                                                                else {
+                                                                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+
+                                                                            player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                                                                }
+                                                            }
+                                                            points += spellItt->second->CurrentRank * spell.second->RankCost;
+                                                        }
+                                                        UpdateCharacterSpec(player, currentSpec);
+                                                    }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    LOG_INFO("server.world", "proints {}", points);
+                    sfp->Sum = sfp->Max - points;
+                    UpdateCharPoints(player, sfp);
+                }
+            }
+            player->SendInitialSpells();
+        }
+    }
+
+    void ApplyActivePerks(Player* player)
+    {
+        ForgeCharacterSpec* currentSpec;
+
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto perk : currentSpec->perks) {
+                auto currentRank = perk.second->spell->ranks[perk.second->rank];
+                auto spell = perk.second->spell;
+                
+                if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                    for (auto rank : spell->ranks)
+                        if (currentRank != rank.second)
+                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                        else
+                            if (!player->HasSpell(currentRank))
+                                player->learnSpell(currentRank, true);
+                }
+            }   
+        }
+    }
+
+    void RemoveActivePerks(Player* player) {
+        ForgeCharacterSpec* currentSpec;
+
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto perk : currentSpec->perks) {
+                auto rankedSpell = perk.second->spell->ranks[perk.second->rank];
+                if (auto spellInfo = sSpellMgr->GetSpellInfo(rankedSpell)) {
+                    player->removeSpell(rankedSpell, SPEC_MASK_ALL, false);
+                }
+            }
+        }
+    }
+
+    void RemoveTalents(Player* player) {
+        ForgeCharacterSpec* currentSpec;
+        if (TryGetCharacterActiveSpec(player, currentSpec))
+        {
+            for (auto charTabType : TALENT_POINT_TYPES)
+            {
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE && charTabType != RACIAL_TREE)
                     continue;
 
                 std::list<ForgeTalentTab*> tabs;
@@ -685,23 +784,20 @@ public:
                     for (auto* tab : tabs)
                     {
                         auto talItt = currentSpec->Talents.find(tab->Id);
-
                         for (auto spell : tab->Talents)
                         {
-                            if (playerLevel != 80 && modes.size() == 0 && talItt != currentSpec->Talents.end())
+                            if (talItt != currentSpec->Talents.end())
                             {
                                 auto spellItt = talItt->second.find(spell.first);
-
                                 if (spellItt != talItt->second.end())
                                 {
                                     uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
-                                    for (auto rank : spell.second->Ranks)
-                                        if (currentRank != rank.second)
-                                            player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-
-                                    if (!player->HasSpell(currentRank))
-                                        player->learnSpell(currentRank, false, false);
+                                    if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                        if (spellInfo->IsPassive())
+                                            for (auto rank : spell.second->Ranks)
+                                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                    }
                                 }
                             }
                         }
@@ -1280,68 +1376,48 @@ private:
             newPerk->tags = perkFields[8].Get<std::string>();
             //newPerk->rank = perkFields[9].Get<uint8>();
 
-            switch (newPerk->allowableClass) {
-                case CLASSMASK_CASTER:
-                    Perks[CLASS_PRIEST].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_MAGE].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                case CLASSMASK_PETCLASS:
-                    Perks[CLASS_HUNTER].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    break;
-                case CLASSMASK_MELEE:
+            auto val = newPerk->allowableClass;
+            if (val > 0) {
+                if (val & (1 << (CLASS_WARRIOR - 1)))
                     Perks[CLASS_WARRIOR].push_back(newPerk);
+
+                if (val & (1 << (CLASS_PALADIN - 1)))
                     Perks[CLASS_PALADIN].push_back(newPerk);
-                    Perks[CLASS_ROGUE].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_WARRIOR - 1)):
-                    Perks[CLASS_WARRIOR].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_PALADIN - 1)):
-                    Perks[CLASS_PALADIN].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_HUNTER - 1)):
+
+                if (val & (1 << (CLASS_HUNTER - 1)))
                     Perks[CLASS_HUNTER].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_ROGUE - 1)):
+
+                if (val & (1 << (CLASS_ROGUE - 1)))
                     Perks[CLASS_ROGUE].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_PRIEST - 1)):
+
+                if (val & (1 << (CLASS_PRIEST - 1)))
                     Perks[CLASS_PRIEST].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_DEATH_KNIGHT - 1)):
+
+                if (val & (1 << (CLASS_DEATH_KNIGHT - 1)))
                     Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_SHAMAN - 1)):
+
+                if (val & (1 << (CLASS_SHAMAN - 1)))
                     Perks[CLASS_SHAMAN].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_MAGE - 1)):
+
+                if (val & (1 << (CLASS_MAGE - 1)))
                     Perks[CLASS_MAGE].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_WARLOCK - 1)):
+
+                if (val & (1 << (CLASS_WARLOCK - 1)))
                     Perks[CLASS_WARLOCK].push_back(newPerk);
-                    break;
-                case (1 << (CLASS_DRUID - 1)):
+
+                if (val & (1 << (CLASS_DRUID - 1)))
                     Perks[CLASS_DRUID].push_back(newPerk);
-                    break;
-                default:
-                    Perks[CLASS_WARRIOR].push_back(newPerk);
-                    Perks[CLASS_PALADIN].push_back(newPerk);
-                    Perks[CLASS_HUNTER].push_back(newPerk);
-                    Perks[CLASS_ROGUE].push_back(newPerk);
-                    Perks[CLASS_PRIEST].push_back(newPerk);
-                    Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
-                    Perks[CLASS_SHAMAN].push_back(newPerk);
-                    Perks[CLASS_MAGE].push_back(newPerk);
-                    Perks[CLASS_WARLOCK].push_back(newPerk);
-                    Perks[CLASS_DRUID].push_back(newPerk);
+            } else {
+                Perks[CLASS_WARRIOR].push_back(newPerk);
+                Perks[CLASS_PALADIN].push_back(newPerk);
+                Perks[CLASS_HUNTER].push_back(newPerk);
+                Perks[CLASS_ROGUE].push_back(newPerk);
+                Perks[CLASS_PRIEST].push_back(newPerk);
+                Perks[CLASS_DEATH_KNIGHT].push_back(newPerk);
+                Perks[CLASS_SHAMAN].push_back(newPerk);
+                Perks[CLASS_MAGE].push_back(newPerk);
+                Perks[CLASS_WARLOCK].push_back(newPerk);
+                Perks[CLASS_DRUID].push_back(newPerk);
             }
 
             AllPerks[newPerk->spellId] = newPerk;
@@ -1420,7 +1496,7 @@ private:
 
             if (tabItt == TalentTabs.end())
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading talents, invaild tab id: " + std::to_string(newTalent->TalentTabId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading talents, invalid tab id: " + std::to_string(newTalent->TalentTabId));
             }
             else
                 tabItt->second->Talents[newTalent->SpellId] = newTalent;
@@ -1452,7 +1528,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentPrereqs, invaild req id: " + std::to_string(newTalent->reqId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentPrereqs, invalid req id: " + std::to_string(newTalent->reqId));
             }
 
         } while (preReqTalents->NextRow());
@@ -1479,7 +1555,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentExclusiveness, invaild exclusiveSpellId id: " + std::to_string(exclusiveSpellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentExclusiveness, invalid exclusiveSpellId id: " + std::to_string(exclusiveSpellId));
             }
 
         } while (exclTalents->NextRow());
@@ -1509,7 +1585,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentRanks, invaild talentTabId id: " + std::to_string(talentTabId) + " Rank: " + std::to_string(rank) + " SpellId: " + std::to_string(spellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentRanks, invalid talentTabId id: " + std::to_string(talentTabId) + " Rank: " + std::to_string(rank) + " SpellId: " + std::to_string(spellId));
             }
 
         } while (talentRanks->NextRow());
@@ -1537,7 +1613,7 @@ private:
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentUnlearn, invaild talentTabId id: " + std::to_string(talentTabId) + " ExclusiveSpell: " + std::to_string(exclusiveSpellId) + " SpellId: " + std::to_string(spellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentUnlearn, invalid talentTabId id: " + std::to_string(talentTabId) + " ExclusiveSpell: " + std::to_string(exclusiveSpellId) + " SpellId: " + std::to_string(spellId));
             }
 
         } while (exclTalents->NextRow());

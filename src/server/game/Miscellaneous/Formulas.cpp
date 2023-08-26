@@ -123,6 +123,10 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             xpMod *= sWorld->getRate(RATE_XP_KILL);
         }
 
+        if (player->HasAura(2302))
+            if (auto group = player->GetGroup())
+                xpMod *= 1+(group->GetMembersCount()-1)*.05;
+
         // if players dealt less than 50% of the damage and were credited anyway (due to CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ), scale XP gained appropriately (linear scaling)
         if (creature && creature->GetPlayerDamageReq())
         {

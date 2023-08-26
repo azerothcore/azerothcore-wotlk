@@ -48,19 +48,26 @@ public:
 
                 switch (cpt)
                 {
+                case CharacterPointType::RACIAL_TREE:
                 case CharacterPointType::TALENT_TREE:
                     ForgeTalentTab* ftt;
-
                     if (fc->TryGetTalentTab(iam.player, tab.first, ftt))
                     {
                         spec->PointsSpent[ftt->Id] = 0;
-                        for (auto t : tab.second)
-                        {
-                            iam.player->removeSpell(ftt->Talents[t.second->SpellId]->Ranks[t.second->CurrentRank], SPEC_MASK_ALL, false); // Remove all spells.
-                            t.second->CurrentRank = 0; // only remove talents here.
+                        for (auto t : tab.second) {
+                        
+                            if (auto spellInfo = sSpellMgr->GetSpellInfo(t.second->SpellId)) {
+                                if (spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+                                    iam.player->RemoveOwnedAura(ftt->Talents[t.second->SpellId]->Ranks[t.second->CurrentRank]);
+                                else
+                                    iam.player->removeSpell(ftt->Talents[t.second->SpellId]->Ranks[t.second->CurrentRank], SPEC_MASK_ALL, false); // Remove all spells.
+
+                                t.second->CurrentRank = 0; // only remove talents here.
+                            }
                         }
                     }
                     break;
+
                 default:
                     break;
                 }
@@ -70,14 +77,19 @@ public:
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
             ForgeCharacterPoint* prisCp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::PRESTIGE_COUNT);
+            ForgeCharacterPoint* rp = fc->GetSpecPoints(iam.player, RACIAL_TREE, spec->Id);
 
             baseFcp->Sum = 0;
-            fcp->Sum = baseFcp->Sum;
+            fcp->Sum = 0;
             prisCp->Sum++;
+            rp->Sum = 17;
 
             fc->UpdateCharPoints(iam.player, fcp);
             fc->UpdateCharPoints(iam.player, prisCp);
+            fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);
+
+            fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
         }
 
         iam.player->SetUInt32Value(PLAYER_XP, 0);

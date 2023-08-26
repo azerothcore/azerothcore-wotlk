@@ -952,10 +952,6 @@ void Aura::RefreshTimersWithMods()
 {
     Unit* caster = GetCaster();
     m_maxDuration = CalcMaxDuration();
-    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-    {
-        m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-    }
 
     // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
     RefreshDuration();
@@ -1559,49 +1555,49 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // Can't proc on self
                     if (GetCasterGUID() == target->GetGUID())
                         break;
-                    if (caster->GetAuraEffectDummy(1150043)){
-                        caster->CastSpell(target, 1150007, true);
-                    }
 
                     AuraEffect* aurEff = nullptr;
                     // Ebon Plaguebringer / Crypt Fever
                     Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                    uint32 spellId;
                     for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
                     {
-                        aurEff = *itr;
-                        if (aurEff->GetMiscValue() == 7282)
+                        if ((*itr)->GetMiscValue() == 7282)
                         {
-                            if((*itr)->GetSpellInfo()->SpellIconID == 264){
-                                switch (aurEff->GetId()){
-                                    case 1150039:
-                                        spellId = 1150067;
-                                        break;
-                                    case 1150038:
-                                        spellId = 1150066;
-                                        break;
-                                    case 1150027:
-                                        spellId = 1150065;
-                                        break;
-                                    default:
-                                        LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever ({}) found", aurEff->GetId());
-                                }
-                                caster->CastSpell(target, spellId, true, 0, GetEffect(0));
-                            }
-                        }
-                        else if(aurEff->GetMiscValue() == 1150061) {
-                            switch (aurEff->GetId()) {
-                            case 1150061:
-                                spellId = 1150068;
+                            aurEff = *itr;
+                            // Ebon Plaguebringer - end search if found
+                            if ((*itr)->GetSpellInfo()->SpellIconID == 1766)
                                 break;
-                            case 1150062:
-                                spellId = 1150069;
-                                break;
-                            default:
-                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Scarlet Fever ({}) found", aurEff->GetId());
-                            }
-                            caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                         }
+                    }
+                    if (aurEff)
+                    {
+                        uint32 spellId = 0;
+                        switch (aurEff->GetId())
+                        {
+                            // Ebon Plague
+                        case 51161:
+                            spellId = 51735;
+                            break;
+                        case 51160:
+                            spellId = 51734;
+                            break;
+                        case 51099:
+                            spellId = 51726;
+                            break;
+                            // Crypt Fever
+                        case 49632:
+                            spellId = 50510;
+                            break;
+                        case 49631:
+                            spellId = 50509;
+                            break;
+                        case 49032:
+                            spellId = 50508;
+                            break;
+                        default:
+                            LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
+                        }
+                        caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
                 }
                 // Unholy blight
@@ -1995,7 +1991,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             break;
     }
 
-    if (apply)
+    /*if (apply)
     {
         Unit::AuraEffectList aurEffects;
 
@@ -2003,15 +1999,21 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             aurEffects = caster->GetAuraEffectsByType(SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_SELF);
         else
             aurEffects = caster->GetAuraEffectsByType(SPELL_AURA_MOD_TRIGGER_SPELL_ON_STACKS_ON_TARGET);
+            for (auto aurEff : aurEffects)
+            {
+                auto eff = aurEff->GetSpellInfo()->GetEffect(SpellEffIndex(aurEff->GetEffIndex()));
 
-        for (auto aurEff : aurEffects)
-        {
-            auto eff = aurEff->GetSpellInfo()->GetEffect(SpellEffIndex(aurEff->GetEffIndex()));
-
-            if (aurApp->GetBase()->GetId() == eff.MiscValue)
-                ProcessTriggerSpellOnStacks(aurApp->GetBase(), eff.MiscValueB, eff.TriggerSpell, eff.TargetA.GetTarget(), eff.Amplitude, caster, aurEff->GetBase()->GetEffect(aurEff->GetEffIndex()));
+                if (aurApp->GetBase()->GetId() == eff.MiscValue)
+                    ProcessTriggerSpellOnStacks(aurApp->GetBase(), eff.MiscValueB, eff.TriggerSpell, eff.TargetA.GetTarget(), eff.Amplitude, caster, aurEff->GetBase()->GetEffect(aurEff->GetEffIndex()));
+            }
         }
     }
+
+    Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    uint32 spellId;
+                    for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
+                    {
+    */
 }
 
 void Aura::ProcessTriggerSpellOnStacks(Aura* aurApp, int32 stackCount, int32 triggerSpell, Targets triggerSpellTarget, uint32 amplitude, Unit* caster, AuraEffect* const triggeringEffect)
@@ -2243,7 +2245,7 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
     }
 
     // spell of same spell rank chain
-    if (m_spellInfo->IsRankOf(existingSpellInfo))
+    if (m_spellInfo->IsRankOf(existingSpellInfo) && !(m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->SpellFamilyFlags[1] & 0x80000000))
     {
         // don't allow passive area auras to stack
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
