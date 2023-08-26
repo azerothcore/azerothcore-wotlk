@@ -371,8 +371,12 @@ public:
                     Talk(3, playerWhoStartedAshbringer);
                     return 10 * IN_MILLISECONDS;
                 case 4:
-                    me->SummonCreature(NPC_HIGHLORD_MOGRAINE, HighlordMograineSpawn, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetFaction(FACTION_FRIENDLY);
-                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
+                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, HighlordMograineSpawn, TEMPSUMMON_TIMED_DESPAWN, 400000))
+                    {
+                        summonedMograine->SetFaction(FACTION_FRIENDLY);
+                        summonedMograine->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
+                        summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP); //No weapons are used
+                    }
                     return 35 * IN_MILLISECONDS;
                 case 5:
                     mograine->StopMovingOnCurrentPos();
