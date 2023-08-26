@@ -30,7 +30,8 @@ ObjectData const creatureData[] =
 {
     { NPC_DALLIAH,      DATA_DALLIAH          },
     { NPC_SOCCOTHRATES, DATA_SOCCOTHRATES     },
-    { NPC_MELLICHAR,    DATA_WARDEN_MELLICHAR }
+    { NPC_MELLICHAR,    DATA_WARDEN_MELLICHAR },
+    { 0,                0                     }
 };
 
 class instance_arcatraz : public InstanceMapScript

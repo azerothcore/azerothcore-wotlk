@@ -47,6 +47,7 @@ ObjectData const creatureData[] =
     { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS      },
     { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS },
     { NPC_CHROMAGGUS,      DATA_CHROMAGGUS           },
+    { 0,                   0                         }
 };
 
 ObjectData const objectData[] =
