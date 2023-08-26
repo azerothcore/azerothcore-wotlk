@@ -35,9 +35,9 @@ public:
     std::string BuildTree(Player*, CharacterPointType pointType, std::list<ForgeTalentTab*> tabs);
     void ApplyKnownForgeSpells(Player*);
     bool CanLearnTalent(Player*, uint32, uint32);
+    std::string DoBuildPerks(std::vector<CharacterSpecPerk*> spec, Player* player);
 private:
 
     std::string DoBuildRanks(std::unordered_map<uint32, ForgeCharacterTalent*>& spec, Player* player, std::string clientMsg, uint32 tabId);
-    std::string DoBuildPerks(std::vector<CharacterSpecPerk*> spec, Player* player);
     std::string DoBuildPerkCatalogue(std::vector<Perk*> perks);
 };
