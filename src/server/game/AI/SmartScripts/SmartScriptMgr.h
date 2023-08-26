@@ -210,10 +210,12 @@ enum SMART_EVENT
     SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
     SMART_EVENT_NEAR_UNIT_NEGATION       = 104,      // type (0: creature 1: gob), entry, count, range, timer
-    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, range
-    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, range
+    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
+    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
+    SMART_EVENT_IS_BEHIND_ME             = 107,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
+    SMART_EVENT_VICTIM_NOT_ATTACKING     = 108,      // min, max, repeatMin, repeatMax
 
-    SMART_EVENT_AC_END                   = 107
+    SMART_EVENT_AC_END                   = 109
 };
 
 struct SmartEvent
@@ -230,6 +232,8 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } minMaxRepeat;
 
         struct
@@ -516,26 +520,6 @@ struct SmartEvent
             uint32 range;
             uint32 timer;
         } nearUnitNegation;
-
-        struct
-        {
-            uint32 min;
-            uint32 max;
-            uint32 repeatMin;
-            uint32 repeatMax;
-            uint32 rangeMin;
-            uint32 rangeMax;
-        } areaCasting;
-
-        struct
-        {
-            uint32 min;
-            uint32 max;
-            uint32 repeatMin;
-            uint32 repeatMax;
-            uint32 rangeMin;
-            uint32 rangeMax;
-        } areaRange;
 
         struct
         {
@@ -1870,7 +1854,9 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_NEAR_UNIT,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_NEAR_UNIT_NEGATION,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_IS_BEHIND_ME,              SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_VICTIM_NOT_ATTACKING,      SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags

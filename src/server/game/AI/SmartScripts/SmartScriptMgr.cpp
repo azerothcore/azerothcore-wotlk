@@ -266,6 +266,9 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_FRIENDLY_MISSING_BUFF:
             case SMART_EVENT_HAS_AURA:
             case SMART_EVENT_TARGET_BUFFED:
+            case SMART_EVENT_AREA_RANGE:
+            case SMART_EVENT_IS_BEHIND_ME:
+            case SMART_EVENT_VICTIM_NOT_ATTACKING:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
@@ -275,10 +278,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 // Will only work properly if value is 0 or 1
                 if (temp.event.rangeRepeat.onlyFireOnRepeat > 1)
                     temp.event.rangeRepeat.onlyFireOnRepeat = 1;
-                break;
-            case SMART_EVENT_AREA_RANGE:
-                if (temp.event.areaRange.repeatMin == 0 && temp.event.areaRange.repeatMax == 0)
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
@@ -362,6 +361,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
         case SMART_EVENT_NEAR_PLAYERS:
+        case SMART_EVENT_IS_BEHIND_ME:
             return true;
         default:
             return false;
@@ -586,8 +586,10 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_NEAR_PLAYERS_NEGATION: return sizeof(SmartEvent::nearPlayerNegation);
             case SMART_EVENT_NEAR_UNIT: return sizeof(SmartEvent::nearUnit);
             case SMART_EVENT_NEAR_UNIT_NEGATION: return sizeof(SmartEvent::nearUnitNegation);
-            case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::areaCasting);
-            case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::areaRange);
+            case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_IS_BEHIND_ME: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_VICTIM_NOT_ATTACKING: return sizeof(SmartEvent::minMaxRepeat);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -783,7 +785,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
             case SMART_ACTION_FOLLOW_GROUP: return sizeof(SmartAction::followGroup);
-            case SMART_ACTION_SET_ORIENTATION_TARGET: return sizeof(SmartAcion::orientationTarget);
+            case SMART_ACTION_SET_ORIENTATION_TARGET: return sizeof(SmartAction::orientationTarget);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -960,6 +962,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
+            case SMART_EVENT_IS_BEHIND_TARGET:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 
@@ -974,13 +977,15 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_AREA_RANGE:
-                if (!IsMinMaxValid(e, e.event.areaRange.min, e.event.areaRange.max))
+            case SMART_EVENT_AREA_CASTING:
+            case SMART_EVENT_IS_BEHIND_ME:
+                if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 
-                if (!IsMinMaxValid(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax))
+                if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
 
-                if (!IsMinMaxValid(e, e.event.areaRange.rangeMin, e.event.areaRange.rangeMax))
+                if (!IsMinMaxValid(e, e.event.minMaxRepeat.param5Min, e.event.minMaxRepeat.param6Max))
                     return false;
 
                 break;
@@ -1071,16 +1076,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
 
                 if (!IsMinMaxValid(e, e.event.targetCasting.repeatMin, e.event.targetCasting.repeatMax))
-                    return false;
-                break;
-            case SMART_EVENT_AREA_CASTING:
-                if (!IsMinMaxValid(e, e.event.areaCasting.min, e.event.areaCasting.max))
-                    return false;
-
-                if (!IsMinMaxValid(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax))
-                    return false;
-
-                if (!IsMinMaxValid(e, e.event.areaCasting.rangeMin, e.event.areaCasting.rangeMax))
                     return false;
                 break;
             case SMART_EVENT_PASSENGER_BOARDED:
@@ -1188,10 +1183,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     }
                     break;
                 }
-            case SMART_EVENT_IS_BEHIND_TARGET:
-                if (!IsMinMaxValid(e, e.event.behindTarget.cooldownMin, e.event.behindTarget.cooldownMax))
-                    return false;
-                break;
             case SMART_EVENT_GAME_EVENT_START:
             case SMART_EVENT_GAME_EVENT_END:
                 {

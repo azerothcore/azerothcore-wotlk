@@ -4475,11 +4475,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     if (!target || target->IsPet() || target->IsTotem() || !target->IsNonMeleeSpellCast(false, false, true))
                         continue;
 
-                    if (e.event.areaCasting.rangeMin && !(me->IsInRange(target, (float)e.event.areaCasting.rangeMin, (float)e.event.areaCasting.rangeMax)))
+                    if (e.event.minMaxRepeat.rangeMin && !(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)))
                         continue;
 
                     ProcessAction(e, target);
-                    RecalcTimer(e, e.event.areaCasting.repeatMin, e.event.areaCasting.repeatMax);
+                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                     return;
                 }
 
@@ -4500,11 +4500,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!(me->IsInRange(target, (float)e.event.areaRange.rangeMin, (float)e.event.areaRange.rangeMax)))
+                    if (!(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)))
                         continue;
 
                     ProcessAction(e, target);
-                    RecalcTimer(e, e.event.areaRange.repeatMin, e.event.areaRange.repeatMax);
+                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                     return;
                 }
             }
@@ -4523,11 +4523,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.behindMe.rangeMin, (float)e.event.behindMe.rangeMax)) || !me->HasInArc(M_PI*1.5f, target))
+                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)) || !me->HasInArc(M_PI*1.5f, target))
                         continue;
 
                     ProcessAction(e, target);
-                    RecalcTimer(e, e.event.behindMe.repeatMin, e.event.behindMe.repeatMax);
+                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                     return;
                 }
             }
@@ -4542,7 +4542,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
             if (Unit* victim = me->GetVictim())
                 if (victim->GetVictim()->GetGUID() != me->GetGUID())
-                    ProcessTimedAction(e, e.event.victimPassive.repeatMin, e.event.victimPassive.repeatMax);
+                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
 
             break;
         }
@@ -4564,9 +4564,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             // make it predictable
             RecalcTimer(e, 1200, 1200);
             break;
-        case SMART_EVENT_AREA_RANGE:
-            RecalcTimer(e, e.event.areaRange.min, e.event.areaRange.max);
-            break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
@@ -4574,6 +4571,11 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_UPDATE:
         case SMART_EVENT_UPDATE_IC:
         case SMART_EVENT_UPDATE_OOC:
+        case SMART_EVENT_AREA_RANGE:
+        case SMART_EVENT_AREA_CASTING:
+        case SMART_EVENT_IS_BEHIND_TARGET:
+        case SMART_EVENT_IS_BEHIND_ME:
+        case SMART_EVENT_VICTIM_NOT_ATTACKING:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_OOC_LOS:
@@ -4588,9 +4590,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_NEAR_UNIT:
         case SMART_EVENT_NEAR_UNIT_NEGATION:
             RecalcTimer(e, e.event.nearUnit.timer, e.event.nearUnit.timer);
-            break;
-        case SMART_EVENT_AREA_CASTING:
-            RecalcTimer(e, e.event.areaCasting.min, e.event.areaCasting.max);
             break;
         default:
             e.active = true;
@@ -4667,6 +4666,8 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
+            case SMART_EVENT_IS_BEHIND_ME:
+            case SMART_EVENT_VICTIM_NOT_ATTACKING:
                 {
                     ProcessEvent(e);
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
