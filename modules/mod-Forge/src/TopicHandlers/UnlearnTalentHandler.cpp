@@ -37,8 +37,6 @@ public:
         if (results.empty() || results.size() != 2 || !fc->isNumber(results[1]))
             return;
 
-
-
         if (results[0] == "-1") {
             ResetAllTabsForSpec(iam.player, static_cast<uint32>(std::stoul(results[1])));
             return;

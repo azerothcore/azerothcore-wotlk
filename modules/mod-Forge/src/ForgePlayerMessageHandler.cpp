@@ -51,21 +51,27 @@ public:
         fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::RACIAL_TREE, fc->GetConfig("InitialPoints", 17));
     }
 
-    void OnFirstLogin(Player* player) override
-    {
-        if (!player)
-            return;
-
-        fc->ApplyTalents(player);
-        fc->ApplyActivePerks(player);
-    }
-
     void OnLogin(Player* player) override
     {
         if (!player)
             return;
 
-        fc->ApplyTalents(player);
+        
+        if (fc->IsFlaggedReset(player->GetGUID().GetCounter())) {
+            ForgeCharacterSpec* spec;
+            if (fc->TryGetCharacterActiveSpec(player, spec))
+            {
+                ForgeAddonMessage msg;
+                msg.topic = "2";
+                msg.player = player;
+                std::string message = "-1;"+std::to_string(spec->Id);
+                msg.message = message;
+                sTopicRouter->Route(msg, message);
+            }
+        }
+        else {
+            fc->ApplyTalents(player);
+        }
         fc->ApplyActivePerks(player);
         LearnSpellsForLevel(player, player->GetLevel());
     }
