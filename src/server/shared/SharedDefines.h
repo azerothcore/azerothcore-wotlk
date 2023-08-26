@@ -100,6 +100,7 @@ enum class ForgeTopic
     RESET_ALL_PERKS = 61,
     OFFER_SELECTION = 62,
     GET_PERK_CATALOGUE = 63,
+    GET_INSPECT_PERKS = 64,
 };
 
 enum class ForgeError
