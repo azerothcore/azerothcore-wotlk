@@ -71,8 +71,7 @@ while [[ $# -gt 0 ]]; do
         build)
             set -x
             docker compose --profile local --profile dev --profile dev-build build
-            docker image prune -af
-            docker compose run --rm --no-deps ac-dev-build /bin/bash /azerothcore/apps/docker/docker-build-dev.sh
+            docker compose --profile dev-build run --rm --no-deps ac-dev-build /bin/bash /azerothcore/apps/docker/docker-build-dev.sh
             set +x
             shift
             ;;
