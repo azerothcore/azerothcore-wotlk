@@ -67,6 +67,8 @@ public:
                 std::string message = "-1;"+std::to_string(spec->Id);
                 msg.message = message;
                 sTopicRouter->Route(msg, message);
+
+                fc->ClearResetFlag(player->GetGUID().GetCounter());
             }
         }
         else {

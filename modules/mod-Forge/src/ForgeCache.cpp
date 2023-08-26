@@ -1141,6 +1141,13 @@ public:
         return false;
     }
 
+    void ClearResetFlag(uint32 guid) {
+        FlaggedForReset.erase(std::remove(FlaggedForReset.begin(), FlaggedForReset.end(), guid), FlaggedForReset.end());
+        auto trans = WorldDatabase.BeginTransaction();
+        trans->Append("delete from forge_talent_flagged_reset where guid = {}", guid);
+        WorldDatabase.CommitTransaction(trans);
+    }
+
     std::vector<uint32> RACE_LIST;
     std::vector<uint32> CLASS_LIST;
     std::vector<CharacterPointType> TALENT_POINT_TYPES;
