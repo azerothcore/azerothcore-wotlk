@@ -228,6 +228,7 @@ enum ScarletMonasteryTrashMisc
 {
     SAY_WELCOME = 0,
     AURA_ASHBRINGER = 28282,
+    EFFECT_ASHBRINGER = 28441,
     //FACTION_FRIENDLY_TO_ALL = 35,
     NPC_HIGHLORD_MOGRAINE = 16062,
     MODEL_HIGHLORD_MOGRAINE = 16180,
@@ -250,41 +251,34 @@ public:
             SayAshbringer = false;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (who && who->GetDistance2d(me) < 12.0f)
+            if (who && spell->Id == EFFECT_ASHBRINGER && !SayAshbringer)
             {
-                if (Player* player = who->ToPlayer())
+                me->SetFaction(FACTION_FRIENDLY);
+                me->GetMotionMaster()->Clear(); // stop patrolling
+                me->GetMotionMaster()->MoveIdle();
+                me->StopMoving();
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetFacingToObject(who);
+                Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
+
+                me->m_Events.AddEventAtOffset([this, who]()
                 {
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
+                    me->SetSheath(SHEATH_STATE_UNARMED);
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+
+                    if (urand(0, 1))
                     {
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->GetMotionMaster()->Clear(); // stop patrolling
-                        me->GetMotionMaster()->MoveIdle();
-                        me->StopMoving();
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->SetFacingToObject(player);
-                        Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
-
-                        me->m_Events.AddEventAtOffset([this, player]()
-                        {
-                            me->SetSheath(SHEATH_STATE_UNARMED);
-                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
-
-                            if (urand(0, 1))
-                            {
-                                Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
-                                Talk(SAY_WELCOME, player, delayTalk);
-                            }
-                        }, delayKneel);
-
-                        SayAshbringer = true;
+                        Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
+                        Talk(SAY_WELCOME, who, delayTalk);
                     }
-                }
-            }
+                }, delayKneel);
 
-            SmartAI::MoveInLineOfSight(who);
+                SayAshbringer = true;
+            }
         }
+
     private:
         bool SayAshbringer = false;
     };
@@ -455,20 +449,6 @@ public:
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who && who->GetDistance2d(me) < 3.0f)
-                if (Player* player = who->ToPlayer())
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
-                    {
-                        me->SetFaction(FACTION_FRIENDLY);
-                        playerWhoStartedAshbringer = player;
-                        SayAshbringer = true;
-                    }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_MO_AGGRO);
@@ -513,7 +493,7 @@ public:
                 Talk(SAY_MO_KILL);
         }
 
-        void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
+        void SpellHit(Unit* who, SpellInfo const* spell) override
         {
             //When hit with resurrection say text
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
@@ -521,6 +501,11 @@ public:
                 Talk(SAY_MO_RESURRECTED);
                 fakeDeath = false;
                 instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
+            } else if (who && spell->Id == EFFECT_ASHBRINGER && !SayAshbringer)
+            {
+                me->SetFaction(FACTION_FRIENDLY);
+                playerWhoStartedAshbringer = who->ToPlayer();
+                SayAshbringer = true;
             }
         }
 
