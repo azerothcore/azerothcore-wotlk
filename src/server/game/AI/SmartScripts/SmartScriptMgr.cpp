@@ -267,8 +267,10 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_HAS_AURA:
             case SMART_EVENT_TARGET_BUFFED:
             case SMART_EVENT_AREA_RANGE:
+            case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_ME:
             case SMART_EVENT_VICTIM_NOT_ATTACKING:
+            case SMART_EVENT_IS_BEHIND_TARGET:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
@@ -280,14 +282,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     temp.event.rangeRepeat.onlyFireOnRepeat = 1;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
-            case SMART_EVENT_IS_BEHIND_TARGET:
-                if (temp.event.minMaxRepeat.min == 0 && temp.event.minMaxRepeat.max == 0)
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                break;
-            case SMART_EVENT_AREA_CASTING:
-                if (temp.event.areaCasting.repeatMin == 0 && temp.event.areaCasting.repeatMax == 0)
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                break;
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
@@ -566,7 +560,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_GOSSIP_HELLO: return sizeof(SmartEvent::gossipHello);
             case SMART_EVENT_FOLLOW_COMPLETED: return NO_PARAMS;
             case SMART_EVENT_EVENT_PHASE_CHANGE: return sizeof(SmartEvent::eventPhaseChange);
-            case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::behindTarget);
+            case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_GAME_EVENT_START: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GAME_EVENT_END: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GO_STATE_CHANGED: return sizeof(SmartEvent::goStateChanged);
@@ -962,7 +956,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
-            case SMART_EVENT_IS_BEHIND_TARGET:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 
@@ -978,6 +971,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
+            case SMART_EVENT_IS_BEHIND_TARGET:
             case SMART_EVENT_IS_BEHIND_ME:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
@@ -985,7 +979,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
 
-                if (!IsMinMaxValid(e, e.event.minMaxRepeat.param5Min, e.event.minMaxRepeat.param6Max))
+                if (!IsMinMaxValid(e, e.event.minMaxRepeat.rangeMin, e.event.minMaxRepeat.rangeMax))
                     return false;
 
                 break;
