@@ -23,47 +23,47 @@
 namespace Acore::Impl::EnumUtilsImpl
 {
 
-/****************************************************************\
-|* data for enum 'EvadeReason' in 'CreatureAI.h' auto-generated *|
-\****************************************************************/
+/****************************************************************************\
+|* data for enum 'CreatureAI::EvadeReason' in 'CreatureAI.h' auto-generated *|
+\****************************************************************************/
 template <>
-AC_API_EXPORT EnumText EnumUtils<EvadeReason>::ToString(EvadeReason value)
+AC_API_EXPORT EnumText EnumUtils<CreatureAI::EvadeReason>::ToString(CreatureAI::EvadeReason value)
 {
     switch (value)
     {
-        case EVADE_REASON_NO_HOSTILES: return { "EVADE_REASON_NO_HOSTILES", "EVADE_REASON_NO_HOSTILES", "the creature's threat list is empty" };
-        case EVADE_REASON_BOUNDARY: return { "EVADE_REASON_BOUNDARY", "EVADE_REASON_BOUNDARY", "the creature has moved outside its evade boundary" };
-        case EVADE_REASON_SEQUENCE_BREAK: return { "EVADE_REASON_SEQUENCE_BREAK", "EVADE_REASON_SEQUENCE_BREAK", "this is a boss and the pre-requisite encounters for engaging it are not defeated yet" };
-        case EVADE_REASON_NO_PATH: return { "EVADE_REASON_NO_PATH", "EVADE_REASON_NO_PATH", "the creature was unable to reach its target for over 5 seconds" };
+        case CreatureAI::EVADE_REASON_NO_HOSTILES: return { "EVADE_REASON_NO_HOSTILES", "EVADE_REASON_NO_HOSTILES", "the creature's threat list is empty" };
+        case CreatureAI::EVADE_REASON_BOUNDARY: return { "EVADE_REASON_BOUNDARY", "EVADE_REASON_BOUNDARY", "the creature has moved outside its evade boundary" };
+        case CreatureAI::EVADE_REASON_SEQUENCE_BREAK: return { "EVADE_REASON_SEQUENCE_BREAK", "EVADE_REASON_SEQUENCE_BREAK", "this is a boss and the pre-requisite encounters for engaging it are not defeated yet" };
+        case CreatureAI::EVADE_REASON_NO_PATH: return { "EVADE_REASON_NO_PATH", "EVADE_REASON_NO_PATH", "the creature was unable to reach its target for over 5 seconds" };
         default: throw std::out_of_range("value");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<EvadeReason>::Count() { return 4; }
+AC_API_EXPORT size_t EnumUtils<CreatureAI::EvadeReason>::Count() { return 4; }
 
 template <>
-AC_API_EXPORT EvadeReason EnumUtils<EvadeReason>::FromIndex(size_t index)
+AC_API_EXPORT CreatureAI::EvadeReason EnumUtils<CreatureAI::EvadeReason>::FromIndex(size_t index)
 {
     switch (index)
     {
-        case 0: return EVADE_REASON_NO_HOSTILES;
-        case 1: return EVADE_REASON_BOUNDARY;
-        case 2: return EVADE_REASON_SEQUENCE_BREAK;
-        case 3: return EVADE_REASON_NO_PATH;
+        case 0: return CreatureAI::EVADE_REASON_NO_HOSTILES;
+        case 1: return CreatureAI::EVADE_REASON_BOUNDARY;
+        case 2: return CreatureAI::EVADE_REASON_SEQUENCE_BREAK;
+        case 3: return CreatureAI::EVADE_REASON_NO_PATH;
         default: throw std::out_of_range("index");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<EvadeReason>::ToIndex(EvadeReason value)
+AC_API_EXPORT size_t EnumUtils<CreatureAI::EvadeReason>::ToIndex(CreatureAI::EvadeReason value)
 {
     switch (value)
     {
-        case EVADE_REASON_NO_HOSTILES: return 0;
-        case EVADE_REASON_BOUNDARY: return 1;
-        case EVADE_REASON_SEQUENCE_BREAK: return 2;
-        case EVADE_REASON_NO_PATH: return 3;
+        case CreatureAI::EVADE_REASON_NO_HOSTILES: return 0;
+        case CreatureAI::EVADE_REASON_BOUNDARY: return 1;
+        case CreatureAI::EVADE_REASON_SEQUENCE_BREAK: return 2;
+        case CreatureAI::EVADE_REASON_NO_PATH: return 3;
         default: throw std::out_of_range("value");
     }
 }
