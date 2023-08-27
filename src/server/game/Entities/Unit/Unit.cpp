@@ -9111,10 +9111,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
-    if(procSpell)
-        if (procSpell->SpellFamilyName == SPELLFAMILY_PERK)
-            return false;
-
     // Try handle unknown trigger spells
     //if (sSpellMgr->GetSpellInfo(trigger_spell_id) == nullptr)
     {
@@ -10034,12 +10030,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             return false;
 
         AddSpellCooldown(triggerEntry->Id, 0, cooldown);
-    }
-
-    if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_PERK)
-    {
-
-        ToPlayer()->AddSpellCooldown(trigger_spell_id, 0, 3.1 * IN_MILLISECONDS);
     }
 
     if(basepoints0)
