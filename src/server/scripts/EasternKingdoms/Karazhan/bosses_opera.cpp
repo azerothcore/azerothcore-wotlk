@@ -97,6 +97,11 @@ enum Creatures
     CREATURE_CRONE          = 18168,
 };
 
+enum OZActions
+{
+    ACTION_RELEASE          = 1,
+};
+
 void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
 {
     instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, SPECIAL);  // Increment DeathCount
@@ -137,13 +142,26 @@ void DespawnAll(InstanceScript* instance)
     }
 }
 
+void DoActions(InstanceScript* instance)
+{
+    uint32 datas[4] = {DATA_DOROTHEE, DATA_ROAR, DATA_STRAWMAN, DATA_TINHEAD};
+
+    for (uint32 data : datas)
+    {
+        if (Creature* actionCreature = instance->GetCreature(data))
+        {
+            actionCreature->AI()->DoAction(ACTION_RELEASE);
+        }
+    }
+}
+
 struct boss_dorothee : public ScriptedAI
 {
     boss_dorothee(Creature* creature) : ScriptedAI(creature)
     {
         SetCombatMovement(false);
         //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
-        Initialize();
+
         instance = creature->GetInstanceScript();
 
         _scheduler.SetValidator([this]
@@ -152,47 +170,26 @@ struct boss_dorothee : public ScriptedAI
         });
     }
 
-    void ScheduleActivation()
-    {
-        _scheduler.Schedule(16670ms, [this](TaskContext)
-        {
-            if (Creature* roar = instance->GetCreature(DATA_ROAR))
-            {
-                roar->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                roar->SetImmuneToPC(false);
-                roar->SetInCombatWithZone();
-            }
-        }).Schedule(26300ms, [this](TaskContext)
-        {
-            if (Creature* strawman = instance->GetCreature(DATA_STRAWMAN))
-            {
-                strawman->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                strawman->SetImmuneToPC(false);
-                strawman->SetInCombatWithZone();
-            }
-        }).Schedule(34470ms, [this](TaskContext)
-        {
-            if (Creature* tinhead = instance->GetCreature(DATA_TINHEAD))
-            {
-                tinhead->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                tinhead->SetImmuneToPC(false);
-                tinhead->SetInCombatWithZone();
-            }
-        });
-    }
-
-    void Initialize()
-    {
-        titoDied = false;
-        _startIntro = false;
-    }
-
     InstanceScript* instance;
     bool titoDied;
 
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            _scheduler.Schedule(11700ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+        }
+    }
+
     void Reset() override
     {
-        Initialize();
+        titoDied = false;
+        _startIntro = false;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -270,13 +267,7 @@ struct boss_dorothee : public ScriptedAI
 
         if (!_startIntro)
         {
-            ScheduleActivation();
-            _scheduler.Schedule(12s, [this](TaskContext)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToPC(false);
-                me->SetInCombatWithZone();
-            });
+            DoActions(instance);
             _startIntro = true;
         }
         DoMeleeAttackIfReady();
@@ -346,6 +337,19 @@ struct boss_roar : public ScriptedAI
     }
 
     InstanceScript* instance;
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            _scheduler.Schedule(16670ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+        }
+    }
 
     void Reset() override { }
 
@@ -441,6 +445,19 @@ struct boss_strawman : public ScriptedAI
 
     InstanceScript* instance;
 
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            _scheduler.Schedule(26300ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+        }
+    }
+
     void Reset() override { }
 
     void AttackStart(Unit* who) override
@@ -516,10 +533,10 @@ struct boss_strawman : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        _scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
-
-        _scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
@@ -540,6 +557,19 @@ struct boss_tinhead : public ScriptedAI
     }
 
     InstanceScript* instance;
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RELEASE)
+        {
+            _scheduler.Schedule(34470ms, [this](TaskContext)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(false);
+                me->SetInCombatWithZone();
+            });
+        }
+    }
 
     void Reset() override
     {

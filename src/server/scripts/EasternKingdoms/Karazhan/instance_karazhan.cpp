@@ -43,6 +43,7 @@ ObjectData const creatureData[] =
     { NPC_TINHEAD,              DATA_TINHEAD  },
     { NPC_ROMULO,               DATA_ROMULO   },
     { NPC_JULIANNE,             DATA_JULIANNE },
+    { 0,                        0             }
 };
 
 class instance_karazhan : public InstanceMapScript
