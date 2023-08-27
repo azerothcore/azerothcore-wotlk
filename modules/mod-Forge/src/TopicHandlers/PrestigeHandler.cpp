@@ -26,12 +26,6 @@ public:
             return;
         }
 
-        if (iam.player->getLevel() != 80)
-        {
-            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must be max level before prestiging.");
-            return;
-        }
-
         iam.player->SetPhaseMask(1, false);
         iam.player->ClearQuestStatus();
         iam.player->resetSpells();
@@ -72,7 +66,24 @@ public:
                     break;
                 }
             }
-            fc->PrestigePerks(iam.player);
+
+            if (iam.player->getLevel() == 80)
+            {
+                fc->PrestigePerks(iam.player);
+                fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
+            }
+            else {
+                auto trans = CharacterDatabase.BeginTransaction();
+                trans->Append("delete from character_prestige_perk_carryover where `guid` = {} and specId = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                trans->Append("delete from character_perk_selection_queue where `guid` = {} and specId = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                trans->Append("DELETE FROM character_spec_perks WHERE `guid` = {} AND `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+
+                CharacterDatabase.CommitTransaction(trans);
+                spec->perks.clear();
+                spec->prestigePerks.clear();
+                spec->perkQueue.clear();
+            }
+
 
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
@@ -88,8 +99,6 @@ public:
             fc->UpdateCharPoints(iam.player, prisCp);
             fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);
-
-            fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
         }
 
         iam.player->SetUInt32Value(PLAYER_XP, 0);

@@ -74,7 +74,6 @@ public:
 
                     fc->InsertNewPerksForLevelUp(iam.player, spec);
                     cm->SendPerks(iam.player, spec->Id);
-                    cm->SendWithstandingSelect(iam.player, "");
                 }
             }
             else {

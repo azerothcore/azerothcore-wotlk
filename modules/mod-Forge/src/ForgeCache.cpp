@@ -968,7 +968,10 @@ public:
         auto it = std::find_if(Perks[charClass].begin(), Perks[charClass].end(),
             [&spellId](Perk* perk) {return perk->spellId == spellId; });
 
-        return *it;
+        if (it != Perks[charClass].end())
+            return *it;
+        else
+            return nullptr;
     }
 
     Perk* GetRandomPerk(Player* player)
@@ -1045,6 +1048,8 @@ public:
             i.second->perkQueue.clear();
             i.second->prestigePerks.clear();
             trans->Append("delete from character_prestige_perk_carryover where `guid` = {} and specId = {}", player->GetGUID().GetCounter(), i.first);
+            trans->Append("delete from character_perk_selection_queue where `guid` = {} and specId = {}", player->GetGUID().GetCounter(), i.first);
+
             for (auto perkMap : i.second->perks) {
                 auto perk = perkMap.second;
                 for (auto j = 1; j <= perk->rank; j++) {
@@ -1089,14 +1094,13 @@ public:
         }
     }
 
-    std::string FindFirstUuid(ForgeCharacterSpec* spec, uint32 spellId)
+    bool PerkInQueue(ForgeCharacterSpec* spec, uint32 spellId)
     {
         std::string out;
-        for (auto roll : spec->perkQueue)
-            for (auto perk : roll.second)
-                if (perk->spell->spellId == spellId)
-                    return perk->uuid;
-        return "";
+        for (auto perk : spec->perkQueue.begin()->second)
+            if (perk->spell->spellId == spellId)
+                return true;
+        return false;
     }
 
     void InsertNewPerksForLevelUp(Player* player, ForgeCharacterSpec* spec)

@@ -27,6 +27,15 @@ public:
         uint32 specId = static_cast<uint32>(std::stoul(iam.message));
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(iam.player, spec)) {
+            uint8 max = iam.player->GetLevel() / 2;
+            uint8 present = fc->CountPerks(iam.player);
+            if ((max - present) < 1) {
+                spec->perkQueue.clear();
+                spec->prestigePerks.clear();
+                CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                CharacterDatabase.DirectExecute("delete from character_prestige_perk_carryover where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+                return;
+            }
 
             if (specId != iam.player->GetActiveSpec()) {
                 iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "Incorrect spec for selection request: Id "
@@ -34,14 +43,18 @@ public:
                 return;
             }
 
-            if (fc->CountPerks(iam.player) >= 40)
-            {
-                spec->perkQueue.clear();
-                CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
+            if (spec->perkQueue.empty())
+                fc->InsertNewPerksForLevelUp(iam.player, spec);
+            else
                 return;
-            }
 
-            cm->SendWithstandingSelect(iam.player, "");
+            std::string out = "";
+            std::string delim = "*";
+            for (CharacterSpecPerk* perk : spec->perkQueue.begin()->second)
+                out = out + std::to_string(perk->spell->spellId) + "^"
+                + std::to_string(perk->carryover) + delim;
+
+            cm->SendPerkSelection(iam.player, out);
         }
     }
 

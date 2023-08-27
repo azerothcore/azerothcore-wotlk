@@ -57,7 +57,6 @@ public:
         if (!player)
             return;
 
-        
         if (fc->IsFlaggedReset(player->GetGUID().GetCounter())) {
             ForgeCharacterSpec* spec;
             if (fc->TryGetCharacterActiveSpec(player, spec))
@@ -113,35 +112,28 @@ public:
             }
 
             LearnSpellsForLevel(player, player->GetLevel());
-
-            auto missing = player->GetLevel()/2 - (fc->CountPerks(player)+spec->perkQueue.size());
-            if (missing > 0)
-            {
-                fc->InsertNewPerksForLevelUp(player, spec);
-            }
-
             fc->UpdateCharacterSpec(player, spec);
         }
     }
 
     void OnLearnSpell(Player* player, uint32 spellID) 
     {
-        // check if its forged.
-        if (auto* fs = fc->GetTalent(player, spellID))
-        {
-            if (fs->CurrentRank != 0)
-            {
-                auto* tab = fc->TalentTabs[fs->TabId];
-                auto* spell = tab->Talents[fs->SpellId];
-                auto fsId = spell->Ranks[fs->CurrentRank];
+        //// check if its forged.
+        //if (auto* fs = fc->GetTalent(player, spellID))
+        //{
+        //    if (fs->CurrentRank != 0)
+        //    {
+        //        auto* tab = fc->TalentTabs[fs->TabId];
+        //        auto* spell = tab->Talents[fs->SpellId];
+        //        auto fsId = spell->Ranks[fs->CurrentRank];
 
-                for (auto s : spell->UnlearnSpells)
-                    player->removeSpell(s, SPEC_MASK_ALL, false);
+        //        for (auto s : spell->UnlearnSpells)
+        //            player->removeSpell(s, SPEC_MASK_ALL, false);
 
-                if (!player->HasSpell(fsId))
-                    player->learnSpell(fsId);
-            }
-        }
+        //        if (!player->HasSpell(fsId))
+        //            player->learnSpell(fsId);
+        //    }
+        //}
     }
 
     /*

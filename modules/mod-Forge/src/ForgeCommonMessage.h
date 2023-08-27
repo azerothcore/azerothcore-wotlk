@@ -26,7 +26,6 @@ public:
     void SendTalents(Player*);
     void SendPerks(Player*, uint8);
     void SendAllPerks(Player*);
-    void SendWithstandingSelect(Player*, std::string);
     void SendPerkSelection(Player*, std::string);
     void SendTalentTreeLayout(Player*);
     void SendTalentTreeLayout(Player*, uint32);

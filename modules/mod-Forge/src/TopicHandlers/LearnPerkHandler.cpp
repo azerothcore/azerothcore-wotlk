@@ -41,8 +41,7 @@ public:
 
         if (fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
-            auto rolled = fc->FindFirstUuid(spec, spellId);
-            if (!rolled.empty())
+            if (fc->PerkInQueue(spec, spellId))
             {
                 auto perkMap = spec->perks;
                 auto perk = perkMap.find(spellId);
@@ -51,7 +50,7 @@ public:
                 Perk* spell = fc->GetPerk(iam.player->getClass(), spellId);
                 if (perk == perkMap.end()) {
                     csp->rank = 0;
-                    csp->uuid = rolled;
+                    csp->uuid = spec->perkQueue.begin()->first;
                     csp->spell = spell;
                     perkMap[spellId] = csp;
                 }
@@ -76,25 +75,18 @@ public:
 
                 fc->LearnCharacterPerkInternal(iam.player, spec, csp);
 
-                spec->perkQueue.erase(rolled);
+                spec->perkQueue.clear();
                 spec->perks[spellId] = csp;
 
                 cm->SendPerks(iam.player, specId);
 
-                if (fc->CountPerks(iam.player) < 40) {
-                    cm->SendWithstandingSelect(iam.player, rolled);
-                }
-                else {
-                    spec->perkQueue.clear();
-                    CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
-                    return;
-                }
-
                 iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected
                 iam.player->SendPlaySpellImpact(iam.player->GetGUID(), 362); // 113 EmoteSalute
             }
-            else
+            else {
                 iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "Unknown Spec Error");
+                spec->perkQueue.clear();
+            }
         }
         else
             iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "The perk you attempted to learn was not offered.");
