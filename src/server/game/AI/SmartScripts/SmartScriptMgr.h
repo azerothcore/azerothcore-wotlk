@@ -1855,16 +1855,16 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
 
 enum SmartEventFlags
 {
-    SMART_EVENT_FLAG_NOT_REPEATABLE        = 0x001,                     //Event can not repeat
-    SMART_EVENT_FLAG_DIFFICULTY_0          = 0x002,                     //Event only occurs in instance difficulty 0
-    SMART_EVENT_FLAG_DIFFICULTY_1          = 0x004,                     //Event only occurs in instance difficulty 1
-    SMART_EVENT_FLAG_DIFFICULTY_2          = 0x008,                     //Event only occurs in instance difficulty 2
-    SMART_EVENT_FLAG_DIFFICULTY_3          = 0x010,                     //Event only occurs in instance difficulty 3
+    SMART_EVENT_FLAG_NOT_REPEATABLE        = 0x001,                     // Event can not repeat
+    SMART_EVENT_FLAG_DIFFICULTY_0          = 0x002,                     // Event only occurs in instance difficulty 0
+    SMART_EVENT_FLAG_DIFFICULTY_1          = 0x004,                     // Event only occurs in instance difficulty 1
+    SMART_EVENT_FLAG_DIFFICULTY_2          = 0x008,                     // Event only occurs in instance difficulty 2
+    SMART_EVENT_FLAG_DIFFICULTY_3          = 0x010,                     // Event only occurs in instance difficulty 3
     SMART_EVENT_FLAG_RESERVED_5            = 0x020,
     SMART_EVENT_FLAG_RESERVED_6            = 0x040,
-    SMART_EVENT_FLAG_DEBUG_ONLY            = 0x080,                     //Event only occurs in debug build
-    SMART_EVENT_FLAG_DONT_RESET            = 0x100,                     //Event will not reset in SmartScript::OnReset()
-    SMART_EVENT_FLAG_WHILE_CHARMED         = 0x200,                     //Event occurs even if AI owner is charmed
+    SMART_EVENT_FLAG_DEBUG_ONLY            = 0x080,                     // Event only occurs in debug build
+    SMART_EVENT_FLAG_DONT_RESET            = 0x100,                     // Event will not reset in SmartScript::OnReset()
+    SMART_EVENT_FLAG_WHILE_CHARMED         = 0x200,                     // Event occurs even if AI owner is charmed
 
     SMART_EVENT_FLAG_DIFFICULTY_ALL        = (SMART_EVENT_FLAG_DIFFICULTY_0 | SMART_EVENT_FLAG_DIFFICULTY_1 | SMART_EVENT_FLAG_DIFFICULTY_2 | SMART_EVENT_FLAG_DIFFICULTY_3),
     SMART_EVENT_FLAGS_ALL                  = (SMART_EVENT_FLAG_NOT_REPEATABLE | SMART_EVENT_FLAG_DIFFICULTY_ALL | SMART_EVENT_FLAG_RESERVED_5 | SMART_EVENT_FLAG_RESERVED_6 | SMART_EVENT_FLAG_DEBUG_ONLY | SMART_EVENT_FLAG_DONT_RESET | SMART_EVENT_FLAG_WHILE_CHARMED)
@@ -1872,15 +1872,15 @@ enum SmartEventFlags
 
 enum SmartCastFlags
 {
-    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     //Interrupt any spell casting
-    SMARTCAST_TRIGGERED              = 0x002,                     //Triggered (this makes spell cost zero mana and have no cast time)
-    //CAST_FORCE_CAST                  = 0x004,                     //Forces cast even if creature is out of mana or out of range
-    //CAST_NO_MELEE_IF_OOM             = 0x008,                     //Prevents creature from entering melee if out of mana or out of range
-    //CAST_FORCE_TARGET_SELF           = 0x010,                     //Forces the target to cast this spell on itself
-    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     //Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x040,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
-    SMARTCAST_TARGET_POWER_MANA      = 0x100                      //Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
+    SMARTCAST_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
+    //CAST_FORCE_CAST                  = 0x004,                     // Forces cast even if creature is out of mana or out of range
+    //CAST_NO_MELEE_IF_OOM             = 0x008,                     // Prevents creature from entering melee if out of mana or out of range
+    //CAST_FORCE_TARGET_SELF           = 0x010,                     // Forces the target to cast this spell on itself
+    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
+    SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_TARGET_POWER_MANA      = 0x100                      // Only cast if the target has power type mana (e.g. Mana Drain)
 };
 
 enum SmartFollowType
