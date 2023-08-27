@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
 #include "SpellMgr.h"
 #include "Totem.h"

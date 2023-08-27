@@ -21,7 +21,6 @@
 
 #include "CliRunnable.h"
 #include "Config.h"
-#include "Errors.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include <fmt/core.h>
