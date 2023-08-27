@@ -27,7 +27,8 @@ DoorData const doorData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { GO_THE_TALON_KINGS_COFFER, DATA_GO_TALON_KING_COFFER }
+    { GO_THE_TALON_KINGS_COFFER, DATA_GO_TALON_KING_COFFER },
+    { 0,                         0                         }
 };
 
 class instance_sethekk_halls : public InstanceMapScript
