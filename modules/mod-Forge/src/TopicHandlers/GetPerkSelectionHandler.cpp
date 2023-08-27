@@ -24,16 +24,15 @@ public:
         if (!fc->isNumber(iam.message))
             return;
 
+        if (iam.player->GetLevel() < 2)
+            return;
+
         uint32 specId = static_cast<uint32>(std::stoul(iam.message));
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(iam.player, spec)) {
             uint8 max = iam.player->GetLevel() / 2;
             uint8 present = fc->CountPerks(iam.player);
             if ((max - present) < 1) {
-                spec->perkQueue.clear();
-                spec->prestigePerks.clear();
-                CharacterDatabase.DirectExecute("delete from character_perk_selection_queue where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
-                CharacterDatabase.DirectExecute("delete from character_prestige_perk_carryover where `guid` = {} and `specId` = {}", iam.player->GetGUID().GetCounter(), spec->Id);
                 return;
             }
 
