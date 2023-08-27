@@ -2024,7 +2024,10 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    LOG_INFO("server.loading", "Loading Scripts...");
+    LOG_INFO("server.loading", "Initializing Scripts...");
+    sScriptMgr->Initialize();
+
+    LOG_INFO("server.loading", "Loading Scripts..."); // must be called after initialize scripts
     sScriptMgr->LoadDatabase();
 
     LOG_INFO("server.loading", "Validating Spell Scripts...");

@@ -276,9 +276,6 @@ int main(int argc, char** argv)
         //sScriptReloadMgr->Unload();
     });
 
-    LOG_INFO("server.loading", "Initializing Scripts...");
-    sScriptMgr->Initialize();
-
     // Start the databases
     if (!StartDB())
         return 1;
