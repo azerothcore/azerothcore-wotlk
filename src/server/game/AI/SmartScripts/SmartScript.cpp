@@ -602,13 +602,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (me && (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.cast.spell)))
                 {
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
-                    {
                         me->InterruptNonMeleeSpells(false);
-                    }
 
                     if (e.action.cast.castFlags & SMARTCAST_THREATLIST_NOT_SINGLE)
                         if (me->GetThreatMgr().GetThreatListSize() <= 1)
                             break;
+
+                    if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_MANA))
+                        continue;
 
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
