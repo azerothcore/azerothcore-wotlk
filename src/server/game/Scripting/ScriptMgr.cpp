@@ -58,7 +58,7 @@ ScriptMgr* ScriptMgr::instance()
 
 void ScriptMgr::Initialize()
 {
-    LOG_INFO("server.loading", "> Loading C++ scripts");
+    LOG_INFO("server.loading", ">> Loading C++ scripts");
     LOG_INFO("server.loading", " ");
 
     AddSC_SmartScripts();
