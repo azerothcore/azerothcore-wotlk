@@ -24,7 +24,6 @@
 #include "GameTime.h"
 #include "Geometry.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -39,7 +38,6 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "VMapFactory.h"
-#include "VMapMgr2.h"
 #include "Vehicle.h"
 #include "Weather.h"
 

@@ -29,7 +29,6 @@
 #include "Timer.h"
 #include "Tokenize.h"
 #include <chrono>
-#include <sstream>
 
 Log::Log() : AppenderId(0), highestLogLevel(LOG_LEVEL_FATAL)
 {

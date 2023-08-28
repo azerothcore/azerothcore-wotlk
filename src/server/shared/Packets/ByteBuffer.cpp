@@ -20,7 +20,6 @@
 #include "Log.h"
 #include "MessageBuffer.h"
 #include "Timer.h"
-#include "Util.h"
 #include <ctime>
 #include <sstream>
 #include <utf8.h>
