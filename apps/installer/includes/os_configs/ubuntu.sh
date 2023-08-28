@@ -14,16 +14,7 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libunwind-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
   openssl zlib1g-dev
 else
-  case $UBUNTU_VERSION in
-     "20.04")
-       sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server
-       ;;
-     *)
-       sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server
-       ;;
-  esac
+  sudo apt-get install -y g++ gdb gdbserver gcc git \
+  libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+  libssl-dev mysql-server
 fi
