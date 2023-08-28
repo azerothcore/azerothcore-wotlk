@@ -103,6 +103,7 @@ function comp_configure() {
             $CBUILD_APPS_LIST $CBUILD_TOOLS_LIST $OSOPTIONS $CCUSTOMOPTIONS
             ;;
         esac
+        ;;
       *)
         cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF \
         -DAPPS_BUILD=$CAPPS_BUILD \
