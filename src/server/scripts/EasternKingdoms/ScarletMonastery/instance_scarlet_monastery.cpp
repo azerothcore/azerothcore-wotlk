@@ -738,13 +738,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        if (player->HasAura(AURA_OF_ASHBRINGER))
+            AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+
         SendGossipMenuFor(player, 100100, creature->GetGUID());
         return true;
     }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32  /*Sender*/, uint32 uiAction) override
     {
+        if (!(player->HasAura(AURA_OF_ASHBRINGER)))
+            return true;
+
         ClearGossipMenuFor(player);
 
         switch (uiAction)
