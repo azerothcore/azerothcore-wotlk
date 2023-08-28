@@ -23,9 +23,9 @@
 
 #define LOG_CHAT(TYPE, ...)                        \
     if (lang != LANG_ADDON)                        \
-        LOG_TRACE("chat."TYPE, __VA_ARGS__);       \
+        LOG_INFO("chat."TYPE, __VA_ARGS__);        \
     else                                           \
-        LOG_TRACE("chat.addon."TYPE, __VA_ARGS__);
+        LOG_INFO("chat.addon."TYPE, __VA_ARGS__);
 
 class ChatLogScript : public PlayerScript
 {
