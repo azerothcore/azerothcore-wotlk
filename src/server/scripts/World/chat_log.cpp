@@ -19,12 +19,13 @@
 #include "Group.h"
 #include "Guild.h"
 #include "ScriptMgr.h"
+#include "Log.h"
 
-#define LOG_CHAT(TYPE, ...)                             \
-    if (lang != LANG_ADDON)                             \
-        LOG_DEBUG("chat.log." TYPE, __VA_ARGS__);       \
-    else                                                \
-        LOG_DEBUG("chat.log.addon." TYPE, __VA_ARGS__);
+#define LOG_CHAT(TYPE, ...)                        \
+    if (lang != LANG_ADDON)                        \
+        LOG_TRACE("chat."TYPE, __VA_ARGS__);       \
+    else                                           \
+        LOG_TRACE("chat.addon."TYPE, __VA_ARGS__);
 
 class ChatLogScript : public PlayerScript
 {
@@ -85,7 +86,7 @@ public:
                 break;
 
             case CHAT_MSG_RAID_WARNING:
-                LOG_CHAT("raid", "Leader player {} warns raid with: {}",
+                LOG_CHAT("raid", "Leader player {} sends raid warning: {}",
                     player->GetName(), msg);
                 break;
 
@@ -127,11 +128,13 @@ public:
 
         if (isSystem)
         {
-            LOG_CHAT("system", "Player {} tells channel {}: {}",
+            LOG_CHAT("channel", "Player {} tells channel {}: {}",
                 player->GetName(), channel->GetName(), msg);
         }
         else
         {
+            // Allow to log custom channels. i.e. world channel
+            // in that case set config: Logger.channel.world=6,Chat
             std::string channelName = channel ? channel->GetName() : "<unknown>";
             LOG_CHAT("channel." + channelName, "Player {} tells channel {}: {}",
                 player->GetName(), channelName, msg);
