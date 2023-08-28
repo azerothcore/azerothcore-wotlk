@@ -72,7 +72,6 @@ public:
                         spec->perks.erase(spellId);
                     }
 
-                    fc->InsertNewPerksForLevelUp(iam.player, spec);
                     cm->SendPerks(iam.player, spec->Id);
                 }
             }

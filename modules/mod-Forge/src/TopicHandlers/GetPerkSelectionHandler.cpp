@@ -44,8 +44,6 @@ public:
 
             if (spec->perkQueue.empty())
                 fc->InsertNewPerksForLevelUp(iam.player, spec);
-            else
-                return;
 
             std::string out = "";
             std::string delim = "*";
