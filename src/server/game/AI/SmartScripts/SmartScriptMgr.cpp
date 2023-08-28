@@ -266,6 +266,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_FRIENDLY_MISSING_BUFF:
             case SMART_EVENT_HAS_AURA:
             case SMART_EVENT_TARGET_BUFFED:
+            case SMART_EVENT_RANGE:
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_ME:
@@ -273,13 +274,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_IS_BEHIND_TARGET:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                break;
-            case SMART_EVENT_RANGE:
-                if (temp.event.rangeRepeat.repeatMin == 0 && temp.event.rangeRepeat.repeatMax == 0)
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                // Will only work properly if value is 0 or 1
-                if (temp.event.rangeRepeat.onlyFireOnRepeat > 1)
-                    temp.event.rangeRepeat.onlyFireOnRepeat = 1;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
@@ -502,7 +496,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_DEATH: return NO_PARAMS;
             case SMART_EVENT_EVADE: return NO_PARAMS;
             case SMART_EVENT_SPELLHIT: return sizeof(SmartEvent::spellHit);
-            case SMART_EVENT_RANGE: return sizeof(SmartEvent::rangeRepeat);
+            case SMART_EVENT_RANGE: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_OOC_LOS: return sizeof(SmartEvent::los);
             case SMART_EVENT_RESPAWN: return sizeof(SmartEvent::respawn);
             case SMART_EVENT_TARGET_HEALTH_PCT: return sizeof(SmartEvent::minMaxRepeat);
@@ -963,17 +957,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
                 break;
-            case SMART_EVENT_RANGE:
-                if (!IsMinMaxValid(e, e.event.rangeRepeat.minRange, e.event.rangeRepeat.maxRange))
-                    return false;
-
-                if (!IsMinMaxValid(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax))
-                    return false;
-                break;
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
             case SMART_EVENT_IS_BEHIND_ME:
+            case SMART_EVENT_RANGE:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 

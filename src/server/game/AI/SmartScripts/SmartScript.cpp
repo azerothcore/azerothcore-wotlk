@@ -3822,16 +3822,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsEngaged() || !me->GetVictim())
                     return;
 
-                if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
-                {
-                    if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
-                    {
-                        e.event.rangeRepeat.onlyFireOnRepeat = 1;
-                        RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
-                    }
-                    else
-                        ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
-                }
+                if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax))
+                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
                 else
                     RecalcTimer(e, 1200, 1200); // make it predictable
 
@@ -4559,13 +4551,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
     switch (e.GetEventType())
     {
         //set only events which have initial timers
-        case SMART_EVENT_RANGE:
-            // If onlyFireOnRepeat is true set to 2 before entering combat. Will be set back to 1 after entering combat to ignore initial firing.
-            if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
-                e.event.rangeRepeat.onlyFireOnRepeat = 2;
-            // make it predictable
-            RecalcTimer(e, 1200, 1200);
-            break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
@@ -4573,6 +4558,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_UPDATE:
         case SMART_EVENT_UPDATE_IC:
         case SMART_EVENT_UPDATE_OOC:
+        case SMART_EVENT_RANGE:
         case SMART_EVENT_AREA_RANGE:
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
@@ -4580,11 +4566,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_VICTIM_NOT_ATTACKING:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
-        case SMART_EVENT_OOC_LOS:
-        case SMART_EVENT_IC_LOS:
-        // Xinef: cooldown should be processed AFTER action is done, not before...
-        //RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
-        //break;
         case SMART_EVENT_DISTANCE_CREATURE:
         case SMART_EVENT_DISTANCE_GAMEOBJECT:
             RecalcTimer(e, e.event.distance.repeat, e.event.distance.repeat);
@@ -4882,10 +4863,10 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
         InitTimer((*i));//calculate timers for first time use
         if (i->GetEventType() == SMART_EVENT_RANGE && i->GetActionType() == SMART_ACTION_ALLOW_COMBAT_MOVEMENT)
         {
-            if (i->action.combatMove.move == 1 && i->event.rangeRepeat.minRange > minEnableDist)
-                minEnableDist = i->event.rangeRepeat.minRange;
-            else if (i->action.combatMove.move == 0 && (i->event.rangeRepeat.maxRange < maxDisableDist || maxDisableDist == 0))
-                maxDisableDist = i->event.rangeRepeat.maxRange;
+            if (i->action.combatMove.move == 1 && i->event.minMaxRepeat.rangeMin > minEnableDist)
+                minEnableDist = i->event.minMaxRepeat.rangeMin;
+            else if (i->action.combatMove.move == 0 && (i->event.minMaxRepeat.rangeMax < maxDisableDist || maxDisableDist == 0))
+                maxDisableDist = i->event.minMaxRepeat.rangeMax;
         }
 
         // Xinef: if smartcast combat move flag is present
