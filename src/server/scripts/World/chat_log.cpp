@@ -47,7 +47,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
+    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
         LOG_INFO("chat.whisper", "Player {} tells {}: {}",
                player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg);
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Channel* channel) override
+    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Channel* channel) override
     {
         bool isSystem = channel &&
                         (channel->HasFlag(CHANNEL_FLAG_TRADE) ||
