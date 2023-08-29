@@ -9,7 +9,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (14041, 1, 0, '%s yawns.', 16, 0, 100, 0, 0, 0, 9417, 0, 'Haggle - Emote 1'),
 (14041, 2, 0, '%s sifts through the trash.', 16, 0, 100, 69, 0, 0, 9141, 0, 'Haggle - Emote 2');
 
-DELETE FROM `creature` WHERE `guid` = 53788;
+DELETE FROM `creature` WHERE `guid` = 53788 AND `id1` = 14041;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (53788, 14041, 0, 0, 369, 0, 0, 1, 1, 0, 38.99483, 24.375648, -4.2973485, 0.366166770458221435, 190, 0, 0, 484, 0, 0, 0, 0, 0, '', 45704);
 
@@ -70,7 +70,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1404100, 1404101, 1404102, 1
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (14041, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 1404100, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Respawn - Start waypoint'),
 (14041, 0, 1, 0, 40, 0, 100, 0, 11, 0, 0, 0, 0, 0, 80, 1404100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP11 reached - Run Actionlist'),
-(14041, 0, 2, 0, 40, 0, 100, 512, 13, 0, 0, 0, 0, 0, 80, 1404101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP13 reached - Run Actionlist'),
+(14041, 0, 2, 0, 40, 0, 100, 0, 13, 0, 0, 0, 0, 0, 80, 1404101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP13 reached - Run Actionlist'),
 (14041, 0, 3, 0, 40, 0, 100, 0, 16, 0, 0, 0, 0, 0, 80, 1404102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP16 reached - Run Actionlist'),
 (14041, 0, 4, 0, 40, 0, 100, 0, 18, 0, 0, 0, 0, 0, 80, 1404105, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP18 reached - Run Actionlist'),
 (14041, 0, 5, 0, 40, 0, 100, 0, 19, 0, 0, 0, 0, 0, 80, 1404105, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On WP19 reached - Run Actionlist'),
@@ -86,18 +86,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1404100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 20000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 20 seconds'),
 (1404100, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 89, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Random movement'),
 (1404100, 9, 2, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Say random'),
-(1404100, 9, 3, 0, 0, 0, 100, 0, 18500, 18500, 0, 0, 0, 0, 212, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Stop random movement'),
-(1404100, 9, 4, 0, 0, 0, 100, 0, 19000, 19000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Say emote 1'),
-(1404101, 9, 0, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 0, 54, 122000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 122 seconds'),
-(1404101, 9, 1, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On On Script - Set bytes1 - sleep'),
-(1404101, 9, 2, 0, 0, 0, 100, 0, 121500, 121500, 0, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script- Remove bytes1 - sleep'),
+(1404100, 9, 3, 0, 0, 0, 100, 0, 12000, 12000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Say emote 1'),
+(1404101, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 122000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 122 seconds'),
+(1404101, 9, 1, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.448623299598693847, 'Haggle - On On Script - Change orientation'),
+(1404101, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On On Script - Set bytes1 - sleep'),
+(1404101, 9, 3, 0, 0, 0, 100, 0, 121500, 121500, 0, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script- Remove bytes1 - sleep'),
 (1404102, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 45000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 45 seconds'),
 (1404102, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 89, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Random movement'),
-(1404102, 9, 2, 0, 0, 0, 100, 0, 44000, 44000, 0, 0, 0, 0, 212, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Stop random movement'),
 (1404103, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 45000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 45 seconds'),
 (1404103, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 89, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Random movement'),
 (1404103, 9, 2, 0, 0, 0, 100, 0, 36000, 36000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Say random'),
-(1404103, 9, 3, 0, 0, 0, 100, 0, 43000, 43000, 0, 0, 0, 0, 212, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Stop random movement'),
 (1404104, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 16000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script - Pause Waypoint 16 seconds'),
 (1404104, 9, 1, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 90, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On On Script - Set bytes1 - sit'),
 (1404104, 9, 2, 0, 0, 0, 100, 0, 15500, 15500, 0, 0, 0, 0, 91, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Haggle - On Script- Remove bytes1 - sit'),
