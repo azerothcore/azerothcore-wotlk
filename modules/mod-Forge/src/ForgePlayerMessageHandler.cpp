@@ -203,6 +203,11 @@ public:
 
         else if (player->getLevel() <= 79)
             amount *= fc->GetConfig("Dynamic.XP.Rate.70-79", 9);
+
+        if (auto prestiges = GetPrestigeStatus(player)) {
+            auto bonus = (50 * std::log(prestiges + 1)) / 100;
+            amount *= 1 + bonus;
+        }
     }
 
 private:
@@ -211,9 +216,10 @@ private:
     ForgeCommonMessage* cm;
     uint32 FORGE_SCRAP = 90000;
 
-    bool GetPrestigeStatus(Player* player)
+    uint8 GetPrestigeStatus(Player* player)
     {
-        return false;
+        ForgeCharacterPoint* presCp = fc->GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
+        return presCp->Sum;
     }
 
     void LearnSpellsForLevel(Player* player, uint8 newlevel) {

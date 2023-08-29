@@ -1504,13 +1504,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         uint32 damage = GetEffect(0)->GetAmount();
                         damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT);
-                        float dmgRatio;
-                        int tickCount = GetEffect(0)->GetTotalTicks(dmgRatio);
-
-                        if (dmgRatio != 0)
-                            damage += damage * dmgRatio;
-
-                        int32 basepoints0 = aurEff->GetAmount() * tickCount * int32(damage) / 100;
+                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
                         int32 heal = int32(CalculatePct(basepoints0, 15));
 
                         caster->CastCustomSpell(target, 63675, &basepoints0, nullptr, nullptr, true, nullptr, GetEffect(0));
