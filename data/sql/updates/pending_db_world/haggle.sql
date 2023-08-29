@@ -6,7 +6,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (14041, 0, 2, 'Forty-two... forty-two... forty-two what?  It could be anything!  Forty-two... hmmm...', 12, 0, 100, 1, 0, 0, 9098, 0, 'Haggle - Random Say'),
 (14041, 0, 3, 'Rat-kabobs!  Get your tasty Rat-kabobs here!  Get them while they last!', 12, 0, 100, 1, 0, 0, 9150, 0, 'Haggle - Random Say'),
 (14041, 0, 4, 'Rats everywhere.  Everywhere I see rats.  Always looking at me with their beedy little eyes.  I\'ll show them.  I\'ll show them all!', 12, 0, 100, 1, 0, 0, 9149, 0, 'Haggle - Random Say'),
-(14041, 1, 0, '%s yawns.', 16, 0, 100, 0, 0, 0, 9417, 0, 'Haggle - Emote 1'),
+(14041, 1, 0, '%s yawns.', 16, 0, 100, 0, 0, 0, 9147, 0, 'Haggle - Emote 1'),
 (14041, 2, 0, '%s sifts through the trash.', 16, 0, 100, 69, 0, 0, 9141, 0, 'Haggle - Emote 2');
 
 DELETE FROM `creature` WHERE `guid` = 53788 AND `id1` = 14041;
