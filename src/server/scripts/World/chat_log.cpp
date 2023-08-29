@@ -21,12 +21,6 @@
 #include "ScriptMgr.h"
 #include "Log.h"
 
-#define LOG_CHAT(TYPE, ...)                        \
-    if (lang != LANG_ADDON)                        \
-        LOG_INFO("chat." + TYPE, __VA_ARGS__);        \
-    else                                           \
-        LOG_INFO("chat.addon." + TYPE, __VA_ARGS__);
-
 class ChatLogScript : public PlayerScript
 {
 public:
@@ -37,17 +31,17 @@ public:
         switch (type)
         {
             case CHAT_MSG_SAY:
-                LOG_CHAT("say", "Player {} says (language {}): {}",
+                LOG_INFO("chat.say", "Player {} says (language {}): {}",
                     player->GetName(), lang, msg);
                 break;
 
             case CHAT_MSG_EMOTE:
-                LOG_CHAT("emote", "Player {} emotes: {}",
+                LOG_INFO("chat.emote", "Player {} emotes: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_YELL:
-                LOG_CHAT("yell", "Player {} yells (language {}): {}",
+                LOG_INFO("chat.yell", "Player {} yells(language{}) : {}",
                     player->GetName(), lang, msg);
                 break;
         }
@@ -55,48 +49,49 @@ public:
 
     void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
     {
-        LOG_CHAT("whisper", "Player {} tells {}: {}",
+        LOG_INFO("chat.whisper", "Player {} tells {}: {}",
                player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg);
     }
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group) override
     {
+        std::string str = lang != LANG_ADDON ? "chat." : "chat.addon.";
         //! NOTE:
         //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
         switch (type)
         {
             case CHAT_MSG_PARTY:
-                LOG_CHAT("party", "Player {} tells group with leader {}: {}",
+                LOG_INFO(str + "party", "Player {} tells group with leader {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_PARTY_LEADER:
-                LOG_CHAT("party", "Leader {} tells group: {}",
+                LOG_INFO(str + "party", "Leader {} tells group: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID:
-                LOG_CHAT("raid", "Player {} tells raid with leader {}: {}",
+                LOG_INFO(str + "raid", "Player {} tells raid with leader {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_RAID_LEADER:
-                LOG_CHAT("raid", "Leader player {} tells raid: {}",
+                LOG_INFO(str + "raid", "Leader player {} tells raid: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID_WARNING:
-                LOG_CHAT("raid", "Leader player {} sends raid warning: {}",
+                LOG_INFO(str + "raid", "Leader player {} sends raid warning: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND:
-                LOG_CHAT("bg", "Player {} tells battleground with leader {}: {}",
+                LOG_INFO(str + "bg", "Player {} tells battleground with leader {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND_LEADER:
-                LOG_CHAT("bg", "Leader player {} tells battleground: {}",
+                LOG_INFO(str + "bg", "Leader player {} tells battleground: {}",
                     player->GetName(), msg);
                 break;
         }
@@ -104,15 +99,16 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild) override
     {
+        std::string str = lang != LANG_ADDON ? "chat." : "chat.addon.";
         switch (type)
         {
             case CHAT_MSG_GUILD:
-                LOG_CHAT("guild", "Player {} tells guild {}: {}",
+                LOG_INFO(str + "guild", "Player {} tells guild {}: {}",
                     player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_OFFICER:
-                LOG_CHAT("guild.officer", "Player {} tells guild {} officers: {}",
+                LOG_INFO(str + "guild.officer", "Player {} tells guild {} officers: {}",
                     player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
         }
@@ -128,7 +124,7 @@ public:
 
         if (isSystem)
         {
-            LOG_CHAT("channel", "Player {} tells channel {}: {}",
+            LOG_INFO("chat.channel", "Player {} tells channel {}: {}",
                 player->GetName(), channel->GetName(), msg);
         }
         else
@@ -136,7 +132,7 @@ public:
             // Allow to log custom channels. i.e. world channel
             // in that case set config: Logger.channel.world=6,Chat
             std::string channelName = channel ? channel->GetName() : "<unknown>";
-            LOG_CHAT("channel." + channelName, "Player {} tells channel {}: {}",
+            LOG_INFO("chat.channel." + channelName, "Player {} tells channel {}: {}",
                 player->GetName(), channelName, msg);
         }
     }
