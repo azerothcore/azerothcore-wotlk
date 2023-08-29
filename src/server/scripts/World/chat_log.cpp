@@ -41,7 +41,7 @@ public:
                 break;
 
             case CHAT_MSG_YELL:
-                LOG_INFO("chat.yell", "Player {} yells(language{}) : {}",
+                LOG_INFO("chat.yell", "Player {} yells (language {}): {}",
                     player->GetName(), lang, msg);
                 break;
         }
