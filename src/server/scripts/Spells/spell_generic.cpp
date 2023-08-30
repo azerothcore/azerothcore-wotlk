@@ -2414,13 +2414,8 @@ class spell_gen_lifeblood : public AuraScript
 
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        float f;
-
         if (Unit* owner = GetUnitOwner())
             amount += int32(CalculatePct(owner->GetMaxHealth(), 1.5f / aurEff->GetTotalTicks()));
-
-        if (f != 0)
-            amount += amount * f;
     }
 
     void Register() override
