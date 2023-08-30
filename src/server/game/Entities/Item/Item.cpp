@@ -1002,6 +1002,7 @@ bool Item::GemsFitSockets() const
 
         if (!(GemColor & SocketColor)) // bad gem color on this socket
             return false;
+        // TODO CHECK SOCKET
     }
     return true;
 }

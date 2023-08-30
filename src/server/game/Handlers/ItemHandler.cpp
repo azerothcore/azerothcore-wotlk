@@ -1455,6 +1455,9 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 return;
         }
 
+        if (itemProto->ItemId > 1000000 && GemProps[i]->ID < 10000)
+            return;
+
         // tried to put normal gem in meta socket
         if (itemProto->Socket[i].Color == SOCKET_COLOR_META && GemProps[i]->color != SOCKET_COLOR_META)
             return;
