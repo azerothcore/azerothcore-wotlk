@@ -1,3 +1,4 @@
+-- DB update 2023_08_25_02 -> 2023_08_30_00
 -- Table Condition - Fix Quests - 8353 - 8355 - 8356 - 8357 - 8311 --
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 19) AND (`SourceGroup` = 0) AND (`SourceEntry` IN (8353, 8355, 8356, 8357, 8311)) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 12) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 12) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
