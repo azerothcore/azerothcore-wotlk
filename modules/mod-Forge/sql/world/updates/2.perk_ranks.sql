@@ -7,7 +7,6 @@ CREATE TABLE acore_world.`perk_ranks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500500,1,500500),
 	 (500501,1,500501),
 	 (500502,1,500502),
 	 (500503,1,500503),
@@ -16,9 +15,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500507,1,500507),
 	 (500508,1,500508),
 	 (500509,1,500509),
-	 (500509,2,1500509);
+	 (500509,2,1500509),
+	 (500509,3,2500509);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500509,3,2500509),
 	 (500511,1,500511),
 	 (500511,2,1500511),
 	 (500511,3,2500511),
@@ -27,9 +26,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500512,3,2500512),
 	 (500513,1,500513),
 	 (500513,2,1500513),
-	 (500513,3,2500513);
+	 (500513,3,2500513),
+	 (500514,1,500514);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500514,1,500514),
 	 (500515,1,500515),
 	 (500515,2,1500515),
 	 (500515,3,2500515),
@@ -38,9 +37,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500518,1,500518),
 	 (500518,2,1500518),
 	 (500518,3,2500518),
-	 (500519,1,500519);
+	 (500519,1,500519),
+	 (500519,2,1500519);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500519,2,1500519),
 	 (500519,3,2500519),
 	 (500520,1,500520),
 	 (500520,2,1500520),
@@ -49,9 +48,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500521,2,1500521),
 	 (500521,3,2500521),
 	 (500522,1,500522),
-	 (500522,2,1500522);
+	 (500522,2,1500522),
+	 (500522,3,2500522);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500522,3,2500522),
 	 (500523,1,500523),
 	 (500523,2,1500523),
 	 (500523,3,2500523),
@@ -60,9 +59,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500524,3,2500524),
 	 (500525,1,500525),
 	 (500525,2,1500525),
-	 (500525,3,2500525);
+	 (500525,3,2500525),
+	 (500526,1,500526);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500526,1,500526),
 	 (500526,2,1500526),
 	 (500526,3,2500526),
 	 (500527,1,500527),
@@ -71,9 +70,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500528,1,500528),
 	 (500528,2,1500528),
 	 (500528,3,2500528),
-	 (500529,1,500529);
+	 (500529,1,500529),
+	 (500529,2,1500529);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500529,2,1500529),
 	 (500529,3,2500529),
 	 (500530,1,500530),
 	 (500530,2,1500530),
@@ -82,9 +81,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500531,2,1500531),
 	 (500531,3,2500531),
 	 (500533,1,500533),
-	 (500534,1,500534);
+	 (500534,1,500534),
+	 (500534,2,1500534);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500534,2,1500534),
 	 (500534,3,2500534),
 	 (500535,1,500535),
 	 (500535,2,1500535),
@@ -93,9 +92,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500537,2,1500537),
 	 (500537,3,2500537),
 	 (500538,1,500538),
-	 (500538,2,1500538);
+	 (500538,2,1500538),
+	 (500538,3,2500538);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500538,3,2500538),
 	 (500539,1,500539),
 	 (500539,2,1500539),
 	 (500539,3,2500539),
@@ -104,9 +103,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500542,1,500542),
 	 (500543,1,500543),
 	 (500545,1,500545),
-	 (500546,1,500546);
+	 (500546,1,500546),
+	 (500547,1,500547);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500547,1,500547),
 	 (500549,1,500549),
 	 (500550,1,500550),
 	 (500550,2,1500550),
@@ -115,9 +114,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500552,1,500552),
 	 (500552,2,1500552),
 	 (500552,3,2500552),
-	 (500553,1,500553);
+	 (500553,1,500553),
+	 (500554,1,500554);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500554,1,500554),
 	 (500557,1,500557),
 	 (500558,1,500558),
 	 (500559,1,500559),
@@ -126,9 +125,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (500700,1,500700),
 	 (500701,1,500701),
 	 (500702,1,500702),
-	 (500703,1,500703);
+	 (500703,1,500703),
+	 (500704,1,500704);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (500704,1,500704),
 	 (500706,1,500706),
 	 (500707,1,500707),
 	 (600600,1,600600),
@@ -137,9 +136,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (600606,1,600606),
 	 (600608,1,600608),
 	 (600609,1,600609),
-	 (600614,1,600614);
+	 (600614,1,600614),
+	 (600628,1,600628);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (600628,1,600628),
 	 (600630,1,600630),
 	 (600634,1,600634),
 	 (600636,1,600636),
@@ -148,9 +147,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (600660,1,600660),
 	 (600661,1,600661),
 	 (600700,1,600700),
-	 (600701,1,600701);
+	 (600701,1,600701),
+	 (600702,1,600702);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (600702,1,600702),
 	 (600703,1,600703),
 	 (600704,1,600704),
 	 (600705,1,600705),
@@ -159,9 +158,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (600706,1,600706),
 	 (600709,1,600709),
 	 (600710,1,600710),
-	 (600712,1,600712);
+	 (600712,1,600712),
+	 (600715,1,600715);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (600715,1,600715),
 	 (600720,1,600720),
 	 (600721,1,600721),
 	 (700700,1,700700),
@@ -170,9 +169,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700701,1,700701),
 	 (700701,2,1700701),
 	 (700701,3,2700701),
-	 (700702,1,700702);
+	 (700702,1,700702),
+	 (700702,2,1700702);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700702,2,1700702),
 	 (700702,3,2700702),
 	 (700703,1,700703),
 	 (700703,2,1700703),
@@ -181,9 +180,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700705,1,700705),
 	 (700706,1,700706),
 	 (700707,1,700707),
-	 (700707,2,1700707);
+	 (700707,2,1700707),
+	 (700707,3,2700707);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700707,3,2700707),
 	 (700708,1,700708),
 	 (700709,1,700709),
 	 (700709,2,1700709),
@@ -192,9 +191,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700710,2,1700710),
 	 (700710,3,2700710),
 	 (700711,1,700711),
-	 (700711,2,1700711);
+	 (700711,2,1700711),
+	 (700711,3,2700711);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700711,3,2700711),
 	 (700712,1,700712),
 	 (700712,2,1700712),
 	 (700712,3,2700712),
@@ -203,9 +202,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700714,2,1700714),
 	 (700714,3,2700714),
 	 (700715,1,700715),
-	 (700716,1,700716);
+	 (700716,1,700716),
+	 (700717,1,700717);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700717,1,700717),
 	 (700717,2,1700717),
 	 (700717,3,2700717),
 	 (700718,1,700718),
@@ -214,9 +213,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700719,1,700719),
 	 (700719,2,1700719),
 	 (700719,3,2700719),
-	 (700720,1,700720);
+	 (700720,1,700720),
+	 (700721,1,700721);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700721,1,700721),
 	 (700721,2,1700721),
 	 (700721,3,2700721),
 	 (700722,1,700722),
@@ -225,9 +224,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700723,1,700723),
 	 (700723,2,1700723),
 	 (700723,3,2700723),
-	 (700724,1,700724);
+	 (700724,1,700724),
+	 (700725,1,700725);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700725,1,700725),
 	 (700725,2,1700725),
 	 (700725,3,2700725),
 	 (700726,1,700726),
@@ -236,9 +235,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700727,3,2700727),
 	 (700728,1,700728),
 	 (700729,1,700729),
-	 (700730,1,700730);
+	 (700730,1,700730),
+	 (700730,2,1700730);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700730,2,1700730),
 	 (700730,3,2700730),
 	 (700731,1,700731),
 	 (700731,2,1700731),
@@ -247,9 +246,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700732,2,1700732),
 	 (700732,3,2700732),
 	 (700733,1,700733),
-	 (700734,1,700734);
+	 (700734,1,700734),
+	 (700734,2,1700734);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700734,2,1700734),
 	 (700734,3,2700734),
 	 (700735,1,700735),
 	 (700735,2,1700735),
@@ -258,9 +257,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700736,2,1700736),
 	 (700736,3,2700736),
 	 (700737,1,700737),
-	 (700738,1,700738);
+	 (700738,1,700738),
+	 (700738,2,1700738);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700738,2,1700738),
 	 (700738,3,2700738),
 	 (700739,1,700739),
 	 (700740,1,700740),
@@ -269,9 +268,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700741,1,700741),
 	 (700741,2,1700741),
 	 (700741,3,2700741),
-	 (700742,1,700742);
+	 (700742,1,700742),
+	 (700744,1,700744);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700744,1,700744),
 	 (700744,2,1700744),
 	 (700744,3,2700744),
 	 (700745,1,700745),
@@ -280,9 +279,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700746,1,700746),
 	 (700746,2,1700746),
 	 (700746,3,2700746),
-	 (700747,1,700747);
+	 (700747,1,700747),
+	 (700748,1,700748);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700748,1,700748),
 	 (700748,2,1700748),
 	 (700748,3,2700748),
 	 (700749,1,700749),
@@ -291,9 +290,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700751,1,700751),
 	 (700751,2,1700751),
 	 (700751,3,2700751),
-	 (700753,1,700753);
+	 (700753,1,700753),
+	 (700753,2,1700753);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700753,2,1700753),
 	 (700753,3,2700753),
 	 (700754,1,700754),
 	 (700754,2,1700754),
@@ -302,9 +301,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700756,1,700756),
 	 (700756,2,1700756),
 	 (700756,3,2700756),
-	 (700757,1,700757);
+	 (700757,1,700757),
+	 (700758,1,700758);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700758,1,700758),
 	 (700758,2,1700758),
 	 (700758,3,2700758),
 	 (700759,1,700759),
@@ -313,9 +312,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700761,2,1700761),
 	 (700761,3,2700761),
 	 (700762,1,700762),
-	 (700762,2,1700762);
+	 (700762,2,1700762),
+	 (700762,3,2700762);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700762,3,2700762),
 	 (700763,1,700763),
 	 (700764,1,700764),
 	 (700764,2,1700764),
@@ -324,9 +323,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700765,2,1700765),
 	 (700765,3,2700765),
 	 (700766,1,700766),
-	 (700766,2,1700766);
+	 (700766,2,1700766),
+	 (700766,3,2700766);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700766,3,2700766),
 	 (700767,1,700767),
 	 (700767,2,1700767),
 	 (700767,3,2700767),
@@ -335,9 +334,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700768,3,2700768),
 	 (700769,1,700769),
 	 (700769,2,1700769),
-	 (700769,3,2700769);
+	 (700769,3,2700769),
+	 (700770,1,700770);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700770,1,700770),
 	 (700770,2,1700770),
 	 (700770,3,2700770),
 	 (700771,1,700771),
@@ -346,9 +345,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700772,1,700772),
 	 (700772,2,1700772),
 	 (700772,3,2700772),
-	 (700773,1,700773);
+	 (700773,1,700773),
+	 (700773,2,1700773);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700773,2,1700773),
 	 (700773,3,2700773),
 	 (700774,1,700774),
 	 (700774,2,1700774),
@@ -357,9 +356,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700775,2,1700775),
 	 (700775,3,2700775),
 	 (700776,1,700776),
-	 (700776,2,1700776);
+	 (700776,2,1700776),
+	 (700776,3,2700776);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700776,3,2700776),
 	 (700777,1,700777),
 	 (700777,2,1700777),
 	 (700777,3,2700777),
@@ -368,9 +367,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700778,3,2700778),
 	 (700779,1,700779),
 	 (700779,2,1700779),
-	 (700779,3,2700779);
+	 (700779,3,2700779),
+	 (700780,1,700780);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700780,1,700780),
 	 (700780,2,1700780),
 	 (700780,3,2700780),
 	 (700781,1,700781),
@@ -379,9 +378,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700783,1,700783),
 	 (700783,2,1700783),
 	 (700783,3,2700783),
-	 (700785,1,700785);
+	 (700785,1,700785),
+	 (700785,2,1700785);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700785,2,1700785),
 	 (700785,3,2700785),
 	 (700786,1,700786),
 	 (700786,2,1700786),
@@ -390,9 +389,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700788,1,700788),
 	 (700789,1,700789),
 	 (700790,1,700790),
-	 (700791,1,700791);
+	 (700791,1,700791),
+	 (700791,2,1700791);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700791,2,1700791),
 	 (700791,3,2700791),
 	 (700792,1,700792),
 	 (700792,2,1700792),
@@ -401,9 +400,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700794,1,700794),
 	 (700794,2,1700794),
 	 (700794,3,2700794),
-	 (700795,1,700795);
+	 (700795,1,700795),
+	 (700796,1,700796);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700796,1,700796),
 	 (700796,2,1700796),
 	 (700796,3,2700796),
 	 (700797,1,700797),
@@ -412,9 +411,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700800,1,700800),
 	 (700801,1,700801),
 	 (700802,1,700802),
-	 (700803,1,700803);
+	 (700803,1,700803),
+	 (700804,1,700804);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700804,1,700804),
 	 (700805,1,700805),
 	 (700805,2,1700805),
 	 (700805,3,2700805),
@@ -423,9 +422,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700808,2,1700808),
 	 (700808,3,2700808),
 	 (700809,1,700809),
-	 (700810,1,700810);
+	 (700810,1,700810),
+	 (700810,2,1700810);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700810,2,1700810),
 	 (700810,3,2700810),
 	 (700811,1,700811),
 	 (700811,2,1700811),
@@ -434,9 +433,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700812,2,1700812),
 	 (700812,3,2700812),
 	 (700813,1,700813),
-	 (700814,1,700814);
+	 (700814,1,700814),
+	 (700814,2,1700814);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700814,2,1700814),
 	 (700814,3,2700814),
 	 (700815,1,700815),
 	 (700815,2,1700815),
@@ -445,9 +444,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700816,2,1700816),
 	 (700816,3,2700816),
 	 (700817,1,700817),
-	 (700817,2,1700817);
+	 (700817,2,1700817),
+	 (700817,3,2700817);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700817,3,2700817),
 	 (700818,1,700818),
 	 (700819,1,700819),
 	 (700820,1,700820),
@@ -456,9 +455,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700821,1,700821),
 	 (700822,1,700822),
 	 (700822,2,1700822),
-	 (700822,3,2700822);
+	 (700822,3,2700822),
+	 (700823,1,700823);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700823,1,700823),
 	 (700824,1,700824),
 	 (700824,2,1700824),
 	 (700824,3,2700824),
@@ -467,9 +466,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700826,2,1700826),
 	 (700826,3,2700826),
 	 (700827,1,700827),
-	 (700827,2,1700827);
+	 (700827,2,1700827),
+	 (700827,3,2700827);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700827,3,2700827),
 	 (700828,1,700828),
 	 (700830,1,700830),
 	 (700830,2,1700830),
@@ -478,9 +477,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700833,1,700833),
 	 (700833,2,1700833),
 	 (700833,3,2700833),
-	 (700834,1,700834);
+	 (700834,1,700834),
+	 (700835,1,700835);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700835,1,700835),
 	 (700835,2,1700835),
 	 (700835,3,2700835),
 	 (700836,1,700836),
@@ -489,9 +488,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700837,1,700837),
 	 (700838,1,700838),
 	 (700838,2,1700838),
-	 (700838,3,2700838);
+	 (700838,3,2700838),
+	 (700839,1,700839);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700839,1,700839),
 	 (700840,1,700840),
 	 (700840,2,1700840),
 	 (700840,3,2700840),
@@ -500,9 +499,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700842,2,1700842),
 	 (700842,3,2700842),
 	 (700843,1,700843),
-	 (700843,2,1700843);
+	 (700843,2,1700843),
+	 (700843,3,2700843);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700843,3,2700843),
 	 (700844,1,700844),
 	 (700846,1,700846),
 	 (700846,2,1700846),
@@ -511,9 +510,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700848,1,700848),
 	 (700848,2,1700848),
 	 (700848,3,2700848),
-	 (700849,1,700849);
+	 (700849,1,700849),
+	 (700849,2,1700849);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700849,2,1700849),
 	 (700849,3,2700849),
 	 (700850,1,700850),
 	 (700851,1,700851),
@@ -522,9 +521,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700852,1,700852),
 	 (700852,2,1700852),
 	 (700852,3,2700852),
-	 (700853,1,700853);
+	 (700853,1,700853),
+	 (700854,1,700854);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700854,1,700854),
 	 (700854,2,1700854),
 	 (700854,3,2700854),
 	 (700855,1,700855),
@@ -533,9 +532,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700856,1,700856),
 	 (700857,1,700857),
 	 (700857,2,1700857),
-	 (700857,3,2700857);
+	 (700857,3,2700857),
+	 (700858,1,700858);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700858,1,700858),
 	 (700858,2,1700858),
 	 (700858,3,2700858),
 	 (700859,1,700859),
@@ -544,9 +543,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700861,2,1700861),
 	 (700861,3,2700861),
 	 (700862,1,700862),
-	 (700862,2,1700862);
+	 (700862,2,1700862),
+	 (700862,3,2700862);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700862,3,2700862),
 	 (700863,1,700863),
 	 (700864,1,700864),
 	 (700865,1,700865),
@@ -555,9 +554,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700867,1,700867),
 	 (700868,1,700868),
 	 (700868,2,1700868),
-	 (700868,3,2700868);
+	 (700868,3,2700868),
+	 (700869,1,700869);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700869,1,700869),
 	 (700869,2,1700869),
 	 (700869,3,2700869),
 	 (700870,1,700870),
@@ -566,9 +565,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700871,1,700871),
 	 (700872,1,700872),
 	 (700872,2,1700872),
-	 (700872,3,2700872);
+	 (700872,3,2700872),
+	 (700873,1,700873);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700873,1,700873),
 	 (700874,1,700874),
 	 (700875,1,700875),
 	 (700875,2,1700875),
@@ -577,9 +576,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700876,2,1700876),
 	 (700876,3,2700876),
 	 (700877,1,700877),
-	 (700877,2,1700877);
+	 (700877,2,1700877),
+	 (700877,3,2700877);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700877,3,2700877),
 	 (700878,1,700878),
 	 (700879,1,700879),
 	 (700879,2,1700879),
@@ -588,9 +587,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700880,2,1700880),
 	 (700880,3,2700880),
 	 (700881,1,700881),
-	 (700882,1,700882);
+	 (700882,1,700882),
+	 (700883,1,700883);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700883,1,700883),
 	 (700883,2,1700883),
 	 (700883,3,2700883),
 	 (700884,1,700884),
@@ -599,9 +598,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700885,1,700885),
 	 (700885,2,1700885),
 	 (700885,3,2700885),
-	 (700887,1,700887);
+	 (700887,1,700887),
+	 (700888,1,700888);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700888,1,700888),
 	 (700888,2,1700888),
 	 (700888,3,2700888),
 	 (700889,1,700889),
@@ -610,9 +609,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700890,3,2700890),
 	 (700891,1,700891),
 	 (700892,1,700892),
-	 (700892,2,1700892);
+	 (700892,2,1700892),
+	 (700892,3,2700892);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700892,3,2700892),
 	 (700893,1,700893),
 	 (700893,2,1700893),
 	 (700893,3,2700893),
@@ -621,9 +620,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700896,1,700896),
 	 (700897,1,700897),
 	 (700897,2,1700897),
-	 (700897,3,2700897);
+	 (700897,3,2700897),
+	 (700898,1,700898);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700898,1,700898),
 	 (700899,1,700899),
 	 (700901,1,700901),
 	 (700901,2,1700901),
@@ -632,9 +631,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700902,2,1700902),
 	 (700902,3,2700902),
 	 (700903,1,700903),
-	 (700904,1,700904);
+	 (700904,1,700904),
+	 (700904,2,1700904);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700904,2,1700904),
 	 (700904,3,2700904),
 	 (700905,1,700905),
 	 (700905,2,1700905),
@@ -643,9 +642,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700907,1,700907),
 	 (700907,2,1700907),
 	 (700907,3,2700907),
-	 (700908,1,700908);
+	 (700908,1,700908),
+	 (700909,1,700909);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700909,1,700909),
 	 (700909,2,1700909),
 	 (700909,3,2700909),
 	 (700910,1,700910),
@@ -654,9 +653,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700911,3,2700911),
 	 (700912,1,700912),
 	 (700912,2,1700912),
-	 (700912,3,2700912);
+	 (700912,3,2700912),
+	 (700913,1,700913);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700913,1,700913),
 	 (700914,1,700914),
 	 (700915,1,700915),
 	 (700916,1,700916),
@@ -665,9 +664,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700917,3,2700917),
 	 (700918,1,700918),
 	 (700919,1,700919),
-	 (700920,1,700920);
+	 (700920,1,700920),
+	 (700920,2,1700920);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700920,2,1700920),
 	 (700920,3,2700920),
 	 (700921,1,700921),
 	 (700922,1,700922),
@@ -676,9 +675,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700925,1,700925),
 	 (700926,1,700926),
 	 (700926,2,1700926),
-	 (700926,3,2700926);
+	 (700926,3,2700926),
+	 (700927,1,700927);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700927,1,700927),
 	 (700927,2,1700927),
 	 (700927,3,2700927),
 	 (700928,1,700928),
@@ -687,9 +686,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700929,1,700929),
 	 (700930,1,700930),
 	 (700931,1,700931),
-	 (700932,1,700932);
+	 (700932,1,700932),
+	 (700933,1,700933);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700933,1,700933),
 	 (700933,2,1700933),
 	 (700933,3,2700933),
 	 (700934,1,700934),
@@ -698,9 +697,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700936,2,1700936),
 	 (700936,3,2700936),
 	 (700937,1,700937),
-	 (700938,1,700938);
+	 (700938,1,700938),
+	 (700938,2,1700938);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700938,2,1700938),
 	 (700938,3,2700938),
 	 (700939,1,700939),
 	 (700939,2,1700939),
@@ -709,9 +708,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700940,2,1700940),
 	 (700940,3,2700940),
 	 (700941,1,700941),
-	 (700941,2,1700941);
+	 (700941,2,1700941),
+	 (700941,3,2700941);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700941,3,2700941),
 	 (700942,1,700942),
 	 (700943,1,700943),
 	 (700943,2,1700943),
@@ -720,9 +719,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700944,2,1700944),
 	 (700944,3,2700944),
 	 (700945,1,700945),
-	 (700945,2,1700945);
+	 (700945,2,1700945),
+	 (700945,3,2700945);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700945,3,2700945),
 	 (700946,1,700946),
 	 (700947,1,700947),
 	 (700947,2,1700947),
@@ -731,9 +730,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700949,2,1700949),
 	 (700949,3,2700949),
 	 (700950,1,700950),
-	 (700951,1,700951);
+	 (700951,1,700951),
+	 (700951,2,1700951);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700951,2,1700951),
 	 (700951,3,2700951),
 	 (700952,1,700952),
 	 (700953,1,700953),
@@ -742,9 +741,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700954,1,700954),
 	 (700955,1,700955),
 	 (700956,1,700956),
-	 (700957,1,700957);
+	 (700957,1,700957),
+	 (700957,2,1700957);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700957,2,1700957),
 	 (700957,3,2700957),
 	 (700958,1,700958),
 	 (700958,2,1700958),
@@ -753,9 +752,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700960,1,700960),
 	 (700960,2,1700960),
 	 (700960,3,2700960),
-	 (700961,1,700961);
+	 (700961,1,700961),
+	 (700962,1,700962);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700962,1,700962),
 	 (700962,2,1700962),
 	 (700962,3,2700962),
 	 (700963,1,700963),
@@ -764,9 +763,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700964,1,700964),
 	 (700964,2,1700964),
 	 (700964,3,2700964),
-	 (700965,1,700965);
+	 (700965,1,700965),
+	 (700965,2,1700965);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700965,2,1700965),
 	 (700965,3,2700965),
 	 (700966,1,700966),
 	 (700966,2,1700966),
@@ -775,9 +774,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700967,2,1700967),
 	 (700967,3,2700967),
 	 (700968,1,700968),
-	 (700969,1,700969);
+	 (700969,1,700969),
+	 (700969,2,1700969);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700969,2,1700969),
 	 (700969,3,2700969),
 	 (700970,1,700970),
 	 (700970,2,1700970),
@@ -786,9 +785,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700972,1,700972),
 	 (700973,1,700973),
 	 (700974,1,700974),
-	 (700974,2,1700974);
+	 (700974,2,1700974),
+	 (700974,3,2700974);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700974,3,2700974),
 	 (700975,1,700975),
 	 (700976,1,700976),
 	 (700977,1,700977),
@@ -797,9 +796,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700978,1,700978),
 	 (700979,1,700979),
 	 (700979,2,1700979),
-	 (700979,3,2700979);
+	 (700979,3,2700979),
+	 (700980,1,700980);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700980,1,700980),
 	 (700980,2,1700980),
 	 (700980,3,2700980),
 	 (700981,1,700981),
@@ -808,9 +807,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700982,3,2700982),
 	 (700983,1,700983),
 	 (700983,2,1700983),
-	 (700983,3,2700983);
+	 (700983,3,2700983),
+	 (700984,1,700984);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700984,1,700984),
 	 (700984,2,1700984),
 	 (700984,3,2700984),
 	 (700985,1,700985),
@@ -819,9 +818,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700986,1,700986),
 	 (700986,2,1700986),
 	 (700986,3,2700986),
-	 (700987,1,700987);
+	 (700987,1,700987),
+	 (700988,1,700988);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700988,1,700988),
 	 (700988,2,1700988),
 	 (700988,3,2700988),
 	 (700989,1,700989),
@@ -830,9 +829,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700990,1,700990),
 	 (700990,2,1700990),
 	 (700990,3,2700990),
-	 (700991,1,700991);
+	 (700991,1,700991),
+	 (700992,1,700992);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700992,1,700992),
 	 (700993,1,700993),
 	 (700994,1,700994),
 	 (700995,1,700995),
@@ -841,9 +840,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (700996,1,700996),
 	 (700997,1,700997),
 	 (700997,2,1700997),
-	 (700997,3,2700997);
+	 (700997,3,2700997),
+	 (700998,1,700998);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (700998,1,700998),
 	 (700999,1,700999),
 	 (701000,1,701000),
 	 (701001,1,701001),
@@ -852,9 +851,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701003,2,1701003),
 	 (701003,3,2701003),
 	 (701004,1,701004),
-	 (701005,1,701005);
+	 (701005,1,701005),
+	 (701005,2,1701005);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701005,2,1701005),
 	 (701005,3,2701005),
 	 (701006,1,701006),
 	 (701007,1,701007),
@@ -863,9 +862,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701008,1,701008),
 	 (701008,2,1701008),
 	 (701008,3,2701008),
-	 (701009,1,701009);
+	 (701009,1,701009),
+	 (701009,2,1701009);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701009,2,1701009),
 	 (701009,3,2701009),
 	 (701010,1,701010),
 	 (701010,2,1701010),
@@ -874,9 +873,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701011,2,1701011),
 	 (701011,3,2701011),
 	 (701012,1,701012),
-	 (701012,2,1701012);
+	 (701012,2,1701012),
+	 (701012,3,2701012);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701012,3,2701012),
 	 (701013,1,701013),
 	 (701013,2,1701013),
 	 (701013,3,2701013),
@@ -885,9 +884,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701014,3,2701014),
 	 (701015,1,701015),
 	 (701015,2,1701015),
-	 (701015,3,2701015);
+	 (701015,3,2701015),
+	 (701016,1,701016);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701016,1,701016),
 	 (701017,1,701017),
 	 (701018,1,701018),
 	 (701018,2,1701018),
@@ -896,9 +895,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701019,2,1701019),
 	 (701019,3,2701019),
 	 (701020,1,701020),
-	 (701020,2,1701020);
+	 (701020,2,1701020),
+	 (701020,3,2701020);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701020,3,2701020),
 	 (701021,1,701021),
 	 (701021,2,1701021),
 	 (701021,3,2701021),
@@ -907,9 +906,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701022,3,2701022),
 	 (701023,1,701023),
 	 (701024,1,701024),
-	 (701025,1,701025);
+	 (701025,1,701025),
+	 (701025,2,1701025);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701025,2,1701025),
 	 (701025,3,2701025),
 	 (701026,1,701026),
 	 (701027,1,701027),
@@ -918,9 +917,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701028,1,701028),
 	 (701029,1,701029),
 	 (701031,1,701031),
-	 (701032,1,701032);
+	 (701032,1,701032),
+	 (701032,2,1701032);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701032,2,1701032),
 	 (701032,3,2701032),
 	 (701033,1,701033),
 	 (701033,2,1701033),
@@ -929,9 +928,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701035,1,701035),
 	 (701035,2,1701035),
 	 (701035,3,2701035),
-	 (701036,1,701036);
+	 (701036,1,701036),
+	 (701037,1,701037);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701037,1,701037),
 	 (701037,2,1701037),
 	 (701037,3,2701037),
 	 (701038,1,701038),
@@ -940,9 +939,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701039,1,701039),
 	 (701039,2,1701039),
 	 (701039,3,2701039),
-	 (701040,1,701040);
+	 (701040,1,701040),
+	 (701040,2,1701040);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701040,2,1701040),
 	 (701040,3,2701040),
 	 (701041,1,701041),
 	 (701041,2,1701041),
@@ -951,9 +950,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701042,2,1701042),
 	 (701042,3,2701042),
 	 (701043,1,701043),
-	 (701044,1,701044);
+	 (701044,1,701044),
+	 (701046,1,701046);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701046,1,701046),
 	 (701046,2,1701046),
 	 (701046,3,2701046),
 	 (701047,1,701047),
@@ -962,9 +961,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701050,2,1701050),
 	 (701050,3,2701050),
 	 (701052,1,701052),
-	 (701052,2,1701052);
+	 (701052,2,1701052),
+	 (701052,3,2701052);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701052,3,2701052),
 	 (701053,1,701053),
 	 (701054,1,701054),
 	 (701054,2,1701054),
@@ -973,9 +972,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701056,1,701056),
 	 (701057,1,701057),
 	 (701057,2,1701057),
-	 (701057,3,2701057);
+	 (701057,3,2701057),
+	 (701059,1,701059);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701059,1,701059),
 	 (701060,1,701060),
 	 (701060,2,1701060),
 	 (701060,3,2701060),
@@ -984,9 +983,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701061,3,2701061),
 	 (701062,1,701062),
 	 (701062,2,1701062),
-	 (701062,3,2701062);
+	 (701062,3,2701062),
+	 (701063,1,701063);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701063,1,701063),
 	 (701064,1,701064),
 	 (701066,1,701066),
 	 (701066,2,1701066),
@@ -995,9 +994,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701067,2,1701067),
 	 (701067,3,2701067),
 	 (701068,1,701068),
-	 (701069,1,701069);
+	 (701069,1,701069),
+	 (701070,1,701070);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701070,1,701070),
 	 (701070,2,1701070),
 	 (701070,3,2701070),
 	 (701071,1,701071),
@@ -1006,9 +1005,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701072,1,701072),
 	 (701072,2,1701072),
 	 (701072,3,2701072),
-	 (701073,1,701073);
+	 (701073,1,701073),
+	 (701074,1,701074);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701074,1,701074),
 	 (701074,2,1701074),
 	 (701074,3,2701074),
 	 (701075,1,701075),
@@ -1017,9 +1016,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701076,1,701076),
 	 (701076,2,1701076),
 	 (701076,3,2701076),
-	 (701077,1,701077);
+	 (701077,1,701077),
+	 (701078,1,701078);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701078,1,701078),
 	 (701079,1,701079),
 	 (701080,1,701080),
 	 (701080,2,1701080),
@@ -1028,9 +1027,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701081,2,1701081),
 	 (701081,3,2701081),
 	 (701082,1,701082),
-	 (701082,2,1701082);
+	 (701082,2,1701082),
+	 (701082,3,2701082);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701082,3,2701082),
 	 (701083,1,701083),
 	 (701083,2,1701083),
 	 (701083,3,2701083),
@@ -1039,9 +1038,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701084,3,2701084),
 	 (701085,1,701085),
 	 (701086,1,701086),
-	 (701086,2,1701086);
+	 (701086,2,1701086),
+	 (701086,3,2701086);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701086,3,2701086),
 	 (701087,1,701087),
 	 (701088,1,701088),
 	 (701088,2,1701088),
@@ -1050,9 +1049,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701089,2,1701089),
 	 (701089,3,2701089),
 	 (701090,1,701090),
-	 (701091,1,701091);
+	 (701091,1,701091),
+	 (701092,1,701092);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701092,1,701092),
 	 (701092,2,1701092),
 	 (701092,3,2701092),
 	 (701093,1,701093),
@@ -1061,9 +1060,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701094,1,701094),
 	 (701094,2,1701094),
 	 (701094,3,2701094),
-	 (701096,1,701096);
+	 (701096,1,701096),
+	 (701096,2,1701096);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701096,2,1701096),
 	 (701096,3,2701096),
 	 (701097,1,701097),
 	 (701097,2,1701097),
@@ -1072,9 +1071,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701099,1,701099),
 	 (701099,2,1701099),
 	 (701099,3,2701099),
-	 (701100,1,701100);
+	 (701100,1,701100),
+	 (701100,2,1701100);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701100,2,1701100),
 	 (701100,3,2701100),
 	 (701101,1,701101),
 	 (701101,2,1701101),
@@ -1083,9 +1082,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701102,2,1701102),
 	 (701102,3,2701102),
 	 (701103,1,701103),
-	 (701104,1,701104);
+	 (701104,1,701104),
+	 (701105,1,701105);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701105,1,701105),
 	 (701105,2,1701105),
 	 (701105,3,2701105),
 	 (701106,1,701106),
@@ -1094,9 +1093,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701107,3,2701107),
 	 (701108,1,701108),
 	 (701109,1,701109),
-	 (701109,2,1701109);
+	 (701109,2,1701109),
+	 (701109,3,2701109);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701109,3,2701109),
 	 (701110,1,701110),
 	 (701110,2,1701110),
 	 (701110,3,2701110),
@@ -1105,9 +1104,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701112,2,1701112),
 	 (701112,3,2701112),
 	 (701113,1,701113),
-	 (701114,1,701114);
+	 (701114,1,701114),
+	 (701115,1,701115);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701115,1,701115),
 	 (701116,1,701116),
 	 (701117,1,701117),
 	 (701117,2,1701117),
@@ -1116,9 +1115,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701118,2,1701118),
 	 (701118,3,2701118),
 	 (701119,1,701119),
-	 (701120,1,701120);
+	 (701120,1,701120),
+	 (701120,2,1701120);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701120,2,1701120),
 	 (701120,3,2701120),
 	 (701121,1,701121),
 	 (701122,1,701122),
@@ -1127,9 +1126,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701123,1,701123),
 	 (701124,1,701124),
 	 (701124,2,1701124),
-	 (701124,3,2701124);
+	 (701124,3,2701124),
+	 (701125,1,701125);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701125,1,701125),
 	 (701126,1,701126),
 	 (701126,2,1701126),
 	 (701126,3,2701126),
@@ -1138,9 +1137,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701128,2,1701128),
 	 (701128,3,2701128),
 	 (701129,1,701129),
-	 (701129,2,1701129);
+	 (701129,2,1701129),
+	 (701129,3,2701129);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701129,3,2701129),
 	 (701130,1,701130),
 	 (701131,1,701131),
 	 (701132,1,701132),
@@ -1149,9 +1148,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701133,1,701133),
 	 (701134,1,701134),
 	 (701134,2,1701134),
-	 (701134,3,2701134);
+	 (701134,3,2701134),
+	 (701135,1,701135);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701135,1,701135),
 	 (701135,2,1701135),
 	 (701135,3,2701135),
 	 (701136,1,701136),
@@ -1160,9 +1159,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701137,3,2701137),
 	 (701138,1,701138),
 	 (701139,1,701139),
-	 (701140,1,701140);
+	 (701140,1,701140),
+	 (701141,1,701141);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701141,1,701141),
 	 (701141,2,1701141),
 	 (701141,3,2701141),
 	 (701142,1,701142),
@@ -1171,9 +1170,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701143,1,701143),
 	 (701144,1,701144),
 	 (701144,2,1701144),
-	 (701144,3,2701144);
+	 (701144,3,2701144),
+	 (701145,1,701145);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701145,1,701145),
 	 (701145,2,1701145),
 	 (701145,3,2701145),
 	 (701146,1,701146),
@@ -1182,9 +1181,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701149,1,701149),
 	 (701150,1,701150),
 	 (701150,2,1701150),
-	 (701150,3,2701150);
+	 (701150,3,2701150),
+	 (701151,1,701151);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701151,1,701151),
 	 (701151,2,1701151),
 	 (701151,3,2701151),
 	 (701152,1,701152),
@@ -1193,9 +1192,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701155,1,701155),
 	 (701157,1,701157),
 	 (701157,2,1701157),
-	 (701157,3,2701157);
+	 (701157,3,2701157),
+	 (701158,1,701158);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701158,1,701158),
 	 (701160,1,701160),
 	 (701161,1,701161),
 	 (701162,1,701162),
@@ -1204,9 +1203,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701163,1,701163),
 	 (701163,2,1701163),
 	 (701163,3,2701163),
-	 (701164,1,701164);
+	 (701164,1,701164),
+	 (701164,2,1701164);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701164,2,1701164),
 	 (701164,3,2701164),
 	 (701165,1,701165),
 	 (701165,2,1701165),
@@ -1215,9 +1214,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701166,2,1701166),
 	 (701166,3,2701166),
 	 (701167,1,701167),
-	 (701167,2,1701167);
+	 (701167,2,1701167),
+	 (701167,3,2701167);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701167,3,2701167),
 	 (701168,1,701168),
 	 (701169,1,701169),
 	 (701170,1,701170),
@@ -1226,9 +1225,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701171,1,701171),
 	 (701172,1,701172),
 	 (701172,2,1701172),
-	 (701172,3,2701172);
+	 (701172,3,2701172),
+	 (701173,1,701173);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701173,1,701173),
 	 (701173,2,1701173),
 	 (701173,3,2701173),
 	 (701174,1,701174),
@@ -1237,9 +1236,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701177,1,701177),
 	 (701177,2,1701177),
 	 (701177,3,2701177),
-	 (701178,1,701178);
+	 (701178,1,701178),
+	 (701179,1,701179);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701179,1,701179),
 	 (701179,2,1701179),
 	 (701179,3,2701179),
 	 (701180,1,701180),
@@ -1248,9 +1247,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701183,1,701183),
 	 (701183,2,1701183),
 	 (701183,3,2701183),
-	 (701184,1,701184);
+	 (701184,1,701184),
+	 (701186,1,701186);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701186,1,701186),
 	 (701186,2,1701186),
 	 (701186,3,2701186),
 	 (701187,1,701187),
@@ -1259,9 +1258,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701190,1,701190),
 	 (701190,2,1701190),
 	 (701190,3,2701190),
-	 (701191,1,701191);
+	 (701191,1,701191),
+	 (701192,1,701192);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701192,1,701192),
 	 (701192,2,1701192),
 	 (701192,3,2701192),
 	 (701193,1,701193),
@@ -1270,9 +1269,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701194,3,2701194),
 	 (701196,1,701196),
 	 (701196,2,1701196),
-	 (701196,3,2701196);
+	 (701196,3,2701196),
+	 (701197,1,701197);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701197,1,701197),
 	 (701198,1,701198),
 	 (701198,2,1701198),
 	 (701198,3,2701198),
@@ -1281,9 +1280,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701201,1,701201),
 	 (701202,1,701202),
 	 (701202,2,1701202),
-	 (701202,3,2701202);
+	 (701202,3,2701202),
+	 (701203,1,701203);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701203,1,701203),
 	 (701203,2,1701203),
 	 (701203,3,2701203),
 	 (701204,1,701204),
@@ -1292,9 +1291,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701205,1,701205),
 	 (701206,1,701206),
 	 (701206,2,1701206),
-	 (701206,3,2701206);
+	 (701206,3,2701206),
+	 (701207,1,701207);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701207,1,701207),
 	 (701208,1,701208),
 	 (701209,1,701209),
 	 (701209,2,1701209),
@@ -1303,9 +1302,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701210,2,1701210),
 	 (701210,3,2701210),
 	 (701211,1,701211),
-	 (701211,2,1701211);
+	 (701211,2,1701211),
+	 (701211,3,2701211);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701211,3,2701211),
 	 (701212,1,701212),
 	 (701212,2,1701212),
 	 (701212,3,2701212),
@@ -1314,9 +1313,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701213,3,2701213),
 	 (701214,1,701214),
 	 (701214,2,1701214),
-	 (701214,3,2701214);
+	 (701214,3,2701214),
+	 (701215,1,701215);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701215,1,701215),
 	 (701216,1,701216),
 	 (701216,2,1701216),
 	 (701216,3,2701216),
@@ -1325,9 +1324,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701217,3,2701217),
 	 (701218,1,701218),
 	 (701220,1,701220),
-	 (701220,2,1701220);
+	 (701220,2,1701220),
+	 (701220,3,2701220);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701220,3,2701220),
 	 (701221,1,701221),
 	 (701222,1,701222),
 	 (701222,2,1701222),
@@ -1336,9 +1335,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701224,1,701224),
 	 (701225,1,701225),
 	 (701225,2,1701225),
-	 (701225,3,2701225);
+	 (701225,3,2701225),
+	 (701226,1,701226);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701226,1,701226),
 	 (701227,1,701227),
 	 (701227,2,1701227),
 	 (701227,3,2701227),
@@ -1347,9 +1346,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701228,3,2701228),
 	 (701229,1,701229),
 	 (701230,1,701230),
-	 (701230,2,1701230);
+	 (701230,2,1701230),
+	 (701230,3,2701230);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701230,3,2701230),
 	 (701231,1,701231),
 	 (701232,1,701232),
 	 (701233,1,701233),
@@ -1358,9 +1357,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701234,3,2701234),
 	 (701235,1,701235),
 	 (701235,2,1701235),
-	 (701235,3,2701235);
+	 (701235,3,2701235),
+	 (701236,1,701236);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701236,1,701236),
 	 (701237,1,701237),
 	 (701237,2,1701237),
 	 (701237,3,2701237),
@@ -1369,9 +1368,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701238,3,2701238),
 	 (701239,1,701239),
 	 (701240,1,701240),
-	 (701240,2,1701240);
+	 (701240,2,1701240),
+	 (701240,3,2701240);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701240,3,2701240),
 	 (701241,1,701241),
 	 (701242,1,701242),
 	 (701242,2,1701242),
@@ -1380,9 +1379,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701243,2,1701243),
 	 (701243,3,2701243),
 	 (701244,1,701244),
-	 (701245,1,701245);
+	 (701245,1,701245),
+	 (701245,2,1701245);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701245,2,1701245),
 	 (701245,3,2701245),
 	 (701246,1,701246),
 	 (701246,2,1701246),
@@ -1391,9 +1390,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701248,1,701248),
 	 (701248,2,1701248),
 	 (701248,3,2701248),
-	 (701249,1,701249);
+	 (701249,1,701249),
+	 (701250,1,701250);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701250,1,701250),
 	 (701250,2,1701250),
 	 (701250,3,2701250),
 	 (701251,1,701251),
@@ -1402,9 +1401,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701252,3,2701252),
 	 (701253,1,701253),
 	 (701253,2,1701253),
-	 (701253,3,2701253);
+	 (701253,3,2701253),
+	 (701254,1,701254);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701254,1,701254),
 	 (701255,1,701255),
 	 (701255,2,1701255),
 	 (701255,3,2701255),
@@ -1413,9 +1412,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701257,2,1701257),
 	 (701257,3,2701257),
 	 (701258,1,701258),
-	 (701260,1,701260);
+	 (701260,1,701260),
+	 (701260,2,1701260);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701260,2,1701260),
 	 (701260,3,2701260),
 	 (701261,1,701261),
 	 (701261,2,1701261),
@@ -1424,9 +1423,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701262,2,1701262),
 	 (701262,3,2701262),
 	 (701263,1,701263),
-	 (701263,2,1701263);
+	 (701263,2,1701263),
+	 (701263,3,2701263);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701263,3,2701263),
 	 (701264,1,701264),
 	 (701265,1,701265),
 	 (701265,2,1701265),
@@ -1435,9 +1434,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701266,2,1701266),
 	 (701266,3,2701266),
 	 (701267,1,701267),
-	 (701268,1,701268);
+	 (701268,1,701268),
+	 (701268,2,1701268);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701268,2,1701268),
 	 (701268,3,2701268),
 	 (701269,1,701269),
 	 (701269,2,1701269),
@@ -1446,9 +1445,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701271,1,701271),
 	 (701271,2,1701271),
 	 (701271,3,2701271),
-	 (701272,1,701272);
+	 (701272,1,701272),
+	 (701272,2,1701272);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701272,2,1701272),
 	 (701272,3,2701272),
 	 (701273,1,701273),
 	 (701274,1,701274),
@@ -1457,9 +1456,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701275,1,701275),
 	 (701276,1,701276),
 	 (701276,2,1701276),
-	 (701276,3,2701276);
+	 (701276,3,2701276),
+	 (701277,1,701277);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701277,1,701277),
 	 (701278,1,701278),
 	 (701280,1,701280),
 	 (701280,2,1701280),
@@ -1468,9 +1467,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701282,1,701282),
 	 (701282,2,1701282),
 	 (701282,3,2701282),
-	 (701283,1,701283);
+	 (701283,1,701283),
+	 (701284,1,701284);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701284,1,701284),
 	 (701284,2,1701284),
 	 (701284,3,2701284),
 	 (701285,1,701285),
@@ -1479,9 +1478,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701286,3,2701286),
 	 (701287,1,701287),
 	 (701288,1,701288),
-	 (701289,1,701289);
+	 (701289,1,701289),
+	 (701289,2,1701289);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (701289,2,1701289),
 	 (701289,3,2701289),
 	 (701290,1,701290),
 	 (701292,1,701292),
@@ -1490,9 +1489,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (701293,1,701293),
 	 (701294,1,701294),
 	 (800803,1,800803),
-	 (800804,1,800804);
+	 (800804,1,800804),
+	 (800805,1,800805);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800805,1,800805),
 	 (800806,1,800806),
 	 (800807,1,800807),
 	 (800808,1,800808),
@@ -1501,9 +1500,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800815,1,800815),
 	 (800816,1,800816),
 	 (800817,1,800817),
-	 (800818,1,800818);
+	 (800818,1,800818),
+	 (800819,1,800819);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800819,1,800819),
 	 (800820,1,800820),
 	 (800821,1,800821),
 	 (800822,1,800822),
@@ -1512,9 +1511,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800825,1,800825),
 	 (800826,1,800826),
 	 (800827,1,800827),
-	 (800828,1,800828);
+	 (800828,1,800828),
+	 (800829,1,800829);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800829,1,800829),
 	 (800830,1,800830),
 	 (800831,1,800831),
 	 (800832,1,800832),
@@ -1523,9 +1522,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800835,1,800835),
 	 (800836,1,800836),
 	 (800837,1,800837),
-	 (800838,1,800838);
+	 (800838,1,800838),
+	 (800839,1,800839);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800839,1,800839),
 	 (800840,1,800840),
 	 (800841,1,800841),
 	 (800842,1,800842),
@@ -1534,9 +1533,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800845,1,800845),
 	 (800846,1,800846),
 	 (800847,1,800847),
-	 (800848,1,800848);
+	 (800848,1,800848),
+	 (800849,1,800849);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800849,1,800849),
 	 (800850,1,800850),
 	 (800851,1,800851),
 	 (800852,1,800852),
@@ -1545,9 +1544,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800855,1,800855),
 	 (800856,1,800856),
 	 (800857,1,800857),
-	 (800858,1,800858);
+	 (800858,1,800858),
+	 (800859,1,800859);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800859,1,800859),
 	 (800860,1,800860),
 	 (800860,2,1800860),
 	 (800860,3,2800860),
@@ -1556,9 +1555,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800863,1,800863),
 	 (800864,1,800864),
 	 (800865,1,800865),
-	 (800866,1,800866);
+	 (800866,1,800866),
+	 (800867,1,800867);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800867,1,800867),
 	 (800868,1,800868),
 	 (800869,1,800869),
 	 (800870,1,800870),
@@ -1567,9 +1566,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800871,3,2800871),
 	 (800872,1,800872),
 	 (800885,1,800885),
-	 (800886,1,800886);
+	 (800886,1,800886),
+	 (800887,1,800887);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800887,1,800887),
 	 (800888,1,800888),
 	 (800889,1,800889),
 	 (800890,1,800890),
@@ -1578,9 +1577,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800893,1,800893),
 	 (800894,1,800894),
 	 (800895,1,800895),
-	 (800896,1,800896);
+	 (800896,1,800896),
+	 (800897,1,800897);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800897,1,800897),
 	 (800898,1,800898),
 	 (800899,1,800899),
 	 (800900,1,800900),
@@ -1589,9 +1588,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800903,1,800903),
 	 (800904,1,800904),
 	 (800905,1,800905),
-	 (800906,1,800906);
+	 (800906,1,800906),
+	 (800907,1,800907);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800907,1,800907),
 	 (800908,1,800908),
 	 (800909,1,800909),
 	 (800910,1,800910),
@@ -1600,9 +1599,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800913,1,800913),
 	 (800914,1,800914),
 	 (800915,1,800915),
-	 (800916,1,800916);
+	 (800916,1,800916),
+	 (800917,1,800917);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800917,1,800917),
 	 (800918,1,800918),
 	 (800919,1,800919),
 	 (800920,1,800920),
@@ -1611,9 +1610,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800923,1,800923),
 	 (800924,1,800924),
 	 (800924,2,1800924),
-	 (800924,3,2800924);
+	 (800924,3,2800924),
+	 (800925,1,800925);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800925,1,800925),
 	 (800926,1,800926),
 	 (800927,1,800927),
 	 (800927,2,1800927),
@@ -1622,9 +1621,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800929,1,800929),
 	 (800930,1,800930),
 	 (800930,2,1800930),
-	 (800930,3,2800930);
+	 (800930,3,2800930),
+	 (800931,1,800931);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800931,1,800931),
 	 (800932,1,800932),
 	 (800933,1,800933),
 	 (800933,2,1800933),
@@ -1633,9 +1632,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800935,1,800935),
 	 (800937,1,800937),
 	 (800938,1,800938),
-	 (800938,2,1800938);
+	 (800938,2,1800938),
+	 (800938,3,2800938);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800938,3,2800938),
 	 (800939,1,800939),
 	 (800940,1,800940),
 	 (800941,1,800941),
@@ -1644,9 +1643,9 @@ INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
 	 (800945,1,800945),
 	 (800946,1,800946),
 	 (800947,1,800947),
-	 (800947,2,1800947);
+	 (800947,2,1800947),
+	 (800947,3,2800947);
 INSERT INTO acore_world.perk_ranks (perkId,`rank`,spellId) VALUES
-	 (800947,3,2800947),
 	 (800948,1,800948),
 	 (800948,2,1800948),
 	 (800948,3,2800948);
