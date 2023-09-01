@@ -751,7 +751,7 @@ public:
 
         if (TryGetCharacterActiveSpec(player, currentSpec))
         {
-            for (int i = 1; i < CharacterPerkType::MAX; i++)
+            for (int i = CharacterPerkType::ARCHETYPE; i < CharacterPerkType::MAX; i++)
                 for (auto perk : currentSpec->perks[CharacterPerkType(i)]) {
                     auto currentRank = perk.second->spell->ranks[perk.second->rank];
                     auto spell = perk.second->spell;

@@ -582,7 +582,7 @@ void Player::UpdateRating(CombatRating cr)
         auto crMask = 1 << cr;
         if ((*i)->GetMiscValue() & crMask)
             amount += int32(CalculatePct(GetStat(Stats((*i)->GetMiscValueB())),
-                (*i)->GetAmount() / 1000));
+                (float) (*i)->GetAmount()/1000.0f));
     }
     if (amount < 0)
         amount = 0;

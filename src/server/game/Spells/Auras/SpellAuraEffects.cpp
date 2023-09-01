@@ -389,6 +389,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNoImmediateEffect,                         //325 SPELL_AURA_MOD_DAMAGE_TAKEN_PCT_BEFORE_BLOCK
     &AuraEffect::HandleNoImmediateEffect,                         //326 SPELL_AURA_ADD_SPELL_BLOCK
     &AuraEffect::HandleNoImmediateEffect,                         //327 SPELL_AURA_MOD_MOVEMENT_SPEED_COMBAT
+    &AuraEffect::HandleAuraModHasteFromStat,                      //328 SPELL_AURA_MOD_HASTE_FROM_STAT
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster):
@@ -4758,6 +4759,35 @@ void AuraEffect::HandleAuraModRangedHaste(AuraApplication const* aurApp, uint8 m
     Unit* target = aurApp->GetTarget();
 
     target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)GetAmount(), apply);
+}
+
+void AuraEffect::HandleAuraModHasteFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    auto stat = target->GetStat(Stats(GetMiscValue()));
+    auto value = stat * (GetAmount()/1000.0f);
+    if (value > 0) {
+        auto type = GetMiscValueB();
+        if (type & (1 << CR_HASTE_MELEE)) {
+            target->ApplyAttackTimePercentMod(BASE_ATTACK, value, apply);
+            target->ApplyAttackTimePercentMod(OFF_ATTACK, value, apply);
+        }
+
+        if (type & (1 << CR_HASTE_RANGED)) {
+            target->ApplyAttackTimePercentMod(RANGED_ATTACK, value, apply);
+        }
+
+        if (type & (1 << CR_HASTE_SPELL)) {
+            target->ApplyCastTimePercentMod(value, apply);
+        }
+    }
 }
 
 void AuraEffect::HandleRangedAmmoHaste(AuraApplication const* aurApp, uint8 mode, bool apply) const
