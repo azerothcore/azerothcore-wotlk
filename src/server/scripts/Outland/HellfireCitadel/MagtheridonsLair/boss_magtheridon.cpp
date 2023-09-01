@@ -247,6 +247,13 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
+        me->GetCreaturesWithEntryInRange(_channelers, 200.0f, NPC_HELLFIRE_CHANNELER);
+
+        for (Creature* channeler : _channelers)
+        {
+            channeler->SetInCombatWithZone();
+        }
+
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
@@ -282,6 +289,7 @@ private:
     uint8 _currentPhase;
     uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
+    std::list<Creature*> _channelers;
 };
 
 class spell_magtheridon_blaze : public SpellScript
