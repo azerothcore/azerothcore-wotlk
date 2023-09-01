@@ -20,9 +20,9 @@ public:
 
     void HandleMessage(ForgeAddonMessage& iam) override
     {
-        if (HasItemEquiped(iam.player))
+        if (!TryStowEquipment(iam.player))
         {
-            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must remove all equiptment before prestiging.");
+            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must remove all equipment before prestiging.");
             return;
         }
 
@@ -71,10 +71,6 @@ public:
             {
                 fc->PrestigePerks(iam.player);
                 fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
-                ForgeCharacterPoint* prisCp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::PRESTIGE_COUNT);
-                prisCp->Sum++;
-
-                fc->UpdateCharPoints(iam.player, prisCp);
             }
             else {
                 auto trans = CharacterDatabase.BeginTransaction();
@@ -91,13 +87,16 @@ public:
 
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
+            ForgeCharacterPoint* prisCp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::PRESTIGE_COUNT);
             ForgeCharacterPoint* rp = fc->GetSpecPoints(iam.player, RACIAL_TREE, spec->Id);
 
             baseFcp->Sum = 0;
             fcp->Sum = 0;
+            prisCp->Sum++;
             rp->Sum = 17;
 
             fc->UpdateCharPoints(iam.player, fcp);
+            fc->UpdateCharPoints(iam.player, prisCp);
             fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);
         }
@@ -118,18 +117,27 @@ public:
 
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(iam.player->getRace(), iam.player->getClass());
         iam.player->TeleportTo(info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation);
-        iam.player->GetSession()->SetLogoutStartTime(20);
+        iam.player->GetSession()->SetLogoutStartTime(500);
     }
 
 
-    bool HasItemEquiped(Player* player)
+    bool TryStowEquipment(Player* player)
     {
-        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++) {
+        auto equipment = 0;
+        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
             if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i)) {
-                return true;
+                ItemPosCountVec off_dest;
+                auto off_msg = player->CanStoreItem(NULL_BAG, NULL_BAG, off_dest, pItem, false);
+                if (off_msg == EQUIP_ERR_OK) {
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    player->StoreItem(off_dest, pItem, true);
+                }
+                else {
+                    return false;
+                }
             }
-        }
-        return false;
+
+        return true;
     }
 
 

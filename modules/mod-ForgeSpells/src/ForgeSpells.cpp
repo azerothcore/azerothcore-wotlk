@@ -17,6 +17,7 @@
 #include <LoadWarlockSpells.cpp>
 #include <LoadWarriorSpells.cpp>
 #include <LoadShamanSpells.cpp>
+#include <LoadPerkSpells.cpp>
 
 struct SpellTooltipInfo
 {
@@ -361,7 +362,7 @@ void AddForgeSpellsScripts()
     sTopicRouter->AddHandler(new GetToolTipsHandler(pc));
     new ForgeSpellStartup(pc);
 
-    //(new LoadDKSpells())->Load();
+    (new LoadDKSpells())->Load();
     (new LoadDruidSpells())->Load();
     (new LoadHunterSpells())->Load();
     (new LoadMageSpells())->Load();
@@ -371,4 +372,5 @@ void AddForgeSpellsScripts()
     (new LoadShamanSpells())->Load();
     (new LoadWarlockSpells())->Load();
     (new LoadWarriorSpells())->Load();
+    (new LoadPerkSpells())->Load();
 }

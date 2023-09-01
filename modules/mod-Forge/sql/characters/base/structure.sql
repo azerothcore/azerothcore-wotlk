@@ -12,6 +12,7 @@ CREATE TABLE `acore_characters`.`forge_character_talents` (
   `currentrank` TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (`guid`, `spec`, `spellid`, `tabId`));
 
+drop table if exists acore_characters.forge_character_specs;
 CREATE TABLE `acore_characters`.`forge_character_specs` (
   `id` INT UNSIGNED NOT NULL,
   `guid` INT UNSIGNED NOT NULL,
@@ -21,6 +22,7 @@ CREATE TABLE `acore_characters`.`forge_character_specs` (
   `spellicon` MEDIUMINT UNSIGNED NOT NULL,
   `visability` TINYINT UNSIGNED NOT NULL,
   `charSpec` TINYINT UNSIGNED NOT NULL,
+  `archetypalRole` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`, `guid`));
 
 CREATE TABLE `acore_characters`.`forge_character_points` (

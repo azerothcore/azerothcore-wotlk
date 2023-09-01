@@ -344,7 +344,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
-
+  
     float damageMultiplier = m_spellInfo->GetEffect(effIndex).DamageMultiplier * 100;
     float damageDivisor = 1.0f;
 
@@ -678,6 +678,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         damage /= damageDivisor;
 
         m_damage += damage;
+        
     }
 }
 

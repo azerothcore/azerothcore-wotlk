@@ -24,17 +24,9 @@ public:
         if (!fc->isNumber(iam.message))
             return;
 
-        if (iam.player->GetLevel() < 2)
-            return;
-
         uint32 specId = static_cast<uint32>(std::stoul(iam.message));
         ForgeCharacterSpec* spec;
         if (fc->TryGetCharacterActiveSpec(iam.player, spec)) {
-            uint8 max = iam.player->GetLevel() / 2;
-            uint8 present = fc->CountPerks(iam.player);
-            if ((max - present) < 1) {
-                return;
-            }
 
             if (specId != iam.player->GetActiveSpec()) {
                 iam.player->SendForgeUIMsg(ForgeTopic::LEARN_PERK_ERROR, "Incorrect spec for selection request: Id "
@@ -42,16 +34,25 @@ public:
                 return;
             }
 
-            if (spec->perkQueue.empty())
-                fc->InsertNewPerksForLevelUp(iam.player, spec);
+            for (int i = CharacterPerkType::ARCHETYPE; i < CharacterPerkType::MAX; i++) {
+                auto max = i == 0 ? 1 : iam.player->GetLevel() / 2;
+                auto  present = fc->CountPerksByType(iam.player, CharacterPerkType(i));
 
-            std::string out = "";
-            std::string delim = "*";
-            for (CharacterSpecPerk* perk : spec->perkQueue.begin()->second)
-                out = out + std::to_string(perk->spell->spellId) + "^"
-                + std::to_string(perk->carryover) + delim;
+                if ((max - present) < 1)
+                    continue;
 
-            cm->SendPerkSelection(iam.player, out);
+                if (iam.player->GetLevel() < 2 && i > CharacterPerkType::ARCHETYPE)
+                    continue;
+
+                auto perkType = CharacterPerkType(i);
+                if (spec->perkQueue[perkType].empty())
+                    fc->InsertNewPerksForLevelUp(iam.player, spec, perkType);
+
+                if (!spec->perkQueue[perkType].empty())
+                    SendSelection(iam.player, spec->perkQueue[perkType].begin()->second);
+
+                return;
+            }
         }
     }
 
@@ -59,4 +60,15 @@ private:
 
     ForgeCache* fc;
     ForgeCommonMessage* cm;
+
+    void SendSelection(Player* player, std::vector<CharacterSpecPerk*> options) {
+        std::string out = "";
+        std::string delim = "*";
+
+        for (CharacterSpecPerk* perk : options)
+            out = out + std::to_string(perk->spell->spellId) + "^"
+            + std::to_string(perk->carryover) + delim;
+
+        cm->SendPerkSelection(player, out);
+    }
 };

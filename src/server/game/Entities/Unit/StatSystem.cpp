@@ -163,9 +163,11 @@ bool Player::UpdateStats(Stats stat)
             mask |= (*i)->GetMiscValue();
     if (mask)
     {
-        for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+        for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating) {
+            auto ratMask = 1 << CR_HASTE_RANGED;
             if (mask & (1 << rating))
                 ApplyRatingMod(CombatRating(rating), 0, true);
+        }
     }
     return true;
 }

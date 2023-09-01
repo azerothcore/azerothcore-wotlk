@@ -101,6 +101,8 @@ enum class ForgeTopic
     OFFER_SELECTION = 62,
     GET_PERK_CATALOGUE = 63,
     GET_INSPECT_PERKS = 64,
+    GET_ARCHETYPES = 65,
+    GET_UTILITY_PERKS = 67
 };
 
 enum class ForgeError

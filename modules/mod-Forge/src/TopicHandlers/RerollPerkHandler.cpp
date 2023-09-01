@@ -43,36 +43,39 @@ public:
             }
 
             if (iam.player->HasItemCount(REROLL_TOKEN)) {
-                iam.player->DestroyItemCount(REROLL_TOKEN,1,true);
+                for (int i = CharacterPerkType::COMBAT; i < CharacterPerkType::MAX; i++) {
+                    auto type = CharacterPerkType(i);
+                    auto csp = spec->perks[type].find(spellId);
+                    if (csp != spec->perks[type].end()) {
+                        iam.player->DestroyItemCount(REROLL_TOKEN, 1, true);
+                        auto rank = csp->second->rank;
+                        auto spell = csp->second->spell;
 
-                auto csp = spec->perks.find(spellId);
-                if (csp != spec->perks.end()) {
-                    auto rank = csp->second->rank;
-                    auto spell = csp->second->spell;
-
-                    auto rankIt = spell->ranks.find(rank);
-                    if (rankIt != spell->ranks.end())
-                        if (spell->isAura)
-                            iam.player->RemoveAura(rankIt->second);
-                        else
-                            iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
-                    rank--;
-
-                    if (rank) {
-                        rankIt = spell->ranks.find(rank);
+                        auto rankIt = spell->ranks.find(rank);
                         if (rankIt != spell->ranks.end())
                             if (spell->isAura)
-                                iam.player->AddAura(rankIt->second, iam.player);
+                                iam.player->RemoveAura(rankIt->second);
                             else
-                                iam.player->learnSpell(rankIt->second, true);
+                                iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
+                        rank--;
 
-                        csp->second->rank = rank;
-                    }
-                    else {
-                        spec->perks.erase(spellId);
-                    }
+                        if (rank) {
+                            rankIt = spell->ranks.find(rank);
+                            if (rankIt != spell->ranks.end())
+                                if (spell->isAura)
+                                    iam.player->AddAura(rankIt->second, iam.player);
+                                else
+                                    iam.player->learnSpell(rankIt->second, true);
 
-                    cm->SendPerks(iam.player, spec->Id);
+                            csp->second->rank = rank;
+                        }
+                        else {
+                            spec->perks[type].erase(spellId);
+                        }
+
+                        cm->SendPerks(iam.player, spec->Id);
+                        return;
+                    }
                 }
             }
             else {
