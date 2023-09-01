@@ -45,13 +45,3 @@ CREATE TABLE acore_characters.`character_prestige_perk_carryover` (
   PRIMARY KEY (`guid`,`specId`,`uuid`,`spellId`, `rank`),
   index (`guid`,`specId`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
-
-drop table if exists acore_world.`archetypes`;
-CREATE TABLE acore_world.`archetypes` (
-  `allowableClass` int NOT NULL default '-1',
-  `level` tinyint NOT NULL,
-  `role` tinyint DEFAULT NULL,
-  `id` int NOT NULL,
-  `isSpell` tinyint DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
