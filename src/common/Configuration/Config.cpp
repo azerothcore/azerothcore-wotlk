@@ -32,6 +32,7 @@ namespace
     std::vector<std::string> _additonalFiles;
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
+    std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
 
     // Check system configs like *server.conf*
@@ -282,9 +283,14 @@ namespace
         return result;
     }
 
+    std::string getEnvVarName(std::string const& configName)
+    {
+        return "AC_" + IniKeyToEnvVarKey(configName);
+    }
+
     Optional<std::string> EnvVarForIniKey(std::string const& key)
     {
-        std::string envKey = "AC_" + IniKeyToEnvVarKey(key);
+        std::string envKey = getEnvVarName(key);
         char* val = std::getenv(envKey.c_str());
         if (!val)
             return std::nullopt;
@@ -329,6 +335,29 @@ bool ConfigMgr::Reload()
     return true;
 }
 
+// Check the _envVarCache if the env var is there
+// if not, check the env for the value
+Optional<std::string> getEnvFromCache(std::string const& configName, std::string const& envVarName)
+{
+    auto foundInCache = _envVarCache.find(envVarName);
+    Optional<std::string> foundInEnv;
+    // If it's not in the cache
+    if (foundInCache == _envVarCache.end())
+    {
+        // Check the env itself
+        foundInEnv = EnvVarForIniKey(configName);
+        if (foundInEnv)
+        {
+            // If it's found in the env, put it in the cache
+            _envVarCache.emplace(envVarName, *foundInEnv);
+        }
+        // Return the result of checking env
+        return foundInEnv;
+    }
+
+    return foundInCache->second;
+}
+
 std::vector<std::string> ConfigMgr::OverrideWithEnvVariablesIfAny()
 {
     std::lock_guard<std::mutex> lock(_configLock);
@@ -359,8 +388,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
 
     auto const& itr = _configOptions.find(name);
     bool notFound = itr == _configOptions.end();
-    Optional<std::string> envVar = EnvVarForIniKey(name);
-    auto envVarName = "AC_" + IniKeyToEnvVarKey(name);
+    auto envVarName = getEnvVarName(name);
+    Optional<std::string> envVar = getEnvFromCache(name, envVarName);
     if (envVar)
     {
         // If showLogs and this key/value pair wasn't found in the currently saved config
@@ -406,8 +435,8 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
 {
     auto const& itr = _configOptions.find(name);
     bool notFound = itr == _configOptions.end();
-    Optional<std::string> envVar = EnvVarForIniKey(name);
-    auto envVarName = "AC_" + IniKeyToEnvVarKey(name);
+    auto envVarName = getEnvVarName(name);
+    Optional<std::string> envVar = getEnvFromCache(name, envVarName);
     if (envVar)
     {
         // If showLogs and this key/value pair wasn't found in the currently saved config
