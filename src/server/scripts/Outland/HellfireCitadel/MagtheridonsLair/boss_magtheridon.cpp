@@ -105,6 +105,7 @@ struct boss_magtheridon : public BossAI
         _castingQuake = false;
         _recentlySpoken = false;
         _magReleased = false;
+        _channelers.clear();
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
