@@ -14,3 +14,8 @@ INSERT INTO acore_world.archetype (allowableClass,`level`,`role`,id,isSpell) VAL
 	 (1488,1,0,600608,0),
 	 (1059,1,0,600702,0),
 	 (4,1,0,700821,0);
+
+
+DELETE FROM acore_world.spell_script_names where spell_id in (500546, 600608);
+INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(500546, 'spell_arch_mana_battery');
+INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(600608, 'spell_arch_wild_magic');
