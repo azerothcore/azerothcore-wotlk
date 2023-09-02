@@ -17,7 +17,7 @@ class spell_arch_wild_magic : public AuraScript
         PreventDefaultAction();
 
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo()) {
-            damage = damageInfo->GetDamage();
+            auto damage = damageInfo->GetDamage();
 
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
             auto cost = procSpell->ManaCostPercentage;
@@ -31,10 +31,6 @@ class spell_arch_wild_magic : public AuraScript
     {
         OnEffectProc += AuraEffectProcFn(spell_arch_wild_magic::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
-
-private:
-    uint32 damage;
-
 };
 
 // 500546
@@ -54,6 +50,30 @@ class spell_arch_mana_battery : public AuraScript
     void Register()
     {
         OnEffectProc += AuraEffectProcFn(spell_arch_mana_battery::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 600600
+class spell_perk_fire_explosion : public AuraScript
+{
+    PrepareAuraScript(spell_perk_fire_explosion);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (DamageInfo* damageInfo = eventInfo.GetDamageInfo()) {
+            auto damage = damageInfo->GetDamage();
+
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            if (auto player = GetOwner()->ToPlayer())
+                player->CastCustomSpell(aurEff->GetTriggerSpell(), SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true);
+        }
+    }
+
+    void Register()
+    {
+        OnEffectProc += AuraEffectProcFn(spell_perk_fire_explosion::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 

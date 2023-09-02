@@ -1212,6 +1212,9 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         case SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE:
             HandleRaidProcFromChargeWithValueAuraProc(aurApp, eventInfo);
             break;
+        case SPELL_AURA_PROC_REFUND_COOLDOWN:
+            HandleProcTriggerSpellAuraProc(aurApp, eventInfo);
+            break;
         default:
             break;
     }
@@ -6995,6 +6998,23 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
 
     DamageInfo dmgInfo(damageInfo, DOT);
     Unit::ProcDamageAndSpell(caster, damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, BASE_ATTACK, spellProto, nullptr, GetEffIndex(), nullptr, &dmgInfo);
+}
+
+void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+{
+    Unit* triggerCaster = aurApp->GetTarget();
+    Unit* triggerTarget = eventInfo.GetProcTarget();
+
+    uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    {
+        LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Triggering spell {} from aura {} proc", triggeredSpellInfo->Id, GetId());
+        triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, nullptr, this);
+    }
+    else
+    {
+        LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Could not trigger spell {} from aura {} proc, because the spell does not have an entry in Spell.dbc.", triggerSpellId, GetId());
+    }
 }
 
 void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
