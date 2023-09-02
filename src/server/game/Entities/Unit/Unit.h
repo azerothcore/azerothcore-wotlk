@@ -2613,6 +2613,7 @@ private:
     bool HandleOverrideClassScriptAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 cooldown);
     bool HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura);
     bool HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura);
+    bool HandleProcRefundSpellCooldown(AuraEffect* triggeredByAura);
 
     void UpdateSplineMovement(uint32 t_diff);
     void UpdateSplinePosition();

@@ -16415,6 +16415,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_MOD_DAMAGE_FROM_CASTER] = true;
     isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
+    isTriggerAura[SPELL_AURA_PROC_REFUND_COOLDOWN] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -16917,6 +16918,14 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                                 takeCharges = true;
                             break;
                         }
+                    case SPELL_AURA_PROC_REFUND_COOLDOWN:
+                    {
+                        LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered with value by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
+
+                        if (HandleProcRefundSpellCooldown(triggeredByAura))
+                            takeCharges = true;
+                        break;
+                    }
                     case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
                         
                         // Skip melee hits or instant cast spells
@@ -18338,6 +18347,33 @@ bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
     }
 
     CastSpell(this, damageSpellId, true, nullptr, triggeredByAura, caster_guid);
+
+    return true;
+}
+
+bool Unit::HandleProcRefundSpellCooldown(AuraEffect* triggeredByAura)
+{
+    // aura can be deleted at casts
+    SpellInfo const* spellProto = triggeredByAura->GetSpellInfo();
+    ObjectGuid caster_guid = triggeredByAura->GetCasterGUID();
+
+    if (auto player = ObjectAccessor::FindPlayer(caster_guid)) {
+        for (int effi = EFFECT_0; effi < MAX_SPELL_EFFECTS; effi++) {
+            auto effect = spellProto->Effects[effi];
+            if (SpellInfo const* refundThis = sSpellMgr->GetSpellInfo(effect.MiscValue))
+            {
+                auto refunded = refundThis->Id;
+                if (player->HasSpellCooldown(refundThis->Id)) {
+                    SpellCooldowns& cds = player->GetSpellCooldownMap();
+                    auto target = cds.find(refunded);
+                    if (target != cds.end())
+                        target->second.end = std::max((uint32)0, target->second.end - effect.CalcValue());
+
+
+                }
+            }
+        }
+    }
 
     return true;
 }

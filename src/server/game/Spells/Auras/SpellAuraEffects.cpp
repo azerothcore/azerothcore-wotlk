@@ -1214,7 +1214,7 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
             HandleRaidProcFromChargeWithValueAuraProc(aurApp, eventInfo);
             break;
         case SPELL_AURA_PROC_REFUND_COOLDOWN:
-            HandleProcTriggerSpellAuraProc(aurApp, eventInfo);
+            HandleProcRefundCooldownAuraProc(aurApp, eventInfo);
             break;
         default:
             break;

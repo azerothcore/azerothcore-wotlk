@@ -77,6 +77,59 @@ class spell_perk_fire_explosion : public AuraScript
     }
 };
 
+// Snappy anything
+class spell_perk_refund_cost : public AuraScript
+{
+    PrepareAuraScript(spell_perk_refund_cost);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellProto = aurEff->GetSpellInfo();
+
+        if (auto player = GetOwner()->ToPlayer()) {
+            auto timeOff = aurEff->GetAmount();
+            auto spell = aurEff->GetMiscValue();
+
+            if (player->HasSpellCooldown(spell)) {
+                SpellCooldowns& cds = player->GetSpellCooldownMap();
+                auto target = cds.find(spell);
+                if (target != cds.end())
+                    target->second.end = std::max((uint32)0, target->second.end - timeOff);
+            }
+        }
+    }
+
+    void Register()
+    {
+        OnEffectProc += AuraEffectProcFn(spell_perk_refund_cost::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_perk_any_proc : public AuraScript
+{
+    PrepareAuraScript(spell_perk_any_proc);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellProto = aurEff->GetSpellInfo();
+
+        if (auto player = GetOwner()->ToPlayer()) {
+            if (!player->HasSpellCooldown(aurEff->GetTriggerSpell())) {
+                player->CastSpell(eventInfo.GetActionTarget(), aurEff->GetTriggerSpell(), true);
+                player->AddSpellCooldown(aurEff->GetTriggerSpell(), 0, aurEff->GetAmount() * IN_MILLISECONDS);
+
+            }
+        }
+    }
+
+    void Register()
+    {
+        OnEffectProc += AuraEffectProcFn(spell_perk_any_proc::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 class LoadPerkSpells : LoadForgeSpells
 {
 public:
@@ -89,5 +142,7 @@ public:
     {
         RegisterSpellScript(spell_arch_wild_magic);
         RegisterSpellScript(spell_arch_mana_battery);
+        RegisterSpellScript(spell_perk_refund_cost);
+        RegisterSpellScript(spell_perk_any_proc);
     }
 };
