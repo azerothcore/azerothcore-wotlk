@@ -247,7 +247,7 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
-        instance->DoForAllMinions(DATA_MAGTHERIDON, [&](Creature* creature) {
+        instance->DoForAllMinions(TYPE_MAGTHERIDON, [&](Creature* creature) {
             creature->SetInCombatWithZone();
         });
 
