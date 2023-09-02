@@ -105,7 +105,6 @@ struct boss_magtheridon : public BossAI
         _castingQuake = false;
         _recentlySpoken = false;
         _magReleased = false;
-        _channelers.clear();
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
@@ -248,12 +247,9 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
-        me->GetCreaturesWithEntryInRange(_channelers, 200.0f, NPC_HELLFIRE_CHANNELER);
-
-        for (Creature* channeler : _channelers)
-        {
-            channeler->SetInCombatWithZone();
-        }
+        instance->DoForAllMinions(DATA_MAGTHERIDON, [&](Creature* creature) {
+            creature->SetInCombatWithZone();
+        });
 
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
@@ -290,7 +286,6 @@ private:
     uint8 _currentPhase;
     uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
-    std::list<Creature*> _channelers;
 };
 
 class spell_magtheridon_blaze : public SpellScript
