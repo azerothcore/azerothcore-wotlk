@@ -22,7 +22,12 @@ public:
     {
         if (!TryStowEquipment(iam.player))
         {
-            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must remove all equipment before prestiging.");
+            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must have enough bag space to store your equipment.");
+            return;
+        }
+
+        if (!iam.player->GetFreeInventorySpace() > 1) {
+            iam.player->SendForgeUIMsg(ForgeTopic::PRESTIGE_ERROR, "You must have enough bag space to store your prestige reward.");
             return;
         }
 
@@ -71,6 +76,8 @@ public:
             {
                 fc->PrestigePerks(iam.player);
                 fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
+
+                iam.player->AddItem(1000002, 2);
             }
             else {
                 auto trans = CharacterDatabase.BeginTransaction();
