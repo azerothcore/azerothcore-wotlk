@@ -392,7 +392,7 @@ public:
             }
         }
 
-        SendGossipMenuFor(player, 8978, creature->GetGUID());
+        SendGossipMenuFor(player, 8969, creature->GetGUID());
         return true;
     }
 
