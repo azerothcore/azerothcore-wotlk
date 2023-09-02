@@ -76,6 +76,7 @@ public:
             {
                 fc->PrestigePerks(iam.player);
                 fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_TREE, 1);
+                fc->AddCharacterPointsToAllSpecs(iam.player, CharacterPointType::PRESTIGE_COUNT, 1);
 
                 iam.player->AddItem(1000002, 2);
             }
@@ -94,16 +95,13 @@ public:
 
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
-            ForgeCharacterPoint* prisCp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::PRESTIGE_COUNT);
             ForgeCharacterPoint* rp = fc->GetSpecPoints(iam.player, RACIAL_TREE, spec->Id);
 
             baseFcp->Sum = 0;
             fcp->Sum = 0;
-            prisCp->Sum++;
             rp->Sum = 17;
 
             fc->UpdateCharPoints(iam.player, fcp);
-            fc->UpdateCharPoints(iam.player, prisCp);
             fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);
         }

@@ -426,7 +426,7 @@ public:
 
     ForgeCharacterPoint* GetSpecPoints(Player* player, CharacterPointType pointType, uint32 specId)
     {
-        if (ACCOUNT_WIDE_TYPE == pointType)
+        if (ACCOUNT_WIDE_TYPE == pointType || pointType == CharacterPointType::PRESTIGE_COUNT)
         {
             auto ptItt = AccountWidePoints.find(player->GetSession()->GetAccountId());
 
@@ -470,7 +470,7 @@ public:
 
     ForgeCharacterPoint* GetCommonCharacterPoint(Player* player, CharacterPointType pointType)
     {
-        if (pointType != ACCOUNT_WIDE_TYPE)
+        if (pointType != ACCOUNT_WIDE_TYPE || pointType == CharacterPointType::PRESTIGE_COUNT)
             return GetSpecPoints(player, pointType, UINT_MAX);
         else
             return GetSpecPoints(player, pointType);
@@ -577,7 +577,7 @@ public:
 
         for (auto pt : TALENT_POINT_TYPES)
         {
-            if (ACCOUNT_WIDE_TYPE == pt)
+            if (ACCOUNT_WIDE_TYPE == pt || pt == CharacterPointType::PRESTIGE_COUNT)
             {
                 if (actItt == AccountWideCharacterSpecs.end() || AccountWidePoints[act].find(pt) == AccountWidePoints[act].end())
                     CreateAccountBoundCharPoint(player, pt);
@@ -609,7 +609,7 @@ public:
     {
         auto charGuid = player->GetGUID();
         auto acct = player->GetSession()->GetAccountId();
-        bool isNotAccountWide = ACCOUNT_WIDE_TYPE != fp->PointType;
+        bool isNotAccountWide = ACCOUNT_WIDE_TYPE != fp->PointType && fp->PointType != CharacterPointType::PRESTIGE_COUNT;
 
         if (isNotAccountWide)
             CharacterPoints[charGuid][fp->PointType][fp->SpecId] = fp;
@@ -861,7 +861,7 @@ public:
             ccp->Sum += amount;
             UpdateCharPoints(player, ccp);
 
-            if (pointType != ACCOUNT_WIDE_TYPE)
+            if (pointType != ACCOUNT_WIDE_TYPE && pointType != CharacterPointType::PRESTIGE_COUNT)
                 for (auto& spec : CharacterSpecs[player->GetGUID()])
                 {
                     ForgeCharacterPoint* cp = GetSpecPoints(player, pointType, spec.first);
@@ -1108,7 +1108,7 @@ public:
             if (spec->prestigePerks[type].size() > 0) {
                 std::random_device rd;
                 std::mt19937 eng(rd());
-                std::uniform_int_distribution<> distr(0, spec->prestigePerks.size() - 1);
+                std::uniform_int_distribution<> distr(0, spec->prestigePerks[type].size() - 1);
                 auto index = distr(eng);
                 auto it = spec->prestigePerks[type][index];
 
