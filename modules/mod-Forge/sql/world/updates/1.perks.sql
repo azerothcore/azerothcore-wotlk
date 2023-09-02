@@ -69,7 +69,6 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (600640,1,1618,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
         (600660,1,2002,1,1,1,0,0,''),
-        (600661,1,2002,1,1,1,0,0,''),
         (600702,1,1059,1,1,0,0,0,''),
         (600705,0,1061,1,1,1,0,0,''),
         (600709,1,13,1,1,1,0,0,''),
