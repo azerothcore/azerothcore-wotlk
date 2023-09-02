@@ -782,25 +782,24 @@ struct npc_grandmother : public CreatureScript
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF)
-        {
-            AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, GRANDMOTHER_TEXT2, creature->GetGUID());
-        }
-        else if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, GRANDMOTHER_TEXT3, creature->GetGUID());
-        }
-        else if (action == GOSSIP_ACTION_INFO_DEF + 2)
-        {
-            if (Creature* pBigBadWolf = creature->SummonCreature(CREATURE_BIG_BAD_WOLF, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
-            {
-                pBigBadWolf->AI()->AttackStart(player);
-            }
-            creature->DespawnOrUnsummon();
-        }
 
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF:
+                AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, GRANDMOTHER_TEXT2, creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GRANDMOTHER_TEXT3, creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                if (Creature* pBigBadWolf = creature->SummonCreature(CREATURE_BIG_BAD_WOLF, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
+                {
+                    pBigBadWolf->AI()->AttackStart(player);
+                }
+                creature->DespawnOrUnsummon();
+        }
         return true;
     }
 
