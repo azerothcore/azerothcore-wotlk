@@ -1105,7 +1105,7 @@ public:
     CharacterSpecPerk* GetPrestigePerk(Player* player, CharacterPerkType type) {
         ForgeCharacterSpec* spec;
         if (TryGetCharacterActiveSpec(player, spec)) {
-            if (spec->prestigePerks.size() > 0) {
+            if (spec->prestigePerks[type].size() > 0) {
                 std::random_device rd;
                 std::mt19937 eng(rd());
                 std::uniform_int_distribution<> distr(0, spec->prestigePerks.size() - 1);
