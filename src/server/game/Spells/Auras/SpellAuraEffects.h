@@ -349,6 +349,7 @@ public:
 
     // aura effect proc handlers
     void HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void HandleProcRefundCooldownAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleRaidProcFromChargeAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);

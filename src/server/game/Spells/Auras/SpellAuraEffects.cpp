@@ -390,6 +390,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNoImmediateEffect,                         //326 SPELL_AURA_ADD_SPELL_BLOCK
     &AuraEffect::HandleNoImmediateEffect,                         //327 SPELL_AURA_MOD_MOVEMENT_SPEED_COMBAT
     &AuraEffect::HandleAuraModHasteFromStat,                      //328 SPELL_AURA_MOD_HASTE_FROM_STAT
+    &AuraEffect::HandleNoImmediateEffect,                         //329 SPELL_AURA_PROC_REFUND_COOLDOWN
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster):
@@ -7017,20 +7018,22 @@ void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEve
     }
 }
 
-void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+void AuraEffect::HandleProcRefundCooldownAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
     Unit* triggerCaster = aurApp->GetTarget();
     Unit* triggerTarget = eventInfo.GetProcTarget();
 
-    uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
-    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    uint32 refundedSpellId = GetSpellInfo()->Effects[GetEffIndex()].MiscValue;
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(refundedSpellId))
     {
-        LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Triggering spell {} from aura {} proc", triggeredSpellInfo->Id, GetId());
-        triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, nullptr, this);
-    }
-    else
-    {
-        LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Could not trigger spell {} from aura {} proc, because the spell does not have an entry in Spell.dbc.", triggerSpellId, GetId());
+        if (Player* player = triggerTarget->ToPlayer())
+            if (player->HasSpellCooldown(refundedSpellId)) {
+                SpellCooldowns& cds = player->GetSpellCooldownMap();
+                auto target = cds.find(refundedSpellId);
+                if (target != cds.end())
+                    target->second.end = std::max((uint32) 0, target->second.end - GetAmount());
+
+            }
     }
 }
 
