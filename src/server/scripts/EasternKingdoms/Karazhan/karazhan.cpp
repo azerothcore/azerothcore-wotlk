@@ -192,7 +192,7 @@ public:
                     }
                     break;
                 case 8:
-                    if (!m_uiEventId == EVENT_HOOD) // in red riding hood door should close when gossip with grandma is over
+                    if (m_uiEventId != EVENT_HOOD) // in red riding hood door should close when gossip with grandma is over
                     {
                         instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     }
