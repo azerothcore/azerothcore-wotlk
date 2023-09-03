@@ -404,7 +404,7 @@ public:
 
     //if we summon an entity instead of using a sort of invisible entity, we could unsummon boss on reset
     //right now that doesn't work because of how the urn works
-    bool OnGossipHello(Player* player, GameObject* go) override
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
