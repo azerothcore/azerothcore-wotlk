@@ -838,6 +838,7 @@ struct boss_bigbadwolf : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
         Talk(SAY_WOLF_AGGRO);
         DoZoneInCombat();
 
