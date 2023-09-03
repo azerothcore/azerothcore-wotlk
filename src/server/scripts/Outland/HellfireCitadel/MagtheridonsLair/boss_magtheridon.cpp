@@ -108,7 +108,7 @@ struct boss_magtheridon : public BossAI
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
-            if(!me->IsEngaged())
+            if (!me->IsEngaged())
             {
                 Talk(SAY_TAUNT);
             }
