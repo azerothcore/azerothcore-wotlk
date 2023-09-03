@@ -634,7 +634,7 @@ public:
                         {
                             Talk(EMOTE_MALLEABLE_GOO);
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                                me->CastSpell(*itr, SPELL_MALLEABLE_GOO, true);
+                                me->CastSpell(*itr, SPELL_MALLEABLE_GOO, false);
                         }
                     }
                     else
@@ -642,7 +642,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, MalleableGooSelector(me)))
                         {
                             Talk(EMOTE_MALLEABLE_GOO);
-                            me->CastSpell(target, SPELL_MALLEABLE_GOO, true);
+                            me->CastSpell(target, SPELL_MALLEABLE_GOO, false);
                         }
                     }
                     events.ScheduleEvent(EVENT_MALLEABLE_GOO, 25s, 30s, EVENT_GROUP_ABILITIES);
