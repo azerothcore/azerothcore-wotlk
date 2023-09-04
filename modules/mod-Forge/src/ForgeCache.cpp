@@ -470,7 +470,7 @@ public:
 
     ForgeCharacterPoint* GetCommonCharacterPoint(Player* player, CharacterPointType pointType)
     {
-        if (pointType != ACCOUNT_WIDE_TYPE || pointType == CharacterPointType::PRESTIGE_COUNT)
+        if (pointType != ACCOUNT_WIDE_TYPE || pointType != CharacterPointType::PRESTIGE_COUNT)
             return GetSpecPoints(player, pointType, UINT_MAX);
         else
             return GetSpecPoints(player, pointType);

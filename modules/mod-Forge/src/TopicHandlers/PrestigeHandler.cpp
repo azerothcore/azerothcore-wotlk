@@ -122,7 +122,7 @@ public:
 
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(iam.player->getRace(), iam.player->getClass());
         iam.player->TeleportTo(info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation);
-        iam.player->GetSession()->SetLogoutStartTime(500);
+        iam.player->GetSession()->SetLogoutStartTime(1500);
     }
 
 
