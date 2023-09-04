@@ -645,13 +645,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
                     {
                         if (e.action.cast.triggerFlags)
-                        {
                             triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
-                        }
                         else
-                        {
                             triggerFlags = TRIGGERED_FULL_MASK;
-                        }
                     }
 
                     me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
