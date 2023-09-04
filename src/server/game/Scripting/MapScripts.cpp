@@ -18,7 +18,6 @@
 #include "CellImpl.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "MapRefMgr.h"
