@@ -1,0 +1,3 @@
+--
+ALTER TABLE `creature`
+	ADD COLUMN `CreateObject` TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER `VerifiedBuild`;
