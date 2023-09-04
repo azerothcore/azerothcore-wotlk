@@ -702,7 +702,6 @@ public:
                     }
                 }
 
-            me->RemoveVehicleKit(); // not Crash (;
             events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
             me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
         }

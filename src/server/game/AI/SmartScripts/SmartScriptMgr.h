@@ -209,9 +209,11 @@ enum SMART_EVENT
     SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
-    SMART_EVENT_AREA_CASTING             = 104,      // spellId (0: any), range (0: any), repeatMin, repeatMax, checkTimer
+    SMART_EVENT_NEAR_UNIT_NEGATION       = 104,      // type (0: creature 1: gob), entry, count, range, timer
+    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, range
+    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, range
 
-    SMART_EVENT_AC_END                   = 105
+    SMART_EVENT_AC_END                   = 107
 };
 
 struct SmartEvent
@@ -508,12 +510,32 @@ struct SmartEvent
 
         struct
         {
-            uint32 spellId;
+            uint32 type;
+            uint32 entry;
+            uint32 count;
             uint32 range;
+            uint32 timer;
+        } nearUnitNegation;
+
+        struct
+        {
+            uint32 min;
+            uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
-            uint32 checkTimer;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } areaCasting;
+
+        struct
+        {
+            uint32 min;
+            uint32 max;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 rangeMin;
+            uint32 rangeMax;
+        } areaRange;
 
         struct
         {
@@ -522,6 +544,7 @@ struct SmartEvent
             uint32 param3;
             uint32 param4;
             uint32 param5;
+            uint32 param6;
         } raw;
     };
 
@@ -718,8 +741,10 @@ enum SMART_ACTION
     SMART_ACTION_DISABLE                            = 226,    // state
     SMART_ACTION_SET_SCALE                          = 227,    // scale
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
+    SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
+    SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
 
-    SMART_ACTION_AC_END                             = 229,    // placeholder
+    SMART_ACTION_AC_END                             = 231,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1416,6 +1441,18 @@ struct SmartAction
             uint32 stepAngle;
             uint32 dist;
         } radialSummon;
+
+        struct
+        {
+            uint32 visualId;
+        } spellVisual;
+
+        struct
+        {
+            uint32 followState;
+            uint32 followType;
+            uint32 dist;
+        } followGroup;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1820,7 +1857,9 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_NEAR_UNIT,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
-    {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_NEAR_UNIT_NEGATION,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
@@ -1848,7 +1887,18 @@ enum SmartCastFlags
     //CAST_NO_MELEE_IF_OOM        = 0x08,                     //Prevents creature from entering melee if out of mana or out of range
     //CAST_FORCE_TARGET_SELF      = 0x10,                     //Forces the target to cast this spell on itself
     SMARTCAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x40                      //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_COMBAT_MOVE            = 0x40,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x80                      //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+};
+
+enum SmartFollowType
+{
+    FOLLOW_TYPE_CIRCLE                     = 1,                  // 360 degrees around leader, 90 degrees is the maximum angle
+    FOLLOW_TYPE_SEMI_CIRCLE_BEHIND         = 2,                  // 180 degrees behind leader
+    FOLLOW_TYPE_SEMI_CIRCLE_FRONT          = 3,                  // 180 degrees in front of leader
+    FOLLOW_TYPE_LINE                       = 4,                  // front -> back -> front -> back
+    FOLLOW_TYPE_COLUMN                     = 5,                  // left -> right -> left -> right
+    FOLLOW_TYPE_ANGULAR                    = 6                   // geese-like formation 135 and 225 degrees behind leader
 };
 
 // one line in DB is one event

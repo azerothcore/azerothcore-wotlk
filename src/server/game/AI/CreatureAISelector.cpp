@@ -22,7 +22,6 @@
 #include "MovementGenerator.h"
 
 #include "GameObject.h"
-#include "GameObjectAIFactory.h"
 
 #include "ScriptMgr.h"
 
