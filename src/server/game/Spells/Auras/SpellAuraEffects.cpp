@@ -5188,29 +5188,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (caster && target->CanHaveThreatList())
                         target->AddThreat(caster, 10.0f);
                     break;
-                case 34026:   // kill command
-                    {
-                        Unit* pet = target->GetGuardianPet();
-                        if (!pet)
-                            break;
-
-                        target->CastSpell(target, 34027, true, nullptr, this);
-
-                        // set 3 stacks and 3 charges (to make all auras not disappear at once)
-                        Aura* owner_aura = target->GetAura(34027, GetCasterGUID());
-                        Aura* pet_aura  = pet->GetAura(58914, GetCasterGUID());
-                        if (owner_aura)
-                        {
-                            owner_aura->SetCharges(0);
-                            owner_aura->SetStackAmount(owner_aura->GetSpellInfo()->StackAmount);
-                            if (pet_aura)
-                            {
-                                pet_aura->SetCharges(0);
-                                pet_aura->SetStackAmount(owner_aura->GetSpellInfo()->StackAmount);
-                            }
-                        }
-                        break;
-                    }
                 case 37096:                                     // Blood Elf Illusion
                     {
                         if (caster)

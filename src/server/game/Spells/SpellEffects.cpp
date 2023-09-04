@@ -4060,6 +4060,20 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 }
                 break;
             }
+        case SPELLFAMILY_HUNTER:
+        {
+            switch (m_spellInfo->Id) {
+            case 34026: // Kill command
+            {
+                if (!unitTarget)
+                    return;
+
+                unitTarget->CastSpell(unitTarget->GetVictim(), GetSpellInfo()->Effects[effIndex].BasePoints, false);
+                return;
+            }
+            }
+            break;
+        }
     }
 
     // normal DB scripted effect

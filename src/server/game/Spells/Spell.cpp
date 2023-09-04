@@ -6195,6 +6195,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 return SPELL_FAILED_TARGET_NOT_DEAD;
                         }
                     }
+                    else if (m_spellInfo->Id == 34026) {
+                        Pet* pet = m_caster->ToPlayer()->GetPet();
+                        if (!pet || !pet->GetVictim() || !pet->IsInCombat() || !pet->IsWithinCombatRange(pet->GetVictim(), 5.0f))
+                            return SPELL_FAILED_OUT_OF_RANGE;
+                        break;
+                    }
                     break;
                 }
             case SPELL_EFFECT_LEARN_SPELL:

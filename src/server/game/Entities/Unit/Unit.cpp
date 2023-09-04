@@ -12425,6 +12425,21 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                         break;
                     }
                     break;
+                case SPELLFAMILY_HUNTER :
+                    {
+                        switch (spellProto->Id)
+                        {
+                        case 9000000: // Kill command
+                        {
+                            if (Unit* owner = GetOwner())
+                                // Improved Kill command
+                                if (AuraEffect const* aura = owner->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2221, EFFECT_0))
+                                    crit_chance += aura->GetAmount();
+                            break;
+                        }
+                        }
+                        break;
+                    }
                 case SPELLFAMILY_WARRIOR:
                     // Victory Rush
                     if (spellProto->SpellFamilyFlags[1] & 0x100)

@@ -78,6 +78,15 @@ public:
         LearnSpellsForLevel(player, player->GetLevel());
     }
 
+    void OnLogout(Player* player) override
+    {
+        if (!player)
+            return;
+
+        fc->RemoveActivePerks(player);
+        fc->RemoveTalents(player);
+    }
+
     void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         fc->DeleteCharacter(guid, accountId);
