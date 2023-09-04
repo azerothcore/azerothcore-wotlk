@@ -31,6 +31,11 @@ public:
         if (iam.message.empty())
             return;
 
+        if (iam.player->isDead())
+            return;
+
+        iam.player->UnsummonPetTemporaryIfAny();
+
         std::vector<std::string> results;
         boost::algorithm::split(results, iam.message, boost::is_any_of(";"));
 
