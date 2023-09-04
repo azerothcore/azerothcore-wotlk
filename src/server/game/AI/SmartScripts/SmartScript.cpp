@@ -599,8 +599,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     caster->CastSpell(target->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
                 }
-                else if (me && (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.cast.spell)))
+                else if (me)
                 {
+                    // If target has the aura, iterate through the target vector
+                    if ((e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || target->ToUnit()->HasAura(e.action.cast.spell))
+                        continue;
+
                     // Interrupts any other spells
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
@@ -617,19 +621,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     // If already casting another spell, retry in the next AI tick
                     if (me->HasUnitState(UNIT_STATE_CASTING))
                         RecalcTimer(e, 1200, 1200);
-
-                    TriggerCastFlags triggerFlags = TRIGGERED_NONE;
-                    if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
-                    {
-                        if (e.action.cast.triggerFlags)
-                        {
-                            triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
-                        }
-                        else
-                        {
-                            triggerFlags = TRIGGERED_FULL_MASK;
-                        }
-                    }
 
                     // Flag usable only if caster has max dist set.
                     if ((e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
@@ -650,15 +641,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         }
                     }
 
+                    TriggerCastFlags triggerFlags = TRIGGERED_NONE;
+                    if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+                    {
+                        if (e.action.cast.triggerFlags)
+                        {
+                            triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
+                        }
+                        else
+                        {
+                            triggerFlags = TRIGGERED_FULL_MASK;
+                        }
+                    }
+
                     me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
                               me->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
-                }
-                else
-                {
-                    LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
-                              e.action.cast.spell, target->GetGUID().ToString());
-                    continue; // Iterate through the target vector
                 }
             }
             break;
