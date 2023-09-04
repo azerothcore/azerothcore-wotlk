@@ -53,7 +53,7 @@ struct boss_maiden_of_virtue : public BossAI
         DoCastAOE(SPELL_HOLY_GROUND, true);
         scheduler.Schedule(25s, [this](TaskContext context)
         {
-            DoCastAOE(SPELL_REPENTANCE, true);
+            DoCastAOE(SPELL_REPENTANCE);
             Talk(SAY_REPENTANCE);
             context.Repeat(25s, 35s);
         }).Schedule(8s, [this](TaskContext context)

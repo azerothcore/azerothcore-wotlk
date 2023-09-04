@@ -20,7 +20,6 @@
 #include "SmartAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 
 enum medivhMisc
 {
