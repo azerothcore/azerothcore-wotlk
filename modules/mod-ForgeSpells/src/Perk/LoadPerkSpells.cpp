@@ -41,10 +41,10 @@ class spell_arch_mana_battery : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        auto* healInfo = eventInfo.GetHealInfo();
+        if(auto* healInfo = eventInfo.GetHealInfo())
+            if (auto player = GetOwner()->ToPlayer())
+                player->CastCustomSpell(aurEff->GetTriggerSpell(), SPELLVALUE_BASE_POINT0, healInfo->GetEffectiveHeal() * .07, eventInfo.GetProcTarget(), true);
 
-        if (auto player = GetOwner()->ToPlayer())
-            player->CastCustomSpell(aurEff->GetTriggerSpell(), SPELLVALUE_BASE_POINT0, healInfo->GetEffectiveHeal() * .07, eventInfo.GetProcTarget(), true);
     }
 
     void Register()
@@ -85,19 +85,18 @@ class spell_perk_refund_cost : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        SpellInfo const* spellProto = aurEff->GetSpellInfo();
+        if(SpellInfo const* spellProto = aurEff->GetSpellInfo())
+            if (auto player = GetOwner()->ToPlayer()) {
+                auto timeOff = aurEff->GetAmount();
+                auto spell = aurEff->GetMiscValue();
 
-        if (auto player = GetOwner()->ToPlayer()) {
-            auto timeOff = aurEff->GetAmount();
-            auto spell = aurEff->GetMiscValue();
-
-            if (player->HasSpellCooldown(spell)) {
-                SpellCooldowns& cds = player->GetSpellCooldownMap();
-                auto target = cds.find(spell);
-                if (target != cds.end())
-                    target->second.end = std::max((uint32)0, target->second.end - timeOff);
+                if (player->HasSpellCooldown(spell)) {
+                    SpellCooldowns& cds = player->GetSpellCooldownMap();
+                    auto target = cds.find(spell);
+                    if (target != cds.end())
+                        target->second.end = std::max((uint32)0, target->second.end - timeOff);
+                }
             }
-        }
     }
 
     void Register()

@@ -41,9 +41,14 @@ where it.RequiredLevel = 0 and (it.class = 2 or it.class = 4);
 update item_template it 
 inner join quest_template qt on it.entry = qt.RewardChoiceItemID4
 set it.RequiredLevel = qt.MinLevel
-where it.RequiredLevel = 0 and (it.class = 2 or it.class = 5);
+where it.RequiredLevel = 0 and (it.class = 2 or it.class = 4);
 
 update item_template it 
 inner join quest_template qt on it.entry = qt.RewardChoiceItemID4
 set it.RequiredLevel = qt.MinLevel
-where it.RequiredLevel = 0 and (it.class = 2 or it.class = 6);
+where it.RequiredLevel = 0 and (it.class = 2 or it.class = 4);
+
+UPDATE  item_template it 
+join (SELECT MAX(RequiredLevel) as RequiredLevel, ItemLevel  FROM item_template where RequiredLevel < 81 and ItemLevel > 1 group by ItemLevel) it2 on it.ItemLevel = it2.ItemLevel
+set it.Requiredlevel = it2.RequiredLevel
+where (it.RequiredLevel = 0 or it.RequiredLevel = 255) and (it.class = 2 or it.class = 4);
