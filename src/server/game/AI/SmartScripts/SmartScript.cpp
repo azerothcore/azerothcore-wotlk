@@ -601,15 +601,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (me && (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.cast.spell)))
                 {
+                    // Interrupts any other spells
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
+                    // If the threatlist is a singleton, skip cast
                     if (e.action.cast.castFlags & SMARTCAST_THREATLIST_NOT_SINGLE)
                         if (me->GetThreatMgr().GetThreatListSize() <= 1)
                             break;
 
+                    // If target has no mana, iterate through the target vector until a valid target is found
                     if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_MANA))
                         continue;
+
+                    // If already casting another spell, retry in the next AI tick
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        RecalcTimer(e, 1200, 1200);
 
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
@@ -651,6 +658,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     LOG_DEBUG("scripts.ai", "Spell {} not cast because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
                               e.action.cast.spell, target->GetGUID().ToString());
+                    continue; // Iterate through the target vector
                 }
             }
             break;
