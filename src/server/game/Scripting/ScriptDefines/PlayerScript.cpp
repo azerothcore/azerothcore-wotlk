@@ -76,7 +76,7 @@ void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 
 bool ScriptMgr::OnCanPlayerFlyInZone(Player const* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell)
 {
-    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    auto ret = IsValidBoolScript<PlayerScript>([player, mapId, zoneId, bySpell](PlayerScript* script)
         {
             return !script->OnCanPlayerFlyInZone(player, mapId, zoneId, bySpell);
         });
