@@ -79,7 +79,6 @@
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
-#include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
 #include "Weather.h"

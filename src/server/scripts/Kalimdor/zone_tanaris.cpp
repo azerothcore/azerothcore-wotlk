@@ -36,7 +36,6 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_aquementas

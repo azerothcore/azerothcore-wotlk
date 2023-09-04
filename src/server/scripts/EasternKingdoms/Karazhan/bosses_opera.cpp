@@ -765,9 +765,15 @@ enum RedRidingHood
     SPELL_WIDE_SWIPE                = 30761,
 
     CREATURE_BIG_BAD_WOLF           = 17521,
-};
 
-#define GOSSIP_GRANDMA          "What phat lewtz you have grandmother?"
+    GRANDMOTHER_GOSSIP_MENU1        = 7441,
+    GRANDMOTHER_GOSSIP_MENU2        = 7442,
+    GRANDMOTHER_GOSSIP_MENU3        = 7443,
+
+    GRANDMOTHER_TEXT1               = 9009,
+    GRANDMOTHER_TEXT2               = 9010,
+    GRANDMOTHER_TEXT3               = 9011
+};
 
 struct npc_grandmother : public CreatureScript
 {
@@ -776,21 +782,31 @@ struct npc_grandmother : public CreatureScript
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF)
+
+        switch (action)
         {
-            if (Creature* pBigBadWolf = creature->SummonCreature(CREATURE_BIG_BAD_WOLF, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
-                pBigBadWolf->AI()->AttackStart(player);
-
-            creature->DespawnOrUnsummon();
+            case GOSSIP_ACTION_INFO_DEF:
+                AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, GRANDMOTHER_TEXT2, creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GRANDMOTHER_TEXT3, creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                if (Creature* pBigBadWolf = creature->SummonCreature(CREATURE_BIG_BAD_WOLF, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
+                {
+                    pBigBadWolf->AI()->AttackStart(player);
+                }
+                creature->DespawnOrUnsummon();
         }
-
         return true;
     }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GRANDMA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        SendGossipMenuFor(player, 8990, creature->GetGUID());
+        AddGossipItemFor(player, GRANDMOTHER_GOSSIP_MENU1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        SendGossipMenuFor(player, GRANDMOTHER_TEXT1, creature->GetGUID());
 
         return true;
     }
@@ -822,6 +838,7 @@ struct boss_bigbadwolf : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
         Talk(SAY_WOLF_AGGRO);
         DoZoneInCombat();
 

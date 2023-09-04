@@ -18,7 +18,6 @@
 #include "OutdoorPvP.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Map.h"
 #include "MapMgr.h"
