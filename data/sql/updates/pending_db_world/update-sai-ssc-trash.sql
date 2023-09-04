@@ -84,7 +84,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21964, 0, 0, 0, 0, 0, 100, 0, 15750, 15750, 47250, 51550, 0, 0, 11, 38337, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Summon Cyclone'),-- fully sniffed
 (21964, 0, 1, 0, 0, 0, 100, 0, 27900, 27900, 6050, 19750, 0, 0, 11, 38335, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Water Bolt Volley'),-- fully sniffed
 (21964, 0, 2, 0, 0, 0, 100, 0, 23050, 23050, 24250, 33250, 0, 0, 11, 38358, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Tidal Surge'),-- fully sniffed
-(21964, 0, 3, 0, 14, 0, 100, 0, 70000, 200, 15000, 15000, 0, 0, 11, 38330, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - Friendly Missing Health - Cast Healing Wave'),-- not sniffed
+(21964, 0, 3, 0, 74, 0, 100, 0, 0, 85, 15000, 15000, 0, 0, 11, 38330, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - Friendly between health 0-85% - Cast Healing Wave'),-- not sniffed
 (21964, 0, 4, 5, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Aggro - Set In Combat With Zone'),
 (21964, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Aggro - Set In Combat With Zone'),
 (21964, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38451, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Death - Cast Power of Caribdis'),-- N/A note: missing ability 38449 (on hp%?)
@@ -96,7 +96,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21965, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - On Aggro - Set In Combat With Zone'),
 (21965, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38452, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - On Death - Cast Power of Tidalvess'),
 (21966, 0, 0, 0, 0, 0, 100, 0, 0, 1000, 2000, 2000, 0, 0, 11, 38374, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Hurl Trident'),-- not sniffed
-(21966, 0, 1, 0, 0, 0, 100, 0, 53400, 53400, 6050, 22250, 0, 0, 11, 29436, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Leeching Throw'),-- fully sniffed
+(21966, 0, 1, 0, 2, 0, 100, 0, 0, 85, 6050, 22250, 0, 0, 11, 29436, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - Between health 0-85% - Cast Leeching Throw'),-- fully sniffed
 (21966, 0, 2, 0, 0, 0, 100, 0, 20650, 20650, 12150, 26350, 0, 0, 11, 38366, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Multi-Toss'),-- fully sniffed
 (21966, 0, 3, 0, 0, 0, 100, 0, 14550, 14550, 60650, 84850, 0, 0, 11, 38431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Summon Fathom Sporebat'),-- fully sniffed -> now repeatable
 (21966, 0, 4, 0, 0, 0, 100, 0, 44900, 44900, 30300, 60500, 0, 0, 11, 38433, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Summon Fathom Lurker'),-- fully sniffed -> now repeatable
