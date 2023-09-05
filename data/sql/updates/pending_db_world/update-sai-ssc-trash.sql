@@ -58,11 +58,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21251, 0, 10, 0, 59, 0, 100, 512, 3, 0, 0, 0, 0, 0, 11, 38928, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Timed Event - Cast Summon Colossus Ragers'),-- unchanged
 (21251, 0, 11, 0, 59, 0, 100, 512, 4, 0, 0, 0, 0, 0, 11, 38726, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Timed Event - Cast Summon Serpentshrine Mushroom'),-- unchanged
 (21263, 0, 0, 0, 0, 0, 100, 0, 6050, 17850, 7250, 16350, 0, 0, 11, 38995, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Greyheart Technician - In Combat - Cast Hamstring'),-- fully sniffed
-(21298, 0, 0, 0, 0, 0, 80, 2, 10850, 17550, 10900, 17000, 0, 0, 11, 38599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Serpentguard - In Combat - Cast \'Spell Reflection\' (Phase 1)'),-- fully sniffed
-(21298, 0, 1, 0, 0, 0, 100, 2, 0, 0, 59000, 60000, 0, 0, 11, 38603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Serpentguard - In Combat - Cast \'Corrupt Devotion Aura\' (Phase 1)'),-- not sniffed thus unchanged
-(21299, 0, 0, 0, 0, 0, 80, 2, 10900, 16000, 22900, 32900, 0, 0, 11, 38626, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Domination\' (Phase 1)'),-- repeat timer not sniffed
-(21299, 0, 1, 0, 0, 0, 100, 2, 14700, 18500, 66300, 89300, 0, 0, 11, 38627, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Shadow Nova\' (Phase 1)'),-- repeat timer not sniffed
-(21299, 0, 2, 0, 0, 0, 100, 2, 4450, 5850, 3650, 8450, 0, 0, 11, 38628, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Shadow Bolt\' (Phase 1)'),-- fully sniffed
+(21298, 0, 0, 0, 0, 0, 80, 0, 10850, 17550, 10900, 17000, 0, 0, 11, 38599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Serpentguard - In Combat - Cast \'Spell Reflection\''),-- fully sniffed
+(21298, 0, 1, 0, 0, 0, 100, 0, 0, 0, 59000, 60000, 0, 0, 11, 38603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Serpentguard - In Combat - Cast \'Corrupt Devotion Aura\''),-- not sniffed thus unchanged
+(21299, 0, 0, 0, 0, 0, 80, 0, 10900, 16000, 22900, 32900, 0, 0, 11, 38626, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Domination\''),-- repeat timer not sniffed
+(21299, 0, 1, 0, 0, 0, 100, 0, 14700, 18500, 66300, 89300, 0, 0, 11, 38627, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Shadow Nova\''),-- repeat timer not sniffed
+(21299, 0, 2, 0, 0, 0, 100, 0, 4450, 5850, 3650, 8450, 0, 0, 11, 38628, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Fathom-Witch - In Combat - Cast \'Shadow Bolt\''),-- fully sniffed
 (21301, 0, 0, 0, 0, 0, 100, 0, 6850, 12350, 19400, 27400, 0, 0, 11, 38591, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Shatterer - In Combat - Cast Shatter Armor'),-- fully sniffed
 (21301, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Shatterer - On Aggro - Call For Help'),
 (21339, 0, 0, 0, 0, 0, 100, 0, 9700, 22400, 13350, 40050, 0, 0, 11, 38491, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Hate-Screamer - In Combat - Cast Silence'),-- fully sniffed
