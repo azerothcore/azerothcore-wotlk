@@ -43,9 +43,9 @@ enum Spells
     SPELL_LEECHING_THROW            = 29436,
     SPELL_MULTI_TOSS                = 38366,
     SPELL_SUMMON_FATHOM_SPOREBAT    = 38431,
-    SPELL_SUMMON_FATHOM_LUKER       = 38433,
-    SPELL_CAST_THE_BEAST_WITHIN     = 38373,
-    SPELL_CAST_BESTIAL_WRATH        = 38371,
+    SPELL_SUMMON_FATHOM_LURKER      = 38433,
+    SPELL_THE_BEAST_WITHIN          = 38373,
+    SPELL_BESTIAL_WRATH             = 38371,
     SPELL_POWER_OF_SHARKKIS         = 38455,
     //Fathomguard Tidalvess
     SPELL_FROST_SHOCK               = 38234,
@@ -69,11 +69,6 @@ enum Misc
     NPC_FATHOM_GUARD_SHARKKIS       = 21966,
     NPC_SEER_OLUM                   = 22820,
     GO_CAGE                         = 185952,
-};
-
-enum FKActions
-{
-    ACTION_COMBATZONE               = 1
 };
 
 const Position advisorsPosition[MAX_ADVISORS + 2] =
@@ -173,7 +168,7 @@ struct boss_fathomlord_karathress : public BossAI
         Talk(SAY_AGGRO);
         
         instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
-            fathomguard->AI()->DoAction(ACTION_COMBATZONE);
+            fathomguard->SetInCombatWithZone();
         });
 
         scheduler.Schedule(10s, [this](TaskContext context)
@@ -196,6 +191,19 @@ private:
     bool _recentlySpoken;
 };
 
+struct LeechingThrowSelector
+{
+public:
+    explicit LeechingThrowSelector(WorldObject const* source) : _source(source) { }
+
+    bool operator() (Unit* unit) const
+    {
+        return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) < 50.0f;
+    }
+private:
+    WorldObject const* _source;
+};
+
 struct boss_fathomguard_sharkkis : public ScriptedAI
 {
     boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature)
@@ -208,22 +216,52 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         });
     }
 
+    SummonList summons;
+
     void Reset() override
     {
         _scheduler.CancelAll();
+
+        summons.DespawnAll();
     }
 
-    void DoAction(int32 action) override
+    void JustSummoned(Creature* summon) override
     {
-        if (action == ACTION_COMBATZONE)
-        {
-            me->SetInCombatWithZone();
-        }
+        summon->SetInCombatWithZone();
+        
+        summons.Summon(summon);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-
+        _scheduler.Schedule(2500ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_HURL_TRIDENT);
+            context.Repeat(5s);
+        }).Schedule(20650ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_MULTI_TOSS);
+            context.Repeat(12150ms, 26350ms);
+        }).Schedule(6050ms, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, LeechingThrowSelector(me)))
+            {
+                me->CastSpell(target, SPELL_LEECHING_THROW);
+            }
+            context.Repeat(6050ms, 22250ms);
+        }).Schedule(41250ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_THE_BEAST_WITHIN);
+            summons.DoForAllSummons([&](WorldObject* summon)
+            {
+                me->CastSpell(summon->ToCreature(), SPELL_BESTIAL_WRATH);
+            });
+            context.Repeat(39950ms, 46050ms);
+        }).Schedule(14550ms, [this](TaskContext context)
+        {
+            DoCastSelf(urand(0, 1) ? SPELL_SUMMON_FATHOM_LURKER : SPELL_SUMMON_FATHOM_SPOREBAT);
+            context.Repeat(30300ms);
+        });
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -251,6 +289,20 @@ private:
     InstanceScript* _instance;
 };
 
+enum Totems
+{
+    SPITFIRE_TOTEM          = 0,
+    EARTHBIND_TOTEM         = 1,
+    POISON_CLEANSING_TOTEM  = 2
+};
+
+enum TidalActions
+{
+    ACTION_REMOVE_SPITFIRE  = 1,
+    ACTION_REMOVE_EARTHBIND = 2,
+    ACTION_REMOVE_CLEANSING = 3
+};
+
 struct boss_fathomguard_tidalvess : public ScriptedAI
 {
     boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature)
@@ -263,22 +315,111 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         });
     }
 
+    SummonList summons;
+
+    std::vector<bool> summonedTotems;
+
     void Reset() override
     {
         _scheduler.CancelAll();
+        _choice = 0;
+
+        summons.DespawnAll();
+
+        summonedTotems.clear();
+
+        //populating vector
+        for (uint8 i = 0; i < 3; i++)
+        {
+            summonedTotems.push_back(false);
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
     }
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_COMBATZONE)
+        switch (action)
         {
-            me->SetInCombatWithZone();
+            case ACTION_REMOVE_SPITFIRE:
+                summonedTotems[SPITFIRE_TOTEM] = false;
+                break;
+            case ACTION_REMOVE_EARTHBIND:
+                summonedTotems[EARTHBIND_TOTEM] = false;
+                break;
+            case ACTION_REMOVE_CLEANSING:
+                summonedTotems[POISON_CLEANSING_TOTEM] = false;
+                break;
+            default:
+                return;
         }
+    }
+
+    void SummonTotem(uint8 choice)
+    {
+        switch(choice)
+        {
+            case SPITFIRE_TOTEM:
+                DoCastSelf(SPELL_SPITFIRE_TOTEM);
+                break;
+            case EARTHBIND_TOTEM:
+                DoCastSelf(SPELL_EARTHBIND_TOTEM);
+                break;
+            case POISON_CLEANSING_TOTEM:
+                DoCastSelf(SPELL_POISON_CLEANSING_TOTEM);
+                break;
+            default:
+                return;
+        }
+    }
+
+    uint8 CountTotems(std::vector<bool> totemList)
+    {
+        uint8 sum = 0;
+        for (uint8 i = 0; i < 3; i++)
+        {
+            if (totemList[i] == false)
+            {
+                sum++;
+            }
+        }
+        return sum;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-
+        _scheduler.Schedule(10900ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_FROST_SHOCK);
+            context.Repeat(10900ms, 14700ms);
+        }).Schedule(15800ms, [this](TaskContext context)
+        {
+            //summon totem
+            if (CountTotems(summonedTotems) != 0)
+            {
+                if (CountTotems(summonedTotems) < 3) //if not all totems are currently summoned
+                {
+                    //keep making a choice of available totems
+                    _choice = urand(0, 2);
+                    while (summonedTotems[_choice] == true)
+                    {
+                        _choice = urand(0, 2);
+                    }
+                    summonedTotems[_choice] = true;
+                    SummonTotem(_choice);
+                }
+            }
+            else
+            {
+                _choice = urand(0, 2);
+                summonedTotems[_choice] = true;
+                SummonTotem(_choice);
+            }
+            context.Repeat(13350ms, 24250ms);
+        });
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -304,6 +445,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     InstanceScript* _instance;
+    uint8 _choice;
 };
 
 struct boss_fathomguard_caribdis : public ScriptedAI
@@ -318,22 +460,42 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         });
     }
 
+    SummonList summons;
+
     void Reset() override
     {
         _scheduler.CancelAll();
+
+        summons.DespawnAll();
     }
 
-    void DoAction(int32 action) override
+    void JustSummoned(Creature* summon) override
     {
-        if (action == ACTION_COMBATZONE)
-        {
-            me->SetInCombatWithZone();
-        }
+        summons.Summon(summon);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-
+        _scheduler.Schedule(27900ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_WATER_BOLT_VOLLEY);
+            context.Repeat(6050ms, 19750ms);
+        }).Schedule(23050ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_TIDAL_SURGE);
+            context.Repeat(24250ms, 33250ms);
+        }).Schedule(15750ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_SUMMON_CYCLONE);
+            context.Repeat(47250ms, 51550ms);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            if (Unit* target = DoSelectLowestHpFriendly(60.0f, 150000))
+            {
+                DoCast(target, SPELL_HEALING_WAVE);
+            }
+            context.Repeat(20s);
+        });
     }
 
     void JustDied(Unit* /*killer*/) override
