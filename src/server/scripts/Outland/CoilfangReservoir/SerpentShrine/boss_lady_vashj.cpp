@@ -165,18 +165,18 @@ struct boss_lady_vashj : public BossAI
 
     void ScheduleSpells()
     {
-        scheduler.Schedule(10s, [this](TaskContext context)
+        scheduler.Schedule(14550ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SHOCK_BLAST);
-            context.Repeat(10s, 20s);
-        }).Schedule(15s, [this](TaskContext context)
+            context.Repeat(10850ms, 25100ms);
+        }).Schedule(18150ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_STATIC_CHARGE);
-            context.Repeat(20s);
-        }).Schedule(20s, [this](TaskContext context)
+            context.Repeat(7250ms, 27050ms);
+        }).Schedule(25450ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_ENTANGLE);
-            context.Repeat(30s);
+            context.Repeat(18200ms, 51500ms);
         });
     }
 
@@ -202,10 +202,10 @@ struct boss_lady_vashj : public BossAI
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
         scheduler.CancelAll();
 
-        scheduler.Schedule(3s, [this](TaskContext context)
+        scheduler.Schedule(2400ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_FORKED_LIGHTNING);
-            context.Repeat(2500s, 5000s);
+            context.Repeat(2400ms, 12450ms);
         }).Schedule(0s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_SUMMON_ENCHANTED_ELEMENTAL, true);
