@@ -122,7 +122,7 @@ struct boss_nightbane : public BossAI
             MovePhase = 0;
         }
 
-        ScheduleHealthCheckEvent({25, 50, 70}, [&]{
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
             TakeOff();
         });
     }
@@ -219,9 +219,7 @@ struct boss_nightbane : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (instance)
-            instance->SetData(DATA_NIGHTBANE, DONE);
-
+        _JustDied();
         HandleTerraceDoors(true);
     }
 
@@ -398,6 +396,7 @@ private:
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
 };
+
 class go_blackened_urn : public GameObjectScript
 {
 public:
@@ -405,13 +404,17 @@ public:
 
     //if we summon an entity instead of using a sort of invisible entity, we could unsummon boss on reset
     //right now that doesn't work because of how the urn works
-    bool OnGossipHello(Player* player, GameObject* go) override
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        if (InstanceScript* pInstance = go->GetInstanceScript())
+        if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetGuidData(DATA_NIGHTBANE)))
+            if (instance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+            {
+                if (Creature* cr = instance->GetCreature(DATA_NIGHTBANE))
+                {
                     cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+                }
+            }
         }
 
         return false;

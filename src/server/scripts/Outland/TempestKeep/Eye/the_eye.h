@@ -65,4 +65,6 @@ inline AI* GetTheEyeAI(T* obj)
     return GetInstanceAI<AI>(obj, TheEyeScriptName);
 }
 
+#define RegisterTheEyeAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheEyeAI)
+
 #endif
