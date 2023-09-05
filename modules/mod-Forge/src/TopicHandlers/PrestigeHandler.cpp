@@ -92,7 +92,6 @@ public:
                 spec->perkQueue.clear();
             }
 
-
             ForgeCharacterPoint* fcp = fc->GetSpecPoints(iam.player, CharacterPointType::TALENT_TREE, spec->Id);
             ForgeCharacterPoint* baseFcp = fc->GetCommonCharacterPoint(iam.player, CharacterPointType::TALENT_TREE);
             ForgeCharacterPoint* rp = fc->GetSpecPoints(iam.player, RACIAL_TREE, spec->Id);
@@ -101,6 +100,7 @@ public:
             fcp->Sum = 0;
             rp->Sum = 17;
 
+            fc->UpdateCharPoints(iam.player, baseFcp);
             fc->UpdateCharPoints(iam.player, fcp);
             fc->UpdateCharPoints(iam.player, rp);
             fc->UpdateCharacterSpec(iam.player, spec);

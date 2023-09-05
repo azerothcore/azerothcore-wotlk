@@ -63,7 +63,7 @@ class spell_perk_fire_explosion : public AuraScript
         PreventDefaultAction();
 
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo()) {
-            auto damage = damageInfo->GetDamage();
+            auto damage = CalculatePct(damageInfo->GetDamage(), aurEff->GetAmount());
 
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
             if (auto player = GetOwner()->ToPlayer())

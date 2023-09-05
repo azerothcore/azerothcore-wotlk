@@ -158,6 +158,7 @@ private:
             }
             ForgeCharacterPoint* sfp = fc->GetSpecPoints(player, TALENT_TREE, spec->Id);
             sfp->Sum = std::max(player->GetLevel() - 9, 0);
+            sfp->Max = sfp->Sum;
             fc->UpdateCharPoints(player, sfp);
             cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);
