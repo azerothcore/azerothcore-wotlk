@@ -26,7 +26,10 @@ enum Spells
     SPELL_GEYSER                = 37478,
     SPELL_SPOUT_VISUAL          = 37431,
     SPELL_SPOUT_PERIODIC        = 37430,
-    SPELL_LURKER_SPAWN_TRIGGER  = 54587 // Needed for achievement
+    SPELL_LURKER_SPAWN_TRIGGER  = 54587, // Needed for achievement
+
+    SPELL_CLEAR_ALL_DEBUFFS     = 34098,
+    SPELL_SUBMERGE_VISUAL       = 28819,
 };
 
 enum Misc
@@ -116,19 +119,19 @@ struct boss_the_lurker_below : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        SchedulerPhaseOne(45s, 125s);
+        SchedulerPhaseOne(38800ms, 91000ms);
     }
 
-    void SchedulerPhaseOne(std::chrono::seconds spoutTimer, std::chrono::seconds p2Timer)
+    void SchedulerPhaseOne(std::chrono::milliseconds spoutTimer, std::chrono::milliseconds p2Timer)
     {
-        scheduler.Schedule(10s, GROUP_GEYSER, [this](TaskContext context)
+        scheduler.Schedule(10900ms, GROUP_GEYSER, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_GEYSER);
-            context.Repeat(10s);
-        }).Schedule(18s, GROUP_WHIRL, [this](TaskContext context)
+            context.Repeat(10200ms, 54900ms);
+        }).Schedule(18150s, GROUP_WHIRL, [this](TaskContext context)
         {
             DoCastSelf(SPELL_WHIRL);
-            context.Repeat(18s);
+            context.Repeat(34150ms, 68550ms);
         }).Schedule(spoutTimer, [this](TaskContext context)
         {
             Talk(EMOTE_TAKE_BREATH);
@@ -148,6 +151,8 @@ struct boss_the_lurker_below : public BossAI
         {
             //phase2
             scheduler.CancelAll();
+            DoCastSelf(SPELL_SUBMERGE_VISUAL, true);
+            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < MAX_SUMMONS; ++i)
@@ -168,7 +173,7 @@ struct boss_the_lurker_below : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             scheduler.CancelAll();
-            SchedulerPhaseOne(10s, 120s);
+            SchedulerPhaseOne(10000ms, 90750ms);
         });
     }
 
