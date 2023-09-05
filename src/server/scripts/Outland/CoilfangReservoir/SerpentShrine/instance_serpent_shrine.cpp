@@ -59,6 +59,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
+            LoadMinionData(minionData);
 
             AliveKeepersCount = 0;
         }
