@@ -227,7 +227,6 @@ struct boss_leotheras_the_blind : public BossAI
             me->setAttackTimer(BASE_ATTACK, 2000);
         }
     }
-
 private:
     bool _recentlySpoken;
 };
@@ -303,7 +302,6 @@ struct npc_inner_demon : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
 private:
     TaskScheduler _scheduler;
 };
