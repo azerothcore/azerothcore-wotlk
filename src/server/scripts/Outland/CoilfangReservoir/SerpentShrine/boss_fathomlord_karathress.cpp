@@ -165,7 +165,7 @@ struct boss_fathomlord_karathress : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        
+
         instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
             fathomguard->SetInCombatWithZone();
         });
@@ -229,7 +229,6 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     void JustSummoned(Creature* summon) override
     {
         summon->SetInCombatWithZone();
-        
         summons.Summon(summon);
     }
 
