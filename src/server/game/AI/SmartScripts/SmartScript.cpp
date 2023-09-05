@@ -24,7 +24,6 @@
 #include "GossipDef.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Language.h"
@@ -36,6 +35,12 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 SmartScript::SmartScript()
 {
@@ -2889,6 +2894,101 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         target->ToUnit()->SendPlaySpellVisual(e.action.spellVisual.visualId);
                 }
             }
+            break;
+        }
+        case SMART_ACTION_FOLLOW_GROUP:
+        {
+            if (!e.action.followGroup.followState)
+            {
+                for (WorldObject* target : targets)
+                    if (IsUnit(target))
+                        target->ToCreature()->GetMotionMaster()->MoveIdle();
+
+                break;
+            }
+
+            uint8 membCount = targets.size();
+            uint8 itr = 1;
+            float dist = float(e.action.followGroup.dist / 100);
+            switch (e.action.followGroup.followType)
+            {
+                case FOLLOW_TYPE_CIRCLE:
+                {
+                    float angle = (membCount > 4 ? (M_PI * 2)/membCount : (M_PI / 2)); // 90 degrees is the maximum angle
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle * itr);
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_SEMI_CIRCLE_BEHIND:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, (M_PI / 2.0f) + (M_PI / membCount) * (itr - 1));
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_SEMI_CIRCLE_FRONT:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, (M_PI + (M_PI / 2.0f) + (M_PI / membCount) * (itr - 1)));
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_LINE:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? 0.f : M_PI);
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_COLUMN:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? (M_PI / 2) : (M_PI * 1.5f));
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_ANGULAR:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? M_PI - (M_PI / 4) : M_PI + (M_PI / 4));
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
             break;
         }
         default:

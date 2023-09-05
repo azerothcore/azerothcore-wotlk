@@ -391,6 +391,15 @@ int main(int argc, char** argv)
 
     sScriptMgr->OnStartup();
 
+// Be kind and warn people of EOL deprecation :)
+#if !defined(MARIADB_VERSION_ID)
+    if (MySQL::GetLibraryVersion() < 80000)
+        LOG_WARN("server", "WARNING: You are using MySQL version 5.7 which is soon EOL!\nThis version will be deprecated. Consider upgrading to MySQL 8.0 or 8.1!");
+#endif
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+    LOG_WARN("server", "WARNING: You are using OpenSSL version 1.1 which is soon EOL!\nThis version will be deprecated. Consider upgrading to OpenSSL 3.0 or 3.1!");
+#endif
+
     // Launch CliRunnable thread
     std::shared_ptr<std::thread> cliThread;
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
