@@ -3327,7 +3327,10 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
         {
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
             {
-                m_caster->CastSpell(unit, i->triggeredSpell->Id, true);
+                if (auto pct = i->triggeredByAura->Effects[0].MiscValue)
+                    m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_BASE_POINT0, CalculatePct(m_damage, pct), unit, true);
+                else
+                    m_caster->CastSpell(unit, i->triggeredSpell->Id, true);
                 LOG_DEBUG("spells.aura", "Spell {} triggered spell {} by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
 
                 // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration

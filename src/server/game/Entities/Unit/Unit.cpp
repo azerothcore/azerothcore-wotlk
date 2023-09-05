@@ -9107,6 +9107,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     if (triggeredByAura->GetAuraType() == SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE)
         basepoints0 = triggerAmount;
 
+    if (triggeredByAura->GetAuraType() == SPELL_AURA_PROC_TRIGGER_SPELL_PCT_HIT)
+        basepoints0 = CalculatePct(damage, triggerAmount);
+
     Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
@@ -16430,6 +16433,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
     isTriggerAura[SPELL_AURA_PROC_REFUND_COOLDOWN] = true;
+    isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_PCT_HIT] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -16749,6 +16753,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MANA_SHIELD:
                     case SPELL_AURA_DUMMY:
                     case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
+                    case SPELL_AURA_PROC_REFUND_COOLDOWN:
+                    case SPELL_AURA_PROC_TRIGGER_SPELL_PCT_HIT:
                         if (uint32 triggerSpellId = aurEff->GetSpellInfo()->Effects[i].TriggerSpell)
                         {
                             triggerData.triggerSpelId[i] = triggerSpellId;
@@ -16937,6 +16943,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered with value by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
 
                         if (HandleProcRefundSpellCooldown(triggeredByAura))
+                            takeCharges = true;
+                        break;
+                    }
+                    case SPELL_AURA_PROC_TRIGGER_SPELL_PCT_HIT:
+                    {
+                        if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
                             takeCharges = true;
                         break;
                     }

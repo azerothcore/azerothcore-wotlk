@@ -13,6 +13,8 @@ CREATE TABLE acore_world.`perks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (100005,0,64,1,1,1,0,0,''),
+        (100009,0,2,1,1,1,0,0,''),
         (500505,0,2047,1,1,1,0,0,''),
         (500506,1,2002,1,1,1,0,0,''),
         (500507,0,1059,1,1,1,0,1,''),
@@ -20,10 +22,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (500509,0,1583,1,1,1,0,0,''),
         (500511,0,35,1,1,1,0,0,''),
         (500512,0,1571,1,1,1,0,0,''),
-        (500513,0,2,1,1,1,0,0,''),
-        (500514,1,35,1,1,1,0,0,''),
-        (500515,0,2047,1,1,1,0,0,'');
+        (500513,0,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (500514,1,35,1,1,1,0,0,''),
+        (500515,0,2047,1,1,1,0,0,''),
         (500517,1,2047,1,1,1,0,0,''),
         (500518,0,1123,1,1,1,0,0,''),
         (500519,0,107,1,1,1,0,0,''),
@@ -31,10 +33,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (500521,0,1088,1,1,1,0,0,''),
         (500522,0,18,1,1,1,0,0,''),
         (500523,0,192,1,1,1,0,0,''),
-        (500524,0,192,1,1,1,0,0,''),
-        (500525,0,1057,1,1,1,0,0,''),
-        (500526,0,1032,1,1,1,0,0,'');
+        (500524,0,192,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (500525,0,1057,1,1,1,0,0,''),
+        (500526,0,1032,1,1,1,0,0,''),
         (500527,0,105,1,1,1,0,0,''),
         (500533,1,2047,1,1,1,0,0,''),
         (500534,0,1583,1,1,1,0,0,''),
@@ -42,10 +44,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (500537,0,292,1,1,1,0,0,''),
         (500538,0,1024,1,1,1,0,0,''),
         (500539,0,35,1,1,1,0,0,''),
-        (500546,1,1106,1,1,0,0,0,''),
-        (500547,1,2047,1,1,1,0,0,''),
-        (500550,0,2047,1,1,1,0,0,'');
+        (500546,1,1106,1,1,0,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (500547,1,2047,1,1,1,0,0,''),
+        (500550,0,2047,1,1,1,0,0,''),
         (500551,0,1032,1,1,1,0,0,''),
         (500552,0,2002,1,1,1,0,0,''),
         (500553,1,2047,1,1,1,0,0,''),
@@ -53,10 +55,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (500700,1,1488,1,1,1,0,0,''),
         (500701,1,1106,1,1,1,0,0,''),
         (500704,1,1059,1,1,1,0,0,''),
-        (500707,0,1583,1,1,1,0,0,''),
-        (600600,1,2047,1,1,1,0,0,''),
-        (600604,1,1131,1,1,0,0,0,'');
+        (500707,0,1583,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (600600,1,2047,1,1,1,0,0,''),
+        (600604,1,1131,1,1,0,0,0,''),
         (600606,1,2047,1,1,1,0,0,''),
         (600608,1,1488,1,1,0,0,0,''),
         (600609,1,2047,1,1,1,0,0,''),
@@ -64,20 +66,21 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (600628,1,1571,1,1,1,0,0,''),
         (600630,1,2047,1,1,1,0,0,''),
         (600634,1,4,1,1,1,0,0,''),
-        (600636,1,1612,1,1,1,0,0,''),
-        (600639,1,13,1,1,1,0,0,''),
-        (600640,1,1618,1,1,1,0,0,'');
+        (600636,1,1612,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (600639,1,13,1,1,1,0,0,''),
+        (600640,1,1618,1,1,1,0,0,''),
         (600660,1,2002,1,1,1,0,0,''),
+        (600661,1,2002,1,1,1,0,0,''),
         (600702,1,1059,1,1,0,0,0,''),
         (600705,0,1061,1,1,1,0,0,''),
         (600709,1,13,1,1,1,0,0,''),
         (600710,1,2002,1,1,1,0,0,''),
         (600712,1,1612,1,1,1,0,0,''),
-        (600715,1,1612,1,1,1,0,0,''),
-        (600720,1,4,1,1,1,0,0,''),
-        (600721,1,4,1,1,1,0,0,'');
+        (600715,1,1612,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (600720,1,4,1,1,1,0,0,''),
+        (600721,1,4,1,1,1,0,0,''),
         (700700,0,16,1,1,1,0,0,''),
         (700701,0,16,1,1,1,0,0,''),
         (700702,0,16,1,1,1,0,0,''),
@@ -85,10 +88,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700704,1,16,1,1,1,0,0,''),
         (700705,0,16,1,1,1,0,0,''),
         (700706,1,16,1,1,1,0,0,''),
-        (700707,0,16,1,1,1,0,0,''),
-        (700708,1,16,1,1,1,0,0,''),
-        (700709,0,16,1,1,1,0,0,'');
+        (700707,0,16,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700708,1,16,1,1,1,0,0,''),
+        (700709,0,16,1,1,1,0,0,''),
         (700710,0,16,1,1,1,0,0,''),
         (700711,0,16,1,1,1,0,0,''),
         (700712,0,16,1,1,1,0,0,''),
@@ -96,10 +99,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700714,0,16,1,1,1,0,0,''),
         (700715,1,16,1,1,1,0,0,''),
         (700716,0,16,1,1,1,0,0,''),
-        (700717,0,16,1,1,1,0,0,''),
-        (700718,0,16,1,1,1,0,0,''),
-        (700719,0,16,1,1,1,0,0,'');
+        (700717,0,16,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700718,0,16,1,1,1,0,0,''),
+        (700719,0,16,1,1,1,0,0,''),
         (700720,1,16,1,1,1,0,0,''),
         (700721,0,16,1,1,1,0,0,''),
         (700722,0,16,1,1,1,0,0,''),
@@ -107,10 +110,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700724,1,16,1,1,1,0,0,''),
         (700725,0,16,1,1,1,0,0,''),
         (700726,1,16,1,1,1,0,0,''),
-        (700727,0,16,1,1,1,0,0,''),
-        (700728,1,16,1,1,1,0,0,''),
-        (700729,1,16,1,1,1,0,0,'');
+        (700727,0,16,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700728,1,16,1,1,1,0,0,''),
+        (700729,1,16,1,1,1,0,0,''),
         (700730,0,16,1,1,1,0,0,''),
         (700731,0,16,1,1,1,0,0,''),
         (700732,0,16,1,1,1,0,0,''),
@@ -118,10 +121,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700734,0,16,1,1,1,0,0,''),
         (700735,0,16,1,1,1,0,0,''),
         (700736,0,16,1,1,1,0,0,''),
-        (700737,1,16,1,1,1,0,0,''),
-        (700738,0,16,1,1,1,0,0,''),
-        (700739,1,16,1,1,1,0,0,'');
+        (700737,1,16,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700738,0,16,1,1,1,0,0,''),
+        (700739,1,16,1,1,1,0,0,''),
         (700740,0,16,1,1,1,0,0,''),
         (700741,0,16,1,1,1,0,0,''),
         (700742,1,16,1,1,1,0,0,''),
@@ -129,10 +132,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700745,0,16,1,1,1,0,0,''),
         (700746,0,16,1,1,1,0,0,''),
         (700747,1,16,1,1,1,0,0,''),
-        (700748,0,16,1,1,1,0,0,''),
-        (700749,0,16,1,1,1,0,0,''),
-        (700751,0,64,1,1,1,0,0,'');
+        (700748,0,16,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700749,0,16,1,1,1,0,0,''),
+        (700751,0,64,1,1,1,0,0,''),
         (700753,0,64,1,1,1,0,0,''),
         (700754,0,64,1,1,1,0,0,''),
         (700755,0,64,1,1,1,0,0,''),
@@ -140,10 +143,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700757,1,64,1,1,1,0,0,''),
         (700758,0,64,1,1,1,0,0,''),
         (700759,1,64,1,1,1,0,0,''),
-        (700760,1,64,1,1,1,0,0,''),
-        (700761,0,64,1,1,1,0,0,''),
-        (700762,0,64,1,1,1,0,0,'');
+        (700760,1,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700761,0,64,1,1,1,0,0,''),
+        (700762,0,64,1,1,1,0,0,''),
         (700763,1,64,1,1,1,0,0,''),
         (700764,0,64,1,1,1,0,0,''),
         (700765,0,64,1,1,1,0,0,''),
@@ -151,10 +154,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700767,0,64,1,1,1,0,0,''),
         (700768,0,64,1,1,1,0,0,''),
         (700769,0,64,1,1,1,0,0,''),
-        (700770,0,64,1,1,1,0,0,''),
-        (700771,0,64,1,1,1,0,0,''),
-        (700772,1,64,1,1,1,0,0,'');
+        (700770,0,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700771,0,64,1,1,1,0,0,''),
+        (700772,1,64,1,1,1,0,0,''),
         (700773,0,64,1,1,1,0,0,''),
         (700774,0,64,1,1,1,0,0,''),
         (700775,0,64,1,1,1,0,0,''),
@@ -162,10 +165,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700777,0,64,1,1,1,0,0,''),
         (700778,0,64,1,1,1,0,0,''),
         (700779,0,64,1,1,1,0,0,''),
-        (700780,0,64,1,1,1,0,0,''),
-        (700781,0,64,1,1,1,0,0,''),
-        (700783,0,64,1,1,1,0,0,'');
+        (700780,0,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700781,0,64,1,1,1,0,0,''),
+        (700783,0,64,1,1,1,0,0,''),
         (700785,0,64,1,1,1,0,0,''),
         (700786,0,64,1,1,1,0,0,''),
         (700787,0,64,1,1,1,0,0,''),
@@ -173,10 +176,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700789,1,64,1,1,1,0,0,''),
         (700790,1,64,1,1,1,0,0,''),
         (700791,0,64,1,1,1,0,0,''),
-        (700792,0,64,1,1,1,0,0,''),
-        (700793,1,64,1,1,1,0,0,''),
-        (700794,0,64,1,1,1,0,0,'');
+        (700792,0,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700793,1,64,1,1,1,0,0,''),
+        (700794,0,64,1,1,1,0,0,''),
         (700795,1,64,1,1,1,0,0,''),
         (700796,0,64,1,1,1,0,0,''),
         (700797,0,64,1,1,1,0,0,''),
@@ -184,10 +187,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700799,1,64,1,1,1,0,0,''),
         (700800,1,64,1,1,1,0,0,''),
         (700801,1,64,1,1,1,0,0,''),
-        (700802,1,64,1,1,1,0,0,''),
-        (700803,1,64,1,1,1,0,0,''),
-        (700804,1,64,1,1,1,0,0,'');
+        (700802,1,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700803,1,64,1,1,1,0,0,''),
+        (700804,1,64,1,1,1,0,0,''),
         (700805,0,64,1,1,1,0,0,''),
         (700806,1,64,1,1,1,0,0,''),
         (700808,0,4,1,1,1,0,0,''),
@@ -195,10 +198,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700810,0,4,1,1,1,0,0,''),
         (700811,0,4,1,1,1,0,0,''),
         (700812,0,4,1,1,1,0,0,''),
-        (700813,1,4,1,1,1,0,0,''),
-        (700814,0,4,1,1,1,0,0,''),
-        (700815,0,4,1,1,1,0,0,'');
+        (700813,1,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700814,0,4,1,1,1,0,0,''),
+        (700815,0,4,1,1,1,0,0,''),
         (700816,0,4,1,1,1,0,0,''),
         (700817,0,4,1,1,1,0,0,''),
         (700818,1,4,1,1,1,0,0,''),
@@ -206,10 +209,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700820,0,4,1,1,1,0,0,''),
         (700821,1,4,1,1,0,0,0,''),
         (700822,0,4,1,1,1,0,0,''),
-        (700823,1,4,1,1,1,0,0,''),
-        (700824,0,4,1,1,1,0,0,''),
-        (700825,1,4,1,1,1,0,0,'');
+        (700823,1,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700824,0,4,1,1,1,0,0,''),
+        (700825,1,4,1,1,1,0,0,''),
         (700826,0,4,1,1,1,0,0,''),
         (700827,0,4,1,1,1,0,0,''),
         (700828,1,4,1,1,1,0,0,''),
@@ -217,10 +220,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700831,1,4,1,1,1,0,0,''),
         (700833,0,4,1,1,1,0,0,''),
         (700834,1,4,1,1,1,0,0,''),
-        (700835,0,4,1,1,1,0,0,''),
-        (700836,0,4,1,1,1,0,0,''),
-        (700837,1,4,1,1,1,0,0,'');
+        (700835,0,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700836,0,4,1,1,1,0,0,''),
+        (700837,1,4,1,1,1,0,0,''),
         (700838,0,4,1,1,1,0,0,''),
         (700839,1,4,1,1,1,0,0,''),
         (700840,0,4,1,1,1,0,0,''),
@@ -228,10 +231,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700842,0,4,1,1,1,0,0,''),
         (700843,0,4,1,1,1,0,0,''),
         (700844,1,4,1,1,1,0,0,''),
-        (700846,0,4,1,1,1,0,0,''),
-        (700847,1,4,1,1,1,0,0,''),
-        (700848,0,4,1,1,1,0,0,'');
+        (700846,0,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700847,1,4,1,1,1,0,0,''),
+        (700848,0,4,1,1,1,0,0,''),
         (700849,0,4,1,1,1,0,0,''),
         (700850,1,4,1,1,1,0,0,''),
         (700851,0,4,1,1,1,0,0,''),
@@ -239,10 +242,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700853,1,4,1,1,1,0,0,''),
         (700854,0,4,1,1,1,0,0,''),
         (700855,0,4,1,1,1,0,0,''),
-        (700856,1,4,1,1,1,0,0,''),
-        (700857,0,4,1,1,1,0,0,''),
-        (700858,0,1,1,1,1,0,0,'');
+        (700856,1,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700857,0,4,1,1,1,0,0,''),
+        (700858,0,1,1,1,1,0,0,''),
         (700859,1,1,1,1,1,0,0,''),
         (700860,1,1,1,1,1,0,0,''),
         (700861,0,1,1,1,1,0,0,''),
@@ -250,10 +253,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700863,1,1,1,1,1,0,0,''),
         (700864,1,1,1,1,1,0,0,''),
         (700865,0,1,1,1,1,0,0,''),
-        (700867,0,1,1,1,1,0,0,''),
-        (700868,0,1,1,1,1,0,0,''),
-        (700869,0,1,1,1,1,0,0,'');
+        (700867,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700868,0,1,1,1,1,0,0,''),
+        (700869,0,1,1,1,1,0,0,''),
         (700870,0,1,1,1,1,0,0,''),
         (700871,1,1,1,1,1,0,0,''),
         (700872,0,1,1,1,1,0,0,''),
@@ -261,10 +264,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700874,1,1,1,1,1,0,0,''),
         (700875,0,1,1,1,1,0,0,''),
         (700876,0,1,1,1,1,0,0,''),
-        (700877,0,1,1,1,1,0,0,''),
-        (700878,0,1,1,1,1,0,0,''),
-        (700879,0,1,1,1,1,0,0,'');
+        (700877,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700878,0,1,1,1,1,0,0,''),
+        (700879,0,1,1,1,1,0,0,''),
         (700880,0,1,1,1,1,0,0,''),
         (700881,1,1,1,1,1,0,0,''),
         (700882,1,1,1,1,1,0,0,''),
@@ -272,10 +275,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700884,0,1,1,1,1,0,0,''),
         (700885,0,1,1,1,1,0,0,''),
         (700887,1,1,1,1,1,0,0,''),
-        (700888,0,1,1,1,1,0,0,''),
-        (700889,1,1,1,1,1,0,0,''),
-        (700890,0,1,1,1,1,0,0,'');
+        (700888,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700889,1,1,1,1,1,0,0,''),
+        (700890,0,1,1,1,1,0,0,''),
         (700891,1,1,1,1,1,0,0,''),
         (700892,0,1,1,1,1,0,0,''),
         (700893,0,1,1,1,1,0,0,''),
@@ -283,10 +286,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700895,1,1,1,1,1,0,0,''),
         (700896,1,1,1,1,1,0,0,''),
         (700897,0,1,1,1,1,0,0,''),
-        (700898,1,1,1,1,1,0,0,''),
-        (700899,1,1,1,1,1,0,0,''),
-        (700901,0,1,1,1,1,0,0,'');
+        (700898,1,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700899,1,1,1,1,1,0,0,''),
+        (700901,0,1,1,1,1,0,0,''),
         (700902,0,1,1,1,1,0,0,''),
         (700903,1,1,1,1,1,0,0,''),
         (700904,0,1,1,1,1,0,0,''),
@@ -294,21 +297,20 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700906,1,1,1,1,1,0,0,''),
         (700907,0,1,1,1,1,0,0,''),
         (700908,1,1,1,1,1,0,0,''),
-        (700909,0,1,1,1,1,0,0,''),
-        (700910,1,1,1,1,1,0,0,''),
-        (700911,0,1,1,1,1,0,0,'');
+        (700909,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700910,1,1,1,1,1,0,0,''),
+        (700911,0,1,1,1,1,0,0,''),
         (700912,0,1,1,1,1,0,0,''),
         (700913,1,1,1,1,1,0,0,''),
         (700914,1,1,1,1,1,0,0,''),
         (700915,0,1,1,1,1,0,0,''),
         (700916,1,1,1,1,1,0,0,''),
         (700917,0,1,1,1,1,0,0,''),
-        (700918,1,1,1,1,1,0,0,''),
         (700919,1,1,1,1,1,0,0,''),
-        (700920,0,1,1,1,1,0,0,''),
-        (700921,1,32,1,1,1,0,0,'');
+        (700920,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700921,1,32,1,1,1,0,0,''),
         (700922,1,32,1,1,1,0,0,''),
         (700923,1,32,1,1,1,0,0,''),
         (700924,1,32,1,1,1,0,0,''),
@@ -317,9 +319,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700927,0,32,1,1,1,0,0,''),
         (700928,0,32,1,1,1,0,0,''),
         (700929,1,32,1,1,1,0,0,''),
-        (700930,1,32,1,1,1,0,0,''),
-        (700931,1,32,1,1,1,0,0,'');
+        (700930,1,32,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700931,1,32,1,1,1,0,0,''),
         (700932,1,32,1,1,1,0,0,''),
         (700933,0,32,1,1,1,0,0,''),
         (700934,1,32,1,1,1,0,0,''),
@@ -328,9 +330,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700937,1,32,1,1,1,0,0,''),
         (700938,0,32,1,1,1,0,0,''),
         (700939,0,32,1,1,1,0,0,''),
-        (700940,0,32,1,1,1,0,0,''),
-        (700941,0,32,1,1,1,0,0,'');
+        (700940,0,32,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700941,0,32,1,1,1,0,0,''),
         (700942,1,32,1,1,1,0,0,''),
         (700943,0,32,1,1,1,0,0,''),
         (700944,0,32,1,1,1,0,0,''),
@@ -339,9 +341,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700947,0,32,1,1,1,0,0,''),
         (700949,0,32,1,1,1,0,0,''),
         (700950,1,32,1,1,1,0,0,''),
-        (700951,0,32,1,1,1,0,0,''),
-        (700952,1,32,1,1,1,0,0,'');
+        (700951,0,32,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700952,1,32,1,1,1,0,0,''),
         (700953,0,32,1,1,1,0,0,''),
         (700954,1,32,1,1,1,0,0,''),
         (700955,1,32,1,1,1,0,0,''),
@@ -350,9 +352,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700958,0,32,1,1,1,0,0,''),
         (700959,1,32,1,1,1,0,0,''),
         (700960,0,32,1,1,1,0,0,''),
-        (700961,1,32,1,1,1,0,0,''),
-        (700962,0,32,1,1,1,0,0,'');
+        (700961,1,32,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700962,0,32,1,1,1,0,0,''),
         (700963,0,32,1,1,1,0,0,''),
         (700964,0,32,1,1,1,0,0,''),
         (700965,0,32,1,1,1,0,0,''),
@@ -361,9 +363,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700968,1,32,1,1,1,0,0,''),
         (700969,0,32,1,1,1,0,0,''),
         (700970,0,32,1,1,1,0,0,''),
-        (700971,1,32,1,1,1,0,0,''),
-        (700972,1,32,1,1,1,0,0,'');
+        (700971,1,32,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700972,1,32,1,1,1,0,0,''),
         (700973,1,32,1,1,1,0,0,''),
         (700974,0,32,1,1,1,0,0,''),
         (700975,1,32,1,1,1,0,0,''),
@@ -372,9 +374,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700978,1,32,1,1,1,0,0,''),
         (700979,0,128,1,1,1,0,0,''),
         (700980,0,128,1,1,1,0,0,''),
-        (700981,0,128,1,1,1,0,0,''),
-        (700982,0,128,1,1,1,0,0,'');
+        (700981,0,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700982,0,128,1,1,1,0,0,''),
         (700983,0,128,1,1,1,0,0,''),
         (700984,0,128,1,1,1,0,0,''),
         (700985,0,128,1,1,1,0,0,''),
@@ -383,9 +385,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700988,0,128,1,1,1,0,0,''),
         (700989,0,128,1,1,1,0,0,''),
         (700990,0,128,1,1,1,0,0,''),
-        (700991,1,128,1,1,1,0,0,''),
-        (700992,1,128,1,1,1,0,0,'');
+        (700991,1,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (700992,1,128,1,1,1,0,0,''),
         (700993,1,128,1,1,1,0,0,''),
         (700994,1,128,1,1,1,0,0,''),
         (700995,0,128,1,1,1,0,0,''),
@@ -394,9 +396,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (700998,0,128,1,1,1,0,0,''),
         (700999,1,128,1,1,1,0,0,''),
         (701000,1,128,1,1,1,0,0,''),
-        (701001,0,1024,1,1,1,0,0,''),
-        (701002,1,128,1,1,1,0,0,'');
+        (701001,0,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701002,1,128,1,1,1,0,0,''),
         (701003,0,128,1,1,1,0,0,''),
         (701004,1,128,1,1,1,0,0,''),
         (701005,0,128,1,1,1,0,0,''),
@@ -405,9 +407,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701008,0,128,1,1,1,0,0,''),
         (701009,0,128,1,1,1,0,0,''),
         (701010,0,128,1,1,1,0,0,''),
-        (701011,0,128,1,1,1,0,0,''),
-        (701012,0,128,1,1,1,0,0,'');
+        (701011,0,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701012,0,128,1,1,1,0,0,''),
         (701013,0,128,1,1,1,0,0,''),
         (701014,0,128,1,1,1,0,0,''),
         (701015,0,128,1,1,1,0,0,''),
@@ -416,9 +418,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701018,0,128,1,1,1,0,0,''),
         (701019,0,128,1,1,1,0,0,''),
         (701020,0,128,1,1,1,0,0,''),
-        (701021,0,128,1,1,1,0,0,''),
-        (701022,0,128,1,1,1,0,0,'');
+        (701021,0,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701022,0,128,1,1,1,0,0,''),
         (701023,1,128,1,1,1,0,0,''),
         (701024,1,128,1,1,1,0,0,''),
         (701025,0,128,1,1,1,0,0,''),
@@ -427,9 +429,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701028,0,128,1,1,1,0,0,''),
         (701029,1,128,1,1,1,0,0,''),
         (701031,1,128,1,1,1,0,0,''),
-        (701032,0,128,1,1,1,0,0,''),
-        (701033,0,128,1,1,1,0,0,'');
+        (701032,0,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701033,0,128,1,1,1,0,0,''),
         (701034,1,128,1,1,1,0,0,''),
         (701035,0,128,1,1,1,0,0,''),
         (701036,1,128,1,1,1,0,0,''),
@@ -438,9 +440,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701039,0,128,1,1,1,0,0,''),
         (701040,0,128,1,1,1,0,0,''),
         (701041,0,256,1,1,1,0,0,''),
-        (701042,0,256,1,1,1,0,0,''),
-        (701043,1,256,1,1,1,0,0,'');
+        (701042,0,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701043,1,256,1,1,1,0,0,''),
         (701044,1,256,1,1,1,0,0,''),
         (701046,0,256,1,1,1,0,0,''),
         (701047,1,256,1,1,1,0,0,''),
@@ -449,9 +451,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701052,0,256,1,1,1,0,0,''),
         (701053,1,256,1,1,1,0,0,''),
         (701054,0,256,1,1,1,0,0,''),
-        (701055,1,256,1,1,1,0,0,''),
-        (701056,1,256,1,1,1,0,0,'');
+        (701055,1,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701056,1,256,1,1,1,0,0,''),
         (701057,0,256,1,1,1,0,0,''),
         (701059,1,256,1,1,1,0,0,''),
         (701060,0,256,1,1,1,0,0,''),
@@ -460,9 +462,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701063,0,256,1,1,1,0,0,''),
         (701064,1,256,1,1,1,0,0,''),
         (701066,0,256,1,1,1,0,0,''),
-        (701067,0,256,1,1,1,0,0,''),
-        (701068,1,256,1,1,1,0,0,'');
+        (701067,0,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701068,1,256,1,1,1,0,0,''),
         (701069,0,256,1,1,1,0,0,''),
         (701070,0,256,1,1,1,0,0,''),
         (701071,0,256,1,1,1,0,0,''),
@@ -471,9 +473,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701074,0,256,1,1,1,0,0,''),
         (701075,0,256,1,1,1,0,0,''),
         (701076,0,256,1,1,1,0,0,''),
-        (701077,1,256,1,1,1,0,0,''),
-        (701078,1,256,1,1,1,0,0,'');
+        (701077,1,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701078,1,256,1,1,1,0,0,''),
         (701079,1,256,1,1,1,0,0,''),
         (701080,0,256,1,1,1,0,0,''),
         (701081,0,256,1,1,1,0,0,''),
@@ -482,9 +484,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701084,0,256,1,1,1,0,0,''),
         (701085,1,256,1,1,1,0,0,''),
         (701086,0,256,1,1,1,0,0,''),
-        (701087,1,256,1,1,1,0,0,''),
-        (701088,0,256,1,1,1,0,0,'');
+        (701087,1,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701088,0,256,1,1,1,0,0,''),
         (701089,0,256,1,1,1,0,0,''),
         (701090,1,256,1,1,1,0,0,''),
         (701091,1,256,1,1,1,0,0,''),
@@ -493,9 +495,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701094,0,256,1,1,1,0,0,''),
         (701096,0,256,1,1,1,0,0,''),
         (701097,0,256,1,1,1,0,0,''),
-        (701098,1,256,1,1,1,0,0,''),
-        (701099,0,256,1,1,1,0,0,'');
+        (701098,1,256,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701099,0,256,1,1,1,0,0,''),
         (701100,0,256,1,1,1,0,0,''),
         (701101,0,256,1,1,1,0,0,''),
         (701102,0,256,1,1,1,0,0,''),
@@ -504,9 +506,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701105,0,8,1,1,1,0,0,''),
         (701106,1,8,1,1,1,0,0,''),
         (701107,0,8,1,1,1,0,0,''),
-        (701108,0,8,1,1,1,0,0,''),
-        (701109,1,8,1,1,1,0,0,'');
+        (701108,0,8,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701109,1,8,1,1,1,0,0,''),
         (701110,0,8,1,1,1,0,0,''),
         (701111,0,8,1,1,1,0,0,''),
         (701112,0,8,1,1,1,0,0,''),
@@ -515,9 +517,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701115,1,8,1,1,1,0,0,''),
         (701116,1,8,1,1,1,0,0,''),
         (701117,0,8,1,1,1,0,0,''),
-        (701118,0,8,1,1,1,0,0,''),
-        (701119,1,8,1,1,1,0,0,'');
+        (701118,0,8,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701119,1,8,1,1,1,0,0,''),
         (701120,0,8,1,1,1,0,0,''),
         (701121,1,8,1,1,1,0,0,''),
         (701122,0,8,1,1,1,0,0,''),
@@ -526,9 +528,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701125,1,8,1,1,1,0,0,''),
         (701126,0,8,1,1,1,0,0,''),
         (701127,0,8,1,1,1,0,0,''),
-        (701128,0,8,1,1,1,0,0,''),
-        (701129,0,8,1,1,1,0,0,'');
+        (701128,0,8,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701129,0,8,1,1,1,0,0,''),
         (701130,1,8,1,1,1,0,0,''),
         (701131,1,8,1,1,1,0,0,''),
         (701132,0,8,1,1,1,0,0,''),
@@ -537,9 +539,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701135,0,8,1,1,1,0,0,''),
         (701136,0,8,1,1,1,0,0,''),
         (701137,0,8,1,1,1,0,0,''),
-        (701138,1,8,1,1,1,0,0,''),
-        (701139,1,8,1,1,1,0,0,'');
+        (701138,1,8,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701139,1,8,1,1,1,0,0,''),
         (701140,1,8,1,1,1,0,0,''),
         (701141,0,8,1,1,1,0,0,''),
         (701142,0,8,1,1,1,0,0,''),
@@ -548,9 +550,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701145,0,8,1,1,1,0,0,''),
         (701146,1,8,1,1,1,0,0,''),
         (701147,1,8,1,1,1,0,0,''),
-        (701148,1,8,1,1,1,0,0,''),
-        (701149,1,8,1,1,1,0,0,'');
+        (701148,1,8,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701149,1,8,1,1,1,0,0,''),
         (701150,0,8,1,1,1,0,0,''),
         (701151,0,8,1,1,1,0,0,''),
         (701152,1,8,1,1,1,0,0,''),
@@ -559,9 +561,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701155,1,8,1,1,1,0,0,''),
         (701157,0,2,1,1,1,0,0,''),
         (701158,1,2,1,1,1,0,0,''),
-        (701160,1,2,1,1,1,0,0,''),
-        (701161,1,2,1,1,1,0,0,'');
+        (701160,1,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701161,1,2,1,1,1,0,0,''),
         (701162,0,2,1,1,1,0,0,''),
         (701163,0,2,1,1,1,0,0,''),
         (701164,0,2,1,1,1,0,0,''),
@@ -570,9 +572,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701167,0,2,1,1,1,0,0,''),
         (701168,1,2,1,1,1,0,0,''),
         (701169,1,2,1,1,1,0,0,''),
-        (701170,0,2,1,1,1,0,0,''),
-        (701171,1,2,1,1,1,0,0,'');
+        (701170,0,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701171,1,2,1,1,1,0,0,''),
         (701172,0,2,1,1,1,0,0,''),
         (701173,0,2,1,1,1,0,0,''),
         (701174,1,2,1,1,1,0,0,''),
@@ -581,9 +583,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701177,0,2,1,1,1,0,0,''),
         (701178,1,2,1,1,1,0,0,''),
         (701179,0,2,1,1,1,0,0,''),
-        (701180,1,2,1,1,1,0,0,''),
-        (701181,1,2,1,1,1,0,0,'');
+        (701180,1,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701181,1,2,1,1,1,0,0,''),
         (701182,1,2,1,1,1,0,0,''),
         (701183,0,2,1,1,1,0,0,''),
         (701184,1,2,1,1,1,0,0,''),
@@ -592,9 +594,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701188,1,2,1,1,1,0,0,''),
         (701189,0,2,1,1,1,0,0,''),
         (701190,0,2,1,1,1,0,0,''),
-        (701191,1,2,1,1,1,0,0,''),
-        (701192,0,2,1,1,1,0,0,'');
+        (701191,1,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701192,0,2,1,1,1,0,0,''),
         (701193,1,2,1,1,1,0,0,''),
         (701194,0,2,1,1,1,0,0,''),
         (701196,0,2,1,1,1,0,0,''),
@@ -603,9 +605,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701199,1,2,1,1,1,0,0,''),
         (701200,1,2,1,1,1,0,0,''),
         (701201,1,2,1,1,1,0,0,''),
-        (701202,0,2,1,1,1,0,0,''),
-        (701203,0,2,1,1,1,0,0,'');
+        (701202,0,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701203,0,2,1,1,1,0,0,''),
         (701204,0,2,1,1,1,0,0,''),
         (701205,1,2,1,1,1,0,0,''),
         (701206,0,2,1,1,1,0,0,''),
@@ -614,9 +616,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701209,0,2,1,1,1,0,0,''),
         (701210,0,2,1,1,1,0,0,''),
         (701211,0,2,1,1,1,0,0,''),
-        (701212,0,2,1,1,1,0,0,''),
-        (701213,0,2,1,1,1,0,0,'');
+        (701212,0,2,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701213,0,2,1,1,1,0,0,''),
         (701214,0,2,1,1,1,0,0,''),
         (701215,1,2,1,1,1,0,0,''),
         (701216,0,2,1,1,1,0,0,''),
@@ -625,9 +627,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701220,0,1024,1,1,1,0,0,''),
         (701221,1,1024,1,1,1,0,0,''),
         (701222,0,1024,1,1,1,0,0,''),
-        (701223,1,1024,1,1,1,0,0,''),
-        (701224,1,1024,1,1,1,0,0,'');
+        (701223,1,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701224,1,1024,1,1,1,0,0,''),
         (701225,0,1024,1,1,1,0,0,''),
         (701226,1,1024,1,1,1,0,0,''),
         (701227,0,1024,1,1,1,0,0,''),
@@ -636,9 +638,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701230,0,1024,1,1,1,0,0,''),
         (701231,1,1024,1,1,1,0,0,''),
         (701232,1,1024,1,1,1,0,0,''),
-        (701233,1,1024,1,1,1,0,0,''),
-        (701234,0,1024,1,1,1,0,0,'');
+        (701233,1,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701234,0,1024,1,1,1,0,0,''),
         (701235,0,1024,1,1,1,0,0,''),
         (701236,1,1024,1,1,1,0,0,''),
         (701237,0,1024,1,1,1,0,0,''),
@@ -647,9 +649,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701240,0,1024,1,1,1,0,0,''),
         (701241,1,1024,1,1,1,0,0,''),
         (701242,0,1024,1,1,1,0,0,''),
-        (701243,0,1024,1,1,1,0,0,''),
-        (701244,1,1024,1,1,1,0,0,'');
+        (701243,0,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701244,1,1024,1,1,1,0,0,''),
         (701245,0,1024,1,1,1,0,0,''),
         (701246,0,1024,1,1,1,0,0,''),
         (701247,1,1024,1,1,1,0,0,''),
@@ -658,9 +660,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701250,0,1024,1,1,1,0,0,''),
         (701251,1,1024,1,1,1,0,0,''),
         (701252,0,1024,1,1,1,0,0,''),
-        (701253,0,1024,1,1,1,0,0,''),
-        (701254,1,1024,1,1,1,0,0,'');
+        (701253,0,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701254,1,1024,1,1,1,0,0,''),
         (701255,0,1024,1,1,1,0,0,''),
         (701256,1,1024,1,1,1,0,0,''),
         (701257,0,1024,1,1,1,0,0,''),
@@ -669,9 +671,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701261,0,1024,1,1,1,0,0,''),
         (701262,0,1024,1,1,1,0,0,''),
         (701263,0,1024,1,1,1,0,0,''),
-        (701264,1,1024,1,1,1,0,0,''),
-        (701265,0,1024,1,1,1,0,0,'');
+        (701264,1,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701265,0,1024,1,1,1,0,0,''),
         (701266,0,1024,1,1,1,0,0,''),
         (701267,1,1024,1,1,1,0,0,''),
         (701268,0,1024,1,1,1,0,0,''),
@@ -680,9 +682,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701271,0,1024,1,1,1,0,0,''),
         (701272,0,1024,1,1,1,0,0,''),
         (701273,1,1024,1,1,1,0,0,''),
-        (701274,0,1024,1,1,1,0,0,''),
-        (701275,1,1024,1,1,1,0,0,'');
+        (701274,0,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701275,1,1024,1,1,1,0,0,''),
         (701276,0,1024,1,1,1,0,0,''),
         (701277,0,1024,1,1,1,0,0,''),
         (701278,1,1024,1,1,1,0,0,''),
@@ -691,9 +693,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701282,0,1024,1,1,1,0,0,''),
         (701283,1,1024,1,1,1,0,0,''),
         (701284,0,1024,1,1,1,0,0,''),
-        (701285,1,1024,1,1,1,0,0,''),
-        (701286,0,1024,1,1,1,0,0,'');
+        (701285,1,1024,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (701286,0,1024,1,1,1,0,0,''),
         (701287,1,1024,1,1,1,0,0,''),
         (701288,1,1024,1,1,1,0,0,''),
         (701289,0,1024,1,1,1,0,0,''),
@@ -702,9 +704,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (701293,1,1024,1,1,1,0,0,''),
         (701294,1,1024,1,1,1,0,0,''),
         (800803,1,1024,1,1,1,0,0,''),
-        (800804,1,128,1,1,1,0,0,''),
-        (800805,1,256,1,1,1,0,0,'');
+        (800804,1,128,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (800805,1,256,1,1,1,0,0,''),
         (800806,1,2,1,1,1,0,0,''),
         (800807,1,64,1,1,1,0,0,''),
         (800808,1,16,1,1,1,0,0,''),
@@ -713,9 +715,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (800815,0,2047,1,1,1,0,0,''),
         (800816,0,64,1,1,1,0,0,''),
         (800817,0,256,1,1,1,0,0,''),
-        (800819,0,1,1,1,1,0,0,''),
-        (800820,1,32,1,1,1,0,0,'');
+        (800819,0,1,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (800820,1,32,1,1,1,0,0,''),
         (800821,1,1024,1,1,1,0,0,''),
         (800822,1,4,1,1,1,0,0,''),
         (800823,1,1024,1,1,1,0,0,''),
@@ -724,9 +726,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (800826,1,1,1,1,1,0,0,''),
         (800827,1,2,1,1,1,0,0,''),
         (800828,1,1127,1,1,1,0,0,''),
-        (800829,0,4,1,1,1,0,0,''),
-        (800830,1,8,1,1,1,0,0,'');
+        (800829,0,4,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (800830,1,8,1,1,1,0,0,''),
         (800831,1,8,1,1,1,0,0,''),
         (800832,1,128,1,1,1,0,0,''),
         (800833,1,1024,1,1,1,0,0,''),
@@ -735,9 +737,9 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (800836,1,1,1,1,1,0,0,''),
         (800837,1,1612,1,1,1,0,0,''),
         (800838,1,1612,1,1,1,0,0,''),
-        (800839,1,1612,1,1,1,0,0,''),
-        (800840,1,1,1,1,1,0,0,'');
+        (800839,1,1612,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (800840,1,1,1,1,1,0,0,''),
         (800841,0,1024,1,1,1,0,0,''),
         (800842,1,32,1,1,1,0,0,''),
         (800843,1,16,1,1,1,0,0,''),
@@ -746,11 +748,10 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (800846,1,256,1,1,1,0,0,''),
         (800847,1,256,1,1,1,0,0,''),
         (800848,1,1024,1,1,1,0,0,''),
-        (800849,1,64,1,1,1,0,0,''),
-        (800850,1,2,1,1,1,0,0,'');
+        (800849,1,64,1,1,1,0,0,'');
 INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,category,`type`,groupId,tags) VALUES
+        (800850,1,2,1,1,1,0,0,''),
         (800851,1,8,1,1,1,0,0,''),
-        (800852,1,32,1,1,1,0,0,''),
         (800853,1,1,1,1,1,0,0,''),
         (800854,1,4,1,1,1,0,0,''),
         (800855,1,16,1,1,1,0,0,''),
@@ -797,4 +798,3 @@ INSERT INTO acore_world.perks (id,`unique`,allowableClass,permanent,chance,categ
         (800946,1,292,1,1,1,0,0,''),
         (800947,0,64,1,1,1,0,0,''),
         (800948,0,64,1,1,1,0,0,'');
-

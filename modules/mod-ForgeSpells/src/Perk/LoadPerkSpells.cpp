@@ -143,5 +143,6 @@ public:
         RegisterSpellScript(spell_arch_mana_battery);
         RegisterSpellScript(spell_perk_refund_cost);
         RegisterSpellScript(spell_perk_any_proc);
+        RegisterSpellScript(spell_perk_fire_explosion);
     }
 };

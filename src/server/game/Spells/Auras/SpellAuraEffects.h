@@ -351,6 +351,7 @@ public:
     void HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcRefundCooldownAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void HandleProcTriggerSpellPctOfHitAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleRaidProcFromChargeAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);

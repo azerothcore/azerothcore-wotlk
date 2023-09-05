@@ -1215,6 +1215,9 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         case SPELL_AURA_PROC_REFUND_COOLDOWN:
             HandleProcRefundCooldownAuraProc(aurApp, eventInfo);
             break;
+        case SPELL_AURA_PROC_TRIGGER_SPELL_PCT_HIT:
+            HandleProcTriggerSpellPctOfHitAuraProc(aurApp, eventInfo);
+            break;
         default:
             break;
     }
@@ -7031,6 +7034,28 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
     else
     {
         LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellWithValueAuraProc: Could not trigger spell {} from aura {} proc, because the spell does not have an entry in Spell.dbc.", triggerSpellId, GetId());
+    }
+}
+
+void AuraEffect::HandleProcTriggerSpellPctOfHitAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+{
+    Unit* triggerCaster = aurApp->GetTarget();
+    Unit* triggerTarget = eventInfo.GetProcTarget();
+
+    uint32 triggerSpellId = GetSpellInfo()->Effects[m_effIndex].TriggerSpell;
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    {
+        // used only with EXTRA_LOGS
+        (void)triggeredSpellInfo;
+        if (auto damageInfo = eventInfo.GetDamageInfo()) {
+            int32 basepoints0 = CalculatePct(damageInfo->GetDamage(), GetAmount());
+            LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellPctOfHitAuraProc: Triggering spell {} with value {} from aura {} proc", triggeredSpellInfo->Id, basepoints0, GetId());
+            triggerCaster->CastCustomSpell(triggerTarget, triggerSpellId, &basepoints0, nullptr, nullptr, true, nullptr, this);
+        }
+    }
+    else
+    {
+        LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellPctOfHitAuraProc: Could not trigger spell {} from aura {} proc, because the spell does not have an entry in Spell.dbc.", triggerSpellId, GetId());
     }
 }
 
