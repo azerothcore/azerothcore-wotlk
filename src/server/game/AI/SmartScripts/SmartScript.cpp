@@ -593,9 +593,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 // may be nullptr
                 if (go)
-                {
                     go->CastSpell(target->ToUnit(), e.action.cast.spell);
-                }
 
                 if (!IsUnit(target))
                     continue;
@@ -610,10 +608,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if ((e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || target->ToUnit()->HasAura(e.action.cast.spell))
                         continue;
 
-                    // Interrupts any other spells
-                    if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
-                        me->InterruptNonMeleeSpells(false);
-
                     // If the threatlist is a singleton, skip cast
                     if (e.action.cast.castFlags & SMARTCAST_THREATLIST_NOT_SINGLE)
                         if (me->GetThreatMgr().GetThreatListSize() <= 1)
@@ -623,9 +617,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_MANA))
                         continue;
 
+                    // Interrupts any other spells
+                    if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
+                        me->InterruptNonMeleeSpells(false);
+
                     // If already casting another spell, retry in the next AI tick
-                    if (me->HasUnitState(UNIT_STATE_CASTING))
-                        RecalcTimer(e, 1200, 1200);
+                    //if (!(e.action.cast.castFlags & SMARTCAST_TRIGGERED) && (me->HasUnitState(UNIT_STATE_CASTING)))
+                    //    RecalcTimer(e, 1200, 1200);
 
                     // Flag usable only if caster has max dist set.
                     if ((e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
@@ -4609,14 +4607,14 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
 
     if (e.timer < diff)
     {
-        // delay spell cast event if another spell is being casted
+        // delay spell cast for another AI tick if another spell is being cast
         if (e.GetActionType() == SMART_ACTION_CAST)
         {
             if (!(e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
                 if (me && me->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    e.timer = 1;
+                    e.timer = 1200;
                     return;
                 }
             }
@@ -4625,9 +4623,9 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         // Delay flee for assist event if casting
         if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->HasUnitState(UNIT_STATE_CASTING))
         {
-            e.timer = 1;
+            e.timer = 1200;
             return;
-        }
+        } // @TODO: Can't these be handled by the action themselves instead? Less expensive
 
         e.active = true;//activate events with cooldown
         switch (e.GetEventType())//process ONLY timed events
