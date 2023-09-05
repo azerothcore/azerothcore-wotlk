@@ -84,7 +84,7 @@ struct boss_void_reaver : public BossAI
         Talk(SAY_AGGRO);
         me->CallForHelp(105.0f);
 
-        scheduler.Schedule(10min, [this](TaskContext context)
+        scheduler.Schedule(10min, [this](TaskContext)
         {
             DoCastSelf(SPELL_BERSERK);
         }).Schedule(15s, [this](TaskContext context)
