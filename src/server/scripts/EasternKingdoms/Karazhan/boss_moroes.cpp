@@ -114,7 +114,7 @@ struct boss_moroes : public BossAI
 
         scheduler.Schedule(10s, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
-            if(Creature* guest = GetRandomGuest())
+            if (Creature* guest = GetRandomGuest())
             {
                 guest->AI()->Talk(SAY_GUEST);
             }
@@ -156,7 +156,6 @@ struct boss_moroes : public BossAI
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);
-                DoCastRandomTarget(SPELL_GARROTE, 0, 100.0f, true, true);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
@@ -178,7 +177,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if(!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
+        if (!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
         {
             Talk(SAY_KILL);
             _recentlySpoken = true;
@@ -206,6 +205,7 @@ struct boss_moroes : public BossAI
                 guestList.push_back(summon);
             }
         }
+
         return Acore::Containers::SelectRandomContainerElement(guestList);
     }
 
@@ -234,7 +234,7 @@ struct boss_moroes : public BossAI
             EnterEvadeMode();
             summons.DoForAllSummons([](WorldObject* summon)
             {
-                summon->ToCreature()->AI()->EnterEvadeMode();
+                summon->ToCreature()->DespawnOnEvade(5s);
             });
             return;
         }
