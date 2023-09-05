@@ -203,8 +203,10 @@ private:
 
 struct boss_fathomguard_sharkkis : public ScriptedAI
 {
-    boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature)
+    boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature), summons(creature)
     {
+        summons.clear();
+
         _instance = creature->GetInstanceScript();
 
         _scheduler.SetValidator([this]
@@ -302,7 +304,7 @@ enum TidalActions
 
 struct boss_fathomguard_tidalvess : public ScriptedAI
 {
-    boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature)
+    boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature), summons(creature)
     {
         _instance = creature->GetInstanceScript();
 
@@ -447,7 +449,7 @@ private:
 
 struct boss_fathomguard_caribdis : public ScriptedAI
 {
-    boss_fathomguard_caribdis(Creature* creature) : ScriptedAI(creature)
+    boss_fathomguard_caribdis(Creature* creature) : ScriptedAI(creature), summons(creature)
     {
         _instance = creature->GetInstanceScript();
 
