@@ -1,5 +1,5 @@
 --
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (21218, 21220, 21221, 21224, 21225, 21226, 21228, 21229, 21230, 21231, 21232, 21251, 21263, 21298, 21299, 21301, 21339, 21806, 21863, 21865, 21873, 21913, 21920, 21964, 21965, 21966, 22009, 22055, 22056, 22250) AND `source_type` = 0;
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (21218, 21220, 21221, 21224, 21225, 21226, 21228, 21229, 21230, 21231, 21232, 21251, 21263, 21298, 21299, 21301, 21339, 21806, 21863, 21865, 21873, 21920, 22009, 22055, 22056, 22250) AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21218, 0, 0, 0, 0, 0, 100, 0, 16300, 19300, 10090, 19400, 0, 0, 11, 38572, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Vashj\'ir Honor Guard - In Combat - Cast Mortal Cleave'),-- fully sniffed
 (21218, 0, 1, 0, 105, 0, 100, 0, 15750, 16850, 15750, 16850, 0, 5, 11, 38576, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Vashj\'ir Honor Guard - Victim Casting - Cast Knockback'),-- fully sniffed
@@ -77,34 +77,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21865, 0, 1, 0, 0, 0, 100, 0, 7250, 14850, 12100, 16000, 0, 0, 11, 37790, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Ambusher - In Combat - Cast Spread Shot'),-- fully sniffed
 (21873, 0, 0, 0, 0, 0, 100, 0, 1000, 5000, 9000, 12000, 0, 0, 11, 28168, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Guardian - In Combat - Cast Arcing Smash'),-- not sniffed correctly
 (21873, 0, 1, 0, 0, 0, 100, 0, 8000, 12000, 14000, 18000, 0, 0, 11, 9080, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Guardian - In Combat - Cast Hamstring'),-- not sniffed but weird ID
-(21913, 0, 0, 0, 0, 0, 100, 0, 6000, 10300, 8450, 10750, 0, 0, 11, 39848, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Water Globule - In Combat - Cast Water Globule New Target'),-- fully sniffed
-(21913, 0, 1, 0, 0, 0, 100, 0, 6000, 42700, 4850, 14550, 0, 0, 11, 37871, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Water Globule - In Combat - Cast Freeze'),-- fully sniffed
-(21913, 0, 2, 0, 31, 0, 100, 512, 37871, 0, 0, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Water Globule - Spell Hit Target - Despawn'),
 (21920, 0, 0, 0, 0, 0, 100, 0, 7650, 26050, 7250, 26950, 0, 0, 11, 41932, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Tidewalker Lurker - In Combat - Cast Carnivorous Bite'),-- fully sniffed
-(21964, 0, 0, 0, 0, 0, 100, 0, 15750, 15750, 47250, 51550, 0, 0, 11, 38337, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Summon Cyclone'),-- fully sniffed
-(21964, 0, 1, 0, 0, 0, 100, 0, 27900, 27900, 6050, 19750, 0, 0, 11, 38335, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Water Bolt Volley'),-- fully sniffed
-(21964, 0, 2, 0, 0, 0, 100, 0, 23050, 23050, 24250, 33250, 0, 0, 11, 38358, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - In Combat - Cast Tidal Surge'),-- fully sniffed
-(21964, 0, 3, 0, 74, 0, 100, 0, 0, 85, 15000, 15000, 0, 0, 11, 38330, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - Friendly between health 0-85% - Cast Healing Wave'),-- not sniffed
-(21964, 0, 4, 5, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Aggro - Set In Combat With Zone'),
-(21964, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Aggro - Set In Combat With Zone'),
-(21964, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38451, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Caribdis - On Death - Cast Power of Caribdis'),-- N/A note: missing ability 38449 (on hp%?)
-(21965, 0, 0, 0, 0, 0, 100, 0, 10900, 10900, 10900, 14700, 0, 0, 11, 38234, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - In Combat - Cast Frost Shock'),-- fully sniffed
-(21965, 0, 1, 0, 0, 0, 100, 0, 17000, 17000, 13350, 24250, 0, 0, 11, 38304, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - In Combat - Cast Earthbind Totem'),-- fully sniffed
-(21965, 0, 2, 0, 0, 0, 100, 0, 15000, 15000, 30000, 30000, 0, 0, 11, 38306, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - In Combat - Cast Poison Cleansing Totem'),-- not sniffed
-(21965, 0, 3, 0, 0, 0, 100, 0, 15800, 15800, 24250, 76750, 0, 0, 11, 38236, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - In Combat - Cast Spitfire Totem'),-- fully sniffed
-(21965, 0, 4, 5, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - On Aggro - Set In Combat With Zone'),
-(21965, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - On Aggro - Set In Combat With Zone'),
-(21965, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38452, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Tidalvess - On Death - Cast Power of Tidalvess'),
-(21966, 0, 0, 0, 0, 0, 100, 0, 0, 1000, 2000, 2000, 0, 0, 11, 38374, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Hurl Trident'),-- not sniffed
-(21966, 0, 1, 0, 2, 0, 100, 0, 0, 85, 6050, 22250, 0, 0, 11, 29436, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - Between health 0-85% - Cast Leeching Throw'),-- fully sniffed
-(21966, 0, 2, 0, 0, 0, 100, 0, 20650, 20650, 12150, 26350, 0, 0, 11, 38366, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Multi-Toss'),-- fully sniffed
-(21966, 0, 3, 0, 0, 0, 100, 0, 14550, 14550, 60650, 84850, 0, 0, 11, 38431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Summon Fathom Sporebat'),-- fully sniffed -> now repeatable
-(21966, 0, 4, 0, 0, 0, 100, 0, 44900, 44900, 30300, 60500, 0, 0, 11, 38433, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Summon Fathom Lurker'),-- fully sniffed -> now repeatable
-(21966, 0, 5, 6, 0, 0, 100, 0, 41250, 41250, 39950, 46050, 0, 0, 11, 38373, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast The Beast Within'),-- fully sniffed
-(21966, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38371, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - In Combat - Cast Bestial Wrath'),-- linked but %hp based? missing ability 38449 as well?
-(21966, 0, 7, 8, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - On Aggro - Set In Combat With Zone'),
-(21966, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - On Aggro - Set In Combat With Zone'),
-(21966, 0, 9, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 38455, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom-Guard Sharkkis - On Death - Cast Power of Sharkkis'),
 (22009, 0, 0, 0, 60, 0, 100, 1, 100, 100, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tainted Elemental - On Reset - Set In Combat With Zone'),
 (22009, 0, 1, 0, 60, 0, 100, 0, 100, 500, 2350, 2650, 0, 0, 11, 38253, 0, 0, 0, 0, 0, 5, 200, 0, 0, 0, 0, 0, 0, 0, 'Tainted Elemental - In Combat - Cast Poison Bolt'),-- fully sniffed
 (22009, 0, 2, 0, 60, 0, 100, 769, 15000, 15000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tainted Elemental - On Update - Despawn'),
