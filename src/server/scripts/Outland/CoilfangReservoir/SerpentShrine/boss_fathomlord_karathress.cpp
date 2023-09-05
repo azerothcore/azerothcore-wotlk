@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "serpent_shrine.h"
+#include "TaskScheduler.h"
 
 enum Talk
 {
@@ -32,10 +33,32 @@ enum Talk
 
 enum Spells
 {
+    //Fathomlord Karathress
     SPELL_CATACLYSMIC_BOLT          = 38441,
     SPELL_SEAR_NOVA                 = 38445,
     SPELL_ENRAGE                    = 24318,
-    SPELL_BLESSING_OF_THE_TIDES     = 38449
+    SPELL_BLESSING_OF_THE_TIDES     = 38449,
+    //Fathomguard Sharkkis
+    SPELL_HURL_TRIDENT              = 38374,
+    SPELL_LEECHING_THROW            = 29436,
+    SPELL_MULTI_TOSS                = 38366,
+    SPELL_SUMMON_FATHOM_SPOREBAT    = 38431,
+    SPELL_SUMMON_FATHOM_LUKER       = 38433,
+    SPELL_CAST_THE_BEAST_WITHIN     = 38373,
+    SPELL_CAST_BESTIAL_WRATH        = 38371,
+    SPELL_POWER_OF_SHARKKIS         = 38455,
+    //Fathomguard Tidalvess
+    SPELL_FROST_SHOCK               = 38234,
+    SPELL_EARTHBIND_TOTEM           = 38304,
+    SPELL_POISON_CLEANSING_TOTEM    = 38306,
+    SPELL_SPITFIRE_TOTEM            = 38236,
+    SPELL_POWER_OF_TIDALVESS        = 38452,
+    //Fathomguard Caribdis
+    SPELL_SUMMON_CYCLONE            = 38337,
+    SPELL_WATER_BOLT_VOLLEY         = 38335,
+    SPELL_TIDAL_SURGE               = 38358,
+    SPELL_HEALING_WAVE              = 38330,
+    SPELL_POWER_OF_CARIBDIS         = 38451
 };
 
 enum Misc
@@ -46,6 +69,11 @@ enum Misc
     NPC_FATHOM_GUARD_SHARKKIS       = 21966,
     NPC_SEER_OLUM                   = 22820,
     GO_CAGE                         = 185952,
+};
+
+enum FKActions
+{
+    ACTION_COMBATZONE               = 1
 };
 
 const Position advisorsPosition[MAX_ADVISORS + 2] =
@@ -143,7 +171,10 @@ struct boss_fathomlord_karathress : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        me->CallForHelp(10.0f);
+        
+        instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
+            fathomguard->AI()->DoAction(ACTION_COMBATZONE);
+        });
 
         scheduler.Schedule(10s, [this](TaskContext context)
         {
@@ -163,6 +194,171 @@ struct boss_fathomlord_karathress : public BossAI
     }
 private:
     bool _recentlySpoken;
+};
+
+struct boss_fathomguard_sharkkis : public ScriptedAI
+{
+    boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_COMBATZONE)
+        {
+            me->SetInCombatWithZone();
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+    InstanceScript* _instance;
+};
+
+struct boss_fathomguard_tidalvess : public ScriptedAI
+{
+    boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_COMBATZONE)
+        {
+            me->SetInCombatWithZone();
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+    InstanceScript* _instance;
+};
+
+struct boss_fathomguard_caribdis : public ScriptedAI
+{
+    boss_fathomguard_caribdis(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_COMBATZONE)
+        {
+            me->SetInCombatWithZone();
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+    InstanceScript* _instance;
 };
 
 class spell_karathress_power_of_caribdis : public SpellScriptLoader
@@ -196,5 +392,8 @@ public:
 void AddSC_boss_fathomlord_karathress()
 {
     RegisterSerpentShrineAI(boss_fathomlord_karathress);
+    RegisterSerpentShrineAI(boss_fathomguard_sharkkis);
+    RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
+    RegisterSerpentShrineAI(boss_fathomguard_caribdis);
     new spell_karathress_power_of_caribdis();
 }

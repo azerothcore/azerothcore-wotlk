@@ -29,6 +29,19 @@ DoorData const doorData[] =
     { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
+    { 0,                          0                           }
+};
+
+MinionData const minionData[] =
+{
+    { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_LORD_KARATHRESS },
+};
+
 class instance_serpent_shrine : public InstanceMapScript
 {
 public:
@@ -45,6 +58,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
 
             AliveKeepersCount = 0;
         }

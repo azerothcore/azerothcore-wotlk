@@ -53,7 +53,12 @@ enum SSNPCs
     NPC_THE_LURKER_BELOW                    = 21217,
     NPC_LEOTHERAS_THE_BLIND                 = 21215,
     NPC_CYCLONE_KARATHRESS                  = 22104,
+    NPC_FATHOM_LORD_KARATHRESS              = 21214,
     NPC_LADY_VASHJ                          = 21212,
+
+    NPC_FATHOM_GUARD_SHARKKIS               = 21966,
+    NPC_FATHOM_GUARD_TIDALVESS              = 21965,
+    NPC_FATHOM_GUARD_CARIBDIS               = 21964,
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
