@@ -4265,7 +4265,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                             if (IsUnit(target) && me->IsFriendlyTo(target->ToUnit()) && target->ToUnit()->IsAlive() && target->ToUnit()->IsInCombat())
                             {
                                 uint32 healthPct = uint32(target->ToUnit()->GetHealthPct());
-                                if (healthPct > e.event.friendlyHealthPct.maxHpPct || healthPct < e.event.friendlyHealthPct.minHpPct)
+                                if (healthPct > e.event.friendlyHealthPct.hpPct)
                                 {
                                     continue;
                                 }
@@ -4279,7 +4279,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     }
                     case SMART_TARGET_SELF:
                     case SMART_TARGET_ACTION_INVOKER:
-                        unitTarget = DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
+                        unitTarget = DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, 0, e.event.friendlyHealthPct.hpPct);
                         break;
                     default:
                         return;
@@ -4567,6 +4567,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_AREA_RANGE:
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
+        case SMART_EVENT_FRIENDLY_HEALTH_PCT:
         case SMART_EVENT_IS_BEHIND_ME:
         case SMART_EVENT_VICTIM_NOT_ATTACKING:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);

@@ -1182,10 +1182,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     break;
                 }
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
+                if (!IsMinMaxValid(e, e.event.friendlyHealthPct.min, e.event.friendlyHealthPct.max))
+                    return false;
+
                 if (!IsMinMaxValid(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax))
                     return false;
 
-                if (e.event.friendlyHealthPct.maxHpPct > 100 || e.event.friendlyHealthPct.minHpPct > 100)
+                if (e.event.friendlyHealthPct.hpPct > 100)
                 {
                     LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has pct value above 100, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
