@@ -178,6 +178,9 @@ struct boss_leotheras_the_blind : public BossAI
             context.Repeat(30250ms, 34900ms);
         }).Schedule(60350ms, GROUP_DEMON, [this](TaskContext context)
         {
+            context.Repeat(27s);
+        }).Schedule(55s, GROUP_DEMON, [this](TaskContext)
+        {
             DoResetThreatList();
             Talk(SAY_SWITCH_TO_DEMON);
             DemonTime();
