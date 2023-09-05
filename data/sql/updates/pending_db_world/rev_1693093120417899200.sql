@@ -90,6 +90,14 @@ UPDATE `smart_scripts` SET `action_param2`=`action_param2`|256 WHERE `entryorgui
 UPDATE `smart_scripts` SET `action_param2`=`action_param2`|256 WHERE `entryorguid`=26737 AND `source_type`=0 AND `id`=2 AND `link`=0;
 UPDATE `smart_scripts` SET `action_param2`=`action_param2`|256 WHERE `entryorguid`=26737 AND `source_type`=0 AND `id`=3 AND `link`=0;
 UPDATE `smart_scripts` SET `action_param2`=`action_param2`|256 WHERE `entryorguid`=32163 AND `source_type`=0 AND `id`=0 AND `link`=0;
+UPDATE `smart_scripts` SET `action_param2`=`action_param2`&~256 WHERE `entryorguid` IN (-63697, -63695, -63694, -63693, -63691, -63690, -56029, -56028) AND `source_type`=0 AND `id`=0 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=7664 AND `source_type`=0 AND `id`=1 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=7728 AND `source_type`=0 AND `id`=1 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=9240 AND `source_type`=0 AND `id`=2 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=16304 AND `source_type`=0 AND `id`=0 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=16310 AND `source_type`=0 AND `id`=0 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=18880 AND `source_type`=0 AND `id`=2 AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=1 WHERE `entryorguid`=25363 AND `source_type`=0 AND `id`=2 AND `link`=0;
 -- Port Range to new system
 UPDATE `smart_scripts` SET `event_param1`=5000, `event_param2`=9000, `event_param3`=25000, `event_param4`=35000, `event_param5`=0, `event_param6`=30 WHERE `entryorguid`=2319 AND `source_type`=0 AND `id`=2 AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=500, `event_param2`=1000, `event_param3`=3000, `event_param4`=4000, `event_param5`=0, `event_param6`=40 WHERE `entryorguid`=7734 AND `source_type`=0 AND `id`=0 AND `link`=0;

@@ -621,7 +621,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
-                    // If already casting another spell, retry in the next AI tick
+                    // If already casting another spell, retry in the next AI tick @TODO
                     //if (!(e.action.cast.castFlags & SMARTCAST_TRIGGERED) && (me->HasUnitState(UNIT_STATE_CASTING)))
                     //    RecalcTimer(e, 1200, 1200);
 
