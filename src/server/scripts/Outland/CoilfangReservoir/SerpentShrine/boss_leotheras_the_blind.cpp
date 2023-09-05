@@ -172,11 +172,11 @@ struct boss_leotheras_the_blind : public BossAI
 
     void ElfTime()
     {
-        scheduler.Schedule(10s, GROUP_COMBAT, [this](TaskContext context)
+        scheduler.Schedule(25050ms, 32550ms, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastSelf(SPELL_WHIRLWIND);
-            context.Repeat(27s);
-        }).Schedule(55s, GROUP_DEMON, [this](TaskContext context)
+            context.Repeat(30250ms, 34900ms);
+        }).Schedule(60350ms, GROUP_DEMON, [this](TaskContext context)
         {
             DoResetThreatList();
             Talk(SAY_SWITCH_TO_DEMON);
@@ -191,7 +191,7 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_METAMORPHOSIS, true);
 
         scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(25s, GROUP_DEMON, [this](TaskContext)
+        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
         {
             Talk(SAY_INNER_DEMONS);
             me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
