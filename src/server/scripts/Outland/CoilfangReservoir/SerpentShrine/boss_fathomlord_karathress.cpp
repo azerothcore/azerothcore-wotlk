@@ -380,15 +380,15 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
     uint8 CountTotems(std::vector<bool> totemList)
     {
-        uint8 sum = 0;
+        uint8 conditionalCount = 0;
         for (uint8 i = 0; i < 3; i++)
         {
             if (totemList[i] == true)
             {
-                sum++;
+                conditionalCount++;
             }
         }
-        return sum;
+        return conditionalCount;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
