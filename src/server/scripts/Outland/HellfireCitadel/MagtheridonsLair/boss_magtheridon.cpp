@@ -170,6 +170,7 @@ struct boss_magtheridon : public BossAI
 
     void ScheduleCombatEvents()
     {
+        me->GetThreatMgr().ClearAllThreat();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetImmuneToPC(false);
         me->SetReactState(REACT_AGGRESSIVE);
