@@ -128,7 +128,7 @@ struct boss_the_lurker_below : public BossAI
         {
             DoCastRandomTarget(SPELL_GEYSER);
             context.Repeat(10200ms, 54900ms);
-        }).Schedule(18150s, GROUP_WHIRL, [this](TaskContext context)
+        }).Schedule(18150ms, GROUP_WHIRL, [this](TaskContext context)
         {
             DoCastSelf(SPELL_WHIRL);
             context.Repeat(34150ms, 68550ms);
