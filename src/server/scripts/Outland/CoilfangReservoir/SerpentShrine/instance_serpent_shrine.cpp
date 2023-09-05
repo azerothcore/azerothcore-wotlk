@@ -32,6 +32,9 @@ DoorData const doorData[] =
 ObjectData const creatureData[] =
 {
     { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_GUARD_SHARKKIS  },
+    { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_GUARD_TIDALVESS },
+    { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_GUARD_CARIBDIS  },
     { 0,                          0                           }
 };
 
