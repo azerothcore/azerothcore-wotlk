@@ -59,7 +59,7 @@ struct boss_void_reaver : public BossAI
         _recentlySpoken = false;
     }
 
-    void KilledUnit(Unit* victim) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         if (!_recentlySpoken)
         {
