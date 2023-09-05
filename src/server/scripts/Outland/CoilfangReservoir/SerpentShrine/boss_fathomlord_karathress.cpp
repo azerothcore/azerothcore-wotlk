@@ -64,9 +64,6 @@ enum Spells
 enum Misc
 {
     MAX_ADVISORS                    = 3,
-    NPC_FATHOM_GUARD_CARIBDIS       = 21964,
-    NPC_FATHOM_GUARD_TIDALVESS      = 21965,
-    NPC_FATHOM_GUARD_SHARKKIS       = 21966,
     NPC_SEER_OLUM                   = 22820,
     GO_CAGE                         = 185952,
 };
