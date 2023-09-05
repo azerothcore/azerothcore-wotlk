@@ -90,4 +90,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (22056, 0, 2, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Strider - Movement Inform - Set In Combat With Zone'),
 (22250, 0, 0, 0, 25, 0, 100, 769, 0, 0, 0, 0, 0, 0, 41, 21000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rancid Mushroom - On Reset - Despawn'),
 (22250, 0, 1, 0, 0, 0, 100, 0, 1150, 1150, 1200, 3400, 0, 0, 11, 31698, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rancid Mushroom - In Combat - Cast Grow'),-- fully sniffed
-(22250, 0, 2, 0, 0, 0, 100, 0, 22950, 22950, 19400, 23400, 0, 0, 11, 38652, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rancid Mushroom - In Combat - Cast Spore Cloud');-- fully sniffed
+(22250, 0, 2, 3, 0, 0, 100, 1, 22950, 22950, 0, 0, 0, 0, 11, 38652, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rancid Mushroom - In Combat - Cast Spore Cloud (no repeat)'),-- fully sniffed
+(22250, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rancid Mushroom - In Combat - Die');
