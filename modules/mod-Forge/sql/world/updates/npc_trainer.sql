@@ -5480,3 +5480,5 @@ INSERT INTO acore_world.npc_trainer (ID,SpellID,MoneyCost,ReqSkillLine,ReqSkillR
 INSERT INTO acore_world.npc_trainer (ID,SpellID,MoneyCost,ReqSkillLine,ReqSkillRank,ReqLevel,ReqSpell) VALUES
 	 (202011,34091,50000000,762,225,70,0),
 	 (202012,54197,10000000,762,225,77,0);
+
+INSERT INTO acore_world.npc_trainer (ID, SpellID, MoneyCost, ReqSkillLine, ReqSkillRank, ReqLevel, ReqSpell) VALUES(17504, 30213, 0, 0, 0, 0, 0);

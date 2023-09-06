@@ -15,3 +15,5 @@ INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(600710,
 INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(600712, 'spell_perk_any_proc');
 INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(600715, 'spell_perk_any_proc');
 INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES(600721, 'spell_perk_any_proc');
+
+INSERT INTO acore_world.spell_script_names (spell_id, ScriptName) VALUES (600600, 'spell_perk_fire_explosion');

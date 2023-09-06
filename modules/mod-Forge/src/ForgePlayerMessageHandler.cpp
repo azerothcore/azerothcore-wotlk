@@ -272,11 +272,6 @@ private:
                 if (!valid)
                     continue;
 
-                if (tSpell->reqSpell && !player->HasSpell(tSpell->reqSpell))
-                {
-                    continue;
-                }
-
                 if (player->GetTrainerSpellState(tSpell) != TRAINER_SPELL_GREEN)
                     continue;
 

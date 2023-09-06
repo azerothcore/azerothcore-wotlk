@@ -327,6 +327,8 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
 
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
+    SpellScalingEntry* scaling = sObjectMgr->GetSpellScalingEntry(spellInfo->Id);
+
     _spellInfo = spellInfo;
     _effIndex = effIndex;
     Effect = spellEntry->Effect[effIndex];
@@ -350,6 +352,10 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];
     SpellClassMask = spellEntry->EffectSpellClassMask[effIndex];
     ImplicitTargetConditions = nullptr;
+
+    ScalingMultiplier = scaling ? scaling->Multiplier[effIndex] : 0.0f;
+    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[effIndex] : 0.0f;
+    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[effIndex] : 0.0f;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -408,43 +414,79 @@ bool SpellEffectInfo::IsUnitOwnedAuraEffect() const
     return IsAreaAuraEffect() || Effect == SPELL_EFFECT_APPLY_AURA;
 }
 
-int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const* /*target*/) const
+int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const* target) const
 {
     float basePointsPerLevel = RealPointsPerLevel;
     int32 basePoints = bp ? *bp : BasePoints;
-    int32 randomPoints = int32(DieSides);
+    float comboDamage = PointsPerComboPoint;
+
+    auto Id = _spellInfo->Id;
 
     // base amount modification based on spell lvl vs caster lvl
-    // xinef: added basePointsPerLevel check
-    if (caster && basePointsPerLevel != 0.0f)
+    // Don't execute default calculation if Basepoints were manually set
+    if (ScalingMultiplier != 0.0f && !(bp && *bp != BasePoints))
     {
-        int32 level = int32(caster->GetLevel());
-        if (level > int32(_spellInfo->MaxLevel) && _spellInfo->MaxLevel > 0)
-            level = int32(_spellInfo->MaxLevel);
-        else if (level < int32(_spellInfo->BaseLevel))
-            level = int32(_spellInfo->BaseLevel);
+        if (caster)
+        {
+            int32 level = caster->getLevel();
+            if (target && _spellInfo->IsPositiveEffect(_effIndex) && (Effect == SPELL_EFFECT_APPLY_AURA))
+                level = target->getLevel();
 
-        // xinef: if base level is greater than spell level, reduce by base level (eg. pilgrims foods)
-        level -= int32(std::max(_spellInfo->BaseLevel, _spellInfo->SpellLevel));
-        basePoints += int32(level * basePointsPerLevel);
+            if (auto gtScaling = sObjectMgr->GetSpellScalingValue((_spellInfo->ScalingClass != -1 ? _spellInfo->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
+            {
+                float multiplier = gtScaling;
+                if (_spellInfo->CastTimeMax > 0 && _spellInfo->CastTimeMaxLevel > level)
+                    multiplier *= float(_spellInfo->CastTimeMin + (level - 1) * (_spellInfo->CastTimeMax - _spellInfo->CastTimeMin) / (_spellInfo->CastTimeMaxLevel - 1)) / float(_spellInfo->CastTimeMax);
+                if (_spellInfo->CoefLevelBase > level)
+                    multiplier *= (1.0f - _spellInfo->CoefBase) * (float)(level - 1) / (float)(_spellInfo->CoefLevelBase - 1) + _spellInfo->CoefBase;
+
+                float preciseBasePoints = ScalingMultiplier * multiplier;
+                if (DeltaScalingMultiplier)
+                {
+                    float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                    if (delta > 0)
+                        preciseBasePoints += frand(-delta, delta);
+                    else
+                        LOG_ERROR("spells", "SpellEffectInfo::CalcValue: wrong DeltaScalingMultiplier '%f' for spell %d", delta, _spellInfo->Id);
+                }
+
+                basePoints = int32(floor(preciseBasePoints + 0.5));
+
+                if (ComboScalingMultiplier)
+                    comboDamage = ComboScalingMultiplier * multiplier;
+            }
+        }
     }
-
-    // roll in a range <1;EffectDieSides> as of patch 3.3.3
-    switch (randomPoints)
+    else
     {
-        case 0:
-            break;
-        case 1:
-            basePoints += 1;
-            break;                     // range 1..1
+        if (caster)
+        {
+            int32 level = int32(caster->getLevel());
+            if (level > int32(_spellInfo->MaxLevel) && _spellInfo->MaxLevel > 0)
+                level = int32(_spellInfo->MaxLevel);
+            else if (level < int32(_spellInfo->BaseLevel))
+                level = int32(_spellInfo->BaseLevel);
+            level -= int32(_spellInfo->SpellLevel);
+            basePoints += int32(level * basePointsPerLevel);
+        }
+
+        // roll in a range <1;EffectDieSides> as of patch 3.3.3
+        int32 randomPoints = int32(DieSides);
+        switch (randomPoints)
+        {
+        case 0: break;
+        case 1: basePoints += 1; break;                     // range 1..1
         default:
+        {
             // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
             int32 randvalue = (randomPoints >= 1)
-                              ? irand(1, randomPoints)
-                              : irand(randomPoints, 1);
+                ? irand(1, randomPoints)
+                : irand(randomPoints, 1);
 
             basePoints += randvalue;
             break;
+        }
+        }
     }
 
     float value = float(basePoints);
@@ -461,74 +503,17 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
         // amount multiplication based on caster's level
-        if (!caster->IsControlledByPlayer() &&
-                _spellInfo->SpellLevel && _spellInfo->SpellLevel != caster->GetLevel() &&
-                !basePointsPerLevel && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
-        {
-            bool canEffectScale = false;
-            switch (Effect)
-            {
-                case SPELL_EFFECT_SCHOOL_DAMAGE:
-                case SPELL_EFFECT_DUMMY:
-                case SPELL_EFFECT_POWER_DRAIN:
-                case SPELL_EFFECT_HEALTH_LEECH:
-                case SPELL_EFFECT_HEAL:
-                case SPELL_EFFECT_WEAPON_DAMAGE:
-                case SPELL_EFFECT_POWER_BURN:
-                case SPELL_EFFECT_SCRIPT_EFFECT:
-                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                case SPELL_EFFECT_FORCE_CAST_WITH_VALUE:
-                case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
-                case SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE:
-                    canEffectScale = true;
-                    break;
-                default:
-                    break;
-            }
-
-            switch (ApplyAuraName)
-            {
-                case SPELL_AURA_PERIODIC_DAMAGE:
-                case SPELL_AURA_DUMMY:
-                case SPELL_AURA_PERIODIC_HEAL:
-                case SPELL_AURA_DAMAGE_SHIELD:
-                case SPELL_AURA_PROC_TRIGGER_DAMAGE:
-                case SPELL_AURA_PERIODIC_LEECH:
-                case SPELL_AURA_PERIODIC_MANA_LEECH:
-                case SPELL_AURA_SCHOOL_ABSORB:
-                case SPELL_AURA_MOD_ATTACK_POWER:
-                case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
-                case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
-                    canEffectScale = true;
-                    break;
-                case SPELL_AURA_MOD_WEAPON_SCHOOL_DAMAGE_EFFECT:
-                    if (Amplitude == 1)
-                        canEffectScale = true;
-                    else
-                        canEffectScale = false;
-                    break;
-                default:
-                    break;
-            }
-
-            if (canEffectScale)
-            {
-                if (!caster->IsControlledByPlayer())
-                {
-                    GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
-                    GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
-                    if (spellScaler && casterScaler)
-                        value *= casterScaler->ratio / spellScaler->ratio;
-                }
-                else
-                {
-                    auto spellScaler = PlayerSpellScaleMap[_spellInfo->SpellLevel];
-                    auto casterScaler = PlayerSpellScaleMap[caster->getLevel()];
-                    if (spellScaler && casterScaler)
-                        value *= casterScaler / spellScaler;
-                }
-            }
-        }
+        if (!SpellScaling && !basePointsPerLevel && (_spellInfo->SpellLevel) &&
+            Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
+            Effect != SPELL_EFFECT_KNOCK_BACK &&
+            Effect != SPELL_EFFECT_ADD_EXTRA_ATTACKS &&
+            ApplyAuraName != SPELL_AURA_MOD_SPEED_ALWAYS &&
+            ApplyAuraName != SPELL_AURA_MOD_SPEED_NOT_STACK &&
+            ApplyAuraName != SPELL_AURA_MOD_INCREASE_SPEED &&
+            ApplyAuraName != SPELL_AURA_MOD_DECREASE_SPEED)
+            //there are many more: slow speed, -healing pct
+            value *= 0.25f * exp(caster->getLevel() * (70 - _spellInfo->SpellLevel) / 1000.0f);
+        //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
     return int32(value);
@@ -804,6 +789,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     AttributesEx6 = spellEntry->AttributesEx6;
     AttributesEx7 = spellEntry->AttributesEx7;
     AttributesCu = 0;
+
     Stances = spellEntry->Stances;
     StancesNot = spellEntry->StancesNot;
     Targets = spellEntry->Targets;
@@ -869,6 +855,15 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 
     ChainEntry = nullptr;
     ExplicitTargetMask = 0;
+
+    // SpellScalingEntry
+    SpellScalingEntry const* _scaling = sObjectMgr->GetSpellScalingEntry(Id);
+    CastTimeMin = _scaling ? _scaling->CastTimeMin : 0;
+    CastTimeMax = _scaling ? _scaling->CastTimeMax : 0;
+    CastTimeMaxLevel = _scaling ? _scaling->CastTimeMaxLevel : 0;
+    ScalingClass = _scaling ? _scaling->ScalingClass : 0;
+    CoefBase = _scaling ? _scaling->CoefBase : 0;
+    CoefLevelBase = _scaling ? _scaling->CoefLevelBase : 0;
 
     // Mine
     _isStackableWithRanks = false;
@@ -2369,16 +2364,37 @@ int32 SpellInfo::GetMaxDuration() const
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
 {
-    // not all spells have cast time index and this is all is pasiive abilities
-    if (!CastTimeEntry)
-        return 0;
+    int32 castTime = 0;
 
-    int32 castTime = CastTimeEntry->CastTime;
-    if (HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && (!IsAutoRepeatRangedSpell()))
-        castTime += 500;
+    // not all spells have cast time index and this is all is pasiive abilities
+    if (caster && CastTimeMax > 0)
+    {
+        castTime = CastTimeMax;
+        if (CastTimeMaxLevel > int32(caster->getLevel()))
+            castTime = CastTimeMin + int32(caster->getLevel() - 1) * (CastTimeMax - CastTimeMin) / (CastTimeMaxLevel - 1);
+    }
+    else if (CastTimeEntry)
+        castTime = CastTimeEntry->CastTime;
+
+    if (!castTime)
+        return 0;
 
     if (caster)
         caster->ModSpellCastTime(this, castTime, spell);
+
+    if (caster)
+    {
+        switch (SpellFamilyName)
+        {
+        case SPELLFAMILY_HUNTER:
+        {
+            if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 1629, EFFECT_0))
+                if (SpellFamilyFlags & aur->GetSpellInfo()->Effects[aur->GetEffIndex()].SpellClassMask)
+                    AddPct(castTime, -(aur->GetAmount()));
+            break;
+        }
+        }
+    }
 
     return (castTime > 0) ? uint32(castTime) : 0;
 }

@@ -1588,6 +1588,12 @@ void World::SetInitialWorldSettings()
     ///- Initilize static helper structures
     AIRegistry::Initialize();
 
+    // hater: load scaling spell info
+    LOG_INFO("server.loading", "Loading SpellScaling...");
+    sObjectMgr->LoadSpellScalingData();
+    sObjectMgr->LoadSpellScalingSpellMap();
+    sObjectMgr->LoadSpellScalingValue();
+
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
     sSpellMgr->LoadSpellInfoStore();
 

@@ -271,6 +271,12 @@ public:
     flag96    SpellClassMask;
     std::list<Condition*>* ImplicitTargetConditions;
 
+    // hater: spell scaling
+    SpellScalingEntry* SpellScaling;
+    float     ScalingMultiplier;
+    float     DeltaScalingMultiplier;
+    float     ComboScalingMultiplier;
+
     SpellEffectInfo() : _spellInfo(nullptr), _effIndex(0), Effect(0), ApplyAuraName(0), Amplitude(0), DieSides(0),
         RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
         BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
@@ -392,6 +398,15 @@ public:
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> Effects;
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
+
+    uint32 SpellScalingId;
+    // SpellScalingEntry
+    int32  CastTimeMin;
+    int32  CastTimeMax;
+    int32  CastTimeMaxLevel;
+    int32  ScalingClass;
+    float  CoefBase;
+    int32  CoefLevelBase;
 
     // Mine
     AuraStateType _auraState;
@@ -544,6 +559,7 @@ public:
     void _UnloadImplicitTargetConditionLists();
 
     bool CheckElixirStacking(Unit const* caster) const;
+    SpellScalingEntry const* GetSpellScaling();
 
 private:
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }

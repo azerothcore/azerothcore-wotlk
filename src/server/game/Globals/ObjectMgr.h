@@ -632,6 +632,20 @@ struct GossipMenus
     ConditionList   Conditions;
 };
 
+struct SpellScalingEntry
+{
+    //uint32    Id;                                         // 0        m_ID
+    int32     CastTimeMin;                                  // 1
+    int32     CastTimeMax;                                  // 2
+    int32     CastTimeMaxLevel;                             // 3
+    int32     ScalingClass;                                 // 4        (index * 100) + charLevel - 1 => gtSpellScaling.dbc
+    float     Multiplier[3];                                // 5-7
+    float     RandomMultiplier[3];                          // 8-10
+    float     OtherMultiplier[3];                           // 11-13
+    float     CoefBase;                                     // 14        some coefficient, mostly 1.0f
+    int32     CoefLevelBase;                                // 15        some level
+};
+
 typedef std::multimap<uint32, GossipMenus> GossipMenusContainer;
 typedef std::pair<GossipMenusContainer::const_iterator, GossipMenusContainer::const_iterator> GossipMenusMapBounds;
 typedef std::pair<GossipMenusContainer::iterator, GossipMenusContainer::iterator> GossipMenusMapBoundsNonConst;
@@ -671,6 +685,7 @@ typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingCo
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint8 /*classid*/, std::unordered_map<uint32 /*spellid*/, TrainerSpell>> CacheTrainerSpellByClassContainer;
+typedef std::unordered_map<uint32 /*spellid*/, SpellScalingEntry*> CacheSpellScalingContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 typedef std::vector<uint32> CreatureCustomIDsContainer;
@@ -1099,6 +1114,11 @@ public:
 
     void LoadVendors();
     void LoadTrainerSpell();
+    void LoadSpellScalingData();
+    void LoadSpellScalingSpellMap();
+    void LoadSpellScalingValue();
+    SpellScalingEntry* GetSpellScalingEntry(uint32);
+    float GetSpellScalingValue(uint32 entry);
     void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
@@ -1617,6 +1637,12 @@ private:
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
     CacheTrainerSpellByClassContainer _cacheTrainerSpellByClass;
+    CacheSpellScalingContainer _cacheSpellScaling;
+
+    typedef std::unordered_map</* spellId */ uint32, uint32> CacheSpellScalingSpellMapContainer;
+    CacheSpellScalingSpellMapContainer _cacheSpellScalingSpellMap;
+    typedef std::unordered_map</* spellId */ uint32, float> CacheSpellScalingValueContainer;
+    CacheSpellScalingValueContainer _cacheSpellScalingValue;
 
     ServerMailContainer _serverMailStore;
 

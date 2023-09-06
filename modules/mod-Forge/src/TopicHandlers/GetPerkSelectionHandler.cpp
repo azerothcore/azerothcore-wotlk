@@ -50,8 +50,6 @@ public:
 
                 if (!spec->perkQueue[perkType].empty())
                     SendSelection(iam.player, spec->perkQueue[perkType].begin()->second);
-
-                return;
             }
         }
     }
