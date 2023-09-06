@@ -2486,7 +2486,7 @@ class spell_q9847_a_spirit_ally : public SpellScript
         Position pos = Position(-281.30f, 7235.84f + frand(-4.50f, 6.50f), 24.43f, 5.79f);
         GetCaster()->SummonCreature(NPC_FERALFEN_TOTEM, pos, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
     }
-    
+
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_q9847_a_spirit_ally::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
