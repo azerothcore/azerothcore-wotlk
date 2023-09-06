@@ -165,7 +165,7 @@ struct boss_fathomlord_karathress : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-
+        
         instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
             fathomguard->SetInCombatWithZone();
         });
@@ -229,6 +229,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     void JustSummoned(Creature* summon) override
     {
         summon->SetInCombatWithZone();
+        
         summons.Summon(summon);
     }
 
@@ -339,7 +340,6 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
     {
         summons.Summon(summon);
         summon->SetInCombatWithZone();
-        summon->GetMotionMaster()->Clear();
     }
 
     void DoAction(int32 action) override
@@ -380,15 +380,15 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
     uint8 CountTotems(std::vector<bool> totemList)
     {
-        uint8 conditionalCount = 0;
+        uint8 sum = 0;
         for (uint8 i = 0; i < 3; i++)
         {
             if (totemList[i] == true)
             {
-                conditionalCount++;
+                sum++;
             }
         }
-        return conditionalCount;
+        return sum;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -525,149 +525,6 @@ private:
     InstanceScript* _instance;
 };
 
-struct npc_spitfire_totem : public ScriptedAI
-{
-    npc_spitfire_totem(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-
-        SetCombatMovement(false);
-    }
-
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-
-        _scheduler.Schedule(59500ms, [this](TaskContext)
-        {
-            if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-            {
-                tidalvess->AI()->DoAction(ACTION_REMOVE_SPITFIRE);
-            }
-        });
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        _scheduler.Schedule(0s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_ATTACK);
-            context.Repeat(3s);
-        });
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-        {
-            tidalvess->AI()->DoAction(ACTION_REMOVE_SPITFIRE);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        _scheduler.Update(diff);
-    }
-
-private:
-    TaskScheduler _scheduler;
-    InstanceScript* _instance;
-};
-
-struct npc_greater_earthbind_totem : public ScriptedAI
-{
-    npc_greater_earthbind_totem(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-        SetCombatMovement(false);
-    }
-
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-
-        _scheduler.Schedule(44500ms, [this](TaskContext)
-        {
-            if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-            {
-                tidalvess->AI()->DoAction(ACTION_REMOVE_EARTHBIND);
-            }
-        });
-    }
-
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-        {
-            tidalvess->AI()->DoAction(ACTION_REMOVE_EARTHBIND);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        _scheduler.Update(diff);
-    }
-private:
-    TaskScheduler _scheduler;
-    InstanceScript* _instance;
-};
-
-struct npc_greater_poison_cleansing_totem : public ScriptedAI
-{
-    npc_greater_poison_cleansing_totem(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-        SetCombatMovement(false);
-    }
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-
-        _scheduler.Schedule(29500ms, [this](TaskContext)
-        {
-            if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-            {
-                tidalvess->AI()->DoAction(ACTION_REMOVE_CLEANSING);
-            }
-        });
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        if (Creature* tidalvess = _instance->GetCreature(DATA_FATHOM_GUARD_TIDALVESS))
-        {
-            tidalvess->AI()->DoAction(ACTION_REMOVE_CLEANSING);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        _scheduler.Update(diff);
-    }
-private:
-    TaskScheduler _scheduler;
-    InstanceScript* _instance;
-};
-
 class spell_karathress_power_of_caribdis : public SpellScriptLoader
 {
 public:
@@ -702,8 +559,5 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSerpentShrineAI(boss_fathomguard_sharkkis);
     RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
     RegisterSerpentShrineAI(boss_fathomguard_caribdis);
-    RegisterSerpentShrineAI(npc_spitfire_totem);
-    RegisterSerpentShrineAI(npc_greater_earthbind_totem);
-    RegisterSerpentShrineAI(npc_greater_poison_cleansing_totem);
     new spell_karathress_power_of_caribdis();
 }
