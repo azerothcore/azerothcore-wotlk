@@ -26,7 +26,6 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
-#include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Hyperlinks.h"
@@ -643,7 +642,7 @@ void WorldSession::LogoutPlayer(bool save)
             guild->HandleMemberLogout(this);
 
         ///- Remove pet
-        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
 
         // pussywizard: on logout remove auras that are removed at map change (before saving to db)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses

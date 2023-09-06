@@ -74,7 +74,10 @@ struct boss_exarch_maladaar : public BossAI
         _Reset();
         ScheduleHealthCheckEvent(25, [&] {
             Talk(SAY_SUMMON);
-            DoCastSelf(SPELL_SUMMON_AVATAR);
+            scheduler.Schedule(100ms, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_SUMMON_AVATAR);
+            });
         });
     }
 
@@ -131,6 +134,11 @@ struct boss_exarch_maladaar : public BossAI
         Talk(SAY_DEATH);
         me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
         _JustDied();
+    }
+
+    void JustSummoned(Creature* /*creature*/) override
+    {
+        // Override JustSummoned() so we don't despawn the Avatar.
     }
 
     void UpdateAI(uint32 diff) override

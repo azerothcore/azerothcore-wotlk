@@ -6,6 +6,6 @@ jobs:
   check-pending-sql:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check pending SQL
         run: source ./apps/ci/ci-pending.sh

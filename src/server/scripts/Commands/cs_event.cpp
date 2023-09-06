@@ -152,11 +152,12 @@ public:
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
         if (activeEvents.find(eventId) != activeEvents.end())
         {
-            handler->PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId));
+            handler->PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId), eventData.description.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        handler->PSendSysMessage(LANG_EVENT_STARTED, uint16(eventId), eventData.description.c_str());
         sGameEventMgr->StartEvent(eventId, true);
         return true;
     }
@@ -184,11 +185,12 @@ public:
 
         if (activeEvents.find(eventId) == activeEvents.end())
         {
-            handler->PSendSysMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId));
+            handler->PSendSysMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId), eventData.description.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        handler->PSendSysMessage(LANG_EVENT_STOPPED, uint16(eventId), eventData.description.c_str());
         sGameEventMgr->StopEvent(eventId, true);
         return true;
     }

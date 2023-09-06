@@ -143,30 +143,13 @@ function comp_compile() {
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chown root:root -- {} +
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chmod u+s  -- {} +
 
-      DOCKER_ETC_FOLDER=${DOCKER_ETC_FOLDER:-"env/dist/etc"}
-
-      if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
-        echo "Generating confs..."
-
-        # Search for all configs under DOCKER_ETC_FOLDER
-        for dockerdist in "$DOCKER_ETC_FOLDER"/*.dockerdist; do
-          # Grab "base" conf. turns foo.conf.dockerdist into foo.conf
-          baseConf="$(echo "$dockerdist" | rev | cut -f1 -d. --complement | rev)"
-          # env/dist/etc/foo.conf becomes foo.conf
-          filename="$(basename "$baseConf")"
-          # the dist files should be always found inside $confDir
-          # which may not be the same as DOCKER_ETC_FOLDER
-          distPath="$confDir/$filename.dist"
-          # if dist file doesn't exist, skip this iteration
-          [ ! -f "$distPath" ] && continue
-
-          # replace params in foo.conf.dist with params in foo.conf.dockerdist
-          conf_layer "$dockerdist" "$distPath" " # Copied from dockerdist"
-
-          # Copy modified dist file to $confDir/$filename
-          # Don't overwrite foo.conf if it already exists.
-          cp --no-clobber --verbose "$distPath" "$confDir/$filename"
-        done
+      if [[ -n "$DOCKER" ]]; then
+          [[ -f "$confDir/worldserver.conf.dist" ]] && \
+              cp -nv "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
+          [[ -f "$confDir/authserver.conf.dist" ]] && \
+              cp -nv "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
+          [[ -f "$confDir/dbimport.conf.dist" ]] && \
+              cp -nv "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
       fi
 
       echo "Done"
@@ -184,37 +167,4 @@ function comp_build() {
 function comp_all() {
   comp_clean
   comp_build
-}
-
-# conf_layer FILENAME FILENAME
-# Layer the configuration parameters from the first argument onto the second argument
-function conf_layer() {
-  LAYER="$1"
-  BASE="$2"
-  COMMENT="$3"
-
-  # Loop over all defined params in conf file
-  grep -E "^[a-zA-Z\.0-9]+\s*=.*$" "$LAYER" \
-    | while read -r param
-      do
-        # remove spaces from param
-        # foo       = bar becomes foo=bar
-        NOSPACE="$(tr -d '[:space:]' <<< "$param")"
-
-        # split into key and value
-        KEY="$(cut -f1 -d= <<< "$NOSPACE")"
-        VAL="$(cut -f2 -d= <<< "$NOSPACE")"
-        # if key in base and val not in line
-        if grep -qE "^$KEY" "$BASE" && ! grep -qE "^$KEY.*=.*$VAL" "$BASE"; then
-          # Replace line
-          # Prevent issues with shell quoting 
-          sed -i \
-            's,^'"$KEY"'.*,'"$KEY = $VAL$COMMENT"',g' \
-            "$BASE"
-        else
-          # insert line
-          echo "$KEY = $VAL$COMMENT" >> "$BASE"
-        fi
-      done
-  echo "Layered $LAYER onto $BASE"
 }

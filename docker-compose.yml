@@ -33,9 +33,9 @@ x-ac-service-conf: &ac-service-conf
   <<: *ac-shared-conf
   # List can't be merged. See: https://forums.docker.com/t/how-to-merge-a-list-of-volumes-from-an-extension-field-into-the-service-definition/77454
   # volumes:
-  #   - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+  #   - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc
   #   # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-  #   - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+  #   - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
 
 
 services:
@@ -94,7 +94,7 @@ services:
       # expose some dist folder outside allowing the host to use them
       - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc
       - ac-build-dev:/azerothcore/var/build
       - ac-ccache-dev:/azerothcore/var/ccache
     profiles: [dev-build]
@@ -118,32 +118,22 @@ services:
       - seccomp:unconfined
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+      AC_DATA_DIR: "/azerothcore/env/dist/data"
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+      AC_CLOSE_IDLE_CONNECTIONS: "0"
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ${DOCKER_VOL_ROOT:-.}:/azerothcore:cached
-      # expose some dist folder outside allowing the host to use them
-      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
-      - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
       - ac-build-dev:/azerothcore/var/build
       - ac-ccache-dev:/azerothcore/var/ccache
-      # client data
-      - ${DOCKER_VOL_DATA_CAMERAS:-./env/docker/data/Cameras}:/azerothcore/env/dist/data/Cameras
-      - ${DOCKER_VOL_DATA_DBC:-./env/docker/data/dbc}:/azerothcore/env/dist/data/dbc
-      - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/data/maps
-      - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/data/vmaps
-      - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/data/mmaps
-      # remount again for the extractors
-      - ${DOCKER_VOL_DATA_CAMERAS:-./env/docker/data/Cameras}:/azerothcore/env/dist/bin/Cameras
-      - ${DOCKER_VOL_DATA_DBC:-./env/docker/data/dbc}:/azerothcore/env/dist/bin/dbc
-      - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/bin/maps
-      - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/bin/vmaps
-      - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/bin/mmaps
       # this is not the directory of the extracted data! It's the client folder used by the extractors
       - ${DOCKER_AC_CLIENT_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [dev]
@@ -155,12 +145,19 @@ services:
     <<: *ac-shared-conf
     image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     command: ./env/dist/bin/dbimport
+    environment:
+      AC_DATA_DIR: "/azerothcore/env/dist/data"
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+      AC_CLOSE_IDLE_CONNECTIONS: "0"
     volumes:
       # read-only binaries compiled by ac-dev-server
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin:ro
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc:ro
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
     profiles: [local, app, db-import-local]
     depends_on:
       ac-database:
@@ -183,6 +180,13 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+      AC_DATA_DIR: "/azerothcore/env/dist/data"
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+      AC_CLOSE_IDLE_CONNECTIONS: "0"
     user: ${DOCKER_USER:-root}
     privileged: true
     build:
@@ -194,15 +198,11 @@ services:
     volumes:
       # read-only binaries compiled by ac-dev-server
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin:ro
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc:ro
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
       # client data
-      - ${DOCKER_VOL_DATA_CAMERAS:-./env/docker/data/Cameras}:/azerothcore/env/dist/data/Cameras
-      - ${DOCKER_VOL_DATA_DBC:-./env/docker/data/dbc}:/azerothcore/env/dist/data/dbc
-      - ${DOCKER_VOL_DATA_MAPS:-./env/docker/data/maps}:/azerothcore/env/dist/data/maps
-      - ${DOCKER_VOL_DATA_VMAPS:-./env/docker/data/vmaps}:/azerothcore/env/dist/data/vmaps
-      - ${DOCKER_VOL_DATA_MMAPS:-./env/docker/data/mmaps}:/azerothcore/env/dist/data/mmaps
+      - ${DOCKER_VOL_DATA:-./env/dist/data/}:/azerothcore/env/dist/data/
     profiles: [local, app, worldserver]
     depends_on:
       ac-database:
@@ -218,6 +218,12 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_TEMP_DIR: "/azerothcore/env/dist/temp"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_SQLDRIVER_LOG_FILE: "SQLDriver.log"
+      AC_SQLDRIVER_QUERY_LOGGING: "1"
     user: ${DOCKER_USER:-root}
     build:
       target: authserver-local
@@ -225,9 +231,9 @@ services:
     volumes:
       # read-only binaries compiled by ac-dev-server
       - ${DOCKER_VOL_BIN:-ac-bin-dev}:/azerothcore/env/dist/bin:ro
-      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [local, app, authserver]
@@ -281,6 +287,13 @@ services:
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+      AC_DATA_DIR: "/azerothcore/env/dist/data"
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+      AC_CLOSE_IDLE_CONNECTIONS: "0"
     user: ${DOCKER_USER:-root}
     privileged: true
     build:
@@ -290,7 +303,7 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
       - ${DOCKER_VOL_CLIENT_DATA_PROD:-ac-client-data-prod}:/azerothcore/env/dist/data:ro
     profiles: [prod, prod-app, prod-worldserver]
     depends_on:
@@ -309,12 +322,18 @@ services:
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_TEMP_DIR: "/azerothcore/env/dist/temp"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_SQLDRIVER_LOG_FILE: "SQLDriver.log"
+      AC_SQLDRIVER_QUERY_LOGGING: "1"
     user: ${DOCKER_USER:-root}
     build:
       target: authserver
       <<: *build-params
     volumes:
-      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [prod, prod-app, prod-authserver]
@@ -323,7 +342,6 @@ services:
         condition: service_healthy
       ac-db-import-prod:
         condition: service_completed_successfully
-
 
   ac-client-data-init:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
@@ -356,6 +374,13 @@ services:
     <<: *ac-shared-conf
     image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     command: ./env/dist/bin/dbimport
+    environment:
+      AC_DATA_DIR: "/azerothcore/env/dist/data"
+      AC_LOGS_DIR: "/azerothcore/env/dist/logs"
+      AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
+      AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
+      AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+      AC_CLOSE_IDLE_CONNECTIONS: "0"
     profiles: [prod, prod-app, db-import-prod]
 
   #

@@ -974,6 +974,9 @@ class spell_q6124_6129_apply_salve : public SpellScript
                 if (newEntry)
                 {
                     creatureTarget->UpdateEntry(newEntry);
+                    creatureTarget->GetMotionMaster()->Clear();
+                    creatureTarget->GetMotionMaster()->MoveFleeing(caster);
+                    creatureTarget->SetUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
                     creatureTarget->DespawnOrUnsummon(DESPAWN_TIME);
                     caster->KilledMonsterCredit(newEntry);
                 }
@@ -2448,9 +2451,30 @@ class spell_q4735_collect_rookery_egg : public SpellScript
     }
 };
 
+enum BookOfFelNames
+{
+    SPELL_METAMORPHOSIS   = 36298
+};
+
+class spell_q10651_q10692_book_of_fel_names : public SpellScript
+{
+    PrepareSpellScript(spell_q10651_q10692_book_of_fel_names);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitUnit()->HasAura(SPELL_METAMORPHOSIS))
+            GetHitUnit()->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q10651_q10692_book_of_fel_names::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 enum Feralfen
 {
-    NPC_FERALFEN_TOTEM = 18186
+    NPC_FERALFEN_TOTEM    = 18186
 };
 
 class spell_q9847_a_spirit_ally : public SpellScript
@@ -2462,7 +2486,7 @@ class spell_q9847_a_spirit_ally : public SpellScript
         Position pos = Position(-281.30f, 7235.84f + frand(-4.50f, 6.50f), 24.43f, 5.79f);
         GetCaster()->SummonCreature(NPC_FERALFEN_TOTEM, pos, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
     }
-
+    
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_q9847_a_spirit_ally::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
@@ -2540,5 +2564,6 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12919_gymers_throw);
     RegisterSpellScript(spell_q5056_summon_shy_rotam);
     RegisterSpellScript(spell_q4735_collect_rookery_egg);
+    RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
 }

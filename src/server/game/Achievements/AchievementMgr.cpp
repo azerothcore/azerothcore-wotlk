@@ -2394,6 +2394,11 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
+CompletedAchievementMap const& AchievementMgr::GetCompletedAchievements()
+{
+    return _completedAchievements;
+}
+
 AchievementGlobalMgr* AchievementGlobalMgr::instance()
 {
     static AchievementGlobalMgr instance;

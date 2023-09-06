@@ -23,7 +23,8 @@
 ObjectData const creatureData[] =
 {
     { NPC_HUNGARFEN, DATA_HUNGARFEN },
-    { NPC_GHAZAN, DATA_GHAZAN }
+    { NPC_GHAZAN,    DATA_GHAZAN    },
+    { 0,             0              }
 };
 
 class instance_the_underbog : public InstanceMapScript

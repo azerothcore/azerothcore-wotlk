@@ -21,7 +21,6 @@
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Unit.h"
