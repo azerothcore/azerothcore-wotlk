@@ -277,9 +277,13 @@ public:
                     {
                         if (Creature* c = me->SummonCreature(NPC_OOZE_SPRAY_STALKER, *target, TEMPSUMMON_TIMED_DESPAWN, 8000))
                         {
-                            me->SetFacingToObject(c);
+                            me->SetOrientation(me->GetAngle(c));
+                            me->SetControlled(true, UNIT_STATE_ROOT);
+                            me->DisableRotate(true);
+                            me->SetFacingTo(me->GetAngle(c));
+                            me->SendMovementFlagUpdate();
                             Talk(EMOTE_SLIME_SPRAY);
-                            DoCastSelf(SPELL_SLIME_SPRAY);
+                            me->CastSpell(c, SPELL_SLIME_SPRAY, false);
                         }
                     }
                     events.DelayEvents(1);
