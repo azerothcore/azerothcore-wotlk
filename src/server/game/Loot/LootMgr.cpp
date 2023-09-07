@@ -420,6 +420,11 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
     }
 
+    if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
+    {
+        return false;
+    }
+
     bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
     bool itemVisibleForMasterLooter = !needs_quest && (!follow_loot_rules || !is_underthreshold);
 
@@ -469,11 +474,6 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 
     // check quest requirements
     if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && ((needs_quest || (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE)) && !player->HasQuestForItem(itemid)))
-    {
-        return false;
-    }
-
-    if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
     {
         return false;
     }
