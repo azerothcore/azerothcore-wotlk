@@ -1532,6 +1532,7 @@ struct SmartTarget
             uint32 maxDist;
             SAIBool playerOnly;
             uint32 powerType;
+            uint32 aura;
         } hostileRandom;
 
         struct
