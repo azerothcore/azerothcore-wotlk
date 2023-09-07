@@ -102,12 +102,16 @@ struct boss_magtheridon : public BossAI
         BossAI::Reset();
         _channelersKilled = 0;
         _currentPhase = 0;
+        _castingQuake = false;
         _recentlySpoken = false;
         _magReleased = false;
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
-            Talk(SAY_TAUNT);
+            if (!me->IsEngaged())
+            {
+                Talk(SAY_TAUNT);
+            }
             context.Repeat(90s);
         });
         DoCastSelf(SPELL_SHADOW_CAGE, true);
@@ -166,6 +170,7 @@ struct boss_magtheridon : public BossAI
 
     void ScheduleCombatEvents()
     {
+        DoResetThreatList();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetImmuneToPC(false);
         me->SetReactState(REACT_AGGRESSIVE);
@@ -182,9 +187,18 @@ struct boss_magtheridon : public BossAI
             context.Repeat(11s, 39s);
         }).Schedule(40s, [this](TaskContext context)
         {
-            DoCastSelf(SPELL_QUAKE); //needs fixes with custom spell
+            DoCastSelf(SPELL_QUAKE);
+            _castingQuake = true;
+            me->GetMotionMaster()->Clear();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetOrientation(me->GetAngle(me->GetVictim()));
+            me->SetTarget(ObjectGuid::Empty);
+            scheduler.DelayAll(6999ms);
             scheduler.Schedule(7s, [this](TaskContext /*context*/)
             {
+                _castingQuake = false;
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
                 DoCastSelf(SPELL_BLAST_NOVA);
 
                 _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
@@ -234,6 +248,10 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
+        instance->DoForAllMinions(TYPE_MAGTHERIDON, [&](Creature* creature) {
+            creature->SetInCombatWithZone();
+        });
+
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
@@ -256,13 +274,14 @@ struct boss_magtheridon : public BossAI
         scheduler.Update(diff);
         _interruptScheduler.Update(diff);
 
-        if (_currentPhase != 1)
+        if (_currentPhase != 1 && !_castingQuake)
         {
             DoMeleeAttackIfReady();
         }
     }
 
 private:
+    bool _castingQuake;
     bool _recentlySpoken;
     bool _magReleased;
     uint8 _currentPhase;
