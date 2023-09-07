@@ -213,9 +213,8 @@ enum SMART_EVENT
     SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_IS_BEHIND_ME             = 107,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
-    SMART_EVENT_VICTIM_NOT_ATTACKING     = 108,      // min, max, repeatMin, repeatMax
 
-    SMART_EVENT_AC_END                   = 109
+    SMART_EVENT_AC_END                   = 108
 };
 
 struct SmartEvent
@@ -1842,8 +1841,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_NEAR_UNIT_NEGATION,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_IS_BEHIND_ME,              SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_VICTIM_NOT_ATTACKING,      SMART_SCRIPT_TYPE_MASK_CREATURE }
+    {SMART_EVENT_IS_BEHIND_ME,              SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags

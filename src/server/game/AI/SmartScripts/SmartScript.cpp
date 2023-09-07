@@ -604,20 +604,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (me)
                 {
-                    // If target has the aura, iterate through the target vector
+                    // If target has the aura, skip
                     if ((e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) && target->ToUnit()->HasAura(e.action.cast.spell))
                         continue;
 
-                    // If the threatlist is a singleton, skip cast
+                    // If the threatlist is a singleton, cancel
                     if (e.action.cast.castFlags & SMARTCAST_THREATLIST_NOT_SINGLE)
                         if (me->GetThreatMgr().GetThreatListSize() <= 1)
                             break;
 
-                    // If target has no mana, iterate through the target vector until a valid target is found
+                    // If target does not use mana, skip
                     if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_MANA))
                         continue;
 
-                    // Interrupts any other spells
+                    // Interrupts current spellcast
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
@@ -4518,7 +4518,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                 {
-                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)) || !me->HasInArc(M_PI*1.5f, target))
+                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)) || me->HasInArc(M_PI*1.5f, target))
                         continue;
 
                     ProcessAction(e, target);
@@ -4528,17 +4528,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
 
             RecalcTimer(e, 1200, 1200);
-            break;
-        }
-        case SMART_EVENT_VICTIM_NOT_ATTACKING:
-        {
-            if (!me || !me->IsEngaged())
-                return;
-
-            if (Unit* victim = me->GetVictim())
-                if (victim->GetVictim()->GetGUID() != me->GetGUID())
-                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
-
             break;
         }
         default:
@@ -4565,7 +4554,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
         case SMART_EVENT_IS_BEHIND_ME:
-        case SMART_EVENT_VICTIM_NOT_ATTACKING:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_DISTANCE_CREATURE:
@@ -4652,7 +4640,6 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
             case SMART_EVENT_IS_BEHIND_ME:
-            case SMART_EVENT_VICTIM_NOT_ATTACKING:
                 {
                     ProcessEvent(e);
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
