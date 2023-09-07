@@ -4508,28 +4508,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             RecalcTimer(e, 1200, 1200);
             break;
         }
-        case SMART_EVENT_IS_BEHIND_ME:
-        {
-            if (!me || !me->IsEngaged())
-                return;
-
-            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-            {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-                {
-                    if (!IsPlayer(target) || !(me->IsInRange(target, (float)e.event.minMaxRepeat.rangeMin, (float)e.event.minMaxRepeat.rangeMax)) || me->HasInArc(M_PI*1.5f, target))
-                        continue;
-
-                    ProcessAction(e, target);
-                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
-                    return;
-                }
-            }
-
-            RecalcTimer(e, 1200, 1200);
-            break;
-        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessEvent: Unhandled Event type {}", e.GetEventType());
             break;
@@ -4553,7 +4531,6 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
-        case SMART_EVENT_IS_BEHIND_ME:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_DISTANCE_CREATURE:
@@ -4639,7 +4616,6 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
-            case SMART_EVENT_IS_BEHIND_ME:
                 {
                     ProcessEvent(e);
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)

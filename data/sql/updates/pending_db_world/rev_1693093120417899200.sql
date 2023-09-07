@@ -1621,11 +1621,6 @@ UPDATE `smart_scripts` SET `event_param1`=0, `event_param2`=0, `event_param3`=40
 UPDATE `smart_scripts` SET `event_param1`=0, `event_param2`=0, `event_param3`=8000, `event_param4`=11000, `event_param5`=5, `event_param6`=30 WHERE `entryorguid`=35102 AND `source_type`=0 AND `id`=1 AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=0, `event_param2`=0, `event_param3`=10000, `event_param4`=10000, `event_param5`=8, `event_param6`=25 WHERE `entryorguid`=37501 AND `source_type`=0 AND `id`=0 AND `link`=0;
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 17724);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17724);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17724, 0, 0, 0, 106, 0, 100, 0, 1200, 12500, 1200, 12500, 0, 5, 11, 34171, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbat - On Hostile Behind Me - Cast \'Tentacle Lash\'');
-
 -- Friendly HP PCT
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3939) AND (`source_type` = 0) AND (`id` IN (2, 3, 4));
 

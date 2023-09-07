@@ -267,7 +267,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_RANGE:
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
-            case SMART_EVENT_IS_BEHIND_ME:
             case SMART_EVENT_IS_BEHIND_TARGET:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
@@ -346,7 +345,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
         case SMART_EVENT_NEAR_PLAYERS:
-        case SMART_EVENT_IS_BEHIND_ME:
             return true;
         default:
             return false;
@@ -573,7 +571,6 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_NEAR_UNIT_NEGATION: return sizeof(SmartEvent::nearUnitNegation);
             case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::minMaxRepeat);
-            case SMART_EVENT_IS_BEHIND_ME: return sizeof(SmartEvent::minMaxRepeat);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -955,7 +952,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
-            case SMART_EVENT_IS_BEHIND_ME:
             case SMART_EVENT_RANGE:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
