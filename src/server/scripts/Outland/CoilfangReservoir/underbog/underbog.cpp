@@ -40,13 +40,13 @@ struct npc_underbat : public ScriptedAI
         _scheduler.Schedule(1200ms, 12500ms, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
-                {
-                    return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 5.0f) && !me->HasInArc(M_PI, u);
-                }))
+            {
+                return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 5.0f) && !me->HasInArc(M_PI, u);
+            }))
             {
                 DoCast(target, SPELL_TENTACLE_LASH);
             }
-                context.Repeat(1200ms, 12500ms);
+            context.Repeat(1200ms, 12500ms);
         });
     }
 
