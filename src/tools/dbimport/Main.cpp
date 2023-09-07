@@ -52,18 +52,6 @@ int main(int argc, char** argv)
     auto configFile = fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_DB_IMPORT_CONFIG));
     auto vm = GetConsoleArguments(argc, argv, configFile);
 
-    std::error_code ec;
-    if (!fs::exists(configFile, ec))
-    {
-        if (ec)
-        {
-            printf("failed to read configuration file: '%s'\n", ec.message().c_str());
-        }
-
-        printf("configuration file not found.");
-        return 1;
-    }
-
     // exit if help is enabled
     if (vm.count("help"))
         return 0;
