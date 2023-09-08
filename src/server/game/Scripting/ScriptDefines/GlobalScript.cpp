@@ -182,7 +182,7 @@ bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid s
 {
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
-        return script->OnAllowedForPlayerLootContainerCheck(player, source);
+        return script->OnAllowedToLootContainerCheck(player, source);
     });
 
     if (ret && *ret)
