@@ -5,8 +5,11 @@ UPDATE `creature` SET `CreateObject` = 2 WHERE `guid` IN (46438, 46449, 46459, 4
 
 UPDATE `creature` SET `CreateObject` = 1 WHERE `guid` IN (47326, 47339, 47289);
 
--- ID1 2031 ID2 1984
-UPDATE `creature` SET `id1` = 2031 AND `id2` = 1984 WHERE `guid` IN (49566, 46923, 49610, 46929, 46930, 49565, 46925, 49620);
+-- modernize https://github.com/azerothcore/azerothcore-wotlk/pull/9912
 
--- ID 2032 ID2 1985
-UPDATE `creature` SET `id1` = 2031 AND `id2` = 1984 WHERE `guid` IN (49628, 49648, 46945, 49633, 46952, 49636, 49646, 49626, 46953, 49640, 46954, 49643, 46946, 49639, 49645, 46951, 46950);
+UPDATE `creature` SET `CreateObject` = 2 WHERE `guid` IN (46439, 47917, 47916, 47931, 47913);
+UPDATE `creature` SET `CreateObject` = 1 WHERE `guid` IN (46394, 49845, 49855);
+
+-- modernize https://github.com/azerothcore/azerothcore-wotlk/pull/10052
+UPDATE `creature` SET `CreateObject` = 2 WHERE `guid` IN (49818, 49850, 49819);
+
