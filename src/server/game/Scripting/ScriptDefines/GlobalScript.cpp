@@ -178,6 +178,21 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
     return true;
 }
 
+bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return script->OnAllowedToLootContainerCheck(player, source);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 /**
  * @brief Called when an instance Id is deleted, usually because it expired or no players are bound to it anymore.
  *
