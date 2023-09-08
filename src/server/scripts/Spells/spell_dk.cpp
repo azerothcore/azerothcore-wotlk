@@ -148,11 +148,11 @@ class spell_dk_raise_ally : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        Unit* target = m_targets.GetUnitTarget();
-        if (!target)
+        Player* unitTarget = GetHitPlayer();
+        if (!unitTarget)
             return SPELL_FAILED_BAD_TARGETS;
 
-        if (target->IsAlive()) // not discovered attributeEx5?
+        if (unitTarget->IsAlive()) // not discovered attributeEx5?
             return SPELL_FAILED_TARGET_NOT_DEAD;
         
         return SPELL_CAST_OK;
