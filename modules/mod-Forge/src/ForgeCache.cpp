@@ -1506,8 +1506,6 @@ private:
             auto perkId = archetypeFields[3].Get<uint32>();
             auto isSpell = archetypeFields[4].Get<int>() == 0 ? false : true;
 
-            LOG_INFO("server.world", "1");
-
             if (allowableClass & (1 << (CLASS_WARRIOR - 1)))
                 Archetypes[CLASS_WARRIOR][level].push_back(GetPerk(CLASS_WARRIOR, perkId, CharacterPerkType::ARCHETYPE));
 
