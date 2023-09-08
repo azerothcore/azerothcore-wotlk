@@ -772,8 +772,8 @@ class spell_warl_life_tap : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
-            int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-            int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+            int32 damage = caster->CountPctFromMaxHealth(15);
+            int32 mana = CalculatePct(damage, 120);
 
             // Shouldn't Appear in Combat Log
             target->ModifyHealth(-damage);
@@ -782,7 +782,7 @@ class spell_warl_life_tap : public SpellScript
             if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))
                 AddPct(mana, aurEff->GetAmount());
 
-            caster->CastCustomSpell(target, SPELL_WARLOCK_LIFE_TAP_ENERGIZE, &mana, nullptr, nullptr, false);
+            caster->CastCustomSpell(SPELL_WARLOCK_LIFE_TAP_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, target, false);
 
             // Mana Feed
             int32 manaFeedVal = 0;

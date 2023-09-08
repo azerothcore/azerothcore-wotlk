@@ -855,15 +855,6 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     ChainEntry = nullptr;
     ExplicitTargetMask = 0;
 
-    // SpellScalingEntry
-    SpellScalingEntry const* _scaling = sObjectMgr->GetSpellScalingEntry(Id);
-    CastTimeMin = _scaling ? _scaling->CastTimeMin : 0;
-    CastTimeMax = _scaling ? _scaling->CastTimeMax : 0;
-    CastTimeMaxLevel = _scaling ? _scaling->CastTimeMaxLevel : 0;
-    ScalingClass = _scaling ? _scaling->ScalingClass : 0;
-    CoefBase = _scaling ? _scaling->CoefBase : 0;
-    CoefLevelBase = _scaling ? _scaling->CoefLevelBase : 0;
-
     // Mine
     _isStackableWithRanks = false;
     _isSpellValid = true;
