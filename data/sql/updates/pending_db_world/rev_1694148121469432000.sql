@@ -5,7 +5,7 @@ UPDATE `creature` SET `CreateObject` = 2 WHERE `guid` IN (46438, 46449, 46459, 4
 
 UPDATE `creature` SET `CreateObject` = 1 WHERE `guid` IN (47326, 47339, 47289);
 
--- modernize https://github.com/azerothcore/azerothcore-wotlk/pull/9912
+-- modernize https://github.com/azerothcore/azerothcore-wotlk/pull/9943
 
 UPDATE `creature` SET `CreateObject` = 2 WHERE `guid` IN (46439, 47917, 47916, 47931, 47913);
 UPDATE `creature` SET `CreateObject` = 1 WHERE `guid` IN (46394, 49845, 49855);
