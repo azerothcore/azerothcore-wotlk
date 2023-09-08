@@ -767,12 +767,12 @@ class spell_warl_life_tap : public SpellScript
         return ValidateSpellInfo({ SPELL_WARLOCK_LIFE_TAP_ENERGIZE, SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2 });
     }
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
+    void HandleDummy(SpellEffIndex effIndex)
     {
         Player* caster = GetCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
-            int32 spellEffect = GetEffectValue();
+            int32 spellEffect = GetEffectValue() + GetSpellInfo()->Effects[effIndex].RealPointsPerLevel*caster->GetLevel();
             int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
 
             // Shouldn't Appear in Combat Log

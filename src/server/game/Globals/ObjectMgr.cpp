@@ -9209,11 +9209,11 @@ void ObjectMgr::LoadSpellScalingData()
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].Get<uint32>();
-        uint32 CastTimeMin = fields[1].Get<uint32>();
-        uint32 CastTimeMax = fields[2].Get<uint32>();
-        uint32 CastTimeMaxLevel = fields[3].Get<uint32>();
-        uint32 ScalingClass = fields[4].Get<uint32>();
+        int32 id = fields[0].Get<int32>();
+        int32 CastTimeMin = fields[1].Get<int32>();
+        int32 CastTimeMax = fields[2].Get<int32>();
+        int32 CastTimeMaxLevel = fields[3].Get<int32>();
+        int32 ScalingClass = fields[4].Get<int32>();
         float MultiplierA = fields[5].Get<float>();
         float MultiplierB = fields[6].Get<float>();
         float MultiplierC = fields[7].Get<float>();
@@ -9224,7 +9224,7 @@ void ObjectMgr::LoadSpellScalingData()
         float OtherMultiplierB = fields[12].Get<float>();
         float OtherMultiplierC = fields[13].Get<float>();
         float CoefBase = fields[14].Get<float>();
-        uint32 CoefLevelBased = fields[15].Get<uint32>();
+        int32 CoefLevelBased = fields[15].Get<int32>();
 
         SpellScalingEntry* entry = new SpellScalingEntry();
         entry->CastTimeMin = CastTimeMin;
