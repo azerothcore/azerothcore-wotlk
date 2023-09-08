@@ -772,11 +772,11 @@ class spell_warl_life_tap : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
-            int32 spellEffect = GetEffectValue() + GetSpellInfo()->Effects[effIndex].RealPointsPerLevel*caster->GetLevel();
-            int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
+            int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+            int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
 
             // Shouldn't Appear in Combat Log
-            target->ModifyHealth(-spellEffect);
+            target->ModifyHealth(-damage);
 
             // Improved Life Tap mod
             if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))

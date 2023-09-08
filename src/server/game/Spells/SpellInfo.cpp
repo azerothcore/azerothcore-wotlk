@@ -327,8 +327,6 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
 
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
-    SpellScalingEntry* scaling = sObjectMgr->GetSpellScalingEntry(spellInfo->Id);
-
     _spellInfo = spellInfo;
     _effIndex = effIndex;
     Effect = spellEntry->Effect[effIndex];
@@ -352,10 +350,6 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];
     SpellClassMask = spellEntry->EffectSpellClassMask[effIndex];
     ImplicitTargetConditions = nullptr;
-
-    ScalingMultiplier = scaling ? scaling->Multiplier[effIndex] : 0.0f;
-    DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[effIndex] : 0.0f;
-    ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[effIndex] : 0.0f;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -421,6 +415,11 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     float comboDamage = PointsPerComboPoint;
 
     auto Id = _spellInfo->Id;
+    SpellScalingEntry* scaling = sObjectMgr->GetSpellScalingEntry(Id);
+
+    auto ScalingMultiplier = scaling ? scaling->Multiplier[_effIndex] : 0.0f;
+    auto DeltaScalingMultiplier = scaling ? scaling->RandomMultiplier[_effIndex] : 0.0f;
+    auto ComboScalingMultiplier = scaling ? scaling->OtherMultiplier[_effIndex] : 0.0f;
 
     // base amount modification based on spell lvl vs caster lvl
     // Don't execute default calculation if Basepoints were manually set
@@ -503,7 +502,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
         // amount multiplication based on caster's level
-        if (!SpellScaling && !basePointsPerLevel && (_spellInfo->SpellLevel) &&
+        if (!scaling && !basePointsPerLevel && (_spellInfo->SpellLevel) &&
             Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
             Effect != SPELL_EFFECT_KNOCK_BACK &&
             Effect != SPELL_EFFECT_ADD_EXTRA_ATTACKS &&

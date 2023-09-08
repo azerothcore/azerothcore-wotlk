@@ -52,6 +52,12 @@ public:
         //ShopCache::get_instance()->LoadCache();
         //sTransmogrification->Load();
 
+        // hater: load scaling spell info
+        LOG_INFO("server.loading", "Loading SpellScaling...");
+        sObjectMgr->LoadSpellScalingData();
+        sObjectMgr->LoadSpellScalingSpellMap();
+        sObjectMgr->LoadSpellScalingValue();
+
         // ChatHandler could be Console or Player session
         handler->PSendSysMessage("Cache Reloaded");
         return true;
