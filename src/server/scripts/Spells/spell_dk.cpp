@@ -154,7 +154,7 @@ class spell_dk_raise_ally : public SpellScript
 
         if (unitTarget->IsAlive()) // not discovered attributeEx5?
             return SPELL_FAILED_TARGET_NOT_DEAD;
-        
+
         return SPELL_CAST_OK;
     }
 
