@@ -431,7 +431,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (target && _spellInfo->IsPositiveEffect(_effIndex) && (Effect == SPELL_EFFECT_APPLY_AURA))
                 level = target->getLevel();
 
-            if (auto gtScaling = sObjectMgr->GetSpellScalingValue((_spellInfo->ScalingClass != -1 ? _spellInfo->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
+            if (auto gtScaling = sObjectMgr->GetSpellScalingValue((scaling->ScalingClass != -1 ? scaling->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
             {
                 float multiplier = gtScaling;
                 if (_spellInfo->CastTimeMax > 0 && _spellInfo->CastTimeMaxLevel > level)
@@ -549,7 +549,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         }
     }
 
-    return int32(value);
+    return int32(floor(value + 0.5f));
 }
 
 int32 SpellEffectInfo::CalcBaseValue(int32 value) const
