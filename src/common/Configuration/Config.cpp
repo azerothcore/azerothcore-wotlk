@@ -337,7 +337,7 @@ bool ConfigMgr::Reload()
 
 // Check the _envVarCache if the env var is there
 // if not, check the env for the value
-Optional<std::string> getEnvFromCache(std::string const& configName, std::string const& envVarName)
+Optional<std::string> GetEnvFromCache(std::string const& configName, std::string const& envVarName)
 {
     auto foundInCache = _envVarCache.find(envVarName);
     Optional<std::string> foundInEnv;
