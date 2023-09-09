@@ -19,7 +19,6 @@
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "GameGraveyard.h"
-#include "Language.h"
 #include "Player.h"
 #include "Util.h"
 #include "WorldPacket.h"

@@ -21,8 +21,6 @@
 #include "DatabaseEnv.h"
 #include "GameEventMgr.h"
 #include "GridDefines.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
@@ -782,6 +780,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
             case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
+            case SMART_ACTION_FOLLOW_GROUP: return sizeof(SmartAction::followGroup);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1971,6 +1970,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_SCALE:
         case SMART_ACTION_SUMMON_RADIAL:
         case SMART_ACTION_PLAY_SPELL_VISUAL:
+        case SMART_ACTION_FOLLOW_GROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

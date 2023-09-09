@@ -79,7 +79,6 @@
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
-#include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
 #include "Weather.h"
@@ -8193,6 +8192,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     // need know merged fishing/corpse loot type for achievements
     loot->loot_type = loot_type;
+
+    if (!sScriptMgr->OnAllowedToLootContainerCheck(this, guid))
+    {
+        SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
+        return;
+    }
 
     if (permission != NONE_PERMISSION)
     {

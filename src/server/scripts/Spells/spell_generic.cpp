@@ -32,7 +32,6 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"

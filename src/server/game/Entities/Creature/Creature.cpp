@@ -29,7 +29,6 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
 #include "MapMgr.h"

@@ -16,8 +16,6 @@
  */
 
 #include "BattlegroundRL.h"
-#include "ArenaScore.h"
-#include "Language.h"
 #include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"

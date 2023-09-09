@@ -17,7 +17,6 @@
 
 #include "InstanceScript.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
 #include "Group.h"
