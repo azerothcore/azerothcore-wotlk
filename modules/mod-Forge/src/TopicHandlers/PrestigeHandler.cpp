@@ -108,7 +108,6 @@ public:
 
         iam.player->SetUInt32Value(PLAYER_XP, 0);
         iam.player->SetLevel(1);
-        iam.player->RemoveAllAuras();
         iam.player->UpdateSkillsForLevel();
         iam.player->UpdateAllStats();
         iam.player->SetFullHealth();

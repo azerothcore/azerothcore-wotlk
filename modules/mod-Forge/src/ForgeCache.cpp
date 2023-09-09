@@ -700,35 +700,32 @@ public:
 
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs)) {
-
                     for (auto* tab : tabs)
                     {
                         auto talItt = currentSpec->Talents.find(tab->Id);
-                            for (auto spell : tab->Talents)
+                        for (auto spell : tab->Talents)
+                        {
+                            if (modes.size() == 0 && talItt != currentSpec->Talents.end())
                             {
-                                if (modes.size() == 0 && talItt != currentSpec->Talents.end())
+                                auto spellItt = talItt->second.find(spell.first);
+                                if (spellItt != talItt->second.end())
                                 {
-                                    auto spellItt = talItt->second.find(spell.first);
-                                    if (spellItt != talItt->second.end())
-                                    {
-                                        if (spellItt->second->CurrentRank > 0) {
-                                            uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
+                                    if (spellItt->second->CurrentRank > 0) {
+                                        uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
 
-                                            if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                                for (auto rank : spell.second->Ranks) {
-                                                    if (currentRank != rank.second) {
-                                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                                    }
-                                                    else {
-                                                        if (!player->HasSpell(currentRank)) {
-                                                            if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                                                player->learnSpell(currentRank, true, false);
-                                                            else {
-                                                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                                                                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-
-                                                                        player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-                                                            }
+                                        if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
+                                            for (auto rank : spell.second->Ranks) {
+                                                if (currentRank != rank.second) {
+                                                    player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                                }
+                                                else {
+                                                    if (!player->HasSpell(currentRank)) {
+                                                        if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                                            player->learnSpell(currentRank, true, false);
+                                                        else {
+                                                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                                                                    player->learnSpell(spellInfo->Effects[i].TriggerSpell);
                                                         }
                                                     }
                                                 }
@@ -738,6 +735,8 @@ public:
                                 }
                             }
                         }
+                    }
+
                 }
             }
             UpdateCharacterSpec(player, currentSpec);
@@ -795,26 +794,11 @@ public:
                 std::list<ForgeTalentTab*> tabs;
                 if (TryGetForgeTalentTabs(player, charTabType, tabs))
                     for (auto* tab : tabs)
-                    {
-                        auto talItt = currentSpec->Talents.find(tab->Id);
                         for (auto spell : tab->Talents)
-                        {
-                            if (talItt != currentSpec->Talents.end())
-                            {
-                                auto spellItt = talItt->second.find(spell.first);
-                                if (spellItt != talItt->second.end())
-                                {
-                                    uint32 currentRank = spell.second->Ranks[spellItt->second->CurrentRank];
-
-                                    if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
-                                        if (spellInfo->IsPassive())
-                                            for (auto rank : spell.second->Ranks)
-                                                player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                            for (auto rank : spell.second->Ranks)
+                                if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second))
+                                    for (auto rank : spell.second->Ranks)
+                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
             }
 
             player->SendInitialSpells();
