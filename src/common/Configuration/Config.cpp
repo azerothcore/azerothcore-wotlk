@@ -283,7 +283,7 @@ namespace
         return result;
     }
 
-    std::string getEnvVarName(std::string const& configName)
+    std::string GetEnvVarName(std::string const& configName)
     {
         return "AC_" + IniKeyToEnvVarKey(configName);
     }
