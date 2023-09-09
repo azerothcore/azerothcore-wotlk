@@ -761,6 +761,9 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             }
 
             AuctionEntry* Aentry = itr->second;
+            if (!Aentry)
+                return false;
+
             // Skip expired auctions
             if (Aentry->expire_time < curTime.count())
             {
