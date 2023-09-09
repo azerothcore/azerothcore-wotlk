@@ -434,10 +434,10 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (auto gtScaling = sObjectMgr->GetSpellScalingValue((scaling->ScalingClass != -1 ? scaling->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
             {
                 float multiplier = gtScaling;
-                if (_spellInfo->CastTimeMax > 0 && _spellInfo->CastTimeMaxLevel > level)
-                    multiplier *= float(_spellInfo->CastTimeMin + (level - 1) * (_spellInfo->CastTimeMax - _spellInfo->CastTimeMin) / (_spellInfo->CastTimeMaxLevel - 1)) / float(_spellInfo->CastTimeMax);
-                if (_spellInfo->CoefLevelBase > level)
-                    multiplier *= (1.0f - _spellInfo->CoefBase) * (float)(level - 1) / (float)(_spellInfo->CoefLevelBase - 1) + _spellInfo->CoefBase;
+                if (scaling->CastTimeMax > 0 && _spellInfo->CastTimeMaxLevel > level)
+                    multiplier *= float(scaling->CastTimeMin + (level - 1) * (scaling->CastTimeMax - scaling->CastTimeMin) / (scaling->CastTimeMaxLevel - 1)) / float(scaling->CastTimeMax);
+                if (scaling->CoefLevelBase > level)
+                    multiplier *= (1.0f - scaling->CoefBase) * (float)(level - 1) / (float)(scaling->CoefLevelBase - 1) + scaling->CoefBase;
 
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier)
@@ -446,7 +446,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                     if (delta > 0)
                         preciseBasePoints += frand(-delta, delta);
                     else
-                        LOG_ERROR("spells", "SpellEffectInfo::CalcValue: wrong DeltaScalingMultiplier '%f' for spell %d", delta, _spellInfo->Id);
+                        LOG_ERROR("spells", "SpellEffectInfo::CalcValue: wrong DeltaScalingMultiplier '%f' for spell %d", delta, Id);
                 }
 
                 basePoints = int32(floor(preciseBasePoints + 0.5));
@@ -502,8 +502,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
         // amount multiplication based on caster's level
-        if (!caster->IsControlledByPlayer() &&
-            _spellInfo->SpellLevel && _spellInfo->SpellLevel != caster->GetLevel() &&
+        if (!caster->IsControlledByPlayer() && _spellInfo->SpellLevel &&
             !basePointsPerLevel && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
         {
             bool canEffectScale = false;
@@ -545,7 +544,12 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             }
 
             if (canEffectScale)
-                value *= 0.25f * exp(caster->getLevel() * (100 - _spellInfo->SpellLevel) / 1000.0f);
+            {
+                GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
+                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->GetLevel() - 1);
+                if (spellScaler && casterScaler)
+                    value *= casterScaler->ratio / spellScaler->ratio;
+            }
         }
     }
 
@@ -2389,13 +2393,17 @@ int32 SpellInfo::GetMaxDuration() const
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
 {
     int32 castTime = 0;
+    SpellScalingEntry* scaling = sObjectMgr->GetSpellScalingEntry(Id);
+    auto castTimeMin = scaling ? scaling->CastTimeMin : 0;
+    auto castTimeMax = scaling ? scaling->CastTimeMax : 0;
+    auto castTimeMaxLevel = scaling ? scaling->CastTimeMaxLevel : 0;
 
     // not all spells have cast time index and this is all is pasiive abilities
-    if (caster && CastTimeMax > 0)
+    if (caster && castTimeMin > 0)
     {
-        castTime = CastTimeMax;
-        if (CastTimeMaxLevel > int32(caster->getLevel()))
-            castTime = CastTimeMin + int32(caster->getLevel() - 1) * (CastTimeMax - CastTimeMin) / (CastTimeMaxLevel - 1);
+        castTime = castTimeMax;
+        if (castTimeMaxLevel > int32(caster->getLevel()))
+            castTime = castTimeMin + int32(caster->getLevel() - 1) * (castTimeMax - castTimeMin) / (castTimeMaxLevel - 1);
     }
     else if (CastTimeEntry)
         castTime = CastTimeEntry->CastTime;
