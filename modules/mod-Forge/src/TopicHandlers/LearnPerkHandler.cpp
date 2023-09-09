@@ -74,6 +74,8 @@ public:
                     rankIt = spell->ranks.find(csp->rank);
                     if (rankIt != spell->ranks.end())
                         iam.player->learnSpell(rankIt->second, true);
+                    else
+                        return;
 
                     fc->LearnCharacterPerkInternal(iam.player, spec, csp, type);
                     spec->perks[type][spellId] = csp;

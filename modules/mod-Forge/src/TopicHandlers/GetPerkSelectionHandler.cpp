@@ -48,8 +48,10 @@ public:
                 if (spec->perkQueue[perkType].empty())
                     fc->InsertNewPerksForLevelUp(iam.player, spec, perkType);
 
-                if (!spec->perkQueue[perkType].empty())
+                if (!spec->perkQueue[perkType].empty()) {
                     SendSelection(iam.player, spec->perkQueue[perkType].begin()->second);
+                    return;
+                }
             }
         }
     }

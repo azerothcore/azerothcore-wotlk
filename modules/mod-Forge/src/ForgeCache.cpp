@@ -678,7 +678,7 @@ public:
             player->GetGUID().GetCounter(), spec->Id, type, perk->uuid, perk->spell->spellId, perk->rank);
         trans->Append("INSERT INTO character_perk_roll_history select {} as `accountId`, `guid`, `rollKey`, `specId`, `spellId`, {} as `level`, 0 as `carryover` from character_perk_selection_queue where rollkey = '{}' ON DUPLICATE KEY UPDATE `carryover` = `carryover`+1",
             player->GetSession()->GetAccountId(), player->GetLevel(), perk->uuid);
-        trans->Append("DELETE FROM character_perk_selection_queue where `rollkey` = '{}'", perk->uuid);
+        trans->Append("DELETE FROM character_perk_selection_queue where `type` = {}", type);
 
         CharacterDatabase.CommitTransaction(trans);
     }
@@ -716,7 +716,7 @@ public:
 
                                             if (auto spellInfo = sSpellMgr->GetSpellInfo(currentRank)) {
                                                 for (auto rank : spell.second->Ranks) {
-                                                    if (spellInfo->IsPassive() && currentRank != rank.second) {
+                                                    if (currentRank != rank.second) {
                                                         player->removeSpell(rank.second, SPEC_MASK_ALL, false);
                                                     }
                                                     else {
@@ -1054,16 +1054,15 @@ public:
 
         if (TryGetCharacterActiveSpec(player, charSpec)) {
 
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            trans->Append("INSERT INTO character_perk_selection_queue (`guid`, `specId`, `type`, `rollkey`, `spellId`) VALUES ({}, {}, {}, '{}', {} )",
+            CharacterDatabase.DirectExecute("INSERT INTO character_perk_selection_queue (`guid`, `specId`, `type`, `rollkey`, `spellId`) VALUES ({}, {}, {}, '{}', {} )",
                 player->GetGUID().GetCounter(), charSpec->Id, type, rollKey, perk->spellId);
-            CharacterDatabase.CommitTransaction(trans);
 
             CharacterSpecPerk* csp = new CharacterSpecPerk();
             csp->spell = perk;
             csp->uuid = rollKey;
             csp->rank = 1;
             csp->carryover = carryover;
+
             charSpec->perkQueue[type][rollKey].push_back(csp);
         }
     }
@@ -1132,6 +1131,7 @@ public:
             for (auto perk : spec->perkQueue[type].begin()->second)
                 if (perk->spell->spellId == spellId)
                     return true;
+
         return false;
     }
 
@@ -1140,19 +1140,10 @@ public:
         ForgeCharacterPoint* pp = GetCommonCharacterPoint(player, CharacterPointType::PRESTIGE_COUNT);
         bool prestiged = pp->Sum > 0;
         uint8 maxPerks = 3;
-        uint8 totalPerks = 0;
 
         auto roll = boost::uuids::random_generator()();
         auto rollKey = boost::lexical_cast<std::string>(roll);
         auto guid = player->GetGUID().GetCounter();
-
-        if (prestiged && type != CharacterPerkType::ARCHETYPE) {
-            CharacterSpecPerk* perk = GetPrestigePerk(player, type);
-            if (perk != nullptr) {
-                InsertPerkSelection(player, type, perk->spell, rollKey, 1);
-                maxPerks--;
-            }
-        }
 
         switch (type) {
         case CharacterPerkType::ARCHETYPE: {
@@ -1164,6 +1155,14 @@ public:
             break;
         }
         case CharacterPerkType::COMBAT: {
+            if (prestiged && type != CharacterPerkType::ARCHETYPE) {
+                CharacterSpecPerk* perk = GetPrestigePerk(player, type);
+                if (perk != nullptr) {
+                    InsertPerkSelection(player, type, perk->spell, rollKey, 1);
+                    maxPerks--;
+                }
+            }
+
             do {
                 Perk* possibility = GetRandomPerk(player, type);
 
@@ -1173,13 +1172,13 @@ public:
                         [&possibility](CharacterSpecPerk* perk) {return perk->spell->spellId == possibility->spellId; }) == spec->perkQueue[type][rollKey].end())
                 {
                     InsertPerkSelection(player, type, possibility, rollKey, 0);
-                    totalPerks++;
+                    maxPerks--;
                 }
-            } while (totalPerks < maxPerks);
+            } while (0 < maxPerks);
             break;
         }
         default:
-            break;
+            return;
         }
     }
 

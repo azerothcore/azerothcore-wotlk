@@ -20023,6 +20023,9 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                                 return 8571;
                         }
                 }
+                else if (getRace() == RACE_GNOME) {
+                    return 5555;
+                }
                 else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
                     return 892;
                 else
