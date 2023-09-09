@@ -122,9 +122,9 @@ class spell_perk_any_proc : public AuraScript
             return;
         
         if (auto player = GetOwner()->ToPlayer()) {
-            if (!player->HasSpellCooldown(aurEff->GetTriggerSpell())) {
+            if (!player->HasSpellCooldown(aurEff->GetId())) {
                 player->CastSpell(eventInfo.GetActionTarget(), aurEff->GetTriggerSpell(), true);
-                player->AddSpellCooldown(aurEff->GetTriggerSpell(), 0, aurEff->GetAmount() * IN_MILLISECONDS);
+                player->AddSpellCooldown(aurEff->GetId(), 0, aurEff->GetAmount() * IN_MILLISECONDS);
 
             }
         }
