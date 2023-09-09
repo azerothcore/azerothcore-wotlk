@@ -114,6 +114,13 @@ class spell_perk_any_proc : public AuraScript
         PreventDefaultAction();
         SpellInfo const* spellProto = aurEff->GetSpellInfo();
 
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo()) {
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PERK)
+                return;
+        }
+        else
+            return;
+        
         if (auto player = GetOwner()->ToPlayer()) {
             if (!player->HasSpellCooldown(aurEff->GetTriggerSpell())) {
                 player->CastSpell(eventInfo.GetActionTarget(), aurEff->GetTriggerSpell(), true);
