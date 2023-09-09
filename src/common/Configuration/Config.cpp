@@ -290,7 +290,7 @@ namespace
 
     Optional<std::string> EnvVarForIniKey(std::string const& key)
     {
-        std::string envKey = getEnvVarName(key);
+        std::string envKey = GetEnvVarName(key);
         char* val = std::getenv(envKey.c_str());
         if (!val)
             return std::nullopt;
@@ -388,8 +388,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
 
     auto const& itr = _configOptions.find(name);
     bool notFound = itr == _configOptions.end();
-    auto envVarName = getEnvVarName(name);
-    Optional<std::string> envVar = getEnvFromCache(name, envVarName);
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
     if (envVar)
     {
         // If showLogs and this key/value pair wasn't found in the currently saved config
@@ -435,8 +435,8 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
 {
     auto const& itr = _configOptions.find(name);
     bool notFound = itr == _configOptions.end();
-    auto envVarName = getEnvVarName(name);
-    Optional<std::string> envVar = getEnvFromCache(name, envVarName);
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
     if (envVar)
     {
         // If showLogs and this key/value pair wasn't found in the currently saved config
