@@ -1,3 +1,4 @@
+-- DB update 2023_09_10_00 -> 2023_09_10_01
 --
 ALTER TABLE `creature`
 	ADD COLUMN `CreateObject` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `VerifiedBuild`;

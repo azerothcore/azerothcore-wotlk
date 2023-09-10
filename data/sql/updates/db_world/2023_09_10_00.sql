@@ -1,3 +1,4 @@
+-- DB update 2023_09_05_00 -> 2023_09_10_00
 -- Update IS_BEHIND_TARGET to new system
 UPDATE `smart_scripts` SET `event_param1`=1300, `event_param2`=7300, `event_param3`=1300, `event_param4`=7300, `event_param5`=0, `event_param6`=5 WHERE `entryorguid`=95 AND `source_type`=0 AND `id`=2 AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=3900, `event_param2`=6900, `event_param3`=3900, `event_param4`=6900, `event_param5`=0, `event_param6`=5 WHERE `entryorguid`=732 AND `source_type`=0 AND `id`=0 AND `link`=0;
