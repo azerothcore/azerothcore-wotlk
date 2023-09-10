@@ -29,7 +29,8 @@ jobs:
           git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
           bash bin/acore-db-pendings
           deno run --allow-all --unstable apps/ci/ci-pending-changelogs.ts
-          git fetch --unshallow origin "${{ github.ref_name }}"
+          # Get the latest changes from git
+          git pull --rebase origin "${{ github.ref_name }}"
           git add -A .
           git commit -am "chore(DB): import pending files" -m "Referenced commit(s): ${GITHUB_SHA}" || true
         env:
