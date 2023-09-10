@@ -1115,6 +1115,7 @@ public:
     void LoadVendors();
     void LoadTrainerSpell();
     void LoadSpellScalingData();
+    void LoadSpellDurationData();
     void LoadSpellScalingSpellMap();
     void LoadSpellScalingValue();
     SpellScalingEntry* GetSpellScalingEntry(uint32);

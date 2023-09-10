@@ -71,6 +71,7 @@
 #include "Tokenize.h"
 #include "StringConvert.h"
 #include <math.h>
+#include <random>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
@@ -15120,6 +15121,8 @@ int32 Unit::CalcSpellDuration(SpellInfo const* spellProto)
 {
     uint8 comboPoints = GetComboPoints();
 
+
+
     int32 minduration = spellProto->GetDuration();
     int32 maxduration = spellProto->GetMaxDuration();
 
@@ -19951,180 +19954,58 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
+        std::vector<uint32> select;
+        std::random_device rd;
+        std::mt19937 eng(rd());
+            
+
         switch (form)
         {
             case FORM_CAT:
-                // Based on Hair color
                 if (getRace() == RACE_NIGHTELF)
-                {
-                    uint8 hairColor = GetByteValue(PLAYER_BYTES, 3);
-                    switch (hairColor)
-                    {
-                        case 7: // Violet
-                        case 8:
-                            return 29405;
-                        case 3: // Light Blue
-                            return 29406;
-                        case 0: // Green
-                        case 1: // Light Green
-                        case 2: // Dark Green
-                            return 29407;
-                        case 4: // White
-                            return 29408;
-                        default: // original - Dark Blue
-                            return 892;
-                    }
-                }
-                // Based on Skin color
+                    select = { 29405, 29406, 29407, 29408, 892 };
                 else if (getRace() == RACE_TAUREN)
-                {
-                    uint8 skinColor = GetByteValue(PLAYER_BYTES, 0);
-                    // Male
-                    if (getGender() == GENDER_MALE)
-                    {
-                        switch (skinColor)
-                        {
-                            case 12: // White
-                            case 13:
-                            case 14:
-                            case 18: // Completly White
-                                return 29409;
-                            case 9: // Light Brown
-                            case 10:
-                            case 11:
-                                return 29410;
-                            case 6: // Brown
-                            case 7:
-                            case 8:
-                                return 29411;
-                            case 0: // Dark
-                            case 1:
-                            case 2:
-                            case 3: // Dark Grey
-                            case 4:
-                            case 5:
-                                return 29412;
-                            default: // original - Grey
-                                return 8571;
-                        }
-                    }
-                    // Female
-                    else switch (skinColor)
-                        {
-                            case 10: // White
-                                return 29409;
-                            case 6: // Light Brown
-                            case 7:
-                                return 29410;
-                            case 4: // Brown
-                            case 5:
-                                return 29411;
-                            case 0: // Dark
-                            case 1:
-                            case 2:
-                            case 3:
-                                return 29412;
-                            default: // original - Grey
-                                return 8571;
-                        }
-                }
-                else if (getRace() == RACE_GNOME) {
-                    return 5555;
-                }
+                    select = { 29409, 29410, 29411, 29412, 8571 };
+                else if (getRace() == RACE_GNOME)
+                    select = { 5555, 5556, 5585, 5586, 11709, 5448, 5554, 9990 };
+                /*else if (getRace() == RACE_TROLL)
+                    select = { 21632 };*/
                 else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    return 892;
+                    select = { 892 };
                 else
-                    return 8571;
+                    select = { 8571 }; 
+                break;
             case FORM_DIREBEAR:
             case FORM_BEAR:
-                // Based on Hair color
                 if (getRace() == RACE_NIGHTELF)
-                {
-                    uint8 hairColor = GetByteValue(PLAYER_BYTES, 3);
-                    switch (hairColor)
-                    {
-                        case 0: // Green
-                        case 1: // Light Green
-                        case 2: // Dark Green
-                            return 29413; // 29415?
-                        case 6: // Dark Blue
-                            return 29414;
-                        case 4: // White
-                            return 29416;
-                        case 3: // Light Blue
-                            return 29417;
-                        default: // original - Violet
-                            return 2281;
-                    }
-                }
-                // Based on Skin color
+                    select = { 29413, 29414, 29416, 29417, 2281 };
                 else if (getRace() == RACE_TAUREN)
-                {
-                    uint8 skinColor = GetByteValue(PLAYER_BYTES, 0);
-                    // Male
-                    if (getGender() == GENDER_MALE)
-                    {
-                        switch (skinColor)
-                        {
-                            case 0: // Dark (Black)
-                            case 1:
-                            case 2:
-                                return 29418;
-                            case 3: // White
-                            case 4:
-                            case 5:
-                            case 12:
-                            case 13:
-                            case 14:
-                                return 29419;
-                            case 9: // Light Brown/Grey
-                            case 10:
-                            case 11:
-                            case 15:
-                            case 16:
-                            case 17:
-                                return 29420;
-                            case 18: // Completly White
-                                return 29421;
-                            default: // original - Brown
-                                return 2289;
-                        }
-                    }
-                    // Female
-                    else switch (skinColor)
-                        {
-                            case 0: // Dark (Black)
-                            case 1:
-                                return 29418;
-                            case 2: // White
-                            case 3:
-                                return 29419;
-                            case 6: // Light Brown/Grey
-                            case 7:
-                            case 8:
-                            case 9:
-                                return 29420;
-                            case 10: // Completly White
-                                return 29421;
-                            default: // original - Brown
-                                return 2289;
-                        }
-                }
+                    select = { 29418, 29419, 29420, 29421, 2289 };
+                else if (getRace() == RACE_GNOME)
+                    select = { 30059, 30060, 23948, 28489, 10990 };
+                /*else if (getRace() == RACE_TROLL)
+                    select = { 21631 };*/
                 else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    return 2281;
+                    select = { 2281 };
                 else
-                    return 2289;
+                    select = { 2289 };
+                break;
             case FORM_FLIGHT:
                 if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    return 20857;
-                return 20872;
+                    select = { 20857 };
+                select = { 20872 };
+                break;
             case FORM_FLIGHT_EPIC:
                 if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    return 21243;
-                return 21244;
+                    select = { 21243 };
+                select = { 21244 };
+                break;
             default:
                 break;
         }
+        std::uniform_int_distribution<> distr(0, select.size() - 1);
+        auto index = distr(eng);
+        return select[index];
     }
 
     uint32 modelid = 0;

@@ -9251,6 +9251,69 @@ void ObjectMgr::LoadSpellScalingData()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadSpellDurationData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _cacheSpellScaling.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM forge_spell_scaling");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 SpellScaling. DB table `forge_spell_scaling` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        int32 id = fields[0].Get<int32>();
+        int32 CastTimeMin = fields[1].Get<int32>();
+        int32 CastTimeMax = fields[2].Get<int32>();
+        int32 CastTimeMaxLevel = fields[3].Get<int32>();
+        int32 ScalingClass = fields[4].Get<int32>();
+        float MultiplierA = fields[5].Get<float>();
+        float MultiplierB = fields[6].Get<float>();
+        float MultiplierC = fields[7].Get<float>();
+        float RandomMultiplierA = fields[8].Get<float>();
+        float RandomMultiplierB = fields[9].Get<float>();
+        float RandomMultiplierC = fields[10].Get<float>();
+        float OtherMultiplierA = fields[11].Get<float>();
+        float OtherMultiplierB = fields[12].Get<float>();
+        float OtherMultiplierC = fields[13].Get<float>();
+        float CoefBase = fields[14].Get<float>();
+        int32 CoefLevelBased = fields[15].Get<int32>();
+
+        SpellScalingEntry* entry = new SpellScalingEntry();
+        entry->CastTimeMin = CastTimeMin;
+        entry->CastTimeMax = CastTimeMax;
+        entry->CastTimeMaxLevel = CastTimeMaxLevel;
+        entry->ScalingClass = ScalingClass;
+        entry->Multiplier[0] = MultiplierA;
+        entry->Multiplier[1] = MultiplierB;
+        entry->Multiplier[2] = MultiplierC;
+        entry->RandomMultiplier[0] = RandomMultiplierA;
+        entry->RandomMultiplier[1] = RandomMultiplierB;
+        entry->RandomMultiplier[2] = RandomMultiplierC;
+        entry->OtherMultiplier[0] = OtherMultiplierA;
+        entry->OtherMultiplier[1] = OtherMultiplierB;
+        entry->OtherMultiplier[2] = OtherMultiplierC;
+        entry->CoefBase = CoefBase;
+        entry->CoefLevelBase = CoefLevelBased;
+
+        _cacheSpellScaling[id] = entry;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} SpellScaling for spells in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 SpellScalingEntry* ObjectMgr::GetSpellScalingEntry(uint32 spellid) {
     auto id = _cacheSpellScalingSpellMap.find(spellid);
     if (id != _cacheSpellScalingSpellMap.end())
