@@ -222,7 +222,7 @@ public:
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
             if (ranksItt != ft->Ranks.end()) 
-                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+                iam.player->_removeTalentAurasAndSpells(ranksItt->second);
             
             ct->CurrentRank++;
 
@@ -231,15 +231,19 @@ public:
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
 
-                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                    iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
-                else {
-                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL) {
-                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-                        }
-                }
+                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->IsPassive())
+                    iam.player->learnSpell(ranksItt->second);
+
+                if (spellInfo->IsPassive())
+                    iam.player->_addTalentAurasAndSpells(ranksItt->second);
+
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                    if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+                        iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell, true);
             }
+
+            iam.player->UpdateAllStats();
 
             fc->UpdateCharPoints(iam.player, curPoints);
             fc->UpdateCharacterSpec(iam.player, spec);

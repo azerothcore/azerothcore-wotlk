@@ -61,19 +61,6 @@ public:
                 return;
             }
 
-            auto pointItt = UNLEARN_POINT_TYPE.find(pointType);
-
-            if (pointItt != UNLEARN_POINT_TYPE.end())
-            {
-                if (!iam.player->HasItemCount(pointItt->second))
-                {
-                    iam.player->SendForgeUIMsg(ForgeTopic::UNLEARN_TALENT_ERROR, "Not enough unlearn points available");
-                    return;
-                }
-
-                iam.player->AddItem(pointItt->second, -1);
-            }
-
             ForgeTalentTab* tab;
             ForgeCharacterSpec* spec;
             if (fc->TryGetCharacterActiveSpec(iam.player, spec)) {
@@ -101,22 +88,28 @@ public:
                     spec->PointsSpent[tabId] -= refund;
 
                     sfp->Sum += refund;
-                    sfp->Max -= refund;
+                    auto spell = tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank];
+                    iam.player->_removeTalentAurasAndSpells(spell);
+                    auto spellInfo = sSpellMgr->GetSpellInfo(spell);
+                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                        iam.player->removeSpell(spell, iam.player->GetActiveSpecMask(), false);
 
-                    auto spellInfo = sSpellMgr->GetSpellInfo(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank]);
                     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                         if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                            iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+                            if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+                                iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, iam.player->GetActiveSpecMask(), false);
 
-                    iam.player->removeSpell(tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank], SPEC_MASK_ALL, false);
+                    if (iam.player->CanTitanGrip())
+                        iam.player->SetCanTitanGrip(false);
 
-                    iam.player->UpdateAllStats();
+                    iam.player->AutoUnequipOffhandIfNeed();
+
                     spellItt->second->CurrentRank = 0;
 
                     fc->UpdateCharPoints(iam.player, sfp);
                     fc->UpdateCharacterSpec(iam.player, spec);
 
-                    iam.player->SendForgeUIMsg(ForgeTopic::UNLEARN_TALENT_ERROR, results[0] + ";" + results[1] + ";0");
+                    talItt->second.erase(spellId);
                 }
                 else
                     iam.player->SendForgeUIMsg(ForgeTopic::UNLEARN_TALENT_ERROR, "Unknown spell or spec");

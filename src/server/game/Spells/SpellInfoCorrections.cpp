@@ -4556,12 +4556,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValue = 224;
     });
 
-    // arcane missile
-    ApplySpellFix({ 5143}, [](SpellInfo* spellInfo)
-        {
-            spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(611);
-        });
-
     // Target Fissures
     ApplySpellFix({ 30745 }, [](SpellInfo* spellInfo)
     {

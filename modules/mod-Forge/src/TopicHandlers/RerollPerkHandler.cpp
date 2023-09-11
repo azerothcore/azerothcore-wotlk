@@ -42,7 +42,7 @@ public:
                 return;
             }
 
-            if (iam.player->HasItemCount(REROLL_TOKEN)) {
+            if (true/*iam.player->HasItemCount(REROLL_TOKEN)*/) {
                 for (int i = CharacterPerkType::COMBAT; i < CharacterPerkType::MAX; i++) {
                     auto type = CharacterPerkType(i);
                     auto csp = spec->perks[type].find(spellId);
@@ -53,19 +53,14 @@ public:
 
                         auto rankIt = spell->ranks.find(rank);
                         if (rankIt != spell->ranks.end())
-                            if (spell->isAura)
-                                iam.player->RemoveAura(rankIt->second);
-                            else
-                                iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
+                            iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
+
                         rank--;
 
                         if (rank) {
                             rankIt = spell->ranks.find(rank);
                             if (rankIt != spell->ranks.end())
-                                if (spell->isAura)
-                                    iam.player->AddAura(rankIt->second, iam.player);
-                                else
-                                    iam.player->learnSpell(rankIt->second, true);
+                                iam.player->learnSpell(rankIt->second, true);
 
                             csp->second->rank = rank;
                         }

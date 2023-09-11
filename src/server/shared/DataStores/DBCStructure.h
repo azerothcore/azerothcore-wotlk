@@ -1836,6 +1836,14 @@ struct SpellDurationEntry
     int32     Duration[3];
 };
 
+struct ForgedSpellDurationEntry
+{
+    int32     Duration;
+    int32     DurationPerLevel;
+    int32     MaxDuration;
+};
+
+
 #define MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS 3
 
 struct SpellItemEnchantmentEntry

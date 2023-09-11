@@ -1593,6 +1593,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadSpellScalingData();
     sObjectMgr->LoadSpellScalingSpellMap();
     sObjectMgr->LoadSpellScalingValue();
+    sObjectMgr->LoadSpellDurationData();
 
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
     sSpellMgr->LoadSpellInfoStore();

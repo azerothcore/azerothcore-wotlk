@@ -342,7 +342,6 @@ void ForgeCommonMessage::SendTalents(Player* player)
     ForgeCharacterSpec* spec;
     if (fc->TryGetCharacterActiveSpec(player, spec))
     {
-       
         uint32 i = 0;
 
         for (auto tpt : fc->TALENT_POINT_TYPES)

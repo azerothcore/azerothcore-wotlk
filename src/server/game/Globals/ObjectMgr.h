@@ -1121,6 +1121,7 @@ public:
     SpellScalingEntry* GetSpellScalingEntry(uint32);
     float GetSpellScalingValue(uint32 entry);
     void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
+    ForgedSpellDurationEntry* GetForgedSpellDurationEntry(uint32 spellid);
 
     std::string GeneratePetName(uint32 entry);
     std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
@@ -1644,6 +1645,8 @@ private:
     CacheSpellScalingSpellMapContainer _cacheSpellScalingSpellMap;
     typedef std::unordered_map</* spellId */ uint32, float> CacheSpellScalingValueContainer;
     CacheSpellScalingValueContainer _cacheSpellScalingValue;
+    typedef std::unordered_map</* spellId */ uint32, ForgedSpellDurationEntry*> CacheSpellDurationContainer;
+    CacheSpellDurationContainer _cacheSpellDurationMap;
 
     ServerMailContainer _serverMailStore;
 

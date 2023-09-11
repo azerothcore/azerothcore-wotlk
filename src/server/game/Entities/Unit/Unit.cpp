@@ -15121,8 +15121,6 @@ int32 Unit::CalcSpellDuration(SpellInfo const* spellProto)
 {
     uint8 comboPoints = GetComboPoints();
 
-
-
     int32 minduration = spellProto->GetDuration();
     int32 maxduration = spellProto->GetMaxDuration();
 
@@ -19957,55 +19955,57 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
         std::vector<uint32> select;
         std::random_device rd;
         std::mt19937 eng(rd());
-            
+
 
         switch (form)
         {
-            case FORM_CAT:
-                if (getRace() == RACE_NIGHTELF)
-                    select = { 29405, 29406, 29407, 29408, 892 };
-                else if (getRace() == RACE_TAUREN)
-                    select = { 29409, 29410, 29411, 29412, 8571 };
-                else if (getRace() == RACE_GNOME)
-                    select = { 5555, 5556, 5585, 5586, 11709, 5448, 5554, 9990 };
-                /*else if (getRace() == RACE_TROLL)
-                    select = { 21632 };*/
-                else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    select = { 892 };
-                else
-                    select = { 8571 }; 
-                break;
-            case FORM_DIREBEAR:
-            case FORM_BEAR:
-                if (getRace() == RACE_NIGHTELF)
-                    select = { 29413, 29414, 29416, 29417, 2281 };
-                else if (getRace() == RACE_TAUREN)
-                    select = { 29418, 29419, 29420, 29421, 2289 };
-                else if (getRace() == RACE_GNOME)
-                    select = { 30059, 30060, 23948, 28489, 10990 };
-                /*else if (getRace() == RACE_TROLL)
-                    select = { 21631 };*/
-                else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    select = { 2281 };
-                else
-                    select = { 2289 };
-                break;
-            case FORM_FLIGHT:
-                if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    select = { 20857 };
-                select = { 20872 };
-                break;
-            case FORM_FLIGHT_EPIC:
-                if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
-                    select = { 21243 };
-                select = { 21244 };
-                break;
-            default:
-                break;
+        case FORM_CAT:
+            if (getRace() == RACE_NIGHTELF)
+                select = { 29405, 29406, 29407, 29408, 892 };
+            else if (getRace() == RACE_TAUREN)
+                select = { 29409, 29410, 29411, 29412, 8571 };
+            else if (getRace() == RACE_GNOME)
+                select = { 5555, 5556, 5585, 5586, 11709, 5448, 5554, 9990 };
+            /*else if (getRace() == RACE_TROLL)
+                select = { 21632 };*/
+            else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
+                select = { 892 };
+            else
+                select = { 8571 };
+            break;
+        case FORM_DIREBEAR:
+        case FORM_BEAR:
+            if (getRace() == RACE_NIGHTELF)
+                select = { 29413, 29414, 29416, 29417, 2281 };
+            else if (getRace() == RACE_TAUREN)
+                select = { 29418, 29419, 29420, 29421, 2289 };
+            else if (getRace() == RACE_GNOME)
+                select = { 30059, 30060, 23948, 28489, 10990 };
+            /*else if (getRace() == RACE_TROLL)
+                select = { 21631 };*/
+            else if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
+                select = { 2281 };
+            else
+                select = { 2289 };
+            break;
+        case FORM_FLIGHT:
+            if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
+                select = { 20857 };
+            select = { 20872 };
+            break;
+        case FORM_FLIGHT_EPIC:
+            if (Player::TeamIdForRace(getRace()) == TEAM_ALLIANCE)
+                select = { 21243 };
+            select = { 21244 };
+            break;
+        default:
+            break;
         }
-        std::uniform_int_distribution<> distr(0, select.size() - 1);
-        auto index = distr(eng);
-        return select[index];
+        if (!select.empty()) {
+            std::uniform_int_distribution<> distr(0, select.size() - 1);
+            auto index = distr(eng);
+            return select[index];
+        }
     }
 
     uint32 modelid = 0;

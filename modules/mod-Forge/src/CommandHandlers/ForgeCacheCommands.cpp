@@ -57,6 +57,7 @@ public:
         sObjectMgr->LoadSpellScalingData();
         sObjectMgr->LoadSpellScalingSpellMap();
         sObjectMgr->LoadSpellScalingValue();
+        sObjectMgr->LoadSpellDurationData();
 
         // ChatHandler could be Console or Player session
         handler->PSendSysMessage("Cache Reloaded");

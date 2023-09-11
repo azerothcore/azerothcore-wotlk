@@ -4203,15 +4203,16 @@ class spell_gen_gift_of_naaru : public AuraScript
 {
     PrepareAuraScript(spell_gen_gift_of_naaru);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateBonus(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        if (auto* caster = GetCaster())
+        canBeRecalculated = false;
+        if (Unit* caster = GetCaster())
             amount = CalculatePct(caster->GetMaxHealth(), GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster));
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_gift_of_naaru::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_gift_of_naaru::CalculateBonus, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
     }
 };
 

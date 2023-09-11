@@ -2378,16 +2378,18 @@ float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
 
 int32 SpellInfo::GetDuration() const
 {
-    if (!DurationEntry)
+    auto duration = sObjectMgr->GetForgedSpellDurationEntry(Id);
+    if (!duration)
         return 0;
-    return (DurationEntry->Duration[0] == -1) ? -1 : std::abs(DurationEntry->Duration[0]);
+    return (duration->Duration == -1) ? -1 : std::abs(duration->Duration);
 }
 
 int32 SpellInfo::GetMaxDuration() const
 {
-    if (!DurationEntry)
+    auto duration = sObjectMgr->GetForgedSpellDurationEntry(Id);
+    if (!duration)
         return 0;
-    return (DurationEntry->Duration[2] == -1) ? -1 : std::abs(DurationEntry->Duration[2]);
+    return (duration->MaxDuration == -1) ? -1 : std::abs(duration->MaxDuration);
 }
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const

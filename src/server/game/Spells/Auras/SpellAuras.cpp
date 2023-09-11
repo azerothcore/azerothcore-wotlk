@@ -868,7 +868,8 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     else
         maxDuration = m_spellInfo->GetDuration();
 
-    if (IsPassive() && !m_spellInfo->DurationEntry)
+    auto duration = sObjectMgr->GetForgedSpellDurationEntry(m_spellInfo->Id);
+    if (IsPassive() && !duration)
         maxDuration = -1;
 
     sScriptMgr->OnCalcMaxDuration(this, maxDuration);

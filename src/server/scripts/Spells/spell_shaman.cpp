@@ -776,7 +776,7 @@ class spell_sha_flame_shock : public AuraScript
     }
 };
 
-// 52041, 52046, 52047, 52048, 52049, 52050, 58759, 58760, 58761 - Healing Stream Totem
+// 52041
 class spell_sha_healing_stream_totem : public SpellScript
 {
     PrepareSpellScript(spell_sha_healing_stream_totem);
@@ -796,7 +796,7 @@ class spell_sha_healing_stream_totem : public SpellScript
                 if (Unit* owner = caster->GetOwner())
                 {
                     if (triggeringSpell)
-                        damage = int32(owner->SpellHealingBonusDone(target, triggeringSpell, damage, HEAL, effIndex));
+                        damage = triggeringSpell->Effects[EFFECT_0].CalcValue(caster);
 
                     // Restorative Totems
                     if (AuraEffect* dummy = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, SHAMAN_ICON_ID_RESTORATIVE_TOTEMS, 1))
@@ -806,9 +806,8 @@ class spell_sha_healing_stream_totem : public SpellScript
                     if (AuraEffect const* aurEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_HEALING_STREAM_TOTEM, EFFECT_0))
                         AddPct(damage, aurEff->GetAmount());
 
-                    damage = int32(target->SpellHealingBonusTaken(owner, triggeringSpell, damage, HEAL));
+                    caster->CastCustomSpell(target, SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL, &damage, 0, 0, true, 0, 0, GetOriginalCaster()->GetGUID());
                 }
-                caster->CastCustomSpell(target, SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL, &damage, 0, 0, true, 0, 0, GetOriginalCaster()->GetGUID());
             }
     }
 

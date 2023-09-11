@@ -741,6 +741,7 @@ public:
             }
             UpdateCharacterSpec(player, currentSpec);
             player->SendInitialSpells();
+            player->AutoUnequipOffhandIfNeed();
         }
     }
 
@@ -1382,8 +1383,10 @@ private:
 
     void UpdateChacterTalentInternal(uint32 account, uint32 charId, CharacterDatabaseTransaction& trans, uint32 spec, uint32 spellId, uint32 tabId, uint8 known)
     {
-        if (TalentTabs[tabId]->TalentType != ACCOUNT_WIDE_TYPE)
+        if (TalentTabs[tabId]->TalentType != ACCOUNT_WIDE_TYPE) {
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", charId, spec, spellId, tabId, known, known);
+            trans->Append("DELETE FROM `forge_character_talents` WHERE `guid` = {} and `spec` = {} and `currentRank` = 0", charId, spec);
+        }
         else
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }

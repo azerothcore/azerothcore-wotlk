@@ -118,6 +118,7 @@ class spell_perk_any_proc : public AuraScript
             if (procSpell->SpellFamilyName == SPELLFAMILY_PERK)
                 return;
         }
+
         else
             return;
         
