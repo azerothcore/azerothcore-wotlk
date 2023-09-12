@@ -47,11 +47,13 @@ enum Spells
 
 enum creatures
 {
-    NPC_NETHERSPITE_INFERNAL     = 17646,
-    NPC_MALCHEZARS_AXE           = 17650,
-    INFERNAL_MODEL_INVISIBLE = 11686,
-    SPELL_INFERNAL_RELAY     = 33814,   // 30835,
-    EQUIP_ID_AXE             = 33542
+    NPC_NETHERSPITE_INFERNAL    = 17646,
+    NPC_MALCHEZAARS_AXE         = 17650,
+    INFERNAL_MODEL_INVISIBLE    = 11686,
+    SPELL_INFERNAL_RELAY        = 33814,   // 30835,
+    SPELL_INFERNAL_RELAY_ONE    = 30834,
+    SPELL_INFERNAL_RELAY_TWO    = 30835,
+    EQUIP_ID_AXE                = 33542
 };
 
 enum EventGroups
@@ -68,44 +70,21 @@ enum Phases
     PHASE_THREE = 3
 };
 
-struct InfernalPoint
-{
-    float x, y;
-};
-
-#define INFERNAL_Z 275.5f
-
-/*static InfernalPoint InfernalPoints[] =
-{
-    { -10922.8f, -1985.2f },
-    { -10916.2f, -1996.2f },
-    { -10932.2f, -2008.1f },
-    { -10948.8f, -2022.1f },
-    { -10958.7f, -1997.7f },
-    { -10971.5f, -1997.5f },
-    { -10990.8f, -1995.1f },
-    { -10989.8f, -1976.5f },
-    { -10971.6f, -1973.0f },
-    { -10955.5f, -1974.0f },
-    { -10939.6f, -1969.8f },
-    { -10958.0f, -1952.2f },
-    { -10941.7f, -1954.8f },
-    { -10943.1f, -1988.5f },
-    { -10948.8f, -2005.1f },
-    { -10984.0f, -2019.3f },
-    { -10932.8f, -1979.6f },
-    { -10935.7f, -1996.0f }
-};*/
-
 struct boss_malchezaar : public BossAI
 {
-    boss_malchezaar(Creature* creature) : BossAI(creature, DATA_MALCHEZZAR) { }
+    boss_malchezaar(Creature* creature) : BossAI(creature, DATA_MALCHEZAAR) { }
+
+    std::list<Creature*> relays;
+    std::list<Creature*> infernalTargets;
+    std::list<uint8> spawnForbidden; //list to keep track of where infernals should not spawn
 
     void Initialize()
     {
         _phase = 1;
         clearweapons();
-        positions.clear();
+        relays.clear();
+        infernalTargets.clear();
+        spawnForbidden.clear();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
@@ -145,7 +124,7 @@ struct boss_malchezaar : public BossAI
             _phase = PHASE_THREE;
             clearweapons();
 
-            me->SummonCreature(NPC_MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+            me->SummonCreature(NPC_MALCHEZAARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
 
             scheduler.Schedule(20s, 30s, [this](TaskContext context)
             {
@@ -174,6 +153,18 @@ struct boss_malchezaar : public BossAI
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
+    bool CheckForbidden(uint8 choice, std::list<uint8> toCheckList)
+    {
+        for (uint8 check : toCheckList)
+        {
+            if (check == choice)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
@@ -199,23 +190,54 @@ struct boss_malchezaar : public BossAI
             context.Repeat();
         }).Schedule(40s, [this](TaskContext context)
         {
-            Position pos =  me->GetRandomNearPosition(40.0);;
+            Talk(SAY_SUMMON);
 
-            if (Creature* RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
+            me->GetCreaturesWithEntryInRange(relays, 1000.0f, NPC_INFERNAL_RELAY);
+            me->GetCreaturesWithEntryInRange(infernalTargets, 1000.0f, NPC_INFERNAL_TARGET);
+
+            if (Creature* infernalRelayOne = relays.back())
             {
-                if (Creature* infernal = RELAY->SummonCreature(NPC_NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000))
+                if (Creature* infernalRelayTwo = relays.front())
                 {
-                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                    infernal->SetFaction(me->GetFaction());
-                    infernal->SetControlled(true, UNIT_STATE_ROOT);
-                    RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
-                    summons.Summon(infernal);
+                    infernalRelayOne->CastSpell(infernalRelayTwo, SPELL_INFERNAL_RELAY_ONE, true);
+
+                    uint8 choice = urand(0, infernalTargets.size());
+                    while(CheckForbidden(choice, spawnForbidden) && spawnForbidden.size() < 12)
+                    {
+                        choice = urand(0, infernalTargets.size()); //keep checking for a free position
+                    }
+                    uint8 counter = 0;
+                    spawnForbidden.push_front(choice);
+
+                    for (Creature* infernalTarget : infernalTargets)
+                    {
+                        if (counter == choice)
+                        {
+                            if (Creature* infernal = infernalRelayTwo->SummonCreature(NPC_NETHERSPITE_INFERNAL, infernalTarget->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+                            {
+                                infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+                                infernalRelayTwo->CastSpell(infernalTarget, SPELL_INFERNAL_RELAY_TWO);
+                                infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+                                infernal->SetFaction(me->GetFaction());
+                                infernal->SetControlled(true, UNIT_STATE_ROOT);
+                                infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+                                summons.Summon(infernal);
+                                scheduler.Schedule(3min, [this, choice](TaskContext)
+                                {
+                                    spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
+                                });
+                            }
+                            break;
+                        }
+                        counter++;
+                    }
                 }
             }
 
-            context.Repeat(_phase == PHASE_THREE ? 15s : 45s);
+            relays.clear();
+            infernalTargets.clear();
 
-            Talk(SAY_SUMMON);
+            context.Repeat(_phase == PHASE_THREE ? 15s : 45s);
         }).Schedule(20s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SHADOW_WORD_PAIN);
@@ -261,7 +283,6 @@ struct boss_malchezaar : public BossAI
     private:
         uint32 _phase;
         std::map<ObjectGuid, uint32> _enfeebleTargets;
-        std::vector<InfernalPoint*> positions;
 };
 
 struct npc_netherspite_infernal : public ScriptedAI
