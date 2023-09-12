@@ -195,41 +195,44 @@ struct boss_malchezaar : public BossAI
             me->GetCreaturesWithEntryInRange(relays, 1000.0f, NPC_INFERNAL_RELAY);
             me->GetCreaturesWithEntryInRange(infernalTargets, 1000.0f, NPC_INFERNAL_TARGET);
 
-            if (Creature* infernalRelayOne = relays.back())
+            if (spawnForbidden.size() < 12) // only spawn infernal when the area is not full
             {
-                if (Creature* infernalRelayTwo = relays.front())
+                if (Creature* infernalRelayOne = relays.back())
                 {
-                    infernalRelayOne->CastSpell(infernalRelayTwo, SPELL_INFERNAL_RELAY_ONE, true);
-
-                    uint8 choice = urand(0, infernalTargets.size());
-                    while(CheckForbidden(choice, spawnForbidden) && spawnForbidden.size() < 12)
+                    if (Creature* infernalRelayTwo = relays.front())
                     {
-                        choice = urand(0, infernalTargets.size()); //keep checking for a free position
-                    }
-                    uint8 counter = 0;
-                    spawnForbidden.push_front(choice);
+                        infernalRelayOne->CastSpell(infernalRelayTwo, SPELL_INFERNAL_RELAY_ONE, true);
 
-                    for (Creature* infernalTarget : infernalTargets)
-                    {
-                        if (counter == choice)
+                        uint8 choice = urand(0, infernalTargets.size());
+                        while(CheckForbidden(choice, spawnForbidden))
                         {
-                            if (Creature* infernal = infernalRelayTwo->SummonCreature(NPC_NETHERSPITE_INFERNAL, infernalTarget->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
-                            {
-                                infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                                infernalRelayTwo->CastSpell(infernalTarget, SPELL_INFERNAL_RELAY_TWO);
-                                infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
-                                infernal->SetFaction(me->GetFaction());
-                                infernal->SetControlled(true, UNIT_STATE_ROOT);
-                                infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
-                                summons.Summon(infernal);
-                                scheduler.Schedule(3min, [this, choice](TaskContext)
-                                {
-                                    spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
-                                });
-                            }
-                            break;
+                            choice = urand(0, infernalTargets.size()); //keep checking for a free position
                         }
-                        counter++;
+                        uint8 counter = 0;
+                        spawnForbidden.push_front(choice);
+
+                        for (Creature* infernalTarget : infernalTargets)
+                        {
+                            if (counter == choice)
+                            {
+                                if (Creature* infernal = infernalRelayTwo->SummonCreature(NPC_NETHERSPITE_INFERNAL, infernalTarget->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+                                {
+                                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+                                    infernalRelayTwo->CastSpell(infernalTarget, SPELL_INFERNAL_RELAY_TWO);
+                                    infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+                                    infernal->SetFaction(me->GetFaction());
+                                    infernal->SetControlled(true, UNIT_STATE_ROOT);
+                                    infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+                                    summons.Summon(infernal);
+                                    scheduler.Schedule(3min, [this, choice](TaskContext)
+                                    {
+                                        spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
+                                    });
+                                }
+                                break;
+                            }
+                            counter++;
+                        }
                     }
                 }
             }
