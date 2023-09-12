@@ -1,5 +1,4 @@
 
---adding two entries into creature_template where the NPC flag gets added or removed based on whether Plugger has aggroed or reset
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 9499;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9499) AND (`source_type` = 0) AND (`id` IN (13, 14));
@@ -7,7 +6,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9499, 0, 13, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 83, 130, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plugger Spazzring - On Aggro - Remove Npc Flags Questgiver & Vendor'),
 (9499, 0, 14, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 82, 130, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plugger Spazzring - On Reset - Add Npc Flags Questgiver & Vendor');
 
---adding two entries into creature template where the NPC flag gets added or removed based on whether Grim Patron has aggroed or reset 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 9545;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 9545);
@@ -20,7 +18,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9545, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Aggro - Remove Npc Flags Gossip'),
 (9545, 0, 6, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Add Npc Flags Gossip');
 
---adding two entries into creature template where the NPC flag gets added or removed based on whether Guzzling Patron has aggroed or reset 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 9547;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9547) AND (`source_type` = 0) AND (`id` IN (6, 7));
@@ -29,7 +26,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9547, 0, 7, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Add Npc Flags Gossip');
 
 
---adding two entries into creature template where the NPC flag gets added or removed based on whether Dark Iron Brewer has aggroed or reset 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28067;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28067) AND (`source_type` = 0) AND (`id` IN (3, 4));
@@ -38,7 +34,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28067, 0, 4, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Iron Brewer - On Reset - Add Npc Flags Gossip');
 
 
---adding two entries into creature template where the NPC flag gets added or removed based on whether Hammered Patron has aggroed or reset 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 9554;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9554) AND (`source_type` = 0) AND (`id` IN (2, 5));
