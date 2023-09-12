@@ -1573,7 +1573,7 @@ private:
 
     void AddTalentsToTrees()
     {
-        QueryResult talents = WorldDatabase.Query("SELECT * FROM forge_talents");
+        QueryResult talents = WorldDatabase.Query("SELECT t FROM forge_talents");
 
         if (!talents)
             return;

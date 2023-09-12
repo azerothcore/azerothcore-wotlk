@@ -356,12 +356,18 @@ void ForgeCommonMessage::SendTalents(Player* player)
 
                     if (i == 0)
                         delimiter = "";
+
                     std::string clientMsg;
+                    auto tabId = tpt == CharacterPointType::TALENT_TREE ? tab->ClassMask : tab->Id;
                     //clientMsg = clientMsg + delimiter + std::to_string(tab->Id) + "^" + std::to_string((int)tab->TalentType) + "^";
-                    clientMsg = std::to_string(tab->Id) + "^" + std::to_string((int)tab->TalentType) + "^";
+                    clientMsg = std::to_string(tabId) + "^" + std::to_string((int)tab->TalentType) + "^";
                     std::unordered_map<uint32, ForgeCharacterTalent*> spec;
-                    fc->TryGetCharacterTalents(player, tab->Id, spec);
-                    clientMsg = DoBuildRanks(spec, player, clientMsg, tab->Id);
+                    std::list<ForgeTalentTab*> tabs;
+                    fc->TryGetForgeTalentTabs(player, tpt, tabs);
+                    for (auto tab : tabs) {
+                        fc->TryGetCharacterTalents(player, tab->Id, spec);
+                        clientMsg = DoBuildRanks(spec, player, clientMsg, tab->Id);
+                    }
                     player->SendForgeUIMsg(ForgeTopic::GET_TALENTS, clientMsg);
                     i++;
                 }
@@ -398,6 +404,8 @@ std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCha
 {
     int i = 0;
     ForgeTalentTab* tab;
+
+    clientMsg = clientMsg + "|" + std::to_string(tabId);
 
     if (fc->TryGetTalentTab(player, tabId, tab))
     {
