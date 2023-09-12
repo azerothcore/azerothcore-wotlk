@@ -231,16 +231,13 @@ public:
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
 
-                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->IsPassive())
+                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
                     iam.player->learnSpell(ranksItt->second);
-
-                if (spellInfo->IsPassive())
-                    iam.player->_addTalentAurasAndSpells(ranksItt->second);
 
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                    if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
-                        iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell, true);
+                        if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
+                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
             }
 
             iam.player->UpdateAllStats();
