@@ -214,7 +214,7 @@ struct boss_malchezaar : public BossAI
             context.Repeat();
         }).Schedule(40s, [this](TaskContext context)
         {
-            if (MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full
+            if (!MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full
             {
                 Talk(SAY_SUMMON);
                 if (Creature* infernalRelayOne = relays.back())
