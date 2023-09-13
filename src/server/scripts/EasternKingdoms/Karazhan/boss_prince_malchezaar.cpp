@@ -170,7 +170,7 @@ struct boss_malchezaar : public BossAI
         Talk(SAY_AGGRO);
         _JustEngagedWith();
 
-        me->GetCreaturesWithEntryInRange(relays, 100.0f, NPC_INFERNAL_RELAY);
+        me->GetCreaturesWithEntryInRange(relays, 250.0f, NPC_INFERNAL_RELAY);
         me->GetCreaturesWithEntryInRange(infernalTargets, 100.0f, NPC_INFERNAL_TARGET);
 
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
