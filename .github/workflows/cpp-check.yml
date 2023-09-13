@@ -34,4 +34,9 @@ jobs:
             -i src/server/game/Entities/GameObject/GameObject.cpp \
             -i src/server/game/Entities/Pet/Pet.cpp \
             -i src/server/game/Entities/Player/Player.cpp \
-            src/
+            src/ --output-file=report.txt
+
+            if [ -s report.txt ]; then  # if file is not empty
+              cat report.txt
+              exit 1 # let github action fails
+            fi
