@@ -9274,8 +9274,8 @@ void ObjectMgr::LoadSpellDurationData()
 
         int64 spellId = fields[0].Get<int64>();
         int64 duration = fields[1].Get<int64>();
-        int64 maxDuration = fields[2].Get<int64>();
-        int64 durationPerLevel = fields[3].Get<int64>();
+        int64 durationPerLevel = fields[2].Get<int64>();
+        int64 maxDuration = fields[3].Get<int64>();
 
         ForgedSpellDurationEntry* entry = new ForgedSpellDurationEntry();
         entry->Duration = duration;

@@ -2389,7 +2389,7 @@ int32 SpellInfo::GetMaxDuration() const
     auto duration = sObjectMgr->GetForgedSpellDurationEntry(Id);
     if (!duration)
         return 0;
-    return (duration->MaxDuration == -1) ? -1 : std::abs(duration->MaxDuration);
+    return (duration->MaxDuration == -1) ? -1 : duration->MaxDuration;
 }
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const

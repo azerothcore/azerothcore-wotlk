@@ -674,11 +674,11 @@ public:
     void LearnCharacterPerkInternal(Player* player, ForgeCharacterSpec* spec, CharacterSpecPerk* perk, CharacterPerkType type) {
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-        trans->Append("INSERT INTO character_spec_perks (`guid`, `specId`, `type`, `uuid`, `spellId`, `rank`) VALUES ({}, {}, {}, '{}', {}, {}) ON DUPLICATE KEY UPDATE `rank` = `rank`+1",
-            player->GetGUID().GetCounter(), spec->Id, type, perk->uuid, perk->spell->spellId, perk->rank);
+        trans->Append("INSERT INTO character_spec_perks (`guid`, `specId`, `type`, `uuid`, `spellId`, `rank`) VALUES ({}, {}, {}, '{}', {}, {}) ON DUPLICATE KEY UPDATE `rank` = {}",
+            player->GetGUID().GetCounter(), spec->Id, type, perk->uuid, perk->spell->spellId, perk->rank, perk->rank);
         trans->Append("INSERT INTO character_perk_roll_history select {} as `accountId`, `guid`, `rollKey`, `specId`, `spellId`, {} as `level`, 0 as `carryover` from character_perk_selection_queue where rollkey = '{}' ON DUPLICATE KEY UPDATE `carryover` = `carryover`+1",
             player->GetSession()->GetAccountId(), player->GetLevel(), perk->uuid);
-        trans->Append("DELETE FROM character_perk_selection_queue where `type` = {}", type);
+        trans->Append("DELETE FROM character_spec_perks where `guid` = {} and `specId` = {} and `rank` = 0", player->GetGUID().GetCounter(), spec->Id);
 
         CharacterDatabase.CommitTransaction(trans);
     }
@@ -720,13 +720,11 @@ public:
                                                 }
                                                 else {
                                                     if (!player->HasSpell(currentRank)) {
-                                                        if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                                            player->learnSpell(currentRank, true, false);
-                                                        else {
-                                                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                                                                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                                                                    player->learnSpell(spellInfo->Effects[i].TriggerSpell);
-                                                        }
+                                                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                                                                player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+
+                                                        player->learnSpell(currentRank, spellInfo->IsPassive());
                                                     }
                                                 }
                                             }
@@ -798,8 +796,14 @@ public:
                         for (auto spell : tab->Talents)
                             for (auto rank : spell.second->Ranks)
                                 if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second))
-                                    for (auto rank : spell.second->Ranks)
+                                    for (auto rank : spell.second->Ranks) {
+                                        if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                                player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+
                                         player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                        player->RemoveAura(rank.second);
+                                    }
             }
 
             player->SendInitialSpells();
@@ -1573,7 +1577,7 @@ private:
 
     void AddTalentsToTrees()
     {
-        QueryResult talents = WorldDatabase.Query("SELECT t FROM forge_talents");
+        QueryResult talents = WorldDatabase.Query("SELECT * FROM forge_talents");
 
         if (!talents)
             return;

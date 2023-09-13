@@ -77,9 +77,11 @@ public:
                     else
                         return;
 
-                    fc->LearnCharacterPerkInternal(iam.player, spec, csp, type);
+
                     spec->perks[type][spellId] = csp;
+                    fc->LearnCharacterPerkInternal(iam.player, spec, csp, type);
                     spec->perkQueue[type].clear();
+                    CharacterDatabase.DirectExecute("DELETE FROM character_perk_selection_queue where `guid` = {} and `specId` = {} and `type` = {}", iam.player->GetGUID().GetCounter(), spec->Id, type);
 
                     cm->SendPerks(iam.player, specId);
 

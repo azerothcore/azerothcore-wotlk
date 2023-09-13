@@ -2999,23 +2999,24 @@ void Player::_removeTalentAurasAndSpells(uint32 spellId)
 {
     RemoveOwnedAura(spellId);
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        // pussywizard: remove pet auras
-        if (PetAura const* petSpell = sSpellMgr->GetPetAura(spellId, i))
-            RemovePetAura(petSpell);
-
-        // pussywizard: remove all triggered auras
-        if (spellInfo->Effects[i].TriggerSpell > 0)
-            RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
-
-        // xinef: remove temporary spells added by talent
-        // xinef: recursively remove all learnt spells
-        if (spellInfo->Effects[i].TriggerSpell > 0 && spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId)) {
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
-            _removeTalentAurasAndSpells(spellInfo->Effects[i].TriggerSpell);
+            // pussywizard: remove pet auras
+            if (PetAura const* petSpell = sSpellMgr->GetPetAura(spellId, i))
+                RemovePetAura(petSpell);
+
+            // pussywizard: remove all triggered auras
+            if (spellInfo->Effects[i].TriggerSpell > 0)
+                RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
+
+            // xinef: remove temporary spells added by talent
+            // xinef: recursively remove all learnt spells
+            if (spellInfo->Effects[i].TriggerSpell > 0 && spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+            {
+                removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
+                _removeTalentAurasAndSpells(spellInfo->Effects[i].TriggerSpell);
+            }
         }
     }
 }
@@ -3023,17 +3024,18 @@ void Player::_removeTalentAurasAndSpells(uint32 spellId)
 void Player::_addTalentAurasAndSpells(uint32 spellId)
 {
     // pussywizard: spells learnt from talents are added as TEMPORARY, so not saved to db (only the talent itself is saved)
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-    {
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && !sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
-                _addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
-    }
-    else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
-    {
-        if (IsNeedCastPassiveSpellAtLearn(spellInfo))
-            CastSpell(this, spellId, true);
+    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId)) {
+        if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+        {
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && !sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+                    _addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
+        }
+        else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
+        {
+            if (IsNeedCastPassiveSpellAtLearn(spellInfo))
+                CastSpell(this, spellId, true);
+        }
     }
 }
 

@@ -216,38 +216,39 @@ public:
             spec->PointsSpent[tabId] += ft->RankCost;
             curPoints->Sum -= ft->RankCost;
 
-            for (auto s : ft->UnlearnSpells)
+            for (auto s : ft->UnlearnSpells) {
                 iam.player->removeSpell(s, SPEC_MASK_ALL, false);
+                iam.player->RemoveAura(s);
+            }
 
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
-            if (ranksItt != ft->Ranks.end()) 
-                iam.player->_removeTalentAurasAndSpells(ranksItt->second);
-            
+            if (ranksItt != ft->Ranks.end()) {
+                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+                iam.player->RemoveAura(ranksItt->second);
+            }
+
             ct->CurrentRank++;
 
             ranksItt = ft->Ranks.find(ct->CurrentRank);
 
             if (ranksItt != ft->Ranks.end()) {
                 auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-
-                if (!spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                    iam.player->learnSpell(ranksItt->second);
-
+                    
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
                         if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
-                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell);
+                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell, spellInfo->IsPassive());
+
+                iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
             }
 
             iam.player->UpdateAllStats();
 
             fc->UpdateCharPoints(iam.player, curPoints);
             fc->UpdateCharacterSpec(iam.player, spec);
-
-            cm->SendActiveSpecInfo(iam.player);
             cm->SendSpecInfo(iam.player);
-            cm->SendTalents(iam.player, tabId);
+            cm->SendTalents(iam.player);
 
             iam.player->SendPlaySpellVisual(179); // 53 SpellCastDirected
             iam.player->SendPlaySpellImpact(iam.player->GetGUID(), 362); // 113 EmoteSalute

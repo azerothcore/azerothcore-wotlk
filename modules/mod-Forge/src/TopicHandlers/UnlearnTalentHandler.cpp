@@ -88,20 +88,17 @@ public:
                     spec->PointsSpent[tabId] -= refund;
 
                     sfp->Sum += refund;
-                    auto spell = tab->Talents[spellId]->Ranks[spellItt->second->CurrentRank];
-                    iam.player->_removeTalentAurasAndSpells(spell);
-                    auto spellInfo = sSpellMgr->GetSpellInfo(spell);
-                    if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                        iam.player->removeSpell(spell, iam.player->GetActiveSpecMask(), false);
 
-                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                            iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, iam.player->GetActiveSpecMask(), false);
+                    for (auto spell : tab->Talents[spellId]->Ranks) {
 
-                    if (iam.player->CanTitanGrip())
-                        iam.player->SetCanTitanGrip(false);
+                        auto spellInfo = sSpellMgr->GetSpellInfo(spell.second);
 
-                    iam.player->AutoUnequipOffhandIfNeed();
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                                iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+
+                        iam.player->removeSpell(spell.second, SPEC_MASK_ALL, false);
+                    }
 
                     spellItt->second->CurrentRank = 0;
 
@@ -109,6 +106,8 @@ public:
                     fc->UpdateCharacterSpec(iam.player, spec);
 
                     talItt->second.erase(spellId);
+                    iam.player->SendForgeUIMsg(ForgeTopic::UNLEARN_TALENT_ERROR, results[0] + ";" + results[1] + ";0");
+
                 }
                 else
                     iam.player->SendForgeUIMsg(ForgeTopic::UNLEARN_TALENT_ERROR, "Unknown spell or spec");
@@ -148,6 +147,7 @@ private:
                     }
                 }
             }
+            fc->ApplyTalents(player);
             ForgeCharacterPoint* sfp = fc->GetSpecPoints(player, TALENT_TREE, spec->Id);
             sfp->Sum = std::max(player->GetLevel() - 9, 0);
             sfp->Max = sfp->Sum;

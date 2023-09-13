@@ -48,8 +48,9 @@ public:
                     auto csp = spec->perks[type].find(spellId);
                     if (csp != spec->perks[type].end()) {
                         iam.player->DestroyItemCount(REROLL_TOKEN, 1, true);
-                        auto rank = csp->second->rank;
-                        auto spell = csp->second->spell;
+                        auto perk = csp->second;
+                        auto rank = perk->rank;
+                        auto spell = perk->spell;
 
                         auto rankIt = spell->ranks.find(rank);
                         if (rankIt != spell->ranks.end())
@@ -65,6 +66,8 @@ public:
                             csp->second->rank = rank;
                         }
                         else {
+                            csp->second->rank = rank;
+                            fc->LearnCharacterPerkInternal(iam.player, spec, csp->second, CharacterPerkType(i));
                             spec->perks[type].erase(spellId);
                         }
 
