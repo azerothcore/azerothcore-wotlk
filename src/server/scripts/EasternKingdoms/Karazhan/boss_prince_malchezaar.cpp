@@ -169,6 +169,10 @@ struct boss_malchezaar : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
+
+        me->GetCreaturesWithEntryInRange(relays, 100.0f, NPC_INFERNAL_RELAY);
+        me->GetCreaturesWithEntryInRange(infernalTargets, 100.0f, NPC_INFERNAL_TARGET);
+
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
@@ -191,9 +195,6 @@ struct boss_malchezaar : public BossAI
         }).Schedule(40s, [this](TaskContext context)
         {
             Talk(SAY_SUMMON);
-
-            me->GetCreaturesWithEntryInRange(relays, 1000.0f, NPC_INFERNAL_RELAY);
-            me->GetCreaturesWithEntryInRange(infernalTargets, 1000.0f, NPC_INFERNAL_TARGET);
 
             if (spawnForbidden.size() < 12) // only spawn infernal when the area is not full
             {
@@ -236,10 +237,6 @@ struct boss_malchezaar : public BossAI
                     }
                 }
             }
-
-            relays.clear();
-            infernalTargets.clear();
-
             context.Repeat(_phase == PHASE_THREE ? 15s : 45s);
         }).Schedule(20s, [this](TaskContext context)
         {
