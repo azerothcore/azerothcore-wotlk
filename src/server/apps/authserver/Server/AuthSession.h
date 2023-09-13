@@ -45,7 +45,7 @@ enum AuthStatus
     STATUS_CLOSED
 };
 
-
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 struct AccountInfo
 {
     void LoadResult(Field* fields);

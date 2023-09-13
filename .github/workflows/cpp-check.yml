@@ -26,10 +26,9 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y cppcheck
-          cppcheck --force --inline-suppr --suppressions-list=./.suppress.cppcheck \
-            src/ --output-file=report.txt
+          cppcheck --force --inline-suppr --suppressions-list=./.suppress.cppcheck src/ --output-file=report.txt
 
-            if [ -s report.txt ]; then  # if file is not empty
-              cat report.txt
-              exit 1 # let github action fails
-            fi
+          if [ -s report.txt ]; then  # if file is not empty
+            cat report.txt
+            exit 1 # let github action fails
+          fi
