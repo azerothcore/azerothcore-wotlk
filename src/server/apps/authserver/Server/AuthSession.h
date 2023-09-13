@@ -45,6 +45,7 @@ enum AuthStatus
     STATUS_CLOSED
 };
 
+
 struct AccountInfo
 {
     void LoadResult(Field* fields);
