@@ -76,7 +76,6 @@ struct boss_malchezaar : public BossAI
 
     std::list<Creature*> relays;
     std::list<Creature*> infernalTargets;
-    std::list<uint8> spawnForbidden; //list to keep track of where infernals should not spawn
 
     void Initialize()
     {
@@ -84,7 +83,6 @@ struct boss_malchezaar : public BossAI
         clearweapons();
         relays.clear();
         infernalTargets.clear();
-        spawnForbidden.clear();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
@@ -179,6 +177,26 @@ struct boss_malchezaar : public BossAI
         }
     }
 
+    bool MaxSpawns(std::list<Creature*> spawns)
+    {
+        return spawns.size() == 0;
+    }
+
+    Creature* PickTarget(std::list<Creature*> pickList)
+    {
+        uint8 index = urand(0, pickList.size()-1);
+        uint8 counter = 0;
+        for (Creature* creature : pickList)
+        {
+            if (counter == index)
+            {
+                return creature;
+            }
+            counter++;
+        }
+        return nullptr;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
@@ -208,7 +226,7 @@ struct boss_malchezaar : public BossAI
             context.Repeat();
         }).Schedule(40s, [this](TaskContext context)
         {
-            if (spawnForbidden.size() < 12) // only spawn infernal when the area is not full
+            if (MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full
             {
                 Talk(SAY_SUMMON);
                 if (Creature* infernalRelayOne = relays.back())
@@ -217,27 +235,16 @@ struct boss_malchezaar : public BossAI
                     {
                         infernalRelayOne->CastSpell(infernalRelayTwo, SPELL_INFERNAL_RELAY_ONE, true);
 
-                        uint8 choice = urand(0, infernalTargets.size());
-                        while(CheckForbidden(choice, spawnForbidden))
+                        if (Creature* infernalTarget = PickTarget(infernalTargets))
                         {
-                            choice = urand(0, infernalTargets.size()); //keep checking for a free position
-                        }
-                        uint8 counter = 0;
-                        spawnForbidden.push_front(choice);
+                            infernalTargets.remove(infernalTarget);
+                            SpawnInfernal(infernalRelayTwo, infernalTarget);
 
-                        for (Creature* infernalTarget : infernalTargets)
-                        {
-                            if (counter == choice)
+                            scheduler.Schedule(3min, [this, infernalTarget](TaskContext)
                             {
-                                SpawnInfernal(infernalRelayTwo, infernalTarget);
+                                infernalTargets.push_back(infernalTarget); //adds to list again
+                            });
 
-                                scheduler.Schedule(3min, [this, choice](TaskContext)
-                                {
-                                    spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
-                                });
-                                break;
-                            }
-                            counter++;
                         }
                     }
                 }
