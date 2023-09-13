@@ -151,18 +151,6 @@ struct boss_malchezaar : public BossAI
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
-    bool CheckForbidden(uint8 choice, std::list<uint8> toCheckList)
-    {
-        for (uint8 check : toCheckList)
-        {
-            if (check == choice)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     void SpawnInfernal(Creature* relay, Creature* target)
     {
         if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
