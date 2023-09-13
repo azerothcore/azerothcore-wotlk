@@ -165,6 +165,20 @@ struct boss_malchezaar : public BossAI
         return false;
     }
 
+    void SpawnInfernal(Creature* relay, Creature* target)
+    {
+        if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+        {
+            infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+            relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
+            relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+            infernal->SetFaction(me->GetFaction());
+            infernal->SetControlled(true, UNIT_STATE_ROOT);
+            relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+            summons.Summon(infernal);
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
@@ -194,10 +208,9 @@ struct boss_malchezaar : public BossAI
             context.Repeat();
         }).Schedule(40s, [this](TaskContext context)
         {
-            Talk(SAY_SUMMON);
-
             if (spawnForbidden.size() < 12) // only spawn infernal when the area is not full
             {
+                Talk(SAY_SUMMON);
                 if (Creature* infernalRelayOne = relays.back())
                 {
                     if (Creature* infernalRelayTwo = relays.front())
@@ -216,20 +229,12 @@ struct boss_malchezaar : public BossAI
                         {
                             if (counter == choice)
                             {
-                                if (Creature* infernal = infernalRelayTwo->SummonCreature(NPC_NETHERSPITE_INFERNAL, infernalTarget->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+                                SpawnInfernal(infernalRelayTwo, infernalTarget);
+
+                                scheduler.Schedule(3min, [this, choice](TaskContext)
                                 {
-                                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                                    infernalRelayTwo->CastSpell(infernalTarget, SPELL_INFERNAL_RELAY_TWO);
-                                    infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
-                                    infernal->SetFaction(me->GetFaction());
-                                    infernal->SetControlled(true, UNIT_STATE_ROOT);
-                                    infernalRelayTwo->CastSpell(infernal, SPELL_INFERNAL_RELAY);
-                                    summons.Summon(infernal);
-                                    scheduler.Schedule(3min, [this, choice](TaskContext)
-                                    {
-                                        spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
-                                    });
-                                }
+                                    spawnForbidden.remove(choice); //removes from forbidden list on despawn (3min)
+                                });
                                 break;
                             }
                             counter++;
