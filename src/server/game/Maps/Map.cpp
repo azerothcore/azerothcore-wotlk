@@ -3034,7 +3034,10 @@ void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
     //if (!m_unloadTimer && m_mapRefMgr.getSize() == 1)
     //    m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
     Map::RemovePlayerFromMap(player, remove);
-    player->SetPendingBind(0, 0);
+
+    // If remove == true - player already deleted.
+    if (!remove)
+        player->SetPendingBind(0, 0);
 }
 
 void InstanceMap::AfterPlayerUnlinkFromMap()
