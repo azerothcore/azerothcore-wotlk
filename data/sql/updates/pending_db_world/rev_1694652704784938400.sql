@@ -1,8 +1,7 @@
 --
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (30629, 30632) AND `ScriptName` IN ('spell_magtheridon_debris_target_selector', 'spell_magtheridon_debris_visual');
+DELETE FROM `spell_script_names` WHERE `spell_id` = 30629 AND `ScriptName` = 'spell_magtheridon_debris_target_selector';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(30629, 'spell_magtheridon_debris_target_selector'),
-(30632, 'spell_magtheridon_debris_visual');
+(30629, 'spell_magtheridon_debris_target_selector');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|33554432, `AIName` = '', `ScriptName` = 'npc_target_trigger' WHERE `entry` = 17516;
 

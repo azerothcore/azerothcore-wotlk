@@ -283,13 +283,24 @@ struct npc_target_trigger : public ScriptedAI
         if (_instance && !_cast)
         {
             // Do not pay attention to this, I'm just trying things.
-            me->CastSpell(me, SPELL_DEBRIS_VISUAL, false, nullptr, nullptr, me->ToTempSummon()->GetSummonerGUID());
+            me->CastSpell(me, SPELL_DEBRIS_VISUAL);
             _cast = true;
+            _scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_DEBRIS_DAMAGE);
+                me->DespawnOrUnsummon(6000);
+            });
         }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
     }
 
 protected:
     InstanceScript* _instance;
+    TaskScheduler _scheduler;
     bool _cast;
 };
 
@@ -379,32 +390,6 @@ class spell_magtheridon_debris_target_selector : public SpellScript
     }
 };
 
-class spell_magtheridon_debris_visual : public AuraScript
-{
-    PrepareAuraScript(spell_magtheridon_debris_visual);
-
-    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* caster = GetCaster();
-
-        // Prevents double cast
-        if (!caster || caster != GetTarget())
-            return;
-
-        InstanceScript* instance = caster->GetInstanceScript();
-        if (instance)
-            caster->CastSpell(caster, SPELL_DEBRIS_DAMAGE, true, nullptr, nullptr, instance->GetGuidData(DATA_MAGTHERIDON));
-
-        if (Creature* c = caster->ToCreature())
-            c->DespawnOrUnsummon(6000);
-    }
-
-    void Register() override
-    {
-        OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_debris_visual::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class go_manticron_cube : public GameObjectScript
 {
 public:
@@ -431,6 +416,5 @@ void AddSC_boss_magtheridon()
     RegisterSpellScript(spell_magtheridon_shadow_grasp);
     RegisterSpellScript(spell_magtheridon_quake);
     RegisterSpellScript(spell_magtheridon_debris_target_selector);
-    RegisterSpellScript(spell_magtheridon_debris_visual);
     new go_manticron_cube();
 }
