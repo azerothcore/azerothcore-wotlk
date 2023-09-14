@@ -283,7 +283,7 @@ struct npc_target_trigger : public ScriptedAI
         {
             DoCastSelf(SPELL_DEBRIS_VISUAL);
             _cast = true;
-            _scheduler.Schedule(5s, [this](TaskContext context)
+            _scheduler.Schedule(5s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_DEBRIS_DAMAGE);
                 me->DespawnOrUnsummon(6000);
