@@ -252,7 +252,6 @@ public:
                             piece->NearTeleportTo(x, y, z, o);
                             piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
                             piece->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            piece->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             piece->AI()->Reset();
                         }
                     }

@@ -18,6 +18,7 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-22.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     name: cpp check
     steps:
       - uses: actions/checkout@v3
