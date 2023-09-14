@@ -1400,7 +1400,6 @@ private:
 
     void AddPerkRanks()
     {
-        AllPerks.clear();
         LOG_INFO("server.load", "Loading perk ranks...");
         QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM `acore_world`.`perk_ranks`");
         do
@@ -1418,6 +1417,7 @@ private:
     void AddPerks()
     {
         Perks.clear();
+        AllPerks.clear()
         LOG_INFO("server.load", "Loading all perks...");
         QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
         do
