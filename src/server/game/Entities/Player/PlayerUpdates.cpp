@@ -1548,7 +1548,7 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     notifier.SendToSelf();   // send gathered data
 }
 
-void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
+void Player::UpdateObjectVisibility(bool forced)
 {
     // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
     if (!IsInWorld())

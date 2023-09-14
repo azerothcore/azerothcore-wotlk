@@ -2143,7 +2143,7 @@ public:
     // common function for visibility checks for player/creatures with detection code
     [[nodiscard]] uint32 GetPhaseByAuras() const;
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;// overwrite WorldObject::SetPhaseMask
-    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
+    void UpdateObjectVisibility(bool forced = true) override;
 
     SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
     uint32 m_lastSanctuaryTime;

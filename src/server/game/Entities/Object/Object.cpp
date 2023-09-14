@@ -2922,7 +2922,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
+void WorldObject::UpdateObjectVisibility(bool /*forced*/)
 {
     //updates object's visibility for nearby players
     Acore::VisibleChangesNotifier notifier(*this);

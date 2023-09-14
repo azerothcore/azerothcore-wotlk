@@ -19346,7 +19346,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
     }
 }
 
-void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
+void Unit::UpdateObjectVisibility(bool forced)
 {
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
