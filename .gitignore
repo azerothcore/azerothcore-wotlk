@@ -17,13 +17,6 @@
 /env/dist/*
 !/env/dist/.gitkeep
 /env/user/*
-/env/docker/*
-!/env/docker/bin/.gitkeep
-!/env/docker/data/.gitkeep
-!/env/docker/etc/
-/env/docker/etc/*
-!/env/docker/etc/*.conf.dockerdist
-!/env/docker/logs/.gitkeep
 /.env*
 /apps/joiner
 /deps/deno

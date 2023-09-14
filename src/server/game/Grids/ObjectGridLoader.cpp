@@ -20,7 +20,6 @@
 #include "Corpse.h"
 #include "GridNotifiers.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"

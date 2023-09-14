@@ -21,7 +21,6 @@
 #include "GridDefines.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"

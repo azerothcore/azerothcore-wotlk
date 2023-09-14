@@ -24,7 +24,6 @@ EndScriptData */
 
 #include "Channel.h"
 #include "Chat.h"
-#include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"

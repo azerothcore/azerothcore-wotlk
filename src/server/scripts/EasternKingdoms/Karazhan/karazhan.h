@@ -37,14 +37,13 @@ enum KZDataTypes
     DATA_TERESTIAN                  = 7,
     DATA_NETHERSPITE                = 8,
     DATA_CHESS_EVENT                = 9,
-    DATA_MALCHEZZAR                 = 10,
+    DATA_MALCHEZAAR                 = 10,
     DATA_NIGHTBANE                  = 11,
     DATA_SERVANT_QUARTERS           = 12,
-    DATA_SELECTED_RARE              = 13,
-    DATA_OPERA_OZ_DEATHCOUNT        = 14,
-    DATA_KILREK                     = 15,
+    DATA_OPERA_OZ_DEATHCOUNT        = 13,
+    DATA_KILREK                     = 14,
 
-    MAX_ENCOUNTERS                  = 16,
+    MAX_ENCOUNTERS                  = 15,
 
     DATA_GO_CURTAINS                = 18,
     DATA_GO_STAGEDOORLEFT           = 19,
@@ -133,7 +132,12 @@ enum KZCreatures
     NPC_ROOK_A                          = 21160,
     NPC_KING_H                          = 21752,
     NPC_KING_A                          = 21684,
-    NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521
+    NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521,
+
+    // Malchezaar Helpers
+    NPC_INFERNAL_TARGET                 = 17644,
+    NPC_INFERNAL_RELAY                  = 17645
+
 };
 
 enum KZGameObjectIds
