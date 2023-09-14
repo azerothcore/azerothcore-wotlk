@@ -1,3 +1,4 @@
+-- DB update 2023_09_14_00 -> 2023_09_14_01
 -- ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (707, 708, 709, 710, 711, 712, 713, 714, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 732, 733, 734, 735, 736, 737, 738, 739, 740);
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
