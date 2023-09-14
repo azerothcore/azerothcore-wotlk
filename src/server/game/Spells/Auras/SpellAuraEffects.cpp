@@ -528,6 +528,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 }
             }
             break;
+        case SPELL_AURA_PERIODIC_HEAL:
+            if (caster && !GetBase()->GetSpellInfo()->StackAmount)
+                amount = caster->SpellHealingBonusDone(GetBase()->GetType() == UNIT_AURA_TYPE ? GetBase()->GetUnitOwner() : NULL, GetSpellInfo(), amount, DOT, GetBase()->GetStackAmount());
+            break;
+        case SPELL_AURA_PERIODIC_DAMAGE:
+        case SPELL_AURA_PERIODIC_LEECH:
+            if (caster && !GetBase()->GetSpellInfo()->StackAmount)
+                amount = caster->SpellDamageBonusDone(GetBase()->GetType() == UNIT_AURA_TYPE ? GetBase()->GetUnitOwner() : NULL, GetSpellInfo(), amount, DOT, GetBase()->GetStackAmount());
+            break;
         case SPELL_AURA_SCHOOL_ABSORB:
         case SPELL_AURA_MANA_SHIELD:
             m_canBeRecalculated = false;

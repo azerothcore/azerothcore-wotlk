@@ -880,7 +880,7 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     return maxDuration;
 }
 
-void Aura::SetDuration(int32 duration, bool withMods)
+void Aura::SetDuration(int32 duration, bool withMods, bool recalculatePeriodic)
 {
     if (withMods)
     {
@@ -888,6 +888,12 @@ void Aura::SetDuration(int32 duration, bool withMods)
             if (Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(m_spellInfo, SPELLMOD_DURATION, duration);
     }
+
+    if (recalculatePeriodic)
+        for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (HasEffect(i) && GetEffect(i)->IsPeriodic())
+                GetEffect(i)->RecalculateAmount(GetCaster());
+
     m_duration = duration;
     SetNeedClientUpdateForTargets();
 }

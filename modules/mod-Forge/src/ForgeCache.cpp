@@ -1140,11 +1140,10 @@ public:
             if (!choices.empty())
                 for (auto at : choices)
                     InsertPerkSelection(player, type, at, player->GetName() + std::to_string(player->GetLevel()), 0);
-
             break;
         }
         case CharacterPerkType::COMBAT: {
-            if (prestiged && type != CharacterPerkType::ARCHETYPE) {
+            if (prestiged) {
                 CharacterSpecPerk* perk = GetPrestigePerk(player, type);
                 if (perk != nullptr) {
                     InsertPerkSelection(player, type, perk->spell, rollKey, 1);
@@ -1401,6 +1400,7 @@ private:
 
     void AddPerkRanks()
     {
+        AllPerks.clear();
         LOG_INFO("server.load", "Loading perk ranks...");
         QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM `acore_world`.`perk_ranks`");
         do
@@ -1417,6 +1417,7 @@ private:
 
     void AddPerks()
     {
+        Perks.clear();
         LOG_INFO("server.load", "Loading all perks...");
         QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
         do
@@ -1485,6 +1486,7 @@ private:
     void AddArchetypes()
     {
         LOG_INFO("server.load", "Loading archetypes...");
+        Archetypes.clear();
 
         QueryResult archetypes = WorldDatabase.Query("SELECT * FROM archetype ORDER BY `allowableClass` ASC");
         do
