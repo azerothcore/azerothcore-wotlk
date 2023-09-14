@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     env:
-      BOOST_ROOT: C:\local\boost_1_79_0
+      BOOST_ROOT: C:\local\boost_1_82_0
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
