@@ -274,16 +274,14 @@ struct npc_target_trigger : public ScriptedAI
 {
     npc_target_trigger(Creature* creature) : ScriptedAI(creature), _cast(false)
     {
-        _instance = creature->GetInstanceScript();
         me->SetReactState(REACT_PASSIVE);
     }
 
     void Reset() override
     {
-        if (_instance && !_cast)
+        if (!_cast)
         {
-            // Do not pay attention to this, I'm just trying things.
-            me->CastSpell(me, SPELL_DEBRIS_VISUAL);
+            DoCastSelf(SPELL_DEBRIS_VISUAL);
             _cast = true;
             _scheduler.Schedule(5s, [this](TaskContext context)
             {
@@ -299,7 +297,6 @@ struct npc_target_trigger : public ScriptedAI
     }
 
 protected:
-    InstanceScript* _instance;
     TaskScheduler _scheduler;
     bool _cast;
 };
