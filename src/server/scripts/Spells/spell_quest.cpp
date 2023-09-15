@@ -2483,7 +2483,9 @@ class spell_q9847_a_spirit_ally : public SpellScript
 
     void HandleSendEvent(SpellEffIndex /*effIndex*/)
     {
-        Position pos = Position(-281.30f, 7235.84f + frand(-4.50f, 6.50f), 24.43f, 5.79f);
+        float dist = 5.0f;
+        float angle = GetCaster()->GetOrientation() - 1.25f;
+        Position pos = GetCaster()->GetNearPosition(dist, angle);
         GetCaster()->SummonCreature(NPC_FERALFEN_TOTEM, pos, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
     }
 
