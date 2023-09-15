@@ -793,19 +793,19 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
                 return false;
     }
 
-    // Trap casts are active by default
-    if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
-        active = true;
+    // // Trap casts are active by default
+    // if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
+    //     active = true;
 
-    if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
-        return true;
+    // if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
+    //     return true;
 
-    // check crit events
-    if (procFlags & PROC_FLAG_CRITICAL_DAMAGE_DONE
-        || procFlags & PROC_FLAG_CRITICAL_DAMAGE_TAKEN
-        || procFlags & PROC_FLAG_CRITICAL_HEALING_DONE
-        || procFlags & PROC_FLAG_CRITICAL_HEALING_TAKEN)
-        return true;
+    // // check crit events
+    // if (procFlags & PROC_FLAG_CRITICAL_DAMAGE_DONE
+    //     || procFlags & PROC_FLAG_CRITICAL_DAMAGE_TAKEN
+    //     || procFlags & PROC_FLAG_CRITICAL_HEALING_DONE
+    //     || procFlags & PROC_FLAG_CRITICAL_HEALING_TAKEN)
+    //     return true;
 
     if (spellProcEvent)     // Exist event data
     {

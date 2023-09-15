@@ -172,8 +172,8 @@ void Accountwide::ApplyReputations(Player* player)
                             player->GetReputationMgr().SetOneFactionReputation(factionEntry, value, false);
                        else if (value != rank)// new character could have higher faction.
                        {
-                           trans->Append("INSERT INTO character_accountwide_reputation(`accountId`,`factionGroup`,`factionId`,`rep`) VALUES({}, {}, {}, {}) ON DUPLICATE KEY UPDATE rep = {}",
-                               player->GetSession()->GetAccountId(), player->TeamIdForRace(player->getRace()), factionId, rank, rank);
+                           // trans->Append("INSERT INTO character_accountwide_reputation(`accountId`,`factionGroup`,`factionId`,`rep`) VALUES({}, {}, {}, {}) ON DUPLICATE KEY UPDATE rep = {}",
+                           //     player->GetSession()->GetAccountId(), player->TeamIdForRace(player->getRace()), factionId, rank, rank);
                        }
                     }
             }
