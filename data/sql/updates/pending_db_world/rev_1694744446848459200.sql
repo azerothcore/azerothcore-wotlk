@@ -1,4 +1,4 @@
---
+-- https://github.com/TrinityCore/TrinityCore/commit/dbcbfaa6c7834507b0eba291b45b3927d73ac6d0
 DELETE FROM `creature_text` WHERE `CreatureID` IN (18318,18319,18320,18321,18322,18323,18325,18326,18327,18328) AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
 (18318,0,0,'In Terokk\'s name!',12,0,100,0,0,0,16716,0,'Sethekk Halls Trash'),
