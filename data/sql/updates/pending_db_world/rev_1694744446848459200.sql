@@ -160,3 +160,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21904, 0, 2, 0, 0, 0, 100, 2, 3800, 11100, 10900, 21700, 0, 0, 11, 32901, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avian Warhawk - In Combat - Cast \'Carnivorous Bite\' (Normal Dungeon)'),
 (21904, 0, 3, 0, 0, 0, 100, 4, 3800, 11100, 10900, 21700, 0, 0, 11, 39198, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avian Warhawk - In Combat - Cast \'Carnivorous Bite\' (Heroic Dungeon)'),
 (21904, 0, 4, 0, 0, 0, 100, 0, 6200, 25500, 12100, 24100, 0, 0, 11, 18144, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Avian Warhawk - In Combat - Cast \'Swoop\'');
+
+-- Ravenguard ImmuneMask
+UPDATE `creature_template` SET `mechanic_immune_mask` = 71698 WHERE (`entry` IN (18322, 20696));
