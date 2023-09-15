@@ -1,3 +1,4 @@
+-- DB update 2023_09_15_00 -> 2023_09_15_01
 ALTER TABLE `player_class_stats`
     ADD COLUMN `BaseHP` int unsigned NOT NULL DEFAULT '1' AFTER `Level`,
     ADD COLUMN `BaseMana` int unsigned NOT NULL DEFAULT '1' AFTER `BaseHP`;
