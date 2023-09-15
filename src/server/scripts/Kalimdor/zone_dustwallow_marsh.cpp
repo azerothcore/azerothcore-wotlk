@@ -31,7 +31,6 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_zelfrax

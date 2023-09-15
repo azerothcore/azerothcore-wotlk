@@ -35,7 +35,6 @@ EndScriptData */
 #include "Random.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
-#include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
 

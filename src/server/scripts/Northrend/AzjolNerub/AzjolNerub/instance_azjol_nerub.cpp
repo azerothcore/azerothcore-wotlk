@@ -32,7 +32,8 @@ DoorData const doorData[] =
 ObjectData const creatureData[] =
 {
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR_THE_GATEWATCHER_EVENT },
-    { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 }
+    { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 },
+    { 0,                            0                                   }
 };
 
 BossBoundaryData const boundaries =

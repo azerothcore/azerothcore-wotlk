@@ -22,7 +22,6 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript

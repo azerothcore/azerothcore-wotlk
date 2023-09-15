@@ -3949,8 +3949,8 @@ AuctionHouse.SearchTimeout = 1000
 
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
-Appender.GM=2,5,15,gm_%s.log
-Appender.DBErrors=2,5,0,DBErrors.log
+# Appender.GM=2,5,15,gm_%s.log
+Appender.Errors=2,5,0,Errors.log
 # Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
@@ -3977,10 +3977,11 @@ Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
-Logger.sql.sql=2,Console DBErrors
+Logger.sql.sql=2,Console Errors
 Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
+Logger.spells.scripts=2,Console Errors
 
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server

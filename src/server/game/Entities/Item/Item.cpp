@@ -27,7 +27,6 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "Tokenize.h"
 #include "StringConvert.h"
 

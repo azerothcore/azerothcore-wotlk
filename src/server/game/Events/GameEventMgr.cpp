@@ -30,7 +30,6 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "UnitAI.h"
-#include "Util.h"
 #include "World.h"
 #include "WorldStatePackets.h"
 #include <time.h>
