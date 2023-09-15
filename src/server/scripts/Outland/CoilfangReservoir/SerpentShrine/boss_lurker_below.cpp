@@ -88,9 +88,9 @@ struct boss_the_lurker_below : public BossAI
         summons.Summon(summon);
     }
 
-    void DoAction(int32 param) override
+    void DoAction(int32 action) override
     {
-        if (param == ACTION_START_EVENT)
+        if (action == ACTION_START_EVENT)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
