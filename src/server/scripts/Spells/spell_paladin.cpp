@@ -304,7 +304,6 @@ private:
     {
         PAL_SPELL_ARDENT_DEFENDER_DEBUFF = 66233,
         PAL_SPELL_ARDENT_DEFENDER_HEAL   = 66235
-        
     };
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
