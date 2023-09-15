@@ -491,7 +491,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     {
         Field* fields = result->Fetch();
 
-        uint16 MenuID = fields[0].Get<uint16>();
+        uint32 MenuID = fields[0].Get<uint32>();
         uint16 OptionID = fields[1].Get<uint16>();
 
         LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
@@ -9226,7 +9226,7 @@ void ObjectMgr::LoadGossipMenu()
 
         GossipMenus gMenu;
 
-        gMenu.MenuID        = fields[0].Get<uint16>();
+        gMenu.MenuID        = fields[0].Get<uint32>();
         gMenu.TextID        = fields[1].Get<uint32>();
 
         if (!GetGossipText(gMenu.TextID))
@@ -9266,7 +9266,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
         GossipMenuItems gMenuItem;
 
-        gMenuItem.MenuID                    = fields[0].Get<uint16>();
+        gMenuItem.MenuID                    = fields[0].Get<uint32>();
         gMenuItem.OptionID                  = fields[1].Get<uint16>();
         gMenuItem.OptionIcon                = fields[2].Get<uint32>();
         gMenuItem.OptionText                = fields[3].Get<std::string>();

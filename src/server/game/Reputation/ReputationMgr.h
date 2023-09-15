@@ -128,7 +128,7 @@ public:                                                 // modifiers
     void ApplyForceReaction(uint32 faction_id, ReputationRank rank, bool apply);
 
     //! Public for chat command needs
-    bool SetOneFactionReputation(FactionEntry const* factionEntry, float standing, bool incremental, Optional<ReputationRank> repMaxCap = { });
+    bool SetOneFactionReputation(FactionEntry const* factionEntry, float standing, bool incremental, Optional<ReputationRank> repMaxCap = { }, bool atLogin = false);
 
 public:                                                 // senders
     void SendInitialReputations();

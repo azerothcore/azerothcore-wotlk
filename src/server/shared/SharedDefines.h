@@ -91,7 +91,7 @@ enum class ForgeTopic
     COLLECTION_SETUP_STARTED = 52,
     COLLECTION_SETUP_FINISHED = 53,
     ADD_XMOG = 54,
-    APPLY_XMOG_ERROR = 55,
+    APPLY_XMOG_ERROR = 55
 };
 
 enum class ForgeError

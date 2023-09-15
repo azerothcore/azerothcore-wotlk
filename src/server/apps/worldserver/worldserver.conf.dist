@@ -949,6 +949,14 @@ MaxArenaPoints = 10000
 StartArenaPoints = 0
 
 #
+#   Arena.LegacyArenaPoints
+#        Description: Use arena point calculation from TBC for season 1 - 5 when rating is less or equal to 1500
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Arena.LegacyArenaPoints = 0
+
+#
 #    RecruitAFriend.MaxLevel
 #        Description: Highest level up to which a character can benefit from the Recruit-A-Friend
 #                     experience multiplier.
@@ -1562,6 +1570,14 @@ AllowTwoSide.Interaction.Group = 0
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Guild = 0
+
+#
+#    AllowTwoSide.Interaction.Arena
+#        Description: Allow joining arena teams between factions.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.Arena = 0
 
 #
 #    AllowTwoSide.Interaction.Auction
@@ -3043,13 +3059,24 @@ Arena.GamesRequired = 10
 Arena.QueueAnnouncer.Enable = 0
 
 #
-#    Battleground.QueueAnnouncer.PlayerOnly
-#        Description: Battleground queue announcement type.
+#    Arena.QueueAnnouncer.PlayerOnly
+#        Description: Arena queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
 #                     1 - (Private, Only queued players can see it)
 #
 
 Arena.QueueAnnouncer.PlayerOnly = 0
+
+#
+#    Arena.QueueAnnouncer.Detail
+#        Description: The amount of detail to announce on teams queued for arenas.
+#        Default:     3 - (Announce the team's name and rating)
+#                     2 - (Announce only the team's name)
+#                     1 - (Announce only the team's rating)
+#                     0 - (Do not announce any information about the teams)
+#
+
+Arena.QueueAnnouncer.Detail = 3
 
 #
 #    Arena.ArenaSeason.ID

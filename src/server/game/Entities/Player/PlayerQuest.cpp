@@ -1477,6 +1477,28 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
         SendQuestUpdate(questId);
 }
 
+void Player::ClearQuestStatus()
+{
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i) {
+        if (uint32 questId = GetQuestSlotQuestId(i)) {
+            if (questId != 500519) {
+                TakeQuestSourceItem(questId, true); // remove quest src item from player
+                AbandonQuest(questId); // remove all quest items player received before abandoning quest.
+                RemoveActiveQuest(questId);
+                RemoveTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, questId);
+                SetQuestSlotState(i, 0);
+            }
+        }
+    }
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED);
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    stmt->SetData(0, this->GetGUID().GetCounter());
+    trans->Append(stmt);
+    CharacterDatabase.AsyncCommitTransaction(trans);
+
+}
+
 void Player::RemoveActiveQuest(uint32 questId, bool update /*= true*/)
 {
     QuestStatusMap::iterator itr = m_QuestStatus.find(questId);

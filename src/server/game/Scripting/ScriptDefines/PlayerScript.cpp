@@ -598,6 +598,14 @@ void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid 
     });
 }
 
+void ScriptMgr::OnChangeSpec(Player* player, uint8 specId)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnChangeSpec(player, specId);
+        });
+}
+
 void ScriptMgr::OnBeforeFillQuestLootItem(Player* player, LootItem& item)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

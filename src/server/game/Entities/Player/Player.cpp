@@ -3638,6 +3638,21 @@ void Player::RemoveAllSpellCooldown()
     }
 }
 
+void Player::RemoveAllSpellCooldownWithoutIds(std::vector<uint32> idsToKeep)
+{
+    uint32 infTime = GameTime::GetGameTimeMS().count() + infinityCooldownDelayCheck;
+    if (!m_spellCooldowns.empty())
+    {
+        for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
+            if (itr->second.end < infTime) {
+                if (std::find(idsToKeep.begin(), idsToKeep.end(), itr->first) == idsToKeep.end()) {
+                    SendClearCooldown(itr->first, this);
+                    m_spellCooldowns.erase(itr);
+                }
+            }
+    }
+}
+
 void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 {
     // some cooldowns can be already set at aura loading...
@@ -3925,6 +3940,78 @@ bool Player::resetTalents(bool noResetCost)
         m_resetTalentsCost = resetCost;
         m_resetTalentsTime = GameTime::GetGameTime().count();
     }
+
+    return true;
+}
+
+bool Player::resetAllSpecs()
+{
+    // xinef: remove at login flag upon talents reset
+    if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
+        RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
+
+    // xinef: get max available talent points amount
+    uint32 talentPointsForLevel = CalculateTalentsPoints();
+
+    // xinef: no talent points are used, return
+    if (m_usedTalentCount == 0)
+        return false;
+    m_usedTalentCount = 0;
+
+    // xinef: check if we have enough money
+
+    RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+
+    // xinef: reset talents
+    for (PlayerTalentMap::iterator iter = m_talents.begin(); iter != m_talents.end(); )
+    {
+        PlayerTalentMap::iterator itr = iter++;
+
+        if (itr->second->State == PLAYERSPELL_REMOVED)
+            continue;
+
+        // xinef: talent not in current spec
+
+        // xinef: remove talent auras
+        _removeTalentAurasAndSpells(itr->first);
+
+        // xinef: check if talent learns spell to spell book
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+
+        bool removed = false;
+        if (talentInfo->addToSpellBook)
+            if (!spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+            {
+                removeSpell(itr->first, SPEC_MASK_ALL, false);
+                removed = true;
+            }
+
+        // Xinef: send unlearn spell packet at talent remove
+        if (!removed)
+            SendLearnPacket(itr->first, false);
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+                    removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+
+        // xinef: remove talent modifies m_talents, move itr to map begin
+        _removeTalent(itr, SPEC_MASK_ALL);
+    }
+
+    // xinef: remove titan grip if player had it set
+    if (m_canTitanGrip)
+        SetCanTitanGrip(false);
+    // xinef: remove dual wield if player does not have dual wield spell (shamans)
+    if (!HasSpell(674) && m_canDualWield)
+        SetCanDualWield(false);
+
+    AutoUnequipOffhandIfNeed();
+
+    // pussywizard: removed saving to db, nothing important happens and saving only spells and talents may cause data integrity problems (eg. with skills saved to db)
+    SetFreeTalentPoints(talentPointsForLevel);
+    m_resetTalentsTime = GameTime::GetGameTime().count();
 
     return true;
 }
@@ -8988,11 +9075,7 @@ void Player::SetBindPoint(ObjectGuid guid)
 
 void Player::SendTalentWipeConfirm(ObjectGuid guid)
 {
-    WorldPacket data(MSG_TALENT_WIPE_CONFIRM, (8 + 4));
-    data << guid;
-    uint32 cost = sWorld->getBoolConfig(CONFIG_NO_RESET_TALENT_COST) ? 0 : resetTalentsCost();
-    data << cost;
-    GetSession()->SendPacket(&data);
+    // TODO MAKE THIS CLEARE FORGE UI TALENTS
 }
 
 void Player::ResetPetTalents()

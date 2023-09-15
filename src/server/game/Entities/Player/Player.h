@@ -1474,6 +1474,7 @@ public:
     [[nodiscard]] bool GetQuestRewardStatus(uint32 quest_id) const;
     [[nodiscard]] QuestStatus GetQuestStatus(uint32 quest_id) const;
     void SetQuestStatus(uint32 questId, QuestStatus status, bool update = true);
+    void ClearQuestStatus();
     void RemoveActiveQuest(uint32 questId, bool update = true);
     void RemoveRewardedQuest(uint32 questId, bool update = true);
     void SendQuestUpdate(uint32 questId);
@@ -1716,6 +1717,7 @@ public:
     [[nodiscard]] uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
     void SetFreeTalentPoints(uint32 points);
     bool resetTalents(bool noResetCost = false);
+    bool resetAllSpecs();
     [[nodiscard]] uint32 resetTalentsCost() const;
     void InitTalentForLevel();
     void BuildPlayerTalentsInfoData(WorldPacket* data);
@@ -1820,6 +1822,7 @@ public:
     void RemoveCategoryCooldown(uint32 cat);
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
     void RemoveAllSpellCooldown();
+    void RemoveAllSpellCooldownWithoutIds(std::vector<uint32> ids);
     void _LoadSpellCooldowns(PreparedQueryResult result);
     void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
     void _LoadSpellCharges(PreparedQueryResult result);

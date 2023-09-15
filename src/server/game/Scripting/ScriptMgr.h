@@ -1190,6 +1190,9 @@ public:
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
+    //After Changing spec
+    virtual void OnChangeSpec(Player* /*player*/, uint8 /*specId*/) { }
+
     //Before looting item
     virtual void OnBeforeFillQuestLootItem(Player* /*player*/, LootItem& /*item*/) { }
 
@@ -2355,6 +2358,7 @@ public: /* PlayerScript */
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnAddItem(Player* player, uint32 item, uint32 count);
+    void OnChangeSpec(Player* player, uint8 specId);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
     void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);

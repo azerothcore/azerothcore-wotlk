@@ -180,7 +180,7 @@ void BattlegroundMgr::Update(uint32 diff)
             if (GameTime::GetGameTime() > m_NextAutoDistributionTime)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
-                m_NextAutoDistributionTime = m_NextAutoDistributionTime + 1_days * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
+                m_NextAutoDistributionTime = GameTime::GetGameTime() + Seconds(DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
                 sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
