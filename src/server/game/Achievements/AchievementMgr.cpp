@@ -2101,7 +2101,25 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     progress->changed = true;
-    progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
+
+    bool isAverageCriteria = false;
+
+    if ((sAchievementStore.LookupEntry(entry->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+        isAverageCriteria = true;
+
+    if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(entry->referredAchievement))
+        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
+                isAverageCriteria = true;
+
+    if (isAverageCriteria)
+    {
+        progress->date = GetPlayer()->GetCreationDate();; // set to character creation date for correct average value calculation
+    }
+    else
+    {
+        progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
+    }
 
     uint32 timeElapsed = 0;
     bool timedCompleted = false;
