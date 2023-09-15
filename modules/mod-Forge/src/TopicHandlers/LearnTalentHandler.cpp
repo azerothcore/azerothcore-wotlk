@@ -255,9 +255,9 @@ public:
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
                         if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
-                            iam.player->_addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
+                            iam.player->_addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, spellInfo->IsPassive());
 
-                iam.player->_addSpell(ranksItt->second, SPEC_MASK_ALL, true);
+                iam.player->_addSpell(ranksItt->second, SPEC_MASK_ALL, spellInfo->IsPassive());
             }
 
             iam.player->UpdateAllStats();
