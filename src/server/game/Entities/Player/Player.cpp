@@ -3292,6 +3292,12 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
+void Player::RemoveSpell(uint32 spell_id) {
+    auto itr = m_spells.find(spell_id);
+    if (itr != m_spells.end())
+        m_spells.erase(spell_id);
+}
+
 void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
     // Xinef: don't allow to learn active spell once more

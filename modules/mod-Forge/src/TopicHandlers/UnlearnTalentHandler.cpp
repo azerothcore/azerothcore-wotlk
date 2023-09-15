@@ -34,7 +34,7 @@ public:
         if (iam.player->isDead())
             return;
 
-        iam.player->UnsummonPetTemporaryIfAny();
+        iam.player->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
         std::vector<std::string> results;
         boost::algorithm::split(results, iam.message, boost::is_any_of(";"));
@@ -89,19 +89,21 @@ public:
 
                     sfp->Sum += refund;
 
-                    for (auto spell : tab->Talents[spellId]->Ranks) {
-
-                        auto spellInfo = sSpellMgr->GetSpellInfo(spell.second);
-
-                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                                iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
-
-                        iam.player->removeSpell(spell.second, SPEC_MASK_ALL, false);
-                    }
+                    for (auto rank : tab->Talents[spellId]->Ranks)
+                        if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second)) {
+                            if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i) {
+                                    iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+                                    iam.player->RemoveSpell(spellInfo->Effects[i].TriggerSpell);
+                                }
+                            iam.player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                            iam.player->RemoveSpell(rank.second);
+                            iam.player->RemoveAura(rank.second);
+                        }
 
                     spellItt->second->CurrentRank = 0;
 
+                    iam.player->UpdateAllStats();
                     fc->UpdateCharPoints(iam.player, sfp);
                     fc->UpdateCharacterSpec(iam.player, spec);
 

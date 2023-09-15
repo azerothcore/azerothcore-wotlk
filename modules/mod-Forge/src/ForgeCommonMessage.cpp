@@ -1,4 +1,5 @@
 #include "ForgeCommonMessage.h"
+#include "Pet.h"
 
 ForgeCommonMessage::ForgeCommonMessage(ForgeCache* cache)
 {
@@ -40,7 +41,7 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
     {
         std::string msg;
 
-        auto id = tab->TalentType == CharacterPointType::TALENT_TREE ? tab->ClassMask : tab->Id;
+        auto id = tab->TalentType == CharacterPointType::TALENT_TREE ? tab->ClassMask : tab->TalentType == CharacterPointType::PET_TALENT ? CharacterPointType::PET_TALENT : tab->Id;
 
         msg = msg + std::to_string(id) + "^" +
             tab->Name + "^" +
@@ -184,6 +185,32 @@ bool ForgeCommonMessage::CanLearnTalent(Player* player, uint32 tabId, uint32 spe
         fc->TryGetCharacterActiveSpec(player, spec))
     {
         ForgeCharacterPoint* curPoints = fc->GetSpecPoints(player, tabType, spec->Id);
+
+        if (tabType == CharacterPointType::PET_TALENT) {
+            /*if (Pet* pet = player->GetPet()) {
+                if (pet->getPetType() == HUNTER_PET)
+                    if (auto ct = pet->GetCreatureTemplate()) {
+                        CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ct->family);
+                        if (!pet_family || pet_family->petTalentType < 0)
+                            return false;
+
+                        switch (1 << pet_family->petTalentType) {
+                        case 2:
+                        case 1:
+                        case 4:
+                            break;
+                        default:
+                            return false;
+                        }
+                    }
+                    else
+                        return false;
+                else
+                    return false;
+            }
+            else*/
+                return false;
+        }
 
         if (curPoints->Sum == 0)
             return false;
@@ -353,7 +380,7 @@ void ForgeCommonMessage::SendTalents(Player* player)
             if (fc->TryGetForgeTalentTabs(player, tpt, tabs))
             {
                 std::string clientMsg;
-                auto tabId = tpt == CharacterPointType::TALENT_TREE ? player->getClassMask() : tpt == CharacterPointType::RACIAL_TREE ? 999900 : 1980000;
+                auto tabId = tpt == CharacterPointType::TALENT_TREE ? player->getClassMask() : tpt == CharacterPointType::RACIAL_TREE ? 999900 : tpt == CharacterPointType::PRESTIGE_TREE ? 1980000 : CharacterPointType::PET_TALENT;
                 //clientMsg = clientMsg + delimiter + std::to_string(tab->Id) + "^" + std::to_string((int)tab->TalentType) + "^";
                 for (auto* tab : tabs)
                 {

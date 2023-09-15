@@ -28,7 +28,8 @@ enum CharacterPointType
     RACIAL_TREE = 4,
     SKILL_PAGE = 5,
     PRESTIGE_COUNT = 6,
-    LEVEL_10_TAB = 7
+    LEVEL_10_TAB = 7,
+    PET_TALENT = 8
 };
 
 enum ForgeSettingIndex
@@ -240,7 +241,8 @@ public:
             CharacterPointType::TALENT_TREE,
             CharacterPointType::FORGE_SKILL_TREE,
             CharacterPointType::PRESTIGE_TREE,
-            CharacterPointType::RACIAL_TREE
+            CharacterPointType::RACIAL_TREE,
+            CharacterPointType::PET_TALENT,
         };
     }
 
@@ -585,6 +587,9 @@ public:
                 continue;
             }
 
+            if (pt == CharacterPointType::PET_TALENT && !(player->getClassMask() & (1 << (CLASS_HUNTER - 1))))
+                continue;
+
             ForgeCharacterPoint* fpt = GetCommonCharacterPoint(player, pt);
             ForgeCharacterPoint* maxCp = GetMaxPointDefaults(pt);
 
@@ -795,15 +800,14 @@ public:
                     for (auto* tab : tabs)
                         for (auto spell : tab->Talents)
                             for (auto rank : spell.second->Ranks)
-                                if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second))
-                                    for (auto rank : spell.second->Ranks) {
-                                        if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                                                player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+                                if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second)) {
+                                    if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                            player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
 
-                                        player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                                        player->RemoveAura(rank.second);
-                                    }
+                                    player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                    player->RemoveAura(rank.second);
+                                }
             }
 
             player->SendInitialSpells();
@@ -1388,7 +1392,6 @@ private:
     {
         if (TalentTabs[tabId]->TalentType != ACCOUNT_WIDE_TYPE) {
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", charId, spec, spellId, tabId, known, known);
-            trans->Append("DELETE FROM `forge_character_talents` WHERE `guid` = {} and `spec` = {} and `currentRank` = 0", charId, spec);
         }
         else
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
@@ -1417,7 +1420,7 @@ private:
     void AddPerks()
     {
         Perks.clear();
-        AllPerks.clear()
+        AllPerks.clear();
         LOG_INFO("server.load", "Loading all perks...");
         QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
         do

@@ -72,6 +72,7 @@ public:
             }
         }
         else {
+            fc->RemoveTalents(player);
             fc->ApplyTalents(player);
         }
         fc->ApplyActivePerks(player);
@@ -109,6 +110,14 @@ public:
         {
             uint8 currentLevel = player->getLevel();
             uint8 levelDiff = currentLevel - oldlevel;
+
+            if (currentLevel >= 20) {
+                uint8 currentLevel = player->getLevel();
+                uint8 amount = (currentLevel - 16) / 4;
+                amount += player->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
+
+                fc->AddCharacterPointsToAllSpecs(player, CharacterPointType::PET_TALENT, amount);
+            }
 
             if (currentLevel >= 10)
             {

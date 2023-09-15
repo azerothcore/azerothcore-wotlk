@@ -4,6 +4,8 @@
 #include "Chat.h"
 #include "WorldPacket.h"
 #include "TopicRouter.h"
+
+#include "Pet.h"
 #include <ForgeCache.cpp>
 #include <boost/algorithm/string.hpp>
 #include "ForgeCommonMessage.h"
@@ -38,6 +40,21 @@ public:
             fc->TryGetTalentTab(iam.player, tabId, tab) &&
             fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
+            if (tabType == CharacterPointType::PET_TALENT)
+                if (Pet* pet = iam.player->GetPet())
+                    if (pet->getPetType() == HUNTER_PET)
+                        if (auto ct = pet->GetCreatureTemplate()) {
+                            CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ct->family);
+                            if (!pet_family || pet_family->petTalentType < 0)
+                                return;
+                            else if ((1 << pet_family->petTalentType) == 2 && tabId != 409)
+                                return;
+                            else if ((1 << pet_family->petTalentType) == 1 && tabId != 410)
+                                return;
+                            else if ((1 << pet_family->petTalentType) == 4 && tabId != 411)
+                                return;
+                        }
+
             ForgeCharacterPoint* curPoints = fc->GetSpecPoints(iam.player, tabType, spec->Id);
             if (~tab->ClassMask & iam.player->getClassMask())
             {
@@ -218,14 +235,14 @@ public:
 
             for (auto s : ft->UnlearnSpells) {
                 iam.player->removeSpell(s, SPEC_MASK_ALL, false);
-                iam.player->RemoveAura(s);
+                iam.player->RemoveSpell(s);
             }
 
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
             if (ranksItt != ft->Ranks.end()) {
                 iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
-                iam.player->RemoveAura(ranksItt->second);
+                iam.player->RemoveSpell(ranksItt->second);
             }
 
             ct->CurrentRank++;
@@ -238,9 +255,9 @@ public:
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
                         if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
-                            iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell, spellInfo->IsPassive());
+                            iam.player->_addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
 
-                iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                iam.player->_addSpell(ranksItt->second, SPEC_MASK_ALL, true);
             }
 
             iam.player->UpdateAllStats();
