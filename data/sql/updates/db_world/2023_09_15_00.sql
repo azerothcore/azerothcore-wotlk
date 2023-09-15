@@ -1,3 +1,4 @@
+-- DB update 2023_09_14_01 -> 2023_09_15_00
 --
 ALTER TABLE `creature`
     ADD COLUMN `Comment` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `CreateObject`;
