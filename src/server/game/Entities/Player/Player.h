@@ -2495,8 +2495,8 @@ public:
     void CompletedAchievement(AchievementEntry const* entry);
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
-    void SetCreationDate(time_t creationDate) { m_creationDate = creationDate; }
-    [[nodiscard]] time_t GetCreationDate() const { return m_creationDate; }
+    void SetCreationTime(Seconds creationTime) { m_creationTime = creationTime; }
+    [[nodiscard]] Seconds GetCreationTime() const { return m_creationTime; }
 
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
@@ -2953,7 +2953,7 @@ private:
 
     PlayerSettingMap m_charSettingsMap;
 
-    time_t m_creationDate;
+    Seconds m_creationTime;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

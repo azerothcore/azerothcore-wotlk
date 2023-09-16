@@ -5027,7 +5027,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
 
     // load character creation date, relevant for achievements of type average
-    SetCreationDate(fields[74].Get<time_t>());
+    SetCreationTime(fields[74].Get<Seconds>());
 
     // load achievements before anything else to prevent multiple gains for the same achievement/criteria on every loading (as loading does call UpdateAchievementCriteria)
     m_achievementMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));

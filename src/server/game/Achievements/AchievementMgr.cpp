@@ -2114,7 +2114,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 
     if (isAverageCriteria)
     {
-        progress->date = GetPlayer()->GetCreationDate();; // set to character creation date for correct average value calculation
+        progress->date = GetPlayer()->GetCreationTime().count(); // set to character creation date for correct average value calculation
     }
     else
     {
