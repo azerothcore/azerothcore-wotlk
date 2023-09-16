@@ -758,7 +758,22 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
         data << uint32(timedCompleted ? 0 : 1); // 1 is for keeping the counter at 0 in client
     data.AppendPackedTime(progress->date);
     data << uint32(timeElapsed);    // time elapsed in seconds
-    data << uint32(0);              // unk
+
+    bool isAverageCriteria = false;
+
+    if ((sAchievementStore.LookupEntry(entry->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+        isAverageCriteria = true;
+
+    if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(entry->referredAchievement))
+        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
+                isAverageCriteria = true;
+
+    if (isAverageCriteria)
+        data << uint32(GameTime::GetGameTime().count() - GetPlayer()->GetCreationTime().count());    // for average achievements
+    else
+        data << uint32(timeElapsed);    // time elapsed in seconds
+
     GetPlayer()->SendDirectMessage(&data);
 }
 
@@ -2101,25 +2116,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     progress->changed = true;
-
-    bool isAverageCriteria = false;
-
-    if ((sAchievementStore.LookupEntry(entry->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
-        isAverageCriteria = true;
-
-    if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(entry->referredAchievement))
-        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
-            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
-                isAverageCriteria = true;
-
-    if (isAverageCriteria)
-    {
-        progress->date = GetPlayer()->GetCreationTime().count(); // set to character creation date for correct average value calculation
-    }
-    else
-    {
-        progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
-    }
+    progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
 
     uint32 timeElapsed = 0;
     bool timedCompleted = false;
@@ -2374,7 +2371,22 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
         *data << uint32(0); /// @todo: This should be 1 if it is a failed timed criteria
         data->AppendPackedTime(iter->second.date);
         *data << uint32(now - iter->second.date);
-        *data << uint32(now - iter->second.date);
+
+        AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(iter->first);
+        bool isAverageCriteria = false;
+
+        if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+            isAverageCriteria = true;
+
+        if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(criteria->referredAchievement))
+            for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+                if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
+                    isAverageCriteria = true;
+
+        if (isAverageCriteria)
+            *data << uint32(now - GetPlayer()->GetCreationTime().count());    // for average achievements
+        else
+            *data << uint32(now - iter->second.date);
     }
 
     *data << int32(-1);
