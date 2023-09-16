@@ -54,8 +54,9 @@ struct boss_curator : public BossAI
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_POWER_BURN, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_BURN, true);
         ScheduleHealthCheckEvent(15, [&] {
-        DoCastSelf(SPELL_ARCANE_INFUSION, true);
-        Talk(SAY_ENRAGE);
+            me->InterruptNonMeleeSpells(true);
+            DoCastSelf(SPELL_ARCANE_INFUSION, true);
+            Talk(SAY_ENRAGE);
         });
     }
 
