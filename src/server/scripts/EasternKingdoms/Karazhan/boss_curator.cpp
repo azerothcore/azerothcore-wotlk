@@ -86,7 +86,8 @@ struct boss_curator : public BossAI
             DoCastSelf(SPELL_ASTRAL_DECONSTRUCTION, true);
         }).Schedule(10s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 45.0f, true, false))
+
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 45.0f, true, false))
             {
                 DoCast(target, SPELL_HATEFUL_BOLT);
             }
