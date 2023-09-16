@@ -17,7 +17,6 @@
 
 #include "Vehicle.h"
 #include "BattlefieldWG.h"
-#include "CreatureAI.h"
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
