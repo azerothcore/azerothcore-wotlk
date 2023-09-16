@@ -823,6 +823,11 @@ char const* WorldSession::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
+char const* WorldSession::GetModuleString(std::string moduleid, uint32 entry) const
+{
+    return sObjectMgr->GetModuleString(moduleid, entry, GetSessionDbLocaleIndex());
+}
+
 void WorldSession::Handle_NULL(WorldPacket& null)
 {
     LOG_ERROR("network.opcode", "Received unhandled opcode {} from {}",

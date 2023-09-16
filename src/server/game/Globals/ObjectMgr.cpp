@@ -8647,6 +8647,56 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
     return "<error>";
 }
 
+bool ObjectMgr::LoadModuleStrings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _moduleStringStore.clear(); // for reload case
+    QueryResult result = WorldDatabase.Query("SELECT moduleid, entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_INFO("server.loading", " ");
+        return false;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        std::string moduleid = fields[0].Get<std::string>();
+
+        uint32 entry = fields[1].Get<uint32>();
+
+        AcoreString& data = _moduleStringStore[entry];
+
+        data.Content.resize(DEFAULT_LOCALE + 1);
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+            AddLocaleString(fields[i + 2].Get<std::string>(), LocaleConstant(i), data.Content);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Module Strings in {} ms", (uint32)_moduleStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+    return true;
+}
+
+char const* ObjectMgr::GetModuleString(std::string moduleid, uint32 entry, LocaleConstant locale) const
+{
+    if (ModuleString const* ts = GetModuleString(moduleid, entry))
+    {
+        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+            return ts->Content[locale].c_str();
+
+        return ts->Content[DEFAULT_LOCALE].c_str();
+    }
+
+    LOG_ERROR("sql.sql", "Module string entry {} for module {} not found in DB.", entry, moduleid);
+
+    return "<error>";
+}
+
 void ObjectMgr::LoadFishingBaseSkillLevel()
 {
     uint32 oldMSTime = getMSTime();
