@@ -124,7 +124,7 @@ enum SMART_EVENT
     SMART_EVENT_DEATH                    = 6,       // NONE
     SMART_EVENT_EVADE                    = 7,       // NONE
     SMART_EVENT_SPELLHIT                 = 8,       // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_RANGE                    = 9,       // minRange, maxRange, repeatMin, repeatMax, onlyFireOnRepeat
+    SMART_EVENT_RANGE                    = 9,       // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_OOC_LOS                  = 10,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_RESPAWN                  = 11,      // type, MapId, ZoneId
     SMART_EVENT_TARGET_HEALTH_PCT        = 12,      // HPMin%, HPMax%, RepeatMin, RepeatMax
@@ -182,14 +182,14 @@ enum SMART_EVENT
     SMART_EVENT_GOSSIP_HELLO             = 64,      // event_para_1 (only) 0 = no filter set, always execute action, 1 = GossipHello only filter set, skip action if reportUse, 2 = reportUse only filter set, skip action if GossipHello
     SMART_EVENT_FOLLOW_COMPLETED         = 65,      // none
     SMART_EVENT_EVENT_PHASE_CHANGE       = 66,      // event phase mask (<= SMART_EVENT_PHASE_ALL)
-    SMART_EVENT_IS_BEHIND_TARGET         = 67,      // cooldownMin, CooldownMax
+    SMART_EVENT_IS_BEHIND_TARGET         = 67,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_GAME_EVENT_START         = 68,      // game_event.Entry
     SMART_EVENT_GAME_EVENT_END           = 69,      // game_event.Entry
     SMART_EVENT_GO_STATE_CHANGED         = 70,      // go state
     SMART_EVENT_GO_EVENT_INFORM          = 71,      // eventId
     SMART_EVENT_ACTION_DONE              = 72,      // eventId (SharedDefines.EventId)
     SMART_EVENT_ON_SPELLCLICK            = 73,      // clicker (unit)
-    SMART_EVENT_FRIENDLY_HEALTH_PCT      = 74,      // minHpPct, maxHpPct, repeatMin, repeatMax
+    SMART_EVENT_FRIENDLY_HEALTH_PCT      = 74,      // min, max, repeatMin, repeatMax, hpPct, range
     SMART_EVENT_DISTANCE_CREATURE        = 75,      // guid, entry, distance, repeat
     SMART_EVENT_DISTANCE_GAMEOBJECT      = 76,      // guid, entry, distance, repeat
     SMART_EVENT_COUNTER_SET              = 77,      // id, value, cooldownMin, cooldownMax
@@ -210,8 +210,8 @@ enum SMART_EVENT
     SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // max, radius, first timer, repeatMin, repeatMax
     SMART_EVENT_NEAR_UNIT                = 103,      // type (0: creature 1: gob), entry, count, range, timer
     SMART_EVENT_NEAR_UNIT_NEGATION       = 104,      // type (0: creature 1: gob), entry, count, range, timer
-    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, range
-    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, range
+    SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
+    SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
 
     SMART_EVENT_AC_END                   = 107
 };
@@ -230,16 +230,9 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 rangeMin;
+            uint32 rangeMax;
         } minMaxRepeat;
-
-        struct
-        {
-            uint32 minRange;
-            uint32 maxRange;
-            uint32 repeatMin;
-            uint32 repeatMax;
-            uint32 onlyFireOnRepeat;
-        } rangeRepeat;
 
         struct
         {
@@ -432,12 +425,6 @@ struct SmartEvent
 
         struct
         {
-            uint32 cooldownMin;
-            uint32 cooldownMax;
-        } behindTarget;
-
-        struct
-        {
             uint32 gameEventId;
         } gameEvent;
 
@@ -458,10 +445,11 @@ struct SmartEvent
 
         struct
         {
-            uint32 minHpPct;
-            uint32 maxHpPct;
+            uint32 min;
+            uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 hpPct;
             uint32 radius;
         } friendlyHealthPct;
 
@@ -516,26 +504,6 @@ struct SmartEvent
             uint32 range;
             uint32 timer;
         } nearUnitNegation;
-
-        struct
-        {
-            uint32 min;
-            uint32 max;
-            uint32 repeatMin;
-            uint32 repeatMax;
-            uint32 rangeMin;
-            uint32 rangeMax;
-        } areaCasting;
-
-        struct
-        {
-            uint32 min;
-            uint32 max;
-            uint32 repeatMin;
-            uint32 repeatMax;
-            uint32 rangeMin;
-            uint32 rangeMax;
-        } areaRange;
 
         struct
         {
@@ -743,8 +711,9 @@ enum SMART_ACTION
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
     SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
+    SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
 
-    SMART_ACTION_AC_END                             = 231,    // placeholder
+    SMART_ACTION_AC_END                             = 232,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1453,6 +1422,16 @@ struct SmartAction
             uint32 followType;
             uint32 dist;
         } followGroup;
+
+        struct
+        {
+            uint32 type;
+            uint32 targetType;
+            uint32 targetParam1;
+            uint32 targetParam2;
+            uint32 targetParam3;
+            uint32 targetParam4;
+        } orientationTarget;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1484,10 +1463,10 @@ enum SMARTAI_TARGETS
     SMART_TARGET_NONE                           = 0,    // NONE
     SMART_TARGET_SELF                           = 1,    // Self cast
     SMART_TARGET_VICTIM                         = 2,    // Our current target (ie: highest aggro)
-    SMART_TARGET_HOSTILE_SECOND_AGGRO           = 3,    // Second highest aggro, maxdist, playerOnly, powerType + 1
-    SMART_TARGET_HOSTILE_LAST_AGGRO             = 4,    // Dead last on aggro, maxdist, playerOnly, powerType + 1
-    SMART_TARGET_HOSTILE_RANDOM                 = 5,    // Just any random target on our threat list, maxdist, playerOnly, powerType + 1
-    SMART_TARGET_HOSTILE_RANDOM_NOT_TOP         = 6,    // Any random target except top threat, maxdist, playerOnly, powerType + 1
+    SMART_TARGET_HOSTILE_SECOND_AGGRO           = 3,    // Second highest aggro, maxdist, playerOnly, powerType + 1, missing aura
+    SMART_TARGET_HOSTILE_LAST_AGGRO             = 4,    // Dead last on aggro, maxdist, playerOnly, powerType + 1, missing aura
+    SMART_TARGET_HOSTILE_RANDOM                 = 5,    // Just any random target on our threat list, maxdist, playerOnly, powerType + 1, missing aura
+    SMART_TARGET_HOSTILE_RANDOM_NOT_TOP         = 6,    // Any random target except top threat, maxdist, playerOnly, powerType + 1, missing aura
     SMART_TARGET_ACTION_INVOKER                 = 7,    // Unit who caused this Event to occur
     SMART_TARGET_POSITION                       = 8,    // use xyz from event params
     SMART_TARGET_CREATURE_RANGE                 = 9,    // CreatureEntry(0any), minDist, maxDist, alive(0 - both, 1 - alive, 2 - dead)
@@ -1551,6 +1530,7 @@ struct SmartTarget
             uint32 maxDist;
             SAIBool playerOnly;
             uint32 powerType;
+            uint32 aura;
         } hostileRandom;
 
         struct
@@ -1864,16 +1844,16 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
 
 enum SmartEventFlags
 {
-    SMART_EVENT_FLAG_NOT_REPEATABLE        = 0x001,                     //Event can not repeat
-    SMART_EVENT_FLAG_DIFFICULTY_0          = 0x002,                     //Event only occurs in instance difficulty 0
-    SMART_EVENT_FLAG_DIFFICULTY_1          = 0x004,                     //Event only occurs in instance difficulty 1
-    SMART_EVENT_FLAG_DIFFICULTY_2          = 0x008,                     //Event only occurs in instance difficulty 2
-    SMART_EVENT_FLAG_DIFFICULTY_3          = 0x010,                     //Event only occurs in instance difficulty 3
+    SMART_EVENT_FLAG_NOT_REPEATABLE        = 0x001,                     // Event can not repeat
+    SMART_EVENT_FLAG_DIFFICULTY_0          = 0x002,                     // Event only occurs in instance difficulty 0
+    SMART_EVENT_FLAG_DIFFICULTY_1          = 0x004,                     // Event only occurs in instance difficulty 1
+    SMART_EVENT_FLAG_DIFFICULTY_2          = 0x008,                     // Event only occurs in instance difficulty 2
+    SMART_EVENT_FLAG_DIFFICULTY_3          = 0x010,                     // Event only occurs in instance difficulty 3
     SMART_EVENT_FLAG_RESERVED_5            = 0x020,
     SMART_EVENT_FLAG_RESERVED_6            = 0x040,
-    SMART_EVENT_FLAG_DEBUG_ONLY            = 0x080,                     //Event only occurs in debug build
-    SMART_EVENT_FLAG_DONT_RESET            = 0x100,                     //Event will not reset in SmartScript::OnReset()
-    SMART_EVENT_FLAG_WHILE_CHARMED         = 0x200,                     //Event occurs even if AI owner is charmed
+    SMART_EVENT_FLAG_DEBUG_ONLY            = 0x080,                     // Event only occurs in debug build
+    SMART_EVENT_FLAG_DONT_RESET            = 0x100,                     // Event will not reset in SmartScript::OnReset()
+    SMART_EVENT_FLAG_WHILE_CHARMED         = 0x200,                     // Event occurs even if AI owner is charmed
 
     SMART_EVENT_FLAG_DIFFICULTY_ALL        = (SMART_EVENT_FLAG_DIFFICULTY_0 | SMART_EVENT_FLAG_DIFFICULTY_1 | SMART_EVENT_FLAG_DIFFICULTY_2 | SMART_EVENT_FLAG_DIFFICULTY_3),
     SMART_EVENT_FLAGS_ALL                  = (SMART_EVENT_FLAG_NOT_REPEATABLE | SMART_EVENT_FLAG_DIFFICULTY_ALL | SMART_EVENT_FLAG_RESERVED_5 | SMART_EVENT_FLAG_RESERVED_6 | SMART_EVENT_FLAG_DEBUG_ONLY | SMART_EVENT_FLAG_DONT_RESET | SMART_EVENT_FLAG_WHILE_CHARMED)
@@ -1881,14 +1861,15 @@ enum SmartEventFlags
 
 enum SmartCastFlags
 {
-    SMARTCAST_INTERRUPT_PREVIOUS     = 0x01,                     //Interrupt any spell casting
-    SMARTCAST_TRIGGERED              = 0x02,                     //Triggered (this makes spell cost zero mana and have no cast time)
-    //CAST_FORCE_CAST             = 0x04,                     //Forces cast even if creature is out of mana or out of range
-    //CAST_NO_MELEE_IF_OOM        = 0x08,                     //Prevents creature from entering melee if out of mana or out of range
-    //CAST_FORCE_TARGET_SELF      = 0x10,                     //Forces the target to cast this spell on itself
-    SMARTCAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x40,                     //Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x80                      //Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
+    SMARTCAST_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
+    //CAST_FORCE_CAST                  = 0x004,                     // Forces cast even if creature is out of mana or out of range
+    //CAST_NO_MELEE_IF_OOM             = 0x008,                     // Prevents creature from entering melee if out of mana or out of range
+    //CAST_FORCE_TARGET_SELF           = 0x010,                     // Forces the target to cast this spell on itself
+    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
+    SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_TARGET_POWER_MANA      = 0x100                      // Only cast if the target has power type mana (e.g. Mana Drain)
 };
 
 enum SmartFollowType

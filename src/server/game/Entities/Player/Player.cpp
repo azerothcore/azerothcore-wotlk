@@ -13441,6 +13441,8 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     data << uint32(title->bit_index);
     data << uint32(lost ? 0 : 1);                           // 1 - earned, 0 - lost
     GetSession()->SendPacket(&data);
+
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK);
 }
 
 uint32 Player::GetRuneBaseCooldown(uint8 index, bool skipGrace)
