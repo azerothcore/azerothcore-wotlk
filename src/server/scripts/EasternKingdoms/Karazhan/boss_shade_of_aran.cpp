@@ -242,7 +242,7 @@ struct boss_shade_of_aran : public BossAI
                     DoCast(target, CurrentNormalSpell);
                 }
             }
-            context.Repeat(10s);
+            context.Repeat(2s);
         }).Schedule(5s, [this](TaskContext context)
         {
             switch (urand(0, 1))
