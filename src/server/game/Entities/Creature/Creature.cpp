@@ -549,6 +549,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetCanModifyStats(true);
     UpdateAllStats();
 
+    // Update movement
+    SetWalk(CanWalk());
+    SetSwim(CanSwim());
+    SetCanFly(CanFly());
+    SetRooted(IsRooted());
+
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
     {
@@ -580,7 +586,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    if (GetMovementTemplate().IsRooted())
+    if (IsRooted())
     {
         SetControlled(true, UNIT_STATE_ROOT);
     }
@@ -3109,7 +3115,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
         return true;
     }
 
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !GetMovementTemplate().IsRooted())
+    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
     {
         if (IsLevitating())
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
@@ -3258,7 +3264,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/, bool updateAni
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
 
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !GetMovementTemplate().IsRooted())
+    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
     {
         if (IsLevitating())
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
