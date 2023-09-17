@@ -5,11 +5,13 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-20.04
-    permissions:
-      pull-requests: read|write
+    permissions: write-all
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: true
       - uses: actions/labeler@v3
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}' # or '${{ github.token }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
           sync-labels: true
