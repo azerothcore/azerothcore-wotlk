@@ -240,10 +240,8 @@ struct npc_inner_demon : public ScriptedAI
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
 
-        instance = creature->GetInstanceScript();
+        _instance = creature->GetInstanceScript();
     }
-
-    InstanceScript* instance;
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
@@ -265,7 +263,7 @@ struct npc_inner_demon : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* leotheras = instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
         {
             leotheras->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
@@ -273,7 +271,7 @@ struct npc_inner_demon : public ScriptedAI
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if(Creature* leotheras = instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
         {
             if (!who || who->GetGUID() != leotheras->GetGUID())
             {
@@ -284,7 +282,7 @@ struct npc_inner_demon : public ScriptedAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        if(Creature* leotheras = instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
         {
             return who->GetGUID() == leotheras->GetGUID();
         }
@@ -304,6 +302,7 @@ struct npc_inner_demon : public ScriptedAI
     }
 private:
     TaskScheduler _scheduler;
+    InstanceScript* _instance;
 };
 
 class spell_leotheras_whirlwind : public SpellScriptLoader
