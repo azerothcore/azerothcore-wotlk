@@ -19,6 +19,15 @@
 #include "ScriptMgr.h"
 #include "magisters_terrace.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_KALECGOS,        DATA_KALECGOS         },
+    { NPC_HUMAN_KALECGOS,  DATA_KALECGOS_HUMAN   },
+    { 0,                   0               }
+};
+
+Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f };
+
 class instance_magisters_terrace : public InstanceMapScript
 {
 public:
@@ -29,6 +38,7 @@ public:
         instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            LoadObjectData(creatureData, nullptr);
         }
 
         uint32 Encounter[MAX_ENCOUNTER];
@@ -67,6 +77,24 @@ public:
                     return Encounter[identifier];
             }
             return 0;
+        }
+
+        void ProcessEvent(WorldObject* obj, uint32 eventId) override
+        {
+            if (eventId == EVENT_SPAWN_KALECGOS)
+            {
+                if (!GetCreature(DATA_KALECGOS))
+                {
+                    scheduler.Schedule(1min, [this](TaskContext /*context*/)
+                    {
+                        if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
+                        {
+                            kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
+                        }
+                    });
+                }
+            }
         }
 
         void SetData(uint32 identifier, uint32 data) override
@@ -116,6 +144,8 @@ public:
                         kael->AI()->JustSummoned(creature);
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -184,7 +214,63 @@ public:
     }
 };
 
+enum Spells
+{
+    SPELL_KALECGOS_TRANSFORM = 44670,
+    SPELL_TRANSFORM_VISUAL = 24085,
+    SPELL_CAMERA_SHAKE = 44762,
+    SPELL_ORB_KILL_CREDIT = 46307
+};
+
+enum MovementPoints
+{
+    POINT_ID_PREPARE_LANDING = 6
+};
+
+enum EventIds
+{
+    EVENT_KALECGOS_TRANSFORM = 1,
+    EVENT_KALECGOS_LANDING = 2
+};
+
+struct npc_kalecgos : public ScriptedAI
+{
+    npc_kalecgos(Creature* creature) : ScriptedAI(creature) { }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != WAYPOINT_MOTION_TYPE)
+            return;
+
+        if (pointId == POINT_ID_PREPARE_LANDING)
+        {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            me->SetDisableGravity(false);
+            me->SetHover(false);
+            events.ScheduleEvent(EVENT_KALECGOS_LANDING, 2s);
+
+            _scheduler.Schedule(2s, [this](TaskContext)
+            {
+                DoCastAOE(SPELL_CAMERA_SHAKE);
+                me->SetObjectScale(0.6f);
+                events.ScheduleEvent(EVENT_KALECGOS_TRANSFORM, 1s);
+                _scheduler.Schedule(1s, [this](TaskContext)
+                {
+                    DoCastSelf(SPELL_ORB_KILL_CREDIT, true);
+                    DoCastSelf(SPELL_TRANSFORM_VISUAL);
+                    DoCastSelf(SPELL_KALECGOS_TRANSFORM);
+                    me->UpdateEntry(NPC_HUMAN_KALECGOS);
+                });
+            });
+        }
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_instance_magisters_terrace()
 {
     new instance_magisters_terrace();
+    RegisterMagistersTerraceCreatureAI(npc_kalecgos);
 }
