@@ -373,7 +373,7 @@ class spell_malchezaar_enfeeble : public SpellScript
 {
     PrepareSpellScript(spell_malchezaar_enfeeble);
 
-    bool Load()
+    bool Load() override
     {
         return GetCaster()->ToCreature();
     }
