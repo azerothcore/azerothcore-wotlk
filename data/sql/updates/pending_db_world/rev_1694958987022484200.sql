@@ -15,3 +15,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 -- 0x1C2F2C4920184300001F1D000038BF6E .go 163.9735 -398.0906 2.083333
 
 DELETE FROM `event_scripts` WHERE `id` = 16547;
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 24844;
+
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_kalecgos' WHERE `entry` = 24844;
