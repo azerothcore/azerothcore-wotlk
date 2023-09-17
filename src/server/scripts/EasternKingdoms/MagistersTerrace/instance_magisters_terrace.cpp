@@ -23,7 +23,7 @@ ObjectData const creatureData[] =
 {
     { NPC_KALECGOS,        DATA_KALECGOS         },
     { NPC_HUMAN_KALECGOS,  DATA_KALECGOS_HUMAN   },
-    { 0,                   0               }
+    { 0,                   0                     }
 };
 
 Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f };
@@ -217,9 +217,9 @@ public:
 enum Spells
 {
     SPELL_KALECGOS_TRANSFORM = 44670,
-    SPELL_TRANSFORM_VISUAL = 24085,
-    SPELL_CAMERA_SHAKE = 44762,
-    SPELL_ORB_KILL_CREDIT = 46307
+    SPELL_TRANSFORM_VISUAL   = 24085,
+    SPELL_CAMERA_SHAKE       = 44762,
+    SPELL_ORB_KILL_CREDIT    = 46307
 };
 
 enum MovementPoints
@@ -247,7 +247,6 @@ struct npc_kalecgos : public ScriptedAI
             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
             me->SetDisableGravity(false);
             me->SetHover(false);
-            events.ScheduleEvent(EVENT_KALECGOS_LANDING, 2s);
 
             _scheduler.Schedule(2s, [this](TaskContext)
             {
