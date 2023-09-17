@@ -15,32 +15,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
           - os: ubuntu-20.04
-            compiler: clang12
+            compiler:
+              CC: gcc-10
+              CXX: g++-10
+          - os: ubuntu-20.04
+            compiler:
+              CC: clang-12
+              CXX: clang++-12
+          - os: ubuntu-22.04
+            compiler:
+              CC: clang-15
+              CXX: clang++-15
+          - os: ubuntu-22.04
+            compiler:
+              CC: gcc-13
+              CXX: g++-13
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-pch
-    env:
-      COMPILER: ${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-        env:
-          CONTINUOUS_INTEGRATION: true
-      - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core-pch.sh
-      - name: Process pending sql
-        run: bash bin/acore-db-pendings
-      - name: Build
-        run: source ./apps/ci/ci-compile.sh
-      - name: Dry run authserver
-        run: source ./apps/ci/ci-dry-run.sh authserver
-      - name: Dry run worldserver
-        run: source ./apps/ci/ci-dry-run.sh worldserver
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
+      - uses: ./.github/actions/linux-build
+        with:
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          pch: true
