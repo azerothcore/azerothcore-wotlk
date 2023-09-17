@@ -69,219 +69,185 @@ enum Misc
 {
     GROUP_ABILITIES                 = 1,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
-
-    EVENT_SPELL_MARK_OF_CORRUPTION1 = 1,
-    EVENT_SPELL_MARK_OF_CORRUPTION2 = 2,
-    EVENT_SPELL_MARK_OF_CORRUPTION3 = 3,
-    EVENT_SPELL_MARK_OF_CORRUPTION4 = 4,
-    EVENT_SPELL_MARK_OF_CORRUPTION5 = 5,
-    EVENT_SPELL_MARK_OF_CORRUPTION6 = 6,
-    EVENT_SPELL_MARK_OF_HYDROSS1    = 7,
-    EVENT_SPELL_MARK_OF_HYDROSS2    = 8,
-    EVENT_SPELL_MARK_OF_HYDROSS3    = 9,
-    EVENT_SPELL_MARK_OF_HYDROSS4    = 10,
-    EVENT_SPELL_MARK_OF_HYDROSS5    = 11,
-    EVENT_SPELL_MARK_OF_HYDROSS6    = 12,
-    EVENT_SPELL_WATER_TOMB          = 13,
-    EVENT_SPELL_VILE_SLUDGE         = 14,
-    EVENT_SPELL_ENRAGE              = 15,
-    EVENT_CHECK_AURA                = 16,
-    EVENT_KILL_TALK                 = 17
 };
 
-class boss_hydross_the_unstable : public CreatureScript
+struct boss_hydross_the_unstable : public BossAI
 {
-public:
-    boss_hydross_the_unstable() : CreatureScript("boss_hydross_the_unstable") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE)
     {
-        return GetSerpentShrineAI<boss_hydross_the_unstableAI>(creature);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_hydross_the_unstableAI : public BossAI
+    void Reset() override
     {
-        boss_hydross_the_unstableAI(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE)
+        BossAI::Reset();
+
+        _recentlySpoken = false;
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        if (!me->HasAura(SPELL_BLUE_BEAM))
         {
+            me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
         }
+    }
 
-        void Reset() override
+    void SetForm(bool corrupt, bool initial)
+    {
+        scheduler.CancelGroup(GROUP_ABILITIES);
+        DoResetThreatList();
+
+        if (corrupt)
         {
-            BossAI::Reset();
-        }
+            me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, false);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+            DoCastSelf(SPELL_CORRUPTION, true);
 
-        void JustReachedHome() override
-        {
-            BossAI::JustReachedHome();
-            if (!me->HasAura(SPELL_BLUE_BEAM))
-                me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
-        }
-
-        void SetForm(bool corrupt, bool initial)
-        {
-            events.CancelEventGroup(GROUP_ABILITIES);
-            DoResetThreatList();
-
-            if (corrupt)
+            scheduler.Schedule(0s, GROUP_ABILITIES, [this](TaskContext)
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, false);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-                me->CastSpell(me, SPELL_CORRUPTION, true);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION1, 0, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION2, 15000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION3, 30000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION4, 45000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION5, 60000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION6, 75000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_VILE_SLUDGE, 7000, GROUP_ABILITIES);
-            }
-            else
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION1);
+            }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
-                me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS1, 0, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS2, 15000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS3, 30000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS4, 45000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS5, 60000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS6, 75000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_WATER_TOMB, 7000, GROUP_ABILITIES);
-            }
-
-            if (initial)
-                return;
-
-            if (corrupt)
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION2);
+            }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
             {
-                Talk(SAY_SWITCH_TO_CORRUPT);
-                for (uint32 i = SPELL_SUMMON_CORRUPTED1; i <= SPELL_SUMMON_CORRUPTED4; ++i)
-                    me->CastSpell(me, i, true);
-            }
-            else
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION3);
+            }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
             {
-                Talk(SAY_SWITCH_TO_CLEAN);
-                for (uint32 i = SPELL_SUMMON_PURIFIED1; i <= SPELL_SUMMON_PURIFIED4; ++i)
-                    me->CastSpell(me, i, true);
-            }
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-            events.ScheduleEvent(EVENT_CHECK_AURA, 1000);
-            SetForm(false, true);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION4);
+            }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
             {
-                Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
-            summon->SetInCombatWithZone();
-
-            if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
-                summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-            else
-                summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            summons.Despawn(summon);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
-            BossAI::JustDied(killer);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION5);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
             {
-                case EVENT_CHECK_AURA:
-                    if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
-                        SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
-                    events.ScheduleEvent(EVENT_CHECK_AURA, 1000);
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS1:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS1, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS2:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS2, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS3:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS3, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS4:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS4, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS5:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS5, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS6:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS6, false);
-                    events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS6, 15000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION1:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION1, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION2:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION2, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION3:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION3, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION4:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION4, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION5:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION5, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION6:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION6, false);
-                    events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION6, 15000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_WATER_TOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                        me->CastSpell(target, SPELL_WATER_TOMB, false);
-                    events.ScheduleEvent(EVENT_SPELL_WATER_TOMB, 7000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_VILE_SLUDGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                        me->CastSpell(target, SPELL_VILE_SLUDGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_VILE_SLUDGE, 15000, GROUP_ABILITIES);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
+            }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_VILE_SLUDGE, true);
+                context.Repeat(9700ms, 32800ms);
+            });
         }
-    };
+        else
+        {
+            me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
+            me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
+
+            scheduler.Schedule(0s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS1);
+            }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS2);
+            }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS3);
+            }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS4);
+            }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS5);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS6);
+            }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_WATER_TOMB, true);
+                context.Repeat(9700ms, 32800ms);
+            });
+        }
+
+        if (initial)
+        {
+            return;
+        }
+
+        if (corrupt)
+        {
+            Talk(SAY_SWITCH_TO_CORRUPT);
+            for (uint32 spellId = SPELL_SUMMON_CORRUPTED1; spellId <= SPELL_SUMMON_CORRUPTED4; ++spellId)
+            {
+                DoCastSelf(spellId, true);
+            }
+        }
+        else
+        {
+            Talk(SAY_SWITCH_TO_CLEAN);
+            for (uint32 spellId = SPELL_SUMMON_PURIFIED1; spellId <= SPELL_SUMMON_PURIFIED4; ++spellId)
+            {
+                DoCastSelf(spellId, true);
+            }
+        }
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        SetForm(false, true);
+
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
+            {
+                SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
+            }
+            context.Repeat(1s);
+        }).Schedule(10min, [this](TaskContext)
+        {
+            DoCastSelf(SPELL_ENRAGE, true);
+        });
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (!_recentlySpoken)
+        {
+            Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
+            _recentlySpoken = true;
+        }
+        scheduler.Schedule(6s, [this](TaskContext)
+        {
+            _recentlySpoken = false;
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
+        summon->SetInCombatWithZone();
+
+        if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
+        {
+            summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+        }
+        else
+        {
+            summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        summons.Despawn(summon);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
+        BossAI::JustDied(killer);
+    }
+private:
+    bool _recentlySpoken;
 };
 
 class spell_hydross_cleansing_field_aura : public SpellScriptLoader
@@ -377,7 +343,7 @@ public:
 
 void AddSC_boss_hydross_the_unstable()
 {
-    new boss_hydross_the_unstable();
+    RegisterSerpentShrineAI(boss_hydross_the_unstable);
     new spell_hydross_cleansing_field_aura();
     new spell_hydross_cleansing_field_command();
     new spell_hydross_mark_of_hydross();
