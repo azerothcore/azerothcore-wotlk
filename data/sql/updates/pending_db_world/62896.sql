@@ -17,5 +17,3 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY*100,9,6,0,0,0,100,0,2000,2000,0,0,82,2,0,0,0,0,0,1,0,0,0,0,0,0,0,'Vindicator Aalesia - On Script - Add Npc Flag Questgiver');
 
 UPDATE `creature_text` SET `Text`='No, this can\'t be... It says this creature willingly became a servant of the Legion. He transforms into a satyr and receives the Legion\'s "blessing."' WHERE `CreatureID`=@ENTRY AND `GroupID` = 2;
-UPDATE `broadcast_text_locale` SET `FemaleText` = 'No puede ser... Dice que esta criatura se unió a la Legión voluntariamente. Se transformó en un sátiro y recibió la "bendición" de la Legión.' WHERE `ID` = 14031 AND `locale` IN ('esES','esMX');
-
