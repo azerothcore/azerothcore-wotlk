@@ -135,8 +135,7 @@ struct boss_lady_vashj : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-
-        me->CastSpell(me, SPELL_REMOVE_TAINTED_CORES, true);
+        DoCastSelf(SPELL_REMOVE_TAINTED_CORES, true);
 
         ScheduleSpells();
     }
@@ -146,7 +145,7 @@ struct boss_lady_vashj : public BossAI
         summons.Summon(summon);
         if (summon->GetEntry() == WORLD_TRIGGER)
         {
-            summon->CastSpell(summon, SPELL_MAGIC_BARRIER, false);
+            summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
         }
         else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
         {
