@@ -153,8 +153,7 @@ struct boss_shade_of_aran : public BossAI
 
     bool CheckAranInRoom()
     {
-        float distanceToCenter = std::sqrt(std::pow(me->GetPositionX()-roomCenter.GetPositionX(), 2) + std::pow(me->GetPositionY()-roomCenter.GetPositionY(), 2));
-        return distanceToCenter < 45.0f;
+        return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
     }
 
     void KilledUnit(Unit* /*victim*/) override
