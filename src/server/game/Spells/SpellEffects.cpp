@@ -3239,6 +3239,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     float x, y, z;
     owner->GetClosePoint(x, y, z, owner->GetObjectSize());
     Pet* pet = owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET);
+    sScriptMgr->AfterSummonPet(owner, pet);
     if (!pet)
         return;
 
@@ -5292,6 +5293,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
         // Position passed to SummonPet is irrelevant with current implementation,
         // pet will be relocated without using these coords in Pet::LoadPetFromDB
         player->SummonPet(0, 0.0f, 0.0f, 0.0f, 0.0f, SUMMON_PET, 0s, damage);
+        sScriptMgr->AfterSummonPet(player, pet);
         return;
     }
 

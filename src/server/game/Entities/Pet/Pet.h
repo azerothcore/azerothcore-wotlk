@@ -113,6 +113,7 @@ public:
     void learnSpellHighRank(uint32 spellid);
     void InitLevelupSpellsForLevel();
     bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+    void RemoveSpell(uint32 spell_id);
     bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
     void CleanupActionBar();
     std::string GenerateActionBarData() const;

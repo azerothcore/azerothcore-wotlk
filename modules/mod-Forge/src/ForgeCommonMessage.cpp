@@ -187,28 +187,25 @@ bool ForgeCommonMessage::CanLearnTalent(Player* player, uint32 tabId, uint32 spe
         ForgeCharacterPoint* curPoints = fc->GetSpecPoints(player, tabType, spec->Id);
 
         if (tabType == CharacterPointType::PET_TALENT) {
-            /*if (Pet* pet = player->GetPet()) {
+            if (Pet* pet = player->GetPet()) {
                 if (pet->getPetType() == HUNTER_PET)
                     if (auto ct = pet->GetCreatureTemplate()) {
                         CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ct->family);
                         if (!pet_family || pet_family->petTalentType < 0)
                             return false;
-
-                        switch (1 << pet_family->petTalentType) {
-                        case 2:
-                        case 1:
-                        case 4:
-                            break;
-                        default:
+                        else if ((1 << pet_family->petTalentType) == 2 && tabId != 409)
                             return false;
-                        }
+                        else if ((1 << pet_family->petTalentType) == 1 && tabId != 410)
+                            return false;
+                        else if ((1 << pet_family->petTalentType) == 4 && tabId != 411)
+                            return false;
                     }
                     else
                         return false;
                 else
                     return false;
             }
-            else*/
+            else
                 return false;
         }
 

@@ -53,9 +53,10 @@ public:
                         auto spell = perk->spell;
 
                         auto rankIt = spell->ranks.find(rank);
-                        if (rankIt != spell->ranks.end())
+                        if (rankIt != spell->ranks.end()) {
                             iam.player->removeSpell(rankIt->second, SPEC_MASK_ALL, false);
-
+                            iam.player->RemoveSpell(rankIt->second);
+                        }
                         rank--;
 
                         if (rank) {

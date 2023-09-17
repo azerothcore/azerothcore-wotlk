@@ -1965,6 +1965,13 @@ bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     return false;
 }
 
+void Pet::RemoveSpell(uint32 spell_id) {
+    RemoveAurasDueToSpell(spell_id);
+    auto itr = m_spells.find(spell_id);
+    if (itr != m_spells.end())
+        m_spells.erase(spell_id);
+}
+
 bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
     PetSpellMap::iterator itr = m_spells.find(spell_id);

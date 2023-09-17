@@ -233,34 +233,53 @@ public:
             spec->PointsSpent[tabId] += ft->RankCost;
             curPoints->Sum -= ft->RankCost;
 
-            for (auto s : ft->UnlearnSpells) {
-                iam.player->removeSpell(s, SPEC_MASK_ALL, false);
-                iam.player->RemoveSpell(s);
-            }
-
             auto ranksItt = ft->Ranks.find(ct->CurrentRank);
 
-            if (ranksItt != ft->Ranks.end()) {
-                iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
-                iam.player->RemoveSpell(ranksItt->second);
+            // unlearn old
+            if (tabType == CharacterPointType::PET_TALENT) {
+                auto pet = iam.player->GetPet();
+                for (auto s : ft->UnlearnSpells) {
+                    pet->unlearnSpell(s, false);
+                    pet->RemoveSpell(s);
+                }
+
+                if (ranksItt != ft->Ranks.end()) {
+                    pet->unlearnSpell(ranksItt->second, false);
+                    pet->RemoveSpell(ranksItt->second);
+                }
             }
+            else {
+                for (auto s : ft->UnlearnSpells) {
+                    iam.player->removeSpell(s, SPEC_MASK_ALL, false);
+                    iam.player->RemoveSpell(s);
+                }
 
+                if (ranksItt != ft->Ranks.end()) {
+                    iam.player->removeSpell(ranksItt->second, SPEC_MASK_ALL, false);
+                    iam.player->RemoveSpell(ranksItt->second);
+                }
+            }
             ct->CurrentRank++;
-
             ranksItt = ft->Ranks.find(ct->CurrentRank);
 
             if (ranksItt != ft->Ranks.end()) {
-                auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
-                    
-                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                    if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                        if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
-                            iam.player->_addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, spellInfo->IsPassive());
+                if (tabType == CharacterPointType::PET_TALENT) {
+                    auto pet = iam.player->GetPet();
+                    pet->learnSpell(ranksItt->second);
+                } else {
+                    auto spellInfo = sSpellMgr->GetSpellInfo(ranksItt->second);
 
-                iam.player->_addSpell(ranksItt->second, SPEC_MASK_ALL, spellInfo->IsPassive());
+                    if (!iam.player->HasSpell(ranksItt->second)) {
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL) {
+                                if (!iam.player->HasSpell(spellInfo->Effects[i].TriggerSpell))
+                                    iam.player->learnSpell(spellInfo->Effects[i].TriggerSpell, spellInfo->IsPassive());
+                            }
+
+                        iam.player->learnSpell(ranksItt->second, spellInfo->IsPassive());
+                    }
+                }
             }
-
-            iam.player->UpdateAllStats();
 
             fc->UpdateCharPoints(iam.player, curPoints);
             fc->UpdateCharacterSpec(iam.player, spec);

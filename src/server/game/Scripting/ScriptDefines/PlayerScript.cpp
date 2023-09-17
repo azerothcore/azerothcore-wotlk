@@ -767,6 +767,14 @@ void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& 
     });
 }
 
+void ScriptMgr::AfterSummonPet(Player* player, Pet* pet)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->AfterSummonPet(player, pet);
+        });
+}
+
 void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

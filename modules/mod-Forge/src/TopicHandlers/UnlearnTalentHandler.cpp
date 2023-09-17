@@ -5,6 +5,7 @@
 #include "WorldPacket.h"
 #include "TopicRouter.h"
 #include "ForgeCommonMessage.h"
+#include "Pet.h"
 #include <ForgeCache.cpp>
 #include <boost/algorithm/string.hpp>
 
@@ -33,8 +34,6 @@ public:
 
         if (iam.player->isDead())
             return;
-
-        iam.player->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
         std::vector<std::string> results;
         boost::algorithm::split(results, iam.message, boost::is_any_of(";"));
@@ -88,19 +87,23 @@ public:
                     spec->PointsSpent[tabId] -= refund;
 
                     sfp->Sum += refund;
-
-                    for (auto rank : tab->Talents[spellId]->Ranks)
-                        if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second)) {
-                            if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-                                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i) {
-                                    iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
-                                    iam.player->RemoveSpell(spellInfo->Effects[i].TriggerSpell);
-                                }
-                            iam.player->removeSpell(rank.second, SPEC_MASK_ALL, false);
-                            iam.player->RemoveSpell(rank.second);
-                            iam.player->RemoveAura(rank.second);
-                        }
-
+                    if (pointType == CharacterPointType::PET_TALENT) {
+                        Pet* pet = iam.player->GetPet();
+                        pet->unlearnSpell(spellId, false);
+                    }
+                    else {
+                        for (auto rank : tab->Talents[spellId]->Ranks)
+                            if (auto spellInfo = sSpellMgr->GetSpellInfo(rank.second)) {
+                                if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i) {
+                                        iam.player->removeSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, false);
+                                        iam.player->RemoveSpell(spellInfo->Effects[i].TriggerSpell);
+                                    }
+                                iam.player->removeSpell(rank.second, SPEC_MASK_ALL, false);
+                                iam.player->RemoveSpell(rank.second);
+                                iam.player->RemoveAura(rank.second);
+                            }
+                    }
                     spellItt->second->CurrentRank = 0;
 
                     iam.player->UpdateAllStats();
@@ -127,7 +130,7 @@ private:
                 CharacterPointType pt;
                 if (fc->TryGetTabPointType(tab.first, pt))
                 {
-                    if (pt == CharacterPointType::TALENT_TREE)
+                    if (pt == CharacterPointType::TALENT_TREE || pt == CharacterPointType::PET_TALENT)
                     {
                         for (auto spell : tab.second)
                         {
@@ -149,10 +152,19 @@ private:
                     }
                 }
             }
-            fc->ApplyTalents(player);
+
             ForgeCharacterPoint* sfp = fc->GetSpecPoints(player, TALENT_TREE, spec->Id);
             sfp->Sum = std::max(player->GetLevel() - 9, 0);
             sfp->Max = sfp->Sum;
+
+            if (player->getClass() == CLASS_HUNTER) {
+                if (PetStable* petStable = player->GetPetStable()) {
+                    if (petStable->CurrentPet) {
+                        CharacterDatabase.Execute("Delete from pet_spell where guid = {}", petStable->CurrentPet->PetNumber);
+                        player->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+                    }
+                }
+            }
             fc->UpdateCharPoints(player, sfp);
             cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);

@@ -88,6 +88,13 @@ public:
         fc->RemoveTalents(player);
     }
 
+    void AfterSummonPet(Player* player, Pet* pet) override {
+        if (player->getClass() == CLASS_HUNTER) {
+            cm->SendTalentTreeLayout(player);
+            cm->SendTalents(player);
+        }
+    }
+
     void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         fc->DeleteCharacter(guid, accountId);
