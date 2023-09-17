@@ -85,15 +85,13 @@ public:
             {
                 if (!GetCreature(DATA_KALECGOS) && !scheduler.IsGroupScheduled(DATA_KALECGOS))
                 {
-                    scheduler.Schedule(1min, [this](TaskContext context)
+                    scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext context)
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
                         {
                             kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
                             kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
                         }
-
-                        context.SetGroup(DATA_KALECGOS);
                     });
                 }
             }
