@@ -384,7 +384,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     _activeCheats = CHEAT_NONE;
 
-    m_creationTime = Seconds(0);
+    m_creationTime = 0s;
 
     _cinematicMgr = new CinematicMgr(this);
 
