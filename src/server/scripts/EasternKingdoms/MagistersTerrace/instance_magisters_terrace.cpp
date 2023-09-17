@@ -16,6 +16,7 @@
  */
 
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "magisters_terrace.h"
 
