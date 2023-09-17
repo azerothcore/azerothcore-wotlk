@@ -242,24 +242,21 @@ struct npc_kalecgos : public ScriptedAI
             me->SetDisableGravity(false);
             me->SetHover(false);
 
-            _scheduler.Schedule(2s, [this](TaskContext)
+            me->m_Events.AddEventAtOffset([this]()
             {
                 DoCastAOE(SPELL_CAMERA_SHAKE);
                 me->SetObjectScale(0.6f);
 
-                _scheduler.Schedule(1s, [this](TaskContext)
+                me->m_Events.AddEventAtOffset([this]()
                 {
                     DoCastSelf(SPELL_ORB_KILL_CREDIT, true);
                     DoCastSelf(SPELL_TRANSFORM_VISUAL);
                     DoCastSelf(SPELL_KALECGOS_TRANSFORM);
                     me->UpdateEntry(NPC_HUMAN_KALECGOS);
-                });
-            });
+                }, 1s);
+            }, 2s);
         }
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 void AddSC_instance_magisters_terrace()
