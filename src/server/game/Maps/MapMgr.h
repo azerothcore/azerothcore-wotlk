@@ -24,6 +24,7 @@
 #include "MapInstanced.h"
 #include "MapUpdater.h"
 #include "Object.h"
+#include "GridStates.h"
 
 #include <mutex>
 
