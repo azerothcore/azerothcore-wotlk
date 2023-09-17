@@ -1,3 +1,4 @@
+-- DB update 2023_09_17_02 -> 2023_09_17_03
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 30629 AND `ScriptName` = 'spell_magtheridon_debris_target_selector';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
