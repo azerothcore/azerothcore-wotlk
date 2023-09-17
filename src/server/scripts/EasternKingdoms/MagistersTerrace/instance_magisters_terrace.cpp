@@ -85,7 +85,7 @@ public:
             {
                 if (!GetCreature(DATA_KALECGOS) && !scheduler.IsGroupScheduled(DATA_KALECGOS))
                 {
-                    scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext context)
+                    scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext)
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
                         {
