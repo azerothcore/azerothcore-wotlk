@@ -189,15 +189,6 @@ struct boss_shade_of_aran : public BossAI
         }
     }
 
-    bool CheckDamageDuringDrinking(uint32 oldHealth)
-    {
-        if (me->GetHealth() < oldHealth)
-        {
-            return true;
-        }
-        return false;
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
@@ -357,7 +348,7 @@ struct boss_shade_of_aran : public BossAI
                 drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
                 {
                     //check for damage to interrupt
-                    if(CheckDamageDuringDrinking(_currentHealth))
+                    if (me->GetHealth() < _currentHealth)
                     {
                         me->RemoveAurasDueToSpell(SPELL_DRINK);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
