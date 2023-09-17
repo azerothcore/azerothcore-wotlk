@@ -74,10 +74,7 @@ enum SuperSpell
 enum Groups
 {
     GROUP_FLAMEWREATH   = 0,
-    GROUP_DRINKING      = 1,
-    GROUP_NORMAL_CAST   = 2,
-    GROUP_CHAINS        = 3,
-    GROUP_SUPER         = 4
+    GROUP_DRINKING      = 1
 };
 
 Position const elementalPos[4] =
