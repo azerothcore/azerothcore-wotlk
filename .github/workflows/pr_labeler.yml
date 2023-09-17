@@ -12,6 +12,6 @@ jobs:
           persist-credentials: true
       - uses: actions/labeler@v3
         with:
-          github_token: ${{ secrets.PAT_TOKEN }}
+          repo-token: ${{ secrets.PAT_TOKEN }}
           configuration-path: .github/labeler.yml
           sync-labels: true
