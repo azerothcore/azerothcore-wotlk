@@ -5,8 +5,7 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-20.04
-    permissions:
-      pull-requests: write
+    permissions: read-all|write-all
     steps:
       - uses: actions/labeler@v3
         with:
