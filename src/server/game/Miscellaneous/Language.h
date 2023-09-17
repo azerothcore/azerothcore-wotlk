@@ -1058,7 +1058,7 @@ enum AcoreStrings
     LANG_COMMAND_TICKETLISTRESPONSE     = 2029,
     LANG_COMMAND_TICKETCOMPLETED        = 2030,
 
-    // Trinity strings                    5000-9999
+    // acore strings                    5000-9999
     LANG_COMMAND_FREEZE                 = 5000,
     LANG_COMMAND_FREEZE_ERROR           = 5001,
     LANG_COMMAND_FREEZE_WRONG           = 5002,
