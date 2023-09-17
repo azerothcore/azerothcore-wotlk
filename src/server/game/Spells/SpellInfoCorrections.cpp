@@ -1542,6 +1542,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
+    //  Malchezaar Enfeeble
+    ApplySpellFix({ 30843 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
     // Activate Sunblade Protecto
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
