@@ -227,12 +227,6 @@ enum MovementPoints
     POINT_ID_PREPARE_LANDING = 6
 };
 
-enum EventIds
-{
-    EVENT_KALECGOS_TRANSFORM = 1,
-    EVENT_KALECGOS_LANDING = 2
-};
-
 struct npc_kalecgos : public ScriptedAI
 {
     npc_kalecgos(Creature* creature) : ScriptedAI(creature) { }
@@ -252,7 +246,7 @@ struct npc_kalecgos : public ScriptedAI
             {
                 DoCastAOE(SPELL_CAMERA_SHAKE);
                 me->SetObjectScale(0.6f);
-                events.ScheduleEvent(EVENT_KALECGOS_TRANSFORM, 1s);
+
                 _scheduler.Schedule(1s, [this](TaskContext)
                 {
                     DoCastSelf(SPELL_ORB_KILL_CREDIT, true);
