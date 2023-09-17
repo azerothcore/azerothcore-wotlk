@@ -26,7 +26,8 @@ jobs:
 
       - name: Import and commit pending sql
         run: |
-          git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           # Get the latest changes from git
           git pull --rebase origin "${{ github.ref_name }}"
           bash bin/acore-db-pendings
