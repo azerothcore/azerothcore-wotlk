@@ -78,7 +78,7 @@ public:
             return 0;
         }
 
-        void ProcessEvent(WorldObject* obj, uint32 eventId) override
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
             if (eventId == EVENT_SPAWN_KALECGOS)
             {
