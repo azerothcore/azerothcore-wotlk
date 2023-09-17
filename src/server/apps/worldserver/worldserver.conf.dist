@@ -940,6 +940,13 @@ ClientCacheVersion = 0
 SessionAddDelay = 10000
 
 #
+#    GridCleanUpDelay
+#        Description: Time (in milliseconds) grid clean up delay.
+#        Default:     300000 - (5 minutes)
+
+GridCleanUpDelay = 300000
+
+#
 #    CloseIdleConnections
 #        Description: Automatically close idle connections.
 #                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.

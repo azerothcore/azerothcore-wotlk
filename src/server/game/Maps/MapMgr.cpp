@@ -36,7 +36,7 @@
 
 MapMgr::MapMgr()
 {
-    i_gridCleanUpDelay = 30000; //sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
+    i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;

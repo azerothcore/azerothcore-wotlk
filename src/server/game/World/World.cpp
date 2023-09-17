@@ -670,16 +670,14 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "PlayerSave.Stats.MinLevel ({}) must be in range 0..80. Using default, do not save character stats (0).", _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]);
         _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
     }
-    /*
     _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfigMgr->GetOption("GridCleanUpDelay", 5 * MINUTE * IN_MILLISECONDS);
     if (_int_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
     {
         LOG_ERROR("server.loading", "GridCleanUpDelay (%i) must be greater %u. Use this minimal value.", _int_configs[CONFIG_INTERVAL_GRIDCLEAN], MIN_GRID_DELAY);
         _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = MIN_GRID_DELAY;
     }
-    */
     if (reload)
-        sMapMgr->SetGridCleanUpDelay(300000); // TODO: Read value from config instead. See commented-code code above.
+        sMapMgr->SetGridCleanUpDelay(_int_configs[CONFIG_INTERVAL_GRIDCLEAN]);
 
     _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 10);
     if (_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
