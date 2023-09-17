@@ -383,16 +383,16 @@ class spell_malchezaar_enfeeble : public SpellScript
         uint8 maxSize = 5;
         Unit* caster = GetCaster();
 
-        if (targets.size() > maxSize)
-        {
-            Acore::Containers::RandomResize(targets, maxSize);
-        }
-
         targets.remove_if([caster](WorldObject const* target) -> bool
         {
             // Should not target current victim.
             return caster->GetVictim() == target;
         });
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
     }
 
     void Register() override
