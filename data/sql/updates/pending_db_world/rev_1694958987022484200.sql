@@ -18,3 +18,4 @@ DELETE FROM `event_scripts` WHERE `id` = 16547;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 24844;
 
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_kalecgos' WHERE `entry` = 24844;
+UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 24848;
