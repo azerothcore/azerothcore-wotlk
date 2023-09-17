@@ -245,7 +245,7 @@ struct boss_shade_of_aran : public BossAI
         {
             if (!_drinking)
             {
-            switch (urand(0, 1))
+                switch (urand(0, 1))
                 {
                     case 0:
                         DoCastSelf(SPELL_AOE_CS);
