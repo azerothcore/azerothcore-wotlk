@@ -3,14 +3,6 @@
 -- The orientation of the initial NPC This is roughly towards the coordinates that need to be sniffed 
 -- UPDATE `creature` SET `orientation`=4.41048 WHERE `guid`=41833;
 
--- 3 emoticons when preparing for a task
-DELETE FROM `quest_details` WHERE `ID`=1476;
--- EMOTE_ONESHOT_QUESTION && EMOTE_ONESHOT_LAUGH && EMOTE_ONESHOT_TALK
-INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES
-(1476, 6, 11, 1, 0, 0, 0, 0, 0, 0);
-
-
-
 -- Use SmatAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5693;
 
