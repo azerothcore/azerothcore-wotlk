@@ -1,3 +1,4 @@
+-- DB update 2023_09_17_11 -> 2023_09_17_12
 -- ---------------------creature_template  -------------------
 -- fairbanks Use gossip_menu_id 7283
 -- add gossip menu flag  Prevent red errors when the server starts
