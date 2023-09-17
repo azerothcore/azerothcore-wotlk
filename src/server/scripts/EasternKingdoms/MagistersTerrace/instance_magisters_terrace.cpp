@@ -255,11 +255,6 @@ struct npc_kalecgos : public ScriptedAI
                     DoCastSelf(SPELL_TRANSFORM_VISUAL);
                     DoCastSelf(SPELL_KALECGOS_TRANSFORM);
                     me->UpdateEntry(NPC_HUMAN_KALECGOS);
-                    // The updated entry inherits the previous creature's inhabit type on AzerothCore.
-                    // So this is needed, else Kalecgos hovers (floats).
-                    me->SetCanFly(false);
-                    me->SetHover(false);
-                    me->SetDisableGravity(false);
                 }, 1s);
             }, 2s);
         }
