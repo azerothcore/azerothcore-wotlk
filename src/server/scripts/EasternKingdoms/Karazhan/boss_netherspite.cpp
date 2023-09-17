@@ -237,13 +237,10 @@ struct boss_netherspite : public BossAI
         DoCastSelf(SPELL_BANISH_VISUAL, true);
         DoCastSelf(SPELL_BANISH_ROOT, true);
         DestroyPortals();
-        scheduler.Schedule(30s, [this](TaskContext /*context*/)
+        scheduler.Schedule(30s, [this](TaskContext)
         {
-            if (!me->IsNonMeleeSpellCast(false))
-            {
-                SwitchToPortalPhase();
-                return;
-            }
+            SwitchToPortalPhase();
+            return;
         }).Schedule(10s, VANISH_PHASE, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
