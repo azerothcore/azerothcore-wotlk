@@ -22,7 +22,6 @@
 ObjectData const creatureData[] =
 {
     { NPC_KALECGOS,        DATA_KALECGOS         },
-    { NPC_HUMAN_KALECGOS,  DATA_KALECGOS_HUMAN   },
     { 0,                   0                     }
 };
 

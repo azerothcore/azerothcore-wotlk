@@ -34,8 +34,7 @@ enum MTData
     DATA_KAELTHAS_EVENT         = 3,
     MAX_ENCOUNTER               = 4,
 
-    DATA_KALECGOS               = 5,
-    DATA_KALECGOS_HUMAN         = 6
+    DATA_KALECGOS               = 5
 };
 
 enum MTCreatures
