@@ -373,7 +373,6 @@ void ForgeCommonMessage::SendTalents(Player* player)
         for (auto tpt : fc->TALENT_POINT_TYPES)
         {
             std::list<ForgeTalentTab*> tabs;
-
             if (fc->TryGetForgeTalentTabs(player, tpt, tabs))
             {
                 std::string clientMsg;
@@ -381,7 +380,6 @@ void ForgeCommonMessage::SendTalents(Player* player)
                 //clientMsg = clientMsg + delimiter + std::to_string(tab->Id) + "^" + std::to_string((int)tab->TalentType) + "^";
                 for (auto* tab : tabs)
                 {
-
                     clientMsg = clientMsg + std::to_string(tabId) + "^" + std::to_string(tpt) + "^";
                     std::string delimiter = ";";
 

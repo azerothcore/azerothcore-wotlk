@@ -40,9 +40,9 @@ public:
             fc->TryGetTalentTab(iam.player, tabId, tab) &&
             fc->TryGetCharacterActiveSpec(iam.player, spec))
         {
-            if (tabType == CharacterPointType::PET_TALENT)
-                if (Pet* pet = iam.player->GetPet())
-                    if (pet->getPetType() == HUNTER_PET)
+            if (tabType == CharacterPointType::PET_TALENT) {
+                if (Pet* pet = iam.player->GetPet()) {
+                    if (pet->getPetType() == HUNTER_PET) {
                         if (auto ct = pet->GetCreatureTemplate()) {
                             CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ct->family);
                             if (!pet_family || pet_family->petTalentType < 0)
@@ -54,6 +54,12 @@ public:
                             else if ((1 << pet_family->petTalentType) == 4 && tabId != 411)
                                 return;
                         }
+                        else return;
+                    }
+                    else return;
+                }
+                else return;
+            }
 
             ForgeCharacterPoint* curPoints = fc->GetSpecPoints(iam.player, tabType, spec->Id);
             if (~tab->ClassMask & iam.player->getClassMask())
