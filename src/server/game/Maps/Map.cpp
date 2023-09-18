@@ -237,7 +237,7 @@ void Map::LoadMapAndVMap(int gx, int gy)
     }
 }
 
-Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
+Map::Map(uint32 id, std::chrono::seconds expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _creatureToMoveLock(false), _gameObjectsToMoveLock(false), _dynamicObjectsToMoveLock(false),
     i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
     m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), _instanceResetPeriod(0),
@@ -3316,7 +3316,7 @@ template void Map::RemoveFromMap(DynamicObject*, bool);
 
 /* ******* Dungeon Instance Maps ******* */
 
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
+InstanceMap::InstanceMap(uint32 id, std::chrono::seconds expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
     : Map(id, expiry, InstanceId, SpawnMode, _parent),
       m_resetAfterUnload(false), m_unloadWhenEmpty(false),
       instance_data(nullptr), i_script_id(0)
@@ -3726,7 +3726,7 @@ uint32 InstanceMap::GetMaxResetDelay() const
 
 /* ******* Battleground Instance Maps ******* */
 
-BattlegroundMap::BattlegroundMap(uint32 id, time_t expiry, uint32 InstanceId, Map* _parent, uint8 spawnMode)
+BattlegroundMap::BattlegroundMap(uint32 id, std::chrono::seconds expiry, uint32 InstanceId, Map* _parent, uint8 spawnMode)
     : Map(id, expiry, InstanceId, spawnMode, _parent), m_bg(nullptr)
 {
     //lets initialize visibility distance for BG/Arenas
