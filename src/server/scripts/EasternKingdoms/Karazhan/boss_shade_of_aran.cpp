@@ -147,6 +147,18 @@ struct boss_shade_of_aran : public BossAI
         });
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
+            }
+        }
+    }
+
     void KilledUnit(Unit* /*victim*/) override
     {
         Talk(SAY_KILL);
