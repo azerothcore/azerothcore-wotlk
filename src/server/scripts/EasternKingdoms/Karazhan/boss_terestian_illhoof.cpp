@@ -146,64 +146,6 @@ private:
     ObjectGuid sacrificeGUID;
 };
 
-struct npc_fiendish_portal : public PassiveAI
-{
-    npc_fiendish_portal(Creature* creature) : PassiveAI(creature), summons(me) {}
-
-    void Reset() override
-    {
-        DespawnAllImp();
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-        DoZoneInCombat(summon);
-    }
-
-    void DespawnAllImp()
-    {
-        summons.DespawnAll();
-    }
-
-private:
-    SummonList summons;
-};
-
-struct npc_fiendish_imp : public ScriptedAI
-{
-    npc_fiendish_imp(Creature* creature) : ScriptedAI(creature) {}
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        _scheduler.Schedule(2s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_FIREBOLT);
-            context.Repeat(2200ms);
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        _scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-
-private:
-    TaskScheduler _scheduler;
-};
-
 struct boss_terestian_illhoof : public BossAI
 {
     boss_terestian_illhoof(Creature* creature) : BossAI(creature, DATA_TERESTIAN)
@@ -218,20 +160,6 @@ struct boss_terestian_illhoof : public BossAI
     {
         _Reset();
         SummonKilrek();
-        portalsCount = 0;
-        berserk = false;
-        for (uint8 i = 0; i < 2; ++i)
-        {
-            if (portalGUID[i])
-            {
-                if (Creature* pPortal = ObjectAccessor::GetCreature(*me, portalGUID[i]))
-                {
-                    pPortal->AI()->Reset();
-                    pPortal->DespawnOrUnsummon();
-                }
-                portalGUID[i].Clear();
-            }
-        }
     }
 
     void SummonKilrek()
@@ -269,29 +197,13 @@ struct boss_terestian_illhoof : public BossAI
             context.Repeat(10s);
         }).Schedule(10s, [this](TaskContext context)
         {
-            if (!portalGUID[0])
-            {
-                DoCastVictim(SPELL_FIENDISH_PORTAL);
-            }
-            if (!portalGUID[1])
-            {
-                DoCastVictim(SPELL_FIENDISH_PORTAL_1);
-            }
-            if (portalGUID[0] && portalGUID[1])
-            {
-                if (Creature* pPortal = ObjectAccessor::GetCreature(*me, portalGUID[urand(0, 1)]))
-                {
-                    pPortal->CastSpell(me->GetVictim(), SPELL_SUMMON_FIENDISIMP);
-                }
-                context.Repeat(5s);
-            }
+            DoCastAOE(SPELL_FIENDISH_PORTAL);
+        }).Schedule(11s, [this](TaskContext)
+        {
+            DoCastAOE(SPELL_FIENDISH_PORTAL_1);
         }).Schedule(10min, [this](TaskContext /*context*/)
         {
-            if (!berserk)
-            {
-                DoCastSelf(SPELL_BERSERK);
-                berserk = true;
-            }
+            DoCastSelf(SPELL_BERSERK);
         });
     }
 
@@ -299,13 +211,14 @@ struct boss_terestian_illhoof : public BossAI
     {
         if (summoned->GetEntry() == NPC_PORTAL)
         {
-            portalGUID[portalsCount] = summoned->GetGUID();
-            ++portalsCount;
+            summoned->SetReactState(REACT_PASSIVE);
             if (summoned->GetUInt32Value(UNIT_CREATED_BY_SPELL) == SPELL_FIENDISH_PORTAL_1)
             {
                 Talk(SAY_SUMMON);
             }
         }
+
+        summons.Summon(summoned);
     }
 
     void KilledUnit(Unit* victim) override
@@ -318,44 +231,14 @@ struct boss_terestian_illhoof : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-        for (uint8 i = 0; i < 2; ++i)
-        {
-            if (portalGUID[i])
-            {
-                if (Creature* pPortal = ObjectAccessor::GetCreature((*me), portalGUID[i]))
-                {
-                    pPortal->AI()->Reset();
-                    pPortal->DespawnOrUnsummon();
-                }
-                portalGUID[i].Clear();
-            }
-        }
     }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-
-private:
-    bool berserk;
-    ObjectGuid portalGUID[2];
-    uint8 portalsCount;
 };
 
 void AddSC_boss_terestian_illhoof()
 {
     RegisterKarazhanCreatureAI(boss_terestian_illhoof);
-    RegisterKarazhanCreatureAI(npc_fiendish_imp);
-    RegisterKarazhanCreatureAI(npc_fiendish_portal);
     RegisterKarazhanCreatureAI(npc_kilrek);
     RegisterKarazhanCreatureAI(npc_demon_chain);
 }
