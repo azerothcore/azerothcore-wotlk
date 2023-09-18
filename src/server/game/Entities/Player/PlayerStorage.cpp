@@ -24,14 +24,12 @@
 #include "Battleground.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
-#include "CellImpl.h"
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Config.h"
-#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -43,7 +41,6 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "InstanceSaveMgr.h"
-#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
@@ -946,9 +943,6 @@ InventoryResult Player::CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemP
         pItem2 = nullptr;
 
     uint32 need_space;
-
-    if (pSrcItem && pSrcItem->IsNotEmptyBag() && !IsBagPos(uint16(bag) << 8 | slot))
-        return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
     // empty specific slot - check item fit to slot
     if (!pItem2 || swap)
@@ -6880,7 +6874,13 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     else if (missingPlayerItems.size())
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1.c_str());
+                        LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                        std::string name = sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1;
+                        if (ItemLocale const* il = sObjectMgr->GetItemLocale(missingPlayerItems[0]->id))
+                        {
+                            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                        }
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
                     }
                     else if (LevelMin)
                     {

@@ -14,21 +14,34 @@ jobs:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
-      - name: Extract branch name
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+          # If we're fetching all the history in a later step it makes sense to
+          # pre-load it now
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - uses: denoland/setup-deno@v1
+        with:
+          # Specifies latest 1.x
+          deno-version: "~1.0"
+
       - name: Import and commit pending sql
         run: |
           git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
+          # Get the latest changes from git
+          git pull --rebase origin "${{ github.ref_name }}"
           bash bin/acore-db-pendings
-          bash bin/acore-import-changelogs
-          git fetch --unshallow origin ${BRANCH}
+          deno run --allow-all --unstable apps/ci/ci-pending-changelogs.ts
           git add -A .
           git commit -am "chore(DB): import pending files" -m "Referenced commit(s): ${GITHUB_SHA}" || true
         env:
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+          # Noting that the branch name can only be master, as per the event
+          # triggering this action
+          BRANCH: ${{ github.ref_name }}
+
       - name: Push changes
         uses: ad-m/github-push-action@fe38f0a751bf9149f0270cc1fe20bf9156854365
         with:
           github_token: ${{ secrets.AC_GITHUB_TOKEN }}
-          branch: ${{ steps.extract_branch.outputs.branch }}
+          # Noting that the branch name can only be master, as per the event
+          # triggering this action
+          branch: ${{ github.ref_name }}

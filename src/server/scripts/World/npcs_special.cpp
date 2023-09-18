@@ -19,7 +19,6 @@
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
-#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"

@@ -26,7 +26,6 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
 {

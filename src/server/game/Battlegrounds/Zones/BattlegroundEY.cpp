@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"

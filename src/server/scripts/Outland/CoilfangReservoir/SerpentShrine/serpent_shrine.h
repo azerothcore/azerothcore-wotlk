@@ -89,4 +89,6 @@ inline AI* GetSerpentShrineAI(T* obj)
     return GetInstanceAI<AI>(obj, SerpentShrineScriptName);
 }
 
+#define RegisterSerpentShrineAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSerpentShrineAI)
+
 #endif
