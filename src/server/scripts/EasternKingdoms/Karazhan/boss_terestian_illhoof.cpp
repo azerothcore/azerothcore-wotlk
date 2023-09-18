@@ -195,7 +195,7 @@ struct boss_terestian_illhoof : public BossAI
         {
             DoCastVictim(SPELL_SHADOW_BOLT);
             context.Repeat(10s);
-        }).Schedule(10s, [this](TaskContext context)
+        }).Schedule(10s, [this](TaskContext)
         {
             DoCastAOE(SPELL_FIENDISH_PORTAL);
         }).Schedule(11s, [this](TaskContext)
