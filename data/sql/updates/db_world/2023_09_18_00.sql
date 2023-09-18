@@ -1,3 +1,4 @@
+-- DB update 2023_09_17_13 -> 2023_09_18_00
 -- Hearts of the Pure Rp -------------
 
 -- The orientation of the initial NPC This is roughly towards the coordinates that need to be sniffed 
