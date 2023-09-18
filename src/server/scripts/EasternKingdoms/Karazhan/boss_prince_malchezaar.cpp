@@ -156,7 +156,7 @@ struct boss_malchezaar : public BossAI
         if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
         {
             infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-            relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
+            //relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
             relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
             infernal->SetFaction(me->GetFaction());
             infernal->SetControlled(true, UNIT_STATE_ROOT);
