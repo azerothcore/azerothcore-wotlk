@@ -27,8 +27,8 @@ jobs:
 
       - name: Import and commit pending sql
         run: |
-          git config --local user.email "azerothcorebot@gmail.com"
-          git config --local user.name "AzerothCoreBot"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           # Get the latest changes from git
           git pull --rebase origin "${{ github.ref_name }}"
           bash bin/acore-db-pendings
@@ -43,7 +43,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.AC_GITHUB_TOKEN }}
           # Noting that the branch name can only be master, as per the event
           # triggering this action
           branch: ${{ github.ref_name }}
