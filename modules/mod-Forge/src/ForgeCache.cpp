@@ -792,7 +792,8 @@ public:
         {
             for (auto charTabType : TALENT_POINT_TYPES)
             {
-                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE && charTabType != RACIAL_TREE)
+                if (ACCOUNT_WIDE_TYPE != charTabType && charTabType != CharacterPointType::TALENT_TREE
+                    && charTabType != RACIAL_TREE && charTabType != PET_TALENT)
                     continue;
 
                 std::list<ForgeTalentTab*> tabs;
