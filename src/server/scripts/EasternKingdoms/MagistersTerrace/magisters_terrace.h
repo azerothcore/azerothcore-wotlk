@@ -32,7 +32,9 @@ enum MTData
     DATA_VEXALLUS_EVENT         = 1,
     DATA_DELRISSA_EVENT         = 2,
     DATA_KAELTHAS_EVENT         = 3,
-    MAX_ENCOUNTER               = 4
+    MAX_ENCOUNTER               = 4,
+
+    DATA_KALECGOS               = 5
 };
 
 enum MTCreatures
@@ -41,7 +43,9 @@ enum MTCreatures
     NPC_FEL_CRYSTAL             = 24722,
     NPC_KAEL_THAS               = 24664,
     NPC_PHOENIX                 = 21362,
-    NPC_PHOENIX_EGG             = 21364
+    NPC_PHOENIX_EGG             = 21364,
+    NPC_KALECGOS                = 24844,
+    NPC_HUMAN_KALECGOS          = 24848
 };
 
 enum MTGameObjects
@@ -54,10 +58,27 @@ enum MTGameObjects
     GO_ESCAPE_ORB               = 188173
 };
 
+enum InstanceEventIds
+{
+    EVENT_SPAWN_KALECGOS = 16547
+};
+
+enum InstanceText
+{
+    SAY_KALECGOS_SPAWN = 0
+};
+
+enum MovementData
+{
+    PATH_KALECGOS_FLIGHT = 248440
+};
+
 template <class AI, class T>
 inline AI* GetMagistersTerraceAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, MTScriptName);
 }
+
+#define RegisterMagistersTerraceCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetMagistersTerraceAI)
 
 #endif
