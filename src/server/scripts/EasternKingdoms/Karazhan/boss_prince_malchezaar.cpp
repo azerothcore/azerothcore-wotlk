@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "karazhan.h"
 
 enum PrinceSay
@@ -47,11 +48,13 @@ enum Spells
 
 enum creatures
 {
-    NPC_NETHERSPITE_INFERNAL     = 17646,
-    NPC_MALCHEZARS_AXE           = 17650,
-    INFERNAL_MODEL_INVISIBLE = 11686,
-    SPELL_INFERNAL_RELAY     = 33814,   // 30835,
-    EQUIP_ID_AXE             = 33542
+    NPC_NETHERSPITE_INFERNAL    = 17646,
+    NPC_MALCHEZAARS_AXE         = 17650,
+    INFERNAL_MODEL_INVISIBLE    = 11686,
+    SPELL_INFERNAL_RELAY        = 33814,   // 30835,
+    SPELL_INFERNAL_RELAY_ONE    = 30834,
+    SPELL_INFERNAL_RELAY_TWO    = 30835,
+    EQUIP_ID_AXE                = 33542
 };
 
 enum EventGroups
@@ -68,44 +71,19 @@ enum Phases
     PHASE_THREE = 3
 };
 
-struct InfernalPoint
-{
-    float x, y;
-};
-
-#define INFERNAL_Z 275.5f
-
-/*static InfernalPoint InfernalPoints[] =
-{
-    { -10922.8f, -1985.2f },
-    { -10916.2f, -1996.2f },
-    { -10932.2f, -2008.1f },
-    { -10948.8f, -2022.1f },
-    { -10958.7f, -1997.7f },
-    { -10971.5f, -1997.5f },
-    { -10990.8f, -1995.1f },
-    { -10989.8f, -1976.5f },
-    { -10971.6f, -1973.0f },
-    { -10955.5f, -1974.0f },
-    { -10939.6f, -1969.8f },
-    { -10958.0f, -1952.2f },
-    { -10941.7f, -1954.8f },
-    { -10943.1f, -1988.5f },
-    { -10948.8f, -2005.1f },
-    { -10984.0f, -2019.3f },
-    { -10932.8f, -1979.6f },
-    { -10935.7f, -1996.0f }
-};*/
-
 struct boss_malchezaar : public BossAI
 {
-    boss_malchezaar(Creature* creature) : BossAI(creature, DATA_MALCHEZZAR) { }
+    boss_malchezaar(Creature* creature) : BossAI(creature, DATA_MALCHEZAAR) { }
+
+    std::list<Creature*> relays;
+    std::list<Creature*> infernalTargets;
 
     void Initialize()
     {
         _phase = 1;
         clearweapons();
-        positions.clear();
+        relays.clear();
+        infernalTargets.clear();
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
@@ -145,7 +123,7 @@ struct boss_malchezaar : public BossAI
             _phase = PHASE_THREE;
             clearweapons();
 
-            me->SummonCreature(NPC_MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+            me->SummonCreature(NPC_MALCHEZAARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
 
             scheduler.Schedule(20s, 30s, [this](TaskContext context)
             {
@@ -174,15 +152,53 @@ struct boss_malchezaar : public BossAI
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
+    void SpawnInfernal(Creature* relay, Creature* target)
+    {
+        if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+        {
+            infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+            relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
+            relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+            infernal->SetFaction(me->GetFaction());
+            infernal->SetControlled(true, UNIT_STATE_ROOT);
+            relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
+            summons.Summon(infernal);
+        }
+    }
+
+    bool MaxSpawns(std::list<Creature*> spawns)
+    {
+        return spawns.size() == 0;
+    }
+
+    Creature* PickTarget(std::list<Creature*> pickList)
+    {
+        uint8 index = urand(0, pickList.size()-1);
+        uint8 counter = 0;
+        for (Creature* creature : pickList)
+        {
+            if (counter == index)
+            {
+                return creature;
+            }
+            counter++;
+        }
+        return nullptr;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
+
+        me->GetCreaturesWithEntryInRange(relays, 250.0f, NPC_INFERNAL_RELAY);
+        me->GetCreaturesWithEntryInRange(infernalTargets, 100.0f, NPC_INFERNAL_TARGET);
+
         instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
         {
-            EnfeebleHealthEffect();
+            DoCastAOE(SPELL_ENFEEBLE);
 
             scheduler.Schedule(9s, [this](TaskContext)
             {
@@ -199,23 +215,30 @@ struct boss_malchezaar : public BossAI
             context.Repeat();
         }).Schedule(40s, [this](TaskContext context)
         {
-            Position pos =  me->GetRandomNearPosition(40.0);;
-
-            if (Creature* RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
+            if (!MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full
             {
-                if (Creature* infernal = RELAY->SummonCreature(NPC_NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000))
+                Talk(SAY_SUMMON);
+                if (Creature* infernalRelayOne = relays.back())
                 {
-                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                    infernal->SetFaction(me->GetFaction());
-                    infernal->SetControlled(true, UNIT_STATE_ROOT);
-                    RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
-                    summons.Summon(infernal);
+                    if (Creature* infernalRelayTwo = relays.front())
+                    {
+                        infernalRelayOne->CastSpell(infernalRelayTwo, SPELL_INFERNAL_RELAY_ONE, true);
+
+                        if (Creature* infernalTarget = PickTarget(infernalTargets))
+                        {
+                            infernalTargets.remove(infernalTarget);
+                            SpawnInfernal(infernalRelayTwo, infernalTarget);
+
+                            scheduler.Schedule(3min, [this, infernalTarget](TaskContext)
+                            {
+                                infernalTargets.push_back(infernalTarget); //adds to list again
+                            });
+
+                        }
+                    }
                 }
             }
-
             context.Repeat(_phase == PHASE_THREE ? 15s : 45s);
-
-            Talk(SAY_SUMMON);
         }).Schedule(20s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SHADOW_WORD_PAIN);
@@ -224,23 +247,12 @@ struct boss_malchezaar : public BossAI
         });
     }
 
-    void EnfeebleHealthEffect()
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        std::list<Unit*> targetList;
-        SelectTargetList(targetList, 5, SelectTargetMethod::Random, 1, [&](Unit* u) { return u->IsAlive() && u->IsPlayer(); });
-
-        if (targetList.empty())
-            return;
-
-        for (auto const& target : targetList)
+        if (spell->Id == SPELL_ENFEEBLE)
         {
-            if (target)
-            {
-                _enfeebleTargets[target->GetGUID()] = target->GetHealth();
-
-                me->CastSpell(target, SPELL_ENFEEBLE, true);
-                target->SetHealth(1);
-            }
+            _enfeebleTargets[target->GetGUID()] = target->GetHealth();
+            target->SetHealth(1);
         }
     }
 
@@ -261,7 +273,6 @@ struct boss_malchezaar : public BossAI
     private:
         uint32 _phase;
         std::map<ObjectGuid, uint32> _enfeebleTargets;
-        std::vector<InfernalPoint*> positions;
 };
 
 struct npc_netherspite_infernal : public ScriptedAI
@@ -357,9 +368,43 @@ struct npc_malchezaar_axe : public ScriptedAI
         TaskScheduler _scheduler;
 };
 
+// 30843 - Enfeeble
+class spell_malchezaar_enfeeble : public SpellScript
+{
+    PrepareSpellScript(spell_malchezaar_enfeeble);
+
+    bool Load() override
+    {
+        return GetCaster()->ToCreature();
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint8 maxSize = 5;
+        Unit* caster = GetCaster();
+
+        targets.remove_if([caster](WorldObject const* target) -> bool
+        {
+            // Should not target current victim.
+            return caster->GetVictim() == target;
+        });
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_malchezaar_enfeeble::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_malchezaar()
 {
     RegisterKarazhanCreatureAI(boss_malchezaar);
     RegisterKarazhanCreatureAI(npc_malchezaar_axe);
     RegisterKarazhanCreatureAI(npc_netherspite_infernal);
+    RegisterSpellScript(spell_malchezaar_enfeeble);
 }

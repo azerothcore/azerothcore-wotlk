@@ -82,7 +82,7 @@ protected:
     Creature* DoSummon(uint32 entry, WorldObject* obj, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
     Creature* DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
 public:
-    // EnumUtils: DESCRIBE THIS
+    // EnumUtils: DESCRIBE THIS (in CreatureAI::)
     enum EvadeReason
     {
         EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty

@@ -16,7 +16,6 @@
  */
 
 #include "DBCStores.h"
-#include "Common.h"
 #include "Containers.h"
 #include "Log.h"
 #include "M2Structure.h"
@@ -25,7 +24,6 @@
 #include <boost/filesystem/path.hpp>
 #include <fstream>
 #include <iostream>
-#include <iomanip>
 
 typedef std::vector<FlyByCamera> FlyByCameraCollection;
 std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;
