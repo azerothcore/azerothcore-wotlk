@@ -52,7 +52,6 @@ enum Spells
 enum Creatures
 {
     NPC_DEMONCHAINS             = 17248,
-    NPC_FIENDISHIMP             = 17267,
     NPC_PORTAL                  = 17265
 };
 
