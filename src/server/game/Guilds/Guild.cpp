@@ -16,7 +16,6 @@
  */
 
 #include "Guild.h"
-#include "AccountMgr.h"
 #include "Bag.h"
 #include "CalendarMgr.h"
 #include "CharacterCache.h"

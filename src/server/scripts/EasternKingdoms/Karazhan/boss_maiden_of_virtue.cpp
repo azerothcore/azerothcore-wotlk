@@ -38,11 +38,12 @@ enum Spells
 
 struct boss_maiden_of_virtue : public BossAI
 {
-    boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
-
-    void Reset() override
+    boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN)
     {
-        BossAI::Reset();
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void JustEngagedWith(Unit* who) override
@@ -52,7 +53,7 @@ struct boss_maiden_of_virtue : public BossAI
         DoCastAOE(SPELL_HOLY_GROUND, true);
         scheduler.Schedule(25s, [this](TaskContext context)
         {
-            DoCastAOE(SPELL_REPENTANCE, true);
+            DoCastAOE(SPELL_REPENTANCE);
             Talk(SAY_REPENTANCE);
             context.Repeat(25s, 35s);
         }).Schedule(8s, [this](TaskContext context)
@@ -81,18 +82,6 @@ struct boss_maiden_of_virtue : public BossAI
     {
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
     }
 };
 

@@ -793,19 +793,19 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
                 return false;
     }
 
-    // Trap casts are active by default
-    if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
-        active = true;
+    // // Trap casts are active by default
+    // if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
+    //     active = true;
 
-    if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
-        return true;
+    // if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
+    //     return true;
 
-    // check crit events
-    if (procFlags & PROC_FLAG_CRITICAL_DAMAGE_DONE
-        || procFlags & PROC_FLAG_CRITICAL_DAMAGE_TAKEN
-        || procFlags & PROC_FLAG_CRITICAL_HEALING_DONE
-        || procFlags & PROC_FLAG_CRITICAL_HEALING_TAKEN)
-        return true;
+    // // check crit events
+    // if (procFlags & PROC_FLAG_CRITICAL_DAMAGE_DONE
+    //     || procFlags & PROC_FLAG_CRITICAL_DAMAGE_TAKEN
+    //     || procFlags & PROC_FLAG_CRITICAL_HEALING_DONE
+    //     || procFlags & PROC_FLAG_CRITICAL_HEALING_TAKEN)
+    //     return true;
 
     if (spellProcEvent)     // Exist event data
     {
@@ -2769,11 +2769,11 @@ void SpellMgr::LoadSpellInfoStore()
 
         for (SpellEffectInfo const& spellEffectInfo : effects)
         {
-            //ASSERT(effect.EffectIndex < MAX_SPELL_EFFECTS, "MAX_SPELL_EFFECTS must be at least %u", effect.EffectIndex + 1);
-            ASSERT(spellEffectInfo.Effect < TOTAL_SPELL_EFFECTS, "TOTAL_SPELL_EFFECTS must be at least %u", spellEffectInfo.Effect + 1);
-            ASSERT(spellEffectInfo.ApplyAuraName < TOTAL_AURAS, "TOTAL_AURAS must be at least %u", spellEffectInfo.ApplyAuraName + 1);
-            ASSERT(spellEffectInfo.TargetA.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetA.GetTarget() + 1);
-            ASSERT(spellEffectInfo.TargetB.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetB.GetTarget() + 1);
+            //ASSERT(effect.EffectIndex < MAX_SPELL_EFFECTS, "MAX_SPELL_EFFECTS must be at least {}", effect.EffectIndex + 1);
+            ASSERT(spellEffectInfo.Effect < TOTAL_SPELL_EFFECTS, "TOTAL_SPELL_EFFECTS must be at least {}", spellEffectInfo.Effect + 1);
+            ASSERT(spellEffectInfo.ApplyAuraName < TOTAL_AURAS, "TOTAL_AURAS must be at least {}", spellEffectInfo.ApplyAuraName + 1);
+            ASSERT(spellEffectInfo.TargetA.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least {}", spellEffectInfo.TargetA.GetTarget() + 1);
+            ASSERT(spellEffectInfo.TargetB.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least {}", spellEffectInfo.TargetB.GetTarget() + 1);
         }
 
         if (effects.size() > 0)

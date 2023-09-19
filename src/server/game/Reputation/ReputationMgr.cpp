@@ -443,7 +443,7 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, fl
 
             if (itr->second.Standing > 0 && !atLogin) {
                 uint32 accountId = _player->GetSession()->GetAccountId();
-                CharacterDatabase.Query("INSERT INTO character_accountwide_reputation (accountId, standing, factionId) VALUES ({}, {}, {}) ON DUPLICATE KEY UPDATE standing = {}", accountId, standing, factionEntry->ID, standing);
+                CharacterDatabase.Query("INSERT INTO character_accountwide_reputation (accountId, factionGroup, factionId) VALUES ({}, {}, {}) ON DUPLICATE KEY UPDATE rep = {}", accountId, _player->TeamIdForRace(_player->getRace()), factionEntry->ID, itr->second.Standing);
             }
 
             UpdateRankCounters(old_rank, new_rank);

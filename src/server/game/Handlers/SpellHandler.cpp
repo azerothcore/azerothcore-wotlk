@@ -325,6 +325,10 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     if (!go)
         return;
 
+    // Prevent use of GameObject if it is not selectable. Fixes hack.
+    if (go->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
+        return;
+
     if (!go->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         return;
 
@@ -720,10 +724,12 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
             else if (Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
             {
                 uint32 displayInfoId = item->GetTemplate()->DisplayInfoID;
-
                 sScriptMgr->OnGlobalMirrorImageDisplayItem(item, displayInfoId);
 
-                data << uint32(displayInfoId);
+                if (auto const * itemTemplate = sObjectMgr->GetItemTemplate(item->GetTransmog()))
+                    data << uint32(itemTemplate->DisplayInfoID);
+                else
+                    data << uint32(item->GetTemplate()->DisplayInfoID);
             }
             else
                 data << uint32(0);

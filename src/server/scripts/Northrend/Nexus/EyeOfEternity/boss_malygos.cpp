@@ -25,7 +25,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include "WorldSession.h"
 #include "eye_of_eternity.h"
 
 enum MovementInformPoints

@@ -32,7 +32,6 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -2245,8 +2244,12 @@ class spell_gen_clone_weapon_aura : public AuraScript
 
                     if (Player* player = caster->ToPlayer())
                     {
-                        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) {
+                            if (mainItem->GetTransmog())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetTransmog());
+                            else
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                        }
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
@@ -2260,7 +2263,12 @@ class spell_gen_clone_weapon_aura : public AuraScript
                     if (Player* player = caster->ToPlayer())
                     {
                         if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
+                        {
+                            if (offItem->GetTransmog())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetTransmog());
+                            else
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
+                        }
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
@@ -2273,7 +2281,14 @@ class spell_gen_clone_weapon_aura : public AuraScript
                     if (Player* player = caster->ToPlayer())
                     {
                         if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetEntry());
+                        {
+                            if (rangedItem->GetTransmog())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetTransmog());
+                            else
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetEntry());
+                        }
+                        else
+                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2));
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2));
@@ -4894,6 +4909,120 @@ class spell_gen_shriveling_gaze : public AuraScript
     }
 };
 
+// 38048 - Curse of Pain
+enum CurseOfPain
+{
+    SPELL_CURSE_OF_PAIN           = 38048,
+};
+
+class spell_gen_curse_of_pain : public AuraScript
+{
+    PrepareAuraScript(spell_gen_curse_of_pain);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CURSE_OF_PAIN });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target && target->ToPlayer())
+        {
+            if (target->GetHealthPct() < 50.f)
+            {
+                target->RemoveAurasDueToSpell(SPELL_CURSE_OF_PAIN);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_curse_of_pain::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+enum SpiritofCompetition
+{
+    // Spells
+    SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT = 48056,
+    SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT      = 48057,
+    // Mail
+    MAIL_THE_COMPETITIORS_TABARD                   = 195,
+    MAIL_A_GOLD_MEDALLION                          = 196,
+    // NPC
+    NPC_SPIRIT_OF_COMPETITION                      = 27217,
+    // Items
+    ITEM_COMPETITORS_TABARD                        = 36941,
+    ITEM_GOLD_MEDALLION                            = 37297,
+};
+
+class spell_gen_spirit_of_competition_participant : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_participant);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_COMPETITORS_TABARD, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_THE_COMPETITIORS_TABARD)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_participant::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_gen_spirit_of_competition_winner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_winner);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_GOLD_MEDALLION, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_A_GOLD_MEDALLION)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_winner::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5039,4 +5168,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_freezing_circle);
     RegisterSpellScript(spell_gen_threshalisk_charge);
     RegisterSpellScript(spell_gen_shriveling_gaze);
+    RegisterSpellScript(spell_gen_curse_of_pain);
+    RegisterSpellScript(spell_gen_spirit_of_competition_participant);
+    RegisterSpellScript(spell_gen_spirit_of_competition_winner);
 }

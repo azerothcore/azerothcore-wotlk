@@ -242,7 +242,7 @@ struct boss_shade_of_aran : public BossAI
                     DoCast(target, CurrentNormalSpell);
                 }
             }
-            context.Repeat(10s);
+            context.Repeat(2s);
         }).Schedule(5s, [this](TaskContext context)
         {
             switch (urand(0, 1))
@@ -305,7 +305,6 @@ struct boss_shade_of_aran : public BossAI
                             if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
                             {
                                 unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
-                                unit->CastSpell(unit, 11027, true);
                                 FlameWreathTarget[i].Clear();
                             }
                         }

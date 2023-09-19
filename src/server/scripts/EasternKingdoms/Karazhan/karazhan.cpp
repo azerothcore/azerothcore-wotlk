@@ -69,6 +69,14 @@ enum Misc
     OZ_GOSSIP2_OID = 0,
 };
 
+enum NPCTexts
+{
+    BARNES_TEXT_NOT_READY   = 8969,
+    BARNES_TEXT_IS_READY    = 8970,
+    BARNES_TEXT_IS_READY2   = 8971,
+    BARNES_TEXT_WIPED       = 8975
+};
+
 #define OZ_GM_GOSSIP1       "[GM] Change event to EVENT_OZ"
 #define OZ_GM_GOSSIP2       "[GM] Change event to EVENT_HOOD"
 #define OZ_GM_GOSSIP3       "[GM] Change event to EVENT_RAJ"
@@ -192,7 +200,10 @@ public:
                     }
                     break;
                 case 8:
-                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+                    if (m_uiEventId != EVENT_HOOD) // in red riding hood door should close when gossip with grandma is over
+                    {
+                        instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+                    }
                     PerformanceReady = true;
                     break;
                 case 9:
@@ -341,7 +352,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 AddGossipItemFor(player, OZ_GOSSIP2_MID, OZ_GOSSIP2_OID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 8971, creature->GetGUID());
+                SendGossipMenuFor(player, BARNES_TEXT_IS_READY2, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
@@ -383,16 +394,16 @@ public:
                 if (npc_barnesAI* pBarnesAI = CAST_AI(npc_barnes::npc_barnesAI, creature->AI()))
                 {
                     if (!pBarnesAI->RaidWiped)
-                        SendGossipMenuFor(player, 8970, creature->GetGUID());
+                        SendGossipMenuFor(player, BARNES_TEXT_IS_READY, creature->GetGUID());
                     else
-                        SendGossipMenuFor(player, 8975, creature->GetGUID());
+                        SendGossipMenuFor(player, BARNES_TEXT_WIPED, creature->GetGUID());
 
                     return true;
                 }
             }
         }
 
-        SendGossipMenuFor(player, 8978, creature->GetGUID());
+        SendGossipMenuFor(player, BARNES_TEXT_NOT_READY, creature->GetGUID());
         return true;
     }
 

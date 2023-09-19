@@ -105,6 +105,10 @@ namespace AccountMgr
         stmt->SetData(0, accountId);
         CharacterDatabase.Execute(stmt);
 
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_TRANSMOG);
+        stmt->SetData(0, accountId);
+        CharacterDatabase.Execute(stmt);
+
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
         loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT);

@@ -20,6 +20,7 @@ Versions of MySQL:
 
 | MySQL Version | Supported          |
 | ------------- | ------------------ |
+| 8.1           | :white_check_mark: |
 | 8.0           | :white_check_mark: |
 | 5.7           | :white_check_mark: |
 | 5.6 and lower | :red_circle:       |
