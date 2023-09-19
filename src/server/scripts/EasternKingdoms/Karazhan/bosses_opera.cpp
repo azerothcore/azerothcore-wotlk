@@ -508,7 +508,7 @@ struct boss_strawman : public ScriptedAI
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* Spell) override
     {
-        if ((Spell->SchoolMask == SPELL_SCHOOL_MASK_FIRE) && (!(rand() % 10)))
+        if ((Spell->SchoolMask == SPELL_SCHOOL_MASK_FIRE) && roll_chance_i(10))
         {
             /*
                 if (not direct damage(aoe, dot))
