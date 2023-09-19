@@ -93,6 +93,8 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Transmogrification.h"
+
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -1463,6 +1465,8 @@ void World::LoadConfigSettings(bool reload)
     // Specifies if IP addresses can be logged to the database
     _bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true);
 
+    Transmogrification::instance().LoadConfig(reload);
+
     // LFG group mechanics.
     _int_configs[CONFIG_LFG_MAX_KICK_COUNT] = sConfigMgr->GetOption<int32>("LFG.MaxKickCount", 2);
     if (_int_configs[CONFIG_LFG_MAX_KICK_COUNT] > 3)
@@ -2177,6 +2181,8 @@ void World::SetInitialWorldSettings()
             }
         }
     }
+
+    Transmogrification::instance().LoadEnchants();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 

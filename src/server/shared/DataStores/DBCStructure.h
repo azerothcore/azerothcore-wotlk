@@ -1159,7 +1159,8 @@ struct ItemDisplayInfoEntry
     // 8        m_helmetGeosetVis[2]
     // 9        m_texture[2]
     // 10       m_itemVisual[8]
-    // 11       m_particleColorID
+    uint32      m_itemVisual;
+    uint32      m_particleColorID;
 };
 
 //struct ItemCondExtCostsEntry
