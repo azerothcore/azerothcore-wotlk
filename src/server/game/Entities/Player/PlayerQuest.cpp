@@ -30,6 +30,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "WorldSession.h"
+#include "Transmogrification.h"
 
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
@@ -704,6 +705,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 problematicItems.emplace_back(itemId, quest->RewardChoiceItemCount[reward]);
             }
         }
+        for (uint32 reward = 0; reward < quest->GetRewChoiceItemsCount(); ++reward) {
+            if (quest->RewardChoiceItemCount[reward]) {
+                Transmogrification::instance().AddToCollection(this, sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[reward]));
+            }
+        }
     }
 
     if (quest->GetRewItemsCount())
@@ -722,6 +728,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 }
                 else
                     problematicItems.emplace_back(itemId, quest->RewardItemIdCount[i]);
+
+                if (quest->RewardItemIdCount[i]) {
+                    Transmogrification::instance().AddToCollection(this, sObjectMgr->GetItemTemplate(quest->RewardItemId[i]));
+                }
             }
         }
     }

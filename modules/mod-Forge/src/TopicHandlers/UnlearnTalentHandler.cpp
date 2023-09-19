@@ -166,6 +166,7 @@ private:
                 }
             }
             fc->UpdateCharPoints(player, sfp);
+
             cm->SendActiveSpecInfo(player);
             cm->SendSpecInfo(player);
             cm->SendTalents(player);

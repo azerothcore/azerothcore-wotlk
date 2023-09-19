@@ -29,6 +29,7 @@
 #include "WorldPacket.h"
 #include "Tokenize.h"
 #include "StringConvert.h"
+#include "Transmogrification.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -375,6 +376,8 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
                 stmt->SetData(++index, m_text);
+                stmt->SetData(++index, transmog);
+                stmt->SetData(++index, enchant);
                 stmt->SetData(++index, guid);
 
                 trans->Append(stmt);
@@ -512,6 +515,9 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         CharacterDatabase.Execute(stmt);
     }
 
+    transmog = fields[11].Get<uint32>();
+    enchant = fields[12].Get<uint32>();
+
     return true;
 }
 
@@ -550,6 +556,13 @@ ItemTemplate const* Item::GetTemplate() const
 Player* Item::GetOwner()const
 {
     return ObjectAccessor::FindPlayer(GetOwnerGUID());
+}
+
+void Item::SetBinding(bool val)
+{
+    ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val);
+    if (val)
+        Transmogrification::instance().AddToCollection(GetOwner(), this);
 }
 
 // Legacy / Shortcut

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Transmogrification.h"
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
@@ -4362,6 +4363,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ACCOUNT_DATA);
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
@@ -8347,6 +8352,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     // need know merged fishing/corpse loot type for achievements
     loot->loot_type = loot_type;
+
+    if (!sScriptMgr->OnAllowedToLootContainerCheck(this, guid))
+    {
+        SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
+        return;
+    }
 
     if (permission != NONE_PERMISSION)
     {
@@ -12853,7 +12864,12 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
     }
     else
     {
+        uint32 transmog = offItem->GetTransmog();
+        uint32 enchant = offItem->GetEnchant();
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
+        offItem->SetTransmog(transmog);
+        offItem->SetEnchant(enchant);
+        
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         offItem->DeleteFromInventoryDB(trans);                   // deletes item from character's inventory
         offItem->SaveToDB(trans);                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
@@ -13723,6 +13739,8 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     data << uint32(title->bit_index);
     data << uint32(lost ? 0 : 1);                           // 1 - earned, 0 - lost
     GetSession()->SendPacket(&data);
+
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK);
 }
 
 uint32 Player::GetRuneBaseCooldown(uint8 index, bool skipGrace)
@@ -15348,6 +15366,24 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
     }
 
     trans->Append(stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
+    stmt->SetData(0, GetGUID().GetCounter());
+    trans->Append(stmt);
+    for (auto&& it : presetMap)
+    {
+        if (it.second.data.empty())
+            continue;
+        std::ostringstream ss;
+        for (auto const & v : it.second.data)
+            ss << static_cast<uint32>(std::get<uint8>(v)) << ' ' << std::get<uint32>(v) << ' ' << static_cast<uint32>(std::get<AppearanceType>(v)) << ' ';
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_TRANSMOG_SETS);
+        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(1, it.first);
+        stmt->SetData(2, it.second.name);
+        stmt->SetData(3, ss.str());
+        trans->Append(stmt);
+    }
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)

@@ -28,6 +28,7 @@
 #include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Transmogrification.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -953,7 +954,8 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
             _player->ModifyMoney(-(int32)price);
             _player->RemoveItemFromBuyBackSlot(slot, false);
             _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
-            _player->StoreItem(dest, pItem, true);
+            pItem = _player->StoreItem(dest, pItem, true);
+            Transmogrification::instance().AddToCollection(_player, pItem);
         }
         else
             _player->SendEquipError(msg, pItem, nullptr);

@@ -62,6 +62,7 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Transmogrification.h"
 
  /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2904,6 +2905,8 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
 
         item_owner->RemoveTradeableItem(itemTarget);
         itemTarget->ClearSoulboundTradeable(item_owner);
+        
+        Transmogrification::instance().AddToCollection(item_owner, itemTarget);
     }
 }
 

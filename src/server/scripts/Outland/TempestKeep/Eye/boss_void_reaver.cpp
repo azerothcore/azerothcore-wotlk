@@ -29,107 +29,94 @@ enum voidReaver
     SPELL_POUNDING              = 34162,
     SPELL_ARCANE_ORB            = 34172,
     SPELL_KNOCK_AWAY            = 25778,
-    SPELL_BERSERK               = 26662,
-
-    EVENT_SPELL_POUNDING        = 1,
-    EVENT_SPELL_ARCANEORB       = 2,
-    EVENT_SPELL_KNOCK_AWAY      = 3,
-    EVENT_SPELL_BERSERK         = 4
+    SPELL_BERSERK               = 26662
 };
 
-class boss_void_reaver : public CreatureScript
+enum Groups
 {
-public:
-    boss_void_reaver() : CreatureScript("boss_void_reaver") { }
+    GROUP_ARCANE_ORB            = 1
+};
 
-    struct boss_void_reaverAI : public BossAI
+struct boss_void_reaver : public BossAI
+{
+    boss_void_reaver(Creature* creature) : BossAI(creature, DATA_REAVER)
     {
-        boss_void_reaverAI(Creature* creature) : BossAI(creature, DATA_REAVER)
+        scheduler.SetValidator([this]
         {
-            me->ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEALTH_LEECH, true);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_DRAIN, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_LEECH, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_MANA_LEECH, true);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
 
-        void Reset() override
-        {
-            BossAI::Reset();
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            Talk(SAY_AGGRO);
-            BossAI::JustEngagedWith(who);
-
-            events.ScheduleEvent(EVENT_SPELL_POUNDING, 15000);
-            events.ScheduleEvent(EVENT_SPELL_ARCANEORB, 3000);
-            events.ScheduleEvent(EVENT_SPELL_KNOCK_AWAY, 30000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
-            me->CallForHelp(105.0f);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_BERSERK:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-                case EVENT_SPELL_POUNDING:
-                    Talk(SAY_POUNDING);
-                    me->CastSpell(me, SPELL_POUNDING, false);
-                    events.ScheduleEvent(EVENT_SPELL_POUNDING, 15000);
-                    break;
-                case EVENT_SPELL_ARCANEORB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
-                        me->CastSpell(target, SPELL_ARCANE_ORB, false);
-                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
-                        me->CastSpell(target, SPELL_ARCANE_ORB, false);
-                    events.ScheduleEvent(EVENT_SPELL_ARCANEORB, 4000);
-                    break;
-                case EVENT_SPELL_KNOCK_AWAY:
-                    me->CastSpell(me->GetVictim(), SPELL_KNOCK_AWAY, false);
-                    events.ScheduleEvent(EVENT_SPELL_POUNDING, 25000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        bool CheckEvadeIfOutOfCombatArea() const override
-        {
-            return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheEyeAI<boss_void_reaverAI>(creature);
+        me->ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEALTH_LEECH, true);
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_DRAIN, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_LEECH, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_MANA_LEECH, true);
     }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        _recentlySpoken = false;
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (!_recentlySpoken)
+        {
+            Talk(SAY_SLAY);
+            _recentlySpoken = true;
+            scheduler.Schedule(5s, [this](TaskContext)
+            {
+                _recentlySpoken = false;
+            });
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        me->CallForHelp(105.0f);
+
+        scheduler.Schedule(10min, [this](TaskContext)
+        {
+            DoCastSelf(SPELL_BERSERK);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            Talk(SAY_POUNDING);
+            DoCastSelf(SPELL_POUNDING);
+            scheduler.DelayGroup(GROUP_ARCANE_ORB, 3s);
+            context.Repeat(15s);
+        }).Schedule(3s, GROUP_ARCANE_ORB, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
+                me->CastSpell(target, SPELL_ARCANE_ORB, false);
+            else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
+                me->CastSpell(target, SPELL_ARCANE_ORB, false);
+            context.Repeat(3s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_KNOCK_AWAY);
+            context.Repeat(25s);
+        });
+    }
+
+    bool CheckEvadeIfOutOfCombatArea() const override
+    {
+        return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
+    }
+
+    private:
+        bool _recentlySpoken;
 };
 
 void AddSC_boss_void_reaver()
 {
-    new boss_void_reaver();
+    RegisterTheEyeAI(boss_void_reaver);
 }

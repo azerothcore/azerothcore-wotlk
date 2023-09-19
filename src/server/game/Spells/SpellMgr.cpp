@@ -793,9 +793,9 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
                 return false;
     }
 
-    // Trap casts are active by default
-    if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
-        active = true;
+    // // Trap casts are active by default
+    // if (procFlags & PROC_FLAG_DONE_TRAP_ACTIVATION)
+    //     active = true;
 
     //if (procFlags & PROC_FLAG_DAMAGE_BLOCKED)
     //    return true;
