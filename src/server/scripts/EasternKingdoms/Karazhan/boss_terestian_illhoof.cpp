@@ -186,7 +186,7 @@ struct boss_terestian_illhoof : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
             {
                 DoCast(target, SPELL_SACRIFICE, true);
-                target->m_Events.AddEvent([target] {
+                target->m_Events.AddEventAtOffset([target] {
                     target->CastSpell(target, SPELL_SUMMON_DEMONCHAINS, true);
                 }, 1s);
 
