@@ -183,10 +183,13 @@ struct boss_terestian_illhoof : public BossAI
         DoZoneInCombat();
         scheduler.Schedule(30s, [this](TaskContext context)
         {
-            if (Unit * target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
             {
                 DoCast(target, SPELL_SACRIFICE, true);
-                target->CastSpell(target, SPELL_SUMMON_DEMONCHAINS, true);
+                target->m_Events.AddEventAtOffset([target] {
+                    target->CastSpell(target, SPELL_SUMMON_DEMONCHAINS, true);
+                }, 1s);
+
                 Talk(SAY_SACRIFICE);
                 context.Repeat(30s);
             }
