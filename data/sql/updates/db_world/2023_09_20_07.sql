@@ -1,3 +1,4 @@
+-- DB update 2023_09_20_06 -> 2023_09_20_07
 SET @Agility 	 := 3;
 SET @Strength	 := 4;
 SET @Intellect	 := 5;
