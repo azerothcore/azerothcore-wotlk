@@ -1,3 +1,4 @@
+-- DB update 2023_09_20_00 -> 2023_09_20_01
 UPDATE `quest_poi` SET `WorldMapAreaId` = 24 WHERE (`QuestID` = 7321) AND (`id` IN (0,1,2,3));
 UPDATE `quest_poi` SET `id` = 4, `ObjectiveIndex` = -1 WHERE (`QuestID` = 7321) AND (`id` = 0);
 UPDATE `quest_poi` SET `id` = 5, `Flags` = 3 WHERE (`QuestID` = 7321) AND (`id` = 1);

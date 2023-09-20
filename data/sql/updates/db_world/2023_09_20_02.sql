@@ -1,3 +1,4 @@
+-- DB update 2023_09_20_01 -> 2023_09_20_02
 
  -- Sir Wendell's Grave smart ai
 SET @ENTRY := 194537;
