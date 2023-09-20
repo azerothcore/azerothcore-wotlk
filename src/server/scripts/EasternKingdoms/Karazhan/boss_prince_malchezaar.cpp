@@ -205,13 +205,12 @@ struct boss_malchezaar : public BossAI
             });
 
             context.SetGroup(GROUP_ENFEEBLE);
-            scheduler.DelayGroup(GROUP_SHADOW_NOVA, 5s);
             context.Repeat();
         }).Schedule(35500ms, [this](TaskContext context)
         {
             DoCastAOE(SPELL_SHADOW_NOVA);
             context.SetGroup(GROUP_SHADOW_NOVA);
-            context.Repeat();
+            context.Repeat(30s);
         }).Schedule(40s, [this](TaskContext context)
         {
             if (!MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full
