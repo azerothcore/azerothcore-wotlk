@@ -55,7 +55,6 @@ enum ShadeOfAran
 
     //Creature Spells
     SPELL_CIRCULAR_BLIZZARD = 29951,
-    SPELL_WATERBOLT = 31012,
     SPELL_SHADOW_PYRO = 29978,
 
     //Creatures
@@ -491,44 +490,7 @@ private:
     uint32 _currentHealth;
 };
 
-struct npc_aran_elemental : public ScriptedAI
-{
-    npc_aran_elemental(Creature* creature) : ScriptedAI(creature)
-    {
-        SetCombatMovement(false);
-        _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        _scheduler.Schedule(2s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_WATERBOLT);
-            context.Repeat(2s);
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        _scheduler.Update(diff);
-    }
-private:
-    TaskScheduler _scheduler;
-};
-
 void AddSC_boss_shade_of_aran()
 {
     RegisterKarazhanCreatureAI(boss_shade_of_aran);
-    RegisterKarazhanCreatureAI(npc_aran_elemental);
 }
