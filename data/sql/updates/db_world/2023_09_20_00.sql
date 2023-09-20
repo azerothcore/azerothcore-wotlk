@@ -1,3 +1,4 @@
+-- DB update 2023_09_19_01 -> 2023_09_20_00
 --
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 17167;
 
