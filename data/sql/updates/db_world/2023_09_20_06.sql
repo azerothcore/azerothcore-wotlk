@@ -1,3 +1,4 @@
+-- DB update 2023_09_20_05 -> 2023_09_20_06
 -- Summoned Succubus
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5677;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5677);
