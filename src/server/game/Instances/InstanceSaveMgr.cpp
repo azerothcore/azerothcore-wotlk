@@ -675,6 +675,8 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
         stmt->SetData(1, save->GetInstanceId());
         stmt->SetData(2, permanent);
         CharacterDatabase.Execute(stmt);
+
+        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);
     }
 
     if (bind.save != save)

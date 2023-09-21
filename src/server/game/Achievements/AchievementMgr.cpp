@@ -1148,6 +1148,21 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
                     break;
                 }
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
+                {
+                    // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                    if (!miscValue1)
+                        continue;
+
+                    Map const* map = GetPlayer()->IsInWorld() ? GetPlayer()->GetMap() : sMapMgr->FindMap(GetPlayer()->GetMapId(), GetPlayer()->GetInstanceId());
+                    if (!map || !map->IsDungeon())
+                        continue;
+
+                    if (map->ToInstanceMap()->GetMaxPlayers() != achievementCriteria->complete_raid.groupSize)
+                        continue;
+                    SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
+                    break;
+                }
             case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if (!miscValue1)
@@ -1752,7 +1767,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_RATING:
                 break;
             // FIXME: not triggered in code as result, need to implement
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 break;                                   // Not implemented yet :(
         }
@@ -1924,6 +1938,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
         case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
         case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM:
