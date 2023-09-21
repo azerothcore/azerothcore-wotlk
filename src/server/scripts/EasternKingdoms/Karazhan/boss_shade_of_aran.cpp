@@ -147,12 +147,12 @@ struct boss_shade_of_aran : public BossAI
             }
         });
     }
-    
+
     bool CheckAranInRoom()
     {
         return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
-    {
-    
+    }
+
     void AttackStart(Unit* who) override
     {
         if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
@@ -455,7 +455,7 @@ struct boss_shade_of_aran : public BossAI
 
         if (!UpdateVictim())
             return;
-            
+
         if (!CheckAranInRoom())
         {
             EnterEvadeMode();
