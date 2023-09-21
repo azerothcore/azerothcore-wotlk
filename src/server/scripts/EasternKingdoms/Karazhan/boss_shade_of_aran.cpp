@@ -76,6 +76,8 @@ enum Groups
     GROUP_DRINKING      = 1
 };
 
+Position const roomCenter = {-11158.f, -1920.f};
+
 Position const elementalPos[4] =
 {
     {-11168.1f, -1939.29f, 232.092f, 1.46f},
@@ -105,7 +107,7 @@ struct boss_shade_of_aran : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        drinkScheduler.CancelAll();
+        _drinkScheduler.CancelAll();
         LastSuperSpell = rand() % 3;
 
         for (uint8 i = 0; i < 3; ++i)
@@ -144,6 +146,11 @@ struct boss_shade_of_aran : public BossAI
                 }
             }
         });
+    }
+
+    bool CheckAranInRoom()
+    {
+        return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
     }
 
     void AttackStart(Unit* who) override
@@ -216,7 +223,7 @@ struct boss_shade_of_aran : public BossAI
                 libraryDoor->SetGoState(GO_STATE_READY);
                 libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             }
-        }).Schedule(1ms, [this](TaskContext context)
+        }).Schedule(1s, [this](TaskContext context)
         {
             if (!me->IsNonMeleeSpellCast(false) && !_drinking)
             {
@@ -356,7 +363,7 @@ struct boss_shade_of_aran : public BossAI
                 me->SetStandState(UNIT_STAND_STATE_SIT);
                 DoCastSelf(SPELL_DRINK, true);
                 _currentHealth = me->GetHealth();
-                drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
+                _drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
                 {
                     //check for damage to interrupt
                     if (me->GetHealth() < _currentHealth)
@@ -367,7 +374,7 @@ struct boss_shade_of_aran : public BossAI
                         me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                         DoCastSelf(SPELL_POTION, false);
                         DoCastSelf(SPELL_AOE_PYROBLAST, false);
-                        drinkScheduler.CancelGroup(GROUP_DRINKING);
+                        _drinkScheduler.CancelGroup(GROUP_DRINKING);
                         _drinking = false;
                     } else
                     {
@@ -380,7 +387,7 @@ struct boss_shade_of_aran : public BossAI
                     me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                     DoCastSelf(SPELL_POTION, true);
                     DoCastSelf(SPELL_AOE_PYROBLAST, false);
-                    drinkScheduler.CancelGroup(GROUP_DRINKING);
+                    _drinkScheduler.CancelGroup(GROUP_DRINKING);
                     _drinking = false;
                 });
                 context.Repeat(12s); //semi-arbitrary duration to envelop drinking duration
@@ -444,12 +451,18 @@ struct boss_shade_of_aran : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        drinkScheduler.Update(diff);
+        _drinkScheduler.Update(diff);
 
         if (!UpdateVictim())
             return;
 
-        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown)
+        if (!CheckAranInRoom())
+        {
+            EnterEvadeMode();
+            return;
+        }
+
+        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown && !_drinking)
             DoMeleeAttackIfReady();
     }
 
@@ -481,7 +494,7 @@ struct boss_shade_of_aran : public BossAI
         }
     }
 private:
-    TaskScheduler drinkScheduler;
+    TaskScheduler _drinkScheduler;
 
     bool _arcaneCooledDown;
     bool _fireCooledDown;
