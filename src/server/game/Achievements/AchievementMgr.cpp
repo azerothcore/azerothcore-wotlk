@@ -759,17 +759,7 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
     data.AppendPackedTime(progress->date);
     data << uint32(timeElapsed);    // time elapsed in seconds
 
-    bool isAverageCriteria = false;
-
-    if ((sAchievementStore.LookupEntry(entry->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
-        isAverageCriteria = true;
-
-    if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(entry->referredAchievement))
-        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
-            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
-                isAverageCriteria = true;
-
-    if (isAverageCriteria)
+    if (sAchievementMgr->IsAverageCriteria(entry))
         data << uint32(GameTime::GetGameTime().count() - GetPlayer()->GetCreationTime().count());    // for average achievements
     else
         data << uint32(timeElapsed);    // time elapsed in seconds
@@ -2372,18 +2362,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
         data->AppendPackedTime(iter->second.date);
         *data << uint32(now - iter->second.date);
 
-        AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(iter->first);
-        bool isAverageCriteria = false;
-
-        if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
-            isAverageCriteria = true;
-
-        if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(criteria->referredAchievement))
-            for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
-                if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
-                    isAverageCriteria = true;
-
-        if (isAverageCriteria)
+        if (sAchievementMgr->IsAverageCriteria(sAchievementCriteriaStore.LookupEntry(iter->first)))
             *data << uint32(now - GetPlayer()->GetCreationTime().count());    // for average achievements
         else
             *data << uint32(now - iter->second.date);
@@ -2471,6 +2450,19 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
                 break;
         }
     } while (cat);
+
+    return false;
+}
+
+bool AchievementGlobalMgr::IsAverageCriteria(AchievementCriteriaEntry const* criteria) const
+{
+    if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+        return true;
+
+    if (AchievementEntryList const* achRefList = GetAchievementByReferencedId(criteria->referredAchievement))
+        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
+                return true;
 
     return false;
 }
