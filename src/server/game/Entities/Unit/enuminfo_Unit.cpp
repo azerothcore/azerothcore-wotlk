@@ -31,6 +31,7 @@ AC_API_EXPORT EnumText EnumUtils<UnitFlags>::ToString(UnitFlags value)
 {
     switch (value)
     {
+        case UNIT_FLAG_NONE: return { "UNIT_FLAG_NONE", "UNIT_FLAG_NONE", "" };
         case UNIT_FLAG_SERVER_CONTROLLED: return { "UNIT_FLAG_SERVER_CONTROLLED", "UNIT_FLAG_SERVER_CONTROLLED", "set only when unit movement is controlled by server - by SPLINE/MONSTER_MOVE packets, together with UNIT_FLAG_STUNNED; only set to units controlled by client; client function CGUnit_C::IsClientControlled returns false when set for owner" };
         case UNIT_FLAG_NON_ATTACKABLE: return { "UNIT_FLAG_NON_ATTACKABLE", "UNIT_FLAG_NON_ATTACKABLE", "not attackable" };
         case UNIT_FLAG_DISABLE_MOVE: return { "UNIT_FLAG_DISABLE_MOVE", "UNIT_FLAG_DISABLE_MOVE", "" };
@@ -68,45 +69,46 @@ AC_API_EXPORT EnumText EnumUtils<UnitFlags>::ToString(UnitFlags value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<UnitFlags>::Count() { return 32; }
+AC_API_EXPORT size_t EnumUtils<UnitFlags>::Count() { return 33; }
 
 template <>
 AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(size_t index)
 {
     switch (index)
     {
-        case 0: return UNIT_FLAG_SERVER_CONTROLLED;
-        case 1: return UNIT_FLAG_NON_ATTACKABLE;
-        case 2: return UNIT_FLAG_DISABLE_MOVE;
-        case 3: return UNIT_FLAG_PLAYER_CONTROLLED;
-        case 4: return UNIT_FLAG_RENAME;
-        case 5: return UNIT_FLAG_PREPARATION;
-        case 6: return UNIT_FLAG_UNK_6;
-        case 7: return UNIT_FLAG_NOT_ATTACKABLE_1;
-        case 8: return UNIT_FLAG_IMMUNE_TO_PC;
-        case 9: return UNIT_FLAG_IMMUNE_TO_NPC;
-        case 10: return UNIT_FLAG_LOOTING;
-        case 11: return UNIT_FLAG_PET_IN_COMBAT;
-        case 12: return UNIT_FLAG_PVP;
-        case 13: return UNIT_FLAG_SILENCED;
-        case 14: return UNIT_FLAG_CANNOT_SWIM;
-        case 15: return UNIT_FLAG_SWIMMING;
-        case 16: return UNIT_FLAG_NON_ATTACKABLE_2;
-        case 17: return UNIT_FLAG_PACIFIED;
-        case 18: return UNIT_FLAG_STUNNED;
-        case 19: return UNIT_FLAG_IN_COMBAT;
-        case 20: return UNIT_FLAG_TAXI_FLIGHT;
-        case 21: return UNIT_FLAG_DISARMED;
-        case 22: return UNIT_FLAG_CONFUSED;
-        case 23: return UNIT_FLAG_FLEEING;
-        case 24: return UNIT_FLAG_POSSESSED;
-        case 25: return UNIT_FLAG_NOT_SELECTABLE;
-        case 26: return UNIT_FLAG_SKINNABLE;
-        case 27: return UNIT_FLAG_MOUNT;
-        case 28: return UNIT_FLAG_UNK_28;
-        case 29: return UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT;
-        case 30: return UNIT_FLAG_SHEATHE;
-        case 31: return UNIT_FLAG_IMMUNE;
+        case 0: return UNIT_FLAG_NONE;
+        case 1: return UNIT_FLAG_SERVER_CONTROLLED;
+        case 2: return UNIT_FLAG_NON_ATTACKABLE;
+        case 3: return UNIT_FLAG_DISABLE_MOVE;
+        case 4: return UNIT_FLAG_PLAYER_CONTROLLED;
+        case 5: return UNIT_FLAG_RENAME;
+        case 6: return UNIT_FLAG_PREPARATION;
+        case 7: return UNIT_FLAG_UNK_6;
+        case 8: return UNIT_FLAG_NOT_ATTACKABLE_1;
+        case 9: return UNIT_FLAG_IMMUNE_TO_PC;
+        case 10: return UNIT_FLAG_IMMUNE_TO_NPC;
+        case 11: return UNIT_FLAG_LOOTING;
+        case 12: return UNIT_FLAG_PET_IN_COMBAT;
+        case 13: return UNIT_FLAG_PVP;
+        case 14: return UNIT_FLAG_SILENCED;
+        case 15: return UNIT_FLAG_CANNOT_SWIM;
+        case 16: return UNIT_FLAG_SWIMMING;
+        case 17: return UNIT_FLAG_NON_ATTACKABLE_2;
+        case 18: return UNIT_FLAG_PACIFIED;
+        case 19: return UNIT_FLAG_STUNNED;
+        case 20: return UNIT_FLAG_IN_COMBAT;
+        case 21: return UNIT_FLAG_TAXI_FLIGHT;
+        case 22: return UNIT_FLAG_DISARMED;
+        case 23: return UNIT_FLAG_CONFUSED;
+        case 24: return UNIT_FLAG_FLEEING;
+        case 25: return UNIT_FLAG_POSSESSED;
+        case 26: return UNIT_FLAG_NOT_SELECTABLE;
+        case 27: return UNIT_FLAG_SKINNABLE;
+        case 28: return UNIT_FLAG_MOUNT;
+        case 29: return UNIT_FLAG_UNK_28;
+        case 30: return UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT;
+        case 31: return UNIT_FLAG_SHEATHE;
+        case 32: return UNIT_FLAG_IMMUNE;
         default: throw std::out_of_range("index");
     }
 }
@@ -116,38 +118,39 @@ AC_API_EXPORT size_t EnumUtils<UnitFlags>::ToIndex(UnitFlags value)
 {
     switch (value)
     {
-        case UNIT_FLAG_SERVER_CONTROLLED: return 0;
-        case UNIT_FLAG_NON_ATTACKABLE: return 1;
-        case UNIT_FLAG_DISABLE_MOVE: return 2;
-        case UNIT_FLAG_PLAYER_CONTROLLED: return 3;
-        case UNIT_FLAG_RENAME: return 4;
-        case UNIT_FLAG_PREPARATION: return 5;
-        case UNIT_FLAG_UNK_6: return 6;
-        case UNIT_FLAG_NOT_ATTACKABLE_1: return 7;
-        case UNIT_FLAG_IMMUNE_TO_PC: return 8;
-        case UNIT_FLAG_IMMUNE_TO_NPC: return 9;
-        case UNIT_FLAG_LOOTING: return 10;
-        case UNIT_FLAG_PET_IN_COMBAT: return 11;
-        case UNIT_FLAG_PVP: return 12;
-        case UNIT_FLAG_SILENCED: return 13;
-        case UNIT_FLAG_CANNOT_SWIM: return 14;
-        case UNIT_FLAG_SWIMMING: return 15;
-        case UNIT_FLAG_NON_ATTACKABLE_2: return 16;
-        case UNIT_FLAG_PACIFIED: return 17;
-        case UNIT_FLAG_STUNNED: return 18;
-        case UNIT_FLAG_IN_COMBAT: return 19;
-        case UNIT_FLAG_TAXI_FLIGHT: return 20;
-        case UNIT_FLAG_DISARMED: return 21;
-        case UNIT_FLAG_CONFUSED: return 22;
-        case UNIT_FLAG_FLEEING: return 23;
-        case UNIT_FLAG_POSSESSED: return 24;
-        case UNIT_FLAG_NOT_SELECTABLE: return 25;
-        case UNIT_FLAG_SKINNABLE: return 26;
-        case UNIT_FLAG_MOUNT: return 27;
-        case UNIT_FLAG_UNK_28: return 28;
-        case UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT: return 29;
-        case UNIT_FLAG_SHEATHE: return 30;
-        case UNIT_FLAG_IMMUNE: return 31;
+        case UNIT_FLAG_NONE: return 0;
+        case UNIT_FLAG_SERVER_CONTROLLED: return 1;
+        case UNIT_FLAG_NON_ATTACKABLE: return 2;
+        case UNIT_FLAG_DISABLE_MOVE: return 3;
+        case UNIT_FLAG_PLAYER_CONTROLLED: return 4;
+        case UNIT_FLAG_RENAME: return 5;
+        case UNIT_FLAG_PREPARATION: return 6;
+        case UNIT_FLAG_UNK_6: return 7;
+        case UNIT_FLAG_NOT_ATTACKABLE_1: return 8;
+        case UNIT_FLAG_IMMUNE_TO_PC: return 9;
+        case UNIT_FLAG_IMMUNE_TO_NPC: return 10;
+        case UNIT_FLAG_LOOTING: return 11;
+        case UNIT_FLAG_PET_IN_COMBAT: return 12;
+        case UNIT_FLAG_PVP: return 13;
+        case UNIT_FLAG_SILENCED: return 14;
+        case UNIT_FLAG_CANNOT_SWIM: return 15;
+        case UNIT_FLAG_SWIMMING: return 16;
+        case UNIT_FLAG_NON_ATTACKABLE_2: return 17;
+        case UNIT_FLAG_PACIFIED: return 18;
+        case UNIT_FLAG_STUNNED: return 19;
+        case UNIT_FLAG_IN_COMBAT: return 20;
+        case UNIT_FLAG_TAXI_FLIGHT: return 21;
+        case UNIT_FLAG_DISARMED: return 22;
+        case UNIT_FLAG_CONFUSED: return 23;
+        case UNIT_FLAG_FLEEING: return 24;
+        case UNIT_FLAG_POSSESSED: return 25;
+        case UNIT_FLAG_NOT_SELECTABLE: return 26;
+        case UNIT_FLAG_SKINNABLE: return 27;
+        case UNIT_FLAG_MOUNT: return 28;
+        case UNIT_FLAG_UNK_28: return 29;
+        case UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT: return 30;
+        case UNIT_FLAG_SHEATHE: return 31;
+        case UNIT_FLAG_IMMUNE: return 32;
         default: throw std::out_of_range("value");
     }
 }
@@ -187,12 +190,13 @@ AC_API_EXPORT EnumText EnumUtils<NPCFlags>::ToString(NPCFlags value)
         case UNIT_NPC_FLAG_SPELLCLICK: return { "UNIT_NPC_FLAG_SPELLCLICK", "has spell click enabled", "cause client to send 1015 opcode (spell click)" };
         case UNIT_NPC_FLAG_PLAYER_VEHICLE: return { "UNIT_NPC_FLAG_PLAYER_VEHICLE", "is player vehicle", "players with mounts that have vehicle data should have it set" };
         case UNIT_NPC_FLAG_MAILBOX: return { "UNIT_NPC_FLAG_MAILBOX", "is mailbox", "" };
+        case UNIT_NPC_FLAG_VENDOR_MASK: return { "UNIT_NPC_FLAG_VENDOR_MASK", "UNIT_NPC_FLAG_VENDOR_MASK", "" };
         default: throw std::out_of_range("value");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<NPCFlags>::Count() { return 27; }
+AC_API_EXPORT size_t EnumUtils<NPCFlags>::Count() { return 28; }
 
 template <>
 AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(size_t index)
@@ -226,6 +230,7 @@ AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(size_t index)
         case 24: return UNIT_NPC_FLAG_SPELLCLICK;
         case 25: return UNIT_NPC_FLAG_PLAYER_VEHICLE;
         case 26: return UNIT_NPC_FLAG_MAILBOX;
+        case 27: return UNIT_NPC_FLAG_VENDOR_MASK;
         default: throw std::out_of_range("index");
     }
 }
@@ -262,6 +267,7 @@ AC_API_EXPORT size_t EnumUtils<NPCFlags>::ToIndex(NPCFlags value)
         case UNIT_NPC_FLAG_SPELLCLICK: return 24;
         case UNIT_NPC_FLAG_PLAYER_VEHICLE: return 25;
         case UNIT_NPC_FLAG_MAILBOX: return 26;
+        case UNIT_NPC_FLAG_VENDOR_MASK: return 27;
         default: throw std::out_of_range("value");
     }
 }

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_SPLINE_H
-#define TRINITYSERVER_SPLINE_H
+#ifndef AC_SPLINE_H
+#define AC_SPLINE_H
 
 #include "Errors.h"
 #include "MovementTypedefs.h"
@@ -210,4 +210,4 @@ namespace Movement
 
 #include "SplineImpl.h"
 
-#endif // TRINITYSERVER_SPLINE_H
+#endif // AC_SPLINE_H

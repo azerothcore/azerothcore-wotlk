@@ -758,7 +758,12 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
         data << uint32(timedCompleted ? 0 : 1); // 1 is for keeping the counter at 0 in client
     data.AppendPackedTime(progress->date);
     data << uint32(timeElapsed);    // time elapsed in seconds
-    data << uint32(0);              // unk
+
+    if (sAchievementMgr->IsAverageCriteria(entry))
+        data << uint32(GameTime::GetGameTime().count() - GetPlayer()->GetCreationTime().count());    // for average achievements
+    else
+        data << uint32(timeElapsed);    // time elapsed in seconds
+
     GetPlayer()->SendDirectMessage(&data);
 }
 
@@ -2356,7 +2361,11 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
         *data << uint32(0); /// @todo: This should be 1 if it is a failed timed criteria
         data->AppendPackedTime(iter->second.date);
         *data << uint32(now - iter->second.date);
-        *data << uint32(now - iter->second.date);
+
+        if (sAchievementMgr->IsAverageCriteria(sAchievementCriteriaStore.LookupEntry(iter->first)))
+            *data << uint32(now - GetPlayer()->GetCreationTime().count());    // for average achievements
+        else
+            *data << uint32(now - iter->second.date);
     }
 
     *data << int32(-1);
@@ -2441,6 +2450,19 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
                 break;
         }
     } while (cat);
+
+    return false;
+}
+
+bool AchievementGlobalMgr::IsAverageCriteria(AchievementCriteriaEntry const* criteria) const
+{
+    if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+        return true;
+
+    if (AchievementEntryList const* achRefList = GetAchievementByReferencedId(criteria->referredAchievement))
+        for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+            if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
+                return true;
 
     return false;
 }
