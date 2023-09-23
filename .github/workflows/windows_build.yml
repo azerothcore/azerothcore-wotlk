@@ -45,7 +45,7 @@ jobs:
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/Program Files/OpenSSL/bin/legacy.dll" "env/dist"
+          cp "/c/Program Files/OpenSSL-Win64/bin/legacy.dll" "env/dist"
       - name: Dry run authserver
         shell: bash
         run: |
