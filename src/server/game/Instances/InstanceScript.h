@@ -20,6 +20,7 @@
 
 #include "CreatureAI.h"
 #include "ObjectMgr.h"
+#include "TaskScheduler.h"
 #include "World.h"
 #include "ZoneScript.h"
 #include <set>
@@ -159,7 +160,7 @@ public:
 
     void SaveToDB();
 
-    virtual void Update(uint32 /*diff*/) {}
+    virtual void Update(uint32 /*diff*/);
 
     //Used by the map's CanEnter function.
     //This is to prevent players from entering during boss encounters.
@@ -270,6 +271,8 @@ public:
 
     // Allows executing code using all creatures registered in the instance script as minions
     void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
+
+    TaskScheduler scheduler;
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }

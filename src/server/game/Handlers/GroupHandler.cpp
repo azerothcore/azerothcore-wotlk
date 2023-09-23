@@ -542,6 +542,9 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
         case ROLL_GREED:
             GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED, 1);
             break;
+        case ROLL_DISENCHANT:
+            GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_DISENCHANT, 1);
+            break;
     }
 }
 

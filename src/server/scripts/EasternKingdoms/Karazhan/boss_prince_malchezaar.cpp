@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "karazhan.h"
 
 enum PrinceSay
@@ -156,7 +157,6 @@ struct boss_malchezaar : public BossAI
         if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
         {
             infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-            relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
             relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
             infernal->SetFaction(me->GetFaction());
             infernal->SetControlled(true, UNIT_STATE_ROOT);
@@ -197,7 +197,7 @@ struct boss_malchezaar : public BossAI
 
         scheduler.Schedule(30s, [this](TaskContext context)
         {
-            EnfeebleHealthEffect();
+            DoCastAOE(SPELL_ENFEEBLE);
 
             scheduler.Schedule(9s, [this](TaskContext)
             {
@@ -246,23 +246,12 @@ struct boss_malchezaar : public BossAI
         });
     }
 
-    void EnfeebleHealthEffect()
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        std::list<Unit*> targetList;
-        SelectTargetList(targetList, 5, SelectTargetMethod::Random, 1, [&](Unit* u) { return u->IsAlive() && u->IsPlayer(); });
-
-        if (targetList.empty())
-            return;
-
-        for (auto const& target : targetList)
+        if (spell->Id == SPELL_ENFEEBLE)
         {
-            if (target)
-            {
-                _enfeebleTargets[target->GetGUID()] = target->GetHealth();
-
-                me->CastSpell(target, SPELL_ENFEEBLE, true);
-                target->SetHealth(1);
-            }
+            _enfeebleTargets[target->GetGUID()] = target->GetHealth();
+            target->SetHealth(1);
         }
     }
 
@@ -378,9 +367,43 @@ struct npc_malchezaar_axe : public ScriptedAI
         TaskScheduler _scheduler;
 };
 
+// 30843 - Enfeeble
+class spell_malchezaar_enfeeble : public SpellScript
+{
+    PrepareSpellScript(spell_malchezaar_enfeeble);
+
+    bool Load() override
+    {
+        return GetCaster()->ToCreature();
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint8 maxSize = 5;
+        Unit* caster = GetCaster();
+
+        targets.remove_if([caster](WorldObject const* target) -> bool
+        {
+            // Should not target current victim.
+            return caster->GetVictim() == target;
+        });
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_malchezaar_enfeeble::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_malchezaar()
 {
     RegisterKarazhanCreatureAI(boss_malchezaar);
     RegisterKarazhanCreatureAI(npc_malchezaar_axe);
     RegisterKarazhanCreatureAI(npc_netherspite_infernal);
+    RegisterSpellScript(spell_malchezaar_enfeeble);
 }

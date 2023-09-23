@@ -57,6 +57,7 @@ namespace WorldPackets
         class AC_GAME_API PlayMusic final : public ServerPacket
         {
         public:
+            // cppcheck-suppress missingReturn
             PlayMusic() : ServerPacket(SMSG_PLAY_MUSIC, 4) { }
             PlayMusic(uint32 soundKitID) : ServerPacket(SMSG_PLAY_MUSIC, 4), SoundKitID(soundKitID) { }
 
@@ -68,6 +69,7 @@ namespace WorldPackets
         class AC_GAME_API PlayObjectSound final : public ServerPacket
         {
         public:
+            // cppcheck-suppress missingReturn
             PlayObjectSound() : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8) { }
             PlayObjectSound(ObjectGuid const& sourceObjectGUID, uint32 soundKitID)
                 : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8), SourceObjectGUID(sourceObjectGUID), SoundKitID(soundKitID) { }
@@ -82,6 +84,7 @@ namespace WorldPackets
         class AC_GAME_API Playsound final : public ServerPacket
         {
         public:
+            // cppcheck-suppress missingReturn
             Playsound() : ServerPacket(SMSG_PLAY_SOUND, 4) { }
             Playsound(uint32 soundKitID) : ServerPacket(SMSG_PLAY_SOUND, 4), SoundKitID(soundKitID) { }
 

@@ -146,6 +146,18 @@ class spell_dk_raise_ally : public SpellScript
 {
     PrepareSpellScript(spell_dk_raise_ally);
 
+    SpellCastResult CheckCast()
+    {
+        Player* unitTarget = GetHitPlayer();
+        if (!unitTarget)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        if (unitTarget->IsAlive()) // not discovered attributeEx5?
+            return SPELL_FAILED_TARGET_NOT_DEAD;
+
+        return SPELL_CAST_OK;
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Player* unitTarget = GetHitPlayer())
@@ -237,6 +249,7 @@ class spell_dk_raise_ally : public SpellScript
 
     void Register() override
     {
+        OnCheckCast += SpellCheckCastFn(spell_dk_raise_ally::CheckCast);
         OnEffectHitTarget += SpellEffectFn(spell_dk_raise_ally::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };

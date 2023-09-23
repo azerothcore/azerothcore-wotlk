@@ -222,6 +222,11 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
     }
 }
 
+void InstanceScript::Update(uint32 diff)
+{
+    scheduler.Update(diff);
+}
+
 void InstanceScript::UpdateDoorState(GameObject* door)
 {
     DoorInfoMapBounds range = doors.equal_range(door->GetEntry());

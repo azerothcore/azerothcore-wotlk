@@ -210,15 +210,9 @@ public:
             return true;
         }
 
-        void Update(uint32 diff) override
-        {
-            scheduler.Update(diff);
-        }
-
     private:
         GuidVector CThunGraspGUIDs;
         uint32 BugTrioDeathCount;
-        TaskScheduler scheduler;
     };
 };
 

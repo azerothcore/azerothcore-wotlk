@@ -117,6 +117,7 @@ enum KZCreatures
     NPC_ROAR                            = 17546,
     NPC_STRAWMAN                        = 17543,
     NPC_TINHEAD                         = 17547,
+    NPC_FIENDISH_IMP                    = 17267,
 
     // Chess Event
     NPC_ECHO_OF_MEDIVH                  = 16816,

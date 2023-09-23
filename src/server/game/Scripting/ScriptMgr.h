@@ -1474,6 +1474,16 @@ public:
      */
     virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
+    /**
+     * @brief This hook called before other CanFlyChecks are applied
+     *
+     * @param player Contains information about the Player
+     * @param mapId Contains information about the current map id
+     * @param zoneId Contains information about the current zone
+     * @param bySpell Contains information about the spell that invoked the check
+     */
+    [[nodiscard]] virtual bool OnCanPlayerFlyInZone(Player* /*player*/, uint32 /*mapId*/, uint32 /*zoneId*/, SpellInfo const* /*bySpell*/) { return true; }
+
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
@@ -2438,6 +2448,7 @@ public: /* PlayerScript */
     bool CanSendErrorAlreadyLooted(Player* player);
     void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
+    bool OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
