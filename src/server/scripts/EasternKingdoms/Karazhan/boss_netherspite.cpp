@@ -218,13 +218,17 @@ struct boss_netherspite : public BossAI
             }
         }).Schedule(10s, PORTAL_PHASE, [this](TaskContext context)
         {
-                UpdatePortals();
-                context.Repeat(1s);
+            UpdatePortals();
+            context.Repeat(1s);
         }).Schedule(10s, PORTAL_PHASE, [this](TaskContext context)
         {
-                DoCastSelf(SPELL_EMPOWERMENT);
-                me->AddAura(SPELL_NETHERBURN_AURA, me);
-                context.Repeat(90s);
+            DoCastSelf(SPELL_EMPOWERMENT);
+            me->AddAura(SPELL_NETHERBURN_AURA, me);
+            context.Repeat(90s);
+        }).Schedule(15s, PORTAL_PHASE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
+            context.Repeat(15s);
         });
         Talk(EMOTE_PHASE_PORTAL);
     }
@@ -237,13 +241,10 @@ struct boss_netherspite : public BossAI
         DoCastSelf(SPELL_BANISH_VISUAL, true);
         DoCastSelf(SPELL_BANISH_ROOT, true);
         DestroyPortals();
-        scheduler.Schedule(30s, [this](TaskContext /*context*/)
+        scheduler.Schedule(30s, [this](TaskContext)
         {
-            if (!me->IsNonMeleeSpellCast(false))
-            {
-                SwitchToPortalPhase();
-                return;
-            }
+            SwitchToPortalPhase();
+            return;
         }).Schedule(10s, VANISH_PHASE, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
@@ -270,11 +271,7 @@ struct boss_netherspite : public BossAI
         HandleDoors(false);
         SwitchToPortalPhase();
         DoZoneInCombat();
-        scheduler.Schedule(15s, [this](TaskContext context)
-        {
-            DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
-            context.Repeat(15s);
-        }).Schedule(9min, [this](TaskContext /*context*/)
+        scheduler.Schedule(9min, [this](TaskContext /*context*/)
         {
             if (!berserk)
             {

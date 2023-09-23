@@ -398,6 +398,4 @@ void Log::LoadFromConfig()
 
     ReadAppendersFromConfig();
     ReadLoggersFromConfig();
-
-    _debugLogMask = DebugLogFilters(sConfigMgr->GetOption<uint32>("DebugLogMask", LOG_FILTER_NONE, false));
 }

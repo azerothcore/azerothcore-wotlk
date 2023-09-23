@@ -44,6 +44,7 @@ ObjectData const creatureData[] =
     { NPC_ROMULO,               DATA_ROMULO    },
     { NPC_JULIANNE,             DATA_JULIANNE  },
     { NPC_NIGHTBANE,            DATA_NIGHTBANE },
+    { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
     { 0,                        0              }
 };
 
@@ -121,6 +122,16 @@ public:
                     break;
                 case NPC_ECHO_OF_MEDIVH:
                     _echoOfMedivhGUID = creature->GetGUID();
+                    break;
+                case NPC_FIENDISH_IMP:
+                    if (Creature* terestrian = GetCreature(DATA_TERESTIAN))
+                    {
+                        if (terestrian->AI())
+                        {
+                            terestrian->AI()->JustSummoned(creature);
+                            creature->SetInCombatWithZone();
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -252,7 +263,6 @@ public:
                             piece->NearTeleportTo(x, y, z, o);
                             piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
                             piece->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            piece->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             piece->AI()->Reset();
                         }
                     }

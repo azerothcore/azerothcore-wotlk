@@ -55,7 +55,6 @@ enum ShadeOfAran
 
     //Creature Spells
     SPELL_CIRCULAR_BLIZZARD = 29951,
-    SPELL_WATERBOLT = 31012,
     SPELL_SHADOW_PYRO = 29978,
 
     //Creatures
@@ -76,6 +75,8 @@ enum Groups
     GROUP_FLAMEWREATH   = 0,
     GROUP_DRINKING      = 1
 };
+
+Position const roomCenter = {-11158.f, -1920.f};
 
 Position const elementalPos[4] =
 {
@@ -103,12 +104,10 @@ struct boss_shade_of_aran : public BossAI
 
     uint32 CurrentNormalSpell;
 
-    bool Drinking;
-
     void Reset() override
     {
         BossAI::Reset();
-        drinkScheduler.CancelAll();
+        _drinkScheduler.CancelAll();
         LastSuperSpell = rand() % 3;
 
         for (uint8 i = 0; i < 3; ++i)
@@ -120,7 +119,7 @@ struct boss_shade_of_aran : public BossAI
         _fireCooledDown = true;
         _frostCooledDown = true;
 
-        Drinking = false;
+        _drinking = false;
 
         // Not in progress
         instance->SetData(DATA_ARAN, NOT_STARTED);
@@ -147,6 +146,23 @@ struct boss_shade_of_aran : public BossAI
                 }
             }
         });
+    }
+
+    bool CheckAranInRoom()
+    {
+        return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
+            }
+        }
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -207,9 +223,9 @@ struct boss_shade_of_aran : public BossAI
                 libraryDoor->SetGoState(GO_STATE_READY);
                 libraryDoor->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             }
-        }).Schedule(1ms, [this](TaskContext context)
+        }).Schedule(1s, [this](TaskContext context)
         {
-            if (!me->IsNonMeleeSpellCast(false))
+            if (!me->IsNonMeleeSpellCast(false) && !_drinking)
             {
                 Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
                 if (!target)
@@ -242,93 +258,144 @@ struct boss_shade_of_aran : public BossAI
                     DoCast(target, CurrentNormalSpell);
                 }
             }
-            context.Repeat(10s);
+            context.Repeat(2s);
         }).Schedule(5s, [this](TaskContext context)
         {
-            switch (urand(0, 1))
+            if (!_drinking)
             {
-                case 0:
-                    DoCastSelf(SPELL_AOE_CS);
-                    break;
-                case 1:
-                    DoCastRandomTarget(SPELL_CHAINSOFICE);
-                    break;
+                switch (urand(0, 1))
+                {
+                    case 0:
+                        DoCastSelf(SPELL_AOE_CS);
+                        break;
+                    case 1:
+                        DoCastRandomTarget(SPELL_CHAINSOFICE);
+                        break;
+                }
             }
             context.Repeat(5s, 20s);
         }).Schedule(35s, [this](TaskContext context)
         {
-            uint8 Available[2];
-
-            switch (LastSuperSpell)
+            if (!_drinking)
             {
-                case SUPER_AE:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_FLAME:
-                    Available[0] = SUPER_AE;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_BLIZZARD:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_AE;
-                    break;
-            }
+                uint8 Available[2];
 
-            LastSuperSpell = Available[urand(0, 1)];
+                switch (LastSuperSpell)
+                {
+                    case SUPER_AE:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_FLAME:
+                        Available[0] = SUPER_AE;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_BLIZZARD:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_AE;
+                        break;
+                }
 
-            switch (LastSuperSpell)
-            {
-                case SUPER_AE:
-                    Talk(SAY_EXPLOSION);
+                LastSuperSpell = Available[urand(0, 1)];
 
-                    DoCastSelf(SPELL_BLINK_CENTER, true);
-                    DoCastSelf(SPELL_PLAYERPULL, true);
-                    DoCastSelf(SPELL_MASSSLOW, true);
-                    DoCastSelf(SPELL_AEXPLOSION, false);
-                    break;
+                switch (LastSuperSpell)
+                {
+                    case SUPER_AE:
+                        Talk(SAY_EXPLOSION);
 
-                case SUPER_FLAME:
-                    Talk(SAY_FLAMEWREATH);
+                        DoCastSelf(SPELL_BLINK_CENTER, true);
+                        DoCastSelf(SPELL_PLAYERPULL, true);
+                        DoCastSelf(SPELL_MASSSLOW, true);
+                        DoCastSelf(SPELL_AEXPLOSION, false);
+                        break;
 
-                    scheduler.Schedule(20s, GROUP_FLAMEWREATH, [this](TaskContext)
-                    {
-                        scheduler.CancelGroup(GROUP_FLAMEWREATH);
-                    }).Schedule(500ms, GROUP_FLAMEWREATH, [this](TaskContext context)
-                    {
-                        for (uint8 i = 0; i < 3; ++i)
+                    case SUPER_FLAME:
+                        Talk(SAY_FLAMEWREATH);
+
+                        scheduler.Schedule(20s, GROUP_FLAMEWREATH, [this](TaskContext)
                         {
-                            if (!FlameWreathTarget[i])
-                                continue;
-
-                            Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
-                            if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
+                            scheduler.CancelGroup(GROUP_FLAMEWREATH);
+                        }).Schedule(500ms, GROUP_FLAMEWREATH, [this](TaskContext context)
+                        {
+                            for (uint8 i = 0; i < 3; ++i)
                             {
-                                unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
-                                FlameWreathTarget[i].Clear();
+                                if (!FlameWreathTarget[i])
+                                    continue;
+
+                                Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
+                                if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
+                                {
+                                    unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
+                                    FlameWreathTarget[i].Clear();
+                                }
                             }
+                            context.Repeat(500ms);
+                        });
+
+                        FlameWreathTarget[0].Clear();
+                        FlameWreathTarget[1].Clear();
+                        FlameWreathTarget[2].Clear();
+
+                        FlameWreathEffect();
+                        break;
+
+                    case SUPER_BLIZZARD:
+                        Talk(SAY_BLIZZARD);
+
+                        if (Creature* pSpawn = me->SummonCreature(NPC_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                        {
+                            pSpawn->SetFaction(me->GetFaction());
+                            pSpawn->CastSpell(me, SPELL_CIRCULAR_BLIZZARD, false);
                         }
-                        context.Repeat(500ms);
-                    });
-
-                    FlameWreathTarget[0].Clear();
-                    FlameWreathTarget[1].Clear();
-                    FlameWreathTarget[2].Clear();
-
-                    FlameWreathEffect();
-                    break;
-
-                case SUPER_BLIZZARD:
-                    Talk(SAY_BLIZZARD);
-
-                    if (Creature* pSpawn = me->SummonCreature(NPC_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
-                    {
-                        pSpawn->SetFaction(me->GetFaction());
-                        pSpawn->CastSpell(me, SPELL_CIRCULAR_BLIZZARD, false);
-                    }
-                    break;
+                        break;
+                }
             }
             context.Repeat(35s, 40s);
+        }).Schedule(1s, [this](TaskContext context){
+            if (me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
+            {
+                _drinking = true;
+                me->InterruptNonMeleeSpells(true);
+                Talk(SAY_DRINK);
+                DoCastSelf(SPELL_MASS_POLY, true);
+                DoCastSelf(SPELL_CONJURE, false);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetStandState(UNIT_STAND_STATE_SIT);
+                DoCastSelf(SPELL_DRINK, true);
+                _currentHealth = me->GetHealth();
+                _drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
+                {
+                    //check for damage to interrupt
+                    if (me->GetHealth() < _currentHealth)
+                    {
+                        me->RemoveAurasDueToSpell(SPELL_DRINK);
+                        me->SetStandState(UNIT_STAND_STATE_STAND);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
+                        DoCastSelf(SPELL_POTION, false);
+                        DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                        _drinkScheduler.CancelGroup(GROUP_DRINKING);
+                        _drinking = false;
+                    } else
+                    {
+                        context.Repeat(500ms);
+                    }
+                }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
+                {
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
+                    DoCastSelf(SPELL_POTION, true);
+                    DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                    _drinkScheduler.CancelGroup(GROUP_DRINKING);
+                    _drinking = false;
+                });
+                context.Repeat(12s); //semi-arbitrary duration to envelop drinking duration
+            }
+            else
+            {
+                context.Repeat(1s);
+            }
         }).Schedule(12min, [this](TaskContext context)
         {
             for (uint32 i = 0; i < 5; ++i)
@@ -384,68 +451,19 @@ struct boss_shade_of_aran : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        drinkScheduler.Update(diff);
+        _drinkScheduler.Update(diff);
 
         if (!UpdateVictim())
             return;
 
-        if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
+        if (!CheckAranInRoom())
         {
-            Drinking = true;
-            me->InterruptNonMeleeSpells(false);
-
-            Talk(SAY_DRINK);
-
-            scheduler.DelayAll(10s);
-            DoCastSelf(SPELL_MASS_POLY, true);
-            DoCastSelf(SPELL_CONJURE, false);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
-            DoCastSelf(SPELL_DRINK, true);
-            _currentHealth = me->GetHealth();
-            drinkScheduler.Schedule(500ms, GROUP_DRINKING, [this](TaskContext context)
-            {
-                //check for damage to interrupt
-                if(CheckDamageDuringDrinking(_currentHealth))
-                {
-                    Drinking = false;
-                    me->RemoveAurasDueToSpell(SPELL_DRINK);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
-                    DoCastSelf(SPELL_POTION, false);
-                    DoCastSelf(SPELL_AOE_PYROBLAST, false);
-                    drinkScheduler.CancelGroup(GROUP_DRINKING);
-                } else {
-                    context.Repeat(500ms);
-                }
-            }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
-            {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
-                DoCastSelf(SPELL_POTION, true);
-                DoCastSelf(SPELL_AOE_PYROBLAST, false);
-
-                Drinking = false;
-                drinkScheduler.CancelGroup(GROUP_DRINKING);
-            });
+            EnterEvadeMode();
+            return;
         }
 
-        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown && !Drinking)
+        if (_arcaneCooledDown && _fireCooledDown && _frostCooledDown && !_drinking)
             DoMeleeAttackIfReady();
-    }
-
-    bool CheckDamageDuringDrinking(uint32 oldHealth)
-    {
-        if (Drinking)
-        {
-            if (me->GetHealth() < oldHealth)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
@@ -476,52 +494,16 @@ struct boss_shade_of_aran : public BossAI
         }
     }
 private:
-    TaskScheduler drinkScheduler;
+    TaskScheduler _drinkScheduler;
 
     bool _arcaneCooledDown;
     bool _fireCooledDown;
     bool _frostCooledDown;
+    bool _drinking;
     uint32 _currentHealth;
-};
-
-struct npc_aran_elemental : public ScriptedAI
-{
-    npc_aran_elemental(Creature* creature) : ScriptedAI(creature)
-    {
-        SetCombatMovement(false);
-        _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        _scheduler.Schedule(2s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_WATERBOLT);
-            context.Repeat(2s);
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        _scheduler.Update(diff);
-    }
-private:
-    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_shade_of_aran()
 {
     RegisterKarazhanCreatureAI(boss_shade_of_aran);
-    RegisterKarazhanCreatureAI(npc_aran_elemental);
 }

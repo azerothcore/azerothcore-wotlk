@@ -1474,6 +1474,16 @@ public:
      */
     virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
+    /**
+     * @brief This hook called before other CanFlyChecks are applied
+     *
+     * @param player Contains information about the Player
+     * @param mapId Contains information about the current map id
+     * @param zoneId Contains information about the current zone
+     * @param bySpell Contains information about the spell that invoked the check
+     */
+    [[nodiscard]] virtual bool OnCanPlayerFlyInZone(Player* /*player*/, uint32 /*mapId*/, uint32 /*zoneId*/, SpellInfo const* /*bySpell*/) { return true; }
+
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
@@ -1648,8 +1658,11 @@ public:
     // Called after loading spell dbc corrections
     virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
 
-    // Called when checking if a player can see the creature loot
+    // Called when checking if a player can see the creature loot item
     virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
+
+    // Called when checking if a player can see the creature loot (if it can click the corpse f.e)
+    virtual bool OnAllowedToLootContainerCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
 
     // Called when instance id is removed from database (e.g. instance reset)
     virtual void OnInstanceIdRemoved(uint32 /*instanceId*/) { }
@@ -2474,6 +2487,7 @@ public: /* PlayerScript */
     bool CanSendErrorAlreadyLooted(Player* player);
     void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
+    bool OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
 
     // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
@@ -2535,6 +2549,7 @@ public: /* GlobalScript */
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
     void OnLoadSpellCustomAttr(SpellInfo* spell);
     bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
+    bool OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source);
     void OnInstanceIdRemoved(uint32 instanceId);
     void OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance);
 

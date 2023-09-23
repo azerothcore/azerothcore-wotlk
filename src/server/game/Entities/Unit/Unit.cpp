@@ -13973,6 +13973,9 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     // additional checks - only PvP case
     if (playerAffectingAttacker && playerAffectingTarget)
     {
+        if (!IsPvP() && bySpell && bySpell->IsAffectingArea() && !bySpell->HasAttribute(SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK))
+            return false;
+
         if (target->IsPvP())
             return true;
 

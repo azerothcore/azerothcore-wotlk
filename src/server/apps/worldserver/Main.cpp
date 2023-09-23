@@ -184,8 +184,6 @@ int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
-    std::vector<std::string> overriddenKeys = sConfigMgr->OverrideWithEnvVariablesIfAny();
-
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
     // Init all logs
@@ -204,9 +202,6 @@ int main(int argc, char** argv)
             LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
-
-    for (std::string const& key : overriddenKeys)
-        LOG_INFO("server.worldserver", "Configuration field {} was overridden with environment variable.", key);
 
     OpenSSLCrypto::threadsSetup();
 
