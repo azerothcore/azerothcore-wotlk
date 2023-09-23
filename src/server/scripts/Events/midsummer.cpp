@@ -424,8 +424,6 @@ class spell_midsummer_juggling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_juggling_torch);
 
-    bool handled;
-    bool Load() override { handled = false; return true; }
     void HandleFinish()
     {
         Unit* caster = GetCaster();
@@ -447,27 +445,9 @@ class spell_midsummer_juggling_torch : public SpellScript
             caster->CastSpell(caster, SPELL_JUGGLE_SELF, true);
     }
 
-    void HandleDummy(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        Unit* caster = GetCaster();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-            return;
-
-        if (Player* target = GetHitPlayer())
-            if (!handled && target->GetQuestRewardStatus(target->GetTeamId() == TEAM_ALLIANCE ? 11657 : 11923))
-            {
-                handled = true;
-                caster->CastSpell(target, SPELL_GIVE_TORCH, true);
-            }
-    }
-
     void Register() override
     {
-        if (m_scriptSpellId == SPELL_TORCH_CHECK)
-            OnEffectHitTarget += SpellEffectFn(spell_midsummer_juggling_torch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        else
-            AfterCast += SpellCastFn(spell_midsummer_juggling_torch::HandleFinish);
+        AfterCast += SpellCastFn(spell_midsummer_juggling_torch::HandleFinish);
     }
 };
 
