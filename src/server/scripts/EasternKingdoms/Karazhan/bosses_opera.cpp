@@ -1042,7 +1042,6 @@ struct boss_julianne : public ScriptedAI
         summonedRomulo = false;
         me->SetImmuneToPC(true);
 
-        //intro sequence
         _scheduler.Schedule(1s, [this](TaskContext)
         {
             Talk(SAY_JULIANNE_ENTER);
@@ -1168,7 +1167,7 @@ struct boss_julianne : public ScriptedAI
         if (phase == PHASE_JULIANNE)
         {
             me->ClearTarget();
-            //this means already drinking, so return
+
             if (isFakingDeath)
             {
                 return;
@@ -1243,7 +1242,7 @@ struct boss_romulo : public ScriptedAI
 {
     boss_romulo(Creature* creature) : ScriptedAI(creature)
     {
-        instance = creature->GetInstanceScript(); //not necessary
+        instance = creature->GetInstanceScript();
     }
 
     void Reset() override
@@ -1286,7 +1285,6 @@ struct boss_romulo : public ScriptedAI
 
         damage = me->GetHealth() - 1;
 
-        //anything below only used if incoming damage will kill
         if (phase == PHASE_ROMULO)
         {
             Talk(SAY_ROMULO_DEATH);
