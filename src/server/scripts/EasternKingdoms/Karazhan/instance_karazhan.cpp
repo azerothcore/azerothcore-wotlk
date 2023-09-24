@@ -418,6 +418,42 @@ public:
             return 0;
         }
 
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SCHEDULE_RAJ_CHECK)
+            {
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Creature* julliane = GetCreature(DATA_JULIANNE);
+                    Creature* romulo = GetCreature(DATA_ROMULO);
+
+                    if (julliane && romulo)
+                    {
+                        if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)
+                            && romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                        {
+                            julliane->KillSelf();
+                            julliane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            romulo->KillSelf();
+                            romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                        else
+                        {
+                            if (romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_RESS_ROMULO);
+                            }
+
+                            if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_DO_RESURRECT);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
