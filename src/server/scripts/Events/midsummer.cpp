@@ -296,6 +296,7 @@ enum flingTorch
     SPELL_FLING_TORCH_DUMMY         = 46747,
     SPELL_MISSED_TORCH              = 45676,
     SPELL_TORCH_COUNTER             = 45693,
+    SPELL_TORCH_SHADOW              = 46105
 };
 
 class spell_midsummer_fling_torch : public SpellScript
@@ -339,7 +340,10 @@ class spell_midsummer_fling_torch : public SpellScript
 
         // we have any pos
         if (pos.GetPositionX())
+        {
             caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
+            caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_TORCH_SHADOW, true);
+        }
     }
 
     void HandleFinish()
@@ -417,7 +421,12 @@ enum eJuggle
     SPELL_TORCH_CHECK           = 45644,
     SPELL_GIVE_TORCH            = 45280,
     QUEST_TORCH_CATCHING_A      = 11657,
-    QUEST_TORCH_CATCHING_H      = 11923
+    QUEST_TORCH_CATCHING_H      = 11923,
+
+    SPELL_TORCH_SHADOW_SELF     = 46121,
+    SPELL_TORCH_SHADOW_SLOW     = 46120,
+    SPELL_TORCH_SHADOW_MED      = 46118,
+    SPELL_TORCH_SHADOW_FAST     = 46117
 };
 
 class spell_midsummer_juggling_torch : public SpellScript
@@ -433,16 +442,31 @@ class spell_midsummer_juggling_torch : public SpellScript
         if (const WorldLocation* loc = GetExplTargetDest())
         {
             if (loc->GetExactDist(caster) < 3.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SELF, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_SELF, true);
+            }
             else if (loc->GetExactDist(caster) < 10.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SLOW, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_SLOW, true);
+            }
             else if (loc->GetExactDist(caster) < 25.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_MED, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_MED, true);
+            }
             else
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_FAST, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_FAST, true);
+            }
         }
         else
+        {
             caster->CastSpell(caster, SPELL_JUGGLE_SELF, true);
+            caster->CastSpell(caster, SPELL_TORCH_SHADOW_SELF, true);
+        }
     }
 
     void Register() override
