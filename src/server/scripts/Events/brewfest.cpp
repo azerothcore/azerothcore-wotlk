@@ -1031,35 +1031,32 @@ class spell_brewfest_apple_trap : public SpellScript
     }
 };
 
-class spell_q11117_catch_the_wild_wolpertinger : public SpellScript
+enum Catch
 {
-    PrepareSpellScript(spell_q11117_catch_the_wild_wolpertinger);
+    NPC_WILD_WOLPERTINGER = 23487,
 
-    SpellCastResult CheckTarget()
+    ITEM_STUNNED_WOLPERTINGER = 32906
+};
+
+class spell_catch_the_wild_wolpertinger : public AuraScript
+{
+    PrepareAuraScript(spell_catch_the_wild_wolpertinger);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
-            if (caster->ToPlayer())
-                if (Unit* target = caster->ToPlayer()->GetSelectedUnit())
-                    if (target->GetEntry() == 23487 && target->IsAlive())
-                        return SPELL_CAST_OK;
-
-        return SPELL_FAILED_BAD_TARGETS;
-    }
-
-    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
-    {
-        if (GetCaster() && GetCaster()->ToPlayer())
+        if (Creature* wild = GetTarget()->ToCreature())
         {
-            GetCaster()->ToPlayer()->AddItem(32906, 1);
-            if (Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit())
-                target->ToCreature()->DespawnOrUnsummon(500);
+            if (wild->GetEntry() == NPC_WILD_WOLPERTINGER)
+            {
+                wild->ToCreature()->DespawnOrUnsummon(1s, 0s);
+                GetCaster()->ToPlayer()->AddItem(ITEM_STUNNED_WOLPERTINGER, 1);
+            }
         }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_q11117_catch_the_wild_wolpertinger::CheckTarget);
-        OnEffectHitTarget += SpellEffectFn(spell_q11117_catch_the_wild_wolpertinger::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_catch_the_wild_wolpertinger::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2072,7 +2069,7 @@ void AddSC_event_brewfest_scripts()
     RegisterSpellScript(spell_brewfest_ram_fatigue);
     RegisterSpellScript(spell_brewfest_apple_trap);
     // other
-    RegisterSpellScript(spell_q11117_catch_the_wild_wolpertinger);
+    RegisterSpellScript(spell_catch_the_wild_wolpertinger);
     RegisterSpellScript(spell_brewfest_fill_keg);
     RegisterSpellScript(spell_brewfest_unfill_keg);
     RegisterSpellScript(spell_brewfest_toss_mug);

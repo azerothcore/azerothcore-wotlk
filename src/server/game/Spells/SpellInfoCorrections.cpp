@@ -3922,12 +3922,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeCasterAuraSpell = 42299;
     });
 
-    // Catch the Wild Wolpertinger!
-    ApplySpellFix({ 41621 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
-    });
-
     // Brewfest quests
     ApplySpellFix({ 47134, 51798 }, [](SpellInfo* spellInfo)
     {
