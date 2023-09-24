@@ -26,7 +26,6 @@ enum Emotes
 {
     EMOTE_PHASE_BANISH      = 0,
     EMOTE_PHASE_PORTAL      = 1
-
 };
 
 enum Spells
