@@ -4765,7 +4765,7 @@ class spell_gen_basic_campfire : public SpellScript
 
     void Register() override
     {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_basic_campfire::ModDest, EFFECT_0, TARGET_DEST_CASTER_SUMMON);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_basic_campfire::ModDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
         OnEffectHit += SpellEffectFn(spell_gen_basic_campfire::ModifyCookingSkill, EFFECT_0, SPELL_EFFECT_TRANS_DOOR);
     }
 };

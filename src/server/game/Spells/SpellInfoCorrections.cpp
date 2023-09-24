@@ -4580,6 +4580,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcChance = 3;
     });
 
+     // Basic Campfire
+    ApplySpellFix({ 818 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
