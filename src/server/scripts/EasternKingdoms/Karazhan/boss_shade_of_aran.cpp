@@ -69,9 +69,7 @@ enum Spells
 
 enum Creatures
 {
-    //Creatures
-    NPC_WATER_ELEMENTAL = 17167,
-    NPC_SHADOW_OF_ARAN  = 18254,
+    NPC_SHADOW_OF_ARAN  = 18254
 };
 
 enum SuperSpell
