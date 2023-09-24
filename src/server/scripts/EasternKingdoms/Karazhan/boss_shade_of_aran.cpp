@@ -62,8 +62,6 @@ enum Spells
 
     SPELL_SUMMON_BLIZZARD     = 29969, // Activates the Blizzard NPC
 
-    //Creature Spells
-    SPELL_CIRCULAR_BLIZZARD   = 29951,
     SPELL_SHADOW_PYRO         = 29978
 };
 
