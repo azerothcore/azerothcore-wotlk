@@ -5,7 +5,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 37051, 0, 0, 31, 0, 3, 17175, 0, 0, 0, 0, '', 'Summon Water Elementals (37051) can only target Shade of Aran Teleport NW (17175)'),
 (13, 1, 37052, 0, 0, 31, 0, 3, 17174, 0, 0, 0, 0, '', 'Summon Water Elementals (37052) can only target Shade of Aran Teleport SW (17174)'),
 (13, 1, 37053, 0, 0, 31, 0, 3, 17173, 0, 0, 0, 0, '', 'Summon Water Elementals (37053) can only target Shade of Aran Teleport SE (17173)'),
-(13, 1, 29969, 0, 0, 31, 0, 3, 17161, 0, 0, 0, 0, '', 'Summon Blizzard (29969) can only target Blizzard (Shade of Aran) (171161)');
+(13, 1, 29969, 0, 0, 31, 0, 3, 17161, 0, 0, 0, 0, '', 'Summon Blizzard (29969) can only target Blizzard (Shade of Aran) (17161)');
 
 SET @NPC := 135127;
 SET @PATH := @NPC * 10;
