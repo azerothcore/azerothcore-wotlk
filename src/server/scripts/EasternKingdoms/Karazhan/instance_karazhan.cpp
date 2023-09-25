@@ -240,6 +240,9 @@ public:
                                 }
                             }
                             break;
+                        case DONE:
+                            HandleGameObject(m_uiGamesmansExitDoor, true);
+                            break;
                         }
                         default:
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
