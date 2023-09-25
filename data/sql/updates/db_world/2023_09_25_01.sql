@@ -1,3 +1,4 @@
+-- DB update 2023_09_25_00 -> 2023_09_25_01
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (67486, 67489, 67487, 67490);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
