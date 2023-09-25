@@ -1325,7 +1325,7 @@ class spell_hun_furious_howl : public SpellScript
         });
     }
 
-    void Register()
+    void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_furious_howl::FilterTargets, EFFECT_ALL, TARGET_UNIT_CASTER_AREA_PARTY);
     }
