@@ -3376,8 +3376,12 @@ class spell_item_mana_injector : public SpellScript
     void HandleEnergize(SpellEffIndex /*effIndex*/)
     {
         if (Player* caster = GetCaster()->ToPlayer())
+        {
             if (caster->HasSkill(SKILL_ENGINEERING))
-                SetHitDamage(GetHitDamage() * 1.25f);
+            {
+                SetEffectValue(GetEffectValue() * 1.25f);
+            }
+        }
     }
 
     void Register() override
