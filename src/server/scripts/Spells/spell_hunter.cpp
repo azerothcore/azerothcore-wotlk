@@ -1331,7 +1331,6 @@ class spell_hun_furious_howl : public SpellScript
     }
 };
 
-
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
