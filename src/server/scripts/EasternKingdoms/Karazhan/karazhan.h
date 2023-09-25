@@ -204,6 +204,14 @@ enum KarazhanChessGameFactions
     CHESS_FACTION_BOTH          = 536
 };
 
+enum InstanceActions
+{
+    ACTION_SCHEDULE_RAJ_CHECK,
+
+    ACTION_DO_RESURRECT = 4,
+    ACTION_RESS_ROMULO  = 5,
+};
+
 template <class AI, class T>
 inline AI* GetKarazhanAI(T* obj)
 {

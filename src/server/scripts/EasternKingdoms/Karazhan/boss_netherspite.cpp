@@ -24,8 +24,8 @@
 
 enum Emotes
 {
-    EMOTE_PHASE_PORTAL      = 0,
-    EMOTE_PHASE_BANISH      = 1
+    EMOTE_PHASE_BANISH      = 0,
+    EMOTE_PHASE_PORTAL      = 1
 };
 
 enum Spells
@@ -101,7 +101,6 @@ struct boss_netherspite : public BossAI
         BossAI::Reset();
         berserk = false;
         HandleDoors(true);
-        DestroyPortals();
     }
 
     void SummonPortals()
@@ -118,23 +117,6 @@ struct boss_netherspite : public BossAI
                 PortalGUID[i] = portal->GetGUID();
                 portal->AddAura(PortalVisual[i], portal);
             }
-        }
-    }
-
-    void DestroyPortals()
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            if (Creature* portal = ObjectAccessor::GetCreature(*me, PortalGUID[i]))
-            {
-                portal->DisappearAndDie();
-            }
-            if (Creature* portal = ObjectAccessor::GetCreature(*me, BeamerGUID[i]))
-            {
-                portal->DisappearAndDie();
-            }
-            PortalGUID[i].Clear();
-            BeamTarget[i].Clear();
         }
     }
 
@@ -203,8 +185,13 @@ struct boss_netherspite : public BossAI
         }
     }
 
-    void SwitchToPortalPhase()
+    void SwitchToPortalPhase(bool aggro = false)
     {
+        if (!aggro)
+        {
+            Talk(EMOTE_PHASE_PORTAL);
+        }
+
         scheduler.CancelGroup(VANISH_PHASE);
         me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
         me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
@@ -230,17 +217,22 @@ struct boss_netherspite : public BossAI
             DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
             context.Repeat(15s);
         });
-        Talk(EMOTE_PHASE_PORTAL);
     }
 
     void SwitchToBanishPhase()
     {
+        Talk(EMOTE_PHASE_BANISH);
         scheduler.CancelGroup(PORTAL_PHASE);
         me->RemoveAurasDueToSpell(SPELL_EMPOWERMENT);
         me->RemoveAurasDueToSpell(SPELL_NETHERBURN_AURA);
         DoCastSelf(SPELL_BANISH_VISUAL, true);
         DoCastSelf(SPELL_BANISH_ROOT, true);
-        DestroyPortals();
+
+        for (uint32 id : PortalID)
+        {
+            summons.DespawnEntry(id);
+        }
+
         scheduler.Schedule(30s, [this](TaskContext)
         {
             SwitchToPortalPhase();
@@ -250,7 +242,7 @@ struct boss_netherspite : public BossAI
             DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
             context.Repeat(5s, 7s);
         });
-        Talk(EMOTE_PHASE_BANISH);
+
         for (uint8 i = 0; i < 3; ++i)
         {
             me->RemoveAurasDueToSpell(NetherBuff[i]);
@@ -269,7 +261,7 @@ struct boss_netherspite : public BossAI
     {
         BossAI::JustEngagedWith(who);
         HandleDoors(false);
-        SwitchToPortalPhase();
+        SwitchToPortalPhase(true);
         DoZoneInCombat();
         scheduler.Schedule(9min, [this](TaskContext /*context*/)
         {
@@ -286,7 +278,6 @@ struct boss_netherspite : public BossAI
     {
         BossAI::JustDied(killer);
         HandleDoors(true);
-        DestroyPortals();
     }
 
     void UpdateAI(uint32 diff) override
