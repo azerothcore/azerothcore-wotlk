@@ -176,7 +176,7 @@ struct boss_leotheras_the_blind : public BossAI
         {
             DoCastSelf(SPELL_WHIRLWIND);
             context.Repeat(30250ms, 34900ms);
-        }).Schedule(60350ms, GROUP_DEMON, [this](TaskContext context)
+        }).Schedule(60350ms, GROUP_DEMON, [this](TaskContext)
         {
             DoResetThreatList();
             Talk(SAY_SWITCH_TO_DEMON);
