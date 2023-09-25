@@ -1319,10 +1319,9 @@ class spell_hun_furious_howl : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Unit* owner = GetCaster()->ToTempSummon()->GetOwner();
         targets.remove_if([&](WorldObject const* target) -> bool
         {
-            return target != GetCaster() || target != owner;
+            return target != GetCaster() || target != GetCaster()->GetOwner();
         });
     }
 
