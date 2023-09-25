@@ -188,9 +188,9 @@ struct boss_the_lurker_below : public BossAI
         else
         {
             ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-            for (uint8 i = 0; i < t_list.size(); i++)
+            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
             {
-                if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                 {
                     if (me->IsWithinMeleeRange(threatTarget))
                     {
