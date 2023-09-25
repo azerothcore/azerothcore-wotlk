@@ -78,8 +78,6 @@ struct boss_the_lurker_below : public BossAI
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         me->SetVisible(false);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        // Reset summons
-        //summons.DespawnAll(); shouldn't be needed
     }
 
     void JustSummoned(Creature* summon) override
@@ -100,11 +98,6 @@ struct boss_the_lurker_below : public BossAI
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
         }
-    }
-
-    void JustDied(Unit* killer) override
-    {
-        BossAI::JustDied(killer);
     }
 
     void AttackStart(Unit* who) override
@@ -189,24 +182,32 @@ struct boss_the_lurker_below : public BossAI
 
         Unit* target = nullptr;
         if (me->IsWithinMeleeRange(me->GetVictim()))
+        {
             target = me->GetVictim();
+        }
         else
         {
             ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            for (uint8 i = 0; i < t_list.size(); i++)
+            {
+                if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
                     if (me->IsWithinMeleeRange(threatTarget))
                     {
                         target = threatTarget;
                         break;
                     }
-        }
+                }
+            }
 
         if (target)
+        {
             me->AttackerStateUpdate(target);
+        }
         else if ((target = SelectTarget(SelectTargetMethod::Random, 0)))
+        {
             me->CastSpell(target, SPELL_WATER_BOLT, false);
-
+        }
         me->resetAttackTimer();
     }
 };
