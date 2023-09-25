@@ -80,12 +80,6 @@ struct boss_the_lurker_below : public BossAI
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        summon->SetInCombatWithZone();
-        summons.Summon(summon);
-    }
-
     void DoAction(int32 action) override
     {
         if (action == ACTION_START_EVENT)
