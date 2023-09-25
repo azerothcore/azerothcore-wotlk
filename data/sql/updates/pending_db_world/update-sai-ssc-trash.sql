@@ -46,12 +46,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21232, 0, 0, 0, 25, 0, 100, 257, 0, 0, 0, 0, 0, 0, 11, 29651, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Greyheart Skulker - On Reset - Cast Dual Wield'),
 (21232, 0, 1, 0, 105, 0, 100, 0, 4800, 13100, 4850, 9050, 0, 5, 11, 38625, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Greyheart Skulker - Victim Casting - Cast Kick'),-- fully sniffed
 (21251, 0, 0, 0, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 30, 1, 2, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Aggro - Set Random Phase'), 
-(21251, 0, 1, 0, 0, 1, 100, 0, 19400, 19400, 13350, 16950, 0, 0, 11, 39031, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Enrage'),-- fully sniffed
-(21251, 0, 2, 0, 0, 1, 100, 1, 0, 0, 0, 0, 0, 0, 11, 39014, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Atrophic Blow'),-- not sniffed thus unchanged
-(21251, 0, 3, 0, 0, 2, 100, 0, 16950, 16950, 25500, 29100, 0, 0, 11, 38971, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Acid Geyser'),-- fully sniffed
-(21251, 0, 4, 0, 0, 2, 100, 0, 25450, 25450, 29150, 29150, 0, 0, 11, 39044, 0, 0, 0, 0, 0, 5, 40, 1, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Serpentshrine Parasite'),-- fully sniffed
-(21251, 0, 5, 0, 0, 4, 100, 0, 19450, 19450, 25450, 25450, 0, 0, 11, 38976, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Spore Quake'),-- fully sniffed
-(21251, 0, 6, 0, 0, 4, 100, 0, 27900, 27900, 29100, 29100, 0, 0, 11, 39032, 0, 0, 0, 0, 0, 5, 40, 1, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Initial Infection'),-- fully sniffed
+(21251, 0, 1, 0, 0, 1, 100, 0, 19400, 19400, 13350, 16950, 0, 0, 11, 39031, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Enrage (Phase 1)'),-- fully sniffed
+(21251, 0, 2, 0, 0, 1, 100, 1, 0, 0, 0, 0, 0, 0, 11, 39014, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Atrophic Blow (Phase 1)'),-- not sniffed thus unchanged
+(21251, 0, 3, 0, 0, 2, 100, 0, 16950, 16950, 25500, 29100, 0, 0, 11, 38971, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Acid Geyser (Phase 2)'),-- fully sniffed
+(21251, 0, 4, 0, 0, 2, 100, 0, 25450, 25450, 29150, 29150, 0, 0, 11, 39044, 0, 0, 0, 0, 0, 5, 40, 1, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Serpentshrine Parasite (Phase 2)'),-- fully sniffed
+(21251, 0, 5, 0, 0, 4, 100, 0, 19450, 19450, 25450, 25450, 0, 0, 11, 38976, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Spore Quake (Phase 3)'),-- fully sniffed
+(21251, 0, 6, 0, 0, 4, 100, 0, 27900, 27900, 29100, 29100, 0, 0, 11, 39032, 0, 0, 0, 0, 0, 5, 40, 1, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - In Combat - Cast Initial Infection (Phase 3)'),-- fully sniffed
 (21251, 0, 7, 0, 6, 0, 80, 512, 0, 0, 0, 0, 0, 0, 125, 1, 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Death - Run Random Timed Event'),
 (21251, 0, 8, 0, 59, 0, 100, 512, 1, 0, 0, 0, 0, 0, 11, 38718, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Timed Event - Cast Toxic Pool'),-- unchanged
 (21251, 0, 9, 0, 59, 0, 100, 512, 2, 0, 0, 0, 0, 0, 11, 38922, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Underbog Colossus - On Timed Event - Cast Summon Colossus Lurkers'),-- unchanged
