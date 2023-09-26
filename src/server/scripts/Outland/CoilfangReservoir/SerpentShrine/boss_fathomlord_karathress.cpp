@@ -339,6 +339,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
+        summon->Attack(me->GetVictim(), false);
         summon->SetInCombatWithZone();
     }
 
