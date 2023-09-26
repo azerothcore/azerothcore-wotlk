@@ -269,19 +269,15 @@ class spell_midsummer_ribbon_pole_visual : public SpellScript
         if (crList.empty())
             return;
 
-        Creature* cr = nullptr;
         for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr)
         {
             // NPC on ribbon pole top is no tempsummon
             if (!(*itr)->ToTempSummon())
             {
-                cr = *itr;
-                break;
+                target = *itr;
+                return;
             }
         }
-
-        if (cr)
-            target = cr;
     }
 
     void Register() override
