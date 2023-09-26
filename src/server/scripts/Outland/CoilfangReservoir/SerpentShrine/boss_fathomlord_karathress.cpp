@@ -325,7 +325,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
     SummonList summons;
 
-    std::list<Creature*> summonedTotems;
+    std::list<uint32> entryList;
 
     void Reset() override
     {
@@ -334,36 +334,46 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
         summons.DespawnAll();
 
-        summonedTotems.clear();
+        entryList.clear();
+
+        //populating entry list
+        entryList = {NPC_SPITFIRE_TOTEM, NPC_GREATER_EARTHBIND_TOTEM, NPC_GREATER_POISON_CLEANSING_TOTEM};
     }
 
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
         summon->Attack(me->GetVictim(), false);
-        summonedTotems.push_back(summon);
         summon->SetInCombatWithZone();
     }
 
-    void ScheduleRemoval(Creature* totem)
+    void ScheduleRemoval(uint32 entry)
     {
-        int32 action = CheckTotem(totem);
         std::chrono::seconds timer = 0s;
-        switch(action)
+        int32 action = 0;
+        uint8 group = 0;
+        
+        switch(entry)
         {
-            case ACTION_REMOVE_SPITFIRE:
+            case NPC_SPITFIRE_TOTEM:
                 timer = 59s;
+                action = ACTION_REMOVE_SPITFIRE;
+                group = SPITFIRE;
                 break;
-            case ACTION_REMOVE_EARTHBIND:
+            case NPC_GREATER_EARTHBIND_TOTEM:
                 timer = 44s;
+                action = ACTION_REMOVE_EARTHBIND;
+                group = EARTHBIND;
                 break;
-            case ACTION_REMOVE_CLEANSING:
+            case NPC_GREATER_POISON_CLEANSING_TOTEM:
                 timer = 29s;
+                action = ACTION_REMOVE_CLEANSING;
+                group = CLEANSING;
                 break;
             default:
                 timer = 29s;
         }
-        _totemScheduler.Schedule(timer, [this, action](TaskContext)
+        _totemScheduler.Schedule(timer, group, [this, action](TaskContext)
         {
             me->AI()->DoAction(action);
         });
@@ -374,28 +384,25 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         switch (action)
         {
             case ACTION_REMOVE_SPITFIRE:
-                summonedTotems.remove_if([&](Creature* creature){
-                    return creature->GetEntry() == NPC_SPITFIRE_TOTEM;
-                });
+                _totemScheduler.CancelGroup(SPITFIRE);
+                entryList.push_back(NPC_SPITFIRE_TOTEM);
                 break;
             case ACTION_REMOVE_EARTHBIND:
-                summonedTotems.remove_if([&](Creature* creature){
-                    return creature->GetEntry() == NPC_GREATER_EARTHBIND_TOTEM;
-                });
+                _totemScheduler.CancelGroup(EARTHBIND);
+                entryList.push_back(NPC_GREATER_EARTHBIND_TOTEM);
                 break;
             case ACTION_REMOVE_CLEANSING:
-                summonedTotems.remove_if([&](Creature* creature){
-                    return creature->GetEntry() == NPC_GREATER_POISON_CLEANSING_TOTEM;
-                });
+                _totemScheduler.CancelGroup(CLEANSING);
+                entryList.push_back(NPC_GREATER_POISON_CLEANSING_TOTEM);
                 break;
             default:
                 return;
         }
     }
 
-    void SummonTotem(Creature* chosenCreature)
+    void SummonTotem(uint32 entry)
     {
-        switch(chosenCreature->GetEntry())
+        switch(entry)
         {
             case NPC_SPITFIRE_TOTEM:
                 DoCastSelf(SPELL_SPITFIRE_TOTEM);
@@ -411,20 +418,6 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         }
     }
 
-        int32 CheckTotem(Creature* chosenCreature)
-        {
-            switch(chosenCreature->GetEntry())
-            {
-                case NPC_SPITFIRE_TOTEM:
-                    return(ACTION_REMOVE_SPITFIRE);
-                case NPC_GREATER_EARTHBIND_TOTEM:
-                    return(ACTION_REMOVE_EARTHBIND);
-                case NPC_GREATER_POISON_CLEANSING_TOTEM:
-                    return(ACTION_REMOVE_CLEANSING);
-                default:
-                    return;
-            }
-        }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -434,22 +427,12 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
             context.Repeat(10900ms, 14700ms);
         }).Schedule(15800ms, [this](TaskContext context)
         {
-            //summon totem
-            if (summonedTotems.size() < 3) //if not all totems are currently summoned
+            if (entryList.size() != 0) //don't summon when all totems are up
             {
-                //keep making a choice of available totems
-                _choice = urand(0, summonedTotems.size());
-                uint8 counter = 0;
-                for (Creature* totem : summonedTotems)
-                {
-                    if (counter == _choice)
-                    {
-                        SummonTotem(totem);
-                        ScheduleRemoval(totem);
-                        break;
-                    }
-                    counter++;
-                }
+                uint32 totemEntry = entryList.front();
+                entryList.pop_front();
+                SummonTotem(totemEntry);
+                ScheduleRemoval(totemEntry);
             }
             context.Repeat(13350ms, 24250ms);
         });
