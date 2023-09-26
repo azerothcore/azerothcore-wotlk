@@ -196,7 +196,6 @@ struct boss_netherspite : public BossAI
         me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
         me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
         SummonPortals();
-        me->GetThreatMgr().ResetAllThreat();
         scheduler.Schedule(60s, [this](TaskContext /*context*/)
         {
             if (!me->IsNonMeleeSpellCast(false))
@@ -237,6 +236,7 @@ struct boss_netherspite : public BossAI
         scheduler.Schedule(30s, [this](TaskContext)
         {
             SwitchToPortalPhase();
+            me->GetThreatMgr().ResetAllThreat();
             return;
         }).Schedule(10s, BANISH_PHASE, [this](TaskContext context)
         {
