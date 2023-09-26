@@ -236,7 +236,7 @@ struct boss_netherspite : public BossAI
         scheduler.Schedule(30s, [this](TaskContext)
         {
             SwitchToPortalPhase();
-            me->GetThreatMgr().ResetAllThreat();
+            DoResetThreatList();
             return;
         }).Schedule(10s, BANISH_PHASE, [this](TaskContext context)
         {
