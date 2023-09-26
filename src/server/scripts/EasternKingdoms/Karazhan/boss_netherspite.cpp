@@ -50,7 +50,7 @@ enum Portals
 enum Groups
 {
     PORTAL_PHASE            = 0,
-    VANISH_PHASE            = 1
+    BANISH_PHASE            = 1
 };
 
 const float PortalCoord[3][3] =
@@ -192,10 +192,11 @@ struct boss_netherspite : public BossAI
             Talk(EMOTE_PHASE_PORTAL);
         }
 
-        scheduler.CancelGroup(VANISH_PHASE);
+        scheduler.CancelGroup(BANISH_PHASE);
         me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
         me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
         SummonPortals();
+        me->GetThreatMgr().ResetAllThreat();
         scheduler.Schedule(60s, [this](TaskContext /*context*/)
         {
             if (!me->IsNonMeleeSpellCast(false))
@@ -237,7 +238,7 @@ struct boss_netherspite : public BossAI
         {
             SwitchToPortalPhase();
             return;
-        }).Schedule(10s, VANISH_PHASE, [this](TaskContext context)
+        }).Schedule(10s, BANISH_PHASE, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
             context.Repeat(5s, 7s);
