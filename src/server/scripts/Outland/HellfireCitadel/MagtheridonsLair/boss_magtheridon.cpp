@@ -166,7 +166,7 @@ struct boss_magtheridon : public BossAI
         {
             me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
             context.Repeat(11s, 39s);
-        }).Schedule(40s, [this](TaskContext context)
+        }).Schedule(28300ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_QUAKE);
             _castingQuake = true;
@@ -181,7 +181,7 @@ struct boss_magtheridon : public BossAI
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
             });
-            context.Repeat(40s);
+            context.Repeat(56300ms, 64300ms);
         }).Schedule(55650ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_BLAST_NOVA);
