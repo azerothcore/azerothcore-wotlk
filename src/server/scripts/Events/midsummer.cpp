@@ -253,6 +253,39 @@ class spell_midsummer_ribbon_pole : public AuraScript
     }
 };
 
+class spell_midsummer_ribbon_pole_visual : public SpellScript
+{
+    PrepareSpellScript(spell_midsummer_ribbon_pole_visual)
+
+    void UpdateTarget(WorldObject*& target)
+    {
+        if (!target)
+            return;
+
+        // find NPC at ribbon pole top as target
+        // trap 181604 also spawns NPCs at pole bottom - ignore those
+        std::list<Creature*> crList;
+        target->GetCreaturesWithEntryInRange(crList, 30.0f, NPC_RIBBON_POLE_DEBUG_TARGET);
+        if (crList.empty())
+            return;
+
+        for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr)
+        {
+            // NPC on ribbon pole top is no tempsummon
+            if (!(*itr)->ToTempSummon())
+            {
+                target = *itr;
+                return;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_midsummer_ribbon_pole_visual::UpdateTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+    }
+};
+
 class spell_midsummer_torch_quest : public AuraScript
 {
     PrepareAuraScript(spell_midsummer_torch_quest)
@@ -514,6 +547,7 @@ void AddSC_event_midsummer_scripts()
     // Spells
     RegisterSpellScript(spell_gen_crab_disguise);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
+    RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
     RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
