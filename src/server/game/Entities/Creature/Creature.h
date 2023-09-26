@@ -399,6 +399,12 @@ public:
      * */
     void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
 
+    /**
+     * @brief Returns true if the creature is able to cast the spell.
+     *
+     * */
+    bool CanCastSpell(uint32 spellID) const;
+
     std::string GetDebugInfo() const override;
 
 protected:
