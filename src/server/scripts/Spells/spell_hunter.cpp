@@ -1314,14 +1314,14 @@ class spell_hun_furious_howl : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->ToTempSummon();
+        return GetCaster()->IsPet();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if([&](WorldObject const* target) -> bool
         {
-            return target != GetCaster() || target != GetCaster()->GetOwner();
+            return target != GetCaster() && target != GetCaster()->ToPet()->GetOwner();
         });
     }
 
