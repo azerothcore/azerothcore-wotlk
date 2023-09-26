@@ -40,6 +40,7 @@ MinionData const minionData[] =
     { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_LORD_KARATHRESS },
     { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_LORD_KARATHRESS },
     { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_LORD_KARATHRESS },
+    { 0,                          0,                          }
 };
 
 class instance_serpent_shrine : public InstanceMapScript
