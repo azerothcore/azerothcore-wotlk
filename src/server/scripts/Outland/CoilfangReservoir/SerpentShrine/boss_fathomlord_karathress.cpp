@@ -229,7 +229,6 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     void JustSummoned(Creature* summon) override
     {
         summon->SetInCombatWithZone();
-
         summons.Summon(summon);
     }
 
@@ -336,7 +335,6 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
         entryList.clear();
 
-        //populating entry list
         entryList = {NPC_SPITFIRE_TOTEM, NPC_GREATER_EARTHBIND_TOTEM, NPC_GREATER_POISON_CLEANSING_TOTEM};
     }
 
@@ -417,7 +415,6 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
                 return;
         }
     }
-
 
     void JustEngagedWith(Unit* /*who*/) override
     {
