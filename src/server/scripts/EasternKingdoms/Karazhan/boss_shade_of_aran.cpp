@@ -256,7 +256,20 @@ struct boss_shade_of_aran : public BossAI
                 if (AvailableSpells)
                 {
                     CurrentNormalSpell = Spells[rand() % AvailableSpells];
-                    DoCast(target, CurrentNormalSpell);
+
+                    if (!me->CanCastSpell(CurrentNormalSpell))
+                    {
+                        me->SetWalk(false);
+                        me->ResumeChasingVictim();
+                    }
+                    else
+                    {
+                        DoCast(target, CurrentNormalSpell);
+                        if (me->GetVictim())
+                        {
+                            me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f);
+                        }
+                    }
                 }
             }
             context.Repeat(2s);
