@@ -198,8 +198,7 @@ struct boss_shade_of_aran : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DEATH);
-
-        instance->SetData(DATA_ARAN, DONE);
+        _JustDied();
 
         if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
         {
@@ -210,11 +209,8 @@ struct boss_shade_of_aran : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
-
-        instance->SetData(DATA_ARAN, IN_PROGRESS);
-
-        DoZoneInCombat();
 
         //handle timed closing door
         scheduler.Schedule(15s, [this](TaskContext)
@@ -382,9 +378,14 @@ struct boss_shade_of_aran : public BossAI
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                         DoCastSelf(SPELL_POTION, false);
-                        DoCastSelf(SPELL_AOE_PYROBLAST, false);
                         _drinkScheduler.CancelGroup(GROUP_DRINKING);
-                        _drinking = false;
+                        _drinkScheduler.Schedule(1s, [this](TaskContext)
+                        {
+                            DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                        }).Schedule(3s, [this](TaskContext)
+                        {
+                            _drinking = false;
+                        });
                     } else
                     {
                         context.Repeat(500ms);
