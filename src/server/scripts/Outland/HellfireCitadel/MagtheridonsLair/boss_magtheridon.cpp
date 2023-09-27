@@ -185,6 +185,7 @@ struct boss_magtheridon : public BossAI
         }).Schedule(55650ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_BLAST_NOVA);
+            scheduler.DelayAll(9999ms);
 
             _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
             {
