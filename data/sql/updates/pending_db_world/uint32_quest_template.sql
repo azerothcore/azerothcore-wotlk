@@ -1,0 +1,1 @@
+ALTER TABLE `quest_template` MODIFY COLUMN `AllowableRaces` int;
