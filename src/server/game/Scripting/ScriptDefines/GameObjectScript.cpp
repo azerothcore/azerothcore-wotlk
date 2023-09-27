@@ -160,6 +160,21 @@ void ScriptMgr::OnGameObjectDamaged(GameObject* go, Player* player)
     }
 }
 
+void ScriptMgr::OnGameObjectModifyHealth(GameObject* go, Unit* attackerOrHealer, int32& change, SpellInfo const* spellInfo)
+{
+    ASSERT(go);
+
+    ExecuteScript<AllGameObjectScript>([&](AllGameObjectScript* script)
+    {
+        script->OnGameObjectModifyHealth(go, attackerOrHealer, change, spellInfo);
+    });
+
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    {
+        tempScript->OnModifyHealth(go, attackerOrHealer, change, spellInfo);
+    }
+}
+
 void ScriptMgr::OnGameObjectLootStateChanged(GameObject* go, uint32 state, Unit* unit)
 {
     ASSERT(go);
