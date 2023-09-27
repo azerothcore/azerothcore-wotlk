@@ -1,1 +1,1 @@
-ALTER TABLE `quest_template` MODIFY COLUMN `AllowableRaces` int;
+ALTER TABLE `quest_template` MODIFY COLUMN `AllowableRaces` int unsigned NOT NULL DEFAULT 0;
