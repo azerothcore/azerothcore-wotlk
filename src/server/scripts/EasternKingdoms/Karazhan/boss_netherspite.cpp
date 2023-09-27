@@ -101,6 +101,12 @@ struct boss_netherspite : public BossAI
         BossAI::Reset();
         berserk = false;
         HandleDoors(true);
+
+        for (int i = 0; i < 3; ++i)
+        {
+            PortalGUID[i].Clear();
+            BeamTarget[i].Clear();
+        }
     }
 
     void SummonPortals()
@@ -231,6 +237,12 @@ struct boss_netherspite : public BossAI
         for (uint32 id : PortalID)
         {
             summons.DespawnEntry(id);
+        }
+
+        for (int i = 0; i < 3; ++i)
+        {
+            PortalGUID[i].Clear();
+            BeamTarget[i].Clear();
         }
 
         scheduler.Schedule(30s, [this](TaskContext)
