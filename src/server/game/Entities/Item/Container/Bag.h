@@ -51,7 +51,7 @@ public:
     // overwrite virtual Item::SaveToDB
     void SaveToDB(CharacterDatabaseTransaction trans) override;
     // overwrite virtual Item::LoadFromDB
-    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) override;
+    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry, bool tmog = false) override;
     // overwrite virtual Item::DeleteFromDB
     void DeleteFromDB(CharacterDatabaseTransaction trans) override;
 

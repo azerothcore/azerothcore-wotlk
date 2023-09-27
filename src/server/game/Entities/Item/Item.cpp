@@ -376,8 +376,8 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
                 stmt->SetData(++index, m_text);
-                stmt->SetData(++index, transmog);
-                stmt->SetData(++index, enchant);
+                stmt->SetData(++index, GetTransmog());
+                stmt->SetData(++index, GetEnchant());
                 stmt->SetData(++index, guid);
 
                 trans->Append(stmt);
@@ -420,7 +420,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
         CharacterDatabase.CommitTransaction(trans);
 }
 
-bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry, bool tmog)
 {
     //                                                    0                1      2         3        4      5             6                 7           8           9    10
     //result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text FROM item_instance WHERE guid = '{}'", guid);
@@ -515,8 +515,10 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         CharacterDatabase.Execute(stmt);
     }
 
-    transmog = fields[11].Get<uint32>();
-    enchant = fields[12].Get<uint32>();
+    if (tmog) {
+        transmog = fields[16].Get<int32>();
+        enchant = fields[17].Get<int32>();
+    }
 
     return true;
 }

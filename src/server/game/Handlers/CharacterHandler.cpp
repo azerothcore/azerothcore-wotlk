@@ -224,10 +224,6 @@ bool LoginQueryHolder::Initialize()
     stmt->SetData(0, m_accountId);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_TRANSMOG, stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_TRANSMOG_SETS);
-    stmt->SetData(0, m_accountId);
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_TRANSMOG_SETS, stmt);
-
     return res;
 }
 

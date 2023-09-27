@@ -128,6 +128,13 @@ struct ForgeTalentTab
     std::unordered_map<uint32, ForgeTalent*> Talents;
 };
 
+// XMOG
+struct ForgeCharacaterXmog
+{
+    std::string name;
+    std::unordered_map<uint8, uint32> slottedItems;
+};
+
 
 class ForgeCache : public DatabaseScript
 {
@@ -766,6 +773,80 @@ public:
     }
 
 
+    std::string BuildXmogSetsMsg(Player* player) {
+        std::string out = "";
+
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+        if (sets != XmogSets.end())
+            for (auto set : sets->second)
+                out += std::to_string(set.first) + "^" + set.second->name + ";";
+        else
+            out += "empty";
+
+        return out;
+    }
+
+    void SaveXmogSet(Player* player, uint32 setId) {
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+        if (sets != XmogSets.end()) {
+            auto set = sets->second.find(setId);
+            if (set != sets->second.end()) {
+                for (int i : xmogSlots)
+                    if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                        set->second->slottedItems[i] = item->GetTransmog();
+                    else
+                        set->second->slottedItems[i] = 0;
+
+                SaveXmogSetInternal(player, setId, set->second);
+            }
+        }
+    }
+
+    void AddXmogSet(Player* player, uint32 setId, std::string name) {
+        ForgeCharacaterXmog* xmog = new ForgeCharacaterXmog();
+        xmog->name = name;
+
+        auto newSetId = FirstOpenXmogSlot(player);
+
+        for (int i : xmogSlots)
+            if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                xmog->slottedItems[i] = item->GetTransmog();
+            else
+                xmog->slottedItems[i] = 0;
+
+        XmogSets[player->GetGUID().GetCounter()][newSetId] = xmog;
+        SaveXmogSetInternal(player, newSetId, xmog);
+    }
+
+    std::string BuildXmogFromEquipped(Player* player) {
+        std::string out = "noname^";
+        for (auto slot : xmogSlots) {
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            out += item == nullptr ? "0^" : std::to_string(item->GetTransmog()) + "^";
+        }
+        return out + ";";
+    }
+
+    std::string BuildXmogFromSet(Player* player, uint8 setId) {
+        std::string out = "";
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+
+        if (sets != XmogSets.end()) {
+            auto set = sets->second.find(setId);
+            if (set != sets->second.end()) {
+                out += set->second->name + "^";
+                for (auto slot : xmogSlots) {
+                    out += std::to_string(set->second->slottedItems[slot]) + "^";
+                }
+                out += ";";
+
+                return out;
+            }
+        }
+
+        return BuildXmogFromEquipped(player);
+    }
+
     std::vector<uint32> RACE_LIST;
     std::vector<uint32> CLASS_LIST;
     std::vector<CharacterPointType> TALENT_POINT_TYPES;
@@ -800,6 +881,23 @@ private:
 
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
 
+<<<<<<< Updated upstream
+=======
+    // Flagged for spec reset
+    std::vector<uint32 /*guid*/> FlaggedForReset;
+
+    // Perks
+    std::unordered_map<CharacterPerkType, std::unordered_map<uint32 /*class*/, std::vector<Perk*>>> Perks;
+    std::unordered_map<uint32 /*class*/, std::unordered_map<uint32 /*level*/, std::vector<Perk*>>> Archetypes;
+    std::unordered_map<uint32 /*id*/, Perk*> AllPerks;
+
+    // xmog
+    std::unordered_map<uint32 /*char*/, std::unordered_map<uint8 /*setId*/, ForgeCharacaterXmog*>> XmogSets;
+    uint8 xmogSlots[14] = { EQUIPMENT_SLOT_HEAD, EQUIPMENT_SLOT_SHOULDERS, EQUIPMENT_SLOT_BODY, EQUIPMENT_SLOT_CHEST,
+        EQUIPMENT_SLOT_WAIST, EQUIPMENT_SLOT_LEGS, EQUIPMENT_SLOT_FEET, EQUIPMENT_SLOT_WRISTS, EQUIPMENT_SLOT_HANDS,
+        EQUIPMENT_SLOT_BACK, EQUIPMENT_SLOT_MAINHAND, EQUIPMENT_SLOT_OFFHAND, EQUIPMENT_SLOT_RANGED, EQUIPMENT_SLOT_TABARD };
+
+>>>>>>> Stashed changes
     void BuildForgeCache()
     {
         CharacterActiveSpecs.clear();
@@ -835,9 +933,22 @@ private:
         AddCharacterSpecs();
         AddTalentSpent();
         AddCharacterTalents();
+<<<<<<< Updated upstream
+=======
+        LOG_INFO("server.load", "Loading characters points...");
+>>>>>>> Stashed changes
         AddCharacterPointsFromDB();
         AddCharacterClassSpecs();
+<<<<<<< Updated upstream
         AddPlayerSpellScaler();
+=======
+        AddCharacterPerks();
+        AddCharacterQueuedPerks();
+        AddCharacterPrestigePerks();
+        LoadCharacterResetFlags();
+
+        AddCharacterXmogSets();
+>>>>>>> Stashed changes
     }
 
     void GetCharacters()
@@ -955,6 +1066,223 @@ private:
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }
 
+<<<<<<< Updated upstream
+=======
+    void ForgetCharacterPerkInternal(uint32 charId, uint32 spec, uint32 spellId) {
+        // TODO trans->Append("DELETE FROM character_perks WHERE spellId = {} and specId = {}", spellId, spec);
+    }
+
+    void AddCharacterXmogSets()
+    {
+        LOG_INFO("server.load", "Loading character xmog sets...");
+        QueryResult xmogSets = CharacterDatabase.Query("SELECT * FROM `forge_character_transmogsets`");
+        
+        if (!xmogSets)
+            return;
+
+        XmogSets.clear();
+
+        do
+        {
+            Field* xmogSet = xmogSets->Fetch();
+            auto guid = xmogSet[0].Get<uint32>();
+            auto setid = xmogSet[1].Get<uint32>();
+            std::string name = xmogSet[2].Get<std::string>();
+            uint32 head = xmogSet[3].Get<uint32>();
+            uint32 shoulders = xmogSet[4].Get<uint32>();
+            uint32 shirt = xmogSet[5].Get<uint32>();
+            uint32 chest = xmogSet[6].Get<uint32>();
+            uint32 waist = xmogSet[7].Get<uint32>();
+            uint32 legs = xmogSet[8].Get<uint32>();
+            uint32 feet = xmogSet[9].Get<uint32>();
+            uint32 wrists = xmogSet[10].Get<uint32>();
+            uint32 hands = xmogSet[11].Get<uint32>();
+            uint32 back = xmogSet[12].Get<uint32>();
+            uint32 mh = xmogSet[13].Get<uint32>();
+            uint32 oh = xmogSet[14].Get<uint32>();
+            uint32 ranged = xmogSet[15].Get<uint32>();
+            uint32 tabard = xmogSet[16].Get<uint32>();
+
+            ForgeCharacaterXmog* set = new ForgeCharacaterXmog();
+            set->name = name;
+            set->slottedItems[EQUIPMENT_SLOT_HEAD] = head;
+            set->slottedItems[EQUIPMENT_SLOT_SHOULDERS] = shoulders;
+            set->slottedItems[EQUIPMENT_SLOT_BODY] = shirt;
+            set->slottedItems[EQUIPMENT_SLOT_CHEST] = chest;
+            set->slottedItems[EQUIPMENT_SLOT_WAIST] = waist;
+            set->slottedItems[EQUIPMENT_SLOT_LEGS] = legs;
+            set->slottedItems[EQUIPMENT_SLOT_FEET] = feet;
+            set->slottedItems[EQUIPMENT_SLOT_WRISTS] = wrists;
+            set->slottedItems[EQUIPMENT_SLOT_HANDS] = hands;
+            set->slottedItems[EQUIPMENT_SLOT_BACK] = back;
+            set->slottedItems[EQUIPMENT_SLOT_MAINHAND] = mh;
+            set->slottedItems[EQUIPMENT_SLOT_OFFHAND] = oh;
+            set->slottedItems[EQUIPMENT_SLOT_RANGED] = ranged;
+            set->slottedItems[EQUIPMENT_SLOT_TABARD] = tabard;
+
+            XmogSets[guid][setid] = set;
+        } while (xmogSets->NextRow());
+    }
+
+    void SaveXmogSetInternal(Player* player, uint32 set, ForgeCharacaterXmog* xmog) {
+        auto trans = CharacterDatabase.BeginTransaction();
+        trans->Append("INSERT INTO acore_characters.forge_character_transmogsets (guid, setid, setname, head, shoulders, shirt, chest, waist, legs, feet, wrists, hands, back, mh, oh, ranged, tabard) VALUES({}, {}, '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) on duplicate key update setname = '{}' , head = {}, shoulders = {}, shirt = {}, chest = {}, waist = {}, legs = {}, feet = {}, wrists = {}, hands = {}, back = {}, mh = {}, oh = {}, ranged = {}, tabard = {}",
+            player->GetGUID().GetCounter(), set, xmog->name, xmog->slottedItems[EQUIPMENT_SLOT_HEAD], xmog->slottedItems[EQUIPMENT_SLOT_SHOULDERS],
+            xmog->slottedItems[EQUIPMENT_SLOT_BODY], xmog->slottedItems[EQUIPMENT_SLOT_CHEST], xmog->slottedItems[EQUIPMENT_SLOT_WAIST],
+            xmog->slottedItems[EQUIPMENT_SLOT_LEGS], xmog->slottedItems[EQUIPMENT_SLOT_FEET], xmog->slottedItems[EQUIPMENT_SLOT_WRISTS],
+            xmog->slottedItems[EQUIPMENT_SLOT_HANDS], xmog->slottedItems[EQUIPMENT_SLOT_BACK], xmog->slottedItems[EQUIPMENT_SLOT_MAINHAND],
+            xmog->slottedItems[EQUIPMENT_SLOT_OFFHAND], xmog->slottedItems[EQUIPMENT_SLOT_RANGED], xmog->slottedItems[EQUIPMENT_SLOT_TABARD],
+            xmog->name, xmog->slottedItems[EQUIPMENT_SLOT_HEAD], xmog->slottedItems[EQUIPMENT_SLOT_SHOULDERS],
+            xmog->slottedItems[EQUIPMENT_SLOT_BODY], xmog->slottedItems[EQUIPMENT_SLOT_CHEST], xmog->slottedItems[EQUIPMENT_SLOT_WAIST],
+            xmog->slottedItems[EQUIPMENT_SLOT_LEGS], xmog->slottedItems[EQUIPMENT_SLOT_FEET], xmog->slottedItems[EQUIPMENT_SLOT_WRISTS],
+            xmog->slottedItems[EQUIPMENT_SLOT_HANDS], xmog->slottedItems[EQUIPMENT_SLOT_BACK], xmog->slottedItems[EQUIPMENT_SLOT_MAINHAND],
+            xmog->slottedItems[EQUIPMENT_SLOT_OFFHAND], xmog->slottedItems[EQUIPMENT_SLOT_RANGED], xmog->slottedItems[EQUIPMENT_SLOT_TABARD]);
+        CharacterDatabase.CommitTransaction(trans);
+    }
+
+    uint8 FirstOpenXmogSlot(Player* player) {
+        auto playerSets = XmogSets[player->GetGUID().GetCounter()];
+        int i = 0;
+        for (auto it = playerSets.cbegin(), end = playerSets.cend();
+            it != end && i == it->first; ++it, ++i)
+        { }
+        return i;
+    }
+
+    void AddPerkRanks()
+    {
+        LOG_INFO("server.load", "Loading perk ranks...");
+        QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM `acore_world`.`perk_ranks`");
+        do
+        {
+            Field* perkFields = perkRanks->Fetch();
+            auto perkId = perkFields[0].Get<uint32>();
+            auto rank = perkFields[1].Get<uint32>();
+            auto spellId = perkFields[2].Get<uint32>();
+
+            AllPerks[perkId]->ranks[rank] = spellId;
+            AllPerks[perkId]->ranksRev[spellId] = rank;
+        } while (perkRanks->NextRow());
+    }
+
+    void AddPerks()
+    {
+        Perks.clear();
+        AllPerks.clear();
+        LOG_INFO("server.load", "Loading all perks...");
+        QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
+        do
+        {
+            Field* perkFields = perks->Fetch();
+            Perk* newPerk = new Perk();
+            newPerk->spellId = perkFields[0].Get<uint32>();
+            newPerk->isUnique = perkFields[1].Get<int>() == 0 ? false : true;
+            newPerk->allowableClass = perkFields[2].Get<int>();
+            newPerk->isPermanent = perkFields[3].Get<int>() == 0 ? false : true;
+            newPerk->chance = perkFields[4].Get<uint8>();
+            newPerk->category = perkFields[5].Get<uint8>();
+            newPerk->isAura = perkFields[6].Get<int>() == 0 ? false : true;
+            newPerk->groupId = perkFields[7].Get<int>();
+            newPerk->tags = perkFields[8].Get<std::string>();
+
+            auto val = newPerk->allowableClass;
+            auto type = CharacterPerkType(newPerk->category);
+            if (val > 0) {
+                if (val & (1 << (CLASS_WARRIOR - 1)))
+                    Perks[type][CLASS_WARRIOR].push_back(newPerk);
+
+                if (val & (1 << (CLASS_PALADIN - 1)))
+                    Perks[type][CLASS_PALADIN].push_back(newPerk);
+
+                if (val & (1 << (CLASS_HUNTER - 1)))
+                    Perks[type][CLASS_HUNTER].push_back(newPerk);
+
+                if (val & (1 << (CLASS_ROGUE - 1)))
+                    Perks[type][CLASS_ROGUE].push_back(newPerk);
+
+                if (val & (1 << (CLASS_PRIEST - 1)))
+                    Perks[type][CLASS_PRIEST].push_back(newPerk);
+
+                if (val & (1 << (CLASS_DEATH_KNIGHT - 1)))
+                    Perks[type][CLASS_DEATH_KNIGHT].push_back(newPerk);
+
+                if (val & (1 << (CLASS_SHAMAN - 1)))
+                    Perks[type][CLASS_SHAMAN].push_back(newPerk);
+
+                if (val & (1 << (CLASS_MAGE - 1)))
+                    Perks[type][CLASS_MAGE].push_back(newPerk);
+
+                if (val & (1 << (CLASS_WARLOCK - 1)))
+                    Perks[type][CLASS_WARLOCK].push_back(newPerk);
+
+                if (val & (1 << (CLASS_DRUID - 1)))
+                    Perks[type][CLASS_DRUID].push_back(newPerk);
+            } else {
+                Perks[type][CLASS_WARRIOR].push_back(newPerk);
+                Perks[type][CLASS_PALADIN].push_back(newPerk);
+                Perks[type][CLASS_HUNTER].push_back(newPerk);
+                Perks[type][CLASS_ROGUE].push_back(newPerk);
+                Perks[type][CLASS_PRIEST].push_back(newPerk);
+                Perks[type][CLASS_DEATH_KNIGHT].push_back(newPerk);
+                Perks[type][CLASS_SHAMAN].push_back(newPerk);
+                Perks[type][CLASS_MAGE].push_back(newPerk);
+                Perks[type][CLASS_WARLOCK].push_back(newPerk);
+                Perks[type][CLASS_DRUID].push_back(newPerk);
+            }
+
+            AllPerks[newPerk->spellId] = newPerk;
+        } while (perks->NextRow());
+    }
+
+    void AddArchetypes()
+    {
+        LOG_INFO("server.load", "Loading archetypes...");
+        Archetypes.clear();
+
+        QueryResult archetypes = WorldDatabase.Query("SELECT * FROM archetype ORDER BY `allowableClass` ASC");
+        do
+        {
+            Field* archetypeFields = archetypes->Fetch();
+            auto allowableClass = archetypeFields[0].Get<int>();
+            auto level = archetypeFields[1].Get<uint32>();
+            auto role = archetypeFields[2].Get<uint8>();
+            auto perkId = archetypeFields[3].Get<uint32>();
+            auto isSpell = archetypeFields[4].Get<int>() == 0 ? false : true;
+
+            if (allowableClass & (1 << (CLASS_WARRIOR - 1)))
+                Archetypes[CLASS_WARRIOR][level].push_back(GetPerk(CLASS_WARRIOR, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_PALADIN - 1)))
+                Archetypes[CLASS_PALADIN][level].push_back(GetPerk(CLASS_PALADIN, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_HUNTER - 1)))
+                Archetypes[CLASS_HUNTER][level].push_back(GetPerk(CLASS_HUNTER, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_ROGUE - 1)))
+                Archetypes[CLASS_ROGUE][level].push_back(GetPerk(CLASS_ROGUE, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_PRIEST - 1)))
+                Archetypes[CLASS_PRIEST][level].push_back(GetPerk(CLASS_PRIEST, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_DEATH_KNIGHT - 1)))
+                Archetypes[CLASS_DEATH_KNIGHT][level].push_back(GetPerk(CLASS_DEATH_KNIGHT, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_SHAMAN - 1)))
+                Archetypes[CLASS_SHAMAN][level].push_back(GetPerk(CLASS_SHAMAN, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_MAGE - 1)))
+                Archetypes[CLASS_MAGE][level].push_back(GetPerk(CLASS_MAGE, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_WARLOCK - 1)))
+                Archetypes[CLASS_WARLOCK][level].push_back(GetPerk(CLASS_WARLOCK, perkId, CharacterPerkType::ARCHETYPE));
+
+            if (allowableClass & (1 << (CLASS_DRUID - 1)))
+                Archetypes[CLASS_DRUID][level].push_back(GetPerk(CLASS_DRUID, perkId, CharacterPerkType::ARCHETYPE));
+
+        } while (archetypes->NextRow());
+    }
+
+>>>>>>> Stashed changes
     void AddTalentTrees()
     {
         QueryResult talentTab = WorldDatabase.Query("SELECT * FROM forge_talent_tabs");
