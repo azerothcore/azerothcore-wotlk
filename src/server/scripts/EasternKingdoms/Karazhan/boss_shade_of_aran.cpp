@@ -384,7 +384,10 @@ struct boss_shade_of_aran : public BossAI
                         DoCastSelf(SPELL_POTION, false);
                         DoCastSelf(SPELL_AOE_PYROBLAST, false);
                         _drinkScheduler.CancelGroup(GROUP_DRINKING);
-                        _drinking = false;
+                        _drinkScheduler.Schedule(3s, [this](TaskContext)
+                        {
+                            _drinking = false;
+                        });
                     } else
                     {
                         context.Repeat(500ms);
