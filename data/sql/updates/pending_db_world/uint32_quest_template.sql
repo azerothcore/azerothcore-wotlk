@@ -1,0 +1,2 @@
+--
+ALTER TABLE `quest_template` MODIFY COLUMN `AllowableRaces` INT UNSIGNED NOT NULL DEFAULT 0;
