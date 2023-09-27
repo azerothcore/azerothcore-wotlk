@@ -1215,13 +1215,15 @@ public:
         if (sets != XmogSets.end()) {
             auto set = sets->second.find(setId);
             if (set != sets->second.end()) {
-                for (int i : xmogSlots)
+              
+                for (int i : slots)
                     if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                         set->second->slottedItems[i] = item->GetTransmog();
                     else
                         set->second->slottedItems[i] = 0;
 
                 SaveXmogSetInternal(player, setId, set->second);
+
             }
         }
     }
@@ -1232,8 +1234,9 @@ public:
 
         auto newSetId = FirstOpenXmogSlot(player);
 
-        for (int i : xmogSlots)
-            if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        uint8 slots[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18 };
+        for (int i : slots)
+            if (auto item = player->GetItemByPos(i))
                 xmog->slottedItems[i] = item->GetTransmog();
             else
                 xmog->slottedItems[i] = 0;
@@ -1243,8 +1246,9 @@ public:
     }
 
     std::string BuildXmogFromEquipped(Player* player) {
+        uint8 slots[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18 };
         std::string out = "noname^";
-        for (auto slot : xmogSlots) {
+        for (auto slot : slots) {
             auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
             out += item == nullptr ? "0^" : std::to_string(item->GetTransmog()) + "^";
         }
@@ -1259,8 +1263,8 @@ public:
             auto set = sets->second.find(setId);
             if (set != sets->second.end()) {
                 out += set->second->name + "^";
-                for (auto slot : xmogSlots) {
-                    out += std::to_string(set->second->slottedItems[slot]) + "^";
+                for (auto item : set->second->slottedItems) {
+                    out += std::to_string(item.second) + "^";
                 }
                 out += ";";
 
@@ -1303,7 +1307,6 @@ private:
     std::unordered_map<uint8, std::unordered_map<uint8, std::vector<ClassSpecDetail*>>> ClassSpecDetails;
 
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
-
 
     // Flagged for spec reset
     std::vector<uint32 /*guid*/> FlaggedForReset;
@@ -1367,6 +1370,7 @@ private:
         AddCharacterQueuedPerks();
         AddCharacterPrestigePerks();
         LoadCharacterResetFlags();
+
         AddCharacterXmogSets();
     }
 
@@ -1484,6 +1488,10 @@ private:
         }
         else
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
+    }
+
+    void ForgetCharacterPerkInternal(uint32 charId, uint32 spec, uint32 spellId) {
+        // TODO trans->Append("DELETE FROM character_perks WHERE spellId = {} and specId = {}", spellId, spec);
     }
 
     void AddCharacterXmogSets()

@@ -24,9 +24,6 @@ public:
 
     void SendTalents(Player*, uint32);
     void SendTalents(Player*);
-    void SendPerks(Player*, uint8);
-    void SendAllPerks(Player*);
-    void SendPerkSelection(Player*, std::string);
     void SendTalentTreeLayout(Player*);
     void SendTalentTreeLayout(Player*, uint32);
     void SendSpecInfo(Player*);
@@ -34,7 +31,7 @@ public:
     std::string BuildTree(Player*, CharacterPointType pointType, std::list<ForgeTalentTab*> tabs);
     void ApplyKnownForgeSpells(Player*);
     bool CanLearnTalent(Player*, uint32, uint32);
-    std::string DoBuildPerks(std::vector<CharacterSpecPerk*> spec, Player* player);
+
     // hater: perks
     void SendPerks(Player*, uint8);
     void SendAllPerks(Player*);

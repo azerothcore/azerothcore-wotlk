@@ -332,6 +332,7 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new SaveTransmogSetHandler(cache, cm));
     sTopicRouter->AddHandler(new GetTransmogSetsHandler(cache, cm));
     sTopicRouter->AddHandler(new GetTransmogHandler(cache, cm));
+
     new UseSkillBook();
     new ForgeCacheCommands();
 }

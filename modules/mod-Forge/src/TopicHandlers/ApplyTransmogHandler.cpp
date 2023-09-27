@@ -21,6 +21,12 @@ public:
 
     void HandleMessage(ForgeAddonMessage& iam) override
     {
+        if (!iam.player->pendingTransmogCheck)
+        {
+            iam.player->GetSession()->SendNotification("A transmogrifier must be present to apply this appearance.");
+            return;
+        }
+
         if (iam.message.empty())
             return;
 
@@ -92,4 +98,5 @@ private:
 
     ForgeCache* fc;
     ForgeCommonMessage* mc;
+
 };
