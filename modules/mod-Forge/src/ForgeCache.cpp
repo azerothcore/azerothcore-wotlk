@@ -881,15 +881,8 @@ private:
 
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
 
-<<<<<<< Updated upstream
-=======
     // Flagged for spec reset
     std::vector<uint32 /*guid*/> FlaggedForReset;
-
-    // Perks
-    std::unordered_map<CharacterPerkType, std::unordered_map<uint32 /*class*/, std::vector<Perk*>>> Perks;
-    std::unordered_map<uint32 /*class*/, std::unordered_map<uint32 /*level*/, std::vector<Perk*>>> Archetypes;
-    std::unordered_map<uint32 /*id*/, Perk*> AllPerks;
 
     // xmog
     std::unordered_map<uint32 /*char*/, std::unordered_map<uint8 /*setId*/, ForgeCharacaterXmog*>> XmogSets;
@@ -897,7 +890,6 @@ private:
         EQUIPMENT_SLOT_WAIST, EQUIPMENT_SLOT_LEGS, EQUIPMENT_SLOT_FEET, EQUIPMENT_SLOT_WRISTS, EQUIPMENT_SLOT_HANDS,
         EQUIPMENT_SLOT_BACK, EQUIPMENT_SLOT_MAINHAND, EQUIPMENT_SLOT_OFFHAND, EQUIPMENT_SLOT_RANGED, EQUIPMENT_SLOT_TABARD };
 
->>>>>>> Stashed changes
     void BuildForgeCache()
     {
         CharacterActiveSpecs.clear();
@@ -933,22 +925,10 @@ private:
         AddCharacterSpecs();
         AddTalentSpent();
         AddCharacterTalents();
-<<<<<<< Updated upstream
-=======
         LOG_INFO("server.load", "Loading characters points...");
->>>>>>> Stashed changes
         AddCharacterPointsFromDB();
         AddCharacterClassSpecs();
-<<<<<<< Updated upstream
-        AddPlayerSpellScaler();
-=======
-        AddCharacterPerks();
-        AddCharacterQueuedPerks();
-        AddCharacterPrestigePerks();
-        LoadCharacterResetFlags();
-
         AddCharacterXmogSets();
->>>>>>> Stashed changes
     }
 
     void GetCharacters()
@@ -1066,8 +1046,6 @@ private:
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }
 
-<<<<<<< Updated upstream
-=======
     void ForgetCharacterPerkInternal(uint32 charId, uint32 spec, uint32 spellId) {
         // TODO trans->Append("DELETE FROM character_perks WHERE spellId = {} and specId = {}", spellId, spec);
     }
@@ -1149,140 +1127,6 @@ private:
         return i;
     }
 
-    void AddPerkRanks()
-    {
-        LOG_INFO("server.load", "Loading perk ranks...");
-        QueryResult perkRanks = WorldDatabase.Query("SELECT * FROM `acore_world`.`perk_ranks`");
-        do
-        {
-            Field* perkFields = perkRanks->Fetch();
-            auto perkId = perkFields[0].Get<uint32>();
-            auto rank = perkFields[1].Get<uint32>();
-            auto spellId = perkFields[2].Get<uint32>();
-
-            AllPerks[perkId]->ranks[rank] = spellId;
-            AllPerks[perkId]->ranksRev[spellId] = rank;
-        } while (perkRanks->NextRow());
-    }
-
-    void AddPerks()
-    {
-        Perks.clear();
-        AllPerks.clear();
-        LOG_INFO("server.load", "Loading all perks...");
-        QueryResult perks = WorldDatabase.Query("SELECT * FROM perks ORDER BY `allowableClass` ASC");
-        do
-        {
-            Field* perkFields = perks->Fetch();
-            Perk* newPerk = new Perk();
-            newPerk->spellId = perkFields[0].Get<uint32>();
-            newPerk->isUnique = perkFields[1].Get<int>() == 0 ? false : true;
-            newPerk->allowableClass = perkFields[2].Get<int>();
-            newPerk->isPermanent = perkFields[3].Get<int>() == 0 ? false : true;
-            newPerk->chance = perkFields[4].Get<uint8>();
-            newPerk->category = perkFields[5].Get<uint8>();
-            newPerk->isAura = perkFields[6].Get<int>() == 0 ? false : true;
-            newPerk->groupId = perkFields[7].Get<int>();
-            newPerk->tags = perkFields[8].Get<std::string>();
-
-            auto val = newPerk->allowableClass;
-            auto type = CharacterPerkType(newPerk->category);
-            if (val > 0) {
-                if (val & (1 << (CLASS_WARRIOR - 1)))
-                    Perks[type][CLASS_WARRIOR].push_back(newPerk);
-
-                if (val & (1 << (CLASS_PALADIN - 1)))
-                    Perks[type][CLASS_PALADIN].push_back(newPerk);
-
-                if (val & (1 << (CLASS_HUNTER - 1)))
-                    Perks[type][CLASS_HUNTER].push_back(newPerk);
-
-                if (val & (1 << (CLASS_ROGUE - 1)))
-                    Perks[type][CLASS_ROGUE].push_back(newPerk);
-
-                if (val & (1 << (CLASS_PRIEST - 1)))
-                    Perks[type][CLASS_PRIEST].push_back(newPerk);
-
-                if (val & (1 << (CLASS_DEATH_KNIGHT - 1)))
-                    Perks[type][CLASS_DEATH_KNIGHT].push_back(newPerk);
-
-                if (val & (1 << (CLASS_SHAMAN - 1)))
-                    Perks[type][CLASS_SHAMAN].push_back(newPerk);
-
-                if (val & (1 << (CLASS_MAGE - 1)))
-                    Perks[type][CLASS_MAGE].push_back(newPerk);
-
-                if (val & (1 << (CLASS_WARLOCK - 1)))
-                    Perks[type][CLASS_WARLOCK].push_back(newPerk);
-
-                if (val & (1 << (CLASS_DRUID - 1)))
-                    Perks[type][CLASS_DRUID].push_back(newPerk);
-            } else {
-                Perks[type][CLASS_WARRIOR].push_back(newPerk);
-                Perks[type][CLASS_PALADIN].push_back(newPerk);
-                Perks[type][CLASS_HUNTER].push_back(newPerk);
-                Perks[type][CLASS_ROGUE].push_back(newPerk);
-                Perks[type][CLASS_PRIEST].push_back(newPerk);
-                Perks[type][CLASS_DEATH_KNIGHT].push_back(newPerk);
-                Perks[type][CLASS_SHAMAN].push_back(newPerk);
-                Perks[type][CLASS_MAGE].push_back(newPerk);
-                Perks[type][CLASS_WARLOCK].push_back(newPerk);
-                Perks[type][CLASS_DRUID].push_back(newPerk);
-            }
-
-            AllPerks[newPerk->spellId] = newPerk;
-        } while (perks->NextRow());
-    }
-
-    void AddArchetypes()
-    {
-        LOG_INFO("server.load", "Loading archetypes...");
-        Archetypes.clear();
-
-        QueryResult archetypes = WorldDatabase.Query("SELECT * FROM archetype ORDER BY `allowableClass` ASC");
-        do
-        {
-            Field* archetypeFields = archetypes->Fetch();
-            auto allowableClass = archetypeFields[0].Get<int>();
-            auto level = archetypeFields[1].Get<uint32>();
-            auto role = archetypeFields[2].Get<uint8>();
-            auto perkId = archetypeFields[3].Get<uint32>();
-            auto isSpell = archetypeFields[4].Get<int>() == 0 ? false : true;
-
-            if (allowableClass & (1 << (CLASS_WARRIOR - 1)))
-                Archetypes[CLASS_WARRIOR][level].push_back(GetPerk(CLASS_WARRIOR, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_PALADIN - 1)))
-                Archetypes[CLASS_PALADIN][level].push_back(GetPerk(CLASS_PALADIN, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_HUNTER - 1)))
-                Archetypes[CLASS_HUNTER][level].push_back(GetPerk(CLASS_HUNTER, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_ROGUE - 1)))
-                Archetypes[CLASS_ROGUE][level].push_back(GetPerk(CLASS_ROGUE, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_PRIEST - 1)))
-                Archetypes[CLASS_PRIEST][level].push_back(GetPerk(CLASS_PRIEST, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_DEATH_KNIGHT - 1)))
-                Archetypes[CLASS_DEATH_KNIGHT][level].push_back(GetPerk(CLASS_DEATH_KNIGHT, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_SHAMAN - 1)))
-                Archetypes[CLASS_SHAMAN][level].push_back(GetPerk(CLASS_SHAMAN, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_MAGE - 1)))
-                Archetypes[CLASS_MAGE][level].push_back(GetPerk(CLASS_MAGE, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_WARLOCK - 1)))
-                Archetypes[CLASS_WARLOCK][level].push_back(GetPerk(CLASS_WARLOCK, perkId, CharacterPerkType::ARCHETYPE));
-
-            if (allowableClass & (1 << (CLASS_DRUID - 1)))
-                Archetypes[CLASS_DRUID][level].push_back(GetPerk(CLASS_DRUID, perkId, CharacterPerkType::ARCHETYPE));
-
-        } while (archetypes->NextRow());
-    }
-
->>>>>>> Stashed changes
     void AddTalentTrees()
     {
         QueryResult talentTab = WorldDatabase.Query("SELECT * FROM forge_talent_tabs");

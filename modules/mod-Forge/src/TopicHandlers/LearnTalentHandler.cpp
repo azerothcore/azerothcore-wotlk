@@ -4,10 +4,7 @@
 #include "Chat.h"
 #include "WorldPacket.h"
 #include "TopicRouter.h"
-<<<<<<< Updated upstream
-=======
 #include "Pet.h"
->>>>>>> Stashed changes
 #include <ForgeCache.cpp>
 #include <boost/algorithm/string.hpp>
 #include "ForgeCommonMessage.h"
