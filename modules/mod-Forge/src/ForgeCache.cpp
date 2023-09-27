@@ -190,6 +190,13 @@ struct ForgeTalentTab
     std::unordered_map<uint32, ForgeTalent*> Talents;
 };
 
+// XMOG
+struct ForgeCharacaterXmog
+{
+    std::string name;
+    std::unordered_map<uint8, uint32> slottedItems;
+};
+
 
 class ForgeCache : public DatabaseScript
 {
@@ -1190,6 +1197,80 @@ public:
         WorldDatabase.CommitTransaction(trans);
     }
 
+    std::string BuildXmogSetsMsg(Player* player) {
+        std::string out = "";
+
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+        if (sets != XmogSets.end())
+            for (auto set : sets->second)
+                out += std::to_string(set.first) + "^" + set.second->name + ";";
+        else
+            out += "empty";
+
+        return out;
+    }
+
+    void SaveXmogSet(Player* player, uint32 setId) {
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+        if (sets != XmogSets.end()) {
+            auto set = sets->second.find(setId);
+            if (set != sets->second.end()) {
+                for (int i : xmogSlots)
+                    if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                        set->second->slottedItems[i] = item->GetTransmog();
+                    else
+                        set->second->slottedItems[i] = 0;
+
+                SaveXmogSetInternal(player, setId, set->second);
+            }
+        }
+    }
+
+    void AddXmogSet(Player* player, uint32 setId, std::string name) {
+        ForgeCharacaterXmog* xmog = new ForgeCharacaterXmog();
+        xmog->name = name;
+
+        auto newSetId = FirstOpenXmogSlot(player);
+
+        for (int i : xmogSlots)
+            if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                xmog->slottedItems[i] = item->GetTransmog();
+            else
+                xmog->slottedItems[i] = 0;
+
+        XmogSets[player->GetGUID().GetCounter()][newSetId] = xmog;
+        SaveXmogSetInternal(player, newSetId, xmog);
+    }
+
+    std::string BuildXmogFromEquipped(Player* player) {
+        std::string out = "noname^";
+        for (auto slot : xmogSlots) {
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            out += item == nullptr ? "0^" : std::to_string(item->GetTransmog()) + "^";
+        }
+        return out + ";";
+    }
+
+    std::string BuildXmogFromSet(Player* player, uint8 setId) {
+        std::string out = "";
+        auto sets = XmogSets.find(player->GetGUID().GetCounter());
+
+        if (sets != XmogSets.end()) {
+            auto set = sets->second.find(setId);
+            if (set != sets->second.end()) {
+                out += set->second->name + "^";
+                for (auto slot : xmogSlots) {
+                    out += std::to_string(set->second->slottedItems[slot]) + "^";
+                }
+                out += ";";
+
+                return out;
+            }
+        }
+
+        return BuildXmogFromEquipped(player);
+    }
+
     std::vector<uint32> RACE_LIST;
     std::vector<uint32> CLASS_LIST;
     std::vector<CharacterPointType> TALENT_POINT_TYPES;
@@ -1223,6 +1304,7 @@ private:
 
     std::unordered_map<uint32, std::vector<ObjectGuid>> PlayerCharacterMap;
 
+
     // Flagged for spec reset
     std::vector<uint32 /*guid*/> FlaggedForReset;
 
@@ -1231,6 +1313,11 @@ private:
     std::unordered_map<uint32 /*class*/, std::unordered_map<uint32 /*level*/, std::vector<Perk*>>> Archetypes;
     std::unordered_map<uint32 /*id*/, Perk*> AllPerks;
 
+    // xmog
+    std::unordered_map<uint32 /*char*/, std::unordered_map<uint8 /*setId*/, ForgeCharacaterXmog*>> XmogSets;
+    uint8 xmogSlots[14] = { EQUIPMENT_SLOT_HEAD, EQUIPMENT_SLOT_SHOULDERS, EQUIPMENT_SLOT_BODY, EQUIPMENT_SLOT_CHEST,
+        EQUIPMENT_SLOT_WAIST, EQUIPMENT_SLOT_LEGS, EQUIPMENT_SLOT_FEET, EQUIPMENT_SLOT_WRISTS, EQUIPMENT_SLOT_HANDS,
+        EQUIPMENT_SLOT_BACK, EQUIPMENT_SLOT_MAINHAND, EQUIPMENT_SLOT_OFFHAND, EQUIPMENT_SLOT_RANGED, EQUIPMENT_SLOT_TABARD };
 
     void BuildForgeCache()
     {
@@ -1272,7 +1359,7 @@ private:
         AddTalentSpent();
         LOG_INFO("server.load", "Loading character talents...");
         AddCharacterTalents();
-        LOG_INFO("server.load", "Loading charcaters points...");
+        LOG_INFO("server.load", "Loading characters points...");
         AddCharacterPointsFromDB();
         LOG_INFO("server.load", "Loading characters class specs...");
         AddCharacterClassSpecs();
@@ -1280,6 +1367,7 @@ private:
         AddCharacterQueuedPerks();
         AddCharacterPrestigePerks();
         LoadCharacterResetFlags();
+        AddCharacterXmogSets();
     }
 
     void GetCharacters()
@@ -1398,8 +1486,81 @@ private:
             trans->Append("INSERT INTO `forge_character_talents` (`guid`,`spec`,`spellid`,`tabId`,`currentrank`) VALUES ({},{},{},{},{}) ON DUPLICATE KEY UPDATE `currentrank` = {}", account, ACCOUNT_WIDE_KEY, spellId, tabId, known, known);
     }
 
-    void ForgetCharacterPerkInternal(uint32 charId, uint32 spec, uint32 spellId) {
-        // TODO trans->Append("DELETE FROM character_perks WHERE spellId = {} and specId = {}", spellId, spec);
+    void AddCharacterXmogSets()
+    {
+        LOG_INFO("server.load", "Loading character xmog sets...");
+        QueryResult xmogSets = CharacterDatabase.Query("SELECT * FROM `forge_character_transmogsets`");
+        
+        if (!xmogSets)
+            return;
+
+        XmogSets.clear();
+
+        do
+        {
+            Field* xmogSet = xmogSets->Fetch();
+            auto guid = xmogSet[0].Get<uint32>();
+            auto setid = xmogSet[1].Get<uint32>();
+            std::string name = xmogSet[2].Get<std::string>();
+            uint32 head = xmogSet[3].Get<uint32>();
+            uint32 shoulders = xmogSet[4].Get<uint32>();
+            uint32 shirt = xmogSet[5].Get<uint32>();
+            uint32 chest = xmogSet[6].Get<uint32>();
+            uint32 waist = xmogSet[7].Get<uint32>();
+            uint32 legs = xmogSet[8].Get<uint32>();
+            uint32 feet = xmogSet[9].Get<uint32>();
+            uint32 wrists = xmogSet[10].Get<uint32>();
+            uint32 hands = xmogSet[11].Get<uint32>();
+            uint32 back = xmogSet[12].Get<uint32>();
+            uint32 mh = xmogSet[13].Get<uint32>();
+            uint32 oh = xmogSet[14].Get<uint32>();
+            uint32 ranged = xmogSet[15].Get<uint32>();
+            uint32 tabard = xmogSet[16].Get<uint32>();
+
+            ForgeCharacaterXmog* set = new ForgeCharacaterXmog();
+            set->name = name;
+            set->slottedItems[EQUIPMENT_SLOT_HEAD] = head;
+            set->slottedItems[EQUIPMENT_SLOT_SHOULDERS] = shoulders;
+            set->slottedItems[EQUIPMENT_SLOT_BODY] = shirt;
+            set->slottedItems[EQUIPMENT_SLOT_CHEST] = chest;
+            set->slottedItems[EQUIPMENT_SLOT_WAIST] = waist;
+            set->slottedItems[EQUIPMENT_SLOT_LEGS] = legs;
+            set->slottedItems[EQUIPMENT_SLOT_FEET] = feet;
+            set->slottedItems[EQUIPMENT_SLOT_WRISTS] = wrists;
+            set->slottedItems[EQUIPMENT_SLOT_HANDS] = hands;
+            set->slottedItems[EQUIPMENT_SLOT_BACK] = back;
+            set->slottedItems[EQUIPMENT_SLOT_MAINHAND] = mh;
+            set->slottedItems[EQUIPMENT_SLOT_OFFHAND] = oh;
+            set->slottedItems[EQUIPMENT_SLOT_RANGED] = ranged;
+            set->slottedItems[EQUIPMENT_SLOT_TABARD] = tabard;
+
+            XmogSets[guid][setid] = set;
+        } while (xmogSets->NextRow());
+    }
+
+    void SaveXmogSetInternal(Player* player, uint32 set, ForgeCharacaterXmog* xmog) {
+        auto trans = CharacterDatabase.BeginTransaction();
+        trans->Append("INSERT INTO acore_characters.forge_character_transmogsets (guid, setid, setname, head, shoulders, shirt, chest, waist, legs, feet, wrists, hands, back, mh, oh, ranged, tabard) VALUES({}, {}, '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) on duplicate key update setname = '{}' , head = {}, shoulders = {}, shirt = {}, chest = {}, waist = {}, legs = {}, feet = {}, wrists = {}, hands = {}, back = {}, mh = {}, oh = {}, ranged = {}, tabard = {}",
+            player->GetGUID().GetCounter(), set, xmog->name, xmog->slottedItems[EQUIPMENT_SLOT_HEAD], xmog->slottedItems[EQUIPMENT_SLOT_SHOULDERS],
+            xmog->slottedItems[EQUIPMENT_SLOT_BODY], xmog->slottedItems[EQUIPMENT_SLOT_CHEST], xmog->slottedItems[EQUIPMENT_SLOT_WAIST],
+            xmog->slottedItems[EQUIPMENT_SLOT_LEGS], xmog->slottedItems[EQUIPMENT_SLOT_FEET], xmog->slottedItems[EQUIPMENT_SLOT_WRISTS],
+            xmog->slottedItems[EQUIPMENT_SLOT_HANDS], xmog->slottedItems[EQUIPMENT_SLOT_BACK], xmog->slottedItems[EQUIPMENT_SLOT_MAINHAND],
+            xmog->slottedItems[EQUIPMENT_SLOT_OFFHAND], xmog->slottedItems[EQUIPMENT_SLOT_RANGED], xmog->slottedItems[EQUIPMENT_SLOT_TABARD],
+            xmog->name, xmog->slottedItems[EQUIPMENT_SLOT_HEAD], xmog->slottedItems[EQUIPMENT_SLOT_SHOULDERS],
+            xmog->slottedItems[EQUIPMENT_SLOT_BODY], xmog->slottedItems[EQUIPMENT_SLOT_CHEST], xmog->slottedItems[EQUIPMENT_SLOT_WAIST],
+            xmog->slottedItems[EQUIPMENT_SLOT_LEGS], xmog->slottedItems[EQUIPMENT_SLOT_FEET], xmog->slottedItems[EQUIPMENT_SLOT_WRISTS],
+            xmog->slottedItems[EQUIPMENT_SLOT_HANDS], xmog->slottedItems[EQUIPMENT_SLOT_BACK], xmog->slottedItems[EQUIPMENT_SLOT_MAINHAND],
+            xmog->slottedItems[EQUIPMENT_SLOT_OFFHAND], xmog->slottedItems[EQUIPMENT_SLOT_RANGED], xmog->slottedItems[EQUIPMENT_SLOT_TABARD]);
+        CharacterDatabase.CommitTransaction(trans);
+    }
+
+    uint8 FirstOpenXmogSlot(Player* player) {
+        auto playerSets = XmogSets[player->GetGUID().GetCounter()];
+        int i = 0;
+        for (auto it = playerSets.cbegin(), end = playerSets.cend();
+            it != end && i == it->first; ++it, ++i)
+        { }
+        return i;
     }
 
     void AddPerkRanks()

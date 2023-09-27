@@ -39,9 +39,6 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_ACCOUNT_TRANSMOG, "DELETE FROM custom_account_transmog WHERE accountid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_ACCOUNT_TRANSMOG, "SELECT `type`, entry FROM custom_account_transmog WHERE accountid = ? ORDER BY entry", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_ACCOUNT_TRANSMOG, "INSERT INTO custom_account_transmog (`accountid`, `type`, `entry`) VALUES (?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_DEL_TRANSMOG_SETS, "DELETE FROM `custom_transmogrification_sets` WHERE owner = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_SEL_TRANSMOG_SETS, "SELECT `presetid`, `setname`, `setdata` FROM `custom_transmogrification_sets` WHERE owner = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_REP_TRANSMOG_SETS, "REPLACE INTO `custom_transmogrification_sets` (`owner`, `presetid`, `setname`, `setdata`) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_BANINFO, "SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d %H:%i:%s'), unbandate-bandate, active, unbandate, banreason, bannedby FROM character_banned WHERE guid = ? ORDER BY bandate ASC", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_GUID_BY_NAME_FILTER, "SELECT guid, name FROM characters WHERE name LIKE CONCAT('%%', ?, '%%')", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_BANINFO_LIST, "SELECT bandate, unbandate, bannedby, banreason FROM character_banned WHERE guid = ? ORDER BY unbandate", CONNECTION_SYNCH);

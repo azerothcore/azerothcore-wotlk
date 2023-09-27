@@ -110,10 +110,10 @@ public:
     bool CanAddToCollection(Player* player, Item* item);
     bool CanAddToCollection(Player* player, ItemTemplate const* itemTemplate);
     bool CanAddEnchantToCollection(Player* player, Item* item);
-    uint32 Save(Player* player, AppearanceType transmogtype, uint32 visual);
-    void SaveToDB(Player* player, AppearanceType transmogtype, uint32 visual);
+    uint32 Save(Player* player, uint32 transmogtype, uint32 visual);
+    void SaveToDB(Player* player, uint32 transmogtype, uint32 visual);
 
-    bool HasVisual(Player* player, AppearanceType transmogtype, uint32 visual);
+    bool HasVisual(Player* player, uint32 transmogtype, uint32 visual);
 
     std::vector<ObjectGuid> GetItemList(const Player* player);
     std::vector<Item*> GetEquippedItems(Player* player);
@@ -128,7 +128,7 @@ public:
     TransmogResult TrySetPendingTransmog(Player* player, uint32 slot, uint32 entry);
     TransmogResult TrySetPendingEnchant(Player* player, uint32 slot, uint32 entry);
     TransmogResult TransmogrifyPending(Player* player, int32 expectedCost = -1);
-    void Transmogrify(Player* player, Item* transmogrified, AppearanceType type, uint32 entry);
+    void Transmogrify(Player* player, Item* transmogrified, uint32 type, uint32 entry);
 
     void RemoveAllTransmogrifications(Player* player);
     void RevertAllTransmogrifications(Player* player);

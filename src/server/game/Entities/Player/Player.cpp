@@ -4363,10 +4363,6 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
-                stmt->SetData(0, lowGuid);
-                trans->Append(stmt);
-
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ACCOUNT_DATA);
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
@@ -15366,24 +15362,6 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
     }
 
     trans->Append(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
-    stmt->SetData(0, GetGUID().GetCounter());
-    trans->Append(stmt);
-    for (auto&& it : presetMap)
-    {
-        if (it.second.data.empty())
-            continue;
-        std::ostringstream ss;
-        for (auto const & v : it.second.data)
-            ss << static_cast<uint32>(std::get<uint8>(v)) << ' ' << std::get<uint32>(v) << ' ' << static_cast<uint32>(std::get<AppearanceType>(v)) << ' ';
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_TRANSMOG_SETS);
-        stmt->SetData(0, GetGUID().GetCounter());
-        stmt->SetData(1, it.first);
-        stmt->SetData(2, it.second.name);
-        stmt->SetData(3, ss.str());
-        trans->Append(stmt);
-    }
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)

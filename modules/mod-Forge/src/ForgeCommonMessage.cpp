@@ -422,6 +422,22 @@ void ForgeCommonMessage::SendPerkSelection(Player* player, std::string clientMsg
     player->SendForgeUIMsg(ForgeTopic::OFFER_SELECTION, clientMsg);
 }
 
+void ForgeCommonMessage::SendXmogSet(Player* player, uint8 setId) {
+    std::string clientMsg = std::to_string(setId) + "^";
+    if (setId < (uint8)sConfigMgr->GetIntDefault("Transmogrification.MaxSets", 10)) {
+        clientMsg += fc->BuildXmogFromSet(player, setId);
+    }
+    else {
+        clientMsg += fc->BuildXmogFromEquipped(player);
+    }
+    player->SendForgeUIMsg(ForgeTopic::LOAD_XMOG_SET, clientMsg);
+}
+
+void ForgeCommonMessage::SendXmogSets(Player* player) {
+    auto msg = fc->BuildXmogSetsMsg(player);
+    player->SendForgeUIMsg(ForgeTopic::GET_XMOG_SETS, msg);
+}
+
 std::string ForgeCommonMessage::DoBuildRanks(std::unordered_map<uint32, ForgeCharacterTalent*>& spec, Player* player, std::string clientMsg, uint32 tabId)
 {
     int i = 0;

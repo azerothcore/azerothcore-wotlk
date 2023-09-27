@@ -4,7 +4,6 @@
 #include "Chat.h"
 #include "WorldPacket.h"
 #include "TopicRouter.h"
-
 #include "Pet.h"
 #include <ForgeCache.cpp>
 #include <boost/algorithm/string.hpp>

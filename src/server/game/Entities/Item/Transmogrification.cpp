@@ -440,32 +440,10 @@ bool Transmogrification::IsNotAllowed(uint32 entry)
     return NotAllowed.find(entry) != NotAllowed.end();
 }
 
-bool Transmogrification::IsAllowedQuality(uint32 quality)
-{
-    LOG_DEBUG("custom.transmog", "Transmogrification::IsAllowedQuality");
-
-    switch (quality)
-    {
-        case ITEM_QUALITY_POOR: return AllowPoor;
-        case ITEM_QUALITY_NORMAL: return AllowCommon;
-        case ITEM_QUALITY_UNCOMMON: return AllowUncommon;
-        case ITEM_QUALITY_RARE: return AllowRare;
-        case ITEM_QUALITY_EPIC: return AllowEpic;
-        case ITEM_QUALITY_LEGENDARY: return AllowLegendary;
-        case ITEM_QUALITY_ARTIFACT: return AllowArtifact;
-        case ITEM_QUALITY_HEIRLOOM: return AllowHeirloom;
-        default: return false;
-    }
-}
-
 void Transmogrification::LoadConfig(bool /*reload*/)
 {
     LOG_DEBUG("custom.transmog", "Transmogrification::LoadConfig");
 
-    EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
-    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 65001));
-
-    EnableSets = sConfigMgr->GetBoolDefault("Transmogrification.EnableSets", true);
     MaxSets = (uint8)sConfigMgr->GetIntDefault("Transmogrification.MaxSets", 10);
 
     if (MaxSets > AbsoluteMaxSets)
@@ -474,7 +452,6 @@ void Transmogrification::LoadConfig(bool /*reload*/)
     }
 
     EnableTransmogInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableTransmogInfo", true);
-    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 65000));
 
     std::istringstream issAllowed(sConfigMgr->GetStringDefault("Transmogrification.Allowed", ""));
     std::istringstream issNotAllowed(sConfigMgr->GetStringDefault("Transmogrification.NotAllowed", ""));
@@ -497,15 +474,6 @@ void Transmogrification::LoadConfig(bool /*reload*/)
 
     ScaledCostModifier = sConfigMgr->GetFloatDefault("Transmogrification.ScaledCostModifier", 1.0f);
     CopperCost = sConfigMgr->GetIntDefault("Transmogrification.CopperCost", 0);
-
-    AllowPoor = sConfigMgr->GetBoolDefault("Transmogrification.AllowPoor", false);
-    AllowCommon = sConfigMgr->GetBoolDefault("Transmogrification.AllowCommon", false);
-    AllowUncommon = sConfigMgr->GetBoolDefault("Transmogrification.AllowUncommon", true);
-    AllowRare = sConfigMgr->GetBoolDefault("Transmogrification.AllowRare", true);
-    AllowEpic = sConfigMgr->GetBoolDefault("Transmogrification.AllowEpic", true);
-    AllowLegendary = sConfigMgr->GetBoolDefault("Transmogrification.AllowLegendary", false);
-    AllowArtifact = sConfigMgr->GetBoolDefault("Transmogrification.AllowArtifact", false);
-    AllowHeirloom = sConfigMgr->GetBoolDefault("Transmogrification.AllowHeirloom", true);
 
     AllowMixedArmorTypes = sConfigMgr->GetBoolDefault("Transmogrification.AllowMixedArmorTypes", false);
     AllowMixedWeaponTypes = sConfigMgr->GetBoolDefault("Transmogrification.AllowMixedWeaponTypes", false);
@@ -670,23 +638,22 @@ TransmogResult Transmogrification::TrySetPendingEnchant(Player* player, uint32 s
     return TransmogResult_Ok;
 }
 
-void Transmogrification::Transmogrify(Player* player, Item* itemTransmogrified, AppearanceType type, uint32 entry)
+void Transmogrification::Transmogrify(Player* player, Item* itemTransmogrified, uint32 type, uint32 entry)
 {
     if (entry == InvisibleEntry)
         entry = InvisibleEntry;
     if (entry == NormalEntry)
         entry = 0;
-    switch (type)
-    {
-        case TRANSMOG_TYPE_ITEM:
-            itemTransmogrified->SetTransmog(entry);
-            break;
-        case TRANSMOG_TYPE_ENCHANT:
-            itemTransmogrified->SetEnchant(entry);
-            break;
-        case TRANSMOG_TYPE_COUNT:
-            return;
+    if (type < EQUIPMENT_SLOT_END && type > 0) {
+        itemTransmogrified->SetTransmog(entry);
     }
+    else if (type == EQUIPMENT_SLOT_END) {
+        itemTransmogrified->SetEnchant(entry);
+    } else {
+        return;
+    }
+    switch (type)
+
     itemTransmogrified->UpdatePlayedTime(player);
     itemTransmogrified->SetOwnerGUID(player->GetGUID());
     itemTransmogrified->SetNotRefundable(player);
@@ -844,27 +811,10 @@ TransmogResult Transmogrification::CannotTransmogrify(ItemTemplate const* proto)
     if (!AllowFishingPoles && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
         return TransmogResult_FishingPoleBlocked;
 
-    if (!IsAllowedQuality(proto->Quality))
-        return TransmogResult_InvalidItemQuality;
-
     // Commented out because not sure if such restriction exists
     // If World Event is not active, prevent using event dependant items
     // if (!IgnoreReqEvent && proto->HolidayId && !IsHolidayActive((HolidayIds)proto->HolidayId))
     //     return TransmogResult_RequiredEventNotActive;
-
-    if (!IgnoreReqStats)
-    {
-        static const auto hasStat = [](ItemTemplate const* proto) {
-            for (decltype(proto->StatsCount) i = 0; i < proto->StatsCount; ++i)
-            {
-                if (proto->ItemStat[i].ItemStatValue != 0)
-                    return true;
-            }
-            return false;
-        };
-        if (!proto->RandomProperty && !proto->RandomSuffix && !hasStat(proto))
-            return TransmogResult_ItemMustHaveStats;
-    }
 
     return TransmogResult_Ok;
 }
@@ -910,7 +860,7 @@ bool Transmogrification::CanAddToCollection(Player* player, ItemTemplate const* 
     return true;
 }
 
-void Transmogrification::SaveToDB(Player* player, AppearanceType transmogtype, uint32 visual)
+void Transmogrification::SaveToDB(Player* player, uint32 transmogtype, uint32 visual)
 {
     auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_TRANSMOG);
     stmt->SetData(0, player->GetSession()->GetAccountId());
@@ -919,9 +869,9 @@ void Transmogrification::SaveToDB(Player* player, AppearanceType transmogtype, u
     CharacterDatabase.Execute(stmt);
 }
 
-bool Transmogrification::HasVisual(Player* player, AppearanceType transmogtype, uint32 visual)
+bool Transmogrification::HasVisual(Player* player, uint32 transmogtype, uint32 visual)
 {
-    if (transmogtype == AppearanceType::TRANSMOG_TYPE_ENCHANT) {
+    if (transmogtype == EQUIPMENT_SLOT_END) {
         // Enchants are currently not all saved to appearances
         auto it = enchant_to_spells.find(visual);
         if (it != enchant_to_spells.end()) {
@@ -932,7 +882,7 @@ bool Transmogrification::HasVisual(Player* player, AppearanceType transmogtype, 
     return cont.find(visual) != cont.end();
 }
 
-uint32 Transmogrification::Save(Player* player, AppearanceType transmogtype, uint32 visual)
+uint32 Transmogrification::Save(Player* player, uint32 transmogtype, uint32 visual)
 {
     if (player->transmogrification_appearances[transmogtype].insert(visual).second)
     {
@@ -944,17 +894,16 @@ uint32 Transmogrification::Save(Player* player, AppearanceType transmogtype, uin
 
 uint32 Transmogrification::AddItemVisualToCollection(Player* player, Item* item)
 {
-    uint32 visual = item->GetEntry();
-    if (!visual || !CanAddToCollection(player, item))
-        return 0;
-    return Save(player, TRANSMOG_TYPE_ITEM, visual);
+    return AddItemVisualToCollection(player, item->GetTemplate());
 }
 
 uint32 Transmogrification::AddItemVisualToCollection(Player* player, const ItemTemplate* itemtemplate)
 {
-    if (!itemtemplate || !CanAddToCollection(player, itemtemplate))
-        return 0;
-    return Save(player, TRANSMOG_TYPE_ITEM, itemtemplate->ItemId);
+    auto slot = player->FindEquipSlot(itemtemplate, NULL_SLOT, true);
+    if (!itemtemplate || !CanAddToCollection(player, itemtemplate) || slot == NULL_SLOT)
+        return 0;   
+
+    return Save(player, slot, itemtemplate->ItemId);
 }
 
 uint32 Transmogrification::AddEnchantVisualToCollection(Player* player, uint32 enchant_id)
@@ -970,7 +919,7 @@ uint32 Transmogrification::AddEnchantVisualToCollection(Player* player, uint32 e
         return 0;
     //if (!CanAddEnchantToCollection(player, item))
     //    return 0;
-    return Save(player, TRANSMOG_TYPE_ENCHANT, enchant_id);
+    return Save(player, EQUIPMENT_SLOT_END, enchant_id);
 }
 
 void Transmogrification::AddToCollection(Player* player, Item* item)

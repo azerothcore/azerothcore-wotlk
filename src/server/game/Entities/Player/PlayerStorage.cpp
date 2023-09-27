@@ -2906,8 +2906,6 @@ void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
         else
             SetUInt16Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), 0, pItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
 
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), pItem->GetEntry());
-        SetUInt16Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), 0, pItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
         SetUInt16Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), 1, pItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT));
     }
     else
@@ -5522,62 +5520,14 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
             Field* fields = result->Fetch();
             uint32 type = fields[0].Get<uint32>();
             uint32 entry = fields[1].Get<uint32>();
-            switch (type)
+
+            if (type < 0 || type > 19)
             {
-            case TRANSMOG_TYPE_ITEM:
-            case TRANSMOG_TYPE_ENCHANT:
-                break;
-            default:
                 LOG_ERROR("custom.transmog", "Account %u has transmog with unknown type %u in custom_account_transmog, ignoring", GetSession()->GetAccountId(), type);
                 continue;
             }
+
             transmogrification_appearances[type].insert(entry);
-        } while (result->NextRow());
-    }
-
-    if (auto result = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TRANSMOG_SETS))
-    {
-        do
-        {
-            Field* field = result->Fetch();
-            uint8 PresetID = field[0].Get<uint8>();
-            std::string SetName = field[1].Get<std::string>();
-            std::istringstream SetData(field[2].Get<std::string>());
-
-            presetMap[PresetID].name = SetName;
-
-            uint32 slot;
-            uint32 entry;
-            uint32 type;
-            while (SetData >> slot >> entry >> type)
-            {
-                if (slot >= EQUIPMENT_SLOT_END)
-                {
-                    LOG_ERROR("custom.transmog", "Set has invalid slot %u (Owner: %u, PresetID: %u), ignoring.", slot, GetGUID().GetCounter(), uint32(PresetID));
-                    continue;
-                }
-                switch (type)
-                {
-                case TRANSMOG_TYPE_ITEM:
-                    if (!sObjectMgr->GetItemTemplate(entry))
-                    {
-                        LOG_ERROR("custom.transmog", "Set has invalid item entry %u (Owner: %u, PresetID: %u), ignoring.", entry, GetGUID().GetCounter(), uint32(PresetID));
-                        continue;
-                    }
-                    break;
-                case TRANSMOG_TYPE_ENCHANT:
-                    if (!sSpellItemEnchantmentStore.LookupEntry(entry))
-                    {
-                        LOG_ERROR("custom.transmog", "Set has invalid enchant entry %u (Owner: %u, PresetID: %u), ignoring.", entry, GetGUID().GetCounter(), uint32(PresetID));
-                        continue;
-                    }
-                    break;
-                default:
-                    LOG_ERROR("custom.transmog", "Set has invalid transmog type %u (Owner: %u, PresetID: %u), ignoring.", type, GetGUID().GetCounter(), uint32(PresetID));
-                    continue;
-                }
-                presetMap[PresetID].data.push_back(std::make_tuple(static_cast<uint8>(slot), static_cast<uint32>(entry), static_cast<AppearanceType>(type)));
-            }
         } while (result->NextRow());
     }
 
@@ -6096,7 +6046,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
     {
         bool remove = false;
         item = NewItemOrBag(proto);
-        if (item->LoadFromDB(itemGuid, GetGUID(), fields, itemEntry))
+        if (item->LoadFromDB(itemGuid, GetGUID(), fields, itemEntry, true))
         {
             auto const transmog = item->GetTransmog();
             bool hasTemplate = transmog != NormalEntry && transmog != InvisibleEntry;
