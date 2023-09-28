@@ -74,6 +74,21 @@ void ScriptMgr::OnPlayerReleasedGhost(Player* player)
     });
 }
 
+bool ScriptMgr::OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([player, mapId, zoneId, bySpell](PlayerScript* script)
+        {
+            return !script->OnCanPlayerFlyInZone(player, mapId, zoneId, bySpell);
+        });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

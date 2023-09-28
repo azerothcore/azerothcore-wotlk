@@ -105,7 +105,7 @@ public:
         {
             PlayersKilled = SAY_PLAYER_KILLED;
             HelpersKilled = SAY_HELPER_DIED;
-            instance->SetData(DATA_DELRISSA_EVENT, NOT_STARTED);
+            instance->SetBossState(DATA_DELRISSA, NOT_STARTED);
             summons.Respawn();
 
             me->SetLootMode(0);
@@ -141,7 +141,7 @@ public:
             {
                 me->loot.clear();
                 me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
-                instance->SetData(DATA_DELRISSA_EVENT, DONE);
+                instance->SetBossState(DATA_DELRISSA, DONE);
                 me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
             ++HelpersKilled;
@@ -151,7 +151,7 @@ public:
         {
             Talk(SAY_AGGRO);
             summons.DoZoneInCombat();
-            instance->SetData(DATA_DELRISSA_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_DELRISSA, IN_PROGRESS);
 
             events.ScheduleEvent(EVENT_SPELL_FLASH_HEAL, 15000);
             events.ScheduleEvent(EVENT_SPELL_RENEW, 10000);
@@ -177,7 +177,7 @@ public:
             Talk(SAY_DEATH);
 
             if (HelpersKilled == MAX_ACTIVE_HELPERS + 1)
-                instance->SetData(DATA_DELRISSA_EVENT, DONE);
+                instance->SetBossState(DATA_DELRISSA, DONE);
         }
 
         void UpdateAI(uint32 diff) override
