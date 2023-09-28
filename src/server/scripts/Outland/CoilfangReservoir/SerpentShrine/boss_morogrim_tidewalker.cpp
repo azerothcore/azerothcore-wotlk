@@ -112,7 +112,7 @@ struct boss_morogrim_tidewalker : public BossAI
             else
             {
                 Talk(EMOTE_WATERY_GLOBULES);
-                for (uint8 waterGlobuleId : waterGlobuleIds)
+                for (uint32 waterGlobuleId : waterGlobuleIds)
                 {
                     DoCastSelf(waterGlobuleId, true);
                 }

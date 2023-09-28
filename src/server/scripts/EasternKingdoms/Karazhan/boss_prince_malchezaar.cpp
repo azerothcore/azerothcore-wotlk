@@ -157,7 +157,6 @@ struct boss_malchezaar : public BossAI
         if (Creature* infernal = relay->SummonCreature(NPC_NETHERSPITE_INFERNAL, target->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 180000))
         {
             infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-            relay->CastSpell(target, SPELL_INFERNAL_RELAY_TWO);
             relay->CastSpell(infernal, SPELL_INFERNAL_RELAY);
             infernal->SetFaction(me->GetFaction());
             infernal->SetControlled(true, UNIT_STATE_ROOT);
@@ -206,13 +205,12 @@ struct boss_malchezaar : public BossAI
             });
 
             context.SetGroup(GROUP_ENFEEBLE);
-            scheduler.DelayGroup(GROUP_SHADOW_NOVA, 5s);
             context.Repeat();
         }).Schedule(35500ms, [this](TaskContext context)
         {
             DoCastAOE(SPELL_SHADOW_NOVA);
             context.SetGroup(GROUP_SHADOW_NOVA);
-            context.Repeat();
+            context.Repeat(30s);
         }).Schedule(40s, [this](TaskContext context)
         {
             if (!MaxSpawns(infernalTargets)) // only spawn infernal when the area is not full

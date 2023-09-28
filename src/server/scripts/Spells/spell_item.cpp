@@ -3342,9 +3342,9 @@ class spell_item_rocket_boots : public SpellScript
     }
 };
 
-class spell_item_runic_healing_injector : public SpellScript
+class spell_item_healing_injector : public SpellScript
 {
-    PrepareSpellScript(spell_item_runic_healing_injector);
+    PrepareSpellScript(spell_item_healing_injector);
 
     bool Load() override
     {
@@ -3360,7 +3360,33 @@ class spell_item_runic_healing_injector : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_item_runic_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        OnEffectHitTarget += SpellEffectFn(spell_item_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
+class spell_item_mana_injector : public SpellScript
+{
+    PrepareSpellScript(spell_item_mana_injector);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleEnergize(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+        {
+            if (caster->HasSkill(SKILL_ENGINEERING))
+            {
+                SetEffectValue(GetEffectValue() * 1.25f);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_mana_injector::HandleEnergize, EFFECT_0, SPELL_EFFECT_ENERGIZE);
     }
 };
 
@@ -3959,7 +3985,8 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_nitro_boots);
     RegisterSpellScript(spell_item_teach_language);
     RegisterSpellScript(spell_item_rocket_boots);
-    RegisterSpellScript(spell_item_runic_healing_injector);
+    RegisterSpellScript(spell_item_healing_injector);
+    RegisterSpellScript(spell_item_mana_injector);
     RegisterSpellScript(spell_item_pygmy_oil);
     RegisterSpellScript(spell_item_unusual_compass);
     RegisterSpellScript(spell_item_chicken_cover);

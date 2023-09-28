@@ -58,6 +58,7 @@ struct boss_curator : public BossAI
             DoCastSelf(SPELL_ARCANE_INFUSION, true);
             Talk(SAY_ENRAGE);
         });
+        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
     }
 
     void KilledUnit(Unit* victim) override

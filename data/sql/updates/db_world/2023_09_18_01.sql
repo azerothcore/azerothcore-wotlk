@@ -1,3 +1,4 @@
+-- DB update 2023_09_18_00 -> 2023_09_18_01
 --
 -- Pathing for Kalecgos Entry: 24844 'TDB FORMAT' 
 SET @NPC := 24844;
