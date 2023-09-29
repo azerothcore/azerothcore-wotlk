@@ -180,7 +180,7 @@ class spell_gen_crab_disguise : public AuraScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
+        return ValidateSpellInfo({ SPELL_APPLY_DIGUISE, SPELL_FADE_DIGUISE });
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -353,6 +353,19 @@ class spell_midsummer_fling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_fling_torch);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FLING_TORCH,
+                SPELL_TORCH_SHADOW,
+                SPELL_MISSED_TORCH,
+                SPELL_TORCH_CATCH_SUCCESS_A,
+                SPELL_TORCH_CATCH_SUCCESS_H,
+                SPELL_TORCH_COUNTER
+            });
+    }
+
     bool handled;
     bool Load() override { handled = false; return true; }
 
@@ -482,6 +495,21 @@ enum eJuggle
 class spell_midsummer_juggling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_juggling_torch);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_JUGGLE_SELF,
+                SPELL_JUGGLE_SLOW,
+                SPELL_JUGGLE_MED,
+                SPELL_JUGGLE_FAST,
+                SPELL_TORCH_SHADOW_SELF,
+                SPELL_TORCH_SHADOW_SLOW,
+                SPELL_TORCH_SHADOW_MED,
+                SPELL_TORCH_SHADOW_FAST
+            });
+    }
 
     void HandleFinish()
     {
