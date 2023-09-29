@@ -214,6 +214,17 @@ class spell_midsummer_ribbon_pole : public AuraScript
 {
     PrepareAuraScript(spell_midsummer_ribbon_pole)
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_RIBBON_POLE_XP,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_RED,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_PINK
+            });
+    }
+
     void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
