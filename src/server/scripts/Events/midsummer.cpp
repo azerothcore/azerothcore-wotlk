@@ -342,7 +342,13 @@ enum flingTorch
     SPELL_FLING_TORCH_DUMMY         = 46747,
     SPELL_MISSED_TORCH              = 45676,
     SPELL_TORCH_COUNTER             = 45693,
-    SPELL_TORCH_SHADOW              = 46105
+    SPELL_TORCH_SHADOW              = 46105,
+    SPELL_TORCH_CATCH_SUCCESS_A     = 46081,
+    SPELL_TORCH_CATCH_SUCCESS_H     = 46654,
+    SPELL_JUGGLE_TORCH              = 45671,
+
+    QUEST_MORE_TORCH_TOSS_A         = 11924,
+    QUEST_MORE_TORCH_TOSS_H         = 11925,
 };
 
 class spell_midsummer_fling_torch : public SpellScript
@@ -425,13 +431,13 @@ class spell_midsummer_fling_torch : public SpellScript
             {
                 aur->ModStackAmount(1);
                 uint8 count = 4;
-                if (target->GetQuestStatus(target->GetTeamId() ? 11925 : 11924) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
+                if (target->GetQuestStatus(target->GetTeamId() ? QUEST_MORE_TORCH_TOSS_H : QUEST_MORE_TORCH_TOSS_A) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
                     count = 10;
 
                 if (aur->GetStackAmount() >= count)
                 {
                     //target->CastSpell(target, 46711, true); // Set Flag: all torch returning quests are complete
-                    target->CastSpell(target, (target->GetTeamId() ? 46654 : 46081), true); // Quest completion
+                    target->CastSpell(target, (target->GetTeamId() ? SPELL_TORCH_CATCH_SUCCESS_H : SPELL_TORCH_CATCH_SUCCESS_A), true); // Quest completion
                     aur->SetDuration(1);
                     return;
                 }
@@ -446,7 +452,7 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
-        if (m_scriptSpellId == 45671)
+        if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
             OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
