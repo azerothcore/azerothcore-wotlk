@@ -49,7 +49,7 @@ public:
 enum torchToss
 {
     GO_TORCH_TARGET_BRAZIER         = 187708,
-    GO_TORCH_TOSS_TARGET_BUNNY      = 25535,
+    NPC_TORCH_TOSS_TARGET_BUNNY     = 25535,
 
     SPELL_TARGET_INDICATOR_RANK_1   = 43313,
     SPELL_TORCH_TOSS_LAND           = 46054,
@@ -314,7 +314,7 @@ class spell_midsummer_torch_quest : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* ar = GetTarget();
-        if (Creature* cr = ar->SummonCreature(GO_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+        if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
         {
             torchGUID = cr->GetGUID();
             CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
