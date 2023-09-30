@@ -1455,6 +1455,13 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
         return;
     }
 
+    if (auto player = this->ToPlayer())
+        if (player->HasSpell(600608)) {
+            auto cost = spellProto->ManaCostPercentage;
+            if (roll_chance_f(cost))
+                damageInfo->schoolMask = SPELL_SCHOOL_MASK_MAGIC;
+        }
+
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, BASE_ATTACK, MELEE_HIT_NORMAL);
     Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell);
@@ -1923,6 +1930,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     {
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
+        // hater: do thorns damage
         auto thornsDamage = CalculateThorns(this, victim, true);
         for (auto tDamage : thornsDamage.ThornsDamageMap)
         {

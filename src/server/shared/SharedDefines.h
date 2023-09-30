@@ -93,7 +93,15 @@ enum class ForgeTopic
     GET_PERK_CATALOGUE = 63,
     GET_INSPECT_PERKS = 64,
     GET_ARCHETYPES = 65,
-    GET_UTILITY_PERKS = 67
+    GET_UTILITY_PERKS = 67,
+
+    // m+
+    MYTHIC_GET_WEEKLY_REWARD,
+    MYTHIC_GET_MAP_STATS,
+    MYTHIC_GET_AFFIXES_LIST,
+    MYTHIC_SET_AFFIXES_AND_START,
+    MYTHIC_KEY_COMPLETED, // send confirmation that key has ended and send gear
+
 };
 
 enum class ForgeError

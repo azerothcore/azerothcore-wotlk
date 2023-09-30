@@ -1216,7 +1216,7 @@ public:
             auto set = sets->second.find(setId);
             if (set != sets->second.end()) {
               
-                for (int i : slots)
+                for (int i : xmogSlots)
                     if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                         set->second->slottedItems[i] = item->GetTransmog();
                     else
@@ -1234,8 +1234,7 @@ public:
 
         auto newSetId = FirstOpenXmogSlot(player);
 
-        uint8 slots[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18 };
-        for (int i : slots)
+        for (int i : xmogSlots)
             if (auto item = player->GetItemByPos(i))
                 xmog->slottedItems[i] = item->GetTransmog();
             else
@@ -1246,9 +1245,8 @@ public:
     }
 
     std::string BuildXmogFromEquipped(Player* player) {
-        uint8 slots[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18 };
         std::string out = "noname^";
-        for (auto slot : slots) {
+        for (auto slot : xmogSlots) {
             auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
             out += item == nullptr ? "0^" : std::to_string(item->GetTransmog()) + "^";
         }
