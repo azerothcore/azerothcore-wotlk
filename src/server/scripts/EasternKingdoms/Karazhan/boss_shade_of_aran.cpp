@@ -274,7 +274,7 @@ struct boss_shade_of_aran : public BossAI
                     }).Schedule(4s, GROUP_DRINKING, [this](TaskContext)
                     {
                         me->SetStandState(UNIT_STAND_STATE_SIT);
-                        DoCastSelf(SPELL_DRINK, true);
+                        DoCastSelf(SPELL_DRINK);
                     });
 
                     _drinkScheduler.Schedule(10s, GROUP_DRINKING, [this](TaskContext)
