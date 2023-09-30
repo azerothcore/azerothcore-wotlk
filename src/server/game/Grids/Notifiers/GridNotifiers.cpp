@@ -62,10 +62,6 @@ void VisibleNotifier::SendToSelf()
 
     for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
-            //npcbot:
-            if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
-                continue;
-            //end npcbot
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if ((*it).IsTransport())
             if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
