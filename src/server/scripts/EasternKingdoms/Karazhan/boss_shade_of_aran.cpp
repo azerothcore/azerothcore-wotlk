@@ -203,9 +203,8 @@ struct boss_shade_of_aran : public BossAI
     {
         BossAI::DamageTaken(doneBy, damage, damagetype, damageSchoolMask);
 
-        if ((damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE) && _drinking)
+        if ((damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE) && _drinking && me->GetReactState() == REACT_PASSIVE)
         {
-            _drinking = false;
             me->RemoveAurasDueToSpell(SPELL_DRINK);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
@@ -214,6 +213,7 @@ struct boss_shade_of_aran : public BossAI
             _drinkScheduler.Schedule(1s, [this](TaskContext)
             {
                 DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                _drinking = false;
             });
         }
     }
@@ -235,8 +235,13 @@ struct boss_shade_of_aran : public BossAI
         {
             context.Repeat(2s);
 
-            if (!me->IsNonMeleeSpellCast(false) && !_drinking)
+            if (!_drinking)
             {
+                if (me->IsNonMeleeSpellCast(false))
+                {
+                    return;
+                }
+
                 uint32 Spells[3];
                 uint8 AvailableSpells = 0;
 
