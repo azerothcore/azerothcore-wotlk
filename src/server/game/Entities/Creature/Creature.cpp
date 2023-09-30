@@ -1486,11 +1486,11 @@ void Creature::SelectLevel(bool changelevel)
     uint8 minlevel = std::min(cInfo->maxlevel, cInfo->minlevel);
     uint8 maxlevel = std::max(cInfo->maxlevel, cInfo->minlevel);
     uint8 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+    
+    sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
+    
     if (changelevel)
-    {
-        sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
         SetLevel(level);
-    }
 
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(level, cInfo->unit_class);
 
