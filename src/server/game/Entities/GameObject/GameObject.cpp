@@ -2325,7 +2325,14 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     if (!IsDestructibleBuilding())
         return;
 
-    if (!m_goValue.Building.MaxHealth || !change)
+    // if this building doesn't have health, return
+    if (!m_goValue.Building.MaxHealth)
+        return;
+
+    sScriptMgr->OnGameObjectModifyHealth(this, attackerOrHealer, change, sSpellMgr->GetSpellInfo(spellId));
+
+    // if the health isn't being changed, return
+    if (!change)
         return;
 
     if (!m_allowModifyDestructibleBuilding)

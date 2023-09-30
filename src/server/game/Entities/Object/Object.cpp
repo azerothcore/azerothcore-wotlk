@@ -65,7 +65,7 @@ constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max
     VISIBILITY_DISTANCE_SMALL,
     VISIBILITY_DISTANCE_LARGE,
     VISIBILITY_DISTANCE_GIGANTIC,
-    VISIBILITY_DISTANCE_INFINITE
+    MAX_VISIBILITY_DISTANCE
 };
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
@@ -2963,7 +2963,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
+void WorldObject::UpdateObjectVisibility(bool /*forced*/)
 {
     //updates object's visibility for nearby players
     Acore::VisibleChangesNotifier notifier(*this);
@@ -2972,28 +2972,7 @@ void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 
 void WorldObject::AddToNotify(uint16 f)
 {
-    if (!(m_notifyflags & f))
-        if (Unit* u = ToUnit())
-        {
-            if (f & NOTIFY_VISIBILITY_CHANGED)
-            {
-                uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
-
-                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
-                if (diff >= EVENT_VISIBILITY_DELAY / 2)
-                    EVENT_VISIBILITY_DELAY /= 2;
-                else
-                    EVENT_VISIBILITY_DELAY -= diff;
-                u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
-                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
-            }
-            else if (f & NOTIFY_AI_RELOCATION)
-            {
-                u->m_delayed_unit_ai_notify_timer = u->FindMap() ? DynamicVisibilityMgr::GetAINotifyDelay(u->FindMap()->GetEntry()->map_type) : 500;
-            }
-
-            m_notifyflags |= f;
-        }
+    m_notifyflags |= f;
 }
 
 struct WorldObjectChangeAccumulator

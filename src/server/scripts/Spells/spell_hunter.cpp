@@ -1324,6 +1324,29 @@ class spell_hun_bestial_wrath : public SpellScript
     }
 };
 
+class spell_hun_furious_howl : public SpellScript
+{
+    PrepareSpellScript(spell_hun_furious_howl);
+
+    bool Load() override
+    {
+        return GetCaster()->IsPet();
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            return target != GetCaster() && target != GetCaster()->ToPet()->GetOwner();
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_furious_howl::FilterTargets, EFFECT_ALL, TARGET_UNIT_CASTER_AREA_PARTY);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1354,4 +1377,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
     RegisterSpellScript(spell_hun_bestial_wrath);
+    RegisterSpellScript(spell_hun_furious_howl);
 }

@@ -379,6 +379,7 @@ public:
 
     // Handling caster facing during spellcast
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
+    void ClearTarget() { SetTarget(); };
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     [[nodiscard]] bool IsMovementPreventedByCasting() const override;
@@ -410,6 +411,12 @@ public:
      *
      * */
     void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
+
+    /**
+     * @brief Returns true if the creature is able to cast the spell.
+     *
+     * */
+    bool CanCastSpell(uint32 spellID) const;
 
     std::string GetDebugInfo() const override;
 

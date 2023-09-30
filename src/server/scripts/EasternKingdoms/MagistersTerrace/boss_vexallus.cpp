@@ -87,7 +87,7 @@ public:
             summons.DespawnAll();
             IntervalHealthAmount = 1;
 
-            instance->SetData(DATA_VEXALLUS_EVENT, NOT_STARTED);
+            instance->SetBossState(DATA_VEXALLUS, NOT_STARTED);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
@@ -100,14 +100,14 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
-            instance->SetData(DATA_VEXALLUS_EVENT, DONE);
+            instance->SetBossState(DATA_VEXALLUS, DONE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            instance->SetData(DATA_VEXALLUS_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_VEXALLUS, IN_PROGRESS);
 
             events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
             events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 5000);

@@ -2183,7 +2183,7 @@ public:
     // common function for visibility checks for player/creatures with detection code
     [[nodiscard]] uint32 GetPhaseByAuras() const;
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;// overwrite WorldObject::SetPhaseMask
-    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
+    void UpdateObjectVisibility(bool forced = true) override;
 
     SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
     uint32 m_lastSanctuaryTime;
@@ -2462,14 +2462,6 @@ public:
     void AddPointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.insert(sup); }
     void RemovePointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.erase(sup); }
     static void HandleSafeUnitPointersOnDelete(Unit* thisUnit);
-    // Relocation Nofier optimization
-    Position m_last_notify_position;
-    uint32 m_last_notify_mstime;
-    uint16 m_delayed_unit_relocation_timer;
-    uint16 m_delayed_unit_ai_notify_timer;
-    bool bRequestForcedVisibilityUpdate;
-    void ExecuteDelayedUnitRelocationEvent();
-    void ExecuteDelayedUnitAINotifyEvent();
 
     // cooldowns
     [[nodiscard]] virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }

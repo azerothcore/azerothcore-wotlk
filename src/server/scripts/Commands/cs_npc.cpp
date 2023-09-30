@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: npc_commandscript
-%Complete: 100
-Comment: All npc related commands
-Category: commandscripts
-EndScriptData */
-
 #include "Chat.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
@@ -738,7 +731,7 @@ public:
                 if (!creatureTemplate)
                     continue;
 
-                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, creatureTemplate->Name.c_str(), x, y, z, mapId, "", "");
+                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, entry, guid, creatureTemplate->Name.c_str(), x, y, z, mapId, "", "");
 
                 ++count;
             } while (result->NextRow());

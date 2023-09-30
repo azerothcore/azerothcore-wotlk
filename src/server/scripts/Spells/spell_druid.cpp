@@ -393,20 +393,25 @@ class spell_dru_treant_scaling : public AuraScript
 };
 
 // -1850 - Dash
-class spell_dru_dash : public AuraScript
+class spell_dru_dash : public SpellScript
 {
-    PrepareAuraScript(spell_dru_dash);
+    PrepareSpellScript(spell_dru_dash);
 
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    SpellCastResult CheckCast()
     {
-        // do not set speed if not in cat form
-        if (GetUnitOwner()->GetShapeshiftForm() != FORM_CAT)
-            amount = 0;
+        Unit* caster = GetCaster();
+        if (caster->GetShapeshiftForm() != FORM_CAT)
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_BE_IN_CAT_FORM);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_dash::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
+        OnCheckCast += SpellCheckCastFn(spell_dru_dash::CheckCast);
     }
 };
 

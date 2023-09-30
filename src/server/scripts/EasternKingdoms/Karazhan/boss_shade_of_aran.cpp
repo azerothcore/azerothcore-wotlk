@@ -22,45 +22,52 @@
 #include "karazhan.h"
 #include "TaskScheduler.h"
 
-enum ShadeOfAran
+enum Texts
 {
-    SAY_AGGRO = 0,
+    SAY_AGGRO       = 0,
     SAY_FLAMEWREATH = 1,
-    SAY_BLIZZARD = 2,
-    SAY_EXPLOSION = 3,
-    SAY_DRINK = 4,
-    SAY_ELEMENTALS = 5,
-    SAY_KILL = 6,
-    SAY_TIMEOVER = 7,
-    SAY_DEATH = 8,
+    SAY_BLIZZARD    = 2,
+    SAY_EXPLOSION   = 3,
+    SAY_DRINK       = 4,
+    SAY_ELEMENTALS  = 5,
+    SAY_KILL        = 6,
+    SAY_TIMEOVER    = 7,
+    SAY_DEATH       = 8
+};
 
+enum Spells
+{
     //Spells
-    SPELL_FROSTBOLT = 29954,
-    SPELL_FIREBALL = 29953,
-    SPELL_ARCMISSLE = 29955,
-    SPELL_CHAINSOFICE = 29991,
-    SPELL_DRAGONSBREATH = 29964,
-    SPELL_MASSSLOW = 30035,
-    SPELL_FLAME_WREATH = 29946,
-    SPELL_AOE_CS = 29961,
-    SPELL_PLAYERPULL = 32265,
-    SPELL_AEXPLOSION = 29973,
-    SPELL_MASS_POLY = 29963,
-    SPELL_BLINK_CENTER = 29967,
-    SPELL_ELEMENTALS = 29962,
-    SPELL_CONJURE = 29975,
-    SPELL_DRINK = 30024,
-    SPELL_POTION = 32453,
-    SPELL_AOE_PYROBLAST = 29978,
+    SPELL_FROSTBOLT           = 29954,
+    SPELL_FIREBALL            = 29953,
+    SPELL_ARCMISSLE           = 29955,
+    SPELL_CHAINSOFICE         = 29991,
+    SPELL_DRAGONSBREATH       = 29964,
+    SPELL_MASSSLOW            = 30035,
+    SPELL_FLAME_WREATH        = 29946,
+    SPELL_AOE_CS              = 29961,
+    SPELL_PLAYERPULL          = 32265,
+    SPELL_AEXPLOSION          = 29973,
+    SPELL_MASS_POLY           = 29963,
+    SPELL_BLINK_CENTER        = 29967,
+    SPELL_CONJURE             = 29975,
+    SPELL_DRINK               = 30024,
+    SPELL_POTION              = 32453,
+    SPELL_AOE_PYROBLAST       = 29978,
 
-    //Creature Spells
-    SPELL_CIRCULAR_BLIZZARD = 29951,
-    SPELL_SHADOW_PYRO = 29978,
+    SPELL_SUMMON_WELEMENTAL_1 = 29962,
+    SPELL_SUMMON_WELEMENTAL_2 = 37051,
+    SPELL_SUMMON_WELEMENTAL_3 = 37052,
+    SPELL_SUMMON_WELEMENTAL_4 = 37053,
 
-    //Creatures
-    NPC_WATER_ELEMENTAL = 17167,
-    NPC_SHADOW_OF_ARAN = 18254,
-    NPC_ARAN_BLIZZARD = 17161,
+    SPELL_SUMMON_BLIZZARD     = 29969, // Activates the Blizzard NPC
+
+    SPELL_SHADOW_PYRO         = 29978
+};
+
+enum Creatures
+{
+    NPC_SHADOW_OF_ARAN  = 18254
 };
 
 enum SuperSpell
@@ -133,17 +140,11 @@ struct boss_shade_of_aran : public BossAI
         ScheduleHealthCheckEvent(40, [&]{
             Talk(SAY_ELEMENTALS);
 
-            for(Position pos : elementalPos)
+            std::vector<uint32> elementalSpells = { SPELL_SUMMON_WELEMENTAL_1, SPELL_SUMMON_WELEMENTAL_2, SPELL_SUMMON_WELEMENTAL_3, SPELL_SUMMON_WELEMENTAL_4 };
+
+            for (auto const& spell : elementalSpells)
             {
-                if(Creature* elemental = me->SummonCreature(NPC_WATER_ELEMENTAL, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
-                {
-                    if(Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
-                    {
-                        DoStartNoMovement(target);
-                        elemental->SetInCombatWithZone();
-                        elemental->CombatStart(target);
-                    }
-                }
+                DoCastAOE(spell, true);
             }
         });
     }
@@ -197,8 +198,7 @@ struct boss_shade_of_aran : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DEATH);
-
-        instance->SetData(DATA_ARAN, DONE);
+        _JustDied();
 
         if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
         {
@@ -209,11 +209,8 @@ struct boss_shade_of_aran : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
-
-        instance->SetData(DATA_ARAN, IN_PROGRESS);
-
-        DoZoneInCombat();
 
         //handle timed closing door
         scheduler.Schedule(15s, [this](TaskContext)
@@ -255,7 +252,20 @@ struct boss_shade_of_aran : public BossAI
                 if (AvailableSpells)
                 {
                     CurrentNormalSpell = Spells[rand() % AvailableSpells];
-                    DoCast(target, CurrentNormalSpell);
+
+                    if (!me->CanCastSpell(CurrentNormalSpell))
+                    {
+                        me->SetWalk(false);
+                        me->ResumeChasingVictim();
+                    }
+                    else
+                    {
+                        DoCast(target, CurrentNormalSpell);
+                        if (me->GetVictim())
+                        {
+                            me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f);
+                        }
+                    }
                 }
             }
             context.Repeat(2s);
@@ -341,12 +351,7 @@ struct boss_shade_of_aran : public BossAI
 
                     case SUPER_BLIZZARD:
                         Talk(SAY_BLIZZARD);
-
-                        if (Creature* pSpawn = me->SummonCreature(NPC_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
-                        {
-                            pSpawn->SetFaction(me->GetFaction());
-                            pSpawn->CastSpell(me, SPELL_CIRCULAR_BLIZZARD, false);
-                        }
+                        DoCastAOE(SPELL_SUMMON_BLIZZARD);
                         break;
                 }
             }
@@ -373,9 +378,14 @@ struct boss_shade_of_aran : public BossAI
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                         DoCastSelf(SPELL_POTION, false);
-                        DoCastSelf(SPELL_AOE_PYROBLAST, false);
                         _drinkScheduler.CancelGroup(GROUP_DRINKING);
-                        _drinking = false;
+                        _drinkScheduler.Schedule(1s, [this](TaskContext)
+                        {
+                            DoCastSelf(SPELL_AOE_PYROBLAST, false);
+                        }).Schedule(3s, [this](TaskContext)
+                        {
+                            _drinking = false;
+                        });
                     } else
                     {
                         context.Repeat(500ms);
