@@ -46,6 +46,19 @@ public:
     }
 };
 
+enum torchToss
+{
+    GO_TORCH_TARGET_BRAZIER         = 187708,
+    NPC_TORCH_TOSS_TARGET_BUNNY     = 25535,
+
+    SPELL_TARGET_INDICATOR_RANK_1   = 43313,
+    SPELL_TORCH_TOSS_LAND           = 46054,
+    SPELL_BRAZIERS_HIT_VISUAL       = 45724,
+    SPELL_TORCH_TOSS_SUCCESS_A      = 45719,
+    SPELL_TORCH_TOSS_SUCCESS_H      = 46651,
+    SPELL_TORCH_TOSS_TRAINING       = 45716,
+};
+
 struct npc_midsummer_torch_target : public ScriptedAI
 {
     npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
@@ -54,7 +67,7 @@ struct npc_midsummer_torch_target : public ScriptedAI
         startTimer = 1;
         posVec.clear();
         playerGUID.Clear();
-        me->CastSpell(me, 43313, true);
+        me->CastSpell(me, SPELL_TARGET_INDICATOR_RANK_1, true);
         counter = 0;
         maxCount = 0;
     }
@@ -82,12 +95,12 @@ struct npc_midsummer_torch_target : public ScriptedAI
         if (posVec.empty())
             return;
         // Triggered spell from torch
-        if (spellInfo->Id == 46054 && caster->GetTypeId() == TYPEID_PLAYER)
+        if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->GetTypeId() == TYPEID_PLAYER)
         {
-            me->CastSpell(me, 45724, true); // hit visual anim
+            me->CastSpell(me, SPELL_BRAZIERS_HIT_VISUAL, true); // hit visual anim
             if (++counter >= maxCount)
             {
-                caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? 46651 : 45719), true); // quest complete spell
+                caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? SPELL_TORCH_TOSS_SUCCESS_H : SPELL_TORCH_TOSS_SUCCESS_A), true); // quest complete spell
                 me->DespawnOrUnsummon(1);
                 return;
             }
@@ -129,7 +142,7 @@ struct npc_midsummer_torch_target : public ScriptedAI
     void FillPositions()
     {
         std::list<GameObject*> gobjList;
-        me->GetGameObjectListWithEntryInGrid(gobjList, 187708 /*TORCH_GO*/, 30.0f);
+        me->GetGameObjectListWithEntryInGrid(gobjList, GO_TORCH_TARGET_BRAZIER, 30.0f);
         for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
         {
             Position pos;
@@ -299,10 +312,10 @@ class spell_midsummer_torch_quest : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* ar = GetTarget();
-        if (Creature* cr = ar->SummonCreature(25535, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+        if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
         {
             torchGUID = cr->GetGUID();
-            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == 45716 ? 8 : 20));
+            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
         }
     }
 
@@ -327,7 +340,13 @@ enum flingTorch
     SPELL_FLING_TORCH_DUMMY         = 46747,
     SPELL_MISSED_TORCH              = 45676,
     SPELL_TORCH_COUNTER             = 45693,
-    SPELL_TORCH_SHADOW              = 46105
+    SPELL_TORCH_SHADOW              = 46105,
+    SPELL_TORCH_CATCH_SUCCESS_A     = 46081,
+    SPELL_TORCH_CATCH_SUCCESS_H     = 46654,
+    SPELL_JUGGLE_TORCH              = 45671,
+
+    QUEST_MORE_TORCH_TOSS_A         = 11924,
+    QUEST_MORE_TORCH_TOSS_H         = 11925,
 };
 
 class spell_midsummer_fling_torch : public SpellScript
@@ -410,13 +429,13 @@ class spell_midsummer_fling_torch : public SpellScript
             {
                 aur->ModStackAmount(1);
                 uint8 count = 4;
-                if (target->GetQuestStatus(target->GetTeamId() ? 11925 : 11924) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
+                if (target->GetQuestStatus(target->GetTeamId() ? QUEST_MORE_TORCH_TOSS_H : QUEST_MORE_TORCH_TOSS_A) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
                     count = 10;
 
                 if (aur->GetStackAmount() >= count)
                 {
                     //target->CastSpell(target, 46711, true); // Set Flag: all torch returning quests are complete
-                    target->CastSpell(target, (target->GetTeamId() ? 46654 : 46081), true); // Quest completion
+                    target->CastSpell(target, (target->GetTeamId() ? SPELL_TORCH_CATCH_SUCCESS_H : SPELL_TORCH_CATCH_SUCCESS_A), true); // Quest completion
                     aur->SetDuration(1);
                     return;
                 }
@@ -431,7 +450,7 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
-        if (m_scriptSpellId == 45671)
+        if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
             OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
