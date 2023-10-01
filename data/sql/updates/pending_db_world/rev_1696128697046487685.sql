@@ -13,10 +13,6 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 DELETE FROM `spell_target_position` WHERE `ID`=17480 AND `EffectIndex`=0;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17480, 0, 329, 4015.36, -3363.66, 115.06, 0.66, 0);
 
--- Since skeletons are slightly closer to the center, adjust Baron
--- Riverdare's (10440) SAI to wait 250ms longer between casts to
--- maintain approximately the same difficulty.
---
 -- Additionally, cause the Baron to despawn his summoned Mindless Skeletons
 -- when he is reset.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10440;
@@ -30,7 +26,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10440, 0, 4, 5, 0, 0, 100, 0, 10000, 10000, 20000, 20000, 0, 0, 11, 17473, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (10s initially) - Self: Cast spell 17473 on Self'),
 (10440, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (10s initially) - Self: Talk 7 to invoker'),
 (10440, 0, 6, 0, 0, 0, 100, 0, 22000, 22000, 20000, 20000, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (22s initially) - Self: Talk 8 to invoker'),
-(10440, 0, 7, 8, 0, 0, 100, 512, 11000, 11000, 20250, 20250, 0, 0, 11, 17475, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (11s initially) - Self: Cast spell 17475 on Self (flags: triggered)'),
+(10440, 0, 7, 8, 0, 0, 100, 512, 11000, 11000, 20000, 20000, 0, 0, 11, 17475, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (11s initially) - Self: Cast spell 17475 on Self (flags: triggered)'),
 (10440, 0, 8, 9, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 17476, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (11s initially) - Self: Cast spell 17476 on Self (flags: triggered)'),
 (10440, 0, 9, 10, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 17477, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (11s initially) - Self: Cast spell 17477 on Self (flags: triggered)'),
 (10440, 0, 10, 11, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 17478, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 seconds (11s initially) - Self: Cast spell 17478 on Self (flags: triggered)'),
