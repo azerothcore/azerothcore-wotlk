@@ -2748,6 +2748,14 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     return false;
 }
 
+void Creature::ClearProhibitedSpellTimers()
+{
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        m_ProhibitSchoolTime[i] = 0;
+    }
+}
+
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)
 {
     CreatureSpellCooldown spellCooldown;
