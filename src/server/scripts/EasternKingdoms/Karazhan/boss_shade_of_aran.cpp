@@ -302,7 +302,7 @@ struct boss_shade_of_aran : public BossAI
 
                     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(CurrentNormalSpell))
                     {
-                        if (me->GetPower(POWER_MANA) < spellInfo->CalcPowerCost(me, (SpellSchoolMask)spellInfo->SchoolMask))
+                        if (int32(me->GetPower(POWER_MANA)) < spellInfo->CalcPowerCost(me, (SpellSchoolMask)spellInfo->SchoolMask))
                         {
                             DoCastSelf(SPELL_POTION);
                         }
