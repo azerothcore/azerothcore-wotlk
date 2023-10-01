@@ -17,8 +17,8 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 -- Riverdare's (10440) SAI to wait 250ms longer between casts to
 -- maintain approximately the same difficulty.
 --
--- Additionally, cause the Baron to kill his summoned Mindless Skeletons
--- when reset.
+-- Additionally, cause the Baron to despawn his summoned Mindless Skeletons
+-- when he is reset.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10440;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 10440);
