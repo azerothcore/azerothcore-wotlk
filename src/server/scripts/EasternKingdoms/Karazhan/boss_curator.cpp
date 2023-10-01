@@ -132,18 +132,6 @@ struct boss_curator : public BossAI
         }
         summon->SetInCombatWithZone();
     }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
-    }
 };
 
 void AddSC_boss_curator()
