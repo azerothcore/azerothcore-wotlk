@@ -1,17 +1,17 @@
 -- Move Mindless Skeletons (11197) created by Baron Rivendare (10440)
--- to safe spots where they will not fall through the floor.
+-- to more accurate locations based on sniffed data.
 DELETE FROM `spell_target_position` WHERE `ID`=17475 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17475, 0, 329, 4050.39, -3363.61, 115.05, 2.48, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17475, 0, 329, 4012.92, -3365.70, 116.251, 0.745, 0);
 DELETE FROM `spell_target_position` WHERE `ID`=17476 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17476, 0, 329, 4052.56, -3350.93, 115.05, 3.11, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17476, 0, 329, 4009.10, -3352.31, 116.712, 0.299, 0);
 DELETE FROM `spell_target_position` WHERE `ID`=17477 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17477, 0, 329, 4048.98, -3339.65, 115.06, 3.74, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17477, 0, 329, 4013.96, -3338.65, 116.242, 6.094, 0);
 DELETE FROM `spell_target_position` WHERE `ID`=17478 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17478, 0, 329, 4016.50, -3340.00, 115.06, 5.71, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17478, 0, 329, 4051.75, -3339.05, 116.241, 3.340, 0);
 DELETE FROM `spell_target_position` WHERE `ID`=17479 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17479, 0, 329, 4012.95, -3352.47, 115.05, 0.10, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17479, 0, 329, 4055.96, -3351.46, 116.586, 2.870, 0);
 DELETE FROM `spell_target_position` WHERE `ID`=17480 AND `EffectIndex`=0;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17480, 0, 329, 4015.36, -3363.66, 115.06, 0.66, 0);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES (17480, 0, 329, 4053.11, -3364.98, 116.402, 2.287, 0);
 
 -- Additionally, cause the Baron to despawn his summoned Mindless Skeletons
 -- when he is reset.
