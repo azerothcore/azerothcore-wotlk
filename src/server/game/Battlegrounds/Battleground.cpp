@@ -576,7 +576,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                             ++iter;
                     }
 
-                    player->UpdateObjectVisibility(true);
+                    player->UpdateObjectVisibility();
                 }
 
             for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
