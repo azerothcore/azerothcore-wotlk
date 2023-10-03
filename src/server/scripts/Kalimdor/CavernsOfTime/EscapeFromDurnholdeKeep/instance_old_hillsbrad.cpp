@@ -214,7 +214,7 @@ public:
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
+                                gobject->UpdateObjectVisibility();
                             }
                         break;
                     }
@@ -236,7 +236,7 @@ public:
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
+                                gobject->UpdateObjectVisibility();
                             }
 
                         for (ObjectGuid const& guid : _prisonersSet)
