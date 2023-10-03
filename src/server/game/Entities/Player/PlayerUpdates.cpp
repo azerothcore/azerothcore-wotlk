@@ -1558,7 +1558,7 @@ void Player::UpdateObjectVisibility(bool forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else if (!isBeingLoaded())
     {
-        Unit::UpdateObjectVisibility(true);
+        Unit::UpdateObjectVisibility();
         UpdateVisibilityForPlayer();
     }
 }
