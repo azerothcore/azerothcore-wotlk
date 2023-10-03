@@ -1238,7 +1238,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
             bool withPet = unitTarget->GetTypeId() == TYPEID_PLAYER && m_spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC && unitTarget->GetMap()->IsDungeon() && unitTarget->GetExactDist(x, y, z) > 50.0f;
             unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster, false, withPet, true);
             if (unitTarget->GetTypeId() == TYPEID_PLAYER) // pussywizard: for units it's done inside NearTeleportTo
-                unitTarget->UpdateObjectVisibility(true);
+                unitTarget->UpdateObjectVisibility();
         }
     }
     else if (unitTarget->GetTypeId() == TYPEID_PLAYER)
