@@ -1603,7 +1603,7 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
     }
 
     if (target->IsInWorld())
-        target->UpdateObjectVisibility();
+        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
 }
 
 void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1677,7 +1677,7 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
     }
 
     if (target->IsInWorld())
-        target->UpdateObjectVisibility();
+        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
 }
 
 void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1838,12 +1838,7 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if (target->IsVisible())
     {
-        if (!target->GetMap()->Instanceable())
-        {
-            target->UpdateObjectVisibility(false);
-        }
-        else
-            target->UpdateObjectVisibility();
+        target->UpdateObjectVisibility(target->GetMap()->Instanceable());
     }
 }
 
