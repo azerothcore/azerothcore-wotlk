@@ -87,7 +87,7 @@ struct boss_the_lurker_below : public BossAI
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
             me->SetVisible(true);
-            me->UpdateObjectVisibility(true);
+            me->UpdateObjectVisibility();
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
