@@ -19355,7 +19355,7 @@ void Unit::UpdateObjectVisibility(bool forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else
     {
-        WorldObject::UpdateObjectVisibility(true);
+        WorldObject::UpdateObjectVisibility();
         Acore::AIRelocationNotifier notifier(*this);
         Cell::VisitAllObjects(this, notifier, GetVisibilityRange());
     }
