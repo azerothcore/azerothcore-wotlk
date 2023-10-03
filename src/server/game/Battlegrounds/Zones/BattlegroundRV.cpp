@@ -91,7 +91,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                     if (GameObject* gObj = player->GetGameObject(48018))
                     {
                         gObj->Relocate(gObj->GetPositionX(), gObj->GetPositionY(), 28.28f);
-                        gObj->UpdateObjectVisibility(true);
+                        gObj->UpdateObjectVisibility();
                     }
 
                     if (player->GetPositionZ() < 27.0f)
