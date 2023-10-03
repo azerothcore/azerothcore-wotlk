@@ -1304,7 +1304,7 @@ void GameObject::SetRespawnTime(int32 respawn)
     SetRespawnDelay(respawn);
     if (respawn && !m_spawnedByDefault)
     {
-        UpdateObjectVisibility(true);
+        UpdateObjectVisibility();
     }
 }
 
