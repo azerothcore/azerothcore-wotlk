@@ -416,7 +416,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Marked for Death
     ApplySpellFix({ 53241, 53243, 53244, 53245, 53246 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(423937, 276955137, 2049);
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(399361, 276955137, 1);
     });
 
     ApplySpellFix({
