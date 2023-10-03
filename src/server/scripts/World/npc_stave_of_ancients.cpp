@@ -578,7 +578,7 @@ public:
             Precious()->SetPosition(current);
             Precious()->SetHomePosition(current);
             Precious()->setDeathState(JUST_RESPAWNED);
-            Precious()->UpdateObjectVisibility(true);
+            Precious()->UpdateObjectVisibility();
         }
 
         void HandlePetRespawn()
