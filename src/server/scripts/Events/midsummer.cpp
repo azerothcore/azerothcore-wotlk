@@ -412,7 +412,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
                 _ribbonPole->CastSpell(me, SPELL_FLAME_PATCH);
         }
     }
-    
+
     void DoFireworkChecks()
     {
         if (!_bunny)
@@ -489,7 +489,6 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
                             fireSpiralBunny->CastSpell(_bunny, SPELL_RIBBON_POLE_SPEW_LAVA_VISUAL, true);
                     }
                 }
-                
             }
         }
     }
