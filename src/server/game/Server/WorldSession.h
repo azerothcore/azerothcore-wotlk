@@ -917,7 +917,7 @@ public:                                                 // opcodes handlers
     void HandleReportPvPAFK(WorldPacket& recvData);
 
     void HandleWardenDataOpcode(WorldPacket& recvData);
-    void HandleWorldTeleportOpcode(WorldPacket& recvData);
+    void HandleWorldTeleport(WorldPacket& msg);
     void HandleMinimapPingOpcode(WorldPacket& recvData);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
