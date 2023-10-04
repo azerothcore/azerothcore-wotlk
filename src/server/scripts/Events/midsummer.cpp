@@ -429,7 +429,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
-            .Schedule(Seconds(1), [this](TaskContext context)
+            .Schedule(Seconds(1), [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
@@ -437,12 +437,12 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_5)
         {
-            _scheduler.Schedule(Milliseconds(1500), [this](TaskContext context)
+            _scheduler.Schedule(Milliseconds(1500), [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
-            .Schedule(Seconds(2), [this](TaskContext context)
+            .Schedule(Seconds(2), [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
