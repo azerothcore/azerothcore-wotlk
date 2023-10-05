@@ -85,8 +85,6 @@ int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
-    std::vector<std::string> overriddenKeys = sConfigMgr->OverrideWithEnvVariablesIfAny();
-
     // Init logging
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize(nullptr);
@@ -102,9 +100,6 @@ int main(int argc, char** argv)
             LOG_INFO("server.authserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.authserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
-
-    for (std::string const& key : overriddenKeys)
-        LOG_INFO("server.authserver", "Configuration field {} was overridden with environment variable.", key);
 
     OpenSSLCrypto::threadsSetup();
 

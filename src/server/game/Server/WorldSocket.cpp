@@ -564,7 +564,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     //! Negative mutetime indicates amount of minutes to be muted effective on next login - which is now.
     if (account.MuteTime < 0)
     {
-        account.MuteTime = GameTime::GetGameTime().count() + llabs(account.MuteTime);
+        account.MuteTime = GameTime::GetGameTime().count() + std::llabs(account.MuteTime);
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
         stmt->SetData(0, account.MuteTime);

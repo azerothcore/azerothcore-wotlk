@@ -55,8 +55,10 @@ enum Spells
     SPELL_QUAKE_KNOCKBACK       = 30571,
     SPELL_COLLAPSE_DAMAGE       = 36449,
     SPELL_CAMERA_SHAKE          = 36455,
+    SPELL_DEBRIS_TARGET         = 30629,
+    SPELL_DEBRIS_SPAWN          = 30630,
+    SPELL_DEBRIS_DAMAGE         = 30631,
     SPELL_DEBRIS_VISUAL         = 30632,
-    SPELL_DEBRIS_DAMAGE         = 30631
 };
 
 enum Groups
@@ -70,26 +72,9 @@ enum Actions
     ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1
 };
 
-class DealDebrisDamage : public BasicEvent
-{
-public:
-    DealDebrisDamage(Creature& creature, ObjectGuid targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-        if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
-            target->CastSpell(target, SPELL_DEBRIS_DAMAGE, true, nullptr, nullptr, _owner.GetGUID());
-        return true;
-    }
-
-private:
-    Creature& _owner;
-    ObjectGuid _targetGUID;
-};
-
 struct boss_magtheridon : public BossAI
 {
-    boss_magtheridon(Creature* creature) : BossAI(creature, TYPE_MAGTHERIDON)
+    boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON)
     {
         scheduler.SetValidator([this]
         {
@@ -102,12 +87,16 @@ struct boss_magtheridon : public BossAI
         BossAI::Reset();
         _channelersKilled = 0;
         _currentPhase = 0;
+        _castingQuake = false;
         _recentlySpoken = false;
         _magReleased = false;
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
-            Talk(SAY_TAUNT);
+            if (!me->IsEngaged())
+            {
+                Talk(SAY_TAUNT);
+            }
             context.Repeat(90s);
         });
         DoCastSelf(SPELL_SHADOW_CAGE, true);
@@ -133,11 +122,7 @@ struct boss_magtheridon : public BossAI
                 _currentPhase = 0;
                 scheduler.Schedule(20s, [this](TaskContext context)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, nullptr, nullptr, me->GetGUID());
-                        me->m_Events.AddEvent(new DealDebrisDamage(*me, target->GetGUID()), me->m_Events.CalculateTime(5000));
-                    }
+                    DoCastAOE(SPELL_DEBRIS_TARGET);
                     context.Repeat(20s);
                 });
             });
@@ -166,6 +151,7 @@ struct boss_magtheridon : public BossAI
 
     void ScheduleCombatEvents()
     {
+        DoResetThreatList();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetImmuneToPC(false);
         me->SetReactState(REACT_AGGRESSIVE);
@@ -180,29 +166,42 @@ struct boss_magtheridon : public BossAI
         {
             me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
             context.Repeat(11s, 39s);
-        }).Schedule(40s, [this](TaskContext context)
+        }).Schedule(28300ms, [this](TaskContext context)
         {
-            DoCastSelf(SPELL_QUAKE); //needs fixes with custom spell
-            scheduler.Schedule(7s, [this](TaskContext /*context*/)
+            DoCastSelf(SPELL_QUAKE);
+            _castingQuake = true;
+            me->GetMotionMaster()->Clear();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetOrientation(me->GetAngle(me->GetVictim()));
+            me->SetTarget(ObjectGuid::Empty);
+            scheduler.DelayAll(6999ms);
+            scheduler.Schedule(7s, [this](TaskContext)
             {
-                DoCastSelf(SPELL_BLAST_NOVA);
-
-                _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
-                {
-                    if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
-                    {
-                        Talk(SAY_BANISH);
-                        me->InterruptNonMeleeSpells(true);
-                        scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                    }
-                    else
-                        context.Repeat(50ms);
-                }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
-                {
-                    _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                });
+                _castingQuake = false;
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
             });
-            context.Repeat(53s, 56s);
+            context.Repeat(56300ms, 64300ms);
+        }).Schedule(55650ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_BLAST_NOVA);
+            scheduler.DelayAll(10s);
+
+            _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
+            {
+                if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
+                {
+                    Talk(SAY_BANISH);
+                    me->InterruptNonMeleeSpells(true);
+                    scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                }
+                else
+                    context.Repeat(50ms);
+            }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
+            {
+                _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+            });
+            context.Repeat(54350ms, 55400ms);
         }).Schedule(22min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);
@@ -234,6 +233,10 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
+        instance->DoForAllMinions(DATA_MAGTHERIDON, [&](Creature* creature) {
+            creature->SetInCombatWithZone();
+        });
+
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
@@ -256,18 +259,50 @@ struct boss_magtheridon : public BossAI
         scheduler.Update(diff);
         _interruptScheduler.Update(diff);
 
-        if (_currentPhase != 1)
+        if (_currentPhase != 1 && !_castingQuake)
         {
             DoMeleeAttackIfReady();
         }
     }
 
 private:
+    bool _castingQuake;
     bool _recentlySpoken;
     bool _magReleased;
     uint8 _currentPhase;
     uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
+};
+
+struct npc_target_trigger : public ScriptedAI
+{
+    npc_target_trigger(Creature* creature) : ScriptedAI(creature), _cast(false)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void Reset() override
+    {
+        if (!_cast)
+        {
+            DoCastSelf(SPELL_DEBRIS_VISUAL);
+            _cast = true;
+            _scheduler.Schedule(5s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_DEBRIS_DAMAGE);
+                me->DespawnOrUnsummon(6000);
+            });
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+protected:
+    TaskScheduler _scheduler;
+    bool _cast;
 };
 
 class spell_magtheridon_blaze : public SpellScript
@@ -329,6 +364,33 @@ class spell_magtheridon_quake : public SpellScript
     }
 };
 
+class spell_magtheridon_debris_target_selector : public SpellScript
+{
+    PrepareSpellScript(spell_magtheridon_debris_target_selector);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+            {
+                return target->GetEntry() != NPC_TARGET_TRIGGER;
+            });
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleHit()
+    {
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_DEBRIS_SPAWN);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_magtheridon_debris_target_selector::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnHit += SpellHitFn(spell_magtheridon_debris_target_selector::HandleHit);
+    }
+};
+
 class go_manticron_cube : public GameObjectScript
 {
 public:
@@ -350,8 +412,10 @@ public:
 void AddSC_boss_magtheridon()
 {
     RegisterMagtheridonsLairCreatureAI(boss_magtheridon);
+    RegisterMagtheridonsLairCreatureAI(npc_target_trigger);
     RegisterSpellScript(spell_magtheridon_blaze);
     RegisterSpellScript(spell_magtheridon_shadow_grasp);
     RegisterSpellScript(spell_magtheridon_quake);
+    RegisterSpellScript(spell_magtheridon_debris_target_selector);
     new go_manticron_cube();
 }
