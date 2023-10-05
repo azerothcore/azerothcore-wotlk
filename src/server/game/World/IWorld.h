@@ -79,6 +79,7 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL,
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP,
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA,
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION,
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL,
     CONFIG_ALLOW_TWO_SIDE_WHO_LIST,
@@ -207,6 +208,7 @@ enum WorldFloatConfigs
 enum WorldIntConfigs
 {
     CONFIG_COMPRESSION = 0,
+    CONFIG_INTERVAL_GRIDCLEAN,
     CONFIG_INTERVAL_MAPUPDATE,
     CONFIG_INTERVAL_CHANGEWEATHER,
     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
@@ -325,8 +327,10 @@ enum WorldIntConfigs
     CONFIG_ARENA_GAMES_REQUIRED,
     CONFIG_ARENA_SEASON_ID,
     CONFIG_ARENA_START_RATING,
+    CONFIG_LEGACY_ARENA_POINTS_CALC,
     CONFIG_ARENA_START_PERSONAL_RATING,
     CONFIG_ARENA_START_MATCHMAKER_RATING,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL,
     CONFIG_HONOR_AFTER_DUEL,
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
@@ -413,6 +417,7 @@ enum WorldIntConfigs
     CONFIG_LFG_KICK_PREVENTION_TIMER,
     CONFIG_CHANGE_FACTION_MAX_MONEY,
     CONFIG_WATER_BREATH_TIMER,
+    CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -596,7 +601,6 @@ public:
     [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
-    virtual void LoadMotd() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;

@@ -29,7 +29,6 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
 #include "MapMgr.h"
@@ -366,17 +365,15 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
         //SaveRespawnTime();
     }
 
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    SetHomePosition(x, y, z, o);
-    SetPosition(x, y, z, o);
-
-    // xinef: relocate notifier
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-
     // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
     if (IsFalling())
         StopMoving();
+
+    float x, y, z, o;
+    GetRespawnPosition(x, y, z, &o);
+    UpdateAllowedPositionZ(x, y, z);
+    SetHomePosition(x, y, z, o);
+    GetMap()->CreatureRelocation(this, x, y, z, o);
 }
 
 /**
@@ -1489,6 +1486,9 @@ void Creature::SelectLevel(bool changelevel)
     uint8 minlevel = std::min(cInfo->maxlevel, cInfo->minlevel);
     uint8 maxlevel = std::max(cInfo->maxlevel, cInfo->minlevel);
     uint8 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+
+    sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
+
     if (changelevel)
         SetLevel(level);
 
@@ -2078,9 +2078,7 @@ void Creature::Respawn(bool force)
         m_respawnedTime = GameTime::GetGameTime().count();
     }
     m_respawnedTime = GameTime::GetGameTime().count();
-    // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    UpdateObjectVisibility(false);
+    UpdateObjectVisibility();
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
@@ -2445,6 +2443,12 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (GetCharmerOrOwnerGUID())
         return false;
 
+    /// @todo: Implement aggro range, detection range and assistance range templates
+    if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ALL_ASSISTANCE_CALLS))
+    {
+        return false;
+    }
+
     // only from same creature faction
     if (checkfaction)
     {
@@ -2745,6 +2749,14 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     }
 
     return false;
+}
+
+void Creature::ClearProhibitedSpellTimers()
+{
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        m_ProhibitSchoolTime[i] = 0;
+    }
 }
 
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)
@@ -3700,6 +3712,24 @@ void Creature::ResetPlayerDamageReq()
 uint32 Creature::GetPlayerDamageReq() const
 {
     return _playerDamageReq;
+}
+
+bool Creature::CanCastSpell(uint32 spellID) const
+{
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+    int32 currentPower = GetPower(getPowerType());
+
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsSpellProhibited(spellInfo->GetSchoolMask()))
+    {
+        return false;
+    }
+
+    if (spellInfo && (currentPower < spellInfo->CalcPowerCost(this, spellInfo->GetSchoolMask())))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 std::string Creature::GetDebugInfo() const

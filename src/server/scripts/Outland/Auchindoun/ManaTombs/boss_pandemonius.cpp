@@ -34,107 +34,70 @@ enum Spells
     SPELL_DARK_SHELL = 32358
 };
 
-enum Events
+enum Groups
 {
-    EVENT_VOID_BLAST = 1,
-    EVENT_DARK_SHELL
+    GROUP_VOID_BLAST = 1
 };
 
-class boss_pandemonius : public CreatureScript
-{
-public:
-    boss_pandemonius() : CreatureScript("boss_pandemonius") { }
+constexpr uint8 MAX_VOID_BLAST = 5;
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_pandemonius : public BossAI
+{
+    boss_pandemonius(Creature* creature) : BossAI(creature, DATA_PANDEMONIUS)
     {
-        return GetManaTombsAI<boss_pandemoniusAI>(creature);
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
-    struct boss_pandemoniusAI : public ScriptedAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_pandemoniusAI(Creature* creature) : ScriptedAI(creature) { }
+        Talk(SAY_AGGRO);
 
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            VoidBlastCounter = 0;
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            me->SetInCombatWithZone();
-
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_DARK_SHELL, 20000);
-            events.ScheduleEvent(EVENT_VOID_BLAST, urand(8000, 23000));
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_KILL);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+        scheduler.
+            Schedule(20s, GROUP_VOID_BLAST, [this](TaskContext context)
             {
-                case EVENT_VOID_BLAST:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                    {
-                        DoCast(target, SPELL_VOID_BLAST);
-                        ++VoidBlastCounter;
-                    }
+                if (me->IsNonMeleeSpellCast(false))
+                {
+                    me->InterruptNonMeleeSpells(true);
+                }
 
-                    if (VoidBlastCounter == 5)
+                Talk(EMOTE_DARK_SHELL);
+                DoCastSelf(SPELL_DARK_SHELL);
+                context.Repeat();
+            })
+            .Schedule(8s, 23s, [this](TaskContext context)
+                {
+                    if (!(context.GetRepeatCounter() % (MAX_VOID_BLAST + 1)))
                     {
-                        VoidBlastCounter = 0;
-                        events.RescheduleEvent(EVENT_VOID_BLAST, urand(15000, 25000));
+                        context.Repeat(15s, 25s);
                     }
                     else
                     {
-                        events.RescheduleEvent(EVENT_VOID_BLAST, 500);
-                        events.DelayEvents(EVENT_DARK_SHELL, 500);
+                        DoCastRandomTarget(SPELL_VOID_BLAST);
+                        context.Repeat(500ms);
+                        context.DelayGroup(GROUP_VOID_BLAST, 500ms);
                     }
-                    break;
-                case EVENT_DARK_SHELL:
-                    if (me->IsNonMeleeSpellCast(false))
-                    {
-                        me->InterruptNonMeleeSpells(true);
-                    }
+                });
 
-                    Talk(EMOTE_DARK_SHELL);
-                    DoCast(me, SPELL_DARK_SHELL);
-                    events.RescheduleEvent(EVENT_DARK_SHELL, 20000);
-                    break;
-                default:
-                    break;
-            }
+        BossAI::JustEngagedWith(who);
+    }
 
-            DoMeleeAttackIfReady();
-        }
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_KILL);
+    }
 
-    private:
-        uint32 VoidBlastCounter;
-    };
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
 };
 
 void AddSC_boss_pandemonius()
 {
-    new boss_pandemonius();
+    RegisterManaTombsCreatureAI(boss_pandemonius);
 }

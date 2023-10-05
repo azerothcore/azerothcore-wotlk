@@ -32,7 +32,7 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
-#include "ServerMotd.h"
+#include "MotdMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"
@@ -128,11 +128,14 @@ public:
                 dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
+        HandleServerInfoCommand(handler);
+
         handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
         handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
         handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
+
+        handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
+        handler->PSendSysMessage("Found MySQL Executable: %s", GitRevision::GetMySQLExecutable());
 
         handler->PSendSysMessage("Compiled on: %s", GitRevision::GetHostOSVersion());
 
@@ -210,9 +213,32 @@ public:
                 availableLocales += " ";
         }
 
-        handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
+        handler->PSendSysMessage("Default DBC locale: %s.\nAll available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
 
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
+
+        std::string lldb = "No updates found!";
+        if (QueryResult resL = LoginDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
+        {
+            Field* fields = resL->Fetch();
+            lldb = fields[0].Get<std::string>();
+        }
+        std::string lcdb = "No updates found!";
+        if (QueryResult resC = CharacterDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
+        {
+            Field* fields = resC->Fetch();
+            lcdb = fields[0].Get<std::string>();
+        }
+        std::string lwdb = "No updates found!";
+        if (QueryResult resW = WorldDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
+        {
+            Field* fields = resW->Fetch();
+            lwdb = fields[0].Get<std::string>();
+        }
+
+        handler->PSendSysMessage("Latest LoginDatabase update: %s", lldb.c_str());
+        handler->PSendSysMessage("Latest CharacterDatabase update: %s", lcdb.c_str());
+        handler->PSendSysMessage("Latest WorldDatabase update: %s", lwdb.c_str());
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
@@ -258,7 +284,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd());
         return true;
     }
 
@@ -530,7 +556,7 @@ public:
         trans->Append(stmt);
         LoginDatabase.CommitTransaction(trans);
 
-        sWorld->LoadMotd();
+        sMotdMgr->LoadMotd();
         handler->PSendSysMessage(LANG_MOTD_NEW, Acore::StringTo<int32>(realmId).value(), strMotd);
         return true;
     }

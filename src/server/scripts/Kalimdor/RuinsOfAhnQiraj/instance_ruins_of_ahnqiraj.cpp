@@ -36,6 +36,7 @@ ObjectData const creatureData[] =
     { NPC_YEGGETH,   DATA_YEGGETH   },
     { NPC_PAKKON,    DATA_PAKKON    },
     { NPC_ZERRAN,    DATA_ZERRAN    },
+    { 0,             0              }
 };
 
 enum RajaxxWaveEvent
@@ -153,8 +154,8 @@ public:
             switch (type)
             {
                 case DATA_RAJAXX_WAVE_ENGAGED:
-                    _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
-                    _scheduler.Schedule(2min, [this](TaskContext context)
+                    scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    scheduler.Schedule(2min, [this](TaskContext context)
                     {
                         CallNextRajaxxLeader();
                         context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
@@ -194,8 +195,8 @@ public:
                             case NPC_YEGGETH:
                             case NPC_PAKKON:
                             case NPC_ZERRAN:
-                                _scheduler.CancelAll();
-                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                                scheduler.CancelAll();
+                                scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
                                 {
                                     if (!formation->IsAnyMemberAlive())
                                     {
@@ -209,11 +210,6 @@ public:
                     }
                 }
             }
-        }
-
-        void Update(uint32 diff) override
-        {
-            _scheduler.Update(diff);
         }
 
         void SetGuidData(uint32 type, ObjectGuid data) override
@@ -284,7 +280,7 @@ public:
         void ResetRajaxxWaves()
         {
             _rajaxWaveCounter = 0;
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
             for (auto const& data : RajaxxWavesData)
             {
                 if (Creature* creature = GetCreature(data.at(0)))
@@ -307,7 +303,6 @@ public:
         ObjectGuid _andorovGUID;
         uint32 _rajaxWaveCounter;
         uint8 _buruPhase;
-        TaskScheduler _scheduler;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

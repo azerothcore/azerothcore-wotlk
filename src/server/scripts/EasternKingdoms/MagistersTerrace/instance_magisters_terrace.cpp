@@ -16,8 +16,32 @@
  */
 
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "magisters_terrace.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_KALECGOS,        DATA_KALECGOS         },
+    { 0,                   0                     }
+};
+
+ObjectData const gameobjectData[] =
+{
+    { GO_ESCAPE_ORB, DATA_ESCAPE_ORB },
+    { 0,             0,              }
+};
+
+DoorData const doorData[] =
+{
+    { GO_SELIN_DOOR,           DATA_SELIN_FIREHEART, DOOR_TYPE_PASSAGE },
+    { GO_SELIN_ENCOUNTER_DOOR, DATA_SELIN_FIREHEART, DOOR_TYPE_ROOM    },
+    { GO_VEXALLUS_DOOR,        DATA_VEXALLUS,        DOOR_TYPE_PASSAGE },
+    { GO_DELRISSA_DOOR,        DATA_DELRISSA,        DOOR_TYPE_PASSAGE },
+    { 0,                       0,                    DOOR_TYPE_ROOM    } // END
+};
+
+Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f };
 
 class instance_magisters_terrace : public InstanceMapScript
 {
@@ -29,75 +53,32 @@ public:
         instance_magisters_terrace_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, gameobjectData);
+            LoadDoorData(doorData);
         }
 
-        uint32 Encounter[MAX_ENCOUNTER];
-
-        ObjectGuid VexallusDoorGUID;
-        ObjectGuid SelinDoorGUID;
-        ObjectGuid SelinEncounterDoorGUID;
-        ObjectGuid DelrissaDoorGUID;
-        ObjectGuid KaelDoorGUID;
         ObjectGuid EscapeOrbGUID;
 
         ObjectGuid DelrissaGUID;
         ObjectGuid KaelGUID;
 
-        void Initialize() override
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
-            memset(&Encounter, 0, sizeof(Encounter));
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (Encounter[i] == IN_PROGRESS)
-                    return true;
-            return false;
-        }
-
-        uint32 GetData(uint32 identifier) const override
-        {
-            switch (identifier)
+            if (eventId == EVENT_SPAWN_KALECGOS)
             {
-                case DATA_SELIN_EVENT:
-                case DATA_VEXALLUS_EVENT:
-                case DATA_DELRISSA_EVENT:
-                case DATA_KAELTHAS_EVENT:
-                    return Encounter[identifier];
+                if (!GetCreature(DATA_KALECGOS) && !scheduler.IsGroupScheduled(DATA_KALECGOS))
+                {
+                    scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext)
+                    {
+                        if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
+                        {
+                            kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
+                        }
+                    });
+                }
             }
-            return 0;
-        }
-
-        void SetData(uint32 identifier, uint32 data) override
-        {
-            switch (identifier)
-            {
-                case DATA_SELIN_EVENT:
-                    HandleGameObject(SelinDoorGUID, data == DONE);
-                    HandleGameObject(SelinEncounterDoorGUID, data != IN_PROGRESS);
-                    Encounter[identifier] = data;
-                    break;
-                case DATA_VEXALLUS_EVENT:
-                    if (data == DONE)
-                        HandleGameObject(VexallusDoorGUID, true);
-                    Encounter[identifier] = data;
-                    break;
-                case DATA_DELRISSA_EVENT:
-                    if (data == DONE)
-                        HandleGameObject(DelrissaDoorGUID, true);
-                    Encounter[identifier] = data;
-                    break;
-                case DATA_KAELTHAS_EVENT:
-                    HandleGameObject(KaelDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE)
-                        if (GameObject* escapeOrb = instance->GetGameObject(EscapeOrbGUID))
-                            escapeOrb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    Encounter[identifier] = data;
-                    break;
-            }
-
-            SaveToDB();
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -116,62 +97,15 @@ public:
                         kael->AI()->JustSummoned(creature);
                     break;
             }
-        }
 
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_SELIN_DOOR:
-                    if (GetData(DATA_SELIN_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    SelinDoorGUID = go->GetGUID();
-                    break;
-                case GO_SELIN_ENCOUNTER_DOOR:
-                    SelinEncounterDoorGUID = go->GetGUID();
-                    break;
-
-                case GO_VEXALLUS_DOOR:
-                    if (GetData(DATA_VEXALLUS_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    VexallusDoorGUID = go->GetGUID();
-                    break;
-
-                case GO_DELRISSA_DOOR:
-                    if (GetData(DATA_DELRISSA_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    DelrissaDoorGUID = go->GetGUID();
-                    break;
-                case GO_KAEL_DOOR:
-                    KaelDoorGUID = go->GetGUID();
-                    break;
-                case GO_ESCAPE_ORB:
-                    if (GetData(DATA_KAELTHAS_EVENT) == DONE)
-                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    EscapeOrbGUID = go->GetGUID();
-                    break;
-            }
-        }
-
-        // @todo: Use BossStates. This is for code compatibility
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> Encounter[1];
-            data >> Encounter[2];
-            data >> Encounter[3];
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << Encounter[0] << ' ' << Encounter[1] << ' ' << Encounter[2] << ' ' << Encounter[3];
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch (identifier)
+            if (identifier == NPC_DELRISSA)
             {
-                case NPC_DELRISSA:
-                    return DelrissaGUID;
+                return DelrissaGUID;
             }
 
             return ObjectGuid::Empty;
@@ -184,7 +118,53 @@ public:
     }
 };
 
+enum Spells
+{
+    SPELL_KALECGOS_TRANSFORM = 44670,
+    SPELL_TRANSFORM_VISUAL   = 24085,
+    SPELL_CAMERA_SHAKE       = 44762,
+    SPELL_ORB_KILL_CREDIT    = 46307
+};
+
+enum MovementPoints
+{
+    POINT_ID_PREPARE_LANDING = 6
+};
+
+struct npc_kalecgos : public ScriptedAI
+{
+    npc_kalecgos(Creature* creature) : ScriptedAI(creature) { }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != WAYPOINT_MOTION_TYPE)
+            return;
+
+        if (pointId == POINT_ID_PREPARE_LANDING)
+        {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            me->SetDisableGravity(false);
+            me->SetHover(false);
+
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                DoCastAOE(SPELL_CAMERA_SHAKE);
+                me->SetObjectScale(0.6f);
+
+                me->m_Events.AddEventAtOffset([this]()
+                {
+                    DoCastSelf(SPELL_ORB_KILL_CREDIT, true);
+                    DoCastSelf(SPELL_TRANSFORM_VISUAL);
+                    DoCastSelf(SPELL_KALECGOS_TRANSFORM);
+                    me->UpdateEntry(NPC_HUMAN_KALECGOS);
+                }, 1s);
+            }, 2s);
+        }
+    }
+};
+
 void AddSC_instance_magisters_terrace()
 {
     new instance_magisters_terrace();
+    RegisterMagistersTerraceCreatureAI(npc_kalecgos);
 }

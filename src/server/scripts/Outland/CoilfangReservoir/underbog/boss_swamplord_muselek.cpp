@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "the_underbog.h"
 
 enum Spells
@@ -27,14 +28,14 @@ enum Spells
     SPELL_MULTISHOT           = 34974,
     SPELL_THROW_FREEZING_TRAP = 31946,
     SPELL_AIMED_SHOT          = 31623,
-    SPELL_HUNTERS_MARK        = 31615
+    SPELL_HUNTERS_MARK        = 31615,
 };
 
 enum Text
 {
-    SAY_AGGRO     = 1,
-    SAY_KILL      = 2,
-    SAY_JUST_DIED = 3
+    SAY_AGGRO       = 1,
+    SAY_KILL        = 2,
+    SAY_JUST_DIED   = 3
 };
 
 enum Misc
@@ -84,7 +85,15 @@ struct boss_swamplord_muselek : public BossAI
 
     bool CanShootVictim()
     {
-        return me->GetVictim() && !me->IsWithinRange(me->GetVictim(), 10.0f) && me->IsWithinLOSInMap(me->GetVictim());
+        Unit* victim = me->GetVictim();
+
+        if (!victim || !me->IsWithinLOSInMap(victim) || !me->IsWithinRange(victim, 30.f) || me->IsWithinRange(victim, 10.f))
+        {
+            _canChase = true;
+            return false;
+        }
+
+        return true;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -99,6 +108,8 @@ struct boss_swamplord_muselek : public BossAI
                 me->LoadEquipment(1, true);
                 DoCastVictim(SPELL_SHOOT);
                 me->GetMotionMaster()->Clear();
+                me->StopMoving();
+                _canChase = false;
             }
             else if (_canChase)
             {
@@ -120,7 +131,7 @@ struct boss_swamplord_muselek : public BossAI
             context.Repeat(20s, 30s);
         }).Schedule(30s, 40s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, false, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, false, true))
             {
                 _markTarget = target->GetGUID();
                 _canChase = false;
@@ -133,7 +144,8 @@ struct boss_swamplord_muselek : public BossAI
                         if (me->IsWithinMeleeRange(me->GetVictim()))
                         {
                             me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                            me->GetMotionMaster()->MoveForwards(me->GetVictim(), 10.0f);
+                            _canChase = false;
                         }
 
                         me->m_Events.AddEventAtOffset([this]()

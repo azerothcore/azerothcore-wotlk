@@ -344,6 +344,32 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     init.Launch();
 }
 
+void MotionMaster::MoveForwards(Unit* target, float dist)
+{
+    //like movebackwards, but without the inversion
+    if (!target)
+    {
+        return;
+    }
+
+    Position const& pos = target->GetPosition();
+    float angle = target->GetAngle(_owner);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true, true))
+    {
+        return;
+    }
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z, false);
+    init.SetFacing(target);
+    init.Launch();
+}
+
 void MotionMaster::MoveCircleTarget(Unit* target)
 {
     if (!target)

@@ -1553,6 +1553,7 @@ public:
     void SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logout);
     void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
     void SaveGoldToDB(CharacterDatabaseTransaction trans);
+    void _SaveSkills(CharacterDatabaseTransaction trans);
 
     static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
@@ -2086,7 +2087,7 @@ public:
     ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
-    void RewardReputation(Unit* victim, float rate);
+    void RewardReputation(Unit* victim);
     void RewardReputation(Quest const* quest);
 
     float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);
@@ -2299,7 +2300,7 @@ public:
     }
     void HandleFall(MovementInfo const& movementInfo);
 
-    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
+    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell);
 
     void SetClientControl(Unit* target, bool allowMove, bool packetOnly = false);
 
@@ -2349,7 +2350,7 @@ public:
     bool IsVisibleGloballyFor(Player const* player) const;
 
     void GetInitialVisiblePackets(Unit* target);
-    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
+    void UpdateObjectVisibility(bool forced = true) override;
     void UpdateVisibilityForPlayer(bool mapChange = false);
     void UpdateVisibilityOf(WorldObject* target);
     void UpdateTriggerVisibility();
@@ -2494,6 +2495,9 @@ public:
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
     void CompletedAchievement(AchievementEntry const* entry);
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
+
+    void SetCreationTime(Seconds creationTime) { m_creationTime = creationTime; }
+    [[nodiscard]] Seconds GetCreationTime() const { return m_creationTime; }
 
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
@@ -2691,7 +2695,6 @@ public:
     void _SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans);
     void _SaveMonthlyQuestStatus(CharacterDatabaseTransaction trans);
     void _SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans);
-    void _SaveSkills(CharacterDatabaseTransaction trans);
     void _SaveSpells(CharacterDatabaseTransaction trans);
     void _SaveEquipmentSets(CharacterDatabaseTransaction trans);
     void _SaveEntryPoint(CharacterDatabaseTransaction trans);
@@ -2949,6 +2952,8 @@ private:
     bool _wasOutdoor;
 
     PlayerSettingMap m_charSettingsMap;
+
+    Seconds m_creationTime;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

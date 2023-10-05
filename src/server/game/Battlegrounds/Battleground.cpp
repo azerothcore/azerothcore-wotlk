@@ -18,7 +18,6 @@
 #include "Battleground.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
-#include "ArenaTeamMgr.h"
 #include "BattlegroundBE.h"
 #include "BattlegroundDS.h"
 #include "BattlegroundMgr.h"
@@ -916,7 +915,47 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, player->GetMapId());
     }
 
+    if (IsEventActive(EVENT_SPIRIT_OF_COMPETITION) && isBattleground())
+        SpiritofCompetitionEvent(winnerTeamId);
+
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
+}
+
+bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
+{
+    // Everyone is eligible for tabard reward
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        Player* player = itr->second;
+        bool questStatus = player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) != QUEST_STATUS_REWARDED;
+
+        if (player && questStatus)
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
+    }
+
+    // In case of a draw nobody get rewarded
+    if (winnerTeamId == PVP_TEAM_NEUTRAL)
+        return false;
+
+    std::vector<Player*> filteredPlayers;
+
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        Player* player = itr->second;
+        bool playerTeam = player->GetBgTeamId() == GetTeamId(winnerTeamId);
+        bool questStatus = player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED;
+
+        if (player && playerTeam && questStatus)
+            filteredPlayers.push_back(player);
+    }
+
+    if (filteredPlayers.size())
+    {
+        if (Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()])
+            wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
+    }
+
+    return true;
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const

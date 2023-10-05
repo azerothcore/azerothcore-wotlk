@@ -48,6 +48,15 @@ void ScriptMgr::OnCreatureSaveToDB(Creature* creature)
     });
 }
 
+void ScriptMgr::OnBeforeCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature, uint8& level)
+{
+    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    {
+        script->OnBeforeCreatureSelectLevel(cinfo, creature, level);
+    });
+
+}
+
 void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature)
 {
     ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)

@@ -19,13 +19,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     env:
-      BOOST_ROOT: C:\local\boost_1_79_0
+      BOOST_ROOT: C:\local\boost_1_82_0
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.9
       - name: Configure OS
         shell: bash
         env:
@@ -40,6 +42,10 @@ jobs:
         run: |
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
+      - name: Copy dll files
+        shell: bash
+        run: |
+          cp "/c/Program Files/OpenSSL/bin/legacy.dll" "env/dist"
       - name: Dry run authserver
         shell: bash
         run: |

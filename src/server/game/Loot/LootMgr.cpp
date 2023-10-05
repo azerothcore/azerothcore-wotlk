@@ -679,6 +679,8 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     {
         LootItem& item = quest_items[i];
 
+        sScriptMgr->OnBeforeFillQuestLootItem(player, item);
+
         // Quest item is not free for all and is already assigned to another player
         // or player doesn't need it
         if (item.is_blocked || !item.AllowedForPlayer(player, sourceWorldObjectGUID))

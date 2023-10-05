@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_TYPEDEFS_H
-#define TRINITYSERVER_TYPEDEFS_H
+#ifndef AC_TYPEDEFS_H
+#define AC_TYPEDEFS_H
 
 #include "Common.h"
 
@@ -74,4 +74,4 @@ namespace Movement
     extern UInt32Counter splineIdGen;
 }
 
-#endif // TRINITYSERVER_TYPEDEFS_H
+#endif // AC_TYPEDEFS_H
