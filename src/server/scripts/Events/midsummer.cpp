@@ -528,7 +528,7 @@ class spell_midsummer_ribbon_pole_firework : public SpellScript
 
     void ModDestHeight(SpellDestination& dest)
     {
-        Position const offset = { 0.0f, 0.0f, 20.0f , 0.0f};
+        Position const offset = { 0.0f, 0.0f, 20.0f , 0.0f };
         dest.RelocateOffset(offset);
     }
 
