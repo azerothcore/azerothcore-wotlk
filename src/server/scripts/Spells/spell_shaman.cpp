@@ -37,6 +37,7 @@ enum ShamanSpells
     SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT         = 52025,
     SPELL_SHAMAN_EARTH_SHIELD_HEAL              = 379,
     SPELL_SHAMAN_ELEMENTAL_MASTERY              = 16166,
+    SPELL_SHAMAN_ELECTRIFIED                    = 64930,
     SPELL_SHAMAN_EXHAUSTION                     = 57723,
     SPELL_SHAMAN_FIRE_NOVA_R1                   = 1535,
     SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1         = 8349,
@@ -1104,6 +1105,45 @@ class spell_sha_flurry_proc : public AuraScript
     }
 };
 
+// 64928 - Item - Shaman T8 Elemental 4P Bonus
+class spell_sha_t8_electrified : public AuraScript
+{
+    PrepareAuraScript(spell_sha_t8_electrified);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHAMAN_ELECTRIFIED });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        // Do not proc from Lightning Overload (patch 3.1~)
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            if (spellInfo->Id == 45284)
+            {
+                return;
+            }
+        }
+
+        SpellInfo const* electrifiedDot = sSpellMgr->AssertSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / electrifiedDot->GetMaxTicks());
+
+        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_SHAMAN_ELECTRIFIED, SPELL_AURA_PERIODIC_DAMAGE, amount);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_sha_t8_electrified::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     RegisterSpellScript(spell_sha_totem_of_wrath);
@@ -1135,4 +1175,5 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_sentry_totem);
     RegisterSpellScript(spell_sha_thunderstorm);
     RegisterSpellScript(spell_sha_flurry_proc);
+    RegisterSpellScript(spell_sha_t8_electrified);
 }
