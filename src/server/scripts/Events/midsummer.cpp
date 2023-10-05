@@ -332,12 +332,12 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void LocateRibbonPole()
     {
-        _scheduler.Schedule(Milliseconds(420), [this](TaskContext context)
+        _scheduler.Schedule(420ms, [this](TaskContext context)
             {
                 _ribbonPole = me->FindNearestGameObject(GO_RIBBON_POLE, 10.0f);
 
                 if (!_ribbonPole)
-                    context.Repeat(Milliseconds(420));
+                    context.Repeat(420ms);
             });
     }
 
@@ -424,12 +424,12 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_3)
         {
-            _scheduler.Schedule(Milliseconds(500), [this](TaskContext /*context*/)
+            _scheduler.Schedule(500ms, [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
-            .Schedule(Seconds(1), [this](TaskContext /*context*/)
+            .Schedule(1s, [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
@@ -437,12 +437,12 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_5)
         {
-            _scheduler.Schedule(Milliseconds(1500), [this](TaskContext /*context*/)
+            _scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
-            .Schedule(Seconds(2), [this](TaskContext /*context*/)
+            .Schedule(2s, [this](TaskContext /*context*/)
             {
                 if (_bunny)
                     _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
