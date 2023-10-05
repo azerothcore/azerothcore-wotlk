@@ -64,7 +64,7 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
     SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083,
-    SPELL_PET_RESISTANCE                            = 37386, // Void Star Talisman
+    SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
 };
 
 enum WarlockSpellIcons
@@ -285,7 +285,7 @@ class spell_warl_generic_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-            if (owner->HasAura(SPELL_PET_RESISTANCE) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
+            if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
                 amount += 130;
             }
@@ -395,7 +395,7 @@ class spell_warl_infernal_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-            if (owner->HasAura(SPELL_PET_RESISTANCE) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
+            if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
                 amount += 130;
             }
