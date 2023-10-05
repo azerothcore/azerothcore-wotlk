@@ -323,7 +323,6 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
 
         // prevent duplicates
-        // https://stackoverflow.com/a/571405
         if (std::find(_dancerList.begin(), _dancerList.end(), dancer) != _dancerList.end())
             return;
 
@@ -352,7 +351,6 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
     void DoCleanupChecks()
     {
         // remove non-dancing players from list
-        // https://stackoverflow.com/a/76842213
         std::erase_if(_dancerList, [](Player* dancer)
             {
                 return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
