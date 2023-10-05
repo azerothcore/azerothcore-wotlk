@@ -60,7 +60,8 @@ enum ShamanSpells
     SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042,
     SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554,
     SPELL_SHAMAN_STORMSTRIKE                    = 17364,
-    SPELL_SHAMAN_LAVA_LASH                      = 60103
+    SPELL_SHAMAN_LAVA_LASH                      = 60103,
+    SPELL_SHAMAN_LIGHTNING_BOLT_OVERLOAD        = 45284,
 };
 
 enum ShamanSpellIcons
@@ -1126,7 +1127,7 @@ class spell_sha_t8_electrified : public AuraScript
         // Do not proc from Lightning Overload (patch 3.1~)
         if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
         {
-            if (spellInfo->Id == 45284)
+            if (spellInfo->Id == SPELL_SHAMAN_LIGHTNING_BOLT_OVERLOAD)
             {
                 return;
             }
