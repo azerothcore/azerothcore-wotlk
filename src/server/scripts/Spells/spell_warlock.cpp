@@ -285,7 +285,7 @@ class spell_warl_generic_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-            if (owner->HasAura(SPELL_PET_RESISTANCE)) // Void Star Talisman
+            if (owner->HasAura(SPELL_PET_RESISTANCE) && schoolMask != SPELL_SCHOOL_MASK_NORMAL) // Void Star Talisman
             {
                 amount += 130;
             }
@@ -395,7 +395,7 @@ class spell_warl_infernal_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-            if (owner->HasAura(SPELL_PET_RESISTANCE)) // Void Star Talisman
+            if (owner->HasAura(SPELL_PET_RESISTANCE) && schoolMask != SPELL_SCHOOL_MASK_NORMAL) // Void Star Talisman
             {
                 amount += 130;
             }
