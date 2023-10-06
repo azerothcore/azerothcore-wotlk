@@ -4571,11 +4571,11 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
     });
-	
-	// Instill Lord Valthalak's Spirit DND
+
+    // Instill Lord Valthalak's Spirit DND
     ApplySpellFix({ 27360 }, [](SpellInfo* spellInfo)
     {
-		spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
