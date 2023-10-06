@@ -25,14 +25,23 @@ inline Optional<bool> IsValidBoolScript(std::function<bool(ScriptName*)> execute
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
         return {};
-
+    
+    bool ret = false;
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
-        if (executeHook(script))
-            return true;
-    }
+        LOG_DEBUG("scripts.execute", "IsValidBoolScript - Valid script found for {}", typeid(ScriptName).name());
+        LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script ID: {}", scriptID);
+        LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script Name: {}", script->GetName());
+        //get script method name
 
-    return false;
+        if (executeHook(script))
+        {
+            LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script executed return true");
+            ret = true;
+        }else
+            LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script executed return false");
+    }
+    return ret;
 }
 
 template<typename ScriptName, class T>

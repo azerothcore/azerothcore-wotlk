@@ -1487,6 +1487,26 @@ void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibi
 //    });
 //}
 
+bool ScriptMgr::OnBeforePlayerResurrect(Player* player, float restore_percent, bool applySickness)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        LOG_DEBUG("scripts.hook", "ScriptMgr - OnBeforePlayerResurrect begin");
+        bool scriptRet = script->OnBeforePlayerResurrect(player, restore_percent, applySickness);
+        //print script name and scriptRet to logs
+        LOG_DEBUG("scripts.hook", "ScriptMgr - OnBeforePlayerResurrect - Script: {} , scriptRet: {} ", script->GetName(), scriptRet ? "true" : "false");
+        return !scriptRet;
+        
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool applySickness)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

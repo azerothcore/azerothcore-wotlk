@@ -1379,6 +1379,9 @@ public:
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
+    // Called when a player is about to be resurrected, if false is returned the player will not be resurrected
+    [[nodiscard]] virtual bool OnBeforePlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { return true; }
+    
     virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
 
     // Called before selecting the graveyard when releasing spirit
@@ -2442,6 +2445,7 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    bool OnBeforePlayerResurrect(Player* player, float restore_percent, bool applySickness);
     void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
     void OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
     bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg);

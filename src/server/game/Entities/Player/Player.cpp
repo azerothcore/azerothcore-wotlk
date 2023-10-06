@@ -4385,6 +4385,19 @@ void Player::BuildPlayerRepop()
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 {
+    LOG_DEBUG("entities.player", "Player::ResurrectPlayer: enter Resurrecting player {} ({})", GetName(), GetGUID().ToString());
+
+    //call the beforePlayerResurrect script first
+    //if false is returned, no resurrection will occur
+    if (!sScriptMgr->OnBeforePlayerResurrect(this, restore_percent, applySickness))
+    {
+        LOG_DEBUG("entities.player", "Player::ResurrectPlayer: OnBeforePlayerResurrect returned false for player {} ({})", GetName(), GetGUID().ToString());
+        return;
+    }
+
+    LOG_DEBUG("entities.player", "Player::ResurrectPlayer: begin Resurrecting player {} ({})", GetName(), GetGUID().ToString());
+        
+
     WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);        // remove spirit healer position
     data << uint32(-1);
     data << float(0);
