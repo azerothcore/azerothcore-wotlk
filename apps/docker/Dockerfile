@@ -60,13 +60,7 @@ ARG CCACHE_COMPRESSLEVEL="9"
 ARG CCACHE_COMPILERCHECK="content"
 ARG CCACHE_LOGFILE=""
 
-# Install packages needed to build azerothcore.
-# Since it's a lot of quite large packages, we're making sure the apt's cache is
-# persisted by docker.
-RUN --mount=target=/var/cache/apt,type=cache,sharing=locked           \
-    # Apt in docker already actually cleans itself up
-    rm -rf /etc/apt/apt.conf.d/docker-clean                           \
-    && apt update                                                     \
+RUN apt update                                                     \
     && apt install -y --no-install-recommends                         \
         build-essential ccache libtool cmake-data make cmake clang    \
         git lsb-base curl unzip default-mysql-client openssl                  \

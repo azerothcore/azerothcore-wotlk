@@ -68,8 +68,6 @@ jobs:
           file: apps/docker/Dockerfile.dev-server
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             USER_ID=1000
             GROUP_ID=1000
@@ -77,16 +75,6 @@ jobs:
 
   # TODO: rename this job
   docker-build-n-deploy-prod:
-    strategy:
-      fail-fast: true
-      max-parallel: 1
-      matrix:
-        component:
-          - worldserver
-          - authserver
-          - db-import
-          - client-data
-          - tools
     runs-on: "ubuntu-latest"
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
@@ -123,28 +111,47 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: build worldserver
+        uses: ./.github/actions/docker-tag-and-build
         with:
-          images: acore/ac-wotlk-${{ matrix.component }}
-          tags: |
-            type=raw,value=${{ steps.version.outputs.version }}
-            type=ref,event=branch
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ github.workspace }}
-          file: apps/docker/Dockerfile
+          component-name: worldserver
+          version: ${{ steps.version.outputs.version }}
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            USER_ID=1000
-            GROUP_ID=1000
-            DOCKER_USER=acore
+
+      - name: build worldserver
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: worldserver
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
+
+      - name: build authserver
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: authserver
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
+
+      - name: build db-import
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: db-import
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
+
+      - name: build client-data
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: client-data
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
+
+      - name: build tools
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: tools
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
 
   dispatch-acore-docker:
     needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
