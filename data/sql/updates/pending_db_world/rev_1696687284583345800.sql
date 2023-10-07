@@ -1,4 +1,4 @@
--- Stone Fury
+-- Stone Fury from Trinity
 UPDATE `creature_template` SET `MovementType` = 2 WHERE (`entry` = 2258);
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 2258);
