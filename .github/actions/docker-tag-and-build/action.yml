@@ -30,7 +30,7 @@ runs:
       with:
         context: ${{ github.workspace }}
         file: apps/docker/Dockerfile
-        push: ${{ inputs.tools }}
+        push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
         build-args: |
           USER_ID=1000
