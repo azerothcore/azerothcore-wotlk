@@ -551,7 +551,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetWalk(cInfo->Movement.IsGroundAllowed());
     SetSwim(cInfo->Movement.IsSwimAllowed());
     SetCanFly(cInfo->Movement.IsFlightAllowed());
-    SetHover(cInfo->Movement.Ground == CreatureGroundMovementType::Hover);
+    SetHover(cInfo->Movement.IsHoverAllowed());
     SetRooted(cInfo->Movement.IsRooted());
 
     // checked and error show at loading templates

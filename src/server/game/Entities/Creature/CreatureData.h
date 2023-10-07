@@ -138,6 +138,11 @@ struct CreatureMovementData
         return Ground != CreatureGroundMovementType::None;
     }
 
+    bool IsHoverAllowed() const
+    {
+        return Ground == CreatureGroundMovementType::Hover;
+    }
+
     bool IsSwimAllowed() const
     {
         return Swim;
