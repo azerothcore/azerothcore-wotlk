@@ -88,6 +88,7 @@ public:
     {
         static ChatCommandTable commandTable =
         {
+            { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
             { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
             { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
@@ -449,6 +450,54 @@ public:
 
         handler->PSendSysMessage("Success! Players are now being teleported to the arena.");
         return true;
+    }
+
+    static bool HandleCommentatorCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+        {
+            return false;
+        }
+
+        auto SetCommentatorMod = [&](bool enable)
+        {
+            session->SendNotification(enable ? "Commentator mode on" : "Commentator mode off");
+            session->GetPlayer()->SetCommentator(enable);
+        };
+
+        if (WorldSession* session = handler->GetSession())
+        {
+            if (!enableArg)
+            {
+                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsCommentator())
+                {
+                    SetCommentatorMod(true);
+                }
+                else
+                {
+                    SetCommentatorMod(false);
+                }
+
+                return true;
+            }
+
+            if (*enableArg)
+            {
+                SetCommentatorMod(true);
+                return true;
+            }
+            else
+            {
+                SetCommentatorMod(false);
+                return true;
+            }
+        }
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+        return false;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
