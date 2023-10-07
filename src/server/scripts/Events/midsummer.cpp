@@ -266,7 +266,6 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         if (me->ToTempSummon())
             me->DespawnOrUnsummon();
 
-        _lastDancerCount = 0;
         _ribbonPole = nullptr;
         _bunny = nullptr;
         _dancerList.clear();
@@ -350,51 +349,14 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void DoCleanupChecks()
     {
+        if (_dancerList.empty())
+            return;
+
         // remove non-dancing players from list
         std::erase_if(_dancerList, [](Player* dancer)
             {
                 return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
             });
-
-        if (_dancerList.size() < _lastDancerCount)
-        {
-            // despawn remaining ground flowers
-            if (_dancerList.size() < THRESHOLD_GROUND_FLOWERS)
-            {
-                std::list<Creature*> crList;
-                me->GetCreaturesWithEntryInRange(crList, 20.0f, NPC_GROUND_FLOWER);
-
-                if (!crList.empty())
-                {
-                    for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr)
-                    {
-                        (*itr)->DespawnOrUnsummon();
-                    }
-                }
-            }
-
-            // cancel lava animation
-            if (_dancerList.size() < THRESHOLD_SPEW_LAVA)
-                if (_bunny)
-                    _bunny->RemoveAura(SPELL_RIBBON_POLE_SPEW_LAVA_VISUAL);
-
-            // despawn remaining dancing flames
-            if (_dancerList.size() < THRESHOLD_DANCING_FLAMES)
-            {
-                std::list<Creature*> crList;
-                me->GetCreaturesWithEntryInRange(crList, 20.0f, NPC_BIG_DANCING_FLAMES);
-
-                if (!crList.empty())
-                {
-                    for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr)
-                    {
-                        (*itr)->DespawnOrUnsummon();
-                    }
-                }
-            }
-        }
-
-        _lastDancerCount = _dancerList.size();
     }
 
     void DoFlameCircleChecks()
@@ -514,7 +476,6 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    uint32 _lastDancerCount;
     std::vector<Player*> _dancerList;
     GameObject* _ribbonPole;
     Creature* _bunny;
