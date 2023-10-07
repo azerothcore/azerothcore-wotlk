@@ -1,3 +1,4 @@
+-- DB update 2023_10_07_00 -> 2023_10_07_01
 -- Lord Valthalak's Amulet
 DELETE FROM `spell_script_names` WHERE `spell_id`=27360;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (27360, 'spell_gen_valthalak_amulet');
