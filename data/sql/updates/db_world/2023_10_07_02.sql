@@ -1,3 +1,4 @@
+-- DB update 2023_10_07_01 -> 2023_10_07_02
 -- Stone Fury from Trinity
 UPDATE `creature_template` SET `MovementType` = 2 WHERE (`entry` = 2258);
 
