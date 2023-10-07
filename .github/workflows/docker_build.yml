@@ -71,9 +71,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            USER_ID="1000"
-            GROUP_ID="1000"
-            DOCKER_USER="acore"
+            USER_ID=1000
+            GROUP_ID=1000
+            DOCKER_USER=acore
 
   # TODO: rename this job
   docker-build-n-deploy-prod:
@@ -142,8 +142,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            USER_ID="1000"
-            GROUP_ID="1000"
+            USER_ID=1000
+            GROUP_ID=1000
             DOCKER_USER=acore
 
   dispatch-acore-docker:
