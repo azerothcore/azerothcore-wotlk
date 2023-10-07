@@ -251,7 +251,7 @@ enum RibbonPole
     INTERVAL_FIREWORK                   = 15,
     INTERVAL_GROUND_FLOWERS             = 10,
     INTERVAL_SPEW_LAVA                  = 10,
-    INTERVAL_DANCING_FLAMES             = 30,
+    INTERVAL_DANCING_FLAMES             = 15,
 
     MAX_COUNT_GROUND_FLOWERS            = 3,
     MAX_COUNT_SPEW_LAVA_TARGETS         = 2,
