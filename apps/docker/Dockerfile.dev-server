@@ -34,7 +34,7 @@ RUN apt-get update \
         make cmake clang libmysqlclient-dev libboost-all-dev \
         build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
         libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
-        libncurses5-dev ccache \
+        libncurses5-dev ccache tzdata \
   && rm -rf /var/lib/apt/lists/*
 
 # Ensure git will work with the AzerothCore source directory

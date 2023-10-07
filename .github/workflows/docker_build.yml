@@ -79,6 +79,7 @@ jobs:
   docker-build-n-deploy-prod:
     strategy:
       fail-fast: true
+      max-parallel: 1
       matrix:
         component:
           - worldserver
