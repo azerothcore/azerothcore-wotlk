@@ -45,8 +45,8 @@ jobs:
       - name: Get version
         id: version
         run: |
-          ./acore.sh docker build
-          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
+          output=$(./acore.sh version | grep "AzerothCore Rev. ")
+          version=${output#"AzerothCore Rev. "}
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
@@ -64,6 +64,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: ${{ github.workspace }}
           file: apps/docker/Dockerfile.dev-server
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -72,7 +73,7 @@ jobs:
           build-args: |
             USER_ID="1000"
             GROUP_ID="1000"
-            DOCKER_USER=acore
+            DOCKER_USER="acore"
 
   # TODO: rename this job
   docker-build-n-deploy-prod:
@@ -133,6 +134,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: ${{ github.workspace }}
           file: apps/docker/Dockerfile
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
           tags: ${{ steps.meta.outputs.tags }}
