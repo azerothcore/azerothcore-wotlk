@@ -585,7 +585,6 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         SetControlled(true, UNIT_STATE_ROOT);
     UpdateMovementFlags();
 
-    LoadCreaturesAddon();
     LoadSpellTemplateImmunity();
 
     if (updateAI)
