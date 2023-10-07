@@ -118,13 +118,6 @@ jobs:
           version: ${{ steps.version.outputs.version }}
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
 
-      - name: build worldserver
-        uses: ./.github/actions/docker-tag-and-build
-        with:
-          component-name: worldserver
-          version: ${{ steps.version.outputs.version }}
-          push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
-
       - name: build authserver
         uses: ./.github/actions/docker-tag-and-build
         with:
