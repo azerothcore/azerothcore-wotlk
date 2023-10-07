@@ -434,9 +434,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         {
             if (!_dancerList.empty())
             {
-                std::vector<Player*>::iterator begin = _dancerList.begin(), end = _dancerList.end();
-                std::random_device rd;
-                std::shuffle(begin, end, std::default_random_engine{ rd() });
+                Acore::Containers::RandomShuffle(_dancerList);
 
                 for (uint8 i = 0; (i < MAX_COUNT_SPEW_LAVA_TARGETS) && (i < _dancerList.size()); i++)
                 {
