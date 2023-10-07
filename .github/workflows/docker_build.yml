@@ -52,12 +52,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: acore/ac-wotlk-dev-server
+          tags: |
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=ref,event=branch
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           file: apps/docker/Dockerfile.dev-server
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
-          tags: acore/ac-wotlk-dev-server:${{ steps.version.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -112,14 +121,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: acore/ac-wotlk-${{ matrix.component }}
+          tags: |
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=ref,event=branch
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          file: apps/docker/Dockerfile.dev-server
+          file: apps/docker/Dockerfile
           push: ${{ github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' }}
-          tags: |
-            acore/ac-wotlk-${{ matrix.component }}:${{ github.ref_name }}
-            acore/ac-wotlk-${{ matrix.component }}:${{ steps.version.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
