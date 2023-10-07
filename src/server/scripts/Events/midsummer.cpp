@@ -464,7 +464,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
             {
                 float spawnDist = 10.0f;
                 float angle = rand_norm() * 2 * M_PI;
-                DoSpawnCreature(NPC_BIG_DANCING_FLAMES, spawnDist * cos(angle), spawnDist * std::sin(angle), 0, angle + M_PI, TEMPSUMMON_TIMED_DESPAWN, 5 * 60000);
+                DoSpawnCreature(NPC_BIG_DANCING_FLAMES, spawnDist * cos(angle), spawnDist * std::sin(angle), 0, angle + M_PI, TEMPSUMMON_TIMED_DESPAWN, 60000);
             }
         }
     }
