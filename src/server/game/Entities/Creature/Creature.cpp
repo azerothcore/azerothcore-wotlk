@@ -547,9 +547,6 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetCanModifyStats(true);
     UpdateAllStats();
 
-    // Update movement
-    UpdateMovementFlags();
-
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
     {
@@ -581,13 +578,14 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    if (IsRooted())
-    {
-        SetControlled(true, UNIT_STATE_ROOT);
-    }
-
     SetDetectionDistance(cInfo->detection_range);
 
+    // Update movement
+    if (IsRooted())
+        SetControlled(true, UNIT_STATE_ROOT);
+    UpdateMovementFlags();
+
+    LoadCreaturesAddon();
     LoadSpellTemplateImmunity();
 
     if (updateAI)
