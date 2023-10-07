@@ -548,11 +548,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     UpdateAllStats();
 
     // Update movement
-    SetWalk(cInfo->Movement.IsGroundAllowed());
-    SetSwim(cInfo->Movement.IsSwimAllowed());
-    SetCanFly(cInfo->Movement.IsFlightAllowed());
-    SetHover(cInfo->Movement.IsHoverAllowed());
-    SetRooted(cInfo->Movement.IsRooted());
+    UpdateMovementFlags();
 
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
