@@ -3906,7 +3906,7 @@ class spell_item_venomhide_feed : public SpellScript
 
         return SPELL_FAILED_BAD_TARGETS;
     }
-    
+
     void UpdateTarget(WorldObject*& target)
     {
         if (!target)
