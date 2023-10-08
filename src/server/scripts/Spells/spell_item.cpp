@@ -3923,7 +3923,7 @@ class spell_item_venomhide_feed : public SpellScript
                 return;
             }
 
-            for (Creature* creature  : hatchling)
+            for (Creature* creature : hatchling)
             {
                 if (creature)
                 {
