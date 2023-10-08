@@ -221,7 +221,7 @@ enum RibbonPole
     // player spinning/rorating around himself
     SPELL_RIBBON_POLE_PERIODIC_VISUAL   = 45406,
     // spew lava trails
-    SPELL_RIBBON_POLE_SPEW_LAVA_VISUAL  = 45421,
+    SPELL_RIBBON_POLE_FIRE_SPIRAL_VISUAL= 45421,
     // blue fire ring, duration 5s
     SPELL_FLAME_RING                    = 46842,
     // red fire ring, duration 5s
@@ -432,7 +432,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
                     {
                         Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                         if (fireSpiralBunny)
-                            fireSpiralBunny->CastSpell(_bunny, SPELL_RIBBON_POLE_SPEW_LAVA_VISUAL, true);
+                            fireSpiralBunny->CastSpell(_bunny, SPELL_RIBBON_POLE_FIRE_SPIRAL_VISUAL, true);
                     }
                 }
             }
