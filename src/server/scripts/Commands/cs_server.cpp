@@ -265,7 +265,7 @@ public:
         uint32 queuedSessionCount = sWorld->GetQueuedSessionCount();
         uint32 connPeak = sWorld->GetMaxActiveSessionCount();
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
+        handler->PSendSysMessage("WoW-TLT Server x3 PvP", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
             handler->PSendSysMessage("Подключенные игроки: %u. Персонажи в мире: %u.", activeSessionCount, playerCount);
         else
