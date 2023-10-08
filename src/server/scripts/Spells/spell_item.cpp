@@ -3934,7 +3934,6 @@ class spell_item_venomhide_feed : public SpellScript
         }
     }
 
-
     void Register() override
     {
         OnCheckCast += SpellCheckCastFn(spell_item_venomhide_feed::CheckCast);
