@@ -535,7 +535,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
-    float armor = (float)stats->GenerateArmor(cInfo); /// @todo: Why is this treated as uint32 when it's a float?
+    float armor = stats->GenerateArmor(cInfo);
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
     SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
     SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
@@ -1492,6 +1492,9 @@ void Creature::SelectLevel(bool changelevel)
     uint8 minlevel = std::min(cInfo->maxlevel, cInfo->minlevel);
     uint8 maxlevel = std::max(cInfo->maxlevel, cInfo->minlevel);
     uint8 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+
+    sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
+
     if (changelevel)
         SetLevel(level);
 
@@ -2752,6 +2755,14 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     }
 
     return false;
+}
+
+void Creature::ClearProhibitedSpellTimers()
+{
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        m_ProhibitSchoolTime[i] = 0;
+    }
 }
 
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)

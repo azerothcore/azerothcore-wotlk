@@ -1294,6 +1294,8 @@ uint8 Player::GetChatTag() const
         tag |= CHAT_TAG_DND;
     if (isAFK())
         tag |= CHAT_TAG_AFK;
+    if (IsCommentator())
+        tag |= CHAT_TAG_COM;
     if (IsDeveloper())
         tag |= CHAT_TAG_DEV;
 
