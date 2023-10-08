@@ -1,5 +1,6 @@
 -- "Dirty" Michael Crowe
 DELETE FROM `waypoint_data` WHERE `id`=306490;
+DELETE FROM `waypoint_scripts` WHERE `id`=23;
 DELETE FROM `creature_addon` WHERE `guid` = 30649;
 UPDATE `creature` SET `MovementType` = 0 WHERE `id1` = 23896 AND `guid` = 30649;
 
