@@ -1,3 +1,4 @@
+-- DB update 2023_10_08_00 -> 2023_10_08_01
 -- Blackrock Depths - Dark Iron Deposit(s)
 DELETE FROM `gameobject` WHERE `id` = 165658 AND `map` = 230;
 DELETE FROM `pool_template` WHERE `entry` BETWEEN 11700 AND 11705;
