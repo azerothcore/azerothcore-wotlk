@@ -191,8 +191,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@OGUID+44, @OBJECTPOOLS+4, 0, 'Durotar Earthroot South 4/5'),
 (@OGUID+45, @OBJECTPOOLS+4, 0, 'Durotar Earthroot South 5/5');
 
---TODO:  CHECK ALL THESE AND THEN POOL THEM:
-
 -- Peacebloom has presumed all known 76 spawns captured
 -- Remove existing Peacebloom from Durotar:
 DELETE FROM `gameobject` where `guid` IN (43735, 43736, 43737, 43738, 43763, 43775, 43780, 43796, 43801, 43832, 43808, 43817, 43829, 43834, 43836, 43841, 43847, 43980, 43983, 43984, 43985, 43986, 44001, 44002, 44003, 44008, 44009, 44010, 44013, 44016, 44017, 44020, 44021, 44022, 44023, 44028, 44030, 44031, 44110, 44111, 44122, 44125, 44126, 44127, 44128, 44130, 44132, 44136, 44140, 44141, 44142, 44144, 44145, 44146, 44148, 44149, 44377, 44475, 44476);
