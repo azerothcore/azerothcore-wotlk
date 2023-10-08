@@ -1,3 +1,4 @@
+-- DB update 2023_10_08_02 -> 2023_10_08_03
 -- "Dirty" Michael Crowe
 DELETE FROM `waypoint_data` WHERE `id`=306490;
 DELETE FROM `waypoint_scripts` WHERE `id`=23;
