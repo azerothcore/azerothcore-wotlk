@@ -14,12 +14,12 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (9256,9257,9258,9266,9268,9270,9272,9273,9274);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(9256, 11699, 3.33, 'Spawn Point 1 - Truesilver'),
-(9266, 11699, 21.66, 'Spawn Point 1 - Mithril'),
-(9272, 11699, 8.34, 'Spawn Point 1 - Iron'),
-(9257, 11699, 3.33, 'Spawn Point 2 - Truesilver'),
-(9268, 11699, 21.67, 'Spawn Point 2 - Mithril'),
-(9273, 11699, 8.33, 'Spawn Point 2 - Iron'),
-(9258, 11699, 3.34, 'Spawn Point 3 - Truesilver'),
-(9270, 11699, 21.66, 'Spawn Point 3 - Mithril'),
-(9274, 11699, 8.33, 'Spawn Point 3 - Iron');
+(9256, 11699, 3.3, 'Spawn Point 1 - Truesilver'),
+(9266, 11699, 0, 'Spawn Point 1 - Mithril'),
+(9272, 11699, 8.3, 'Spawn Point 1 - Iron'),
+(9257, 11699, 3.3, 'Spawn Point 2 - Truesilver'),
+(9268, 11699, 0, 'Spawn Point 2 - Mithril'),
+(9273, 11699, 8.3, 'Spawn Point 2 - Iron'),
+(9258, 11699, 3.3, 'Spawn Point 3 - Truesilver'),
+(9270, 11699, 0, 'Spawn Point 3 - Mithril'),
+(9274, 11699, 8.3, 'Spawn Point 3 - Iron');
