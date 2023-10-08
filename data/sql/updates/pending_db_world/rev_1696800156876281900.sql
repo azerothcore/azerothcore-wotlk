@@ -31,7 +31,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -- Make Mageroyal Pooling:
 SET @OBJECTPOOLS :=112;
 DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+3;
-DELETE FROM `pool_template` WHERE `entry` BETWEEN @OBJECTPOOLS+0 AND @OBJECTPOOLS+;
+DELETE FROM `pool_template` WHERE `entry` BETWEEN @OBJECTPOOLS+0 AND @OBJECTPOOLS+3;
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@OBJECTPOOLS+0, 1, 'Durotar Mageroyal A Pool 1/4');
