@@ -214,8 +214,8 @@ LABEL description="AzerothCore client-data"
 
 ENV DATAPATH=/azerothcore/env/dist/data
 
-RUN apt update && \
-    apt install -y curl unzip && \
+RUN apt-get update && \
+    apt-get install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
