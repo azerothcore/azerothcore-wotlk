@@ -4579,7 +4579,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Feed Venomhide Hatchling - Silithid Egg
-    ApplySpellFix({ 65265  }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 65265 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
         spellInfo->SpellVisual[0] = 13838;
