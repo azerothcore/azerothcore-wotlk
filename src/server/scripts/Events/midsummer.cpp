@@ -245,14 +245,6 @@ enum RibbonPole
     THRESHOLD_SPEW_LAVA                 = 6,
     THRESHOLD_DANCING_FLAMES            = 7,
 
-    // update interval in Seconds(...)
-    INTERVAL_CLEANUPCHECKS              = 1,
-    INTERVAL_FLAME_CIRCLE               = 5,
-    INTERVAL_FIREWORK                   = 15,
-    INTERVAL_GROUND_FLOWERS             = 10,
-    INTERVAL_SPEW_LAVA                  = 10,
-    INTERVAL_DANCING_FLAMES             = 15,
-
     MAX_COUNT_GROUND_FLOWERS            = 3,
     MAX_COUNT_SPEW_LAVA_TARGETS         = 2,
     MAX_COUNT_DANCING_FLAMES            = 4,
@@ -273,32 +265,32 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         LocateRibbonPole();
         SpawnFireSpiralBunny();
 
-        _scheduler.Schedule(Seconds(INTERVAL_CLEANUPCHECKS), [this](TaskContext context)
+        _scheduler.Schedule(1s, [this](TaskContext context)
             {
                 DoCleanupChecks();
                 context.Repeat();
             })
-            .Schedule(Seconds(INTERVAL_FLAME_CIRCLE), [this](TaskContext context)
+            .Schedule(5s, [this](TaskContext context)
             {
                 DoFlameCircleChecks();
                 context.Repeat();
             })
-            .Schedule(Seconds(INTERVAL_FIREWORK), [this](TaskContext context)
+            .Schedule(15s, [this](TaskContext context)
             {
                 DoFireworkChecks();
                 context.Repeat();
             })
-            .Schedule(Seconds(INTERVAL_GROUND_FLOWERS), [this](TaskContext context)
+            .Schedule(10s, [this](TaskContext context)
             {
                 DoGroundFlowerChecks();
                 context.Repeat();
             })
-            .Schedule(Seconds(INTERVAL_SPEW_LAVA), [this](TaskContext context)
+            .Schedule(10s, [this](TaskContext context)
             {
                 DoSpewLavaChecks();
                 context.Repeat();
             })
-            .Schedule(Seconds(INTERVAL_DANCING_FLAMES), [this](TaskContext context)
+            .Schedule(15s, [this](TaskContext context)
             {
                 DoDancingFLameChecks();
                 context.Repeat();
@@ -442,7 +434,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
                     if (dancerTarget)
                     {
-                        Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, INTERVAL_SPEW_LAVA * 1000);
+                        Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                         if (fireSpiralBunny)
                             fireSpiralBunny->CastSpell(_bunny, SPELL_RIBBON_POLE_SPEW_LAVA_VISUAL, true);
                     }
