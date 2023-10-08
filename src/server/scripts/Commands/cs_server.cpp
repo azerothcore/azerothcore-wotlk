@@ -265,15 +265,15 @@ public:
         uint32 queuedSessionCount = sWorld->GetQueuedSessionCount();
         uint32 connPeak = sWorld->GetMaxActiveSessionCount();
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
+        handler->PSendSysMessage("WoW-TLT Server x3 PvP", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
-            handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
+            handler->PSendSysMessage("Подключенные игроки: %u. Персонажи в мире: %u.", activeSessionCount, playerCount);
         else
-            handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
+            handler->PSendSysMessage("Подключенные игроки: %u. Персонажи в мире: %u. Очередь: %u.", activeSessionCount, playerCount, queuedSessionCount);
 
-        handler->PSendSysMessage("Connection peak: %u.", connPeak);
+        handler->PSendSysMessage("Пик подключения: %u.", connPeak);
         handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
-        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("Обновить разницу во времени: %ums, среднийe: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
