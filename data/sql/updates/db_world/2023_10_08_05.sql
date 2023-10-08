@@ -1,3 +1,4 @@
+-- DB update 2023_10_08_04 -> 2023_10_08_05
 -- Terrorclaw 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 20477);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES

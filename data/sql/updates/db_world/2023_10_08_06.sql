@@ -1,3 +1,4 @@
+-- DB update 2023_10_08_05 -> 2023_10_08_06
 -- Pamela's Doll
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10926;
 
