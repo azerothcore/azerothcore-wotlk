@@ -10,7 +10,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 
 DELETE FROM `pool_template` WHERE `entry` = 11699;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(11699, 5, 'Desolace Mithril Deposit Pool');
+(11699, 1, 'Desolace Mithril Deposit Pool');
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (9256,9257,9258,9266,9268,9270,9272,9273,9274);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
