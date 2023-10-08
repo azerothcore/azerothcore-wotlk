@@ -60,8 +60,8 @@ ARG CCACHE_COMPRESSLEVEL="9"
 ARG CCACHE_COMPILERCHECK="content"
 ARG CCACHE_LOGFILE=""
 
-RUN apt update                                                     \
-    && apt install -y --no-install-recommends                         \
+RUN apt-get update                                                     \
+    && apt-get install -y --no-install-recommends                         \
         build-essential ccache libtool cmake-data make cmake clang    \
         git lsb-base curl unzip default-mysql-client openssl                  \
         default-libmysqlclient-dev libboost-all-dev libssl-dev libmysql++-dev \
@@ -115,8 +115,8 @@ ARG DOCKER_USER=acore
 ENV ACORE_COMPONENT=undefined
 
 # Install base dependencies for azerothcore
-RUN apt update && \
-    apt install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
       libmysqlclient21 libreadline8 \
       gettext-base default-mysql-client && \
     rm -rf /var/lib/apt/lists/*
