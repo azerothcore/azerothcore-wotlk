@@ -1,7 +1,7 @@
 --
 -- Remove existing Durotar Herbalism Nodes:
 DELETE FROM pool_gameobject WHERE pool_entry BETWEEN 498 AND 501;
-DELETE FROM pool_template WHERE entry BETWEEN 498 AND 501;
+DELETE FROM `pool_template` WHERE `entry` BETWEEN 498 AND 501;
 
 -- Lets work on Mageroyal first.  There are 16 Nodes and all have been captured and parsed succesfully into 4 pools (pools are also blizzlike in this case, rest are estimates)
 -- Remove Existing Mageroyal:
