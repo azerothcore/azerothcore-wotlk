@@ -467,32 +467,29 @@ public:
             session->GetPlayer()->SetCommentator(enable);
         };
 
-        if (WorldSession* session = handler->GetSession())
+        if (!enableArg)
         {
-            if (!enableArg)
-            {
-                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsCommentator())
-                {
-                    SetCommentatorMod(true);
-                }
-                else
-                {
-                    SetCommentatorMod(false);
-                }
-
-                return true;
-            }
-
-            if (*enableArg)
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsCommentator())
             {
                 SetCommentatorMod(true);
-                return true;
             }
             else
             {
                 SetCommentatorMod(false);
-                return true;
             }
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetCommentatorMod(true);
+            return true;
+        }
+        else
+        {
+            SetCommentatorMod(false);
+            return true;
         }
 
         handler->SendSysMessage(LANG_USE_BOL);
@@ -516,32 +513,29 @@ public:
             sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
         };
 
-        if (WorldSession* session = handler->GetSession())
+        if (!enableArg)
         {
-            if (!enableArg)
-            {
-                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
-                {
-                    SetDevMod(true);
-                }
-                else
-                {
-                    SetDevMod(false);
-                }
-
-                return true;
-            }
-
-            if (*enableArg)
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
             {
                 SetDevMod(true);
-                return true;
             }
             else
             {
                 SetDevMod(false);
-                return true;
             }
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetDevMod(true);
+            return true;
+        }
+        else
+        {
+            SetDevMod(false);
+            return true;
         }
 
         handler->SendSysMessage(LANG_USE_BOL);
