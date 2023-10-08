@@ -4578,20 +4578,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
-    // Feed Venomhide Hatchling - Silithid Egg
-    ApplySpellFix({ 65265 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->SpellVisual[0] = 13838;
-    });
-
-    // Feed Venomhide Hatchling - Fresh Dinosaur Meat
-    ApplySpellFix({ 65200 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->SpellVisual[0] = 13832;
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
