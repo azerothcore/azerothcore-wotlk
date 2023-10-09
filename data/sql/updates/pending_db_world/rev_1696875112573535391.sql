@@ -117,4 +117,4 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (16072, 24018, 24018, 1, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
 (16072, 24020, 24020, 1, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
 (16072, 24024, 24024, 5, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
-(16072, 22094, 0, 100, 1, 1, 0, 1, 1, 'Tidelord Rrurgaz - Bloodkelp');
+(16072, 22094, 0, 7, 1, 1, 0, 1, 1, 'Tidelord Rrurgaz - Bloodkelp');
