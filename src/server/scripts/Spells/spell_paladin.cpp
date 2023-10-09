@@ -872,9 +872,28 @@ public:
         GetCaster()->CastSpell(GetHitUnit(), _spellId, true);
         GetCaster()->CastSpell(GetHitUnit(), spellId2, true);
 
-        // Judgement of the Just
+           // Judgement of the Just
         if (GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
-            GetCaster()->CastSpell(GetHitUnit(), 68055, true);
+        {
+            if(GetCaster()->CastSpell(GetHitUnit(), 68055, true) && (spellId2 == 31804 || spellId2 == 53733))
+            {
+                //hidden effect only cast when spellcast of judgements of the just is succesful
+                GetCaster()->CastSpell(GetHitUnit(), SealApplication(spellId2), true); //add hidden seal apply effect for vengeance and corruption
+            }
+        }
+    }
+
+    uint32 SealApplication(uint32 correspondingSpellId)
+    {
+        switch(correspondingSpellId)
+        {
+            case 31804: //judgement of vengeance
+                return 31803;
+            case 53733: //judgement of corruption
+                return 53742;
+            default:
+                return 0;
+        }
     }
 
     void Register() override
