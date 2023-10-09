@@ -5523,7 +5523,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
             if (type < 0 || type > 19)
             {
-                LOG_ERROR("custom.transmog", "Account %u has transmog with unknown type %u in custom_account_transmog, ignoring", GetSession()->GetAccountId(), type);
+                LOG_ERROR("custom.transmog", "Account %u has transmog with unknown type %u in forge_account_transmog, ignoring", GetSession()->GetAccountId(), type);
                 continue;
             }
 
