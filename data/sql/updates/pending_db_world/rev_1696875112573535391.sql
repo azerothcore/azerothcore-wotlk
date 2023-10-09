@@ -63,7 +63,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (4368, 24024, 24024, 5, 0, 1, 1, 1, 1, 'Strashaz Myrmidon - (ReferenceTable)'),
 (4368, 24033, 24033, 1, 0, 1, 1, 1, 1, 'Strashaz Myrmidon - (ReferenceTable)'),
 (4368, 24036, 24036, 5, 0, 1, 1, 1, 1, 'Strashaz Myrmidon - (ReferenceTable)'),
-(4368, 22094, 0, 25, 1, 1, 0, 1, 1, 'Strashaz Myrmidon - Bloodkelp');
+(4368, 22094, 0, 25, 1, 1, 0, 1, 2, 'Strashaz Myrmidon - Bloodkelp');
 
 -- Strashaz Sorceress (4370)
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 4370);
@@ -117,4 +117,4 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (16072, 24018, 24018, 1, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
 (16072, 24020, 24020, 1, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
 (16072, 24024, 24024, 5, 0, 1, 1, 1, 1, 'Tidelord Rrurgaz - (ReferenceTable)'),
-(16072, 22094, 0, 7, 1, 1, 0, 1, 1, 'Tidelord Rrurgaz - Bloodkelp');
+(16072, 22094, 0, 7, 1, 1, 0, 1, 2, 'Tidelord Rrurgaz - Bloodkelp');
