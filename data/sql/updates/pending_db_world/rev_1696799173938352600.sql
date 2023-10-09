@@ -5,6 +5,11 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 142189)
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (142189, 1, 0, 0, 70, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 14218900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Inconspicuous Landmark - On Gameobject State Changed - Run Script');
 
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 14218900);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(14218900, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 50, 142194, 300, 0, 0, 0, 0, 1, 0, 0, 0, 0, -2, -3, 0, 0, 'Inconspicuous Landmark - Actionlist - Summon Gameobject \'Pirate\'s Treasure!\''),
+(14218900, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 12, 7898, 3, 5000, 0, 0, 0, 1, 0, 0, 0, 0, -2, -3, 0, 0, 'Inconspicuous Landmark - Actionlist - Summon Creature \'Pirate treasure trigger mob\'');
+
 DELETE FROM `gameobject` WHERE `id` = 142189;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (17231, 142189, 1, 0, 0, 1, 1, -10249.2, -3981.8, 1.66783, -0.750491, 0, 0, -0.366501, 0.930418, 600, 100, 1, '', NULL, NULL),
