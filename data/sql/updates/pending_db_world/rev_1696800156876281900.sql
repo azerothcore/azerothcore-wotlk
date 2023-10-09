@@ -493,7 +493,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@OGUID+12, @OBJECTPOOLS+1, 0, 'Durotar Silverleaf NW 5/5');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(@OBJECTPOOLS+2, 4, 'Durotar Silverleaf West  Pool 3/7');
+(@OBJECTPOOLS+2, 4, 'Durotar Silverleaf West Pool 3/7');
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@OGUID+13, @OBJECTPOOLS+2, 0, 'Durotar Silverleaf West 1/12'),
 (@OGUID+14, @OBJECTPOOLS+2, 0, 'Durotar Silverleaf West 2/12'),
