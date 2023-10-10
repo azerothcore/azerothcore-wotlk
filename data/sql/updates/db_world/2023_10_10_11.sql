@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_10 -> 2023_10_10_11
 -- Venomhide Hatchling feed items
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (65200,65258,65265,68359,68358,68360);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
