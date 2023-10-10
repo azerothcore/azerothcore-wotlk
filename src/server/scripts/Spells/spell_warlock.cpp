@@ -287,7 +287,8 @@ class spell_warl_generic_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
-                amount += 130;
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
             }
         }
     }
@@ -397,7 +398,8 @@ class spell_warl_infernal_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
-                amount += 130;
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
             }
         }
     }
