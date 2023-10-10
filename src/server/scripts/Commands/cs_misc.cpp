@@ -88,6 +88,7 @@ public:
     {
         static ChatCommandTable commandTable =
         {
+            { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
             { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
             { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
@@ -451,6 +452,51 @@ public:
         return true;
     }
 
+    static bool HandleCommentatorCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+        {
+            return false;
+        }
+
+        auto SetCommentatorMod = [&](bool enable)
+        {
+            session->SendNotification(enable ? "Commentator mode on" : "Commentator mode off");
+            session->GetPlayer()->SetCommentator(enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsCommentator())
+            {
+                SetCommentatorMod(true);
+            }
+            else
+            {
+                SetCommentatorMod(false);
+            }
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetCommentatorMod(true);
+            return true;
+        }
+        else
+        {
+            SetCommentatorMod(false);
+            return true;
+        }
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
         WorldSession* session = handler->GetSession();
@@ -467,32 +513,29 @@ public:
             sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
         };
 
-        if (WorldSession* session = handler->GetSession())
+        if (!enableArg)
         {
-            if (!enableArg)
-            {
-                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
-                {
-                    SetDevMod(true);
-                }
-                else
-                {
-                    SetDevMod(false);
-                }
-
-                return true;
-            }
-
-            if (*enableArg)
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
             {
                 SetDevMod(true);
-                return true;
             }
             else
             {
                 SetDevMod(false);
-                return true;
             }
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetDevMod(true);
+            return true;
+        }
+        else
+        {
+            SetDevMod(false);
+            return true;
         }
 
         handler->SendSysMessage(LANG_USE_BOL);

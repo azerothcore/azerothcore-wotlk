@@ -55,6 +55,14 @@ void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, 
     });
 }
 
+void ScriptMgr::OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
+    });
+}
+
 void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store)
 {
     ExecuteScript<GlobalScript>([&](GlobalScript* script)

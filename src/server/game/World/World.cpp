@@ -673,7 +673,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfigMgr->GetOption("GridCleanUpDelay", 5 * MINUTE * IN_MILLISECONDS);
     if (_int_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
     {
-        LOG_ERROR("server.loading", "GridCleanUpDelay (%i) must be greater %u. Use this minimal value.", _int_configs[CONFIG_INTERVAL_GRIDCLEAN], MIN_GRID_DELAY);
+        LOG_ERROR("server.loading", "GridCleanUpDelay ({}) must be greater {}. Use this minimal value.", _int_configs[CONFIG_INTERVAL_GRIDCLEAN], MIN_GRID_DELAY);
         _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = MIN_GRID_DELAY;
     }
     if (reload)
