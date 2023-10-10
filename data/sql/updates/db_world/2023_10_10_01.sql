@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_00 -> 2023_10_10_01
 -- Place Draenei Banner
 UPDATE `conditions` SET `Comment` = '\'Place Draenei Banner\' - Target only Lord Xiz' WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 30988) AND (`ConditionTypeOrReference` = 31) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 17701);
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 30988) AND (`ConditionTypeOrReference` = 29) AND (`ConditionValue1` = 17701) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 1);
