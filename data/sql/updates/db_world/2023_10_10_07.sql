@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_06 -> 2023_10_10_07
 -- Change from 150 minutes to 5
 UPDATE `event_scripts` SET `datalong2` = 300000 WHERE `id` = 3084 AND `command` = 10;
 

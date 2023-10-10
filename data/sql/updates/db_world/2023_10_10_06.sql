@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_05 -> 2023_10_10_06
 -- Quest: Cuergo's Gold
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI', `ScriptName` = '' WHERE `entry` = 142189;
 
