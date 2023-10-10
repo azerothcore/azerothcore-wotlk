@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_02 -> 2023_10_10_03
 -- J.D. Collie
 UPDATE `smart_scripts` SET `comment` = 'J.D. Collie - On Quest \'Making Sense of It\' Taken - Run Script' WHERE `entryorguid` = 9117 AND `source_type` = 0 AND `id` = 0;
 
