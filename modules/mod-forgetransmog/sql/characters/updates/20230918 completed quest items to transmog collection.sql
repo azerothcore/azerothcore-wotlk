@@ -26,4 +26,4 @@ SELECT quest_template.id AS ID, RewardItem4 AS RewardItemID FROM quest_template 
 
 USE characters_database;
 
-REPLACE INTO custom_account_transmog (accountid, `type`, entry) SELECT c.account, 0, tqri.RewardItemID FROM transmog__quest_reward_items tqri INNER JOIN character_queststatus_rewarded cqr ON tqri.ID = cqr.quest INNER JOIN characters c ON c.guid = cqr.guid;
+REPLACE INTO forge_account_transmog (accountid, `type`, entry) SELECT c.account, 0, tqri.RewardItemID FROM transmog__quest_reward_items tqri INNER JOIN character_queststatus_rewarded cqr ON tqri.ID = cqr.quest INNER JOIN characters c ON c.guid = cqr.guid;
