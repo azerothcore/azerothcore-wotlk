@@ -4578,12 +4578,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
-    // Jubling Cooldown
-    ApplySpellFix({ 23853 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 23852; // 1 week
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

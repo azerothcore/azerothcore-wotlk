@@ -3822,6 +3822,12 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             m_caster->CastSpell(unitTarget, 22682, true);
                             return;
                         }
+                    // Jubling Cooldown
+                    case 23853:
+                        {
+                            unitTarget->CastSpell(unitTarget, 23852, false);
+                        }
+                        break;
                     // Plant Warmaul Ogre Banner
                     case 32307:
                         if (Player* caster = m_caster->ToPlayer())
