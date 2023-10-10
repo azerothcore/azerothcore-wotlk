@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_09 -> 2023_10_10_10
 -- Mrs. Dalson's Diary
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 1) AND (`SourceGroup` = 10816) AND (`SourceEntry` = 12738);
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 3001) AND (`SourceEntry` = 3694);
