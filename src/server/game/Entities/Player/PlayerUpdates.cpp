@@ -1543,7 +1543,7 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     }
 
     // updates visibility of all objects around point of view for current player
-    Acore::VisibleNotifier notifier(*this, mapChange);
+    Acore::VisibleNotifier notifier(*this);
     Cell::VisitAllObjects(m_seer, notifier, GetSightRange());
     notifier.SendToSelf();   // send gathered data
 }

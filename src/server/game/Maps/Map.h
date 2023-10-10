@@ -311,7 +311,7 @@ class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
 public:
-    Map(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
+    Map(uint32 id, std::chrono::milliseconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
 
     [[nodiscard]] MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -374,10 +374,10 @@ public:
 
     void ResetGridExpiry(NGridType& grid, float factor = 1) const
     {
-        grid.ResetTimeTracker(std::chrono::duration_cast<std::chrono::seconds>(i_gridExpiry * factor));
+        grid.ResetTimeTracker(std::chrono::duration_cast<std::chrono::milliseconds>(i_gridExpiry * factor));
     }
 
-    [[nodiscard]] std::chrono::seconds GetGridExpiry(void) const { return i_gridExpiry; }
+    [[nodiscard]] std::chrono::milliseconds GetGridExpiry(void) const { return i_gridExpiry; }
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
     static void InitStateMachine();
@@ -750,7 +750,7 @@ private:
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
     GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
 
-    std::chrono::seconds i_gridExpiry;
+    std::chrono::milliseconds i_gridExpiry;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -839,7 +839,7 @@ enum InstanceResetMethod
 class InstanceMap : public Map
 {
 public:
-    InstanceMap(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
+    InstanceMap(uint32 id, std::chrono::milliseconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
     ~InstanceMap() override;
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
@@ -873,7 +873,7 @@ private:
 class BattlegroundMap : public Map
 {
 public:
-    BattlegroundMap(uint32 id, std::chrono::seconds, uint32 InstanceId, Map* _parent, uint8 spawnMode);
+    BattlegroundMap(uint32 id, std::chrono::milliseconds, uint32 InstanceId, Map* _parent, uint8 spawnMode);
     ~BattlegroundMap() override;
 
     bool AddPlayerToMap(Player*) override;
