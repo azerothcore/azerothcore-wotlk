@@ -1,3 +1,4 @@
+-- DB update 2023_10_10_11 -> 2023_10_10_12
 -- Witchbane Torch
 SET @GUID := 5448;
 DELETE FROM `gameobject` WHERE `guid`=@GUID;
