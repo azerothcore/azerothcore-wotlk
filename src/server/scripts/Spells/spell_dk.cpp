@@ -1221,7 +1221,7 @@ class spell_dk_death_coil : public SpellScript
             else
             {
                 if (AuraEffect const* auraEffect = caster->GetAuraEffect(SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART, EFFECT_1))
-                    damage += auraEffect->GetBaseAmount();
+                    damage += auraEffect->GetFullAmount();
                 caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, nullptr, nullptr, true);
             }
         }

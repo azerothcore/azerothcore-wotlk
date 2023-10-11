@@ -250,7 +250,7 @@ class spell_warl_demonic_knowledge : public AuraScript
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
-            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), aurEff->GetBaseAmount());
+            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), aurEff->GetFullAmount());
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
@@ -992,7 +992,7 @@ class spell_warl_unstable_affliction : public AuraScript
         if (Unit* caster = GetCaster())
             if (AuraEffect const* aurEff = GetEffect(EFFECT_0))
             {
-                int32 damage = aurEff->GetBaseAmount();
+                int32 damage = aurEff->GetFullAmount();
                 damage = aurEff->GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, &damage, nullptr) * 9;
                 // backfire damage and silence
                 caster->CastCustomSpell(dispelInfo->GetDispeller(), SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL, &damage, nullptr, nullptr, true, nullptr, aurEff);

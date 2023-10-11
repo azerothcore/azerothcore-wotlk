@@ -849,7 +849,7 @@ class spell_pri_vampiric_touch : public AuraScript
             if (Unit* target = GetUnitOwner())
                 if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                 {
-                    int32 damage = aurEff->GetBaseAmount();
+                    int32 damage = aurEff->GetFullAmount();
                     damage = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster, &damage, nullptr) * 8;
                     // backfire damage
                     caster->CastCustomSpell(target, SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL, &damage, nullptr, nullptr, true, nullptr, aurEff);
