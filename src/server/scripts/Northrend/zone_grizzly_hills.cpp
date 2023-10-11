@@ -918,7 +918,8 @@ public:
                     player->AddAura(SPELL_WARTS, player);
                 else
                 {
-                    DoCast(player, SPELL_FROG_KISS); // Removes SPELL_WARTSBGONE_LIP_BALM
+                    // Removes SPELL_WARTSBGONE_LIP_BALM
+                    player->CastSpell(player, SPELL_FROG_KISS, true);
 
                     if (me->GetEntry() == NPC_LAKE_FROG)
                     {
