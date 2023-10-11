@@ -44,19 +44,27 @@ enum Spells
 
 struct boss_curator : public BossAI
 {
-    boss_curator(Creature* creature) : BossAI(creature, DATA_CURATOR) { }
+    boss_curator(Creature* creature) : BossAI(creature, DATA_CURATOR)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
         BossAI::Reset();
-        me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ARCANE, true);
+        me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_MANA_LEECH, true);
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_POWER_BURN, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_BURN, true);
         ScheduleHealthCheckEvent(15, [&] {
-        DoCastSelf(SPELL_ARCANE_INFUSION, true);
-        Talk(SAY_ENRAGE);
+            me->InterruptNonMeleeSpells(true);
+            DoCastSelf(SPELL_ARCANE_INFUSION, true);
+            Talk(SAY_ENRAGE);
         });
+        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
     }
 
     void KilledUnit(Unit* victim) override
@@ -85,7 +93,7 @@ struct boss_curator : public BossAI
             DoCastSelf(SPELL_ASTRAL_DECONSTRUCTION, true);
         }).Schedule(10s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 45.0f, true, false))
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 45.0f, true, false))
             {
                 DoCast(target, SPELL_HATEFUL_BOLT);
             }
@@ -129,18 +137,6 @@ struct boss_curator : public BossAI
             summon->AddThreat(target, 1000.0f);
         }
         summon->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
     }
 };
 

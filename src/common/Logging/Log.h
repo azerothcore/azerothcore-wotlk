@@ -121,8 +121,6 @@ private:
 
     Acore::Asio::IoContext* _ioContext;
     Acore::Asio::Strand* _strand;
-    // Deprecated debug filter logs
-    DebugLogFilters _debugLogMask;
 };
 
 #define sLog Log::instance()

@@ -55,6 +55,14 @@ void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, 
     });
 }
 
+void ScriptMgr::OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
+    });
+}
+
 void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store)
 {
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
@@ -168,6 +176,21 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
         return script->OnAllowedForPlayerLootCheck(player, source);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return script->OnAllowedToLootContainerCheck(player, source);
     });
 
     if (ret && *ret)

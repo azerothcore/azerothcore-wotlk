@@ -2506,9 +2506,9 @@ enum VenomhideHatchlingMisc
     ITEM_VENOMHIDE_BABY_TOOTH = 47196,
 
     MODEL_BABY_RAPTOR              = 29251,
-    MODEL_BABY_RAPTOR_REPTILE_EYES = 29809,
-    MODEL_ADOLESCENT_RAPTOR        = 29103,
-    MODEL_FULL_RAPTOR              = 5291,
+    MODEL_BABY_RAPTOR_REPTILE_EYES = 29274,
+    MODEL_ADOLESCENT_RAPTOR        = 29275,
+    MODEL_FULL_RAPTOR              = 29276,
 };
 
 enum VenomhideHatchlingTexts
