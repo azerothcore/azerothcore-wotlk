@@ -1308,6 +1308,8 @@ class spell_hun_bestial_wrath : public SpellScript
     }
 };
 
+// -24604 - Furious Howl
+// 53434 - Call of the Wild
 class spell_hun_target_self_and_pet : public SpellScript
 {
     PrepareSpellScript(spell_hun_target_self_and_pet);
