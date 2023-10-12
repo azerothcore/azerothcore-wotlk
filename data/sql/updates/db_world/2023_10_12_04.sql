@@ -1,3 +1,4 @@
+-- DB update 2023_10_12_03 -> 2023_10_12_04
 -- Gor'mul RP
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 2792 AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 279200 AND `source_type` = 9;
