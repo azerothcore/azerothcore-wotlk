@@ -27,4 +27,4 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 -- Tidelord Rrurgaz (16072)
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 16072) AND (`Item` IN (22094));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(16072, 22094, 0, 100, 0, 1, 0, 1, 2, 'Tidelord Rrurgaz - Bloodkelp');
+(16072, 22094, 0, 7, 0, 1, 0, 1, 2, 'Tidelord Rrurgaz - Bloodkelp');
