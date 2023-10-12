@@ -937,7 +937,7 @@ class spell_pri_t4_4p_bonus : public AuraScript
         return ValidateSpellInfo({ SPELL_PRIEST_T4_4P_FLEXIBILITY });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         GetTarget()->RemoveAurasDueToSpell(SPELL_PRIEST_T4_4P_FLEXIBILITY);
