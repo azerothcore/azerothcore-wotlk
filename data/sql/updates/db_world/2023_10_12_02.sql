@@ -1,3 +1,4 @@
+-- DB update 2023_10_12_01 -> 2023_10_12_02
 -- 37565 - Flexibility | Item - Priest T4 Holy/Discipline 4P Bonus
 DELETE FROM `spell_script_names` WHERE `spell_id`=37565;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (37565, 'spell_pri_t4_4p_bonus');
