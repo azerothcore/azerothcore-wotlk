@@ -731,8 +731,21 @@ public:
 ## npc_flanis_swiftwing_and_kagrosh
 ######*/
 
-#define GOSSIP_HSK1 "Take Flanis's Pack"
-#define GOSSIP_HSK2 "Take Kagrosh's Pack"
+enum Flanis : uint32
+{
+    QUEST_THE_FATE_OF_FLANIS = 10583,
+    ITEM_FLAUNISS_PACK = 30658,
+    GOSSIP_MENU_FLANIS = 8356,
+};
+
+enum Kagrosh : uint32
+{
+    QUEST_THE_FATE_OF_KAGROSH = 10601,
+    ITEM_KAGROSHS_PACK = 30659,
+    GOSSIP_MENU_KAGROSH = 8371,
+};
+
+constexpr uint8 GOSSIP_OPTION_DEFAULT = 0;
 
 class npcs_flanis_swiftwing_and_kagrosh : public CreatureScript
 {
@@ -745,32 +758,33 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, nullptr);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_FLAUNISS_PACK, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30658, true);
-                ClearGossipMenuFor(player);
+                player->StoreNewItem(dest, ITEM_FLAUNISS_PACK, true);
             }
         }
         if (action == GOSSIP_ACTION_INFO_DEF + 2)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, nullptr);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_KAGROSHS_PACK, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30659, true);
-                ClearGossipMenuFor(player);
+                player->StoreNewItem(dest, ITEM_KAGROSHS_PACK, true);
             }
         }
+
+        CloseGossipMenuFor(player);
+
         return true;
     }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->GetQuestStatus(10583) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30658, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        if (player->GetQuestStatus(10601) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30659, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+        if (player->GetQuestStatus(QUEST_THE_FATE_OF_FLANIS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ITEM_FLAUNISS_PACK, 1, true))
+            AddGossipItemFor(player, GOSSIP_MENU_FLANIS, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        if (player->GetQuestStatus(QUEST_THE_FATE_OF_KAGROSH) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ITEM_KAGROSHS_PACK, 1, true))
+            AddGossipItemFor(player, GOSSIP_MENU_KAGROSH, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
