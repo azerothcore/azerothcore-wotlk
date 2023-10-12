@@ -1,3 +1,4 @@
+-- DB update 2023_10_11_01 -> 2023_10_12_00
 --
 -- Remove existing Durotar Herbalism Nodes:
 DELETE FROM `pool_gameobject` WHERE `pool_entry` BETWEEN 498 AND 501;
