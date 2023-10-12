@@ -1676,7 +1676,7 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                 Talk(SAY_LAND, player);
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
     }
 private:
