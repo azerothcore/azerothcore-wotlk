@@ -5023,6 +5023,36 @@ class spell_gen_valthalak_amulet : public SpellScript
     }
 };
 
+enum Jubling
+{
+    SPELL_JUBLING_COOLDOWN        = 23853,
+    SPELL_JUBLING_COOLDOWN_1_WEEK = 23852
+};
+
+// 23853 - Jubling Cooldown
+class spell_gen_jubling_cooldown : public SpellScript
+{
+    PrepareSpellScript(spell_gen_jubling_cooldown);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN, SPELL_JUBLING_COOLDOWN_1_WEEK });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK, false); // 1 week
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_jubling_cooldown::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5172,4 +5202,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_spirit_of_competition_participant);
     RegisterSpellScript(spell_gen_spirit_of_competition_winner);
     RegisterSpellScript(spell_gen_valthalak_amulet);
+    RegisterSpellScript(spell_gen_jubling_cooldown);
 }
