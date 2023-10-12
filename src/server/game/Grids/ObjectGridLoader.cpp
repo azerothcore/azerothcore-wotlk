@@ -113,18 +113,6 @@ void AddObjectHelper(CellCoord& cell, CreatureMapType& m, uint32& count, Map* ma
     ++count;
 }
 
-template <>
-void AddObjectHelper(CellCoord& cell, GameObjectMapType& m, uint32& count, Map* map, GameObject* obj)
-{
-    obj->AddToGrid(m);
-    ObjectGridLoader::SetObjectCell(obj, cell);
-    obj->AddToWorld();
-    if (obj->isActiveObject())
-        map->AddToActive(obj);
-
-    ++count;
-}
-
 template <class T>
 void LoadHelper(CellGuidSet const& /*guid_set*/, CellCoord& /*cell*/, GridRefMgr<T>& /*m*/, uint32& /*count*/, Map* /*map*/)
 {

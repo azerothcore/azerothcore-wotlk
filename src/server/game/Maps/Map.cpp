@@ -685,15 +685,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
         return false; //Should delete object
     }
 
-    Cell cell(cellCoord);
-    if (obj->isActiveObject())
-        EnsureGridLoaded(cell);
-
     obj->AddToWorld();
-
-    if (obj->isActiveObject())
-        AddToActive(obj);
-
     _transports.insert(obj);
 
     // Broadcast creation to players
@@ -1015,8 +1007,6 @@ template<>
 void Map::RemoveFromMap(MotionTransport* obj, bool remove)
 {
     obj->RemoveFromWorld();
-    if (obj->isActiveObject())
-        RemoveFromActive(obj);
 
     Map::PlayerList const& players = GetPlayers();
     if (!players.IsEmpty())
@@ -3258,12 +3248,6 @@ void Map::AddToActive(DynamicObject* d)
     AddToActiveHelper(d);
 }
 
-template<>
-void Map::AddToActive(GameObject* d)
-{
-    AddToActiveHelper(d);
-}
-
 template<class T>
 void Map::RemoveFromActive(T* obj)
 {
@@ -3294,12 +3278,6 @@ void Map::RemoveFromActive(Creature* c)
 
 template<>
 void Map::RemoveFromActive(DynamicObject* obj)
-{
-    RemoveFromActiveHelper(obj);
-}
-
-template<>
-void Map::RemoveFromActive(GameObject* obj)
 {
     RemoveFromActiveHelper(obj);
 }
