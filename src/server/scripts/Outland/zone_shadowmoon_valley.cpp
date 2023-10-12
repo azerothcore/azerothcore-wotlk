@@ -1762,7 +1762,7 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        PlayerGUID = summoner->GetGUID();
+        _playerGUID = summoner->GetGUID();
         me->SetFacingToObject(summoner);
         Position pos = summoner->GetPosition();
         me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
@@ -1772,14 +1772,14 @@ public:
     {
         if (type == POINT_MOTION_TYPE && id == POINT_LAND)
         {
-            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                 Talk(SAY_LAND, player);
 
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
     }
 private:
-    ObjectGuid PlayerGUID;
+    ObjectGuid _playerGUID;
 };
 
 class spell_calling_korkron_or_wildhammer : public SpellScript
