@@ -35,7 +35,6 @@ EndScriptData */
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"
-#include <openssl/rand.h>
 #include <unordered_map>
 
 #if AC_COMPILER == AC_COMPILER_GNU

@@ -105,7 +105,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-            instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
+            instance->SetBossState(DATA_KAELTHAS, NOT_STARTED);
             me->SetImmuneToAll(false);
         }
 
@@ -125,12 +125,17 @@ public:
 
         void JustDied(Unit*) override
         {
-            instance->SetData(DATA_KAELTHAS_EVENT, DONE);
+            instance->SetBossState(DATA_KAELTHAS, DONE);
+
+            if (GameObject* orb = instance->GetGameObject(DATA_ESCAPE_ORB))
+            {
+                orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_KAELTHAS, IN_PROGRESS);
             me->SetInCombatWithZone();
 
             events.ScheduleEvent(EVENT_SPELL_FIREBALL, 0);

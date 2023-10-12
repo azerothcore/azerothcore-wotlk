@@ -18,19 +18,17 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-22.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     name: cpp check
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: cpp check
         run: |
           sudo apt update -y
           sudo apt install -y cppcheck
-          cppcheck --force --inline-suppr \
-            -i src/server/game/Achievements/AchievementMgr.cpp \
-            -i src/server/game/AuctionHouse/AuctionHouseMgr.cpp \
-            -i src/server/game/Battlegrounds/Zones/BattlegroundSA.cpp \
-            -i src/server/game/DungeonFinding/LFGMgr.cpp \
-            -i src/server/game/Entities/GameObject/GameObject.cpp \
-            -i src/server/game/Entities/Pet/Pet.cpp \
-            -i src/server/game/Entities/Player/Player.cpp \
-            src/
+          cppcheck --force --inline-suppr --suppressions-list=./.suppress.cppcheck src/ --output-file=report.txt
+
+          if [ -s report.txt ]; then  # if file is not empty
+            cat report.txt
+            exit 1 # let github action fails
+          fi

@@ -29,7 +29,6 @@
 #include "Chat.h"
 #include "GossipDef.h"
 #include "GridNotifiersImpl.h"
-#include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"

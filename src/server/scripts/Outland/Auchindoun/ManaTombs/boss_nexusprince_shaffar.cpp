@@ -20,220 +20,185 @@
 #include "ScriptedCreature.h"
 #include "mana_tombs.h"
 
-enum ePrince
+enum Text
 {
     SAY_INTRO                       = 0,
     SAY_AGGRO                       = 1,
     SAY_SLAY                        = 2,
     SAY_SUMMON                      = 3,
-    SAY_DEAD                        = 4,
+    SAY_DEAD                        = 4
+};
 
+enum Spells
+{
+    // Shaffar
     SPELL_BLINK                     = 34605,
     SPELL_FROSTBOLT                 = 32364,
     SPELL_FIREBALL                  = 32363,
     SPELL_FROSTNOVA                 = 32365,
-
-    SPELL_ETHEREAL_BEACON           = 32371,                // Summons NPC_BEACON
+    SPELL_ETHEREAL_BEACON           = 32371, // Summons NPC_BEACON
     SPELL_ETHEREAL_BEACON_VISUAL    = 32368,
 
-    NPC_BEACON                      = 18431,
-    NPC_SHAFFAR                     = 18344,
-
-    EVENT_SPELL_BEACON              = 1,
-    EVENT_SPELL_FR_FI               = 2,
-    EVENT_SPELL_FROST_NOVA          = 3,
-    EVENT_SPELL_BLINK               = 4,
+    // Yor
+    SPELL_DOUBLE_BREATH             = 38361,
+    SPELL_STOMP                     = 36405
 };
 
-class boss_nexusprince_shaffar : public CreatureScript
+enum Npc
 {
-public:
-    boss_nexusprince_shaffar() : CreatureScript("boss_nexusprince_shaffar") { }
+    NPC_BEACON                      = 18431
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_nexusprince_shaffar : public BossAI
+{
+    boss_nexusprince_shaffar(Creature* creature) : BossAI(creature, DATA_NEXUSPRINCE_SHAFFAR), summons(me)
     {
-        return GetManaTombsAI<boss_nexusprince_shaffarAI>(creature);
+        HasTaunted = false;
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_nexusprince_shaffarAI : public ScriptedAI
+    SummonList summons;
+    bool HasTaunted;
+
+    void Reset() override
     {
-        boss_nexusprince_shaffarAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-            HasTaunted = false;
-        }
-
-        EventMap events;
-        SummonList summons;
-        bool HasTaunted;
-
-        void Reset() override
-        {
-            float dist = 8.0f;
-            float posX, posY, posZ, angle;
-            me->GetHomePosition(posX, posY, posZ, angle);
-
-            summons.DespawnAll();
-            events.Reset();
-            me->SummonCreature(NPC_BEACON, posX - dist, posY - dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
-            me->SummonCreature(NPC_BEACON, posX - dist, posY + dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
-            me->SummonCreature(NPC_BEACON, posX + dist, posY, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!HasTaunted && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 100.0f))
-            {
-                Talk(SAY_INTRO);
-                HasTaunted = true;
-            }
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            Talk(SAY_AGGRO);
-
-            me->SetInCombatWithZone();
-            summons.DoZoneInCombat();
-
-            events.ScheduleEvent(EVENT_SPELL_BEACON, 10000);
-            events.ScheduleEvent(EVENT_SPELL_FR_FI, 4000);
-            events.ScheduleEvent(EVENT_SPELL_FROST_NOVA, 15000);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (me->IsInCombat() && summon->GetEntry() == NPC_BEACON)
-            {
-                summon->CastSpell(summon, SPELL_ETHEREAL_BEACON_VISUAL, false);
-                if (Unit* target = SelectTargetFromPlayerList(50.0f))
-                    summon->AI()->AttackStart(target);
-            }
-
-            summons.Summon(summon);
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            summons.Despawn(summon);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEAD);
-            summons.DespawnAll();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_FROST_NOVA:
-                    me->CastSpell(me, SPELL_FROSTNOVA, false);
-                    events.RepeatEvent(urand(16000, 23000));
-                    events.DelayEvents(1500);
-                    events.ScheduleEvent(EVENT_SPELL_BLINK, 1500);
-                    break;
-                case EVENT_SPELL_FR_FI:
-                    me->CastSpell(me->GetVictim(), RAND(SPELL_FROSTBOLT, SPELL_FIREBALL), false);
-                    events.RepeatEvent(urand(3000, 4000));
-                    break;
-                case EVENT_SPELL_BLINK:
-                    me->CastSpell(me, SPELL_BLINK, false);
-                    events.RescheduleEvent(EVENT_SPELL_FR_FI, 0);
-                    break;
-                case EVENT_SPELL_BEACON:
-                    if (!urand(0, 3))
-                        Talk(SAY_SUMMON);
-
-                    me->CastSpell(me, SPELL_ETHEREAL_BEACON, true);
-                    events.RepeatEvent(10000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-enum Yor
-{
-    SPELL_DOUBLE_BREATH     = 38361,
-    SPELL_STOMP             = 36405,
-
-    EVENT_DOUBLE_BREATH     = 1,
-    EVENT_STOMP             = 2
-};
-
-class npc_yor : public CreatureScript
-{
-public:
-    npc_yor() : CreatureScript("npc_yor") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetManaTombsAI<npc_yorAI>(creature);
+        _Reset();
+        float dist = 8.0f;
+        float posX, posY, posZ, angle;
+        me->GetHomePosition(posX, posY, posZ, angle);
+        summons.DespawnAll();
+        me->SummonCreature(NPC_BEACON, posX - dist, posY - dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
+        me->SummonCreature(NPC_BEACON, posX - dist, posY + dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
+        me->SummonCreature(NPC_BEACON, posX + dist, posY, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
     }
 
-    struct npc_yorAI : public ScriptedAI
+    void MoveInLineOfSight(Unit* who) override
     {
-        npc_yorAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override { }
-
-        void JustEngagedWith(Unit* /*who*/) override
+        if (!HasTaunted && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 100.0f))
         {
-            events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(26500, 30500));
-            events.ScheduleEvent(EVENT_STOMP, urand(12000, 18000));
+            HasTaunted = true;
+            Talk(SAY_INTRO);
         }
+    }
 
-        void UpdateAI(uint32 diff) override
+    void JustEngagedWith(Unit*) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+        summons.DoZoneInCombat();
+        scheduler.Schedule(10s, [this](TaskContext context)
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (!urand(0, 3))
             {
-                return;
+                Talk(SAY_SUMMON);
             }
-
-            while (uint32 eventId = events.ExecuteEvent())
+            DoCastSelf(SPELL_ETHEREAL_BEACON, true);
+            context.Repeat(10s);
+        }).Schedule(4s, [this](TaskContext context)
+        {
+            DoCastVictim(RAND(SPELL_FROSTBOLT, SPELL_FIREBALL));
+            context.Repeat(3s, 4s);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_FROSTNOVA);
+            context.Repeat(16s, 23s);
+            scheduler.DelayAll(1500ms);
+            scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
             {
-                switch (eventId)
-                {
-                    case EVENT_DOUBLE_BREATH:
-                        if (me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
-                            DoCastVictim(SPELL_DOUBLE_BREATH);
-                        events.ScheduleEvent(EVENT_DOUBLE_BREATH, urand(10000, 20000));
-                        break;
-                    case EVENT_STOMP:
-                        DoCastAOE(SPELL_STOMP);
-                        events.ScheduleEvent(EVENT_STOMP, urand(14000, 24000));
-                        break;
-                }
+                DoCastSelf(SPELL_BLINK);
+            });
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (me->IsInCombat() && summon->GetEntry() == NPC_BEACON)
+        {
+            summon->CastSpell(summon, SPELL_ETHEREAL_BEACON_VISUAL, false);
+            if (Unit* target = SelectTargetFromPlayerList(50.0f))
+            {
+                summon->AI()->AttackStart(target);
             }
-            DoMeleeAttackIfReady();
         }
-    private:
-        EventMap events;
-    };
+        summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        summons.Despawn(summon);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEAD);
+        summons.DespawnAll();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_yor : public ScriptedAI
+{
+    npc_yor(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override { }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(25500ms, 30500ms, [this](TaskContext context)
+        {
+            if (me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
+            {
+                DoCastVictim(SPELL_DOUBLE_BREATH);
+            }
+            context.Repeat(10s, 20s);
+        }).Schedule(12s, 18s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_STOMP);
+            context.Repeat(14s, 24s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_nexusprince_shaffar()
 {
-    new boss_nexusprince_shaffar();
-    new npc_yor();
+    RegisterManaTombsCreatureAI(boss_nexusprince_shaffar);
+    RegisterManaTombsCreatureAI(npc_yor);
 }

@@ -19,13 +19,11 @@
 #include "ArenaScore.h"
 #include "Battleground.h"
 #include "GameObject.h"
-#include "Language.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
 static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;

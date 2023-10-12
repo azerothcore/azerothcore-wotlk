@@ -322,6 +322,10 @@ public:
     static float GetMaxVisibleDistanceInInstances()     { return _maxVisibleDistanceInInstances;  }
     static float GetMaxVisibleDistanceInBGArenas()      { return _maxVisibleDistanceInBGArenas;   }
 
+    static int32 GetVisibilityNotifyPeriodOnContinents() { return m_visibility_notify_periodOnContinents; }
+    static int32 GetVisibilityNotifyPeriodInInstances()  { return m_visibility_notify_periodInInstances;  }
+    static int32 GetVisibilityNotifyPeriodInBGArenas()   { return m_visibility_notify_periodInBGArenas;   }
+
     // our: needed for arena spectator subscriptions
     uint32 GetNextWhoListUpdateDelaySecs() override;
 
@@ -337,8 +341,6 @@ public:
     // used World DB version
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
-
-    void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
 
@@ -410,6 +412,10 @@ private:
     static float _maxVisibleDistanceOnContinents;
     static float _maxVisibleDistanceInInstances;
     static float _maxVisibleDistanceInBGArenas;
+
+    static int32 m_visibility_notify_periodOnContinents;
+    static int32 m_visibility_notify_periodInInstances;
+    static int32 m_visibility_notify_periodInBGArenas;
 
     std::string _realmName;
 

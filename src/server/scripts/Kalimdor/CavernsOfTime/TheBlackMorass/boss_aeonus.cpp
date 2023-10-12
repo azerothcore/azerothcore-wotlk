@@ -19,14 +19,17 @@
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
 
-enum Enums
+enum Text
 {
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
     SAY_DEATH                   = 4,
-    EMOTE_FRENZY                = 5,
+    EMOTE_FRENZY                = 5
+};
 
+enum Spells
+{
     SPELL_CLEAVE                = 40504,
     SPELL_TIME_STOP             = 31422,
     SPELL_ENRAGE                = 37605,

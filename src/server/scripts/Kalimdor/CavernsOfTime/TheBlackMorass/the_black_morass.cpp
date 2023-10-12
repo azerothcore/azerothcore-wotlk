@@ -20,7 +20,6 @@
 #include "SmartAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 
 enum medivhMisc
 {
@@ -43,9 +42,9 @@ enum medivhMisc
     EVENT_OUTRO_8               = 17
 };
 
-static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASIN, NPC_INFINITE_WHELP, NPC_INFINITE_CHRONOMANCER };
-static std::vector<uint32> secondWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_WHELP, NPC_INFINITE_ASSASIN };
-static std::vector<uint32> thirdWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_ASSASIN  };
+static std::vector<uint32> firstWave = { NPC_INFINITE_ASSASSIN, NPC_INFINITE_WHELP, NPC_INFINITE_CHRONOMANCER };
+static std::vector<uint32> secondWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_WHELP, NPC_INFINITE_ASSASSIN };
+static std::vector<uint32> thirdWave = { NPC_INFINITE_EXECUTIONER, NPC_INFINITE_VANQUISHER, NPC_INFINITE_CHRONOMANCER, NPC_INFINITE_ASSASSIN  };
 
 class NpcRunToHome : public BasicEvent
 {
@@ -323,8 +322,8 @@ struct npc_time_rift : public NullCreatureAI
             {
                 switch (entry)
                 {
-                    case NPC_INFINITE_ASSASIN:
-                        entry = NPC_INFINITE_ASSASIN_2;
+                    case NPC_INFINITE_ASSASSIN:
+                        entry = NPC_INFINITE_ASSASSIN_2;
                         break;
                     case NPC_INFINITE_CHRONOMANCER:
                         entry = NPC_INFINITE_CHRONOMANCER_2;
