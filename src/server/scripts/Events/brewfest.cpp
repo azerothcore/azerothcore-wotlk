@@ -1368,6 +1368,7 @@ enum BrewfestRevelerEnum
     FACTION_HORDE       = 1935,
 
     SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE_2  = 44096,
     SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
     SPELL_BREWFEST_REVELER_TRANSFORM_BE             = 43907,
     SPELL_BREWFEST_REVELER_TRANSFORM_ORC            = 43914,
@@ -1393,6 +1394,7 @@ class spell_brewfest_reveler_transform : public AuraScript
                 factionId = FACTION_HORDE;
                 break;
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
+            case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE_2:
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
                 factionId = FACTION_FRIENDLY;
                 break;
