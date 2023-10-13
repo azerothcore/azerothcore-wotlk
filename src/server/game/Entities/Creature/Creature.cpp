@@ -358,11 +358,20 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     if (IsAIEnabled)
         AI()->CorpseRemoved(respawnDelay);
 
+    bool mplus = false;
+    // hater: disable respawn in m+
+    if (auto script = GetInstanceScript())
+        if (script->IsChallengeModeStarted())
+            mplus = true;
+
     // Should get removed later, just keep "compatibility" with scripts
-    if (setSpawnTime)
+    if (setSpawnTime && !mplus)
     {
         m_respawnTime = GameTime::GetGameTime().count() + respawnDelay;
         //SaveRespawnTime();
+    }
+    else if (mplus) {
+        m_respawnTime = GameTime::GetGameTime().count() + WEEK;
     }
 
     float x, y, z, o;
@@ -1793,6 +1802,14 @@ void Creature::LoadEquipment(int8 id, bool force /*= false*/)
     m_equipmentId = id;
     for (uint8 i = 0; i < 3; ++i)
         SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, einfo->ItemEntry[i]);
+}
+
+void Creature::SetBaseHealth(uint64 health)
+{
+    SetMaxHealth(health);
+    SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+    SetCreateHealth((uint32)health);
+    SetFullHealth();
 }
 
 bool Creature::hasQuest(uint32 quest_id) const

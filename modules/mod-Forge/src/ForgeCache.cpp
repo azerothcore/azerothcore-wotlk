@@ -13,6 +13,14 @@
 #include <unordered_map>
 #include <list>
 #include <tuple>
+<<<<<<< Updated upstream
+=======
+#include <random>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+>>>>>>> Stashed changes
 
 enum CharacterPointType
 {
@@ -853,6 +861,7 @@ public:
 
     // tabId
     std::unordered_map<uint32, ForgeTalentTab*> TalentTabs;
+
 private:
     std::unordered_map<ObjectGuid, uint32> CharacterActiveSpecs;
     std::unordered_map<std::string, uint32> CONFIG;
@@ -929,6 +938,17 @@ private:
         AddCharacterPointsFromDB();
         AddCharacterClassSpecs();
         AddCharacterXmogSets();
+
+        LOG_INFO("server.load", "Loading m+ difficulty multipliers...");
+        sObjectMgr->LoadInstanceDifficultyMultiplier();
+        LOG_INFO("server.load", "Loading m+ difficulty level scales...");
+        sObjectMgr->LoadMythicLevelScale();
+        LOG_INFO("server.load", "Loading m+ minion values...");
+        sObjectMgr->LoadMythicMinionValue();
+        LOG_INFO("server.load", "Loading m+ keys...");
+        sObjectMgr->LoadMythicDungeonKeyMap();
+        LOG_INFO("server.load", "Loading m+ affixes...");
+        sObjectMgr->LoadMythicAffixes();
     }
 
     void GetCharacters()
@@ -1471,6 +1491,24 @@ private:
         } while (pointsQuery->NextRow());
     }
 
+<<<<<<< Updated upstream
+=======
+    void LoadCharacterResetFlags()
+    {
+        QueryResult flags = WorldDatabase.Query("select guid from forge_talent_flagged_reset order by guid asc");
+        if (!flags)
+            return;
+
+        do
+        {
+            Field* flagField = flags->Fetch();
+            uint32 guid = flagField[0].Get<uint32>();
+
+            FlaggedForReset.push_back(guid);
+        } while (flags->NextRow());
+    }
+
+>>>>>>> Stashed changes
     void AddCharacterClassSpecs()
     {
        /* QueryResult specsQuery = WorldDatabase.Query("SELECT sl.DisplayName_Lang_enUS as specName, sl.SpellIconID as specIcon, src.ClassMask, src.RaceMask, sl.id FROM acore_world.db_SkillLine_12340 sl LEFT JOIN acore_world.db_SkillRaceClassInfo_12340 src ON src.SkillID = sl.id WHERE sl.CategoryID = 7 AND ClassMask IS NOT NULL AND sl.SpellIconID != 1 AND sl.SpellIconID != 0 order by src.ClassMask asc, sl.DisplayName_Lang_enUS asc");

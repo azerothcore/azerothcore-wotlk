@@ -5699,6 +5699,11 @@ bool Player::isAllowedToLoot(Creature const* creature)
     if (HasPendingBind())
         return false;
 
+    if (auto script = GetInstanceScript())
+        if (script->IsChallengeModeStarted()) {
+            return false;
+        }
+
     const Loot* loot = &creature->loot;
     if (loot->isLooted()) // nothing to loot or everything looted.
         return false;

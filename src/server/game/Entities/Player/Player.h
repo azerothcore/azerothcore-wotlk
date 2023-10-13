@@ -1423,6 +1423,9 @@ public:
 
     bool AddItem(uint32 itemId, uint32 count);
 
+    // hater: m+
+    bool AddChallengeKey(uint32 challengeId, uint32 challengeLevel/* = 2*/);
+
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/
     /*********************************************************/
@@ -2661,6 +2664,7 @@ public:
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
     BasicEvent* pendingTransmogCheck = nullptr;
+    BasicEvent* mythicStartCheck = nullptr;
     typedef std::array<std::unordered_set<uint32>, EQUIPMENT_SLOT_END> AppearanceContainer;
     AppearanceContainer transmogrification_appearances;
     PresetMapType presetMap;

@@ -39,7 +39,12 @@ public:
     virtual void OnGameObjectRemove(GameObject*) { }
 
     virtual void OnUnitDeath(Unit*) { }
+    virtual void OnPlayerDeath(Player*) { }
     virtual void OnCreatureEvade(Creature*) { }
+
+    // Called when a player successfully enters or exit the zone.
+    virtual void OnPlayerEnter(Player* /*player*/) { }
+    virtual void OnPlayerExit(Player* /*player*/) { }
 
     //All-purpose data storage 64 bit
     virtual ObjectGuid GetGuidData(uint32 /*DataId*/) const { return ObjectGuid::Empty; }

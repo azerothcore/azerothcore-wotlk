@@ -19,9 +19,9 @@
 #define ACORE_INSTANCE_DATA_H
 
 #include "CreatureAI.h"
-#include "ObjectMgr.h"
 #include "World.h"
 #include "ZoneScript.h"
+#include "ChallengeModeCriteria.h"
 #include <set>
 
 #define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {})", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
@@ -67,6 +67,14 @@ enum DoorType
     DOOR_TYPE_PASSAGE       = 1,    // Door can open if encounter is done
     DOOR_TYPE_SPAWN_HOLE    = 2,    // Door can open if encounter is in progress, typically used for spawning places
     MAX_DOOR_TYPES,
+};
+
+enum ChallengeMode
+{
+    GOB_CHALLENGER_DOOR = 239408,
+
+    SPELL_CHALLENGER_MIGHT = 100101,
+    SPELL_CHALLENGER_BURDEN = 100102
 };
 
 struct DoorData
@@ -139,11 +147,13 @@ typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
 class InstanceScript : public ZoneScript
 {
 public:
-    explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
+    InstanceScript(Map* map) : instance(map), completedEncounters(0), _entranceId(0), _temporaryEntranceId(0),
+        _challengeModeStarted(false), _challengeModeLevel(0), _challengeModeStartTime(0), _challengeModeDeathCount(0) {}
 
     ~InstanceScript() override {}
 
     Map* instance;
+    Position _challengeEntranceLoc;
 
     //On creation, NOT load.
     virtual void Initialize() {}
@@ -180,7 +190,9 @@ public:
     GameObject* GetGameObject(uint32 type);
 
     //Called when a player successfully enters the instance.
-    virtual void OnPlayerEnter(Player* /*player*/) {}
+    void OnPlayerEnter(Player* /*player*/) override;
+    void OnPlayerExit(Player*) override;
+    void OnPlayerDeath(Player*) override;
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
@@ -188,6 +200,8 @@ public:
     //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script
     void HandleGameObject(ObjectGuid guid, bool open, GameObject* go = nullptr);
+
+    void UpdateOperations(uint32 const diff);
 
     //change active state of doors or buttons
     void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
@@ -218,10 +232,14 @@ public:
     void DoRemoveAurasDueToSpellOnPlayers(uint32 spell);
 
     // Cast spell on all players in instance
-    void DoCastSpellOnPlayers(uint32 spell);
+    void DoCastSpellOnPlayers(uint32 spell, Unit* caster = nullptr, bool triggered = true);
+
+    // hater: m+
+    void DoOnPlayers(std::function<void(Player*)>&& function);
+    void DoNearTeleportPlayers(const Position pos, bool casting = false);
 
     // Cast spell on player
-    void DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/);
+    void DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets = false, bool includeControlled = false);
 
     // Return wether server allow two side groups or not
     bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
@@ -253,6 +271,30 @@ public:
 
     uint32 GetEncounterCount() const { return bosses.size(); }
 
+    // Sets the entrance location (WorldSafeLoc) id
+    void SetEntranceLocation(uint32 worldSafeLocationId);
+
+    // Sets a temporary entrance that does not get saved to db
+    void SetTemporaryEntranceLocation(uint32 worldSafeLocationId) { _temporaryEntranceId = worldSafeLocationId; }
+
+    // Get's the current entrance id
+    uint32 GetEntranceLocation() const { uint32 locationId = _temporaryEntranceId ? _temporaryEntranceId : _entranceId; OnGetEntranceLocation(locationId); return locationId; }
+
+    virtual void OnGetEntranceLocation(uint32& /*worldSafeLocationId*/) const { }
+
+    void AddTimedDelayedOperation(uint32 timeout, std::function<void()>&& function)
+    {
+        emptyWarned = false;
+        timedDelayedOperations.push_back(std::pair<uint32, std::function<void()>>(timeout, function));
+    }
+
+    /// Called after last delayed operation was deleted
+    /// Do whatever you want
+    virtual void LastOperationCalled() { }
+
+    std::vector<std::pair<int32, std::function<void()>>>    timedDelayedOperations;   ///< Delayed operations
+    bool                                                    emptyWarned;              ///< Warning when there are no more delayed operations
+
     // Only used by areatriggers that inherit from OnlyOnceAreaTriggerScript
     void MarkAreaTriggerDone(uint32 id) { _activatedAreaTriggers.insert(id); }
     void ResetAreaTriggerDone(uint32 id) { _activatedAreaTriggers.erase(id); }
@@ -263,6 +305,29 @@ public:
 
     // Allows executing code using all creatures registered in the instance script as minions
     void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
+
+    // hater: Challenge Modes
+    void StartChallengeMode(Player* player, KeyInfo* key, uint8 level, uint32 affixOne, uint32 affixTwo = 0, uint32 affixThree = 0);
+    void CompleteChallengeMode(Position);
+
+    bool IsChallengeModeStarted() const { return _challengeModeStarted; }
+    uint8 GetChallengeModeLevel() const { return _challengeModeLevel; }
+    uint32 GetChallengeModeCurrentDuration();
+
+    void SendChallengeModeStart(Player* player = nullptr);
+    void SendChallengeModeDeathCount(Player* player = nullptr);
+    void SendChallengeModeElapsedTimer(Player* player = nullptr);
+    void SendChallengeModeCriteria(Player* player = nullptr);
+    void CastChallengeCreatureSpell(Creature* creature);
+    void CastChallengePlayerSpell(Player* player);
+
+    void SetChallengeDoorPos(Position pos) { _challengeModeDoorPosition = pos; }
+    void SpawnChallengeModeRewardChest(Position);
+
+    ChallengeModeCriteria* GetCriteria() {
+        return _challengeModeCriteria;
+    }
+
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }
@@ -305,6 +370,22 @@ private:
     ObjectGuidMap _objectGuids;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
     std::unordered_set<uint32> _activatedAreaTriggers;
+    uint32 _entranceId;
+    uint32 _temporaryEntranceId;
+
+    bool _challengeModeStarted;
+    uint8 _challengeModeLevel = 1;
+    uint32 _challengeModeStartTime;
+    uint32 _challengeModeDeathCount;
+    Optional<Position> _challengeModeDoorPosition;
+    ChallengeModeCriteria* _challengeModeCriteria;
+    Player* _challengeOwner;
+    KeyInfo* _challengeKey;
+    uint32 _challengeModeTimerMax;
+
+    uint32 tierOneAffix;
+    uint32 tierTwoAffix = 0;
+    uint32 tierThreeAffix = 0;
 };
 
 #endif

@@ -5118,6 +5118,14 @@ void Player::RepopAtGraveyard()
         SpawnCorpseBones();
     }
 
+    if (auto script = GetInstanceScript())
+        if (GetMap()->IsDungeon()) {
+            ResurrectPlayer(0.5f);
+            SpawnCorpseBones();
+            script->DoNearTeleportPlayers(script->_challengeEntranceLoc);
+            return;
+        }
+
     GraveyardStruct const* ClosestGrave = nullptr;
 
     // Special handle for battleground maps
@@ -15978,6 +15986,42 @@ bool Player::AddItem(uint32 itemId, uint32 count)
         return false;
     
     //sScriptMgr->OnAddItem(this, itemId, count);
+    return true;
+}
+
+bool Player::AddChallengeKey(uint32 challengeId, uint32 challengeLevel/* = 2*/)
+{
+    uint32 itemId = challengeId;
+
+    uint8 count = 1;
+    uint32 noSpaceForCount = 0;
+    ItemPosCountVec dest;
+
+    bool existingKey = false;
+    auto keyMap = sObjectMgr->GetDungeonKeyMap();
+    for (auto key : keyMap)
+        existingKey = existingKey || HasItemCount(key.second->itemId, 1, true);
+
+    InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
+
+    if (msg != EQUIP_ERR_OK)
+        count -= noSpaceForCount;
+
+    if (count == 0 || dest.empty() || existingKey)
+    {
+        /// @todo Send to mailbox if no space
+        ChatHandler(GetSession()).PSendSysMessage("You don't have any space in your bags.");
+        return false;
+    }
+
+    Item* item = StoreNewItem(dest, itemId, true);
+    if (item)
+    {
+        item->SetItemRandomProperties(-(challengeLevel+100));
+        SendNewItem(item, count, true, false);
+    }
+    else
+        return false;
     return true;
 }
 
