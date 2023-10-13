@@ -576,7 +576,6 @@ public:
 ## go_skull_pile
 ######*/
 
-
 enum SkullPile : uint32
 {
     QUEST_ADVERSARIAL_BLOOD                     = 11885,
