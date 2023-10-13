@@ -610,9 +610,7 @@ public:
             SendActionMenu(player, go, action);
             CloseGossipMenuFor(player);
         }
-            
         return true;
-       
     }
 
     bool OnGossipHello(Player* player, GameObject* go) override
@@ -625,8 +623,8 @@ public:
             AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
             SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE_QUEST, go->GetGUID());
-        } 
-        else 
+        }
+        else
             SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE, go->GetGUID());
 
         return true;
@@ -643,7 +641,7 @@ public:
                 player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->CastSpell(player, SPELL_SUMMON_KARROG, false); 
+                player->CastSpell(player, SPELL_SUMMON_KARROG, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
                 player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
