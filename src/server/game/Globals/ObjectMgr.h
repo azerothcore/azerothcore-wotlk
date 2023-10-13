@@ -654,15 +654,12 @@ struct GossipMenus
     ConditionList   Conditions;
 };
 
-<<<<<<< HEAD
-=======
 struct WorldSafeLocsEntry
 {
     uint32 ID = 0;
     WorldLocation Loc;
 };
 
->>>>>>> master
 struct SpellScalingEntry
 {
     //uint32    Id;                                         // 0        m_ID

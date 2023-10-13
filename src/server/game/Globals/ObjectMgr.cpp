@@ -9071,8 +9071,6 @@ void ObjectMgr::LoadTrainerSpell()
     LOG_INFO("server.loading", " ");
 }
 
-<<<<<<< HEAD
-=======
 void ObjectMgr::LoadWorldSafeLocs()
 {
     uint32 oldMSTime = getMSTime();
@@ -9103,7 +9101,6 @@ void ObjectMgr::LoadWorldSafeLocs()
         LOG_INFO("server.loading", ">> Loaded 0 world locations. DB table `world_safe_locs` is empty.");
 }
 
->>>>>>> master
 void ObjectMgr::LoadSpellScalingSpellMap()
 {
 

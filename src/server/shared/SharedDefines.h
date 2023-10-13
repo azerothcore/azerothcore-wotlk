@@ -84,7 +84,6 @@ enum class ForgeTopic
     COLLECTION_SETUP_FINISHED = 53,
     ADD_XMOG = 54,
     APPLY_XMOG_ERROR = 55,
-<<<<<<< HEAD
     GET_PERKS = 56,
     LEARN_PERK = 57,
     LEARN_PERK_ERROR = 58,
@@ -98,15 +97,6 @@ enum class ForgeTopic
     GET_UTILITY_PERKS = 67,
 
     // m+
-    MYTHIC_GET_WEEKLY_REWARD,
-    MYTHIC_GET_MAP_STATS,
-    MYTHIC_GET_AFFIXES_LIST,
-    MYTHIC_SET_AFFIXES_AND_START,
-    MYTHIC_KEY_COMPLETED, // send confirmation that key has ended and send gear
-
-=======
-
-    // m+
     MYTHIC_GET_WEEKLY_REWARD = 101,
     MYTHIC_GET_MAP_STATS = 102,
     MYTHIC_GET_AFFIXES_LIST = 103,
@@ -116,7 +106,6 @@ enum class ForgeTopic
     MYTHIC_UPDATE_TIMER = 107,
     MYTHIC_UPDATE_DEATHS = 108,
     MYTHIC_UPDATE_CRITERIA = 109,
->>>>>>> master
 };
 
 enum class ForgeError
