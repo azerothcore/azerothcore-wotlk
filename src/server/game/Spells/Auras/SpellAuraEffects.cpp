@@ -7115,49 +7115,7 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
 int32 AuraEffect::GetTotalTicks(float& dmgRatio) const
 {
-     return GetTotalTicks(dmgRatio, false);
-}
-
-int32 AuraEffect::GetTotalTicks(float& dmgRatio, bool noHaste) const
-{
-    uint32 totalTicks = 1;
-    dmgRatio = 0;
-
-    if (m_amplitude)
-    {
-        bool applyHaste = false;
-        switch (GetAuraType())
-        {
-            case SPELL_AURA_PERIODIC_DAMAGE:
-            case SPELL_AURA_PERIODIC_HEAL:
-            case SPELL_AURA_PERIODIC_LEECH:
-            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
-                applyHaste = true;
-                break;
-            default:
-                break;
-        }
-
-        if (GetCaster()->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-            applyHaste = true;
-
-        if (noHaste)
-            applyHaste = false;
-
-        auto max = GetBase()->GetMaxDuration();
-
-        if (applyHaste)
-            totalTicks = GetBase()->GetSpellInfo()->CalculateTicks(m_amplitude, max, GetCaster(), dmgRatio);
-        else
-            totalTicks = max / m_amplitude;
-
-        if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
-        {
-            ++totalTicks;
-        }
-    }
-
-    return totalTicks;
+     return GetTotalTicks();
 }
 
 uint32 AuraEffect::GetTriggerSpell() const

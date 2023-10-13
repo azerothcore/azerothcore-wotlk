@@ -132,11 +132,7 @@ class spell_sha_t10_restoration_4p_bonus : public AuraScript
             return;
         }
 
-        float dmgRatio;
-        int32 amount = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks(eventInfo.GetActor(), dmgRatio);
-
-        if (dmgRatio != 0)
-            amount = amount * dmgRatio;
+        int32 amount = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
         eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
     }
 
