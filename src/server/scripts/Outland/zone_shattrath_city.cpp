@@ -87,10 +87,10 @@ public:
 
 enum Zephyr : int32
 {
-    GOSSIP_MENU_ZEPHYR = 9205,
-    GOSSIP_OPTION_DEFAULT = 0,
+    GOSSIP_MENU_ZEPHYR              = 9205,
+    GOSSIP_OPTION_DEFAULT           = 0,
 
-    SPELL_TELEPORT_CAVERNS_OF_TIME = 37778,
+    SPELL_TELEPORT_CAVERNS_OF_TIME  = 37778,
 };
 
 class npc_zephyr : public CreatureScript
