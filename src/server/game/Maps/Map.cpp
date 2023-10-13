@@ -738,7 +738,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
             markCell(cell_id);
             CellCoord pair(x, y);
             Cell cell(pair);
-            //cell.SetNoCreate(); // in mmaps this is missing
+            cell.SetNoCreate();
 
             Visit(cell, gridVisitor);
             Visit(cell, worldVisitor);
