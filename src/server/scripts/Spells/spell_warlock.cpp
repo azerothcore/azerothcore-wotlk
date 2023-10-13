@@ -243,7 +243,6 @@ class spell_warl_demonic_aegis : public AuraScript
     }
 };
 
-// -35696 - Demonic Knowledge
 class spell_warl_demonic_knowledge : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_knowledge);
@@ -251,10 +250,7 @@ class spell_warl_demonic_knowledge : public AuraScript
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
-        {
-            uint8 pct = aurEff->GetBaseAmount() + aurEff->GetDieSides();
-            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), pct);
-        }
+            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), aurEff->GetBaseAmount());
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
