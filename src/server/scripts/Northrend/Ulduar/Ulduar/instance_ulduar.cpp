@@ -786,6 +786,18 @@ public:
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
+
+                    if (data == FAIL)
+                    {
+                        scheduler.Schedule(5s, [this](TaskContext)
+                        {
+                            if (m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
+                            {
+                                instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
+                            }
+                        });
+                    }
+
                     break;
 
                 // Achievement
@@ -1109,6 +1121,8 @@ public:
 
         void Update(uint32 diff) override
         {
+            InstanceScript::Update(diff);
+
             if (_events.Empty())
                 return;
 

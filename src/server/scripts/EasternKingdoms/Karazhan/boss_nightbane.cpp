@@ -87,9 +87,19 @@ struct boss_nightbane : public BossAI
     {
         BossAI::Reset();
         _skeletonscheduler.CancelAll();
-        Phase = 1;
-        MovePhase = 0;
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        if (!_intro)
+        {
+            //when boss is reset and we're past the intro
+            //cannot despawn, but have to move to a location where he normally is
+            //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
+            Position preSpawnPosis = me->GetHomePosition();
+            EnterEvadeMode();
+            me->NearTeleportTo(preSpawnPosis);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            _intro = true;
+            Phase = 1;
+            MovePhase = 0;
+        }
 
         me->SetSpeed(MOVE_RUN, 2.0f);
         me->SetDisableGravity(_intro);
@@ -109,19 +119,6 @@ struct boss_nightbane : public BossAI
         _flying = false;
         _movement = false;
 
-        if (!_intro)
-        {
-            //when boss is reset and we're past the intro
-            //cannot despawn, but have to move to a location where he normally is
-            //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
-            Position preSpawnPosis = me->GetHomePosition();
-            me->NearTeleportTo(preSpawnPosis);
-            instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
-            _intro = true;
-            Phase = 1;
-            MovePhase = 0;
-        }
-
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
             TakeOff();
         });
@@ -136,11 +133,10 @@ struct boss_nightbane : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
-        if (instance)
-            instance->SetData(DATA_NIGHTBANE, IN_PROGRESS);
+        BossAI::JustEngagedWith(who);
+        _intro = false;
 
         HandleTerraceDoors(false);
         Talk(YELL_AGGRO);
@@ -238,7 +234,6 @@ struct boss_nightbane : public BossAI
         {
             if (id >= 8)
             {
-                _intro = false;
                 //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
                 //doesn't need home position because we have to "despawn" boss on reset
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

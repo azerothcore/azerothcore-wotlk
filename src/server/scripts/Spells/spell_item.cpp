@@ -3342,9 +3342,9 @@ class spell_item_rocket_boots : public SpellScript
     }
 };
 
-class spell_item_runic_healing_injector : public SpellScript
+class spell_item_healing_injector : public SpellScript
 {
-    PrepareSpellScript(spell_item_runic_healing_injector);
+    PrepareSpellScript(spell_item_healing_injector);
 
     bool Load() override
     {
@@ -3360,7 +3360,33 @@ class spell_item_runic_healing_injector : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_item_runic_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        OnEffectHitTarget += SpellEffectFn(spell_item_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
+class spell_item_mana_injector : public SpellScript
+{
+    PrepareSpellScript(spell_item_mana_injector);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleEnergize(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+        {
+            if (caster->HasSkill(SKILL_ENGINEERING))
+            {
+                SetEffectValue(GetEffectValue() * 1.25f);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_mana_injector::HandleEnergize, EFFECT_0, SPELL_EFFECT_ENERGIZE);
     }
 };
 
@@ -3857,6 +3883,64 @@ class spell_item_worn_troll_dice : public SpellScript
     }
 };
 
+enum VenomhideHatchling
+{
+    NPC_VENOMHIDE_HATCHLING = 34320
+};
+
+class spell_item_venomhide_feed : public SpellScript
+{
+    PrepareSpellScript(spell_item_venomhide_feed)
+
+    SpellCastResult CheckCast()
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            std::list<Creature*> hatchling;
+            player->GetAllMinionsByEntry(hatchling, NPC_VENOMHIDE_HATCHLING);
+            if (!hatchling.empty())
+            {
+                return SPELL_CAST_OK;
+            }
+        }
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void UpdateTarget(WorldObject*& target)
+    {
+        if (!target)
+        {
+            return;
+        }
+
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            std::list<Creature*> hatchling;
+            player->GetAllMinionsByEntry(hatchling, NPC_VENOMHIDE_HATCHLING);
+            if (hatchling.empty())
+            {
+                return;
+            }
+
+            for (Creature* creature : hatchling)
+            {
+                if (creature)
+                {
+                    target = creature;
+                    return;
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_venomhide_feed::CheckCast);
+        OnObjectTargetSelect  += SpellObjectTargetSelectFn(spell_item_venomhide_feed::UpdateTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3959,7 +4043,8 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_nitro_boots);
     RegisterSpellScript(spell_item_teach_language);
     RegisterSpellScript(spell_item_rocket_boots);
-    RegisterSpellScript(spell_item_runic_healing_injector);
+    RegisterSpellScript(spell_item_healing_injector);
+    RegisterSpellScript(spell_item_mana_injector);
     RegisterSpellScript(spell_item_pygmy_oil);
     RegisterSpellScript(spell_item_unusual_compass);
     RegisterSpellScript(spell_item_chicken_cover);
@@ -3976,4 +4061,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_green_whelp_armor);
     RegisterSpellScript(spell_item_elixir_of_shadows);
     RegisterSpellScript(spell_item_worn_troll_dice);
+    RegisterSpellScript(spell_item_venomhide_feed);
 }

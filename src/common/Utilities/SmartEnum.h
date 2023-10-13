@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_SMARTENUM_H
-#define TRINITY_SMARTENUM_H
+#ifndef AC_SMARTENUM_H
+#define AC_SMARTENUM_H
 
 #include "IteratorPair.h"
 #include <iterator>
@@ -130,4 +130,4 @@ public:
     static char const* ToDescription(Enum value) { return ToString(value).Description; }
 };
 
-#endif
+#endif // AC_SMART_ENUM_H

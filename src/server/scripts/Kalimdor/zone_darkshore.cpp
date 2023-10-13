@@ -175,6 +175,7 @@ enum Kerlonian
 
     SPELL_SLEEP_VISUAL          = 25148,
     SPELL_AWAKEN                = 17536,
+    SPELL_BEAR_FORM             = 18309,
     QUEST_SLEEPER_AWAKENED      = 5321,
     NPC_LILADRIS                = 11219                    //attackers entries unknown
 };
@@ -194,6 +195,8 @@ public:
         void Reset() override
         {
             FallAsleepTimer = urand(10000, 45000);
+
+            DoCastSelf(SPELL_BEAR_FORM);
         }
 
         void MoveInLineOfSight(Unit* who) override
