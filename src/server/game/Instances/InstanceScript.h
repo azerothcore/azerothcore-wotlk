@@ -19,6 +19,8 @@
 #define ACORE_INSTANCE_DATA_H
 
 #include "CreatureAI.h"
+#include "ObjectMgr.h"
+#include "TaskScheduler.h"
 #include "World.h"
 #include "ZoneScript.h"
 #include "ChallengeModeCriteria.h"
@@ -169,7 +171,7 @@ public:
 
     void SaveToDB();
 
-    virtual void Update(uint32 /*diff*/) {}
+    virtual void Update(uint32 /*diff*/);
 
     //Used by the map's CanEnter function.
     //This is to prevent players from entering during boss encounters.
@@ -328,6 +330,7 @@ public:
         return _challengeModeCriteria;
     }
 
+    TaskScheduler scheduler;
 protected:
     void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }

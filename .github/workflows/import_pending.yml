@@ -9,9 +9,10 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-20.04
+    permissions: write-all
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           # If we're fetching all the history in a later step it makes sense to
@@ -26,7 +27,8 @@ jobs:
 
       - name: Import and commit pending sql
         run: |
-          git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           # Get the latest changes from git
           git pull --rebase origin "${{ github.ref_name }}"
           bash bin/acore-db-pendings
@@ -39,7 +41,7 @@ jobs:
           BRANCH: ${{ github.ref_name }}
 
       - name: Push changes
-        uses: ad-m/github-push-action@fe38f0a751bf9149f0270cc1fe20bf9156854365
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.AC_GITHUB_TOKEN }}
           # Noting that the branch name can only be master, as per the event
