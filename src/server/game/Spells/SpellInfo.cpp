@@ -2491,40 +2491,6 @@ uint32 SpellInfo::GetNoHasteTicks() const
     return 6;
 }
 
-uint32 SpellInfo::GetMaxTicks(Unit* caster, float& dmgRatio) const
-{
-    return GetMaxTicks(GetMaxDuration(), caster, dmgRatio);
-}
-
-uint32 SpellInfo::GetMaxTicks(int32 DotDuration, Unit* caster, float& dmgRatio) const
-{
-    if (DotDuration == 0)
-        return 1;
-
-    // 200% limit
-    if (DotDuration > 30000)
-        DotDuration = 30000;
-
-    for (uint8 x = 0; x < MAX_SPELL_EFFECTS; x++)
-    {
-        if (Effects[x].Effect == SPELL_EFFECT_APPLY_AURA)
-            switch (Effects[x].ApplyAuraName)
-            {
-            case SPELL_AURA_PERIODIC_DAMAGE:
-            case SPELL_AURA_PERIODIC_HEAL:
-            case SPELL_AURA_PERIODIC_LEECH:
-            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
-                if (Effects[x].Amplitude != 0)
-                {
-                    return CalculateTicks(Effects[x].Amplitude, DotDuration, caster, dmgRatio);
-                }
-                break;
-            }
-    }
-    return 6;
-}
-
-
 uint32 SpellInfo::CalculateTicks(uint32 ampl, int32 DotDuration, Unit* caster, float& dmgRatio) const
 {
     dmgRatio = 0;

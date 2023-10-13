@@ -285,7 +285,23 @@ void KillRewarder::Reward()
 
     // 5. Credit instance encounter.
     if (Creature* victim = _victim->ToCreature())
-        if (victim->IsDungeonBoss())
-            if (Map* map = _victim->FindMap())
-                map->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, _victim->GetEntry(), _victim);
+        if (Map* map = _victim->FindMap()) {
+            InstanceScript* script = victim->GetInstanceScript();
+            if (auto criteria = script->GetCriteria()) {
+                if (victim->IsDungeonBoss()) {
+                    map->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, _victim->GetEntry(), _victim);
+                    criteria->UpdateBossState(_victim->GetEntry());
+                }
+                else
+                    criteria->UpdateMinionCount(_victim->GetEntry());
+
+                if (criteria->CheckCriteria())
+                    criteria->CompleteCriteria(_victim);
+                else {
+                    Map::PlayerList const& players = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        itr->GetSource()->GetInstanceScript()->SendChallengeModeCriteria(itr->GetSource());
+                }
+            }
+        }
 }

@@ -14868,7 +14868,12 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
         // players in instance don't have ZoneScript, but they have InstanceScript
         if (ZoneScript* zoneScript = GetZoneScript() ? GetZoneScript() : (ZoneScript*)GetInstanceScript())
+        {
             zoneScript->OnUnitDeath(this);
+
+            if (IsPlayer())
+                zoneScript->OnPlayerDeath(ToPlayer());
+        }
     }
     else if (s == JUST_RESPAWNED)
     {
@@ -17398,7 +17403,7 @@ void Unit::RestoreDisplayId()
 void Unit::AddComboPoints(Unit* target, int8 count)
 {
 
-    auto change = std::max<int8>(std::min<int8>(m_comboPoints + count, 5), 0);
+    auto change = std::max<int8>(std::min<int8>(m_comboPoints + count, 6), 0);
 
     if (target && target != m_comboTarget)
     {

@@ -9071,6 +9071,39 @@ void ObjectMgr::LoadTrainerSpell()
     LOG_INFO("server.loading", " ");
 }
 
+<<<<<<< HEAD
+=======
+void ObjectMgr::LoadWorldSafeLocs()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                   0   1      2     3     4     5
+    if (QueryResult result = WorldDatabase.Query("SELECT ID, MapID, LocX, LocY, LocZ, Facing FROM world_safe_locs"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 id = fields[0].Get<uint32>();
+            WorldLocation loc(fields[1].Get<uint32>(), fields[2].Get<float>(), fields[3].Get<float>(), fields[4].Get<float>(), fields[5].Get<float>());
+            if (!MapMgr::IsValidMapCoord(loc))
+            {
+                LOG_ERROR("sql.sql", "World location (ID: %u) has a invalid position MapID: %u %s, skipped", id, loc.GetMapId(), loc.ToString().c_str());
+                continue;
+            }
+
+            WorldSafeLocsEntry* worldSafeLocs = _worldSafeLocs[id];
+            worldSafeLocs->ID = id;
+            worldSafeLocs->Loc.WorldRelocate(loc);
+
+        } while (result->NextRow());
+
+        LOG_INFO("server.loading", ">> Loaded {} world locations %u ms", _worldSafeLocs.size(), GetMSTimeDiffToNow(oldMSTime));
+    }
+    else
+        LOG_INFO("server.loading", ">> Loaded 0 world locations. DB table `world_safe_locs` is empty.");
+}
+
+>>>>>>> master
 void ObjectMgr::LoadSpellScalingSpellMap()
 {
 
@@ -9239,6 +9272,27 @@ void ObjectMgr::LoadSpellDurationData()
     LOG_INFO("server.loading", " ");
 }
 
+<<<<<<< HEAD
+=======
+MapChallengeModeEntry* ObjectMgr::GetChallengeMode(uint32 id) const
+{
+    auto out = _cacheChallengeMode.find(id);
+    if (out != _cacheChallengeMode.end())
+        return out->second;
+    else
+        return nullptr;
+}
+
+WorldSafeLocsEntry* ObjectMgr::GetWorldSafeLoc(uint32 id) const
+{
+    auto out = _worldSafeLocs.find(id);
+    if (out != _worldSafeLocs.end())
+        return out->second;
+    else
+        return nullptr;
+}
+
+>>>>>>> master
 ForgedSpellDurationEntry* ObjectMgr::GetForgedSpellDurationEntry(uint32 spellid) {
     auto out = _cacheSpellDurationMap.find(spellid);
     if (out != _cacheSpellDurationMap.end())
@@ -10486,4 +10540,161 @@ void ObjectMgr::LoadMailServerTemplates()
 
     LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadInstanceDifficultyMultiplier()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _instanceDifficultyMultipliers.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT mapId, difficultyId, healthMultiplier, damageMultiplier FROM instance_difficulty_multiplier");
+
+    if (!result)
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 instance difficulty multiplier. DB table `instance_difficulty_multiplier` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 mapId = fields[0].Get<uint32>();
+        uint32 difficultyId = fields[1].Get<uint32>();
+
+        InstanceDifficultyMultiplier* multipliers = new InstanceDifficultyMultiplier();
+        multipliers->healthMultiplier = fields[2].Get<float>();
+        multipliers->damageMultiplier = fields[3].Get<float>();
+        _instanceDifficultyMultipliers[mapId][difficultyId] = multipliers;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instance difficulty multipliers in {} ms", _instanceDifficultyMultipliers.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadMythicLevelScale()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _mythicLevelScales.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM forge_mythic_level_scale");
+
+    if (!result)
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 challenge level scales. DB table `forge_mythic_level_scale` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 difficulty = fields[0].Get<uint32>();
+
+        MythicDifficultyScale* scale = new MythicDifficultyScale();
+        scale->mod = fields[1].Get<float>();
+        _mythicLevelScales[difficulty] = scale;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} forge_mythic_level_scale in {} ms", _mythicLevelScales.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadMythicMinionValue()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _cacheMythicMinionValues.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM forge_mythic_minion_value");
+
+    if (!result)
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 minion values. DB table `forge_mythic_minion_value` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 instance = fields[0].Get<uint32>();
+        uint32 unit = fields[1].Get<uint32>();
+        float value = fields[2].Get<float>();
+
+        _cacheMythicMinionValues[instance][unit] = value;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instances from forge_mythic_minion_value in {} ms", _cacheMythicMinionValues.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadMythicDungeonKeyMap()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _forgeMythicKeys.clear();
+    _forgeMythicMaps.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM forge_mythic_instance_key");
+
+    if (!result)
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 instance keys. DB table `forge_mythic_instance_key` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 map = fields[0].Get<uint32>();
+        uint32 key = fields[1].Get<uint32>();
+        int32 baseTimer = fields[2].Get<int32>();
+
+        KeyInfo* info = new KeyInfo();
+        info->baseTimer = baseTimer;
+        info->itemId = key;
+        _forgeMythicKeys[map] = info;
+        _forgeMythicMaps.push_back(map);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instances from forge_mythic_instance_key in {} ms", _forgeMythicMaps.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadMythicAffixes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _forgeAffixes.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM forge_mythic_affixes");
+
+    if (!result)
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 affixes. DB table `forge_mythic_affixes` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 spell = fields[0].Get<uint32>();
+        uint32 tier = fields[1].Get<uint32>();
+        int32 timerDiff = fields[2].Get<int32>();
+
+        AffixInfo* affix = new AffixInfo();
+        affix->tier = tier;
+        affix->timerDiff = timerDiff;
+
+        _forgeAffixes[spell] = affix;
+        _forgeAffixTiers[tier].push_back(spell);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instances from forge_mythic_affixes in {} ms", _forgeMythicMaps.size(), GetMSTimeDiffToNow(oldMSTime));
 }

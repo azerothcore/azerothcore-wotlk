@@ -34,6 +34,8 @@
 #include <GetTransmogHandler.cpp>
 #include <GetTransmogSetsHandler.cpp>
 #include <SaveTransmogSetHandler.cpp>
+#include <StartMythicHandler.cpp>
+#include <GetAffixesHandler.cpp>
 #include <unordered_map>
 
 // Add player scripts
@@ -332,6 +334,8 @@ void AddForgePlayerMessageHandler()
     sTopicRouter->AddHandler(new SaveTransmogSetHandler(cache, cm));
     sTopicRouter->AddHandler(new GetTransmogSetsHandler(cache, cm));
     sTopicRouter->AddHandler(new GetTransmogHandler(cache, cm));
+    sTopicRouter->AddHandler(new StartMythicHandler(cache, cm));
+    sTopicRouter->AddHandler(new GetAffixesHandler(cache, cm));
 
     new UseSkillBook();
     new ForgeCacheCommands();

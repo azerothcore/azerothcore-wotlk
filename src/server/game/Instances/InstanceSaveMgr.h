@@ -94,6 +94,7 @@ private:
     uint32 m_instanceid;
     uint32 m_mapid;
     Difficulty m_difficulty;
+    uint32 m_entranceId;
     bool m_canReset;
     std::string m_instanceData;
     uint32 m_completedEncounterMask;

@@ -304,6 +304,8 @@ public:
 
     void SetInCombatWithZone();
 
+    void SetBaseHealth(uint64 health);
+
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 

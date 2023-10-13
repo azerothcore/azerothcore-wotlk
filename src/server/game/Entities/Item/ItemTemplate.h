@@ -69,7 +69,10 @@ enum ItemModType
     ITEM_MOD_HEALTH_REGEN             = 46,
     ITEM_MOD_SPELL_PENETRATION        = 47,
     ITEM_MOD_BLOCK_VALUE              = 48,
-    ITEM_MOD_THORNS                   = 49
+    ITEM_MOD_THORNS                   = 49,
+    ITEM_MOD_CHALLENGE_MAP_CHALLENGE_MODE_ID = 50,
+    ITEM_MOD_CHALLENGE_KEYSTONE_LEVEL = 60,
+
 };
 
 #define MAX_ITEM_MOD                    50

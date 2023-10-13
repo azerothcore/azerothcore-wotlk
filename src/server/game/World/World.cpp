@@ -2000,6 +2000,10 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Client Addons...");
     AddonMgr::LoadFromDB();
 
+    // hater: xmog
+    LOG_INFO("server.loading", "Load xmog enchants...");
+    Transmogrification::instance().LoadEnchants();
+
     // pussywizard:
     LOG_INFO("server.loading", "Deleting Invalid Mail Items...");
     LOG_INFO("server.loading", " ");
@@ -2188,8 +2192,6 @@ void World::SetInitialWorldSettings()
             }
         }
     }
-
-    Transmogrification::instance().LoadEnchants();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
