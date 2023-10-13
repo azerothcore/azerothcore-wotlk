@@ -26,7 +26,7 @@
 #include "ScriptMgr.h"
 #include "VMapFactory.h"
 
-MapInstanced::MapInstanced(uint32 id, std::chrono::milliseconds expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
+MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS * sizeof(uint16));
