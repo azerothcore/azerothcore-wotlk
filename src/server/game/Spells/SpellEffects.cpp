@@ -3972,11 +3972,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             m_caster->CastSpell(m_caster, 61268, true);
                             return;
                         }
-                    case 62536: // Removes Warts-B-Gone Lip Balm
-                        {
-                            m_caster->RemoveAurasDueToSpell(62574);
-                        }
-                        break;
                 }
                 break;
             }
