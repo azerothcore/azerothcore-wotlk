@@ -19,23 +19,25 @@
 #include "ScriptedCreature.h"
 #include "shadow_labyrinth.h"
 
-enum eEnums
+enum Text
 {
     SAY_INTRO               = 0,
     SAY_AGGRO               = 1,
     SAY_HELP                = 2,
     SAY_SLAY                = 3,
-    SAY_DEATH               = 4,
+    SAY_DEATH               = 4
+};
 
+enum Spells
+{
     SPELL_BANISH            = 30231,
     SPELL_CORROSIVE_ACID    = 33551,
     SPELL_FEAR              = 33547,
-    SPELL_ENRAGE            = 34970,
+    SPELL_ENRAGE            = 34970
+};
 
-    EVENT_SPELL_CORROSIVE   = 1,
-    EVENT_SPELL_FEAR        = 2,
-    EVENT_SPELL_ENRAGE      = 3,
-
+enum Misc
+{
     PATH_ID_START           = 1873100,
     PATH_ID_PATHING         = 1873101,
 
@@ -81,7 +83,6 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             return;
         }
-
         me->RemoveAurasDueToSpell(SPELL_BANISH);
         Talk(SAY_INTRO);
         DoPlaySoundToSet(me, SOUND_INTRO);
@@ -96,9 +97,7 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             return;
         }
-
         Talk(SAY_AGGRO);
-
         scheduler.Schedule(23050ms, 30350ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CORROSIVE_ACID);
@@ -111,12 +110,11 @@ struct boss_ambassador_hellmaw : public BossAI
 
         if (IsHeroic())
         {
-            scheduler.Schedule(3min, [this](TaskContext)
+            scheduler.Schedule(3min, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_ENRAGE, true);
             });
         }
-
         _JustEngagedWith();
     }
 
@@ -126,7 +124,6 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             return;
         }
-
         ScriptedAI::MoveInLineOfSight(who);
     }
 
@@ -136,7 +133,6 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             return;
         }
-
         ScriptedAI::AttackStart(who);
     }
 
@@ -188,7 +184,7 @@ struct boss_ambassador_hellmaw : public BossAI
             return;
         }
 
-        //Make sure our attack is ready and we aren't currently casting before checking distance
+        // Make sure our attack is ready and we aren't currently casting before checking distance
         if (me->isAttackReady())
         {
             // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
@@ -199,7 +195,6 @@ struct boss_ambassador_hellmaw : public BossAI
                     me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
                 }
             }
-
             me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
             me->resetAttackTimer();
         }
@@ -211,7 +206,6 @@ struct boss_ambassador_hellmaw : public BossAI
             {
                 me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
             }
-
             me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
             me->resetAttackTimer(OFF_ATTACK);
         }

@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "MiscPackets.h"
 #include "ObjectMgr.h"
 

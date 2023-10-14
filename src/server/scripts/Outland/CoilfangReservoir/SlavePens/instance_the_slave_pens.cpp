@@ -30,7 +30,8 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_QUAGMIRRAN, DATA_QUAGMIRRAN }
+    { NPC_QUAGMIRRAN, DATA_QUAGMIRRAN },
+    { 0,              0               }
 };
 
 class instance_the_slave_pens : public InstanceMapScript

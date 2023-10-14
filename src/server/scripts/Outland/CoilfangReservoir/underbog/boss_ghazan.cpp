@@ -28,10 +28,6 @@ enum eBlackStalker
     SPELL_TAIL_SWEEP                = 34267,
     SPELL_ENRAGE                    = 15716,
 
-    EVENT_ACID_BREATH               = 1,
-    EVENT_ACID_SPIT                 = 2,
-    EVENT_TAIL_SWEEP                = 3,
-
     ACTION_MOVE_TO_PLATFORM         = 1
 };
 
@@ -39,6 +35,10 @@ struct boss_ghazan : public BossAI
 {
     boss_ghazan(Creature* creature) : BossAI(creature, DATA_GHAZAN)
     {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void InitializeAI() override
@@ -50,31 +50,34 @@ struct boss_ghazan : public BossAI
 
     void Reset() override
     {
-        _enraged = false;
+        _Reset();
         if (!_reachedPlatform)
         {
             _movedToPlatform = false;
         }
 
-        BossAI::Reset();
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        events.ScheduleEvent(EVENT_ACID_BREATH, 3s);
-        events.ScheduleEvent(EVENT_ACID_SPIT, 1s);
-        events.ScheduleEvent(EVENT_TAIL_SWEEP, DUNGEON_MODE<Milliseconds>(5900ms, 10s));
-
-        BossAI::JustEngagedWith(who);
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-    {
-        if (!_enraged && me->HealthBelowPctDamaged(20, damage))
-        {
-            _enraged = true;
+        ScheduleHealthCheckEvent(20, [&] {
             DoCastSelf(SPELL_ENRAGE);
-        }
+        });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(3s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_ACID_BREATH);
+            context.Repeat(7s, 9s);
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_ACID_SPIT);
+            context.Repeat(7s, 9s);
+        }).Schedule(DUNGEON_MODE<Milliseconds>(5900ms, 10s), [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_TAIL_SWEEP);
+            context.Repeat(7s, 9s);
+        });
+
+        _JustEngagedWith();
     }
 
     void DoAction(int32 type) override
@@ -110,7 +113,7 @@ struct boss_ghazan : public BossAI
             me->GetMotionMaster()->MoveRandom(12.f);
         }
 
-        BossAI::JustReachedHome();
+        _JustReachedHome();
     }
 
     void UpdateAI(uint32 diff) override
@@ -120,42 +123,12 @@ struct boss_ghazan : public BossAI
             return;
         }
 
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
-
-        while (uint32 eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_ACID_BREATH:
-                    DoCastVictim(SPELL_ACID_BREATH);
-                    events.Repeat(7s, 9s);
-                    break;
-                case EVENT_ACID_SPIT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        DoCast(target, SPELL_ACID_SPIT);
-                    }
-                    events.Repeat(7s, 9s);
-                    break;
-                case EVENT_TAIL_SWEEP:
-                    DoCastVictim(SPELL_TAIL_SWEEP);
-                    events.Repeat(7s, 9s);
-                    break;
-                default:
-                    break;
-            }
-        }
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
 
     private:
-        bool _enraged;
         bool _movedToPlatform;
         bool _reachedPlatform;
 };

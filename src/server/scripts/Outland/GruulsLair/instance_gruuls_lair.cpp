@@ -26,6 +26,12 @@ DoorData const doorData[] =
     { 0,                0,              DOOR_TYPE_ROOM    } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_MAULGAR, DATA_MAULGAR },
+    { 0,           0            }
+};
+
 MinionData const minionData[] =
 {
     { NPC_MAULGAR,              DATA_MAULGAR },
@@ -46,62 +52,11 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             LoadMinionData(minionData);
 
             _addsKilled = 0;
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_MAULGAR:
-                    _maulgarGUID = creature->GetGUID();
-                    [[fallthrough]];
-                case NPC_KROSH_FIREHAND:
-                case NPC_OLM_THE_SUMMONER:
-                case NPC_KIGGLER_THE_CRAZED:
-                case NPC_BLINDEYE_THE_SEER:
-                    AddMinion(creature, true);
-                    break;
-            }
-        }
-
-        void OnCreatureRemove(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_MAULGAR:
-                case NPC_KROSH_FIREHAND:
-                case NPC_OLM_THE_SUMMONER:
-                case NPC_KIGGLER_THE_CRAZED:
-                case NPC_BLINDEYE_THE_SEER:
-                    AddMinion(creature, false);
-                    break;
-            }
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_MAULGAR_DOOR:
-                case GO_GRUUL_DOOR:
-                    AddDoor(go, true);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_MAULGAR_DOOR:
-                case GO_GRUUL_DOOR:
-                    AddDoor(go, false);
-                    break;
-            }
         }
 
         bool SetBossState(uint32 id, EncounterState state) override
@@ -117,8 +72,12 @@ public:
         void SetData(uint32 type, uint32  /*id*/) override
         {
             if (type == DATA_ADDS_KILLED)
-                if (Creature* maulgar = instance->GetCreature(_maulgarGUID))
+            {
+                if (Creature* maulgar = GetCreature(DATA_MAULGAR))
+                {
                     maulgar->AI()->DoAction(++_addsKilled);
+                }
+            }
         }
 
         uint32 GetData(uint32 type) const override
@@ -130,7 +89,6 @@ public:
 
     protected:
         uint32 _addsKilled;
-        ObjectGuid _maulgarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

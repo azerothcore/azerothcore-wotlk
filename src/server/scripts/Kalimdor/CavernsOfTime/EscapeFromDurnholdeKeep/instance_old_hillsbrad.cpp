@@ -66,7 +66,7 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (instance->GetPlayersCountExceptGMs() == 1)
+            if (instance->GetPlayersCountExceptGMs() <= 1)
                 CleanupInstance();
 
             EnsureGridLoaded();
@@ -144,8 +144,11 @@ public:
                         Reposition(thrall);
                     return;
                 case DATA_ESCORT_PROGRESS:
-                    _encounterProgress = data;
-                    SaveToDB();
+                    if (_encounterProgress < data)
+                    {
+                        _encounterProgress = data;
+                        SaveToDB();
+                    }
                     break;
                 case DATA_BOMBS_PLACED:
                     {

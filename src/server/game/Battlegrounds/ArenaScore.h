@@ -72,4 +72,4 @@ protected:
     std::string TeamName{};
 };
 
-#endif // WARHEAD_ARENA_SCORE_H
+#endif // ACORE_ARENA_SCORE_H

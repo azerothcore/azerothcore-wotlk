@@ -111,6 +111,16 @@ struct boss_grand_warlock_nethekurse : public BossAI
         });
 
         instance->SetBossState(DATA_NETHEKURSE, NOT_STARTED);
+
+        if (!_canAggro)
+        {
+            me->SetImmuneToAll(true);
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        me->GetMotionMaster()->Initialize();
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -121,7 +131,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
 
     void SetData(uint32 data, uint32 value) override
     {
-        if (data != SETDATA_DATA)
+        if (data != SETDATA_DATA || me->IsInCombat())
             return;
 
         if (value == SETDATA_PEON_AGGRO && PeonEngagedCount <= 4)
@@ -137,8 +147,12 @@ struct boss_grand_warlock_nethekurse : public BossAI
             scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                me->GetMotionMaster()->Initialize();
                 Talk(SAY_PEON_DIES);
+
+                scheduler.Schedule(1s, GROUP_RP, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->Initialize();
+                });
 
                 if (++PeonKilledCount == 4)
                 {
@@ -161,16 +175,14 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->GetMotionMaster()->MoveIdle();
             me->SetFacingTo(4.572762489318847656f);
 
-            scheduler.Schedule(500ms, GROUP_RP, [this](TaskContext /*context*/)
+            scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
             {
-                scheduler.Schedule(2500ms, GROUP_RP, [this](TaskContext /*context*/)
-                {
-                    PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
-                    DoCast(me, roleplayData.spellId);
-                    Talk(roleplayData.textId);
-                    me->GetMotionMaster()->Initialize();
-                });
+                PeonRoleplay roleplayData = Acore::Containers::SelectRandomContainerElement(PeonRoleplayData);
+                DoCast(me, roleplayData.spellId);
+                Talk(roleplayData.textId);
+                me->GetMotionMaster()->Initialize();
             });
+
             context.Repeat(16400ms, 28500ms);
         });
     }
@@ -223,8 +235,23 @@ struct boss_grand_warlock_nethekurse : public BossAI
             me->SetInCombatWithZone();
             return;
         }
-        else if (action == ACTION_START_INTRO)
+        else if (action == ACTION_START_INTRO && !_introStarted)
         {
+            // Hack: Prevent from pulling from behind door
+            me->SetImmuneToAll(false);
+            _canAggro = true;
+            // Bit of a hack to make sure it can't be started with the areatrigger AND the door opening
+            _introStarted = true;
+
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_PEON, 60.0f);
+            for (Creature* creature : creatureList)
+            {
+                if (creature)
+                {
+                    creature->SetImmuneToAll(false);
+                }
+            }
             IntroRP();
         }
     }
@@ -232,6 +259,21 @@ struct boss_grand_warlock_nethekurse : public BossAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+
+        // this should never be called if the action to start intro has been called
+        if (!_introStarted)
+        {
+            // find the door that is nearest to the entrance
+            if (GameObject* nethekursedoor = GetClosestGameObjectWithEntry(me, GO_GRAND_WARLOCK_CHAMBER_DOOR_1, 100.0f))
+            {
+                // check if door is openened
+                //this should only happen before the intro, if the door is picked by someone
+                if(nethekursedoor->GetGoState() == 0)
+                {
+                    DoAction(ACTION_START_INTRO);
+                }
+            }
+        }
 
         if (!UpdateVictim())
             return;
@@ -246,6 +288,8 @@ struct boss_grand_warlock_nethekurse : public BossAI
 private:
     uint8 PeonEngagedCount = 0;
     uint8 PeonKilledCount = 0;
+    bool _canAggro = false;
+    bool _introStarted = false;
 };
 
 class spell_tsh_shadow_bolt : public SpellScript

@@ -24,21 +24,9 @@
 #include "Transport.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
+#include "CellImpl.h"
 
 using namespace Acore;
-
-void VisibleNotifier::Visit(GameObjectMapType& m)
-{
-    for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        GameObject* go = iter->GetSource();
-        if (i_largeOnly != go->IsVisibilityOverridden())
-            continue;
-
-        vis_guids.erase(go->GetGUID());
-        i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
-    }
-}
 
 void VisibleNotifier::SendToSelf()
 {
@@ -47,9 +35,6 @@ void VisibleNotifier::SendToSelf()
     if (Transport* transport = i_player.GetTransport())
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
         {
-            if (i_largeOnly != (*itr)->IsVisibilityOverridden())
-                continue;
-
             if (vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
             {
                 vis_guids.erase((*itr)->GetGUID());
@@ -66,6 +51,9 @@ void VisibleNotifier::SendToSelf()
                     case TYPEID_UNIT:
                         i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
                         break;
+                    case TYPEID_DYNAMICOBJECT:
+                        i_player.UpdateVisibilityOf((*itr)->ToDynObject(), i_data, i_visibleNow);
+                        break;
                     default:
                         break;
                 }
@@ -74,12 +62,6 @@ void VisibleNotifier::SendToSelf()
 
     for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
-        if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
-        {
-            if (i_largeOnly != obj->IsVisibilityOverridden())
-                continue;
-        }
-
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if ((*it).IsTransport())
             if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
@@ -106,9 +88,6 @@ void VisibleNotifier::SendToSelf()
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
     {
-        if (i_largeOnly != (*it)->IsVisibilityOverridden())
-            continue;
-
         i_player.GetInitialVisiblePackets(*it);
     }
 }
@@ -179,6 +158,23 @@ void PlayerRelocationNotifier::Visit(PlayerMapType& m)
     }
 }
 
+void PlayerRelocationNotifier::Visit(CreatureMapType& m)
+{
+    bool relocated_for_ai = (&i_player == i_player.m_seer);
+
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        Creature* c = iter->GetSource();
+
+        vis_guids.erase(c->GetGUID());
+
+        i_player.UpdateVisibilityOf(c, i_data, i_visibleNow);
+
+        if (relocated_for_ai && !c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+            CreatureUnitRelocationWorker(c, &i_player);
+    }
+}
+
 void CreatureRelocationNotifier::Visit(PlayerMapType& m)
 {
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
@@ -192,6 +188,58 @@ void CreatureRelocationNotifier::Visit(PlayerMapType& m)
         // NOTIFY_AI_RELOCATION does not guarantee that player will do it himself (because distance is also checked), but screw it, it's not that important
         if (!player->m_seer->isNeedNotify(NOTIFY_AI_RELOCATION) && !i_creature.IsMoveInLineOfSightStrictlyDisabled())
             CreatureUnitRelocationWorker(&i_creature, player);
+    }
+}
+
+void CreatureRelocationNotifier::Visit(CreatureMapType& m)
+{
+    if (!i_creature.IsAlive())
+        return;
+
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        Creature* c = iter->GetSource();
+        CreatureUnitRelocationWorker(&i_creature, c);
+
+        if (!c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+            CreatureUnitRelocationWorker(c, &i_creature);
+    }
+}
+
+void DelayedUnitRelocation::Visit(CreatureMapType& m)
+{
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        Creature* unit = iter->GetSource();
+        if (!unit->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+            continue;
+
+        CreatureRelocationNotifier relocate(*unit);
+
+        TypeContainerVisitor<CreatureRelocationNotifier, WorldTypeMapContainer > c2world_relocation(relocate);
+        TypeContainerVisitor<CreatureRelocationNotifier, GridTypeMapContainer >  c2grid_relocation(relocate);
+
+        cell.Visit(p, c2world_relocation, i_map, *unit, i_radius);
+        cell.Visit(p, c2grid_relocation, i_map, *unit, i_radius);
+    }
+}
+
+void DelayedUnitRelocation::Visit(PlayerMapType& m)
+{
+    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        Player* player = iter->GetSource();
+        WorldObject const* viewPoint = player->m_seer;
+
+        if (!viewPoint->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+            continue;
+
+        if (player != viewPoint && !viewPoint->IsPositionValid())
+            continue;
+
+        PlayerRelocationNotifier relocate(*player);
+        Cell::VisitAllObjects(viewPoint, relocate, i_radius, false);
+        relocate.SendToSelf();
     }
 }
 
@@ -342,14 +390,9 @@ void MessageDistDelivererToHostile::Visit(DynamicObjectMapType& m)
 template<class T>
 void ObjectUpdater::Visit(GridRefMgr<T>& m)
 {
-    T* obj;
-    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); )
-    {
-        obj = iter->GetSource();
-        ++iter;
-        if (obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
-            obj->Update(i_timeDiff);
-    }
+    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
+        if (iter->GetSource()->IsInWorld())
+            iter->GetSource()->Update(i_timeDiff);
 }
 
 bool AnyDeadUnitObjectInRangeCheck::operator()(Player* u)
