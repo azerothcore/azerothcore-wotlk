@@ -780,7 +780,6 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
 
-    this->setActive(true);
     return true;
 }
 
