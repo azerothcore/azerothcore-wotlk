@@ -184,16 +184,17 @@ public:
                 }
             }
 
-            for (auto& exclu : ft->ExclusiveWith)
-            {
-                auto typeItt = skillTabs.find(exclu);
+            // TODO: FIX
+            //for (auto& exclu : ft->Choices)
+            //{
+            //    auto typeItt = skillTabs.find(exclu);
 
-                if (typeItt != skillTabs.end() && typeItt->second->CurrentRank > 0)
-                {
-                    RequirementsNotMet(iam);
-                    return;
-                }
-            }
+            //    if (typeItt != skillTabs.end() && typeItt->second->CurrentRank > 0)
+            //    {
+            //        RequirementsNotMet(iam);
+            //        return;
+            //    }
+            //}
 
             auto spellItter = skillTabs.find(ft->SpellId);
             ForgeCharacterTalent* ct = new ForgeCharacterTalent();

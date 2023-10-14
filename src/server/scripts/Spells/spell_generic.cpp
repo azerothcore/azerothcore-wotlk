@@ -2429,13 +2429,10 @@ class spell_gen_lifeblood : public AuraScript
 
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        float f;
 
         if (Unit* owner = GetUnitOwner())
-            amount += int32(CalculatePct(owner->GetMaxHealth(), 1.5f / aurEff->GetTotalTicks(f, true)));
+            amount += int32(CalculatePct(owner->GetMaxHealth(), 1.5f / aurEff->GetTotalTicks()));
 
-        if (f != 0)
-            amount += amount * f;
     }
 
     void Register() override
@@ -4250,12 +4247,8 @@ class spell_gen_gift_of_naaru : public AuraScript
             default:
                 break;
         }
-        float f;
 
-        int32 healTick = floor(heal / aurEff->GetTotalTicks(f, true));
-
-        if (f != 0)
-            healTick += healTick * f;
+        int32 healTick = floor(heal / aurEff->GetTotalTicks());
             
         amount += int32(std::max(healTick, 0));
     }

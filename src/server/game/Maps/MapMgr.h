@@ -168,8 +168,7 @@ public:
     template<typename Worker>
     void DoForAllMapsWithMapId(uint32 mapId, Worker&& worker);
     
-    typedef std::unordered_map<uint32, Map*> MapMapType;    
-    MapMapType i_maps;
+    typedef std::unordered_map<uint32, Map*> MapMapType;
 private:
     typedef std::vector<bool> InstanceIds;
 

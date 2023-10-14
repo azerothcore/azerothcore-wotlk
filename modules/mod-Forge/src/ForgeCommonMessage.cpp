@@ -94,22 +94,6 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
 
             j = 0;
 
-            for (auto& preReq : talentKvp.second->ExclusiveWith)
-            {
-                std::string reqDel = "!";
-
-                if (j == 0)
-                    reqDel = "";
-
-                msg = msg + reqDel + std::to_string(preReq);
-
-                j++;
-            }
-
-            msg = msg + "&"; // delimit the field
-
-            j = 0;
-
             for (auto& preReq : talentKvp.second->Ranks)
             {
                 std::string reqDel = "%";
@@ -135,6 +119,25 @@ std::string ForgeCommonMessage::BuildTree(Player* player, CharacterPointType poi
                     reqDel = "";
 
                 msg = msg + reqDel + std::to_string(preReq);
+
+                j++;
+            }
+
+            msg = msg + "&" + std::to_string(talentKvp.second->nodeType);
+
+            msg = msg + "&"; // delimit the field
+
+            j = 0;
+
+            // TODO: SET THIS TO BE CHOICE NODE
+            for (auto& choice : talentKvp.second->Choices)
+            {
+                std::string choiceDel = "!";
+
+                if (j == 0)
+                    choiceDel = "";
+
+                msg = msg + choiceDel + std::to_string(choice->spellId);
 
                 j++;
             }
@@ -311,14 +314,6 @@ bool ForgeCommonMessage::CanLearnTalent(Player* player, uint32 tabId, uint32 spe
             {
                 return false;
             }
-        }
-
-        for (auto& exclu : ft->ExclusiveWith)
-        {
-            auto typeItt = skillTabs.find(exclu);
-
-            if (typeItt != skillTabs.end() && (typeItt->second->CurrentRank > 0))
-                return false;
         }
 
         return true;
