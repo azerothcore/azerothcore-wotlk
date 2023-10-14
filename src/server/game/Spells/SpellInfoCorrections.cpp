@@ -4578,13 +4578,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
-    // Raise Dead, Baron Rivendare (10440) encounter
-    // Ensures Mindless Skeletons (11197) are not spawned outside the room
-    ApplySpellFix({ 17475, 17476, 17477, 17478, 17479, 17480 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
