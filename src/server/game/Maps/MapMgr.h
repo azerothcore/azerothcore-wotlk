@@ -24,6 +24,7 @@
 #include "MapInstanced.h"
 #include "MapUpdater.h"
 #include "Object.h"
+#include "GridStates.h"
 
 #include <mutex>
 
@@ -72,6 +73,14 @@ public:
 
     void Initialize(void);
     void Update(uint32);
+
+    void SetGridCleanUpDelay(uint32 t)
+    {
+        if (t < MIN_GRID_DELAY)
+            i_gridCleanUpDelay = MIN_GRID_DELAY;
+        else
+            i_gridCleanUpDelay = t;
+    }
 
     void SetMapUpdateInterval(uint32 t)
     {
@@ -159,8 +168,7 @@ public:
     template<typename Worker>
     void DoForAllMapsWithMapId(uint32 mapId, Worker&& worker);
     
-    typedef std::unordered_map<uint32, Map*> MapMapType;    
-    MapMapType i_maps;
+    typedef std::unordered_map<uint32, Map*> MapMapType;
 private:
     typedef std::vector<bool> InstanceIds;
 
@@ -171,6 +179,8 @@ private:
     MapMgr& operator=(const MapMgr&);
 
     std::mutex Lock;
+    uint32 i_gridCleanUpDelay;
+    MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;
 

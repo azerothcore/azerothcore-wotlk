@@ -83,13 +83,13 @@ struct boss_anzu : public BossAI
 
     uint32 talkTimer;
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         if (summon->GetEntry() == NPC_BROOD_OF_ANZU)
         {
             summons.Despawn(summon);
             summons.RemoveNotExisting();
-            if (summons.empty())
+            if (!summons.HasEntry(NPC_BROOD_OF_ANZU))
             {
                 me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
             }

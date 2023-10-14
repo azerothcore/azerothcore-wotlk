@@ -106,7 +106,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             SpawnCrystals();
-            instance->SetData(DATA_SELIN_EVENT, NOT_STARTED);
+            instance->SetBossState(DATA_SELIN_FIREHEART, NOT_STARTED);
             CrystalGUID.Clear();
             me->SetPower(POWER_MANA, 0);
         }
@@ -114,7 +114,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            instance->SetData(DATA_SELIN_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_SELIN_FIREHEART, IN_PROGRESS);
 
             events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 2500, 1);
             events.ScheduleEvent(EVENT_SPELL_FEL_EXPLOSION, 2000);
@@ -134,7 +134,7 @@ public:
         {
             Talk(SAY_DEATH);
 
-            instance->SetData(DATA_SELIN_EVENT, DONE);         // Encounter complete!
+            instance->SetBossState(DATA_SELIN_FIREHEART, DONE);         // Encounter complete!
             summons.DespawnAll();
         }
 

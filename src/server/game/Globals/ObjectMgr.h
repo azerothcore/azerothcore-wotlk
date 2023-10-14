@@ -1527,9 +1527,8 @@ public:
     void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
     void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 
-<<<<<<< HEAD
     CacheTrainerSpellByClassContainer getTrainerSpellsForClass();
-=======
+
     // hater: m+
     [[nodiscard]] InstanceDifficultyMultiplier const* GetInstanceDifficultyMultiplier(uint32 mapId, uint32 difficultyId) const
     {
@@ -1590,7 +1589,6 @@ public:
         return _forgeAffixTiers;
     }
 
->>>>>>> master
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread

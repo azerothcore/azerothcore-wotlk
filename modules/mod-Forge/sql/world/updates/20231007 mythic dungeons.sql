@@ -127,3 +127,30 @@ VALUES
 (148, '+48', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 16712190, 'm+48', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (149, '+49', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 16712190, 'm+49', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (150, '+50', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 16712190, 'm+50', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO acore_world.gameobject_template (entry, `type`, displayId, name, IconName, castBarCaption, unk1, `size`, Data0, Data1, Data2, Data3, Data4, Data5, Data6, Data7, Data8, Data9, Data10, Data11, Data12, Data13, Data14, Data15, Data16, Data17, Data18, Data19, Data20, Data21, Data22, Data23, AIName, ScriptName, VerifiedBuild) VALUES(1000001, 3, 259, 'Reward Chest', '', '', '', 1.0, 57, 2283, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340);
+INSERT INTO acore_world.gameobject_template (entry, `type`, displayId, name, IconName, castBarCaption, unk1, `size`, Data0, Data1, Data2, Data3, Data4, Data5, Data6, Data7, Data8, Data9, Data10, Data11, Data12, Data13, Data14, Data15, Data16, Data17, Data18, Data19, Data20, Data21, Data22, Data23, AIName, ScriptName, VerifiedBuild) VALUES(1000000, 2, 475, 'Ancient Brazier', '', '', '', 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'go_mythic_init', 12340);
+
+DROP TABLE IF EXISTS `acore_world`.`forge_mythic_affixes`;
+CREATE TABLE `acore_world`.`forge_mythic_affixes` (
+  `affix` bigint unsigned NOT NULL,
+  `tier` int unsigned NOT NULL,
+  `timer_increment` int NOT NULL,
+  PRIMARY KEY (`affix`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO acore_world.forge_mythic_affixes (affix, tier, timer_increment) VALUES(1, 1, 300);
+INSERT INTO acore_world.forge_mythic_affixes (affix, tier, timer_increment) VALUES(3, 2, 300);
+INSERT INTO acore_world.forge_mythic_affixes (affix, tier, timer_increment) VALUES(5, 3, 300);
+
+DROP TABLE IF EXISTS `acore_world`.`forge_mythic_instance_key`;
+CREATE TABLE `acore_world`.`forge_mythic_instance_key` (
+  `instance` bigint unsigned NOT NULL,
+  `keyid` int unsigned NOT NULL,
+  `base_timer` bigint unsigned NOT NULL,
+  PRIMARY KEY (`instance`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO acore_world.forge_mythic_instance_key (`instance`, keyid, base_timer) VALUES(34, 138028, 1800);
+INSERT INTO acore_world.forge_mythic_instance_key (`instance`, keyid, base_timer) VALUES(70, 138023, 1800);
+INSERT INTO acore_world.forge_mythic_instance_key (`instance`, keyid, base_timer) VALUES(209, 138024, 1800);
+INSERT INTO acore_world.forge_mythic_instance_key (`instance`, keyid, base_timer) VALUES(389, 138019, 1800);
+

@@ -23,8 +23,7 @@ enum Spells
 {
     SPELL_ACID_SPRAY            = 38153,
     SPELL_CLEAVE                = 40504,
-    SPELL_POISON_BOLT_VOLLEY_N  = 34780,
-    SPELL_POISON_BOLT_VOLLEY_H  = 39340,
+    SPELL_POISON_BOLT_VOLLEY    = 34780,
     SPELL_UPPERCUT              = 32055
 };
 
@@ -36,11 +35,6 @@ struct boss_quagmirran : public BossAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
-    }
-
-    void Reset() override
-    {
-        _Reset();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -57,11 +51,11 @@ struct boss_quagmirran : public BossAI
             context.Repeat(21800ms);
         }).Schedule(25200ms, [this](TaskContext context)
         {
-            DoCastVictim(SPELL_ACID_SPRAY);
+            DoCastRandomTarget(SPELL_ACID_SPRAY);
             context.Repeat(25s);
         }).Schedule(31800ms, [this](TaskContext context)
         {
-            DoCastSelf(DUNGEON_MODE(SPELL_POISON_BOLT_VOLLEY_N, SPELL_POISON_BOLT_VOLLEY_H));
+            DoCastAOE(SPELL_POISON_BOLT_VOLLEY);
             context.Repeat(24400ms);
         });
     }

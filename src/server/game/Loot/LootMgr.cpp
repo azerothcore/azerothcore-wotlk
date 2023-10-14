@@ -1738,7 +1738,9 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
             // Rate.Drop.Item.GroupAmount is only in effect for the top loot template level
             if (isTopLevel)
             {
-                group->Process(loot, player, store, lootMode, sWorld->getRate(RATE_DROP_ITEM_GROUP_AMOUNT));
+                uint32 groupAmount = sWorld->getRate(RATE_DROP_ITEM_GROUP_AMOUNT);
+                sScriptMgr->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
+                group->Process(loot, player, store, lootMode, groupAmount);
             }
             else
             {

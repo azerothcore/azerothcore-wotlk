@@ -64,20 +64,6 @@ enum Misc
     ITEM_TAINTED_CORE               = 31088,
 
     POINT_HOME                      = 1,
-
-    EVENT_SPELL_SHOCK_BLAST         = 1,
-    EVENT_SPELL_STATIC_CHARGE       = 2,
-    EVENT_SPELL_ENTANGLE            = 3,
-    EVENT_CHECK_HEALTH              = 4,
-    EVENT_SPELL_FORKED_LIGHTNING    = 5,
-    EVENT_SUMMON_A                  = 6,
-    EVENT_SUMMON_B                  = 7,
-    EVENT_SUMMON_C                  = 8,
-    EVENT_SUMMON_D                  = 9,
-    EVENT_CHECK_HEALTH2             = 10,
-    EVENT_SUMMON_SPOREBAT           = 11,
-
-    EVENT_KILL_TALK                 = 20
 };
 
 class startFollow : public BasicEvent
@@ -88,215 +74,223 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (InstanceScript* instance = _owner->GetInstanceScript())
+        {
             if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetGuidData(NPC_LADY_VASHJ)))
+            {
                 _owner->GetMotionMaster()->MoveFollow(vashj, 3.0f, vashj->GetAngle(_owner), MOTION_SLOT_CONTROLLED);
+            }
+        }
         return true;
     }
-
 private:
     Unit* _owner;
 };
 
-class boss_lady_vashj : public CreatureScript
+struct boss_lady_vashj : public BossAI
 {
-public:
-    boss_lady_vashj() : CreatureScript("boss_lady_vashj") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_lady_vashj(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
     {
-        return GetSerpentShrineAI<boss_lady_vashjAI>(creature);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+
+        _intro = false;
     }
 
-    struct boss_lady_vashjAI : public BossAI
+    void Reset() override
     {
-        boss_lady_vashjAI(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
+        _count = 0;
+        _recentlySpoken = false;
+        _batTimer = 20s;
+        BossAI::Reset();
+
+        ScheduleHealthCheckEvent(70, [&]{
+            Talk(SAY_PHASE2);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
+        });
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if(!_recentlySpoken)
         {
-            intro = false;
+            Talk(SAY_SLAY);
+            _recentlySpoken = true;
+        }
+        scheduler.Schedule(6s, [this](TaskContext)
+        {
+            _recentlySpoken = false;
+        });
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        DoCastSelf(SPELL_REMOVE_TAINTED_CORES, true);
+
+        ScheduleSpells();
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        if (summon->GetEntry() == WORLD_TRIGGER)
+        {
+            summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
+        }
+        else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
+        {
+            summon->SetWalk(true);
+            summon->m_Events.AddEvent(new startFollow(summon), summon->m_Events.CalculateTime(0));
+        }
+        else if (summon->GetEntry() == NPC_TOXIC_SPOREBAT)
+        {
+            summon->GetMotionMaster()->MoveRandom(30.0f);
+        }
+        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
+        {
+            summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
+        }
+    }
+
+    void ScheduleSpells()
+    {
+        scheduler.Schedule(14550ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SHOCK_BLAST);
+            context.Repeat(10850ms, 25100ms);
+        }).Schedule(18150ms, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_STATIC_CHARGE);
+            context.Repeat(7250ms, 27050ms);
+        }).Schedule(25450ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_ENTANGLE);
+            context.Repeat(18200ms, 51500ms);
+        });
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
+        {
+            _intro = true;
+            Talk(SAY_INTRO);
         }
 
-        bool intro;
-        int32 count;
+        BossAI::MoveInLineOfSight(who);
+    }
 
-        void Reset() override
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_HOME)
         {
-            count = 0;
-            BossAI::Reset();
+            return;
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        me->SetFacingTo(me->GetHomePosition().GetOrientation());
+        instance->SetData(DATA_ACTIVATE_SHIELD, 0);
+        scheduler.CancelAll();
+
+        scheduler.Schedule(2400ms, [this](TaskContext context)
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            DoCastRandomTarget(SPELL_FORKED_LIGHTNING);
+            context.Repeat(2400ms, 12450ms);
+        }).Schedule(0s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_ENCHANTED_ELEMENTAL, true);
+            context.Repeat(2500ms);
+        }).Schedule(45s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_COILFANG_ELITE, true);
+            context.Repeat(45s);
+        }).Schedule(60s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_COILFANG_STRIDER, true);
+            context.Repeat(60s);
+        }).Schedule(50s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_TAINTED_ELEMENTAL, true);
+            context.Repeat(50s);
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            if (!me->HasAura(SPELL_MAGIC_BARRIER))
             {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-            }
-        }
+                Talk(SAY_PHASE3);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                scheduler.CancelAll();
 
-        void JustDied(Unit* killer) override
-        {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
-
-            me->CastSpell(me, SPELL_REMOVE_TAINTED_CORES, true);
-            events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 10000);
-            events.ScheduleEvent(EVENT_SPELL_STATIC_CHARGE, 15000);
-            events.ScheduleEvent(EVENT_SPELL_ENTANGLE, 20000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            if (summon->GetEntry() == WORLD_TRIGGER)
-                summon->CastSpell(summon, SPELL_MAGIC_BARRIER, false);
-            else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
-            {
-                summon->SetWalk(true);
-                summon->m_Events.AddEvent(new startFollow(summon), summon->m_Events.CalculateTime(0));
-            }
-            else if (summon->GetEntry() == NPC_TOXIC_SPOREBAT)
-                summon->GetMotionMaster()->MoveRandom(30.0f);
-            else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
-                summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!intro && who->GetTypeId() == TYPEID_PLAYER)
-            {
-                intro = true;
-                Talk(SAY_INTRO);
-            }
-
-            BossAI::MoveInLineOfSight(who);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type != POINT_MOTION_TYPE || id != POINT_HOME)
-                return;
-
-            me->SetFacingTo(me->GetHomePosition().GetOrientation());
-            instance->SetData(DATA_ACTIVATE_SHIELD, 0);
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FORKED_LIGHTNING, 3000);
-            events.ScheduleEvent(EVENT_SUMMON_A, 0);
-            events.ScheduleEvent(EVENT_SUMMON_B, 45000);
-            events.ScheduleEvent(EVENT_SUMMON_C, 60000);
-            events.ScheduleEvent(EVENT_SUMMON_D, 50000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SHOCK_BLAST:
-                    me->CastSpell(me->GetVictim(), SPELL_SHOCK_BLAST, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, urand(10000, 20000));
-                    break;
-                case EVENT_SPELL_STATIC_CHARGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f))
-                        me->CastSpell(target, SPELL_STATIC_CHARGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_STATIC_CHARGE, 20000);
-                    break;
-                case EVENT_SPELL_ENTANGLE:
-                    me->CastSpell(me, SPELL_ENTANGLE, false);
-                    events.ScheduleEvent(EVENT_SPELL_ENTANGLE, 30000);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(71))
-                    {
-                        Talk(SAY_PHASE2);
-                        me->SetReactState(REACT_PASSIVE);
-                        me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_SPELL_FORKED_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f))
-                        me->CastSpell(target, SPELL_FORKED_LIGHTNING, false);
-                    events.ScheduleEvent(EVENT_SPELL_FORKED_LIGHTNING, urand(2500, 5000));
-                    break;
-                case EVENT_SUMMON_A:
-                    me->CastSpell(me, SPELL_SUMMON_ENCHANTED_ELEMENTAL, true);
-                    events.ScheduleEvent(EVENT_SUMMON_A, 2500);
-                    break;
-                case EVENT_SUMMON_B:
-                    me->CastSpell(me, SPELL_SUMMON_COILFANG_ELITE, true);
-                    events.ScheduleEvent(EVENT_SUMMON_B, 45000);
-                    break;
-                case EVENT_SUMMON_C:
-                    me->CastSpell(me, SPELL_SUMMON_COILFANG_STRIDER, true);
-                    events.ScheduleEvent(EVENT_SUMMON_C, 60000);
-                    break;
-                case EVENT_SUMMON_D:
-                    me->CastSpell(me, SPELL_SUMMON_TAINTED_ELEMENTAL, true);
-                    events.ScheduleEvent(EVENT_SUMMON_D, 50000);
-                    break;
-                case EVENT_CHECK_HEALTH2:
-                    if (!me->HasAura(SPELL_MAGIC_BARRIER))
-                    {
-                        Talk(SAY_PHASE3);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
-                        events.Reset();
-                        events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 10000);
-                        events.ScheduleEvent(EVENT_SPELL_STATIC_CHARGE, 15000);
-                        events.ScheduleEvent(EVENT_SPELL_ENTANGLE, 20000);
-                        events.ScheduleEvent(EVENT_SUMMON_SPOREBAT, 5000);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-                    break;
-                case EVENT_SUMMON_SPOREBAT:
-                    me->CastSpell(me, SPELL_SUMMON_TOXIC_SPOREBAT, true);
-                    events.ScheduleEvent(EVENT_SUMMON_SPOREBAT, 20000 - 1000 * std::min(count++, 16));
-                    break;
-            }
-
-            if (me->GetReactState() != REACT_AGGRESSIVE || !me->isAttackReady())
-                return;
-
-            if (!me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                me->resetAttackTimer();
-                me->SetSheath(SHEATH_STATE_RANGED);
-                me->CastSpell(me->GetVictim(), roll_chance_i(33) ? SPELL_MULTI_SHOT : SPELL_SHOOT, false);
-                if (roll_chance_i(15))
-                    Talk(SAY_BOWSHOT);
+                ScheduleSpells();
+                scheduler.Schedule(5s, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_SUMMON_TOXIC_SPOREBAT, true);
+                    _batTimer = 20s - static_cast<std::chrono::seconds>(std::min(_count++, 16));
+                    context.Repeat(_batTimer);
+                });
             }
             else
             {
-                me->SetSheath(SHEATH_STATE_MELEE);
-                DoMeleeAttackIfReady();
+                context.Repeat(1s);
             }
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->GetReactState() != REACT_AGGRESSIVE || !me->isAttackReady())
+        {
+            return;
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const override
+        if (!me->IsWithinMeleeRange(me->GetVictim()))
         {
-            return me->GetHomePosition().GetExactDist2d(me) > 80.0f || !SelectTargetFromPlayerList(100.0f);
+            me->resetAttackTimer();
+            me->SetSheath(SHEATH_STATE_RANGED);
+            me->CastSpell(me->GetVictim(), roll_chance_i(33) ? SPELL_MULTI_SHOT : SPELL_SHOOT, false);
+            if (roll_chance_i(15))
+            {
+                Talk(SAY_BOWSHOT);
+            }
         }
-    };
+        else
+        {
+            me->SetSheath(SHEATH_STATE_MELEE);
+            DoMeleeAttackIfReady();
+        }
+    }
+
+    bool CheckEvadeIfOutOfCombatArea() const override
+    {
+        return me->GetHomePosition().GetExactDist2d(me) > 80.0f || !SelectTargetFromPlayerList(100.0f);
+    }
+
+private:
+    bool _recentlySpoken;
+    bool _intro;
+    int32 _count;
+    std::chrono::seconds _batTimer;
 };
+
 /*
 
 //Toxic Sporebat
 //Toxic Spores: Used in Phase 3 by the Spore Bats, it creates a contaminated green patch of ground, dealing about 2775-3225 nature damage every second to anyone who stands in it.
+//deprecated -- adds do work
 class npc_toxic_sporebat : public CreatureScript
 {
 public:
@@ -433,7 +427,9 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
             if (Player* target = GetHitPlayer())
+            {
                 target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
+            }
         }
 
         void Register() override
@@ -488,7 +484,9 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
+            {
                 target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
+            }
         }
 
         void Register() override
@@ -505,7 +503,7 @@ public:
 
 void AddSC_boss_lady_vashj()
 {
-    new boss_lady_vashj();
+    RegisterSerpentShrineAI(boss_lady_vashj);
     new spell_lady_vashj_magic_barrier();
     new spell_lady_vashj_remove_tainted_cores();
     new spell_lady_vashj_summon_sporebat();
