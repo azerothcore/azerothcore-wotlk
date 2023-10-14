@@ -5036,7 +5036,7 @@ class spell_gen_jubling_cooldown : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN, SPELL_JUBLING_COOLDOWN_1_WEEK });
+        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN_1_WEEK });
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
