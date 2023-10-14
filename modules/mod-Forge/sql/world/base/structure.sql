@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS `acore_world`.`forge_talents`;
 DROP TABLE IF EXISTS `acore_world`.`forge_talent_ranks`;
 DROP TABLE IF EXISTS `acore_world`.`forge_talent_tabs`;
 DROP TABLE IF EXISTS `acore_world`.`forge_talent_prereq`;
-DROP TABLE IF EXISTS `acore_world`.`forge_talent_exclusive`;
 DROP TABLE IF EXISTS `acore_world`.`forge_talent_unlearn`;
 DROP TABLE IF EXISTS `acore_world`.`forge_player_spell_scale`; 
 
@@ -45,14 +44,6 @@ CREATE TABLE `acore_world`.`forge_talent_prereq` (
   `reqTalentTabId` INT UNSIGNED NOT NULL,
   `reqRank` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`reqId`, `spellid`, `talentTabId`));
-
-
-CREATE TABLE `acore_world`.`forge_talent_exclusive` (
-  `talentSpellId` MEDIUMINT UNSIGNED NOT NULL,
-  `talentTabId` INT UNSIGNED NOT NULL,
-  `exlusiveSpellId` MEDIUMINT UNSIGNED NOT NULL,
-  PRIMARY KEY (`talentSpellId`, `talentTabId`, `exlusiveSpellId`));
-
 
  CREATE TABLE `acore_world`.`forge_talent_unlearn` (
   `talentTabId` INT UNSIGNED NOT NULL,
