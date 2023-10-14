@@ -1306,7 +1306,7 @@ class spell_frog_kiss : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_FROG_KISS, SPELL_WARTSBGONE_LIP_BALM });
+        return ValidateSpellInfo({ SPELL_WARTSBGONE_LIP_BALM });
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
