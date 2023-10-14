@@ -1734,6 +1734,32 @@ public:
     }
 };
 
+enum InfernalOversoul
+{
+    NPC_INFERNAL_OVERSOUL             = 21735,
+    SPELL_DISRUPT_SUMMONING_RITUAL    = 37285
+};
+
+class spell_disrupt_summoning_ritual : public SpellScript
+{
+public:
+    PrepareSpellScript(spell_disrupt_summoning_ritual);
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* infernal = caster->FindNearestCreature(NPC_INFERNAL_OVERSOUL, 100.0f))
+                if (!infernal->HasAura(SPELL_DISRUPT_SUMMONING_RITUAL))
+                    return SPELL_FAILED_CASTER_AURASTATE;
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_disrupt_summoning_ritual::CheckRequirement);
+    }
+};
+
 void AddSC_shadowmoon_valley()
 {
     // Ours
@@ -1755,4 +1781,5 @@ void AddSC_shadowmoon_valley()
     new npc_torloth_the_magnificent();
     new npc_enraged_spirit();
     new npc_shadowmoon_tuber_node();
+    RegisterSpellScript(spell_disrupt_summoning_ritual);
 }
