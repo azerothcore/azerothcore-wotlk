@@ -5025,7 +5025,6 @@ class spell_gen_valthalak_amulet : public SpellScript
 
 enum Jubling
 {
-    SPELL_JUBLING_COOLDOWN        = 23853,
     SPELL_JUBLING_COOLDOWN_1_WEEK = 23852
 };
 
@@ -5043,7 +5042,7 @@ class spell_gen_jubling_cooldown : public SpellScript
     {
         if (Player* target = GetHitPlayer())
         {
-            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK, false); // 1 week
+            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK); // 1 week
         }
     }
 
