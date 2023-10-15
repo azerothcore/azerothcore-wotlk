@@ -222,7 +222,15 @@ public:
             return false;
         }
 
-        char const* newGuildStr = handler->extractQuotedArg(strtok(nullptr, ""));
+        char* new_args = strtok(nullptr, "");
+        if (!new_args)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char const* newGuildStr = handler->extractQuotedArg(new_args);
         if (!newGuildStr)
         {
             handler->SendSysMessage(LANG_INSERT_GUILD_NAME);
