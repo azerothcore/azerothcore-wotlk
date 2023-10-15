@@ -3269,6 +3269,10 @@ void Map::AddToActive(Creature* c)
         GridCoord p = Acore::ComputeGridCoord(x, y);
         if (getNGrid(p.x_coord, p.y_coord))
             getNGrid(p.x_coord, p.y_coord)->incUnloadActiveLock();
+        //npcbot
+        else if (c->IsNPCBot())
+            EnsureGridLoadedForActiveObject(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())), c);
+        //end npcbot
         else
         {
             GridCoord p2 = Acore::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
@@ -3305,10 +3309,19 @@ void Map::RemoveFromActive(Creature* c)
     if (!c->IsPet() && c->GetSpawnId())
     {
         float x, y, z;
+        //npcbot: prevent crash from accessing deleted creatureData
+        if (c->IsNPCBot())
+            c->GetHomePosition().GetPosition(x, y, z);
+        else
+        //end npcbot
         c->GetRespawnPosition(x, y, z);
         GridCoord p = Acore::ComputeGridCoord(x, y);
         if (getNGrid(p.x_coord, p.y_coord))
             getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
+        //npcbot
+        else if (c->IsNPCBot())
+            EnsureGridLoaded(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())));
+        //end npcbot
         else
         {
             GridCoord p2 = Acore::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
