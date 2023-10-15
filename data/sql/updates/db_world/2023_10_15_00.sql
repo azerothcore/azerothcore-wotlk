@@ -1,3 +1,4 @@
+-- DB update 2023_10_12_04 -> 2023_10_15_00
 -- Paelarin
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 7311) AND (`TextID` IN (8679));
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
