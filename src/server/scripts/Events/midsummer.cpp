@@ -180,7 +180,7 @@ class spell_gen_crab_disguise : public AuraScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
+        return ValidateSpellInfo({ SPELL_APPLY_DIGUISE, SPELL_FADE_DIGUISE });
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -211,6 +211,10 @@ class spell_gen_crab_disguise : public AuraScript
 enum RibbonPole
 {
     SPELL_RIBBON_POLE_CHANNEL_VISUAL    = 29172,
+    SPELL_RIBBON_POLE_CHANNEL_VISUAL_2  = 29531,
+    SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE = 29705,
+    SPELL_TEST_RIBBON_POLE_CHANNEL_RED  = 29726,
+    SPELL_TEST_RIBBON_POLE_CHANNEL_PINK = 29727,
     SPELL_RIBBON_POLE_XP                = 29175,
     SPELL_RIBBON_POLE_FIREWORKS         = 46971,
 
@@ -221,6 +225,17 @@ class spell_midsummer_ribbon_pole : public AuraScript
 {
     PrepareAuraScript(spell_midsummer_ribbon_pole)
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_RIBBON_POLE_XP,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_RED,
+                SPELL_TEST_RIBBON_POLE_CHANNEL_PINK
+            });
+    }
+
     void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
@@ -229,7 +244,9 @@ class spell_midsummer_ribbon_pole : public AuraScript
             Creature* cr = target->FindNearestCreature(NPC_RIBBON_POLE_DEBUG_TARGET, 10.0f);
             if (!cr)
             {
-                target->RemoveAura(SPELL_RIBBON_POLE_CHANNEL_VISUAL);
+                target->RemoveAura(SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE);
+                target->RemoveAura(SPELL_TEST_RIBBON_POLE_CHANNEL_RED);
+                target->RemoveAura(SPELL_TEST_RIBBON_POLE_CHANNEL_PINK);
                 SetDuration(1);
                 return;
             }
@@ -254,7 +271,19 @@ class spell_midsummer_ribbon_pole : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* ar = GetTarget();
-        ar->CastSpell(ar, SPELL_RIBBON_POLE_CHANNEL_VISUAL, true);
+        switch (urand(0, 2))
+        {
+            case 0:
+                ar->CastSpell(ar, SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE, true);
+                break;
+            case 1:
+                ar->CastSpell(ar, SPELL_TEST_RIBBON_POLE_CHANNEL_RED, true);
+                break;
+            case 2:
+            default:
+                ar->CastSpell(ar, SPELL_TEST_RIBBON_POLE_CHANNEL_PINK, true);
+                break;
+        }
     }
 
     void Register() override
@@ -352,6 +381,19 @@ enum flingTorch
 class spell_midsummer_fling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_fling_torch);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FLING_TORCH,
+                SPELL_TORCH_SHADOW,
+                SPELL_MISSED_TORCH,
+                SPELL_TORCH_CATCH_SUCCESS_A,
+                SPELL_TORCH_CATCH_SUCCESS_H,
+                SPELL_TORCH_COUNTER
+            });
+    }
 
     bool handled;
     bool Load() override { handled = false; return true; }
@@ -482,6 +524,21 @@ enum eJuggle
 class spell_midsummer_juggling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_juggling_torch);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_JUGGLE_SELF,
+                SPELL_JUGGLE_SLOW,
+                SPELL_JUGGLE_MED,
+                SPELL_JUGGLE_FAST,
+                SPELL_TORCH_SHADOW_SELF,
+                SPELL_TORCH_SHADOW_SLOW,
+                SPELL_TORCH_SHADOW_MED,
+                SPELL_TORCH_SHADOW_FAST
+            });
+    }
 
     void HandleFinish()
     {

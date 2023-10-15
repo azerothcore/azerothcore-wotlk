@@ -3883,6 +3883,64 @@ class spell_item_worn_troll_dice : public SpellScript
     }
 };
 
+enum VenomhideHatchling
+{
+    NPC_VENOMHIDE_HATCHLING = 34320
+};
+
+class spell_item_venomhide_feed : public SpellScript
+{
+    PrepareSpellScript(spell_item_venomhide_feed)
+
+    SpellCastResult CheckCast()
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            std::list<Creature*> hatchling;
+            player->GetAllMinionsByEntry(hatchling, NPC_VENOMHIDE_HATCHLING);
+            if (!hatchling.empty())
+            {
+                return SPELL_CAST_OK;
+            }
+        }
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void UpdateTarget(WorldObject*& target)
+    {
+        if (!target)
+        {
+            return;
+        }
+
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            std::list<Creature*> hatchling;
+            player->GetAllMinionsByEntry(hatchling, NPC_VENOMHIDE_HATCHLING);
+            if (hatchling.empty())
+            {
+                return;
+            }
+
+            for (Creature* creature : hatchling)
+            {
+                if (creature)
+                {
+                    target = creature;
+                    return;
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_venomhide_feed::CheckCast);
+        OnObjectTargetSelect  += SpellObjectTargetSelectFn(spell_item_venomhide_feed::UpdateTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4003,4 +4061,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_green_whelp_armor);
     RegisterSpellScript(spell_item_elixir_of_shadows);
     RegisterSpellScript(spell_item_worn_troll_dice);
+    RegisterSpellScript(spell_item_venomhide_feed);
 }

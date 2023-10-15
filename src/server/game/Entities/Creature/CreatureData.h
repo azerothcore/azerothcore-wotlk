@@ -312,7 +312,7 @@ struct CreatureBaseStats
 {
     uint32 BaseHealth[MAX_EXPANSIONS];
     uint32 BaseMana;
-    uint32 BaseArmor;
+    float  BaseArmor;
     uint32 AttackPower;
     uint32 RangedAttackPower;
     float BaseDamage[MAX_EXPANSIONS];
@@ -333,9 +333,9 @@ struct CreatureBaseStats
         return uint32(std::ceil(BaseMana * info->ModMana));
     }
 
-    uint32 GenerateArmor(CreatureTemplate const* info) const
+    float GenerateArmor(CreatureTemplate const* info) const
     {
-        return uint32(std::ceil(BaseArmor * info->ModArmor));
+        return std::ceil(BaseArmor * info->ModArmor);
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const

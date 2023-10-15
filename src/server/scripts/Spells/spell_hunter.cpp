@@ -1324,9 +1324,11 @@ class spell_hun_bestial_wrath : public SpellScript
     }
 };
 
-class spell_hun_furious_howl : public SpellScript
+// -24604 - Furious Howl
+// 53434 - Call of the Wild
+class spell_hun_target_self_and_pet : public SpellScript
 {
-    PrepareSpellScript(spell_hun_furious_howl);
+    PrepareSpellScript(spell_hun_target_self_and_pet);
 
     bool Load() override
     {
@@ -1343,7 +1345,7 @@ class spell_hun_furious_howl : public SpellScript
 
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_furious_howl::FilterTargets, EFFECT_ALL, TARGET_UNIT_CASTER_AREA_PARTY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_target_self_and_pet::FilterTargets, EFFECT_ALL, TARGET_UNIT_CASTER_AREA_PARTY);
     }
 };
 
@@ -1377,5 +1379,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
     RegisterSpellScript(spell_hun_bestial_wrath);
-    RegisterSpellScript(spell_hun_furious_howl);
+    RegisterSpellScript(spell_hun_target_self_and_pet);
 }

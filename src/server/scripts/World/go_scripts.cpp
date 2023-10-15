@@ -15,34 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ContentData
-go_cat_figurine (the "trap" version of GO, two different exist)
-go_barov_journal
-go_ethereum_prison
-go_ethereum_stasis
-go_sacred_fire_of_life
-go_shrine_of_the_birds
-go_southfury_moonstone
-go_resonite_cask
-go_tablet_of_the_seven
-go_tele_to_dalaran_crystal
-go_tele_to_violet_stand
-go_scourge_cage
-go_jotunheim_cage
-go_table_theka
-go_soulwell
-go_bashir_crystalforge
-go_soulwell
-go_dragonflayer_cage
-go_tadpole_cage
-go_amberpine_outhouse
-go_hive_pod
-go_veil_skith_cage
-EndContentData */
-
 #include "CellImpl.h"
 #include "GameObjectAI.h"
-#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -1386,41 +1360,6 @@ public:
 };
 
 /*######
-## go_inconspicuous_landmark
-######*/
-
-enum InconspicuousLandmark
-{
-    SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB    = 11462,
-    ITEM_CUERGOS_KEY                                 = 9275,
-};
-
-class go_inconspicuous_landmark : public GameObjectScript
-{
-public:
-    go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
-    {
-        _lastUsedTime = GameTime::GetGameTime().count();
-    }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (player->HasItemCount(ITEM_CUERGOS_KEY))
-            return true;
-
-        if (_lastUsedTime > GameTime::GetGameTime().count())
-            return true;
-
-        _lastUsedTime = GameTime::GetGameTime().count() + MINUTE;
-        player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
-        return true;
-    }
-
-private:
-    uint32 _lastUsedTime;
-};
-
-/*######
 ## go_soulwell
 ######*/
 
@@ -1989,7 +1928,6 @@ void AddSC_go_scripts()
     new go_arcane_prison();
     new go_jotunheim_cage();
     new go_table_theka();
-    new go_inconspicuous_landmark();
     new go_soulwell();
     new go_dragonflayer_cage();
     new go_amberpine_outhouse();
