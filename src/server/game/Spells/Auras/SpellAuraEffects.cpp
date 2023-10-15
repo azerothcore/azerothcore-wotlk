@@ -634,10 +634,6 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     if (m_amplitude <= 0)
         m_amplitude = 1000;
 
-    float dmgRatio;
-    m_tickCount = GetTotalTicks(dmgRatio);
-    m_dmgRatio = 1 + dmgRatio;
-
     Player* modOwner = caster ? caster->GetSpellModOwner() : nullptr;
 
     // Apply casting time mods
@@ -653,6 +649,10 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
                 m_amplitude = int32(m_amplitude * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
         }
     }
+
+    float dmgRatio;
+    m_tickCount = GetTotalTicks(dmgRatio);
+    m_dmgRatio = 1 + dmgRatio;
 
     if (load) // aura loaded from db
     {
