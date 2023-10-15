@@ -3271,7 +3271,7 @@ void Map::AddToActive(Creature* c)
             getNGrid(p.x_coord, p.y_coord)->incUnloadActiveLock();
         //npcbot
         else if (c->IsNPCBot())
-            EnsureGridLoadedForActiveObject(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())), c);
+            EnsureGridLoadedForActiveObject(Cell(Acore::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())), c);
         //end npcbot
         else
         {
@@ -3320,7 +3320,7 @@ void Map::RemoveFromActive(Creature* c)
             getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
         //npcbot
         else if (c->IsNPCBot())
-            EnsureGridLoaded(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())));
+            EnsureGridLoaded(Cell(Acore::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())));
         //end npcbot
         else
         {
