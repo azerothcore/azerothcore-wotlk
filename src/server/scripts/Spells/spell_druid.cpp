@@ -558,7 +558,6 @@ class spell_dru_innervate : public AuraScript
 
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        float f;
 
         if (Unit* caster = GetCaster())
             amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks());

@@ -31,6 +31,13 @@ enum CharacterPointType
     PET_TALENT = 8
 };
 
+enum NodeType
+{
+    AURA = 0,
+    SPELL = 1,
+    CHOICE = 2
+};
+
 enum ForgeSettingIndex
 {
     FORGE_SETTING_SPEC_SLOTS = 0
@@ -147,12 +154,19 @@ struct ForgeCharacterSpec
     uint8 ArchetypalRole;
     // TabId, Spellid
     std::unordered_map<uint32, std::unordered_map<uint32, ForgeCharacterTalent*>> Talents;
+    std::unordered_map<uint32 /*node id*/, uint32/*spell picked*/> ChoiceNodesChosen;
     // tabId
     std::unordered_map<uint32, uint8> PointsSpent;
     std::unordered_map<CharacterPerkType, std::unordered_map<uint32, CharacterSpecPerk*>> perks;
     std::unordered_map<uint32, Perk*> groupPerks;
     std::unordered_map<CharacterPerkType, std::vector<CharacterSpecPerk*>> prestigePerks;
     std::unordered_map<CharacterPerkType, std::unordered_map<std::string, std::vector<CharacterSpecPerk*>>> perkQueue;
+};
+
+struct ForgeTalentChoice
+{
+    uint32 spellId;
+    bool active;
 };
 
 struct ForgeTalent
@@ -165,10 +179,11 @@ struct ForgeTalent
     uint16 TabPointReq;
     uint8 RequiredLevel;
     CharacterPointType TalentType;
+    NodeType nodeType;
     uint8 NumberOfRanks;
     PereqReqirementType PreReqType;
     std::list<ForgeTalentPrereq*> Prereqs;
-    std::list<uint32> ExclusiveWith;
+    std::list<ForgeTalentChoice*> Choices;
     std::list<uint32> UnlearnSpells;
     // rank number, spellId
     std::unordered_map<uint32, uint32> Ranks;
@@ -1279,6 +1294,9 @@ public:
     // tabId
     std::unordered_map<uint32, ForgeTalentTab*> TalentTabs;
 
+    // choiceNodeId is the id of the node in forge_talents
+    std::unordered_map<uint32 /*nodeid*/, std::vector<uint32/*choice spell id*/>> _choiceNodes;
+    
 private:
     std::unordered_map<ObjectGuid, uint32> CharacterActiveSpecs;
     std::unordered_map<std::string, uint32> CONFIG;
@@ -1349,7 +1367,7 @@ private:
         AddTalentTrees();
         AddTalentsToTrees();
         AddTalentPrereqs();
-        AddTalentExclusiveness();
+        AddTalentChoiceNodes();
         AddTalentRanks();
         AddTalentUnlearn();
         AddCharacterSpecs();
@@ -1360,6 +1378,8 @@ private:
         AddTalentSpent();
         LOG_INFO("server.load", "Loading character talents...");
         AddCharacterTalents();
+        AddCharacterChoiceNodes();
+
         LOG_INFO("server.load", "Loading characters points...");
         AddCharacterPointsFromDB();
         LOG_INFO("server.load", "Loading characters class specs...");
@@ -1780,6 +1800,7 @@ private:
             newTalent->NumberOfRanks = talentFields[7].Get<uint8>();
             newTalent->PreReqType = (PereqReqirementType)talentFields[8].Get<uint8>();
             newTalent->TabPointReq = talentFields[9].Get<uint16>();
+            newTalent->nodeType = NodeType(talentFields[10].Get<uint8>());
 
             auto tabItt = TalentTabs.find(newTalent->TalentTabId);
 
@@ -1823,9 +1844,11 @@ private:
         } while (preReqTalents->NextRow());
     }
 
-    void AddTalentExclusiveness()
+    void AddTalentChoiceNodes()
     {
-        QueryResult exclTalents = WorldDatabase.Query("SELECT * FROM forge_talent_exclusive");
+        QueryResult exclTalents = WorldDatabase.Query("SELECT * FROM forge_talent_choice_nodes");
+
+        _choiceNodes.clear();
 
         if (!exclTalents)
             return;
@@ -1833,18 +1856,24 @@ private:
         do
         {
             Field* talentFields = exclTalents->Fetch();
-            uint32 spellId = talentFields[0].Get<uint32>();
+            uint32 choiceNodeId = talentFields[0].Get<uint32>();
             uint32 talentTabId = talentFields[1].Get<uint32>();
-            uint32 exclusiveSpellId = talentFields[2].Get<uint32>();
+            uint32 spellChoice = talentFields[2].Get<uint32>();
 
-            ForgeTalent* lt = TalentTabs[talentTabId]->Talents[spellId];
+            ForgeTalentChoice* choice = new ForgeTalentChoice();
+            choice->active = false;
+            choice->spellId = spellChoice;
+
+            _choiceNodes[choiceNodeId].push_back(spellChoice);
+
+            ForgeTalent* lt = TalentTabs[talentTabId]->Talents[choiceNodeId];
             if (lt != nullptr)
             {
-                lt->ExclusiveWith.push_back(exclusiveSpellId);
+                lt->Choices.push_back(choice);
             }
             else
             {
-                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentExclusiveness, invalid exclusiveSpellId id: " + std::to_string(exclusiveSpellId));
+                LOG_ERROR("FORGE.ForgeCache", "Error loading AddTalentChoiceNodes, invaild choiceNodeId id: " + std::to_string(choiceNodeId));
             }
 
         } while (exclTalents->NextRow());
@@ -2100,6 +2129,31 @@ private:
             ForgeCharacterSpec* spec = CharacterSpecs[characterGuid][specId];
             spec->prestigePerks[CharacterPerkType(type)].push_back(perk);
         } while (prestigeQuery->NextRow());
+    }
+
+    void AddCharacterChoiceNodes() {
+        QueryResult choiceQuery = CharacterDatabase.Query("SELECT * FROM forge_character_node_choices");
+
+        if (!choiceQuery)
+            return;
+
+        do
+        {
+            Field* fields = choiceQuery->Fetch();
+            uint32 id = fields[0].Get<uint32>();
+            ObjectGuid characterGuid = ObjectGuid::Create<HighGuid::Player>(id);
+            uint32 specId = fields[1].Get<uint32>();
+            uint32 TabId = fields[2].Get<uint32>();
+            uint32 nodeId = fields[3].Get<uint8>();
+            uint32 chosenSpell = fields[4].Get<uint32>();
+
+            ForgeTalent* ft = TalentTabs[TabId]->Talents[nodeId];
+            if (ft->nodeType == NodeType::CHOICE) {
+                ForgeCharacterSpec* spec = CharacterSpecs[characterGuid][specId];
+                spec->ChoiceNodesChosen[nodeId] = chosenSpell;
+            }
+
+        } while (choiceQuery->NextRow());
     }
 
     void AddCharacterPointsFromDB()
