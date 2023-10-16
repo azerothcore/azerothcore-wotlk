@@ -93,7 +93,7 @@ struct boss_fathomlord_karathress : public BossAI
 
         ScheduleHealthCheckEvent(75, [&]{
             instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
-                fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);       
+                fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
             });
             if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
             {
