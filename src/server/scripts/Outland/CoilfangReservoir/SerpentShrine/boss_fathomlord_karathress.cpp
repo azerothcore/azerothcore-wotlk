@@ -96,7 +96,7 @@ struct boss_fathomlord_karathress : public BossAI
                 if (fathomguard->IsAlive())
                 {
                     fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
-                }    
+                }
             });
             if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
             {
