@@ -289,8 +289,22 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_NEAR_GAMEOBJECT:
     {
-        condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
-        break;
+        if (!ConditionValue3)
+        {
+            condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
+            break;
+        }
+        else
+        {
+            if (GameObject* go = GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)))
+            {
+                if ((go->GetGoState() == GO_STATE_READY && ConditionValue3 == 1) || (go->GetGoState() != GO_STATE_READY && ConditionValue3 == 2))
+                    condMeets = true;
+                else
+                    condMeets = false;
+            }
+            break;
+        }
     }
     case CONDITION_OBJECT_ENTRY_GUID:
     {
