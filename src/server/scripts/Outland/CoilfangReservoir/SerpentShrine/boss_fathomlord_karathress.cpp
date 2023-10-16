@@ -93,7 +93,10 @@ struct boss_fathomlord_karathress : public BossAI
 
         ScheduleHealthCheckEvent(75, [&]{
             instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
-                fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
+                if (fathomguard->IsAlive())
+                {
+                    fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
+                }    
             });
             if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
             {
@@ -224,7 +227,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            karathress->Attack(who, true);
+            karathress->Attack(who, false);
         }
         _scheduler.Schedule(2500ms, [this](TaskContext context)
         {
@@ -412,7 +415,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            karathress->Attack(who, true);
+            karathress->Attack(who, false);
         }
         _scheduler.Schedule(10900ms, [this](TaskContext context)
         {
@@ -489,7 +492,7 @@ struct boss_fathomguard_caribdis : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            karathress->Attack(who, true);
+            karathress->Attack(who, false);
         }
         _scheduler.Schedule(27900ms, [this](TaskContext context)
         {
