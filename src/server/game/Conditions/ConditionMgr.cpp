@@ -2138,8 +2138,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "NearGameObject condition has non existing gameobject template entry ({}), skipped", cond->ConditionValue1);
             return false;
         }
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "NearGameObject condition has useless data in value3 ({})!", cond->ConditionValue3);
+        if (cond->ConditionValue3 > 2)
+            LOG_ERROR("sql.sql", "NearGameObject condition for gameobject ID ({}) has data over 2 for value3 ({})!", cond->ConditionValue1, cond->ConditionValue3);
         break;
     }
     case CONDITION_OBJECT_ENTRY_GUID:
