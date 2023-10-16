@@ -5035,7 +5035,7 @@ class spell_gen_planting_scourge_banner : public SpellScript
     SpellCastResult CheckCast()
     {
         if (GameObject* tent = GetCaster()->FindNearestGameObject(GO_COMMAND_TENT, 20.0f))
-            if (tent->GetGoState() == GO_NOT_READY) // If tent is burned down
+            if (tent->GetGoState() != GO_STATE_READY) // If tent is burned down
                 return SPELL_CAST_OK;
 
         return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
