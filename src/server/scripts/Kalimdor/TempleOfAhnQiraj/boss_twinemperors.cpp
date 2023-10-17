@@ -25,7 +25,6 @@
 enum Spells
 {
     // Both
-    SPELL_TWIN_EMPATHY            = 1177,
     SPELL_TWIN_TELEPORT_1         = 800,
     SPELL_TWIN_TELEPORT_VISUAL    = 26638,
     SPELL_HEAL_BROTHER            = 7393,
@@ -114,7 +113,7 @@ struct boss_twinemperorsAI : public BossAI
             {
                 float dmgPct = damage / (float)me->GetMaxHealth();
                 int32 actualDmg = dmgPct * twin->GetMaxHealth();
-                twin->CastCustomSpell(twin, SPELL_TWIN_EMPATHY, &actualDmg, nullptr, nullptr, true);
+                twin->SetHealth(twin->GetHealth() - actualDmg);
             }
         }
     }
