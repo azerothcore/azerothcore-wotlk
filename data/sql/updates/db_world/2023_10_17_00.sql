@@ -1,3 +1,4 @@
+-- DB update 2023_10_16_04 -> 2023_10_17_00
 -- Move Mindless Skeletons (11197) created by Baron Rivendare (10440)
 -- to more accurate locations based on sniffed data.
 DELETE FROM `spell_target_position` WHERE `ID`=17475 AND `EffectIndex`=0;
