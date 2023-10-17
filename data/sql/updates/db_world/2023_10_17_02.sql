@@ -1,3 +1,4 @@
+-- DB update 2023_10_17_01 -> 2023_10_17_02
 -- Midsummer Celebrants - Applause/Cheer
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 16781;
 
