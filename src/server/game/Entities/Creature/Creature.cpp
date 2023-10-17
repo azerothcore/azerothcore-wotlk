@@ -3708,6 +3708,24 @@ uint32 Creature::GetPlayerDamageReq() const
     return _playerDamageReq;
 }
 
+bool Creature::CanCastSpell(uint32 spellID) const
+{
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+    int32 currentPower = GetPower(getPowerType());
+
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsSpellProhibited(spellInfo->GetSchoolMask()))
+    {
+        return false;
+    }
+
+    if (spellInfo && (currentPower < spellInfo->CalcPowerCost(this, spellInfo->GetSchoolMask())))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 std::string Creature::GetDebugInfo() const
 {
     std::stringstream sstr;

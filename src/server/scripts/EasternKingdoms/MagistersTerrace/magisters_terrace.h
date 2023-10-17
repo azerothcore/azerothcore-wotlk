@@ -28,13 +28,14 @@
 
 enum MTData
 {
-    DATA_SELIN_EVENT            = 0,
-    DATA_VEXALLUS_EVENT         = 1,
-    DATA_DELRISSA_EVENT         = 2,
-    DATA_KAELTHAS_EVENT         = 3,
+    DATA_SELIN_FIREHEART        = 0,
+    DATA_VEXALLUS               = 1,
+    DATA_DELRISSA               = 2,
+    DATA_KAELTHAS               = 3,
     MAX_ENCOUNTER               = 4,
 
-    DATA_KALECGOS               = 5
+    DATA_KALECGOS               = 5,
+    DATA_ESCAPE_ORB             = 6
 };
 
 enum MTCreatures

@@ -366,6 +366,9 @@ public:
                 return;
             }
 
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_ALGALON, FAIL);
+
             ScriptedAI::EnterEvadeMode(why);
         }
 

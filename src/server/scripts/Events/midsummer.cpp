@@ -253,6 +253,39 @@ class spell_midsummer_ribbon_pole : public AuraScript
     }
 };
 
+class spell_midsummer_ribbon_pole_visual : public SpellScript
+{
+    PrepareSpellScript(spell_midsummer_ribbon_pole_visual)
+
+    void UpdateTarget(WorldObject*& target)
+    {
+        if (!target)
+            return;
+
+        // find NPC at ribbon pole top as target
+        // trap 181604 also spawns NPCs at pole bottom - ignore those
+        std::list<Creature*> crList;
+        target->GetCreaturesWithEntryInRange(crList, 30.0f, NPC_RIBBON_POLE_DEBUG_TARGET);
+        if (crList.empty())
+            return;
+
+        for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr)
+        {
+            // NPC on ribbon pole top is no tempsummon
+            if (!(*itr)->ToTempSummon())
+            {
+                target = *itr;
+                return;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_midsummer_ribbon_pole_visual::UpdateTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+    }
+};
+
 class spell_midsummer_torch_quest : public AuraScript
 {
     PrepareAuraScript(spell_midsummer_torch_quest)
@@ -296,6 +329,7 @@ enum flingTorch
     SPELL_FLING_TORCH_DUMMY         = 46747,
     SPELL_MISSED_TORCH              = 45676,
     SPELL_TORCH_COUNTER             = 45693,
+    SPELL_TORCH_SHADOW              = 46105
 };
 
 class spell_midsummer_fling_torch : public SpellScript
@@ -339,7 +373,10 @@ class spell_midsummer_fling_torch : public SpellScript
 
         // we have any pos
         if (pos.GetPositionX())
+        {
             caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
+            caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_TORCH_SHADOW, true);
+        }
     }
 
     void HandleFinish()
@@ -417,15 +454,18 @@ enum eJuggle
     SPELL_TORCH_CHECK           = 45644,
     SPELL_GIVE_TORCH            = 45280,
     QUEST_TORCH_CATCHING_A      = 11657,
-    QUEST_TORCH_CATCHING_H      = 11923
+    QUEST_TORCH_CATCHING_H      = 11923,
+
+    SPELL_TORCH_SHADOW_SELF     = 46121,
+    SPELL_TORCH_SHADOW_SLOW     = 46120,
+    SPELL_TORCH_SHADOW_MED      = 46118,
+    SPELL_TORCH_SHADOW_FAST     = 46117
 };
 
 class spell_midsummer_juggling_torch : public SpellScript
 {
     PrepareSpellScript(spell_midsummer_juggling_torch);
 
-    bool handled;
-    bool Load() override { handled = false; return true; }
     void HandleFinish()
     {
         Unit* caster = GetCaster();
@@ -435,39 +475,36 @@ class spell_midsummer_juggling_torch : public SpellScript
         if (const WorldLocation* loc = GetExplTargetDest())
         {
             if (loc->GetExactDist(caster) < 3.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SELF, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_SELF, true);
+            }
             else if (loc->GetExactDist(caster) < 10.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SLOW, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_SLOW, true);
+            }
             else if (loc->GetExactDist(caster) < 25.0f)
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_MED, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_MED, true);
+            }
             else
+            {
                 caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_FAST, true);
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_TORCH_SHADOW_FAST, true);
+            }
         }
         else
+        {
             caster->CastSpell(caster, SPELL_JUGGLE_SELF, true);
-    }
-
-    void HandleDummy(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        Unit* caster = GetCaster();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-            return;
-
-        if (Player* target = GetHitPlayer())
-            if (!handled && target->GetQuestRewardStatus(target->GetTeamId() == TEAM_ALLIANCE ? 11657 : 11923))
-            {
-                handled = true;
-                caster->CastSpell(target, SPELL_GIVE_TORCH, true);
-            }
+            caster->CastSpell(caster, SPELL_TORCH_SHADOW_SELF, true);
+        }
     }
 
     void Register() override
     {
-        if (m_scriptSpellId == SPELL_TORCH_CHECK)
-            OnEffectHitTarget += SpellEffectFn(spell_midsummer_juggling_torch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        else
-            AfterCast += SpellCastFn(spell_midsummer_juggling_torch::HandleFinish);
+        AfterCast += SpellCastFn(spell_midsummer_juggling_torch::HandleFinish);
     }
 };
 
@@ -510,6 +547,7 @@ void AddSC_event_midsummer_scripts()
     // Spells
     RegisterSpellScript(spell_gen_crab_disguise);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
+    RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
     RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
