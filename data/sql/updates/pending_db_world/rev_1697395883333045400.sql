@@ -1,5 +1,5 @@
 -- Use sniffed values for Midsummer Music Doodad spawns
-DELETE FROM `gameobject` WHERE `guid` IN (50573, 50571, 50557, 50556, 50555, 50554, 50553, 50552);
+DELETE FROM `gameobject` WHERE `id` = 188174 AND `guid` IN (50573, 50571, 50557, 50556, 50555, 50554, 50553, 50552);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES 
 (50573, 188174, 0, 0, 0, 1, 1, -4695.85888671875, -1218.7857666015625, 501.659393310546875, 5.93412017822265625, 0, 0, -0.17364788055419921, 0.984807789325714111, 120, 255, 1, 50063),
 (50571, 188174, 0, 0, 0, 1, 1, 1817.0294189453125, 223.62457275390625, 59.57859420776367187, 3.089183330535888671, 0, 0, 0.99965667724609375, 0.026201646775007247, 120, 255, 1, 50063),
