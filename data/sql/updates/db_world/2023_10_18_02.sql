@@ -1,3 +1,4 @@
+-- DB update 2023_10_18_01 -> 2023_10_18_02
 -- Strange Engine Part
 DELETE FROM `gameobject_loot_template` WHERE `Entry` = 19605 AND `Item` = 34469;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
