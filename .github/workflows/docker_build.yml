@@ -100,7 +100,7 @@ jobs:
       # If you're wanting containers without mod-eluna, the best solution is to
       # build them locally (such as with `docker compose build`)
       - name: Download Eluna
-        if: github.repository == "azerothcore/azerothcore-wotlk" && github.ref_name == 'master'
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         uses: actions/checkout@v4
         with:
           repository: azerothcore/mod-eluna
