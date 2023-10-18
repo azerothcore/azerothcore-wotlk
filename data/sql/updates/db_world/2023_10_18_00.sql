@@ -1,3 +1,4 @@
+-- DB update 2023_10_17_07 -> 2023_10_18_00
 -- midsummer creatureAI npc_midsummer_ribbon_pole_target
 UPDATE `creature_template` SET `ScriptName` = 'npc_midsummer_ribbon_pole_target' WHERE `entry` = 17066;
 
