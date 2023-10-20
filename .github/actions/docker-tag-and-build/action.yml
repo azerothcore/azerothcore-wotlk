@@ -32,6 +32,7 @@ runs:
         file: apps/docker/Dockerfile
         push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
+        target:  ${{ inputs.component-name }}
         build-args: |
           USER_ID=1000
           GROUP_ID=1000
