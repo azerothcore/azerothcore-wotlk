@@ -2267,8 +2267,6 @@ void World::Update(uint32 diff)
     // Record update if recording set in log and diff is greater then minimum set in log
     sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, GetActiveSessionCount());
 
-    DynamicVisibilityMgr::Update(GetActiveSessionCount());
-
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
     {

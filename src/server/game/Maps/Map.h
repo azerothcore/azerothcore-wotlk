@@ -346,11 +346,17 @@ public:
     virtual void InitVisibilityDistance();
 
     void PlayerRelocation(Player*, float x, float y, float z, float o);
-    void CreatureRelocation(Creature* creature, float x, float y, float z, float o);
-    void GameObjectRelocation(GameObject* go, float x, float y, float z, float o);
+    void CreatureRelocation(Creature* creature, float x, float y, float z, float o, bool respawnRelocationOnFail = true);
+    void GameObjectRelocation(GameObject* go, float x, float y, float z, float o, bool respawnRelocationOnFail = true);
     void DynamicObjectRelocation(DynamicObject* go, float x, float y, float z, float o);
 
     template<class T, class CONTAINER> void Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
+
+    [[nodiscard]] bool IsActiveGrid(float x, float y) const
+    {
+        GridCoord p = Acore::ComputeGridCoord(x, y);
+        return !getNGrid(p.x_coord, p.y_coord) || getNGrid(p.x_coord, p.y_coord)->GetGridState() == GRID_STATE_ACTIVE;
+    }
 
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
@@ -702,9 +708,6 @@ private:
     }
 
     bool EnsureGridLoaded(Cell const&);
-    [[nodiscard]] bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
-    void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
-
     void setNGrid(NGridType* grid, uint32 x, uint32 y);
     void ScriptsProcess();
 
@@ -898,11 +901,12 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     const uint32 cell_x = cell.CellX();
     const uint32 cell_y = cell.CellY();
 
-    if (!cell.NoCreate() || IsGridLoaded(GridCoord(x, y)))
-    {
+    if (!cell.NoCreate())
         EnsureGridLoaded(cell);
-        getNGrid(x, y)->VisitGrid(cell_x, cell_y, visitor);
-    }
+
+    NGridType* grid = getNGrid(x, y);
+    if (grid && grid->isGridObjectDataLoaded())
+        grid->VisitGrid(cell_x, cell_y, visitor);
 }
 
 #endif

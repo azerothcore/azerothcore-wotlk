@@ -4787,7 +4787,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
     WorldPacket data(SMSG_CLEAR_TARGET, 8);
     data << m_caster->GetGUID();
 
-    float dist = m_caster->GetVisibilityRange() + VISIBILITY_COMPENSATION;
+    float dist = m_caster->GetVisibilityRange();
     Acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
     Cell::VisitWorldObjects(m_caster, notifier, dist);
 

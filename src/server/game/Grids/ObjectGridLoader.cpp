@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
+#include "GameTime.h"
 
 void ObjectGridEvacuator::Visit(CreatureMapType& m)
 {
@@ -123,8 +124,13 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<Creatur
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
-        Creature* obj = new Creature();
+        // Don't spawn at all if there's a respawn timer
         ObjectGuid::LowType guid = *i_guid;
+        time_t now = GameTime::GetGameTime().count();
+        if (map->GetCreatureRespawnTime(guid) > now)
+            continue;
+
+        Creature* obj = new Creature();
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -150,7 +156,12 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<GameObj
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
+        // Don't spawn at all if there's a respawn timer
         ObjectGuid::LowType guid = *i_guid;
+        time_t now = GameTime::GetGameTime().count();
+        if (map->GetGORespawnTime(guid) > now)
+            continue;
+
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
 

@@ -569,16 +569,12 @@ public:
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
     [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
+    void SetFarVisible(bool on);
     [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
     void SetWorldObject(bool apply);
     [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
     [[nodiscard]] bool IsWorldObject() const;
-
-    [[nodiscard]] bool IsInWintergrasp() const
-    {
-        return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
-    }
 
 #ifdef MAP_BASED_RAND_GEN
     int32 irand(int32 min, int32 max) const     { return int32 (GetMap()->mtRand.randInt(max - min)) + min; }
