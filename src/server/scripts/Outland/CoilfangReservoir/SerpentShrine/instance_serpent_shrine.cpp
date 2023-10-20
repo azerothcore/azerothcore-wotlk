@@ -138,7 +138,10 @@ public:
                     if (Creature* vashj = instance->GetCreature(LadyVashjGUID))
                         vashj->AI()->JustSummoned(creature);
                     break;
+                default:
+                    break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override

@@ -1,27 +1,41 @@
-# Run AzerothCore with Docker
+# Docker
 
-*This readme it's a summary of the AzerothCore docker features.*
+Full documentation is [on our wiki](https://www.azerothcore.org/wiki/install-with-docker#installation)
 
-Docker. is a software that performs operating-system-level virtualization, allowing to wrap and launch applications inside containers.
+## Building
 
-Thanks to Docker, you can quickly setup and run AzerothCore in any operating system.
+### Prerequisites
 
-The **only** requirement is having [Docker](https://docs.docker.com/install/) installed into your system. Forget about installing mysql, visual studio, cmake, etc...
+Ensure that you have docker, docker compose (v2), and the docker buildx command
+installed.
 
-### Installation instructions
+It's all bundled with [Docker Desktop](https://docs.docker.com/get-docker/),
+though if you're using Linux you can install them through your distribution's
+package manage or by using the [documentation from docker](https://docs.docker.com/engine/install/)
 
-Check the [Install with Docker](https://www.azerothcore.org/wiki/Install-with-Docker) guide.
+### Running the Build
 
-### Memory usage
+1. Build containers with command
 
-The total amount of RAM when running all AzerothCore docker containers is **less than 2 GB**.
+```console
+$ docker compose build
+```
 
-![AzerothCore containers memory](https://user-images.githubusercontent.com/75517/51078287-10e65b80-16b3-11e9-807f-f59a5844dae5.png)
+    1. Note that the initial build will take a long time, though subsequent builds should be faster
 
+2. Start containers with command
 
-### Docker containers vs Virtual machines
+```console
+$ docker compose up -d
+# Skip the build step
+$ docker compose up -d --build
+```
 
-Using Docker will have the same benefits as using virtual machines, but with much less overhead:
+    1. Note that this command may take a while the first time, for the database import
 
-![Docker containers vs Virtual machines](https://user-images.githubusercontent.com/75517/51078179-d4fec680-16b1-11e9-8ce6-87b5053f55dd.png)
+3. (on first install) You'll need to attach to the worldserver and create an Admin account
 
+```console
+$ docker compose attach ac-worldserver
+AC> account create admin password 3 -1
+```
