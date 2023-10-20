@@ -1,3 +1,4 @@
+-- DB update 2023_10_20_01 -> 2023_10_20_02
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_calling_korkron_or_wildhammer';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
