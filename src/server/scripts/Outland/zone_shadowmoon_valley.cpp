@@ -1734,6 +1734,71 @@ public:
     }
 };
 
+enum KorWild
+{
+    SAY_LAND    = 0,
+    POINT_LAND  = 1
+};
+
+class npc_korkron_or_wildhammer : public ScriptedAI
+{
+public:
+    npc_korkron_or_wildhammer(Creature* creature) : ScriptedAI(creature)
+    {
+        creature->SetDisableGravity(true);
+        creature->SetHover(true);
+    }
+
+    void Reset() override
+    {
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->DespawnOrUnsummon(3s, 0s);
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        _playerGUID = summoner->GetGUID();
+        me->SetFacingToObject(summoner);
+        Position pos = summoner->GetPosition();
+        me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                Talk(SAY_LAND, player);
+
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+private:
+    ObjectGuid _playerGUID;
+};
+
+class spell_calling_korkron_or_wildhammer : public SpellScript
+{
+    PrepareSpellScript(spell_calling_korkron_or_wildhammer);
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Adjust effect summon position
+        Position const offset = { -14.0f, -14.0f, 16.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_calling_korkron_or_wildhammer::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+    }
+};
+
 void AddSC_shadowmoon_valley()
 {
     // Ours
@@ -1755,4 +1820,6 @@ void AddSC_shadowmoon_valley()
     new npc_torloth_the_magnificent();
     new npc_enraged_spirit();
     new npc_shadowmoon_tuber_node();
+    RegisterCreatureAI(npc_korkron_or_wildhammer);
+    RegisterSpellScript(spell_calling_korkron_or_wildhammer);
 }
