@@ -494,6 +494,11 @@ class spell_flamewreath_aura : public AuraScript
 {
     PrepareAuraScript(spell_flamewreath_aura);
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_WREATH_RAN_THRU, SPELL_FLAME_WREATH_EXPLOSION });
+    }
+
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && GetDuration())
