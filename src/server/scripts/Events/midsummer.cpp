@@ -23,6 +23,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include <random>
 
 enum eBonfire
 {
@@ -210,15 +211,276 @@ class spell_gen_crab_disguise : public AuraScript
 
 enum RibbonPole
 {
+    GO_RIBBON_POLE                      = 181605,
+
     SPELL_RIBBON_POLE_CHANNEL_VISUAL    = 29172,
     SPELL_RIBBON_POLE_CHANNEL_VISUAL_2  = 29531,
     SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE = 29705,
     SPELL_TEST_RIBBON_POLE_CHANNEL_RED  = 29726,
     SPELL_TEST_RIBBON_POLE_CHANNEL_PINK = 29727,
+    // player spinning/rorating around himself
+    SPELL_RIBBON_POLE_PERIODIC_VISUAL   = 45406,
+    // spew lava trails
+    SPELL_RIBBON_POLE_FIRE_SPIRAL_VISUAL= 45421,
+    // blue fire ring, duration 5s
+    SPELL_FLAME_RING                    = 46842,
+    // red fire ring, duration 5s
+    SPELL_FLAME_PATCH                   = 46836,
+    // single firework explosion
+    SPELL_RIBBON_POLE_FIREWORK          = 46847,
+    SPELL_RIBBON_POLE_GROUND_FLOWER     = 46969,
     SPELL_RIBBON_POLE_XP                = 29175,
-    SPELL_RIBBON_POLE_FIREWORKS         = 46971,
 
     NPC_RIBBON_POLE_DEBUG_TARGET        = 17066,
+    NPC_GROUND_FLOWER                   = 25518,
+    NPC_BIG_DANCING_FLAMES              = 26267,
+    NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY   = 25303,
+
+    // dancing players count
+    THRESHOLD_FLAME_CIRCLE              = 1,
+    THRESHOLD_FIREWORK                  = 2,
+    THRESHOLD_FIREWORK_3                = 3,
+    THRESHOLD_FIREWORK_5                = 5,
+    THRESHOLD_GROUND_FLOWERS            = 3,
+    THRESHOLD_SPEW_LAVA                 = 6,
+    THRESHOLD_DANCING_FLAMES            = 7,
+
+    MAX_COUNT_GROUND_FLOWERS            = 3,
+    MAX_COUNT_SPEW_LAVA_TARGETS         = 2,
+    MAX_COUNT_DANCING_FLAMES            = 4,
+};
+
+struct npc_midsummer_ribbon_pole_target : public ScriptedAI
+{
+    npc_midsummer_ribbon_pole_target(Creature* creature) : ScriptedAI(creature)
+    {
+        // ribbonPole trap also spawns this NPC (currently unwanted)
+        if (me->ToTempSummon())
+            me->DespawnOrUnsummon();
+
+        _ribbonPole = nullptr;
+        _bunny = nullptr;
+        _dancerList.clear();
+
+        LocateRibbonPole();
+        SpawnFireSpiralBunny();
+
+        _scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                DoCleanupChecks();
+                context.Repeat();
+            })
+            .Schedule(5s, [this](TaskContext context)
+            {
+                DoFlameCircleChecks();
+                context.Repeat();
+            })
+            .Schedule(15s, [this](TaskContext context)
+            {
+                DoFireworkChecks();
+                context.Repeat();
+            })
+            .Schedule(10s, [this](TaskContext context)
+            {
+                DoGroundFlowerChecks();
+                context.Repeat();
+            })
+            .Schedule(10s, [this](TaskContext context)
+            {
+                DoSpewLavaChecks();
+                context.Repeat();
+            })
+            .Schedule(15s, [this](TaskContext context)
+            {
+                DoDancingFLameChecks();
+                context.Repeat();
+            });
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        Player* dancer = caster->ToPlayer();
+        if (!dancer)
+            return;
+
+        switch (spell->Id)
+        {
+            case SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE:
+            case SPELL_TEST_RIBBON_POLE_CHANNEL_RED:
+            case SPELL_TEST_RIBBON_POLE_CHANNEL_PINK:
+                break;
+            default:
+                return;
+        }
+
+        // prevent duplicates
+        if (std::find(_dancerList.begin(), _dancerList.end(), dancer) != _dancerList.end())
+            return;
+
+        _dancerList.push_back(dancer);
+    }
+
+    void LocateRibbonPole()
+    {
+        _scheduler.Schedule(420ms, [this](TaskContext context)
+            {
+                _ribbonPole = me->FindNearestGameObject(GO_RIBBON_POLE, 10.0f);
+
+                if (!_ribbonPole)
+                    context.Repeat(420ms);
+            });
+    }
+
+    void SpawnFireSpiralBunny()
+    {
+        _bunny = me->FindNearestCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, 10.0f);
+
+        if (!_bunny)
+            _bunny = DoSpawnCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, 0, 0, 0, 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
+    }
+
+    void DoCleanupChecks()
+    {
+        if (_dancerList.empty())
+            return;
+
+        // remove non-dancing players from list
+        std::erase_if(_dancerList, [](Player* dancer)
+            {
+                return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
+            });
+    }
+
+    void DoFlameCircleChecks()
+    {
+        if (!_ribbonPole)
+            return;
+        if (_dancerList.size() >= THRESHOLD_FLAME_CIRCLE)
+        {
+            // random blue / red circle
+            if (urand(0, 1))
+                _ribbonPole->CastSpell(me, SPELL_FLAME_RING);
+            else
+                _ribbonPole->CastSpell(me, SPELL_FLAME_PATCH);
+        }
+    }
+
+    void DoFireworkChecks()
+    {
+        if (!_bunny)
+            return;
+
+        if (_dancerList.size() >= THRESHOLD_FIREWORK)
+        {
+            _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
+        }
+        if (_dancerList.size() >= THRESHOLD_FIREWORK_3)
+        {
+            _scheduler.Schedule(500ms, [this](TaskContext /*context*/)
+            {
+                _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
+            })
+            .Schedule(1s, [this](TaskContext /*context*/)
+            {
+                _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
+            });
+        }
+        if (_dancerList.size() >= THRESHOLD_FIREWORK_5)
+        {
+            _scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
+            {
+                _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
+            })
+            .Schedule(2s, [this](TaskContext /*context*/)
+            {
+                _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
+            });
+        }
+    }
+
+    void DoGroundFlowerChecks()
+    {
+        if (!_bunny)
+            return;
+
+        if (_dancerList.size() >= THRESHOLD_GROUND_FLOWERS)
+        {
+            std::list<Creature*> crList;
+            me->GetCreaturesWithEntryInRange(crList, 20.0f, NPC_GROUND_FLOWER);
+
+            if (crList.size() < MAX_COUNT_GROUND_FLOWERS)
+                _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_GROUND_FLOWER);
+        }
+    }
+
+    void DoSpewLavaChecks()
+    {
+        if (!_bunny)
+            return;
+
+        if (_dancerList.size() >= THRESHOLD_SPEW_LAVA)
+        {
+            if (!_dancerList.empty())
+            {
+                Acore::Containers::RandomShuffle(_dancerList);
+
+                for (uint8 i = 0; (i < MAX_COUNT_SPEW_LAVA_TARGETS) && (i < _dancerList.size()); i++)
+                {
+                    Player* dancerTarget = _dancerList[i];
+
+                    if (dancerTarget)
+                    {
+                        Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        if (fireSpiralBunny)
+                            fireSpiralBunny->CastSpell(_bunny, SPELL_RIBBON_POLE_FIRE_SPIRAL_VISUAL, true);
+                    }
+                }
+            }
+        }
+    }
+
+    void DoDancingFLameChecks()
+    {
+        if (_dancerList.size() >= THRESHOLD_DANCING_FLAMES)
+        {
+            std::list<Creature*> crList;
+            me->GetCreaturesWithEntryInRange(crList, 20.0f, NPC_BIG_DANCING_FLAMES);
+
+            if (crList.size() < MAX_COUNT_DANCING_FLAMES)
+            {
+                float spawnDist = 12.0f;
+                float angle = rand_norm() * 2 * M_PI;
+                DoSpawnCreature(NPC_BIG_DANCING_FLAMES, spawnDist * cos(angle), spawnDist * std::sin(angle), 0, angle + M_PI, TEMPSUMMON_TIMED_DESPAWN, 60000);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+    std::vector<Player*> _dancerList;
+    GameObject* _ribbonPole;
+    Creature* _bunny;
+};
+
+class spell_midsummer_ribbon_pole_firework : public SpellScript
+{
+    PrepareSpellScript(spell_midsummer_ribbon_pole_firework)
+
+    void ModDestHeight(SpellDestination& dest)
+    {
+        Position const offset = { 0.0f, 0.0f, 20.0f , 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_midsummer_ribbon_pole_firework::ModDestHeight, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
+    }
 };
 
 class spell_midsummer_ribbon_pole : public AuraScript
@@ -617,9 +879,11 @@ void AddSC_event_midsummer_scripts()
     // NPCs
     new go_midsummer_bonfire();
     RegisterCreatureAI(npc_midsummer_torch_target);
+    RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 
     // Spells
     RegisterSpellScript(spell_gen_crab_disguise);
+    RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
     RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
     RegisterSpellScript(spell_midsummer_torch_quest);
