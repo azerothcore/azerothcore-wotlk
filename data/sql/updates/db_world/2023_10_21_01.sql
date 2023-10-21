@@ -1,3 +1,4 @@
+-- DB update 2023_10_21_00 -> 2023_10_21_01
 -- Duplicated gossip option
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 10316) AND (`OptionID` = 1);
 
