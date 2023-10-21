@@ -5575,7 +5575,7 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr) const
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, Player const* skipped_rcvr) const
 {
     if (self)
         GetSession()->SendPacket(data);
