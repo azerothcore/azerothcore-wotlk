@@ -1,3 +1,4 @@
+-- DB update 2023_10_21_04 -> 2023_10_21_05
 --
 ALTER TABLE `spell_cooldown_overrides`
 	ADD COLUMN `Comment` TEXT;
