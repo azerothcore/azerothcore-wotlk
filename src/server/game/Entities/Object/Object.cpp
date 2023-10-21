@@ -1629,16 +1629,22 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
 float WorldObject::GetGridActivationRange() const
 {
-    if (isActiveObject())
+    if (ToPlayer())
     {
-        if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetCinematicMgr()->IsOnCinematic())
+        if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
+        {
             return std::max(DEFAULT_VISIBILITY_INSTANCE, GetMap()->GetVisibilityRange());
-
+        }
+        return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
+    }
+    else if (ToCreature())
+    {
+        return ToCreature()->m_SightDistance;
+    }
+    else if (((GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport()) || GetTypeId() == TYPEID_DYNAMICOBJECT) && isActiveObject())
+    {
         return GetMap()->GetVisibilityRange();
     }
-
-    if (Creature const* thisCreature = ToCreature())
-        return thisCreature->m_SightDistance;
 
     return 0.0f;
 }
@@ -1650,7 +1656,7 @@ float WorldObject::GetVisibilityRange() const
     else if (IsFarVisible() && !ToPlayer())
         return MAX_VISIBILITY_DISTANCE;
     else
-        return GetMap()->GetVisibilityRange();
+        return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
 }
 
 float WorldObject::GetSightRange(WorldObject const* target) const
@@ -1666,7 +1672,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
             else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
                 return DEFAULT_VISIBILITY_INSTANCE;
             else
-                return GetMap()->GetVisibilityRange();
+                return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
         }
         else if (ToCreature())
             return ToCreature()->m_SightDistance;

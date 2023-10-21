@@ -576,6 +576,11 @@ public:
     [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
     [[nodiscard]] bool IsWorldObject() const;
 
+    [[nodiscard]] bool IsInWintergrasp() const
+    {
+        return GetMapId() == 571 && GetZoneId() == 4197;
+    }
+
 #ifdef MAP_BASED_RAND_GEN
     int32 irand(int32 min, int32 max) const     { return int32 (GetMap()->mtRand.randInt(max - min)) + min; }
     uint32 urand(uint32 min, uint32 max) const  { return GetMap()->mtRand.randInt(max - min) + min;}
