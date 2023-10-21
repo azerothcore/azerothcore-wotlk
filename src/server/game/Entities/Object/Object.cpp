@@ -21,7 +21,6 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Creature.h"
-#include "DynamicVisibility.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -2947,7 +2946,7 @@ struct WorldObjectChangeAccumulator
             source = iter->GetSource();
             ObjectGuid guid = source->GetCasterGUID();
 
-            if (guid)
+            if (guid.IsPlayer())
             {
                 //Caster may be nullptr if DynObj is in removelist
                 if (Player* caster = ObjectAccessor::FindPlayer(guid))
