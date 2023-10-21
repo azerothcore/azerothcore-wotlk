@@ -2342,9 +2342,8 @@ public:
 
     // currently visible objects at player client
     GuidUnorderedSet m_clientGUIDs;
-    std::vector<Unit*> m_newVisible; // pussywizard
 
-    [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;
+    [[nodiscard]] bool HaveAtClient(Object const* u) const;
     [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const;
 
     [[nodiscard]] bool IsNeverVisible() const override;
@@ -2358,7 +2357,7 @@ public:
     void UpdateTriggerVisibility();
 
     template<class T>
-    void UpdateVisibilityOf(T* target, UpdateData& data, std::vector<Unit*>& visibleNow);
+    void UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow);
 
     uint8 m_forced_speed_changes[MAX_MOVE_TYPE];
 

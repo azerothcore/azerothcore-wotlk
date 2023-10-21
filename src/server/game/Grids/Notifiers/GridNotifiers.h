@@ -42,15 +42,10 @@ namespace Acore
     {
         Player& i_player;
         GuidUnorderedSet vis_guids;
-        std::vector<Unit*>& i_visibleNow;
+        std::set<Unit*> i_visibleNow;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player) :
-            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible)
-        {
-            i_visibleNow.clear();
-        }
-
+        VisibleNotifier(Player& player) : i_player(player), vis_guids(player.m_clientGUIDs) {}
         template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
