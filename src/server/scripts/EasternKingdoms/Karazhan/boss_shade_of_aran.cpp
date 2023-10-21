@@ -86,8 +86,7 @@ enum SuperSpell
 
 enum Groups
 {
-    GROUP_FLAMEWREATH   = 0,
-    GROUP_DRINKING      = 1
+    GROUP_DRINKING      = 0
 };
 
 Position const roomCenter = {-11158.f, -1920.f};
