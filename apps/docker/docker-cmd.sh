@@ -54,7 +54,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         start:app)
             set -x
-            docker compose --profile app up
+            docker compose up
             set +x
             # pop the head off of the queue of args
             # After this, the value of $1 is the value of $2
@@ -63,102 +63,138 @@ while [[ $# -gt 0 ]]; do
 
         start:app:d)
             set -x
-            docker compose --profile app up -d
+            docker compose up -d
             set +x
             shift
             ;;
 
         build)
             set -x
-            docker compose --profile local --profile dev --profile dev-build build
-            docker compose --profile dev-build run --rm --no-deps ac-dev-build /bin/bash /azerothcore/apps/docker/docker-build-dev.sh
+            docker compose build
             set +x
             shift
             ;;
 
         pull)
             set -x
-            docker compose --profile local --profile dev --profile dev-build pull
+            docker compose pull
             set +x
             shift
             ;;
 
         build:nocache)
             set -x
-            docker compose --profile local --profile dev --profile dev-build build --no-cache
-            docker compose run --rm --no-deps ac-dev-build /bin/bash /azerothcore/apps/docker/docker-build-dev.sh
+            docker compose build --no-cache
             set +x
             shift
             ;;
 
         clean:build)
             set -x
-            docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler clean
-            docker compose run --rm --no-deps ac-dev-server bash acore.sh compiler ccacheClean
+            # Don't run 'docker buildx prune' since it may "escape" our bubble
+            # and affect other projects on the user's workstation/server
+            cat <<EOF
+This command has been deprecated, and at the moment does not do anything.
+If you'd like to build without cache, use the command './acore.sh docker build:nocache' or look into the 'docker buildx prune command'
+
+> https://docs.docker.com/engine/reference/commandline/buildx_prune/
+EOF
             set +x
             shift
             ;;
 
         client-data)
             set -x
-            docker compose run --rm --no-deps ac-dev-server bash acore.sh client-data
+            docker compose up ac-client-data-init
             set +x
             shift
             ;;
 
         dev:up)
             set -x
-            docker compose up -d ac-dev-server
+            docker compose --profile dev up ac-dev-server -d
             set +x
             shift
             ;;
 
         dev:build)
             set -x
-            docker compose run --rm ac-dev-server bash acore.sh compiler build
+            docker compose --profile dev run --rm ac-dev-server bash /azerothcore/acore.sh compiler build
             set +x
             shift
             ;;
 
         dev:dash)
             set -x
-            docker compose run --rm ac-dev-server bash /azerothcore/acore.sh ${@:2}
+            docker compose --profile dev run --rm ac-dev-server bash /azerothcore/acore.sh ${@:2}
             set +x
             shift
             ;;
 
         dev:shell)
             set -x
-            docker compose up -d ac-dev-server
-            docker compose exec ac-dev-server bash ${@:2}
+            docker compose --profile dev up -d ac-dev-server
+            docker compose --profile dev exec ac-dev-server bash ${@:2}
             set +x
             shift
             ;;
 
         build:prod|prod:build)
+            cat <<EOF
+This command is deprecated and is scheduled to be removed. Please update any scripts or automation accordingly to use the other command:
+
+    ./acore.sh docker build
+
+The build will continue in 3 seconds
+EOF
+            sleep 3
             set -x
-            docker compose --profile prod build
+            docker compose build
             set +x
             shift
             ;;
 
         pull:prod|prod:pull)
+            cat <<EOF
+This command is deprecated and is scheduled to be removed. Please update any scripts or automation accordingly to use the other command:
+
+    ./acore.sh docker pull
+
+The image pull will continue in 3 seconds
+EOF
+            sleep 3
             set -x
-            docker compose --profile prod pull
+            docker compose pull
             set +x
             shift
             ;;
 
         prod:up|start:prod)
+            cat <<EOF
+This command is deprecated and is scheduled to be removed. Please update any scripts or automation accordingly to use the other command:
+
+    ./acore.sh docker start:app
+
+The containers will start in 3 seconds
+EOF
+            sleep 3
             set -x
-            docker compose --profile prod-app up
+            docker compose up
             set +x
             shift
             ;;
 
         prod:up:d|start:prod:d)
+            cat <<EOF
+This command is deprecated and is scheduled to be removed. Please update any scripts or automation accordingly to use the other command:
+
+    ./acore.sh docker start:app:d
+
+The containers will start in 3 seconds
+EOF
+            sleep 3
             set -x
-            docker compose --profile prod-app up -d
+            docker compose up -d
             set +x
             shift
             ;;
