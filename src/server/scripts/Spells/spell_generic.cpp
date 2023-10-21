@@ -5076,6 +5076,32 @@ class spell_gen_jubling_cooldown : public SpellScript
     }
 };
 
+// 12699 - Yeh'kinya's Bramble
+enum YehkinyaBramble
+{
+    NPC_VALE_SCREECHER       = 5307,
+    NPC_ROGUE_VALE_SCREECHER = 5308
+};
+
+class spell_gen_yehkinya_bramble : public SpellScript
+{
+    PrepareSpellScript(spell_gen_yehkinya_bramble)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if ((target->GetEntry() == NPC_VALE_SCREECHER || target->GetEntry() == NPC_ROGUE_VALE_SCREECHER) && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_yehkinya_bramble::CheckCast);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5227,4 +5253,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_valthalak_amulet);
     RegisterSpellScript(spell_gen_planting_scourge_banner);
     RegisterSpellScript(spell_gen_jubling_cooldown);
+    RegisterSpellScript(spell_gen_yehkinya_bramble);
 }
