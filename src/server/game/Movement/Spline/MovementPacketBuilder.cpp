@@ -119,7 +119,7 @@ namespace Movement
         data.append<Vector3>(&spline.getPoint(2), count);
     }
 
-    void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data, bool flying)
+    void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
     {
         uint32 count = spline.getPointCount() - 4;
         data << count;
@@ -135,7 +135,7 @@ namespace Movement
         if (splineflags & MoveSplineFlag::Mask_CatmullRom)
         {
             if (splineflags.cyclic)
-                WriteCatmullRomCyclicPath(spline, data, splineflags & MoveSplineFlag::Flying);
+                WriteCatmullRomCyclicPath(spline, data);
             else
                 WriteCatmullRomPath(spline, data);
         }
