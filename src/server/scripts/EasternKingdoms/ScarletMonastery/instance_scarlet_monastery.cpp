@@ -756,6 +756,8 @@ public:
             SayAshbringer = false;
         }
 
+
+        //Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
             if (who && spell->Id == ABE_ffect_000 && !SayAshbringer)            {
