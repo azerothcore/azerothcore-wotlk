@@ -306,7 +306,7 @@ public:
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
