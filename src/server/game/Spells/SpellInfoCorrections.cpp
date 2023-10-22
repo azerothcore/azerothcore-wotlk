@@ -416,7 +416,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Marked for Death
     ApplySpellFix({ 53241, 53243, 53244, 53245, 53246 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(423937, 276955137, 2049);
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(399361, 276955137, 1);
     });
 
     ApplySpellFix({
@@ -4570,6 +4570,18 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 29962, 37051, 37052, 37053 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+    });
+
+    // Instill Lord Valthalak's Spirit DND
+    ApplySpellFix({ 27360 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Holiday - Midsummer, Ribbon Pole Periodic Visual
+    ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

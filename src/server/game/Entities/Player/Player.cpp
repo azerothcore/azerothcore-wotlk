@@ -1294,6 +1294,8 @@ uint8 Player::GetChatTag() const
         tag |= CHAT_TAG_DND;
     if (isAFK())
         tag |= CHAT_TAG_AFK;
+    if (IsCommentator())
+        tag |= CHAT_TAG_COM;
     if (IsDeveloper())
         tag |= CHAT_TAG_DEV;
 
@@ -4653,7 +4655,7 @@ void Player::DurabilityLossAll(double percent, bool inventory)
 
 void Player::DurabilityLoss(Item* item, double percent)
 {
-    if(!item)
+    if(!item || percent == 0.0)
         return;
 
     uint32 pMaxDurability = item ->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);

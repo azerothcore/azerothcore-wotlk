@@ -101,6 +101,7 @@ struct boss_netherspite : public BossAI
         BossAI::Reset();
         berserk = false;
         HandleDoors(true);
+        DestroyPortals();
     }
 
     void SummonPortals()
@@ -219,6 +220,24 @@ struct boss_netherspite : public BossAI
         });
     }
 
+    void DestroyPortals()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            if (Creature* portal = ObjectAccessor::GetCreature(*me, PortalGUID[i]))
+            {
+                portal->DisappearAndDie();
+            }
+            if (Creature* portal = ObjectAccessor::GetCreature(*me, BeamerGUID[i]))
+            {
+                portal->DisappearAndDie();
+            }
+
+            PortalGUID[i].Clear();
+            BeamTarget[i].Clear();
+        }
+    }
+
     void SwitchToBanishPhase()
     {
         Talk(EMOTE_PHASE_BANISH);
@@ -228,10 +247,7 @@ struct boss_netherspite : public BossAI
         DoCastSelf(SPELL_BANISH_VISUAL, true);
         DoCastSelf(SPELL_BANISH_ROOT, true);
 
-        for (uint32 id : PortalID)
-        {
-            summons.DespawnEntry(id);
-        }
+        DestroyPortals();
 
         scheduler.Schedule(30s, [this](TaskContext)
         {
