@@ -88,8 +88,6 @@ public:
 enum Zephyr : int32
 {
     GOSSIP_MENU_ZEPHYR              = 9205,
-    GOSSIP_OPTION_DEFAULT           = 0,
-
     SPELL_TELEPORT_CAVERNS_OF_TIME  = 37778,
 };
 
@@ -110,7 +108,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_MENU_ZEPHYR, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ZEPHYR, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
