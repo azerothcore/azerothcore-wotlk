@@ -46,17 +46,17 @@ enum AshbringerEventMisc
 
 enum DataTypes
 {
-    TYPE_MOGRAINE_AND_WHITE_EVENT   =   1,
+    TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
 
-    DATA_MOGRAINE                   =   2,
-    DATA_WHITEMANE                  =   3,
-    DATA_DOOR_WHITEMANE             =   4,
+    DATA_MOGRAINE = 2,
+    DATA_WHITEMANE = 3,
+    DATA_DOOR_WHITEMANE = 4,
 
-    DATA_HORSEMAN_EVENT             =   5,
-    GAMEOBJECT_PUMPKIN_SHRINE       =   6,
+    DATA_HORSEMAN_EVENT = 5,
+    GAMEOBJECT_PUMPKIN_SHRINE = 6,
 
-    DATA_VORREL                     =   7,
-    DATA_ARCANIST_DOAN              =   8
+    DATA_VORREL = 7,
+    DATA_ARCANIST_DOAN = 8
 };
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -81,11 +81,11 @@ public:
             switch (go->GetEntry())
             {
                 //case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
-                case DOOR_HIGH_INQUISITOR_ID:
-                    DoorHighInquisitorGUID = go->GetGUID();
-                    break;
-                default:
-                    break;
+            case DOOR_HIGH_INQUISITOR_ID:
+                DoorHighInquisitorGUID = go->GetGUID();
+                break;
+            default:
+                break;
             }
         }
 
@@ -93,40 +93,40 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_COMMANDER_MOGRAINE:
-                    MograineGUID = creature->GetGUID();
-                    break;
-                case NPC_INQUISITOR_WHITEMANE:
-                    WhitemaneGUID = creature->GetGUID();
-                    break;
-                default:
-                    break;
+            case NPC_COMMANDER_MOGRAINE:
+                MograineGUID = creature->GetGUID();
+                break;
+            case NPC_INQUISITOR_WHITEMANE:
+                WhitemaneGUID = creature->GetGUID();
+                break;
+            default:
+                break;
             }
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
-                case TYPE_MOGRAINE_AND_WHITE_EVENT:
-                    if (data == IN_PROGRESS)
-                    {
-                        DoUseDoorOrButton(DoorHighInquisitorGUID);
-                        encounter = IN_PROGRESS;
-                    }
-                    if (data == FAIL)
-                    {
-                        DoUseDoorOrButton(DoorHighInquisitorGUID);
-                        encounter = FAIL;
-                    }
-                    if (data == SPECIAL)
-                        encounter = SPECIAL;
-                    break;
-                case DATA_HORSEMAN_EVENT:
-                    encounter = data;
-                    break;
-                default:
-                    break;
+            case TYPE_MOGRAINE_AND_WHITE_EVENT:
+                if (data == IN_PROGRESS)
+                {
+                    DoUseDoorOrButton(DoorHighInquisitorGUID);
+                    encounter = IN_PROGRESS;
+                }
+                if (data == FAIL)
+                {
+                    DoUseDoorOrButton(DoorHighInquisitorGUID);
+                    encounter = FAIL;
+                }
+                if (data == SPECIAL)
+                    encounter = SPECIAL;
+                break;
+            case DATA_HORSEMAN_EVENT:
+                encounter = data;
+                break;
+            default:
+                break;
             }
         }
 
@@ -134,15 +134,15 @@ public:
         {
             switch (type)
             {
-                case DATA_MOGRAINE:
-                    return MograineGUID;
-                case DATA_WHITEMANE:
-                    return WhitemaneGUID;
-                case DATA_DOOR_WHITEMANE:
-                    return DoorHighInquisitorGUID;
-                default:
-                    return ObjectGuid::Empty;
-                    break;
+            case DATA_MOGRAINE:
+                return MograineGUID;
+            case DATA_WHITEMANE:
+                return WhitemaneGUID;
+            case DATA_DOOR_WHITEMANE:
+                return DoorHighInquisitorGUID;
+            default:
+                return ObjectGuid::Empty;
+                break;
             }
         }
 
@@ -206,7 +206,7 @@ public:
 
                     if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
                     {
-                    
+
                         //instance->DoUseDoorOrButton(chapelDoor->GetGUID());//Received //https://github.com/azerothcore/azerothcore-wotlk/commit/2779833768bbe9967006d6d16888dace05b4bcb6 Impact The door cannot be opened                       
                         chapelDoor->SetGoState(GO_STATE_ACTIVE);
                         chapelDoor->SetLootState(GO_ACTIVATED);
@@ -255,34 +255,34 @@ enum AshbringerEvent
 
 enum MograineEvents
 {
-    EVENT_SPELL_CRUSADER_STRIKE     =   1,
-    EVENT_SPELL_HAMMER_OF_JUSTICE   =   2,
-    EVENT_PULL_CATHEDRAL            =   3
+    EVENT_SPELL_CRUSADER_STRIKE = 1,
+    EVENT_SPELL_HAMMER_OF_JUSTICE = 2,
+    EVENT_PULL_CATHEDRAL = 3
 };
 
 enum WhitemaneEvents
 {
-    EVENT_SPELL_HOLY_SMITE          =   1,
-    EVENT_SPELL_POWER_WORLD_SHIELD  =   2,
-    EVENT_SPELL_HEAL                =   3
+    EVENT_SPELL_HOLY_SMITE = 1,
+    EVENT_SPELL_POWER_WORLD_SHIELD = 2,
+    EVENT_SPELL_HEAL = 3
 };
 
 enum Spells
 {
     //Mograine Spells
-    SPELL_CRUSADER_STRIKE           =   14518,
-    SPELL_HAMMER_OF_JUSTICE         =   5589,
-    SPELL_LAY_ON_HANDS              =   9257,
-    SPELL_RETRIBUTION_AURA          =   8990,
-    SPELL_PERMANENT_FEIGN_DEATH     =   29266,
+    SPELL_CRUSADER_STRIKE = 14518,
+    SPELL_HAMMER_OF_JUSTICE = 5589,
+    SPELL_LAY_ON_HANDS = 9257,
+    SPELL_RETRIBUTION_AURA = 8990,
+    SPELL_PERMANENT_FEIGN_DEATH = 29266,
 
     //Whitemanes Spells
-    SPELL_SCARLET_RESURRECTION      =   9232,
-    SPELL_DEEP_SLEEP                =   9256,
-    SPELL_DOMINATE_MIND             =   14515,
-    SPELL_HOLY_SMITE                =   9481,
-    SPELL_HEAL                      =   12039,
-    SPELL_POWER_WORD_SHIELD         =   22187,
+    SPELL_SCARLET_RESURRECTION = 9232,
+    SPELL_DEEP_SLEEP = 9256,
+    SPELL_DOMINATE_MIND = 14515,
+    SPELL_HOLY_SMITE = 9481,
+    SPELL_HEAL = 12039,
+    SPELL_POWER_WORD_SHIELD = 22187,
 
     // Highlord Mograine Spells
     SPELL_MOGRAINE_COMETH_DND = 28688,
@@ -294,17 +294,17 @@ enum Spells
 enum Says
 {
     //Mograine says
-    SAY_MO_AGGRO                    =   0,
-    SAY_MO_KILL                     =   1,
-    SAY_MO_RESURRECTED              =   2,
+    SAY_MO_AGGRO = 0,
+    SAY_MO_KILL = 1,
+    SAY_MO_RESURRECTED = 2,
 
     //Whitemane says
-    SAY_WH_INTRO                    =   0,
-    SAY_WH_KILL                     =   1,
-    SAY_WH_RESURRECT                =   2,
+    SAY_WH_INTRO = 0,
+    SAY_WH_KILL = 1,
+    SAY_WH_RESURRECT = 2,
 };
 
-float const CATHEDRAL_PULL_RANGE    = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
+float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
 
 class npc_mograine : public CreatureScript
 {
@@ -324,98 +324,98 @@ public:
 
             switch (eventId)
             {
-                case  EVENT_MOGRAINE_FACING_PLAYER:
+            case  EVENT_MOGRAINE_FACING_PLAYER:
                 me->SetFacingToObject(playerWhoStartedAshbringer);
                 events.ScheduleEvent(EVENT_MOGRAINE_KNEEL, 1s, 3s);
                 break;
-                case EVENT_MOGRAINE_KNEEL:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
-                    break;
-                case EVENT_MOGRAINE_EMOTE_TALK3:
-                    Talk(3, playerWhoStartedAshbringer);
-                    break;
-                case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
-                    // 03/29/2023 00:13:49.658 Number: 6862
-                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
-                    {
-                        // 03/29/2023 00:13:49.658
-                        summonedMograine->SetFaction(FACTION_FRIENDLY);
-                        summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
-                        summonedMograine->SetSpeed(MOVE_WALK, 1.0f);
-                        summonedMograine->SetDisplayId(NPC_HIGHLORD_MOGRAINE_MOD);//
-                        summonedMograine->setActive(true);
-                        summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false); // Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
-                    }
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48546ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
-                    summonedMograine->StopMovingOnCurrentPos();
-                    summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                    summonedMograine->AI()->Talk(0, 214ms);
-                    events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3024ms);
-                    break;
-                case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
-                    me->SetFacingToObject(summonedMograine);
-                    events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 403ms);
-                    break;
-                case EVENT_MOGRAINE_UNIT_STAND_STATE_STAND:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 809ms);
-                    break;
-                case EVENT_MOGRAINE_EMOTE_TALK4:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    me->AI()->Talk(4, 209ms);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4636ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
-                    summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    summonedMograine->AI()->Talk(1, me, 10ms);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3429ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_EMOTE1: 
-                    summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3236ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_EMOTE2:
-                    summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3243ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_EMOTE3: 
-                    summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3232ms);
-                    break;
-                case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2: 
-                    me->SetFacingToObject(summonedMograine);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1210ms);
-                    break;
-                case EVENT_MOGRAINE_EMOTE_TALK5:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_BEG);
-                    me->AI()->Talk(5, 214ms);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3022ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
-                    summonedMograine->CastSpell(me, SPELL_FORGIVENESS, false);
-                    //events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1010ms);
-                    events.ScheduleEvent(EVENT_MOGRAINE_CASTSPELL, 1000ms); // case 14 hack fix time
-                    break;
-                case EVENT_MOGRAINE_CASTSPELL:
-                    // Hack fix The lightning effect of mograine being hit by a spell
-                    me->CastSpell(me, SPELL_COSMETIC_EXPLODE, false);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 100ms);
-                    break;
-                case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
-                    Unit::Kill(me, me, true);
-                    summonedMograine->AI()->Talk(2, 2764ms);
-                    instance->SetData(DATA_MOGRAINE, DONE);
-                    summonedMograine->DespawnOrUnsummon(6190);
-                    me->setActive(false);
-                    break;
-                default:
-                    break;
+            case EVENT_MOGRAINE_KNEEL:
+                me->SetSheath(SHEATH_STATE_UNARMED);
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
+                break;
+            case EVENT_MOGRAINE_EMOTE_TALK3:
+                Talk(3, playerWhoStartedAshbringer);
+                break;
+            case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
+                // 03/29/2023 00:13:49.658 Number: 6862
+                if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
+                {
+                    // 03/29/2023 00:13:49.658
+                    summonedMograine->SetFaction(FACTION_FRIENDLY);
+                    summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
+                    summonedMograine->SetSpeed(MOVE_WALK, 1.0f);
+                    summonedMograine->SetDisplayId(NPC_HIGHLORD_MOGRAINE_MOD);//
+                    summonedMograine->setActive(true);
+                    summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false); // Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
+                }
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48546ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
+                summonedMograine->StopMovingOnCurrentPos();
+                summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                summonedMograine->AI()->Talk(0, 214ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3024ms);
+                break;
+            case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
+                me->SetFacingToObject(summonedMograine);
+                events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 403ms);
+                break;
+            case EVENT_MOGRAINE_UNIT_STAND_STATE_STAND:
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetSheath(SHEATH_STATE_MELEE);
+                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 809ms);
+                break;
+            case EVENT_MOGRAINE_EMOTE_TALK4:
+                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                me->AI()->Talk(4, 209ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4636ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
+                summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                summonedMograine->AI()->Talk(1, me, 10ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3429ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_EMOTE1:
+                summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3236ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_EMOTE2:
+                summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3243ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_EMOTE3:
+                summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3232ms);
+                break;
+            case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2:
+                me->SetFacingToObject(summonedMograine);
+                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1210ms);
+                break;
+            case EVENT_MOGRAINE_EMOTE_TALK5:
+                me->SetSheath(SHEATH_STATE_UNARMED);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_BEG);
+                me->AI()->Talk(5, 214ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3022ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
+                summonedMograine->CastSpell(me, SPELL_FORGIVENESS, false);
+                //events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1010ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_CASTSPELL, 1000ms); // case 14 hack fix time
+                break;
+            case EVENT_MOGRAINE_CASTSPELL:
+                // Hack fix The lightning effect of mograine being hit by a spell
+                me->CastSpell(me, SPELL_COSMETIC_EXPLODE, false);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 100ms);
+                break;
+            case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
+                Unit::Kill(me, me, true);
+                summonedMograine->AI()->Talk(2, 2764ms);
+                instance->SetData(DATA_MOGRAINE, DONE);
+                summonedMograine->DespawnOrUnsummon(6190);
+                me->setActive(false);
+                break;
+            default:
+                break;
             }
         }
 
@@ -454,7 +454,7 @@ public:
                 summonedMograine->DespawnOrUnsummon();
             }
             events.Reset();
-        }       
+        }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -564,19 +564,19 @@ public:
 
             while (uint32 eventId = events.ExecuteEvent())
             {
-                switch(eventId)
+                switch (eventId)
                 {
-                    case EVENT_SPELL_CRUSADER_STRIKE:
-                        me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
-                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10s);
-                        break;
-                    case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                        me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
-                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60s);
-                        break;
-                    case EVENT_PULL_CATHEDRAL:
-                        PullCathedral();
-                        break;
+                case EVENT_SPELL_CRUSADER_STRIKE:
+                    me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
+                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10s);
+                    break;
+                case EVENT_SPELL_HAMMER_OF_JUSTICE:
+                    me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
+                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60s);
+                    break;
+                case EVENT_PULL_CATHEDRAL:
+                    PullCathedral();
+                    break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -586,9 +586,9 @@ public:
         bool SayAshbringer = false;
         int timer = 0;
         int step = 1;
-        bool hasDied=false;
-        bool heal=false;
-        bool fakeDeath=false;
+        bool hasDied = false;
+        bool heal = false;
+        bool fakeDeath = false;
         Player* playerWhoStartedAshbringer = nullptr;
         EventMap events;
         InstanceScript* instance;
@@ -710,17 +710,17 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SPELL_POWER_WORLD_SHIELD:
-                        me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
-                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
-                        break;
-                    case EVENT_SPELL_HOLY_SMITE:
-                        me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
-                        break;
-                    case EVENT_SPELL_HEAL:
-                        me->CastSpell(me, SPELL_HEAL, false);
-                        break;
+                case EVENT_SPELL_POWER_WORLD_SHIELD:
+                    me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
+                    events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
+                    break;
+                case EVENT_SPELL_HOLY_SMITE:
+                    me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
+                    events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
+                    break;
+                case EVENT_SPELL_HEAL:
+                    me->CastSpell(me, SPELL_HEAL, false);
+                    break;
                 }
             }
 
@@ -760,17 +760,17 @@ public:
         //Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (who && spell->Id == ABE_ffect_000 && !SayAshbringer)            {
-                        
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->SetFacingToObject(who);
-                        //There is a delay in sniffing 1615ms
-                        me->CastSpell(me, SPELL_TRANSFORM_GHOST); //The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
-                        me->CastSpell(me, 57767, true);//
-                        //delay 10ms
-                        me->SetDisplayId(16179);
-                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        SayAshbringer = true;
+            if (who && spell->Id == ABE_ffect_000 && !SayAshbringer)
+            {
+                me->SetFaction(FACTION_FRIENDLY);
+                me->SetFacingToObject(who);
+                //There is a delay in sniffing 1615ms
+                me->CastSpell(me, SPELL_TRANSFORM_GHOST); //The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
+                me->CastSpell(me, 57767, true);//
+                //delay 10ms
+                me->SetDisplayId(16179);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                SayAshbringer = true;
             }
         }
     private:
