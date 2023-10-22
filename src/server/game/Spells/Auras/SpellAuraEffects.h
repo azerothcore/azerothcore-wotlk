@@ -55,6 +55,7 @@ public:
     uint32 GetId() const;
     uint32 GetEffIndex() const { return m_effIndex; }
     int32 GetBaseAmount() const { return m_baseAmount; }
+    int32 GetDieSides() const { return m_dieSides; }
     int32 GetAmplitude() const { return m_amplitude; }
 
     int32 GetMiscValueB() const;
@@ -121,6 +122,7 @@ private:
 
     SpellInfo const* const m_spellInfo;
     int32 const m_baseAmount;
+    int32 const m_dieSides;
 
     bool m_applyResilience;
     uint8 m_casterLevel;
