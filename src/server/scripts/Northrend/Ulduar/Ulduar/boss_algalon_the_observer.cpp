@@ -1156,6 +1156,14 @@ public:
 
                 if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
+
+                if (Map* map = player->GetMap())
+                {
+                    if (InstanceMap* instanceMap = map->ToInstanceMap())
+                    {
+                        instanceMap->PermBindAllPlayers();
+                    }
+                }
             }
 
             return false;
