@@ -95,7 +95,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     bool const mutualChase = IsMutualChase(owner, target);
     float const chaseRange = GetChaseRange(owner, target);
-    float const minRange = _range ? _range->MinRange + chaseRange : CONTACT_DISTANCE;
     float const minTarget = (_range ? _range->MinTolerance : 0.0f) + chaseRange;
     float const maxRange = _range ? _range->MaxRange + chaseRange : owner->GetMeleeRange(target); // melee range already includes hitboxes
     float const maxTarget = _range ? _range->MaxTolerance + chaseRange : CONTACT_DISTANCE + chaseRange;
