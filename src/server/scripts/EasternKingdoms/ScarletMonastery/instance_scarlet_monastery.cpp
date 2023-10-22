@@ -162,9 +162,6 @@ public:
     };
 };
 
-
-
-
 class at_scarlet_monastery_cathedral_entrance : public OnlyOnceAreaTriggerScript
 {
 public:
@@ -190,7 +187,6 @@ public:
                     player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 4000.0f);
                     player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
                     player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
-
 
                     ScarletList.push_back(commanderMograine);
 
@@ -285,10 +281,10 @@ enum Spells
     SPELL_HEAL = 12039,
     SPELL_POWER_WORD_SHIELD = 22187,
 
-    // Highlord Mograine Spells
+    //Highlord Mograine Spells
     SPELL_MOGRAINE_COMETH_DND = 28688,
 
-    // SPELL_TRANSFORM_GHOST
+    //SPELL_TRANSFORM_GHOST
     SPELL_TRANSFORM_GHOST = 28443
 };
 
