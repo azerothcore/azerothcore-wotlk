@@ -1,3 +1,4 @@
+-- DB update 2023_10_22_01 -> 2023_10_22_02
 --
 -- Emotes for Quest "For Love Eternal"
 DELETE FROM `quest_details` WHERE `ID`=963;
