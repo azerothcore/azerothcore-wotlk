@@ -454,24 +454,7 @@ public:
                 summonedMograine->DespawnOrUnsummon();
             }
             events.Reset();
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who && who->GetDistance2d(me) < 15.0f)
-                if (Player* player = who->ToPlayer())
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
-                    {
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->SetFacingToObject(player);
-                        // me->Yell(12389, LANG_UNIVERSAL, player); // Doesn't exist
-                        SayAshbringer = true;
-                    }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
+        }       
 
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -804,4 +787,5 @@ void AddSC_instance_scarlet_monastery()
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();
+    new at_scarlet_monastery_cathedral_entrance();
 }
