@@ -274,9 +274,6 @@ public:
     uint32 Acc{0};
     uint32 ArenaTeamId{0};
     std::string IP{};
-    uint32 DamageDone{0};
-    uint32 HealingDone{0};
-    uint32 KillingBlows{0};
 };
 
 enum BGHonorMode
