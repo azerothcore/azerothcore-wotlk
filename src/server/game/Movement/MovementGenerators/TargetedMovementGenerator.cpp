@@ -59,6 +59,7 @@ bool ChaseMovementGenerator<T>::PositionOkay(T* owner, Unit* target, Optional<fl
     // owner cannot see its target
     if (!owner->IsWithinLOSInMap(target))
         return false;
+
     return true;
 }
 
