@@ -1,3 +1,4 @@
+-- DB update 2023_10_21_06 -> 2023_10_22_00
 SET @As_Probability=100;
 SET @AE_Probability=50;
 -- ------------------------------Scarlet Sorcerer-----------------------------
