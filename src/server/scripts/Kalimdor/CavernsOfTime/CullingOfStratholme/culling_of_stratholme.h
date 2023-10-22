@@ -20,6 +20,7 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "CS"
 #define CullingOfStratholmeScriptName "instance_culling_of_stratholme"
 
 enum Data

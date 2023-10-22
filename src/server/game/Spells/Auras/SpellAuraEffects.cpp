@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -39,7 +38,7 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -55,7 +54,7 @@ class Aura;
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK set - aura is recalculated or is just applied/removed - need to redo all things related to m_amount
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK - logical or of above conditions
 // AURA_EFFECT_HANDLE_STAT - set when stats are reapplied
-// such checks will Speedup trinity change amount/send for client operations
+// such checks will Speedup azerothcore change amount/send for client operations
 // because for change amount operation packets will not be send
 // aura effect handlers shouldn't contain any AuraEffect or Aura object modifications
 
@@ -382,8 +381,8 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster):
     m_base(base), m_spellInfo(base->GetSpellInfo()),
-    m_baseAmount(baseAmount ? * baseAmount : m_spellInfo->Effects[effIndex].BasePoints), m_critChance(0),
-    m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
+    m_baseAmount(baseAmount ? * baseAmount : m_spellInfo->Effects[effIndex].BasePoints), m_dieSides(m_spellInfo->Effects[effIndex].DieSides),
+    m_critChance(0), m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
     m_canBeRecalculated(true), m_isPeriodic(false)
 {
     CalculatePeriodic(caster, true, false);
@@ -595,7 +594,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
             // 3 spells have no amplitude set
             if (!m_amplitude)
                 m_amplitude = 1 * IN_MILLISECONDS;
-            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+            [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:
@@ -1101,6 +1100,20 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 
     Unit* target = aurApp->GetTarget();
 
+    // Update serverside orientation of tracking channeled auras on periodic update ticks
+    // exclude players because can turn during channeling and shouldn't desync orientation client/server
+    if (caster && !caster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
+    {
+        ObjectGuid const channelGuid = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+        if (!channelGuid.IsEmpty() && channelGuid != caster->GetGUID())
+        {
+            if (WorldObject const* objectTarget = ObjectAccessor::GetWorldObject(*caster, channelGuid))
+            {
+                caster->SetInFront(objectTarget);
+            }
+        }
+    }
+
     switch (GetAuraType())
     {
         case SPELL_AURA_PERIODIC_DUMMY:
@@ -1190,7 +1203,7 @@ void AuraEffect::CleanupTriggeredSpells(Unit* target)
         return;
 
     // needed for spell 43680, maybe others
-    // TODO: is there a spell flag, which can solve this in a more sophisticated way?
+    /// @todo: is there a spell flag, which can solve this in a more sophisticated way?
     if (m_spellInfo->Effects[GetEffIndex()].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL &&
             uint32(m_spellInfo->GetDuration()) == m_spellInfo->Effects[GetEffIndex()].Amplitude)
         return;
@@ -1589,8 +1602,8 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
-    target->bRequestForcedVisibilityUpdate = false;
+    if (target->IsInWorld())
+        target->UpdateObjectVisibility();
 }
 
 void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1663,8 +1676,8 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
-    target->bRequestForcedVisibilityUpdate = false;
+    if (target->IsInWorld())
+        target->UpdateObjectVisibility();
 }
 
 void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1828,7 +1841,6 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         if (!target->GetMap()->Instanceable())
         {
             target->UpdateObjectVisibility(false);
-            target->m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f);
         }
         else
             target->UpdateObjectVisibility();
@@ -3128,7 +3140,7 @@ void AuraEffect::HandlePreventFleeing(AuraApplication const* aurApp, uint8 mode,
     // Since patch 3.0.2 this mechanic no longer affects fear effects. It will ONLY prevent humanoids from fleeing due to low health.
     if (target->GetTypeId() == TYPEID_PLAYER || !apply || target->HasAuraType(SPELL_AURA_MOD_FEAR))
         return;
-    /// TODO: find a way to cancel fleeing for assistance.
+    /// @todo: find a way to cancel fleeing for assistance.
     /// Currently this will only stop creatures fleeing due to low health that could not find nearby allies to flee towards.
     target->SetControlled(false, UNIT_STATE_FLEEING);
 }
@@ -3864,7 +3876,7 @@ void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint
             && GetSpellInfo()->HasAttribute(SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE))
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
-    // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
+    /// @todo: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
     if ((apply)
             && GetSpellInfo()->HasAttribute(SPELL_ATTR1_IMMUNITY_PURGES_EFFECT)
             && GetSpellInfo()->IsPositive())                       //Only positive immunity removes auras
@@ -5043,11 +5055,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (caster && target->CanHaveThreatList())
                         target->AddThreat(caster, 10.0f);
                     break;
-                case 13139:                                     // net-o-matic
-                    // root to self part of (root_target->charge->root_self sequence
-                    if (caster)
-                        caster->CastSpell(caster, 13138, true, nullptr, this);
-                    break;
                 case 34026:   // kill command
                     {
                         Unit* pet = target->GetGuardianPet();
@@ -6024,19 +6031,12 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             triggerSpellId = 30571;
                             break;
                         // Doom
-                        // TODO: effect trigger spell may be independant on spell targets, and executed in spell finish phase
+                        /// @todo: effect trigger spell may be independant on spell targets, and executed in spell finish phase
                         // so instakill will be naturally done before trigger spell
                         case 31347:
                             {
                                 target->CastSpell(target, 31350, true, nullptr, this);
                                 Unit::Kill(target, target);
-                                return;
-                            }
-                        // Spellcloth
-                        case 31373:
-                            {
-                                // Summon Elemental after create item
-                                target->SummonCreature(17870, 0, 0, 0, target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 0);
                                 return;
                             }
                         // Eye of Grillok
@@ -6132,14 +6132,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                 {
                     // area aura owner casts the spell
                     GetBase()->GetUnitOwner()->CastSpell(target, triggeredSpellInfo, true, 0, this, GetBase()->GetUnitOwner()->GetGUID());
-                    return;
-                }
-            // Slime Spray - temporary here until preventing default effect works again
-            // added on 9.10.2010
-            case 69508:
-                {
-                    if (caster)
-                        caster->CastSpell(target, triggerSpellId, true, nullptr, nullptr, caster->GetGUID());
                     return;
                 }
             // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
@@ -6306,6 +6298,13 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // ignore non positive values (can be result apply spellmods to aura damage
     uint32 damage = std::max(GetAmount(), 0);
 
+    // If the damage is percent-max-health based, calculate damage before the Modify hook
+    if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE_PERCENT)
+    {
+        // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
+        damage = uint32(std::ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
+    }
+
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
 
@@ -6337,8 +6336,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
             // 5..8 ticks have normal tick damage
         }
     }
-    else // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
-        damage = uint32(std::ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
 
     // calculate crit chance
     bool crit = false;
@@ -6633,8 +6630,9 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
     Unit::CalcHealAbsorb(healInfo);
     int32 gain = Unit::DealHeal(caster, target, healInfo.GetHeal());
+    healInfo.SetEffectiveHeal(gain);
 
-    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - gain, healInfo.GetAbsorb(), 0, 0.0f, crit);
+    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - healInfo.GetEffectiveHeal(), healInfo.GetAbsorb(), 0, 0.0f, crit);
     target->SendPeriodicAuraLog(&pInfo);
 
     if (caster)

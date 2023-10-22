@@ -37,6 +37,7 @@ public:
     {
         instance_drak_tharon_keep_InstanceScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
         }
@@ -64,34 +65,6 @@ public:
                 case GO_NOVOS_CRYSTAL_4:
                     AddDoor(go, false);
                     break;
-            }
-        }
-
-        std::string GetSaveData() override
-        {
-            std::ostringstream saveStream;
-            saveStream << "D K " << GetBossSaveData();
-            return saveStream.str();
-        }
-
-        void Load(const char* in) override
-        {
-            if( !in )
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'D' && dataHead2 == 'K')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
             }
         }
     };

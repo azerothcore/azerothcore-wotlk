@@ -237,9 +237,9 @@ struct boss_twinemperorsAI : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
 
         if (!_introDone)
         {
@@ -300,9 +300,9 @@ struct boss_veknilash : public boss_twinemperorsAI
 
     bool IAmVeklor() override { return false; }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        boss_twinemperorsAI::EnterCombat(who);
+        boss_twinemperorsAI::JustEngagedWith(who);
 
         DoPlaySoundToSet(me, SOUND_VN_AGGRO);
 
@@ -331,9 +331,9 @@ struct boss_veklor : public boss_twinemperorsAI
 
     bool IAmVeklor() override { return true; }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        boss_twinemperorsAI::EnterCombat(who);
+        boss_twinemperorsAI::JustEngagedWith(who);
 
         DoPlaySoundToSet(me, SOUND_VK_AGGRO);
 

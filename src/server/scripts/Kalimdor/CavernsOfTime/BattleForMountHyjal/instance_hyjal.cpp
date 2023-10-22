@@ -55,6 +55,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
             m_uiAncientGemGUID.clear();
@@ -257,18 +258,7 @@ public:
 
             if (data == DONE)
             {
-                OUT_SAVE_INST_DATA;
-
-                std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' '
-                           << m_auiEncounter[3] << ' ' << m_auiEncounter[4]
-                           << ' ' << allianceRetreat << ' ' << hordeRetreat
-                           << ' ' << RaidDamage;
-
-                str_data = saveStream.str();
-
                 SaveToDB();
-                OUT_SAVE_INST_DATA_COMPLETE;
             }
         }
 
@@ -298,31 +288,32 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            return str_data;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
+            data >> m_auiEncounter[3];
+            data >> m_auiEncounter[4];
+            data >> allianceRetreat;
+            data >> hordeRetreat;
+            data >> RaidDamage;
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-            std::istringstream loadStream(in);
-            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> allianceRetreat >> hordeRetreat >> RaidDamage;
-            for (uint8 i = 0; i < EncounterCount; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS)                // Do not load an encounter as IN_PROGRESS - reset it instead.
-                    m_auiEncounter[i] = NOT_STARTED;
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' '
+                << m_auiEncounter[1] << ' '
+                << m_auiEncounter[2] << ' '
+                << m_auiEncounter[3] << ' '
+                << m_auiEncounter[4]<< ' '
+                << allianceRetreat << ' '
+                << hordeRetreat << ' '
+                << RaidDamage;
         }
 
     protected:
         uint32 m_auiEncounter[EncounterCount];
-        std::string str_data;
         GuidList m_uiAncientGemGUID;
         ObjectGuid RageWinterchill;
         ObjectGuid Anetheron;

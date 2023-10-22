@@ -28,6 +28,7 @@
 
 using namespace std;
 
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 class MPQArchive
 {
 public:
@@ -69,6 +70,7 @@ public:
 };
 typedef std::deque<MPQArchive*> ArchiveSet;
 
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 class MPQFile
 {
     //MPQHANDLE handle;

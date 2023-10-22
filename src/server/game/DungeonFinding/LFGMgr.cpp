@@ -189,7 +189,7 @@ namespace lfg
             if (!dungeon)
                 continue;
 
-            switch (dungeon->type)
+            switch (dungeon->TypeID)
             {
                 case LFG_TYPE_DUNGEON:
                 case LFG_TYPE_HEROIC:

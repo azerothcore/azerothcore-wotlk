@@ -248,14 +248,14 @@ void MotionMaster::MoveRandom(float wanderDistance)
     }
 }
 
-void MotionMaster::MoveTargetedHome()
+void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
 {
     Clear(false);
 
     if (_owner->GetTypeId() == TYPEID_UNIT && !_owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted home", _owner->GetGUID().ToString());
-        Mutate(new HomeMovementGenerator<Creature>(), MOTION_SLOT_ACTIVE);
+        Mutate(new HomeMovementGenerator<Creature>(walk), MOTION_SLOT_ACTIVE);
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
@@ -341,6 +341,32 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     init.MoveTo(point.x, point.y, point.z, false);
     init.SetFacing(target);
     init.SetOrientationInversed();
+    init.Launch();
+}
+
+void MotionMaster::MoveForwards(Unit* target, float dist)
+{
+    //like movebackwards, but without the inversion
+    if (!target)
+    {
+        return;
+    }
+
+    Position const& pos = target->GetPosition();
+    float angle = target->GetAngle(_owner);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true, true))
+    {
+        return;
+    }
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z, false);
+    init.SetFacing(target);
     init.Launch();
 }
 

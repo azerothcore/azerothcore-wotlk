@@ -86,9 +86,9 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 480000);
             events.ScheduleEvent(EVENT_YELL, urand(25000, 100000));

@@ -182,7 +182,7 @@ public:
     bool LoadArenaTeamFromDB(QueryResult arenaTeamDataResult);
     bool LoadMembersFromDB(QueryResult arenaTeamMembersResult);
     void LoadStatsFromDB(uint32 ArenaTeamId);
-    void SaveToDB();
+    void SaveToDB(bool forceMemberSave = false);
 
     void BroadcastPacket(WorldPacket* packet);
     void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
@@ -206,7 +206,7 @@ public:
 
     void UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& PlayerPoints);
 
-    void FinishWeek();
+    bool FinishWeek(); // returns true if arena team played this week
     void FinishGame(int32 mod, const Map* bgMap);
 
     void SetPreviousOpponents(uint32 arenaTeamId) { PreviousOpponents = arenaTeamId; }

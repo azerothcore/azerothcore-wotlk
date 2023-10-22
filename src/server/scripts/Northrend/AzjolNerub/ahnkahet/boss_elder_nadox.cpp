@@ -89,18 +89,18 @@ struct boss_elder_nadox : public BossAI
         respectYourElders = true;
     }
 
-    void EnterCombat(Unit * /*who*/) override
+    void JustEngagedWith(Unit * /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        events.ScheduleEvent(EVENT_SWARMER, 10000);
-        events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
-        events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
+        events.ScheduleEvent(EVENT_SWARMER, 10s);
+        events.ScheduleEvent(EVENT_CHECK_HOME, 2s);
+        events.ScheduleEvent(EVENT_PLAGUE, 5s, 8s);
 
         if (IsHeroic())
         {
-            events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
+            events.ScheduleEvent(EVENT_BROOD_RAGE, 5s);
         }
 
         // Cache eggs
@@ -198,19 +198,19 @@ struct boss_elder_nadox : public BossAI
                     if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
                         DoCast(pSwarmer, SPELL_BROOD_RAGE_H, true);
 
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_PLAGUE:
                 {
                     DoCastVictim(SPELL_BROOD_PLAGUE, false);
-                    events.RepeatEvent(urand(12000, 17000));
+                    events.Repeat(12s, 17s);
                     break;
                 }
                 case EVENT_SWARMER:
                 {
                     SummonHelpers(true);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_CHECK_HOME:
@@ -346,7 +346,7 @@ class spell_ahn_kahet_swarmer_aura : public SpellScript
             }
             else if (_targetCount)
             {
-                // TODO: move spell id to enum
+                /// @todo: move spell id to enum
                 caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
                 if (Aura *aur = caster->GetAura(SPELL_SWARM))
                 {

@@ -20,6 +20,8 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "VA"
+
 #define VaultOfArchavonScriptName "instance_vault_of_archavon"
 
 enum Creatures

@@ -24,6 +24,8 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 
+#define DataHeader "UU"
+
 #define UlduarScriptName "instance_ulduar"
 
 enum UlduarEncounters
@@ -299,5 +301,7 @@ inline AI* GetUlduarAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, UlduarScriptName);
 }
+
+#define RegisterUlduarCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUlduarAI)
 
 #endif

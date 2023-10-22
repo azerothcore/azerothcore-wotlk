@@ -181,9 +181,9 @@ struct boss_jarien : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         _scheduler.Schedule(5s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SHADOW_SHOCK);
@@ -307,9 +307,9 @@ struct boss_sothos : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         _scheduler.Schedule(10s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_FEAR);

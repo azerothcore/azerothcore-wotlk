@@ -71,7 +71,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_HEALTH1, 500ms);
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500ms);

@@ -131,7 +131,7 @@ public:
     int32 CalcMaxDuration() const { return CalcMaxDuration(GetCaster()); }
     int32 CalcMaxDuration(Unit* caster) const;
     int32 GetDuration() const { return m_duration; }
-    void SetDuration(int32 duration, bool withMods = false);
+    void SetDuration(int32 duration, bool withMods = false);    /// @todo - Look to convert to std::chrono
     void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
     void RefreshTimersWithMods();

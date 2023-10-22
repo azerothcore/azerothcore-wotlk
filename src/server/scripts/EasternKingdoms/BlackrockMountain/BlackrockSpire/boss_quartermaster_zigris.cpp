@@ -49,9 +49,9 @@ struct boss_quartermaster_zigris : public BossAI
         _hasDrunkPotion = false;
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_STUN_BOMB, 16s);
         events.ScheduleEvent(EVENT_HOOKED_NET, 14s);
         events.ScheduleEvent(EVENT_SHOOT, 1s);

@@ -1343,7 +1343,7 @@ bool GameObject::ActivateToQuest(Player* target) const
         case GAMEOBJECT_TYPE_CHEST:
             {
                 // scan GO chest with loot including quest items
-                if (LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
+                if (target->GetQuestStatus(GetGOInfo()->chest.questId) == QUEST_STATUS_INCOMPLETE || LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
                 {
                     //TODO: fix this hack
                     //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
@@ -1724,7 +1724,10 @@ void GameObject::Use(Unit* user)
                     player->SendCinematicStart(info->camera.cinematicId);
 
                 if (info->camera.eventID)
+                {
                     GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
+                    EventInform(info->camera.eventID);
+                }
 
                 return;
             }
@@ -2276,7 +2279,14 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     if (!IsDestructibleBuilding())
         return;
 
-    if (!m_goValue.Building.MaxHealth || !change)
+    // if this building doesn't have health, return
+    if (!m_goValue.Building.MaxHealth)
+        return;
+
+    sScriptMgr->OnGameObjectModifyHealth(this, attackerOrHealer, change, sSpellMgr->GetSpellInfo(spellId));
+
+    // if the health isn't being changed, return
+    if (!change)
         return;
 
     if (!m_allowModifyDestructibleBuilding)
@@ -2299,7 +2309,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     Player* player = attackerOrHealer->GetCharmerOrOwnerPlayerOrPlayerItself();
 
     // dealing damage, send packet
-    // TODO: is there any packet for healing?
+    /// @todo: is there any packet for healing?
     if (player)
     {
         WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);

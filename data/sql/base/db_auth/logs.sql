@@ -19,10 +19,10 @@ DROP TABLE IF EXISTS `logs`;
 CREATE TABLE IF NOT EXISTS `logs` (
   `time` int unsigned NOT NULL,
   `realm` int unsigned NOT NULL,
-  `type` varchar(250) NOT NULL,
+  `type` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `level` tinyint unsigned NOT NULL DEFAULT '0',
-  `string` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `string` text COLLATE utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_auth.logs: ~0 rows (approximately)
 DELETE FROM `logs`;

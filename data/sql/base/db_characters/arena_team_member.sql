@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `arena_team_member` (
   `seasonWins` smallint unsigned NOT NULL DEFAULT '0',
   `personalRating` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`arenaTeamId`,`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.arena_team_member: ~0 rows (approximately)
 DELETE FROM `arena_team_member`;

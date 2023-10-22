@@ -100,9 +100,9 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(victim);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SHIMMER, 1s);
             events.ScheduleEvent(EVENT_BREATH, 30s);

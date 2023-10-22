@@ -352,7 +352,7 @@ public:
 
         void BeginEvent()
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             Talk(SAY_GAMESBEGIN_2);
 
@@ -552,7 +552,7 @@ struct boss_nefarian : public BossAI
         classesPresent.clear();
     }
 
-    void EnterCombat(Unit* /*who*/) override {}
+    void JustEngagedWith(Unit* /*who*/) override {}
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -1243,7 +1243,7 @@ class spell_shadowblink : public SpellScript
             return;
         }
 
-        for (auto itr : spellPos)
+        for (auto& itr : spellPos)
         {
             float distTarget = target->GetDistance2d(itr.second.m_positionX, itr.second.m_positionY);
             if (distTarget <= 30.f)

@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 class DBCFile
 {
 public:
@@ -48,8 +49,8 @@ public:
         { }
     };
     // Iteration over database
-    class Iterator;
-    class Record
+    class Iterator; // cppcheck-suppress ctuOneDefinitionRuleViolation
+    class Record // cppcheck-suppress ctuOneDefinitionRuleViolation
     {
     public:
         [[nodiscard]] float getFloat(size_t field) const

@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtchancetomeleecrit_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtchancetomeleecrit_dbc: 1,100 rows
+-- Dumping data for table acore_world.gtchancetomeleecrit_dbc: ~1,100 rows (approximately)
 DELETE FROM `gtchancetomeleecrit_dbc`;
-/*!40000 ALTER TABLE `gtchancetomeleecrit_dbc` DISABLE KEYS */;
 INSERT INTO `gtchancetomeleecrit_dbc` (`ID`, `Data`) VALUES
 	(0, 0.002587),
 	(1, 0.002264),
@@ -1126,7 +1125,6 @@ INSERT INTO `gtchancetomeleecrit_dbc` (`ID`, `Data`) VALUES
 	(1097, 0.000299),
 	(1098, 0.000297),
 	(1099, 0.000291);
-/*!40000 ALTER TABLE `gtchancetomeleecrit_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

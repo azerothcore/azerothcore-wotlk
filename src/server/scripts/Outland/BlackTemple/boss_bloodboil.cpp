@@ -92,9 +92,9 @@ public:
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
             me->CastSpell(me, SPELL_ACIDIC_WOUND, true);

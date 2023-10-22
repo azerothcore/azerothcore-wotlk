@@ -16,7 +16,6 @@
  */
 
 #include "TemporarySummon.h"
-#include "CreatureAI.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Log.h"
@@ -499,7 +498,7 @@ void Puppet::Update(uint32 time)
         if (!IsAlive())
         {
             UnSummon();
-            // TODO: why long distance .die does not remove it
+            /// @todo: why long distance .die does not remove it
         }
     }
 }

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
@@ -51,6 +52,14 @@ void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, 
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {
         script->OnAfterRefCount(player, LootStoreItem, loot, canRate, lootMode, maxcount, store);
+    });
+}
+
+void ScriptMgr::OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
     });
 }
 
@@ -177,6 +186,21 @@ bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid sou
     return true;
 }
 
+bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return script->OnAllowedToLootContainerCheck(player, source);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 /**
  * @brief Called when an instance Id is deleted, usually because it expired or no players are bound to it anymore.
  *
@@ -187,5 +211,22 @@ void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {
         script->OnInstanceIdRemoved(instanceId);
+    });
+}
+
+/**
+ * @brief Called when any raid boss has their state updated (e.g. pull, reset, kill).
+ * @details Careful checks for old- and newState are required, since it can fire multiple times and not only when combat starts/ends.
+ *
+ * @param id The id of the boss in the [instance]
+ * @param newState The new boss state to be applied to this boss
+ * @param oldState The previously assigned state of this boss
+ * @param instance A pointer to the [map] object of the instance
+ */
+void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnBeforeSetBossState(id, newState, oldState, instance);
     });
 }

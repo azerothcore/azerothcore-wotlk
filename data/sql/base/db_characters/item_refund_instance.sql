@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `item_refund_instance` (
   `paidMoney` int unsigned NOT NULL DEFAULT '0',
   `paidExtendedCost` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`,`player_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item Refund System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item Refund System';
 
 -- Dumping data for table acore_characters.item_refund_instance: ~0 rows (approximately)
 DELETE FROM `item_refund_instance`;

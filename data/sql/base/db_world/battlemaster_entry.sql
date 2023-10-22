@@ -17,14 +17,13 @@
 -- Dumping structure for table acore_world.battlemaster_entry
 DROP TABLE IF EXISTS `battlemaster_entry`;
 CREATE TABLE IF NOT EXISTS `battlemaster_entry` (
-  `entry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of a creature',
-  `bg_template` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Battleground template id',
+  `entry` int unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of a creature',
+  `bg_template` int unsigned NOT NULL DEFAULT '0' COMMENT 'Battleground template id',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.battlemaster_entry: 146 rows
+-- Dumping data for table acore_world.battlemaster_entry: ~146 rows (approximately)
 DELETE FROM `battlemaster_entry`;
-/*!40000 ALTER TABLE `battlemaster_entry` DISABLE KEYS */;
 INSERT INTO `battlemaster_entry` (`entry`, `bg_template`) VALUES
 	(347, 1),
 	(857, 3),
@@ -172,7 +171,6 @@ INSERT INTO `battlemaster_entry` (`entry`, `bg_template`) VALUES
 	(35027, 30),
 	(37298, 1),
 	(37413, 1);
-/*!40000 ALTER TABLE `battlemaster_entry` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

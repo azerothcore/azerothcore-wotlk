@@ -351,12 +351,16 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed CMSG_AUTH_SESSION", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         }
-        case CMSG_KEEP_ALIVE: // todo: handle this packet in the same way of CMSG_TIME_SYNC_RESP
+        case CMSG_KEEP_ALIVE: /// @todo: handle this packet in the same way of CMSG_TIME_SYNC_RESP
             sessionGuard.lock();
             LogOpcodeText(opcode, sessionGuard);
             if (_worldSession)
+            {
                 _worldSession->ResetTimeOutTime(true);
-            return ReadDataHandlerResult::Ok;
+                return ReadDataHandlerResult::Ok;
+            }
+            LOG_ERROR("network", "WorldSocket::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
+            return ReadDataHandlerResult::Error;
         case CMSG_TIME_SYNC_RESP:
             packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
             break;
@@ -560,7 +564,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     //! Negative mutetime indicates amount of minutes to be muted effective on next login - which is now.
     if (account.MuteTime < 0)
     {
-        account.MuteTime = GameTime::GetGameTime().count() + llabs(account.MuteTime);
+        account.MuteTime = GameTime::GetGameTime().count() + std::llabs(account.MuteTime);
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
         stmt->SetData(0, account.MuteTime);

@@ -32,6 +32,22 @@ const Position OptionalSpawn[] =
     { -10899.903320f, -2085.573730f, 49.474449f, 1.38f }  // Rokad the Ravager
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
+    { NPC_DOROTHEE,             DATA_DOROTHEE  },
+    { NPC_TITO,                 DATA_TITO      },
+    { NPC_ROAR,                 DATA_ROAR      },
+    { NPC_STRAWMAN,             DATA_STRAWMAN  },
+    { NPC_TINHEAD,              DATA_TINHEAD   },
+    { NPC_ROMULO,               DATA_ROMULO    },
+    { NPC_JULIANNE,             DATA_JULIANNE  },
+    { NPC_NIGHTBANE,            DATA_NIGHTBANE },
+    { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
+    { 0,                        0              }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -46,12 +62,18 @@ public:
     {
         instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
             OzDeathCount = 0;
             OptionalBossCount = 0;
+
+            _chessTeam = TEAM_NEUTRAL;
+            _chessGamePhase = CHESS_PHASE_NOT_STARTED;
+            _chessEvent = NOT_STARTED;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -78,6 +100,37 @@ public:
                     if (GetBossState(DATA_OPERA_PERFORMANCE) != DONE && !creature->IsAlive())
                     {
                         creature->Respawn(true);
+                    }
+                    break;
+                case NPC_PAWN_H:
+                case NPC_KNIGHT_H:
+                case NPC_QUEEN_H:
+                case NPC_BISHOP_H:
+                case NPC_ROOK_H:
+                case NPC_KING_H:
+                case NPC_PAWN_A:
+                case NPC_KNIGHT_A:
+                case NPC_QUEEN_A:
+                case NPC_BISHOP_A:
+                case NPC_ROOK_A:
+                case NPC_KING_A:
+                    _chessPiecesGUID.insert(creature->GetGUID());
+                    creature->SetHealth(creature->GetMaxHealth());
+                    break;
+                case NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES:
+                    _medivhCheatFiresGUID.insert(creature->GetGUID());
+                    break;
+                case NPC_ECHO_OF_MEDIVH:
+                    _echoOfMedivhGUID = creature->GetGUID();
+                    break;
+                case NPC_FIENDISH_IMP:
+                    if (Creature* terestrian = GetCreature(DATA_TERESTIAN))
+                    {
+                        if (terestrian->AI())
+                        {
+                            terestrian->AI()->JustSummoned(creature);
+                            creature->SetInCombatWithZone();
+                        }
                     }
                     break;
                 default:
@@ -152,6 +205,84 @@ public:
 
                     break;
                 }
+                case DATA_CHESS_EVENT:
+                {
+                    _chessEvent = data;
+
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                        case SPECIAL:
+                        {
+                            DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                            for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                            {
+                                if (Creature* piece = instance->GetCreature(chessPieceGUID))
+                                {
+                                    if (_chessTeam == TEAM_ALLIANCE)
+                                    {
+                                        if (piece->GetFaction() == CHESS_FACTION_ALLIANCE)
+                                        {
+                                            piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                        }
+                                    }
+                                    else if (_chessTeam == TEAM_HORDE)
+                                    {
+                                        if (piece->GetFaction() == CHESS_FACTION_HORDE)
+                                        {
+                                            piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        piece->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                                    }
+                                }
+                            }
+                            break;
+                        case DONE:
+                            HandleGameObject(m_uiGamesmansExitDoor, true);
+                            break;
+                        }
+                        default:
+                            DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                            break;
+                    }
+                    break;
+                }
+                case CHESS_EVENT_TEAM:
+                    _chessTeam = data;
+                    break;
+                case DATA_CHESS_REINIT_PIECES:
+                    for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                    {
+                        if (Creature* piece = instance->GetCreature(chessPieceGUID))
+                        {
+                            piece->RemoveAllAuras();
+                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->SetHealth(piece->GetMaxHealth());
+                            float x, y, z, o;
+                            piece->GetHomePosition(x, y, z, o);
+                            piece->NearTeleportTo(x, y, z, o);
+                            piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
+                            piece->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            piece->AI()->Reset();
+                        }
+                    }
+
+                    for (ObjectGuid const& medivhCheatFireGUID : _medivhCheatFiresGUID)
+                    {
+                        if (Creature* fire = instance->GetCreature(medivhCheatFireGUID))
+                        {
+                            fire->DespawnOrUnsummon();
+                        }
+                    }
+
+                    _medivhCheatFiresGUID.clear();
+                    break;
+                case DATA_CHESS_GAME_PHASE:
+                    _chessGamePhase = data;
+                    break;
                 default:
                     break;
             }
@@ -175,15 +306,11 @@ public:
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
                     }
-                    break;
-                case DATA_CHESS:
-                    if (state == DONE)
-                        DoRespawnGameObject(DustCoveredChest, DAY);
                     break;
                 default:
                     break;
@@ -247,9 +374,9 @@ public:
                 case GO_SIDE_ENTRANCE_DOOR:
                     m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    else
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -283,9 +410,51 @@ public:
                     return OperaEvent;
                 case DATA_OPERA_OZ_DEATHCOUNT:
                     return OzDeathCount;
+                case CHESS_EVENT_TEAM:
+                    return _chessTeam;
+                case DATA_CHESS_GAME_PHASE:
+                    return _chessGamePhase;
+                case DATA_CHESS_EVENT:
+                    return _chessEvent;
             }
 
             return 0;
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SCHEDULE_RAJ_CHECK)
+            {
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Creature* julliane = GetCreature(DATA_JULIANNE);
+                    Creature* romulo = GetCreature(DATA_ROMULO);
+
+                    if (julliane && romulo)
+                    {
+                        if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)
+                            && romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                        {
+                            julliane->KillSelf();
+                            julliane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            romulo->KillSelf();
+                            romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                        else
+                        {
+                            if (romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_RESS_ROMULO);
+                            }
+
+                            if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_DO_RESURRECT);
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         ObjectGuid GetGuidData(uint32 data) const override
@@ -324,6 +493,10 @@ public:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
                     return m_uiNightBaneGUID;
+                case DATA_ECHO_OF_MEDIVH:
+                    return _echoOfMedivhGUID;
+                case DATA_DUST_COVERED_CHEST:
+                    return DustCoveredChest;
             }
 
             return ObjectGuid::Empty;
@@ -333,8 +506,10 @@ public:
         uint32 OperaEvent;
         uint32 OzDeathCount;
         uint32 OptionalBossCount;
-        //uint32 m_auiEncounter[MAX_ENCOUNTERS];
-        //uint32 m_uiTeam;
+        uint32 _chessTeam;
+        uint32 _chessGamePhase;
+        uint32 _chessEvent;
+
         ObjectGuid m_uiCurtainGUID;
         ObjectGuid m_uiStageDoorLeftGUID;
         ObjectGuid m_uiStageDoorRightGUID;
@@ -342,20 +517,22 @@ public:
         ObjectGuid m_uiTerestianGUID;
         ObjectGuid m_uiMoroesGUID;
         ObjectGuid m_uiNightBaneGUID;
-        //ObjectGuid EchoOfMedivhGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
         ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        //ObjectGuid m_uiServantsAccessDoor;                        // Door to Brocken Stair
         ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
         ObjectGuid _barnesGUID;
+        ObjectGuid _echoOfMedivhGUID;
+
         GuidVector _operaDecorations[EVENT_RAJ];
+        GuidSet _chessPiecesGUID;
+        GuidSet _medivhCheatFiresGUID;
     };
 };
 

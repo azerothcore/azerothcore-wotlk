@@ -18,10 +18,10 @@
 DROP TABLE IF EXISTS `character_talent`;
 CREATE TABLE IF NOT EXISTS `character_talent` (
   `guid` int unsigned NOT NULL,
-  `spell` mediumint unsigned NOT NULL,
+  `spell` int unsigned NOT NULL,
   `specMask` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_talent: ~0 rows (approximately)
 DELETE FROM `character_talent`;

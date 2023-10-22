@@ -20,6 +20,7 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "DM"
 #define DeadminesScriptName "instance_deadmines"
 
 enum DataTypes

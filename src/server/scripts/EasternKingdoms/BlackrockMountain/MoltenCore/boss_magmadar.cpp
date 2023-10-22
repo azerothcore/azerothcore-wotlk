@@ -55,9 +55,9 @@ public:
     {
         boss_magmadarAI(Creature* creature) : BossAI(creature, DATA_MAGMADAR) {}
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_FRENZY, 8500ms);
             events.ScheduleEvent(EVENT_PANIC, 9500ms);
             events.ScheduleEvent(EVENT_LAVA_BOMB, 12s);

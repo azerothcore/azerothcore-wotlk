@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.prospecting_loot_template
 DROP TABLE IF EXISTS `prospecting_loot_template`;
 CREATE TABLE IF NOT EXISTS `prospecting_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.prospecting_loot_template: 37 rows
+-- Dumping data for table acore_world.prospecting_loot_template: ~37 rows (approximately)
 DELETE FROM `prospecting_loot_template`;
-/*!40000 ALTER TABLE `prospecting_loot_template` DISABLE KEYS */;
 INSERT INTO `prospecting_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(2770, 774, 0, 0, 0, 1, 1, 1, 1, 'Malachite'),
 	(2770, 818, 0, 0, 0, 1, 1, 1, 1, 'Tigerseye'),
@@ -60,18 +59,17 @@ INSERT INTO `prospecting_loot_template` (`Entry`, `Item`, `Reference`, `Chance`,
 	(10620, 12799, 0, 15, 0, 1, 1, 1, 2, 'Large Opal'),
 	(10620, 12800, 0, 15, 0, 1, 1, 1, 2, 'Azerothian Diamond'),
 	(23424, 1, 1000, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
-	(23425, 3, 13001, 15, 0, 1, 1, 1, 1, '(ReferenceTable)'),
-	(23425, 2, 13002, 24, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(23425, 1, 13001, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 2, 13002, 24, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 3, 13001, 15, 0, 1, 1, 1, 1, '(ReferenceTable)'),
+	(23425, 24243, 0, 100, 0, 1, 0, 1, 1, 'Adamantite Powder'),
 	(36909, 1, 1001, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 1, 13005, 20, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(36910, 2, 1002, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 3, 1003, 75, 0, 1, 1, 1, 1, '(ReferenceTable)'),
 	(36910, 46849, 0, 75, 0, 1, 0, 1, 1, 'Titanium Powder'),
 	(36912, 1, 1003, 85, 0, 1, 0, 1, 1, '(ReferenceTable)'),
-	(36912, 2, 1004, 100, 0, 1, 1, 1, 1, '(ReferenceTable)'),
-	(23425, 24243, 0, 100, 0, 1, 0, 1, 1, 'Adamantite Powder');
-/*!40000 ALTER TABLE `prospecting_loot_template` ENABLE KEYS */;
+	(36912, 2, 1004, 100, 0, 1, 1, 1, 1, '(ReferenceTable)');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

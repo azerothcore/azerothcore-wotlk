@@ -67,9 +67,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_REND, 17s, 20s);
             events.ScheduleEvent(SPELL_STRIKE, 10s, 12s);
             events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, 25s, 30s);

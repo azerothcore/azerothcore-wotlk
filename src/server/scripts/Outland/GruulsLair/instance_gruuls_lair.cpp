@@ -26,6 +26,12 @@ DoorData const doorData[] =
     { 0,                0,              DOOR_TYPE_ROOM    } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_MAULGAR, DATA_MAULGAR },
+    { 0,           0            }
+};
+
 MinionData const minionData[] =
 {
     { NPC_MAULGAR,              DATA_MAULGAR },
@@ -44,63 +50,13 @@ public:
     {
         instance_gruuls_lair_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             LoadMinionData(minionData);
 
             _addsKilled = 0;
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_MAULGAR:
-                    _maulgarGUID = creature->GetGUID();
-                    [[fallthrough]];
-                case NPC_KROSH_FIREHAND:
-                case NPC_OLM_THE_SUMMONER:
-                case NPC_KIGGLER_THE_CRAZED:
-                case NPC_BLINDEYE_THE_SEER:
-                    AddMinion(creature, true);
-                    break;
-            }
-        }
-
-        void OnCreatureRemove(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_MAULGAR:
-                case NPC_KROSH_FIREHAND:
-                case NPC_OLM_THE_SUMMONER:
-                case NPC_KIGGLER_THE_CRAZED:
-                case NPC_BLINDEYE_THE_SEER:
-                    AddMinion(creature, false);
-                    break;
-            }
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_MAULGAR_DOOR:
-                case GO_GRUUL_DOOR:
-                    AddDoor(go, true);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_MAULGAR_DOOR:
-                case GO_GRUUL_DOOR:
-                    AddDoor(go, false);
-                    break;
-            }
         }
 
         bool SetBossState(uint32 id, EncounterState state) override
@@ -116,8 +72,12 @@ public:
         void SetData(uint32 type, uint32  /*id*/) override
         {
             if (type == DATA_ADDS_KILLED)
-                if (Creature* maulgar = instance->GetCreature(_maulgarGUID))
+            {
+                if (Creature* maulgar = GetCreature(DATA_MAULGAR))
+                {
                     maulgar->AI()->DoAction(++_addsKilled);
+                }
+            }
         }
 
         uint32 GetData(uint32 type) const override
@@ -127,52 +87,8 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "G L " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'G' && dataHead2 == 'L')
-            {
-                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-
     protected:
         uint32 _addsKilled;
-        ObjectGuid _maulgarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

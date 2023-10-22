@@ -85,10 +85,10 @@ struct boss_fankriss : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         _scheduler.CancelAll();
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
 
         _scheduler
             .Schedule(7s, 14s, [this](TaskContext context)

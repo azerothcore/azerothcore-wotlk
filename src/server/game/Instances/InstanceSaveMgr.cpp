@@ -20,7 +20,7 @@
 #include "Config.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
+#include "GridStates.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -676,6 +676,9 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
         stmt->SetData(1, save->GetInstanceId());
         stmt->SetData(2, permanent);
         CharacterDatabase.Execute(stmt);
+
+        if (player)
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);
     }
 
     if (bind.save != save)

@@ -69,7 +69,8 @@ body:
     attributes:
       label: Operating system
       description: |
-        Operating System, i.e. Windows 10 x64, Debian 10 x64, etc
+        The Operating System the Server is running on.
+        i.e. Windows 11 x64, Debian 10 x64, macOS 12, Ubuntu 20.04
     validations:
       required: true
   - type: textarea

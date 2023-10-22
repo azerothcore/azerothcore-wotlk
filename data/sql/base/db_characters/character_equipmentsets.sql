@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS `character_equipmentsets` (
   `guid` int NOT NULL DEFAULT '0',
   `setguid` bigint NOT NULL AUTO_INCREMENT,
   `setindex` tinyint unsigned NOT NULL DEFAULT '0',
-  `name` varchar(31) NOT NULL,
-  `iconname` varchar(100) NOT NULL,
+  `name` varchar(31) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `iconname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ignore_mask` int unsigned NOT NULL DEFAULT '0',
   `item0` int unsigned NOT NULL DEFAULT '0',
   `item1` int unsigned NOT NULL DEFAULT '0',
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `character_equipmentsets` (
   PRIMARY KEY (`setguid`),
   UNIQUE KEY `idx_set` (`guid`,`setguid`,`setindex`),
   KEY `Idx_setindex` (`setindex`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_equipmentsets: ~0 rows (approximately)
 DELETE FROM `character_equipmentsets`;

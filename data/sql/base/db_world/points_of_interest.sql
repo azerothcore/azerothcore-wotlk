@@ -17,19 +17,18 @@
 -- Dumping structure for table acore_world.points_of_interest
 DROP TABLE IF EXISTS `points_of_interest`;
 CREATE TABLE IF NOT EXISTS `points_of_interest` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
   `PositionX` float NOT NULL DEFAULT '0',
   `PositionY` float NOT NULL DEFAULT '0',
-  `Icon` mediumint unsigned NOT NULL DEFAULT '0',
-  `Flags` mediumint unsigned NOT NULL DEFAULT '0',
-  `Importance` mediumint unsigned NOT NULL DEFAULT '0',
-  `Name` text NOT NULL,
+  `Icon` int unsigned NOT NULL DEFAULT '0',
+  `Flags` int unsigned NOT NULL DEFAULT '0',
+  `Importance` int unsigned NOT NULL DEFAULT '0',
+  `Name` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.points_of_interest: 463 rows
+-- Dumping data for table acore_world.points_of_interest: ~463 rows (approximately)
 DELETE FROM `points_of_interest`;
-/*!40000 ALTER TABLE `points_of_interest` DISABLE KEYS */;
 INSERT INTO `points_of_interest` (`ID`, `PositionX`, `PositionY`, `Icon`, `Flags`, `Importance`, `Name`) VALUES
 	(1, -9459, 42.0805, 7, 99, 0, 'Lion\'s Pride Inn'),
 	(2, -9471, 33.4441, 7, 99, 0, 'Zaldimar Wefhellt'),
@@ -494,7 +493,6 @@ INSERT INTO `points_of_interest` (`ID`, `PositionX`, `PositionY`, `Icon`, `Flags
 	(1007, 2145, 1355, 7, 99, 0, 'Eight Wave'),
 	(1008, 2172, 1259, 7, 99, 0, 'Nineth Wave'),
 	(1009, 2351, 1197, 7, 99, 0, 'Salramm the Fleshcrafter');
-/*!40000 ALTER TABLE `points_of_interest` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

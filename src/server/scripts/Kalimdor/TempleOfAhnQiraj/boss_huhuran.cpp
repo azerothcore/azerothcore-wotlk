@@ -61,9 +61,9 @@ struct boss_huhuran : public BossAI
         _hardEnrage = false;
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_FRENZY, 12s, 21s);
         events.ScheduleEvent(EVENT_WYVERN_STING, 25s, 43s);
         events.ScheduleEvent(EVENT_ACID_SPIT, 1s, 20s);

@@ -22,11 +22,10 @@ CREATE TABLE IF NOT EXISTS `lfg_dungeon_rewards` (
   `firstQuestId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest id with rewards for first dungeon this day',
   `otherQuestId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest id with rewards for Nth dungeon this day',
   PRIMARY KEY (`dungeonId`,`maxLevel`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.lfg_dungeon_rewards: 15 rows
+-- Dumping data for table acore_world.lfg_dungeon_rewards: ~15 rows (approximately)
 DELETE FROM `lfg_dungeon_rewards`;
-/*!40000 ALTER TABLE `lfg_dungeon_rewards` DISABLE KEYS */;
 INSERT INTO `lfg_dungeon_rewards` (`dungeonId`, `maxLevel`, `firstQuestId`, `otherQuestId`) VALUES
 	(258, 15, 24881, 24889),
 	(258, 25, 24882, 24890),
@@ -43,7 +42,6 @@ INSERT INTO `lfg_dungeon_rewards` (`dungeonId`, `maxLevel`, `firstQuestId`, `oth
 	(286, 80, 25484, 0),
 	(287, 80, 25483, 0),
 	(288, 80, 25485, 0);
-/*!40000 ALTER TABLE `lfg_dungeon_rewards` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

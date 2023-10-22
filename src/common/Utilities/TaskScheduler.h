@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+  AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008+  TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _TASK_SCHEDULER_H_
@@ -136,6 +148,9 @@ class TaskScheduler
 
         void ModifyIf(std::function<bool(TaskContainer const&)> const& filter);
 
+        /// Check if the group exists and is currently scheduled.
+        bool IsGroupQueued(group_t const group);
+
         bool IsEmpty() const;
     };
 
@@ -259,6 +274,9 @@ public:
     /// Cancels all groups in the given std::vector.
     /// Hint: Use std::initializer_list for this: "{1, 2, 3, 4}"
     TaskScheduler& CancelGroupsOf(std::vector<group_t> const& groups);
+
+    /// Check if the group exists and is currently scheduled.
+    bool IsGroupScheduled(group_t const group);
 
     /// Delays all tasks with the given duration.
     template<class _Rep, class _Period>
@@ -426,11 +444,11 @@ public:
         : _task(right._task), _owner(right._owner), _consumed(right._consumed) { }
 
     // Move construct
-    TaskContext(TaskContext&& right)
+    TaskContext(TaskContext&& right) noexcept
         : _task(std::move(right._task)), _owner(std::move(right._owner)), _consumed(std::move(right._consumed)) { }
 
     // Copy assign
-    TaskContext& operator= (TaskContext const& right)
+    TaskContext& operator= (TaskContext const& right) noexcept
     {
         _task = right._task;
         _owner = right._owner;
@@ -439,7 +457,7 @@ public:
     }
 
     // Move assign
-    TaskContext& operator= (TaskContext&& right)
+    TaskContext& operator= (TaskContext&& right) noexcept
     {
         _task = std::move(right._task);
         _owner = std::move(right._owner);

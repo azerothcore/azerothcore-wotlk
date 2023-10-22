@@ -183,7 +183,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
             instance->SetData(DATA_DARKMASTER_GANDLING, IN_PROGRESS);

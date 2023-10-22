@@ -201,9 +201,9 @@ struct boss_ayamiss : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* attacker) override
+    void JustEngagedWith(Unit* attacker) override
     {
-        BossAI::EnterCombat(attacker);
+        BossAI::JustEngagedWith(attacker);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);

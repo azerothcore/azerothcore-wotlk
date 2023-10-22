@@ -17,21 +17,20 @@
 -- Dumping structure for table acore_world.event_scripts
 DROP TABLE IF EXISTS `event_scripts`;
 CREATE TABLE IF NOT EXISTS `event_scripts` (
-  `id` mediumint unsigned NOT NULL DEFAULT '0',
+  `id` int unsigned NOT NULL DEFAULT '0',
   `delay` int unsigned NOT NULL DEFAULT '0',
-  `command` mediumint unsigned NOT NULL DEFAULT '0',
-  `datalong` mediumint unsigned NOT NULL DEFAULT '0',
+  `command` int unsigned NOT NULL DEFAULT '0',
+  `datalong` int unsigned NOT NULL DEFAULT '0',
   `datalong2` int unsigned NOT NULL DEFAULT '0',
   `dataint` int NOT NULL DEFAULT '0',
   `x` float NOT NULL DEFAULT '0',
   `y` float NOT NULL DEFAULT '0',
   `z` float NOT NULL DEFAULT '0',
   `o` float NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.event_scripts: 468 rows
+-- Dumping data for table acore_world.event_scripts: ~463 rows (approximately)
 DELETE FROM `event_scripts`;
-/*!40000 ALTER TABLE `event_scripts` DISABLE KEYS */;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
 	(259, 2, 10, 1770, 300000, 0, 881.63, 1230.37, 47.83, 3.1),
 	(1785, 0, 10, 5676, 180000, 0, 1704.61, 41.9147, -63.8433, 0.435896),
@@ -196,7 +195,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(13666, 130, 10, 21294, 3000000, 0, 1717.2, 6301.02, -0.33, 1.11),
 	(13666, 130, 10, 21294, 3000000, 0, 1716.45, 6299.46, -0.36, 1.11),
 	(13666, 180, 10, 20116, 3000000, 0, 1716.33, 6299.22, -0.36, 1.11),
-	(13980, 0, 10, 21735, 3000000, 0, -3334.9, 2136.57, -2.54, 2.85),
+	(13980, 0, 10, 21735, 3000000, 0, -3368.91, 2145.37, -8.39026, 4.4855),
 	(14029, 0, 10, 21767, 9000000, 0, 3170.83, 5345.7, 180.57, 0),
 	(12650, 15, 8, 18384, 30, 0, 0, 0, 0, 0),
 	(14274, 2, 10, 22114, 3000000, 0, 2669.7, 5650.77, -13.45, 4.55),
@@ -221,9 +220,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(8428, 0, 9, 99783, 15, 0, 0, 0, 0, 0),
 	(8428, 10, 10, 14502, 9000000, 0, -35.712, 796.486, -29.5359, 1.90495),
 	(15452, 2, 10, 23864, 3000000, 0, -2984.98, -3853.72, 45.714, 5.34),
-	(14592, 1, 10, 22890, 300000, 0, -108.252, -510.302, 21.4761, 2.44346),
-	(14593, 2, 10, 22891, 300000, 0, 13.49, -307.87, -66, 3.12),
-	(14595, 2, 10, 22892, 300000, 0, 312.72, -19.24, 22.44, 2.12),
 	(14139, 0, 10, 21894, 360000, 0, 568.418, 8653.05, 19.9106, 1.18595),
 	(14797, 0, 10, 21851, 300000, 0, -88.02, 288.18, 75.2, 6),
 	(12823, 3, 10, 19864, 120000, 0, -1194.89, 2267.52, 47.29, 5.36),
@@ -273,8 +269,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(664, 3, 10, 3946, 60000, 0, -11142.5, -1151.78, 43.61, 5.28),
 	(364, 5, 10, 2624, 900000, 0, -12179.4, 644.22, -67.1, 5.18),
 	(2153, 5, 10, 7167, 900000, 0, -1456.55, -3959.53, 0.24, 1.99),
-	(3241, 5, 10, 8581, 600000, 0, 4279.11, -6295.57, 95.56, 0.05),
-	(3241, 20, 10, 8578, 900000, 0, 4279.11, -6295.57, 95.56, 0.05),
 	(3301, 2, 10, 7664, 900000, 0, -11234.4, -2842.68, 157.92, 1.42),
 	(5759, 2, 10, 11886, 600000, 0, 1571.63, -3276, 88.88, 6.05),
 	(5759, 6, 10, 11887, 600000, 0, 1569.4, -3272, 88.15, 0.28),
@@ -501,7 +495,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(19033, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
 	(19123, 0, 16, 5495, 2, 0, 0, 0, 0, 0),
 	(19124, 0, 16, 5495, 2, 0, 0, 0, 0, 0);
-/*!40000 ALTER TABLE `event_scripts` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

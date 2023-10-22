@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `character_account_data` (
   `time` int unsigned NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`guid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_account_data: ~0 rows (approximately)
 DELETE FROM `character_account_data`;

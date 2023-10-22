@@ -18,19 +18,18 @@
 DROP TABLE IF EXISTS `game_event_npc_vendor`;
 CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
   `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event.',
-  `guid` mediumint unsigned NOT NULL DEFAULT '0',
+  `guid` int unsigned NOT NULL DEFAULT '0',
   `slot` smallint NOT NULL DEFAULT '0',
-  `item` mediumint unsigned NOT NULL DEFAULT '0',
-  `maxcount` mediumint unsigned NOT NULL DEFAULT '0',
-  `incrtime` mediumint unsigned NOT NULL DEFAULT '0',
-  `ExtendedCost` mediumint unsigned NOT NULL DEFAULT '0',
+  `item` int unsigned NOT NULL DEFAULT '0',
+  `maxcount` int unsigned NOT NULL DEFAULT '0',
+  `incrtime` int unsigned NOT NULL DEFAULT '0',
+  `ExtendedCost` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`item`),
   KEY `slot` (`slot`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_npc_vendor: 14 rows
+-- Dumping data for table acore_world.game_event_npc_vendor: ~14 rows (approximately)
 DELETE FROM `game_event_npc_vendor`;
-/*!40000 ALTER TABLE `game_event_npc_vendor` DISABLE KEYS */;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
 	(17, 7, 0, 23160, 0, 0, 0),
 	(17, 7, 0, 23161, 0, 0, 0),
@@ -46,7 +45,6 @@ INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxc
 	(10, 99369, 0, 46693, 0, 0, 0),
 	(17, 208240, 0, 23160, 0, 0, 0),
 	(17, 208240, 0, 23161, 0, 0, 0);
-/*!40000 ALTER TABLE `game_event_npc_vendor` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

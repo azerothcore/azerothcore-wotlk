@@ -22,7 +22,6 @@
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 
-#define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
 
 class instance_trial_of_the_crusader : public InstanceMapScript
@@ -32,7 +31,11 @@ public:
 
     struct instance_trial_of_the_crusader_InstanceMapScript : public InstanceScript
     {
-        instance_trial_of_the_crusader_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
+        instance_trial_of_the_crusader_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            SetHeaders(DataHeader);
+            Initialize();
+        }
 
         bool CLEANED;
         uint32 EncounterStatus;
@@ -571,7 +574,7 @@ public:
                         {
                             InstanceCleanup();
                         }
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_OPEN_GATE:
@@ -1411,7 +1414,7 @@ public:
             // if missing spawn anub'arak
             SpawnAnubArak();
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
@@ -1586,57 +1589,35 @@ public:
             Counter = 0;
             EncounterStatus = NOT_STARTED;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-            std::ostringstream saveStream;
-            saveStream << "T C " << InstanceProgress;
-            if( instance->IsHeroic() )
-                saveStream << ' ' << AttemptsLeft << ' ' << (bDedicatedInsanity ? (uint32)1 : (uint32)0) << ' ' << (bNooneDied ? (uint32)1 : (uint32)0);
-            str_data = saveStream.str();
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
+            data >> InstanceProgress;
+
+            if (instance->IsHeroic())
+            {
+                data >> AttemptsLeft;
+                uint32 temp = 0;
+                data >> temp;
+                bDedicatedInsanity = !!temp;
+                data >> temp;
+                bNooneDied = !!temp;
+            }
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            EncounterStatus = NOT_STARTED;
-            CLEANED = false;
-            events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
+            data << InstanceProgress;
 
-            if( !in )
+            if (instance->IsHeroic())
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
+                data << ' '
+                    << AttemptsLeft << ' '
+                    << (bDedicatedInsanity ? 1 : 0) << ' '
+                    << (bNooneDied ? 1 : 0);
             }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint16 data0;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0;
-
-            if( dataHead1 == 'T' && dataHead2 == 'C' )
-            {
-                InstanceProgress = data0;
-                if( instance->IsHeroic() )
-                {
-                    uint32 data1 = 0, data2 = 0, data3 = 0;
-                    loadStream >> data1 >> data2 >> data3;
-                    AttemptsLeft = data1;
-                    bDedicatedInsanity = !!data2;
-                    bNooneDied = !!data3;
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

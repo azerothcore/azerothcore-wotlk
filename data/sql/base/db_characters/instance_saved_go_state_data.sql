@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `instance_saved_go_state_data` (
   `guid` int unsigned NOT NULL COMMENT 'gameobject.guid',
   `state` tinyint unsigned DEFAULT '0' COMMENT 'gameobject.state',
   PRIMARY KEY (`id`,`guid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.instance_saved_go_state_data: ~0 rows (approximately)
 DELETE FROM `instance_saved_go_state_data`;

@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Sholazar_Basin
-SD%Complete: 100
-SDComment: Quest support: 11253, 11241.
-SDCategory: howling_fjord
-EndScriptData */
-
-/* ContentData
-npc_plaguehound_tracker
-npc_apothecary_hanes
-EndContentData */
-
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"

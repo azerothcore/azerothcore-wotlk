@@ -18,13 +18,12 @@
 DROP TABLE IF EXISTS `exploration_basexp`;
 CREATE TABLE IF NOT EXISTS `exploration_basexp` (
   `level` tinyint unsigned NOT NULL DEFAULT '0',
-  `basexp` mediumint NOT NULL DEFAULT '0',
+  `basexp` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Exploration System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Exploration System';
 
--- Dumping data for table acore_world.exploration_basexp: 80 rows
+-- Dumping data for table acore_world.exploration_basexp: ~80 rows (approximately)
 DELETE FROM `exploration_basexp`;
-/*!40000 ALTER TABLE `exploration_basexp` DISABLE KEYS */;
 INSERT INTO `exploration_basexp` (`level`, `basexp`) VALUES
 	(0, 0),
 	(1, 5),
@@ -106,7 +105,6 @@ INSERT INTO `exploration_basexp` (`level`, `basexp`) VALUES
 	(77, 1530),
 	(78, 1600),
 	(79, 1630);
-/*!40000 ALTER TABLE `exploration_basexp` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

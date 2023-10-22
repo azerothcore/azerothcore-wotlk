@@ -29,6 +29,20 @@ DoorData const doorData[] =
     { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
+    { 0,                          0                           }
+};
+
+MinionData const minionData[] =
+{
+    { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_LORD_KARATHRESS },
+    { 0,                          0,                          }
+};
+
 class instance_serpent_shrine : public InstanceMapScript
 {
 public:
@@ -42,8 +56,11 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
+            LoadMinionData(minionData);
 
             AliveKeepersCount = 0;
         }
@@ -121,7 +138,10 @@ public:
                     if (Creature* vashj = instance->GetCreature(LadyVashjGUID))
                         vashj->AI()->JustSummoned(creature);
                     break;
+                default:
+                    break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override
@@ -171,49 +191,6 @@ public:
                 return AliveKeepersCount;
 
             return 0;
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "S C " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'S' && dataHead2 == 'C')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     private:

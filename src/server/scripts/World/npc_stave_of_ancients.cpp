@@ -291,7 +291,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
             RevealForm();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -301,9 +301,9 @@ public:
                 return;
             }
 
-            if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, ARTORIUS_HEAD)))
+            if (who && (UnitIsUnfair(who) || !QuestIncomplete(who, ARTORIUS_HEAD)))
             {
-                me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
             events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
@@ -486,7 +486,7 @@ public:
             ResetState();
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             RevealForm();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -652,16 +652,16 @@ public:
             events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2000);
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
             RevealForm();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
-                if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, SIMONE_HEAD)))
+                if (who && (UnitIsUnfair(who) || !QuestIncomplete(who, SIMONE_HEAD)))
                 {
-                    me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                    me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
@@ -886,7 +886,7 @@ public:
             me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
             RevealForm();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -901,9 +901,9 @@ public:
                 me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
             }
 
-            if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, NELSON_HEAD)))
+            if (who && (UnitIsUnfair(who) || !QuestIncomplete(who, NELSON_HEAD)))
             {
-                me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
             events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
@@ -1069,16 +1069,16 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
             RevealForm();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
-                if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, FRANKLIN_HEAD)))
+                if (who && (UnitIsUnfair(who) || !QuestIncomplete(who, FRANKLIN_HEAD)))
                 {
-                    me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                    me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
                 events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, urand(9000, 13000));

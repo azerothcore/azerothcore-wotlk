@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_skills` (
   `classMask` int unsigned NOT NULL,
   `skill` smallint unsigned NOT NULL,
   `rank` smallint unsigned NOT NULL DEFAULT '0',
-  `comment` varchar(255) DEFAULT NULL,
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.playercreateinfo_skills: ~77 rows (approximately)
 DELETE FROM `playercreateinfo_skills`;

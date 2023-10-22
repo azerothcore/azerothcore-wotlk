@@ -363,6 +363,13 @@ public:
                 return false;
             }
 
+            if (sObjectMgr->IsProfanityName(newName))
+            {
+                handler->SendSysMessage(LANG_PROFANITY_NAME);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
             stmt->SetData(0, newName);
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -884,7 +891,7 @@ public:
         }
 
         // Original TC Notes from Refactor vvv
-        //ToDo: use a new trinity_string for this commands
+        //ToDo: use a new acore_string for this commands
         handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
 
         return true;

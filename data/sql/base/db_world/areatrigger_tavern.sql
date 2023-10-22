@@ -17,15 +17,14 @@
 -- Dumping structure for table acore_world.areatrigger_tavern
 DROP TABLE IF EXISTS `areatrigger_tavern`;
 CREATE TABLE IF NOT EXISTS `areatrigger_tavern` (
-  `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
-  `name` text,
+  `id` int unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `name` text COLLATE utf8mb4_unicode_ci,
   `faction` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_tavern: 113 rows
+-- Dumping data for table acore_world.areatrigger_tavern: ~113 rows (approximately)
 DELETE FROM `areatrigger_tavern`;
-/*!40000 ALTER TABLE `areatrigger_tavern` DISABLE KEYS */;
 INSERT INTO `areatrigger_tavern` (`id`, `name`, `faction`) VALUES
 	(71, 'Westfall - Sentinel Hill Inn', 2),
 	(98, 'Nesingwary\'s Expedition', 6),
@@ -140,7 +139,6 @@ INSERT INTO `areatrigger_tavern` (`id`, `name`, `faction`) VALUES
 	(5323, 'Camp Tunka\'lo', 4),
 	(5327, 'Krasus\' Landing', 6),
 	(5360, 'Grom\'arsh Crash-Site', 4);
-/*!40000 ALTER TABLE `areatrigger_tavern` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

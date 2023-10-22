@@ -427,6 +427,8 @@ enum DyingKodo
 
     QUEST_KODO                      = 5561,
 
+    NPC_TEXT_KODO                   = 4449, // MenuID 3650
+
     NPC_SMEED                       = 11596,
     NPC_AGED_KODO                   = 4700,
     NPC_DYING_KODO                  = 4701,
@@ -498,7 +500,7 @@ public:
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());
         return true;
     }
 

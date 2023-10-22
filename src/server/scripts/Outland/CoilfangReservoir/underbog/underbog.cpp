@@ -16,8 +16,54 @@
  */
 
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "the_underbog.h"
+
+enum UnderbatSpells
+{
+    SPELL_TENTACLE_LASH = 34171
+};
+
+struct npc_underbat : public ScriptedAI
+{
+    npc_underbat(Creature* c) : ScriptedAI(c) {}
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(1200ms, 12500ms, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+            {
+                return u->IsAlive() && !u->IsPet() && me->IsWithinCombatRange(u, 5.0f) && !me->HasInArc(M_PI, u);
+            }))
+            {
+                DoCast(target, SPELL_TENTACLE_LASH);
+            }
+            context.Repeat(1200ms, 12500ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff, [this]
+        {
+            DoMeleeAttackIfReady();
+        });
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
 
 class spell_fungal_decay : public AuraScript
 {
@@ -40,7 +86,39 @@ class spell_fungal_decay : public AuraScript
     }
 };
 
+enum AllergiesEnum
+{
+    SPELL_SNEEZE    = 31428
+};
+
+class spell_allergies : public AuraScript
+{
+    PrepareAuraScript(spell_allergies);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = urand(10 * IN_MILLISECONDS, 60 * IN_MILLISECONDS);
+    }
+
+    void Update(AuraEffect* /*effect*/)
+    {
+        if (Unit* target = GetUnitOwner())
+        {
+            target->CastSpell(target, SPELL_SNEEZE, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_allergies::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_allergies::Update, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_underbog()
 {
+    RegisterUnderbogCreatureAI(npc_underbat);
     RegisterSpellScript(spell_fungal_decay);
+    RegisterSpellScript(spell_allergies);
 }

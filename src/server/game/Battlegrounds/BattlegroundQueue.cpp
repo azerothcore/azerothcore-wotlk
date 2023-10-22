@@ -895,8 +895,8 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
             {
                 if (!(*itr3)->IsInvitedToBGInstanceGUID
                     && (((*itr3)->ArenaMatchmakerRating >= arenaMinRating && (*itr3)->ArenaMatchmakerRating <= arenaMaxRating) || (int32)(*itr3)->JoinTime < discardTime)
-                    && ((*itr_teams[0])->ArenaTeamId != (*itr3)->PreviousOpponentsTeamId || ((int32)(*itr3)->JoinTime < discardOpponentsTime))
-                    && (*itr_teams[0])->ArenaTeamId != (*itr3)->ArenaTeamId)
+                    && ((*(itr_teams[0]))->ArenaTeamId != (*itr3)->PreviousOpponentsTeamId || ((int32)(*itr3)->JoinTime < discardOpponentsTime))
+                    && (*(itr_teams[0]))->ArenaTeamId != (*itr3)->ArenaTeamId)
                 {
                     itr_teams[found++] = itr3;
                     break;
@@ -907,8 +907,8 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         //if we have 2 teams, then start new arena and invite players!
         if (found == 2)
         {
-            GroupQueueInfo* aTeam = *itr_teams[TEAM_ALLIANCE];
-            GroupQueueInfo* hTeam = *itr_teams[TEAM_HORDE];
+            GroupQueueInfo* aTeam = *(itr_teams[TEAM_ALLIANCE]);
+            GroupQueueInfo* hTeam = *(itr_teams[TEAM_HORDE]);
 
             Battleground* arena = sBattlegroundMgr->CreateNewBattleground(bgTypeId, bracketEntry, arenaType, true);
             if (!arena)
@@ -1143,7 +1143,22 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         uint32 ArenaTeamRating = ginfo->ArenaTeamRating;
         std::string TeamName = team->GetName();
 
-        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+        uint32 announcementDetail = sWorld->getIntConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL);
+        switch (announcementDetail)
+        {
+        case 3:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+            break;
+        case 2:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType);
+            break;
+        case 1:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType, ArenaTeamRating);
+            break;
+        default:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType);
+            break;
+        }
     }
 }
 
@@ -1168,7 +1183,22 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
 
     if (ArenaType && ginfo->Players.empty())
     {
-        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+        uint32 announcementDetail = sWorld->getIntConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL);
+        switch (announcementDetail)
+        {
+        case 3:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+            break;
+        case 2:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType);
+            break;
+        case 1:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType, ArenaTeamRating);
+            break;
+        default:
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType);
+            break;
+        }
     }
 }
 

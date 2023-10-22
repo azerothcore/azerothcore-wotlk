@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `quest_mail_sender` (
   `QuestId` int unsigned NOT NULL DEFAULT '0',
   `RewardMailSenderEntry` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`QuestId`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.quest_mail_sender: ~10 rows (approximately)
 DELETE FROM `quest_mail_sender`;

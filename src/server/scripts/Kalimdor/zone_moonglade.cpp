@@ -276,7 +276,7 @@ enum ClintarSpirit
 {
     ASPECT_RAVEN                        = 22915,
 
-    // Texts for EnterCombat, the event and the end of the event are missing
+    // Texts for JustEngagedWith, the event and the end of the event are missing
     CLINTAR_SPIRIT_SAY_START            = 0,
 };
 
@@ -604,7 +604,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CAST_CLEAVE, 3s,  5s);

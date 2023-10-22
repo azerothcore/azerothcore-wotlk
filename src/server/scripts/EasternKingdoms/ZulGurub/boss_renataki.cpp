@@ -63,9 +63,9 @@ public:
             _dynamicFlags = me->GetDynamicFlags();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(EVENT_VANISH, 23s, 25s);
             events.ScheduleEvent(EVENT_GOUGE, 5s, 10s);
             events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 20s);

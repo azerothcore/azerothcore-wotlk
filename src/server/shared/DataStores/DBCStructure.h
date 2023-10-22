@@ -74,7 +74,7 @@ struct AchievementCriteriaEntry
     union
     {
         // ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE          = 0
-        // TODO: also used for player deaths..
+        /// @todo: also used for player deaths..
         struct
         {
             uint32  creatureID;                             // 3
@@ -286,14 +286,14 @@ struct AchievementCriteriaEntry
         // ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA           = 43
         struct
         {
-            // TODO: This rank is _NOT_ the index from AreaTable.dbc
+            /// @todo: This rank is _NOT_ the index from AreaTable.dbc
             uint32  areaReference;                          // 3
         } explore_area;
 
         // ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK               = 44
         struct
         {
-            // TODO: This rank is _NOT_ the index from CharTitles.dbc
+            /// @todo: This rank is _NOT_ the index from CharTitles.dbc
             uint32  rank;                                   // 3
         } own_rank;
 
@@ -326,7 +326,7 @@ struct AchievementCriteriaEntry
         } visit_barber;
 
         // ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM        = 49
-        // TODO: where is the required itemlevel stored?
+        /// @todo: where is the required itemlevel stored?
         struct
         {
             uint32  itemSlot;                               // 3
@@ -361,7 +361,7 @@ struct AchievementCriteriaEntry
         } hk_race;
 
         // ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE               = 54
-        // TODO: where is the information about the target stored?
+        /// @todo: where is the information about the target stored?
         struct
         {
             uint32  emoteID;                                // 3 enum TextEmotes
@@ -412,7 +412,7 @@ struct AchievementCriteriaEntry
         } use_gameobject;
 
         // ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL       = 70
-        // TODO: are those special criteria stored in the dbc or do we have to add another sql table?
+        /// @todo: are those special criteria stored in the dbc or do we have to add another sql table?
         struct
         {
             uint32  unused;                                 // 3
@@ -1127,6 +1127,18 @@ struct HolidaysEntry
     //uint32 flags;                                         // 54       m_flags (0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1)
 };
 
+struct ItemEntry
+{
+    uint32 ID;                                               // 0
+    uint32 ClassID;                                          // 1
+    uint32 SubclassID;                                       // 2
+    int32 SoundOverrideSubclassID;                           // 3
+    int32 Material;                                          // 4
+    uint32 DisplayInfoID;                                    // 5
+    uint32 InventoryType;                                    // 6
+    uint32 SheatheType;                                      // 7
+};
+
 struct ItemBagFamilyEntry
 {
     uint32   ID;                                            // 0
@@ -1222,25 +1234,28 @@ struct ItemSetEntry
 
 struct LFGDungeonEntry
 {
-    uint32  ID;                                             // 0
-    char const*   name[16];                                 // 1-17 Name lang
-    uint32  minlevel;                                       // 18
-    uint32  maxlevel;                                       // 19
-    uint32  reclevel;                                       // 20
-    uint32  recminlevel;                                    // 21
-    uint32  recmaxlevel;                                    // 22
-    int32   map;                                            // 23
-    uint32  difficulty;                                     // 24
-    uint32  flags;                                          // 25
-    uint32  type;                                           // 26
-    //uint32  unk;                                          // 27
-    //char const*   iconname;                               // 28
-    uint32  expansion;                                      // 29
-    //uint32  unk4;                                         // 30
-    uint32  grouptype;                                      // 31
-    //char const*   desc[16];                                     // 32-47 Description
+    uint32 ID;                                              // 0
+    char const* Name[16];                                   // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    uint32 MinLevel;                                        // 18
+    uint32 MaxLevel;                                        // 19
+    uint32 TargetLevel;                                     // 20
+    uint32 TargetLevelMin;                                  // 21
+    uint32 TargetLevelMax;                                  // 22
+    uint32 MapID;                                           // 23
+    uint32 Difficulty;                                      // 24
+    uint32 Flags;                                           // 25
+    uint32 TypeID;                                          // 26
+    //int32 Faction;                                        // 27
+    //char const* TextureFilename;                          // 28
+    uint32 ExpansionLevel;                                  // 29
+    //uint32 OrderIndex;                                    // 30
+    uint32 GroupID;                                         // 31
+    //char const* Description[16];                          // 32-47
+    //uint32 Description_lang_mask;                         // 48
+
     // Helpers
-    [[nodiscard]] uint32 Entry() const { return ID + (type << 24); }
+    [[nodiscard]] uint32 Entry() const { return ID + (TypeID << 24); }
 };
 
 struct LightEntry
@@ -1377,6 +1392,20 @@ struct MovieEntry
     //uint32      unk2;                                     // 2 always 100
 };
 
+struct NamesReservedEntry
+{
+    //uint32         ID;                                    // 0
+    char const*      Pattern;                               // 1
+    //uint32         Language;                              // 2
+};
+
+struct NamesProfanityEntry
+{
+    //uint32         ID;                                    // 0
+    char const*      Pattern;                               // 1
+    //uint32         Language;                              // 2
+};
+
 #define MAX_OVERRIDE_SPELL 10
 
 struct OverrideSpellDataEntry
@@ -1502,6 +1531,16 @@ struct ScalingStatValuesEntry
             if (mask & 0x00004000) return dpsMod[5];        // Wand
         }
         return 0;
+    }
+
+    bool IsTwoHand(uint32 mask) const
+    {
+        if (mask & 0x7E00)
+        {
+            if (mask & 0x00000400) return true;
+            if (mask & 0x00001000) return true;
+        }
+        return false;
     }
 
     [[nodiscard]] uint32 getSpellBonus(uint32 mask) const

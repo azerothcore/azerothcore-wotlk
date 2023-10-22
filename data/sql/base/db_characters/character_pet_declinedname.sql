@@ -19,14 +19,14 @@ DROP TABLE IF EXISTS `character_pet_declinedname`;
 CREATE TABLE IF NOT EXISTS `character_pet_declinedname` (
   `id` int unsigned NOT NULL DEFAULT '0',
   `owner` int unsigned NOT NULL DEFAULT '0',
-  `genitive` varchar(12) NOT NULL DEFAULT '',
-  `dative` varchar(12) NOT NULL DEFAULT '',
-  `accusative` varchar(12) NOT NULL DEFAULT '',
-  `instrumental` varchar(12) NOT NULL DEFAULT '',
-  `prepositional` varchar(12) NOT NULL DEFAULT '',
+  `genitive` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `dative` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `accusative` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `instrumental` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `prepositional` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `owner_key` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_pet_declinedname: ~0 rows (approximately)
 DELETE FROM `character_pet_declinedname`;

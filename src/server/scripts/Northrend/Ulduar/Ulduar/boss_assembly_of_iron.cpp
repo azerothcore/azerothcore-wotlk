@@ -101,6 +101,7 @@ enum eEnums
     EVENT_LIGHTNING_TENDRILS    = 24,
     EVENT_LIGHTNING_LAND        = 25,
     EVENT_LAND_LAND             = 26,
+    EVENT_LIGHTNING_FLIGHT      = 27,
 
     EVENT_ENRAGE                = 30
 };
@@ -228,7 +229,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, IN_PROGRESS);
@@ -236,7 +237,7 @@ public:
             me->setActive(true);
             me->SetInCombatWithZone();
             me->CastSpell(me, SPELL_HIGH_VOLTAGE, true);
-            events.ScheduleEvent(EVENT_ENRAGE, 900000);
+            events.ScheduleEvent(EVENT_ENRAGE, 15min);
             UpdatePhase();
 
             if (!pInstance)
@@ -274,14 +275,14 @@ public:
             switch (_phase)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_FUSION_PUNCH, 15000);
+                    events.RescheduleEvent(EVENT_FUSION_PUNCH, 15s);
                     break;
                 case 2:
-                    events.RescheduleEvent(EVENT_STATIC_DISRUPTION, 20000);
+                    events.RescheduleEvent(EVENT_STATIC_DISRUPTION, 20s);
                     break;
                 case 3:
                     me->ResetLootMode();
-                    events.RescheduleEvent(EVENT_OVERWHELMING_POWER, 8000);
+                    events.RescheduleEvent(EVENT_OVERWHELMING_POWER, 8s);
                     break;
             }
         }
@@ -341,13 +342,13 @@ public:
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     break;
                 case EVENT_STATIC_DISRUPTION:
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
-                    events.RepeatEvent(urand(20000, 40000));
+                    events.Repeat(20s, 40s);
                     break;
                 case EVENT_OVERWHELMING_POWER:
                     Talk(SAY_STEELBREAKER_POWER);
@@ -424,12 +425,12 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ENRAGE, 900000);
+            events.ScheduleEvent(EVENT_ENRAGE, 15min);
             UpdatePhase();
 
             if (!pInstance)
@@ -451,15 +452,15 @@ public:
             switch (_phase)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 20000);
-                    events.RescheduleEvent(EVENT_RUNE_OF_POWER, 30000);
+                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 20s);
+                    events.RescheduleEvent(EVENT_RUNE_OF_POWER, 30s);
                     break;
                 case 2:
-                    events.RescheduleEvent(EVENT_RUNE_OF_DEATH, 35000);
+                    events.RescheduleEvent(EVENT_RUNE_OF_DEATH, 35s);
                     break;
                 case 3:
                     me->ResetLootMode();
-                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, urand(20000, 30000));
+                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, 20s, 30s);
                     break;
             }
         }
@@ -515,25 +516,25 @@ public:
                             target = me;
 
                         me->CastSpell(target, SPELL_RUNE_OF_POWER, true);
-                        events.RepeatEvent(60000);
+                        events.Repeat(1min);
                         break;
                     }
                 case EVENT_SHIELD_OF_RUNES:
                     me->CastSpell(me, SPELL_SHIELD_OF_RUNES, false);
-                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000, 34000));
+                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 27s, 34s);
                     break;
                 case EVENT_RUNE_OF_DEATH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
 
                     Talk(SAY_MOLGEIM_RUNE_DEATH);
-                    events.RepeatEvent(urand(30000, 40000));
+                    events.Repeat(30s, 40s);
                     break;
                 case EVENT_RUNE_OF_SUMMONING:
                     Talk(SAY_MOLGEIM_SUMMON);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNE_OF_SUMMONING);
-                    events.RepeatEvent(urand(30000, 45000));
+                    events.Repeat(30s, 45s);
                     break;
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -611,7 +612,6 @@ public:
         EventMap events;
         InstanceScript* pInstance;
         uint32 _phase;
-        bool _flyPhase;
         ObjectGuid _flyTargetGUID;
         uint32 _channelTimer;
 
@@ -624,7 +624,6 @@ public:
 
             _channelTimer = 0;
             _phase = 0;
-            _flyPhase = false;
             _flyTargetGUID.Clear();
             _stunnedAchievement = true;
 
@@ -643,12 +642,12 @@ public:
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ENRAGE, 900000);
+            events.ScheduleEvent(EVENT_ENRAGE, 15min);
             UpdatePhase();
 
             if (!pInstance)
@@ -670,16 +669,16 @@ public:
             switch (_phase)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, urand(9000, 17000));
-                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
+                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, 9s, 17s);
+                    events.RescheduleEvent(EVENT_OVERLOAD, 25s, 40s);
                     break;
                 case 2:
-                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, urand(20000, 40000));
+                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, 20s, 40s);
                     break;
                 case 3:
                     me->ResetLootMode();
                     me->CastSpell(me, SPELL_STORMSHIELD, true);
-                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, urand(15000, 16000));
+                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, 15s, 16s);
                     break;
             }
         }
@@ -754,19 +753,6 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (_flyPhase)
-            {
-                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
-                {
-                    if (me->GetDistance2d(flyTarget) >= 6)
-                    {
-                        //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                        me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
-                    }
-                }
-            }
-
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -777,53 +763,53 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
 
-                    events.RepeatEvent(urand(9000, 17000));
+                    events.Repeat(9s, 17s);
                     break;
                 case EVENT_OVERLOAD:
                     Talk(EMOTE_BRUNDIR_OVERLOAD);
                     me->CastSpell(me, SPELL_OVERLOAD, true);
-                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
+                    events.RescheduleEvent(EVENT_OVERLOAD, 25s, 40s);
                     break;
                 case EVENT_LIGHTNING_WHIRL:
                     Talk(SAY_BRUNDIR_SPECIAL);
                     me->CastSpell(me, SPELL_LIGHTNING_WHIRL, true);
-                    events.RepeatEvent(urand(10000, 25000));
+                    events.Repeat(10s, 25s);
                     break;
                 case EVENT_LIGHTNING_TENDRILS:
                     {
                         // Reschedule old
-                        events.RepeatEvent(35000);
-                        events.DelayEvents(18000);
+                        events.Repeat(35s);
+                        events.DelayEvents(18s);
                         Talk(SAY_BRUNDIR_FLIGHT);
 
-                        _flyPhase = true;
                         Unit* oldVictim = me->GetVictim();
                         _flyTargetGUID = oldVictim->GetGUID();
                         me->SetRegeneratingHealth(false);
                         me->SetDisableGravity(true);
+                        me->SetHover(true);
 
                         me->CombatStop();
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
-                        events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
+                        events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16s);
+                        events.ScheduleEvent(EVENT_LIGHTNING_FLIGHT, 1s);
                         break;
                     }
                 case EVENT_LIGHTNING_LAND:
                     {
                         float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-                        _flyPhase = false;
-                        events.ScheduleEvent(EVENT_LAND_LAND, 1000);
+                        events.ScheduleEvent(EVENT_LAND_LAND, 1s);
                         break;
                     }
                 case EVENT_LAND_LAND:
                     me->SetCanFly(false);
+                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetDisableGravity(false);
                     if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
@@ -836,10 +822,18 @@ public:
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreatList();
+                    events.CancelEvent(EVENT_LIGHTNING_FLIGHT);
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_LIGHTNING_FLIGHT:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                    {
+                        me->GetMotionMaster()->MovePoint(0, *target);
+                    }
+                    events.ScheduleEvent(EVENT_LIGHTNING_FLIGHT, 6s);
                     break;
             }
 

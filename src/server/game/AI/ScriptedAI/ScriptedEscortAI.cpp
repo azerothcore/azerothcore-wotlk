@@ -141,7 +141,7 @@ void npc_escortAI::MoveInLineOfSight(Unit* who)
         if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombatAgainst(who))
             return;
 
-    if (me->CanStartAttack(who))
+    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
     {
         if (me->HasUnitState(UNIT_STATE_DISTRACTED))
         {
@@ -200,7 +200,6 @@ void npc_escortAI::ReturnToLastPoint()
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
-    me->RemoveAllAuras();
     me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);

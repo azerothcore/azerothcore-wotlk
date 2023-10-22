@@ -42,6 +42,7 @@ SERVICE_STATUS serviceStatus;
 
 SERVICE_STATUS_HANDLE serviceStatusHandle = 0;
 
+// cppcheck-suppress syntaxError
 typedef WINADVAPI BOOL (WINAPI* CSD_T)(SC_HANDLE, DWORD, LPCVOID);
 
 bool WinServiceInstall()

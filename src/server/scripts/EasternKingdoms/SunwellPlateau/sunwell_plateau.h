@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "SWP"
+
 #define SWPScriptName "instance_sunwell_plateau"
 
 enum DataTypes

@@ -26,13 +26,11 @@ CREATE TABLE IF NOT EXISTS `creature_movement_override` (
   `Random` tinyint unsigned DEFAULT NULL,
   `InteractionPauseTimer` int unsigned DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
   PRIMARY KEY (`SpawnId`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_movement_override: 11 rows
+-- Dumping data for table acore_world.creature_movement_override: ~9 rows (approximately)
 DELETE FROM `creature_movement_override`;
-/*!40000 ALTER TABLE `creature_movement_override` DISABLE KEYS */;
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-	(125724, 1, 1, 2, 0, 0, 0, NULL),
 	(106339, 1, 1, 2, 0, 0, 0, NULL),
 	(106340, 1, 1, 2, 0, 0, 0, NULL),
 	(117664, 1, 0, 1, 0, 0, 0, NULL),
@@ -40,10 +38,8 @@ INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`,
 	(117671, 1, 0, 1, 0, 0, 0, NULL),
 	(117672, 1, 0, 1, 0, 0, 0, NULL),
 	(117677, 1, 0, 1, 0, 0, 0, NULL),
-	(247156, 1, 0, 1, 1, 0, 0, NULL),
-	(247157, 1, 0, 1, 1, 0, 0, NULL),
+	(125724, 1, 1, 2, 0, 0, 0, NULL),
 	(130896, 1, 0, 1, 0, 0, 0, NULL);
-/*!40000 ALTER TABLE `creature_movement_override` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -141,9 +141,9 @@ struct boss_skeram : public BossAI
             me->RemoveCorpse();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         events.Reset();
 
         events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6s, 12s);

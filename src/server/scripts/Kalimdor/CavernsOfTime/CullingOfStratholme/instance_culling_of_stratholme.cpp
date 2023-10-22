@@ -38,6 +38,7 @@ public:
         instance_culling_of_stratholme_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             // Instance
+            SetHeaders(DataHeader);
             _crateCount = 0;
             _showCrateTimer = 0;
             _guardianTimer = 0;

@@ -30,7 +30,7 @@ class Item;
 class Object;
 class Player;
 
-#define MAIL_BODY_ITEM_TEMPLATE 8383                        // - plain letter, A Dusty Unsent Letter: 889
+#define MAIL_BODY_ITEM_TEMPLATE 9311                        // - plain letter, A Dusty Unsent Letter: 889
 #define MAX_MAIL_ITEMS 12
 
 enum MailMessageType

@@ -21,6 +21,8 @@
 #include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 
+#define DataHeader "HY"
+
 #define HyjalScriptName "instance_hyjal"
 
 uint32 const EncounterCount     = 5;

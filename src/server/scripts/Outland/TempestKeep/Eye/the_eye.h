@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "TE"
+
 #define TheEyeScriptName "instance_the_eye"
 
 enum EyeData
@@ -62,5 +64,7 @@ inline AI* GetTheEyeAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheEyeScriptName);
 }
+
+#define RegisterTheEyeAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheEyeAI)
 
 #endif

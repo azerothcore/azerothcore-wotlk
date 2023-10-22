@@ -22,6 +22,7 @@
 #include "SpellScript.h"
 #include "CreatureAIImpl.h"
 
+#define DataHeader "SK"
 #define ShadowfangKeepScriptName "instance_shadowfang_keep"
 
 enum DataTypes

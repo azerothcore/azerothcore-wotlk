@@ -104,7 +104,7 @@ public:
                     dwarfRune->SetGoState(state);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2s);
 

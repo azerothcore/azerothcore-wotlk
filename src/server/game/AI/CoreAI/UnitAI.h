@@ -93,7 +93,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 };
 
 // Target selector for spell casts checking range, auras and attributes
-// TODO: Add more checks from Spell::CheckCast
+/// @todo: Add more checks from Spell::CheckCast
 struct SpellTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
@@ -332,6 +332,21 @@ public:
             targetList.resize(num);
     }
 
+    /**
+     * @brief Called when the unit enters combat
+     * (NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
+     *
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
+    virtual void JustEnteredCombat(Unit* /*who*/) { }
+
+    /**
+     * @brief Called when the unit leaves combat
+     *
+     * @todo Never invoked right now. Preparation for Combat Threat refactor
+     */
+    virtual void JustExitedCombat() { }
+
     // Called at any Damage to any victim (before damage apply)
     virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
 
@@ -356,6 +371,9 @@ public:
     SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
+
+    // Cast spell on the top threat target, which may not be the current victim.
+    SpellCastResult DoCastMaxThreat(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
 
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 

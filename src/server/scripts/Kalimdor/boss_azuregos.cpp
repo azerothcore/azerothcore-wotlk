@@ -84,7 +84,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoCastSelf(SPELL_MARK_OF_FROST_AURA);
             Talk(SAY_AGGRO);
@@ -187,7 +187,7 @@ class spell_arcane_vacuum : public SpellScript
     {
         Unit* caster = GetCaster();
         Unit* hitUnit = GetHitUnit();
-        if (caster && hitUnit && hitUnit->ToPlayer())
+        if (caster && hitUnit)
         {
             caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
             caster->CastSpell(hitUnit, SPELL_ARCANE_VACUUM_TP, true);

@@ -17,12 +17,12 @@
 -- Dumping structure for table acore_world.points_of_interest_locale
 DROP TABLE IF EXISTS `points_of_interest_locale`;
 CREATE TABLE IF NOT EXISTS `points_of_interest_locale` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `locale` varchar(4) NOT NULL,
-  `Name` text,
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Name` text COLLATE utf8mb4_unicode_ci,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`,`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.points_of_interest_locale: ~2,524 rows (approximately)
 DELETE FROM `points_of_interest_locale`;

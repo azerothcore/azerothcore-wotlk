@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `gtoctregenhp_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gtoctregenhp_dbc: 1,100 rows
+-- Dumping data for table acore_world.gtoctregenhp_dbc: ~1,100 rows (approximately)
 DELETE FROM `gtoctregenhp_dbc`;
-/*!40000 ALTER TABLE `gtoctregenhp_dbc` DISABLE KEYS */;
 INSERT INTO `gtoctregenhp_dbc` (`ID`, `Data`) VALUES
 	(0, 0.394737),
 	(1, 0.462264),
@@ -1126,7 +1125,6 @@ INSERT INTO `gtoctregenhp_dbc` (`ID`, `Data`) VALUES
 	(1097, 0.138889),
 	(1098, 0.138889),
 	(1099, 0.138889);
-/*!40000 ALTER TABLE `gtoctregenhp_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

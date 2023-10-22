@@ -96,7 +96,7 @@ public:
     void LearnPetPassives();
     void CastPetAuras(bool current);
 
-    void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive = false);
+    void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
     void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
@@ -157,10 +157,10 @@ protected:
 
     std::unique_ptr<DeclinedName> m_declinedname;
 
-    Unit*   m_tempspellTarget;
-    Unit*   m_tempoldTarget;
-    bool    m_tempspellIsPositive;
-    uint32  m_tempspell;
+    Unit*      m_tempspellTarget;
+    ObjectGuid m_tempoldTarget;
+    bool       m_tempspellIsPositive;
+    uint32     m_tempspell;
 
 private:
     void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called

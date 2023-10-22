@@ -17,19 +17,18 @@
 -- Dumping structure for table acore_world.npc_trainer
 DROP TABLE IF EXISTS `npc_trainer`;
 CREATE TABLE IF NOT EXISTS `npc_trainer` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `SpellID` mediumint NOT NULL DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `SpellID` int NOT NULL DEFAULT '0',
   `MoneyCost` int unsigned NOT NULL DEFAULT '0',
   `ReqSkillLine` smallint unsigned NOT NULL DEFAULT '0',
   `ReqSkillRank` smallint unsigned NOT NULL DEFAULT '0',
   `ReqLevel` tinyint unsigned NOT NULL DEFAULT '0',
   `ReqSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`SpellID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.npc_trainer: 4,971 rows
+-- Dumping data for table acore_world.npc_trainer: ~4,971 rows (approximately)
 DELETE FROM `npc_trainer`;
-/*!40000 ALTER TABLE `npc_trainer` DISABLE KEYS */;
 INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSkillRank`, `ReqLevel`, `ReqSpell`) VALUES
 	(198, -200007, 0, 0, 0, 0, 0),
 	(328, -200008, 0, 0, 0, 0, 0),
@@ -4869,6 +4868,7 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(201040, 26772, 20000, 197, 335, 0, 0),
 	(201040, 26791, 100000, 197, 275, 50, 0),
 	(201040, 31460, 20000, 197, 300, 0, 0),
+	(201040, 60969, 105000, 197, 300, 0, 0),
 	(201041, 51308, 350000, 197, 350, 65, 0),
 	(201041, 55642, 125000, 197, 420, 0, 0),
 	(201041, 55769, 125000, 197, 420, 0, 0),
@@ -4930,7 +4930,6 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(201041, 59587, 100000, 197, 420, 0, 0),
 	(201041, 59588, 120000, 197, 420, 0, 0),
 	(201041, 59589, 120000, 197, 420, 0, 0),
-	(201041, 60969, 105000, 197, 300, 0, 0),
 	(201041, 60971, 150000, 197, 425, 0, 0),
 	(201041, 60990, 180000, 197, 420, 0, 0),
 	(201041, 60993, 180000, 197, 425, 0, 0),
@@ -5002,7 +5001,6 @@ INSERT INTO `npc_trainer` (`ID`, `SpellID`, `MoneyCost`, `ReqSkillLine`, `ReqSki
 	(202011, 34090, 2500000, 762, 150, 60, 0),
 	(202011, 34091, 50000000, 762, 225, 70, 0),
 	(202012, 54197, 10000000, 762, 225, 77, 0);
-/*!40000 ALTER TABLE `npc_trainer` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

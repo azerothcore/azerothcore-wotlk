@@ -57,9 +57,9 @@ public:
             }, 15s);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SHADOWFLAME, 18s);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30s);

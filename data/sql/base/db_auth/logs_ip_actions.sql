@@ -21,13 +21,13 @@ CREATE TABLE IF NOT EXISTS `logs_ip_actions` (
   `account_id` int unsigned NOT NULL COMMENT 'Account ID',
   `character_guid` int unsigned NOT NULL COMMENT 'Character Guid',
   `type` tinyint unsigned NOT NULL,
-  `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
-  `systemnote` text COMMENT 'Notes inserted by system',
+  `ip` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '127.0.0.1',
+  `systemnote` text COLLATE utf8mb4_unicode_ci COMMENT 'Notes inserted by system',
   `unixtime` int unsigned NOT NULL COMMENT 'Unixtime',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp',
-  `comment` text COMMENT 'Allows users to add a comment',
+  `comment` text COLLATE utf8mb4_unicode_ci COMMENT 'Allows users to add a comment',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Used to log ips of individual actions';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Used to log ips of individual actions';
 
 -- Dumping data for table acore_auth.logs_ip_actions: ~0 rows (approximately)
 DELETE FROM `logs_ip_actions`;

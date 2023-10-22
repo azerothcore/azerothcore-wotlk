@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `liquidtype_dbc`;
 CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name` varchar(100) DEFAULT NULL,
+  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Flags` int NOT NULL DEFAULT '0',
   `Type` int NOT NULL DEFAULT '0',
   `SoundID` int NOT NULL DEFAULT '0',
@@ -32,12 +32,12 @@ CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ParticleMovement` int NOT NULL DEFAULT '0',
   `ParticleTexSlots` int NOT NULL DEFAULT '0',
   `MaterialID` int NOT NULL DEFAULT '0',
-  `Texture_1` varchar(100) DEFAULT NULL,
-  `Texture_2` varchar(100) DEFAULT NULL,
-  `Texture_3` varchar(100) DEFAULT NULL,
-  `Texture_4` varchar(100) DEFAULT NULL,
-  `Texture_5` varchar(100) DEFAULT NULL,
-  `Texture_6` varchar(100) DEFAULT NULL,
+  `Texture_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_4` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_5` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Color_1` int NOT NULL DEFAULT '0',
   `Color_2` int NOT NULL DEFAULT '0',
   `Float_1` float NOT NULL DEFAULT '0',
@@ -63,12 +63,10 @@ CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `Int_3` int NOT NULL DEFAULT '0',
   `Int_4` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.liquidtype_dbc: 0 rows
+-- Dumping data for table acore_world.liquidtype_dbc: ~0 rows (approximately)
 DELETE FROM `liquidtype_dbc`;
-/*!40000 ALTER TABLE `liquidtype_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `liquidtype_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

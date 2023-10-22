@@ -78,9 +78,9 @@ struct boss_buru : public BossAI
             respawn ? egg->Respawn() : Unit::Kill(me, egg);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         me->AddThreat(who, 1000000.f);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
@@ -193,7 +193,7 @@ struct npc_buru_egg : public ScriptedAI
         me->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
-    void EnterCombat(Unit* attacker) override
+    void JustEngagedWith(Unit* attacker) override
     {
         if (Creature* buru = _instance->GetCreature(DATA_BURU))
         {

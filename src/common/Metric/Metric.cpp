@@ -322,7 +322,7 @@ std::string Metric::FormatInfluxDBValue(float value)
 
 std::string Metric::FormatInfluxDBTagValue(std::string const& value)
 {
-    // ToDo: should handle '=' and ',' characters too
+    /// @todo: should handle '=' and ',' characters too
     return boost::replace_all_copy(value, " ", "\\ ");
 }
 

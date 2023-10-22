@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `game_event_condition_save` (
   `condition_id` int unsigned NOT NULL DEFAULT '0',
   `done` float DEFAULT '0',
   PRIMARY KEY (`eventEntry`,`condition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.game_event_condition_save: ~0 rows (approximately)
 DELETE FROM `game_event_condition_save`;

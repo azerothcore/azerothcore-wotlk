@@ -20,6 +20,7 @@
 
 #include "SpellAuras.h"
 
+#define DataHeader "STR"
 #define StratholmeScriptName "instance_stratholme"
 
 enum DataTypes

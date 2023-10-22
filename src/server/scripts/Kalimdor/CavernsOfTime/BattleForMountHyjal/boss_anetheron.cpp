@@ -76,7 +76,7 @@ public:
                 instance->SetData(DATA_ANETHERONEVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             if (IsEvent)
                 instance->SetData(DATA_ANETHERONEVENT, IN_PROGRESS);
@@ -208,7 +208,7 @@ public:
             CheckTimer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
         }
 

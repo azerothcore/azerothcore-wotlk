@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.pickpocketing_loot_template
 DROP TABLE IF EXISTS `pickpocketing_loot_template`;
 CREATE TABLE IF NOT EXISTS `pickpocketing_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.pickpocketing_loot_template: 10,996 rows
+-- Dumping data for table acore_world.pickpocketing_loot_template: ~10,875 rows (approximately)
 DELETE FROM `pickpocketing_loot_template`;
-/*!40000 ALTER TABLE `pickpocketing_loot_template` DISABLE KEYS */;
 INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(3, 929, 0, 2.449, 0, 1, 0, 1, 1, 'Flesh Eater - Healing Potion'),
 	(3, 1206, 0, 0.8163, 0, 1, 0, 1, 1, 'Flesh Eater - Moss Agate'),
@@ -8388,7 +8387,6 @@ INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance
 	(18203, 29569, 0, 9.8339, 0, 1, 0, 1, 1, 'Murkblood Raider - Strong Junkbox'),
 	(18203, 29570, 0, 9.9686, 0, 1, 0, 1, 1, 'Murkblood Raider - A Gnome Effigy'),
 	(18204, 22829, 0, 1.8182, 0, 1, 0, 1, 1, 'Ortor of Murkblood - Super Healing Potion'),
-	(18204, 24543, 0, 100, 1, 1, 0, 1, 1, 'Ortor of Murkblood - Head of Ortor of Murkblood'),
 	(18204, 27854, 0, 5.4545, 0, 1, 0, 1, 1, 'Ortor of Murkblood - Smoked Talbuk Venison'),
 	(18204, 29569, 0, 5.4545, 0, 1, 0, 1, 1, 'Ortor of Murkblood - Strong Junkbox'),
 	(18204, 29570, 0, 10.9091, 0, 1, 0, 1, 1, 'Ortor of Murkblood - A Gnome Effigy'),
@@ -10033,9 +10031,9 @@ INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance
 	(21285, 22829, 0, 5.4545, 0, 1, 0, 1, 1, 'Auchenai Doomsayer - Super Healing Potion'),
 	(21285, 27854, 0, 5.4545, 0, 1, 0, 1, 1, 'Auchenai Doomsayer - Smoked Talbuk Venison'),
 	(21285, 29569, 0, 3.6364, 0, 1, 0, 1, 1, 'Auchenai Doomsayer - Strong Junkbox'),
-	(21285, 29570, 0, 7.2727, 0, 1, 0, 1, 1, 'Auchenai Doomsayer - A Gnome Effigy');
+	(21285, 29570, 0, 7.2727, 0, 1, 0, 1, 1, 'Auchenai Doomsayer - A Gnome Effigy'),
+	(21287, 22829, 0, 3.0303, 0, 1, 0, 1, 1, 'Warbringer Razuun - Super Healing Potion');
 INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-	(21287, 22829, 0, 3.0303, 0, 1, 0, 1, 1, 'Warbringer Razuun - Super Healing Potion'),
 	(21287, 27854, 0, 3.0303, 0, 1, 0, 1, 1, 'Warbringer Razuun - Smoked Talbuk Venison'),
 	(21287, 29569, 0, 4.5455, 0, 1, 0, 1, 1, 'Warbringer Razuun - Strong Junkbox'),
 	(21287, 29570, 0, 15.1515, 0, 1, 0, 1, 1, 'Warbringer Razuun - A Gnome Effigy'),
@@ -11031,7 +11029,6 @@ INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance
 	(34839, 38260, 0, 32, 0, 1, 0, 1, 1, 'Kvaldir Mist Binder - Empty Tobacco Pouch'),
 	(34839, 40202, 0, 10, 0, 1, 0, 1, 1, 'Kvaldir Mist Binder - Sizzling Grizzly Flank'),
 	(34839, 43575, 0, 37, 0, 1, 0, 1, 1, 'Kvaldir Mist Binder - Reinforced Junkbox');
-/*!40000 ALTER TABLE `pickpocketing_loot_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

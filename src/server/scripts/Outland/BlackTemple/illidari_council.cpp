@@ -271,7 +271,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
             council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
-    void EnterCombat(Unit*  /*who*/) override
+    void JustEngagedWith(Unit*  /*who*/) override
     {
         if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_START_ENCOUNTER);
@@ -305,9 +305,9 @@ public:
             return ObjectAccessor::GetCreature(*me, instance->GetGuidData(RAND(NPC_GATHIOS_THE_SHATTERER, NPC_HIGH_NETHERMANCER_ZEREVOR)));
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_illidari_council_memberAI::EnterCombat(who);
+            boss_illidari_council_memberAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_BLESSING, 10000);
             events.ScheduleEvent(EVENT_SPELL_AURA, 0);
             events.ScheduleEvent(EVENT_SPELL_SEAL, 2000);
@@ -386,9 +386,9 @@ public:
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_illidari_council_memberAI::EnterCombat(who);
+            boss_illidari_council_memberAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 25000);
             events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 5000);
             events.ScheduleEvent(EVENT_SPELL_ARCANE_BOLT, 15000);
@@ -459,9 +459,9 @@ public:
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            boss_illidari_council_memberAI::EnterCombat(who);
+            boss_illidari_council_memberAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_REFLECTIVE_SHIELD, 10000);
             events.ScheduleEvent(EVENT_SPELL_CIRCLE_OF_HEALING, 20000);
             events.ScheduleEvent(EVENT_SPELL_DIVINE_WRATH, 5000);
@@ -517,10 +517,10 @@ public:
     {
         boss_veras_darkshadowAI(Creature* creature) : boss_illidari_council_memberAI(creature) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             me->SetCanDualWield(true);
-            boss_illidari_council_memberAI::EnterCombat(who);
+            boss_illidari_council_memberAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_SPELL_VANISH, 10000);
             events.ScheduleEvent(EVENT_SPELL_ENRAGE, 900000);
         }

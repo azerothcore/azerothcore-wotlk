@@ -226,7 +226,7 @@ struct npc_lava_spawn : public ScriptedAI
         _scheduler.CancelAll();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _scheduler.Schedule(15s, [this](TaskContext context)
         {

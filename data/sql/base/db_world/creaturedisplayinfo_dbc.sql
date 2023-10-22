@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS `creaturedisplayinfo_dbc` (
   `ExtendedDisplayInfoID` int NOT NULL DEFAULT '0',
   `CreatureModelScale` float NOT NULL DEFAULT '0',
   `CreatureModelAlpha` int NOT NULL DEFAULT '0',
-  `TextureVariation_1` varchar(100) DEFAULT NULL,
-  `TextureVariation_2` varchar(100) DEFAULT NULL,
-  `TextureVariation_3` varchar(100) DEFAULT NULL,
-  `PortraitTextureName` varchar(100) DEFAULT NULL,
+  `TextureVariation_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `TextureVariation_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `TextureVariation_3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `PortraitTextureName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `BloodLevel` int NOT NULL DEFAULT '0',
   `BloodID` int NOT NULL DEFAULT '0',
   `NPCSoundID` int NOT NULL DEFAULT '0',
@@ -34,12 +34,10 @@ CREATE TABLE IF NOT EXISTS `creaturedisplayinfo_dbc` (
   `CreatureGeosetData` int NOT NULL DEFAULT '0',
   `ObjectEffectPackageID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creaturedisplayinfo_dbc: 0 rows
+-- Dumping data for table acore_world.creaturedisplayinfo_dbc: ~0 rows (approximately)
 DELETE FROM `creaturedisplayinfo_dbc`;
-/*!40000 ALTER TABLE `creaturedisplayinfo_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creaturedisplayinfo_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

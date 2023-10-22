@@ -21,7 +21,6 @@
 #include "GridDefines.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
@@ -37,6 +36,7 @@
 
 MapMgr::MapMgr()
 {
+    i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;
@@ -54,6 +54,8 @@ MapMgr* MapMgr::instance()
 
 void MapMgr::Initialize()
 {
+    Map::InitStateMachine();
+
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
 
     // Start mtmaps if needed
@@ -82,10 +84,10 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             ASSERT(entry);
 
             if (entry->Instanceable())
-                map = new MapInstanced(id);
+                map = new MapInstanced(id, std::chrono::seconds(i_gridCleanUpDelay));
             else
             {
-                map = new Map(id, 0, REGULAR_DIFFICULTY);
+                map = new Map(id, std::chrono::seconds(i_gridCleanUpDelay), 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
@@ -167,7 +169,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         if ((!group || !group->isRaidGroup()) && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
-            // TODO: this is not a good place to send the message
+            /// @todo: this is not a good place to send the message
             player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
             LOG_DEBUG("maps", "MAP: Player '{}' must be in a raid group to enter instance '{}'", player->GetName(), mapName);
             return Map::CANNOT_ENTER_NOT_IN_RAID;
@@ -320,7 +322,7 @@ bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)
         return mEntry && (!mEntry->IsDungeon() || sObjectMgr->GetInstanceTemplate(mapid));
     }
 
-    // TODO: add check for battleground template
+    /// @todo: add check for battleground template
 }
 
 void MapMgr::UnloadAll()
@@ -334,6 +336,8 @@ void MapMgr::UnloadAll()
 
     if (m_updater.activated())
         m_updater.deactivate();
+
+    Map::DeleteStateMachine();
 }
 
 void MapMgr::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)

@@ -249,17 +249,17 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
             Talk(SAY_INTRO_1);
-            events.ScheduleEvent(EVENT_INTRO_2, 4000);
-            events.ScheduleEvent(EVENT_INTRO_3, 9000);
-            events.ScheduleEvent(EVENT_INTRO_4, 14000);
+            events.ScheduleEvent(EVENT_INTRO_2, 4s);
+            events.ScheduleEvent(EVENT_INTRO_3, 9s);
+            events.ScheduleEvent(EVENT_INTRO_4, 14s);
             me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-            events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
-            events.ScheduleEvent(EVENT_CHECK_PLAYERS, 120000);
+            events.ScheduleEvent(EVENT_SUMMON_ADDS, 30s);
+            events.ScheduleEvent(EVENT_CHECK_PLAYERS, 2min);
             if (pInstance)
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_ENTER_GATE)))
@@ -276,14 +276,32 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (gateOpened)
+            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
             {
-                summons.DoZoneInCombat();
-            }
-            else if (Unit* target = me->SelectNearestTarget(50.0f))
-            {
-                AttackStart(target);
-                DoZoneInCombat();
+                if (gateOpened)
+                {
+                    summon->AI()->AttackStart(target);
+                    summon->CallForHelp(40.0f);
+                }
+                else
+                {
+                    if (summon->GetEntry() == NPC_LIVING_TRAINEE ||
+                        summon->GetEntry() == NPC_LIVING_KNIGHT  ||
+                        summon->GetEntry() == NPC_LIVING_RIDER   )
+                    {
+                        if (IN_LIVE_SIDE(target))
+                        {
+                            summon->AI()->AttackStart(target);
+                        }
+                    }
+                    else
+                    {
+                        if (!IN_LIVE_SIDE(target))
+                        {
+                            summon->AI()->AttackStart(target);
+                        }
+                    }
+                }
             }
         }
 
@@ -437,11 +455,11 @@ public:
                     break;
                 case EVENT_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
-                    events.RepeatEvent(1010);
+                    events.Repeat(1s);
                     break;
                 case EVENT_HARVEST_SOUL:
                     me->CastSpell(me, SPELL_HARVEST_SOUL, false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_TELEPORT:
                     me->AttackStop();
@@ -459,7 +477,7 @@ public:
                         me->GetThreatMgr().AddThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
                     }
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30) && pInstance)
@@ -471,7 +489,7 @@ public:
                         events.CancelEvent(EVENT_TELEPORT);
                         break;
                     }
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 case EVENT_SUMMON_ADDS:
                     if (gothikWaves[waveCount][0])
@@ -489,11 +507,10 @@ public:
                         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                         me->SetImmuneToPC(false);
                         me->RemoveAllAuras();
-                        summons.DoZoneInCombat();
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 1000);
-                        events.ScheduleEvent(EVENT_HARVEST_SOUL, urand(5000, 15000));
-                        events.ScheduleEvent(EVENT_TELEPORT, 20000);
-                        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 1s);
+                        events.ScheduleEvent(EVENT_HARVEST_SOUL, 5s, 15s);
+                        events.ScheduleEvent(EVENT_TELEPORT, 20s);
+                        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
                     }
                     waveCount++;
                     break;
@@ -504,7 +521,6 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        summons.DoZoneInCombat();
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
                     }
@@ -542,46 +558,32 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void JustEngagedWith(Unit*  /*who*/) override
         {
             switch (me->GetEntry())
             {
                 case NPC_LIVING_TRAINEE:
-                    events.ScheduleEvent(EVENT_DEATH_PLAGUE, 3000);
+                    events.ScheduleEvent(EVENT_DEATH_PLAGUE, 3s);
                     break;
                 case NPC_DEAD_TRAINEE:
-                    events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 2500);
+                    events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 2500ms);
                     break;
                 case NPC_LIVING_KNIGHT:
-                    events.ScheduleEvent(EVENT_SHADOW_MARK, 3000);
+                    events.ScheduleEvent(EVENT_SHADOW_MARK, 3s);
                     break;
                 case NPC_DEAD_KNIGHT:
-                    events.ScheduleEvent(EVENT_WHIRLWIND, 2000);
+                    events.ScheduleEvent(EVENT_WHIRLWIND, 2s);
                     break;
                 case NPC_LIVING_RIDER:
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3000);
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3s);
                     break;
                 case NPC_DEAD_RIDER:
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, urand(2000, 3500));
-                    events.ScheduleEvent(EVENT_UNHOLY_FRENZY, urand(5000, 9000));
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2000ms, 3500ms);
+                    events.ScheduleEvent(EVENT_UNHOLY_FRENZY, 5s, 9s);
                     break;
                 case NPC_DEAD_HORSE:
-                    events.ScheduleEvent(EVENT_STOMP, urand(2000, 5000));
+                    events.ScheduleEvent(EVENT_STOMP, 2s, 5s);
                     break;
-            }
-        }
-
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!attacker || !IsOnSameSide(attacker))
-            {
-                damage = 0;
-            }
-
-            if (!me->IsInCombat())
-            {
-                me->CallForHelp(25.0f);
-                AttackStart(attacker);
             }
         }
 
@@ -619,7 +621,7 @@ public:
             {
                 case EVENT_DEATH_PLAGUE:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
-                    events.RepeatEvent(urand(4000, 7000));
+                    events.Repeat(4s, 7s);
                     break;
                 case EVENT_ARCANE_EXPLOSION:
                     if (Unit* victim = me->GetVictim())
@@ -629,17 +631,17 @@ public:
                             me->CastSpell(victim, SPELL_ARCANE_EXPLOSION, false);
                         }
                     }
-                    events.RepeatEvent(2500);
+                    events.Repeat(2500ms);
                     break;
                 case EVENT_SHADOW_MARK:
                     if (Unit* victim = me->GetVictim())
                     {
-                        if (!victim->HasAura(SPELL_SHADOW_MARK))
+                        if (victim->IsWithinDist(me, 10))
                         {
-                            me->CastSpell(me->GetVictim(), SPELL_SHADOW_MARK, false);
+                            me->CastSpell(victim, SPELL_SHADOW_MARK, false);
                         }
                     }
-                    events.RepeatEvent(urand(5000, 7000));
+                    events.Repeat(5s, 7s);
                     break;
                 case EVENT_WHIRLWIND:
                     if (Unit* victim = me->GetVictim())
@@ -649,11 +651,11 @@ public:
                             me->CastSpell(victim, SPELL_WHIRLWIND, false);
                         }
                     }
-                    events.RepeatEvent(urand(4000, 6000));
+                    events.Repeat(4s, 6s);
                     break;
                 case EVENT_SHADOW_BOLT_VOLLEY:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
                 case EVENT_DRAIN_LIFE:
                     if (Unit* victim = me->GetVictim())
@@ -663,11 +665,11 @@ public:
                             me->CastSpell(victim, SPELL_DRAIN_LIFE, false);
                         }
                     }
-                    events.RepeatEvent(urand(8000, 12000));
+                    events.Repeat(8s, 12s);
                     break;
                 case EVENT_UNHOLY_FRENZY:
                     me->AddAura(SPELL_UNHOLY_FRENZY, me);
-                    events.RepeatEvent(urand(15000, 17000));
+                    events.Repeat(15s, 17s);
                     break;
                 case EVENT_STOMP:
                     if (Unit* victim = me->GetVictim())
@@ -677,7 +679,7 @@ public:
                             me->CastSpell(victim, SPELL_STOMP, false);
                         }
                     }
-                    events.RepeatEvent(urand(4000, 9000));
+                    events.Repeat(4s, 9s);
                     break;
             }
             DoMeleeAttackIfReady();

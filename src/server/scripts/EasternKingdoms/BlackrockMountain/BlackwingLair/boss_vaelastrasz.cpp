@@ -114,9 +114,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(victim);
+            BossAI::JustEngagedWith(who);
 
             DoCastAOE(SPELL_ESSENCE_OF_THE_RED);
             // now drop damage requirement to be able to take loot

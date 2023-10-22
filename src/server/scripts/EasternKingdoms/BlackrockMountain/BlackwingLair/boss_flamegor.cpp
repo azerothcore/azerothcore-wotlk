@@ -47,9 +47,9 @@ public:
     {
         boss_flamegorAI(Creature* creature) : BossAI(creature, DATA_FLAMEGOR) { }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(victim);
+            BossAI::JustEngagedWith(who);
 
             events.ScheduleEvent(EVENT_SHADOWFLAME, 18s);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30s);
@@ -83,7 +83,7 @@ public:
                     case EVENT_FRENZY:
                         Talk(EMOTE_FRENZY);
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 80s, 10s);
+                        events.ScheduleEvent(EVENT_FRENZY, 8s, 10s);
                         break;
                 }
 

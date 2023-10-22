@@ -18,19 +18,18 @@
 DROP TABLE IF EXISTS `dungeon_access_template`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `id` tinyint unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
-  `map_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template',
+  `map_id` int unsigned DEFAULT NULL COMMENT 'Map ID from instance_template',
   `difficulty` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic',
   `min_level` tinyint unsigned DEFAULT NULL,
   `max_level` tinyint unsigned DEFAULT NULL,
   `min_avg_item_level` smallint unsigned DEFAULT NULL COMMENT 'Min average ilvl required to enter',
-  `comment` varchar(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
   PRIMARY KEY (`id`),
   KEY `FK_dungeon_access_template__instance_template` (`map_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';
+) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Dungeon/raid access template and single requirements';
 
--- Dumping data for table acore_world.dungeon_access_template: 121 rows
+-- Dumping data for table acore_world.dungeon_access_template: ~121 rows (approximately)
 DELETE FROM `dungeon_access_template`;
-/*!40000 ALTER TABLE `dungeon_access_template` DISABLE KEYS */;
 INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES
 	(1, 33, 0, 14, 0, 0, 'Shadowfang Keep'),
 	(2, 34, 0, 15, 0, 0, 'Stormwind Stockades'),
@@ -153,7 +152,6 @@ INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`
 	(119, 724, 1, 80, 0, 0, 'The Ruby Sanctum'),
 	(120, 724, 2, 80, 0, 0, 'The Ruby Sanctum'),
 	(121, 724, 3, 80, 0, 0, 'The Ruby Sanctum');
-/*!40000 ALTER TABLE `dungeon_access_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

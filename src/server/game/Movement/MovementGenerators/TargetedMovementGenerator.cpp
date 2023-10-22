@@ -296,29 +296,21 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
-        UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
-        speed = std::max(target->GetSpeed(moveType), owner->GetSpeed(moveType));
+        uint32 moveFlags = target->GetUnitMovementFlags();
+        if (target->movespline->isWalking())
+        {
+            moveFlags |= MOVEMENTFLAG_WALKING;
+        }
 
+        UnitMoveType moveType = Movement::SelectSpeedType(moveFlags);
+        speed = target->GetSpeed(moveType);
         if (playerPet)
         {
-            float distance = owner->GetDistance2d(dest.x, dest.y) - (*speed / 2.f);
+            float distance = owner->GetDistance2d(dest.x, dest.y) - target->GetObjectSize() - (*speed / 2.f);
             if (distance > 0.f)
             {
                 float multiplier = 1.f + (distance / 10.f);
                 *speed *= multiplier;
-            }
-            else
-            {
-                switch (moveType)
-                {
-                    case MOVE_RUN_BACK:
-                    case MOVE_SWIM_BACK:
-                    case MOVE_FLIGHT_BACK:
-                        break;
-                    default:
-                        *speed *= 0.9f;
-                        break;
-                }
             }
         }
     }
@@ -503,8 +495,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
-        init.SetWalk(target->IsWalking());
-        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER))
+        init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
             init.SetVelocity(*velocity);
         init.Launch();
     }

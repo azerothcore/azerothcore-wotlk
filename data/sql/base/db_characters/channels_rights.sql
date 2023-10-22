@@ -17,14 +17,14 @@
 -- Dumping structure for table acore_characters.channels_rights
 DROP TABLE IF EXISTS `channels_rights`;
 CREATE TABLE IF NOT EXISTS `channels_rights` (
-  `name` varchar(128) NOT NULL,
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `flags` int unsigned NOT NULL,
   `speakdelay` int unsigned NOT NULL,
-  `joinmessage` varchar(255) NOT NULL DEFAULT '',
-  `delaymessage` varchar(255) NOT NULL DEFAULT '',
-  `moderators` text,
+  `joinmessage` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `delaymessage` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `moderators` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.channels_rights: ~0 rows (approximately)
 DELETE FROM `channels_rights`;

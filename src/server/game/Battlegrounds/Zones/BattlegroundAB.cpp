@@ -19,7 +19,6 @@
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "GameGraveyard.h"
-#include "Language.h"
 #include "Player.h"
 #include "Util.h"
 #include "WorldPacket.h"
@@ -552,6 +551,6 @@ void BattlegroundAB::ApplyPhaseMask()
     for (auto const& itr : bgPlayerMap)
     {
         itr.second->SetPhaseMask(phaseMask, false);
-        itr.second->UpdateObjectVisibility(true, false);
+        itr.second->UpdateObjectVisibility(true);
     }
 }

@@ -131,16 +131,16 @@ public:
 
             if (!cobraList.empty())
             {
-                for (auto cobras : cobraList)
+                for (auto& cobras : cobraList)
                 {
                     cobras->SetInCombatWithZone();
                 }
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             me->SetReactState(REACT_AGGRESSIVE);
             // Always running events
             events.ScheduleEvent(EVENT_THRASH, 5s);
@@ -299,9 +299,9 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void JustEngagedWith(Unit*)
         {
-            events.ScheduleEvent(EVENT_POISON, 8ms);
+            events.ScheduleEvent(EVENT_POISON, 8s);
 
             if (Creature* Venoxis = GetVenoxis())
             {
@@ -331,7 +331,7 @@ public:
                 case EVENT_POISON:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_POISON);
-                    events.ScheduleEvent(EVENT_POISON, 15ms);
+                    events.ScheduleEvent(EVENT_POISON, 15s);
                     break;
                 }
                 }

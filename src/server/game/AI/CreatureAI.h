@@ -82,7 +82,7 @@ protected:
     Creature* DoSummon(uint32 entry, WorldObject* obj, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
     Creature* DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
 public:
-    // EnumUtils: DESCRIBE THIS
+    // EnumUtils: DESCRIBE THIS (in CreatureAI::)
     enum EvadeReason
     {
         EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty
@@ -92,7 +92,8 @@ public:
         EVADE_REASON_OTHER
     };
 
-    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
+    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
+    void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
@@ -115,8 +116,10 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
-    // Called for reaction when initially engaged
-    virtual void EnterCombat(Unit* /*victim*/) {}
+    /**
+     * @brief Called for reaction when initially engaged
+     */
+    virtual void JustEngagedWith(Unit* /*who*/) {}
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}

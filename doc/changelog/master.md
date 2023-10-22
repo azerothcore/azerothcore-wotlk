@@ -1,3 +1,25 @@
+## 7.0.0-dev.1 | Commit: [0c4feb674444210da295751a0c4e5eefb9c771f1
+](https://github.com/azerothcore/azerothcore-wotlk/commit/0c4feb674444210da295751a0c4e5eefb9c771f1
+
+
+### How to upgrade
+
+Motd is removed from config file
+
+Motd is can now be found in auth database table `motd`
+
+`realmid` = Realm ID or -1 for all realms.
+`text` = Text for Motd
+
+Specified realmId is prioritized over -1 (All Realms)
+
+For example:
+
+You have realm 1, 2, 3
+
+(-1, "This Motd will show for 2, 3")
+(1, "This Motd will show for 1")
+
 ## 6.0.0-dev.3 | Commit: [44b7a0666c78dc99ab0bbc94045abb6685b3ad86
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/44b7a0666c78dc99ab0bbc94045abb6685b3ad86
 

@@ -17,20 +17,18 @@
 -- Dumping structure for table acore_world.vehicle_accessory
 DROP TABLE IF EXISTS `vehicle_accessory`;
 CREATE TABLE IF NOT EXISTS `vehicle_accessory` (
-  `guid` mediumint unsigned NOT NULL DEFAULT '0',
-  `accessory_entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `accessory_entry` int unsigned NOT NULL DEFAULT '0',
   `seat_id` tinyint NOT NULL DEFAULT '0',
   `minion` tinyint unsigned NOT NULL DEFAULT '0',
-  `description` text NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `summontype` tinyint unsigned NOT NULL DEFAULT '6' COMMENT 'see enum TempSummonType',
   `summontimer` int unsigned NOT NULL DEFAULT '30000' COMMENT 'timer, only relevant for certain summontypes',
   PRIMARY KEY (`guid`,`seat_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.vehicle_accessory: 0 rows
+-- Dumping data for table acore_world.vehicle_accessory: ~0 rows (approximately)
 DELETE FROM `vehicle_accessory`;
-/*!40000 ALTER TABLE `vehicle_accessory` DISABLE KEYS */;
-/*!40000 ALTER TABLE `vehicle_accessory` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

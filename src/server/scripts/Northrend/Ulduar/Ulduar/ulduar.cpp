@@ -24,30 +24,49 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "TaskScheduler.h"
 
 enum Texts
 {
     // Freya
-    GOSSIP_MENU_FREYA     = 10324,
-    NPC_TEXT_FREYA        = 14332,
+    GOSSIP_MENU_FREYA           = 10324,
+    NPC_TEXT_FREYA              = 14332,
 
     // Hodir
-    GOSSIP_MENU_HODIR     = 10335,
-    NPC_TEXT_HODIR        = 14326,
+    GOSSIP_MENU_HODIR           = 10335,
+    NPC_TEXT_HODIR              = 14326,
 
     // Mimiron
-    GOSSIP_MENU_MIMIRON   = 10336,
-    NPC_TEXT_MIMIRON      = 14334,
+    GOSSIP_MENU_MIMIRON         = 10336,
+    NPC_TEXT_MIMIRON            = 14334,
 
     // Thorim
-    GOSSIP_MENU_THORIM    = 10337,
-    NPC_TEXT_THORIM       = 14333,
+    GOSSIP_MENU_THORIM          = 10337,
+    NPC_TEXT_THORIM             = 14333,
 
     // Confirm assistance
-    GOSSIP_MENU_CONFIRM   = 10333,
-    NPC_TEXT_CONFIRM      = 14325,
+    GOSSIP_MENU_CONFIRM         = 10333,
+    NPC_TEXT_CONFIRM            = 14325,
 
-    SAY_KEEPER_SELECTED   = 1,
+    SAY_KEEPER_SELECTED         = 1,
+};
+
+enum UldNPCs
+{
+    NPC_WINTER_JORMUNGAR        = 34137,
+    NPC_SNOW_MOUND_4            = 34146,
+    NPC_SNOW_MOUND_6            = 34150,
+    NPC_SNOW_MOUND_8            = 34151
+};
+
+enum UldGameObjects
+{
+    GOBJ_SNOW_MOUND             = 194907
+};
+
+enum UldSpells
+{
+    SPELL_SNOW_MOUND_PARTICLES  = 64615
 };
 
 class npc_ulduar_keeper : public CreatureScript
@@ -157,52 +176,72 @@ public:
     }
 };
 
-class npc_ulduar_snow_mound : public CreatureScript
+struct npc_ulduar_snow_mound : public ScriptedAI
 {
-public:
-    npc_ulduar_snow_mound() : CreatureScript("npc_ulduar_snow_mound") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_ulduar_snow_mound(Creature* creature) : ScriptedAI(creature)
     {
-        return GetUlduarAI<npc_ulduar_snow_moundAI>(creature);
+        _activated = false;
+        _count = 0;
+        _counter = 0;
     }
 
-    struct npc_ulduar_snow_moundAI : public ScriptedAI
+    void MoveInLineOfSight(Unit* who) override
     {
-        npc_ulduar_snow_moundAI(Creature* creature) : ScriptedAI(creature)
+        if (!_activated && who->GetTypeId() == TYPEID_PLAYER)
         {
-            activated = false;
-            me->CastSpell(me, 64615, true);
-        }
-
-        bool activated;
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
-                    who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
+            if (me->GetExactDist2d(who) <= 10.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
+                who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
+            {
+                _activated = true;
+                me->RemoveAura(SPELL_SNOW_MOUND_PARTICLES);
+                if (GameObject* go = me->FindNearestGameObject(GOBJ_SNOW_MOUND, 5.0f))
                 {
-                    activated = true;
-                    me->RemoveAura(64615);
-                    if (GameObject* go = me->FindNearestGameObject(194907, 5.0f))
-                        go->Delete();
-                    uint8 count;
-                    if (me->GetEntry() == 34146) count = 4;
-                    else if (me->GetEntry() == 34150) count = 6;
-                    else count = 8;
-                    for (uint8 i = 0; i < count; ++i)
-                    {
-                        float a = rand_norm() * 2 * M_PI;
-                        float d = rand_norm() * 4.0f;
-                        if (Creature* c = me->SummonCreature(34137, me->GetPositionX() + cos(a) * d, me->GetPositionY() + std::sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
-                            c->AI()->AttackStart(who);
-                    }
+                    go->Delete();
                 }
-        }
 
-        void UpdateAI(uint32  /*diff*/) override {}
-    };
+                switch (me->GetEntry())
+                {
+                    case NPC_SNOW_MOUND_4:
+                        _count = 4;
+                        break;
+                    case NPC_SNOW_MOUND_6:
+                        _count = 6;
+                        break;
+                    case NPC_SNOW_MOUND_8:
+                        _count = 8;
+                        break;
+                    default:
+                        return;
+                }
+
+                _scheduler.Schedule(0s, [this](TaskContext context)
+                {
+                    _counter++;
+                    float a = rand_norm() * 2 * M_PI; //needs verification from sniffs
+                    float d = rand_norm() * 4.0f;
+                    if (Creature* jormungar = me->SummonCreature(NPC_WINTER_JORMUNGAR, me->GetPositionX() + cos(a) * d, me->GetPositionY() + std::sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
+                    {
+                        jormungar->SetInCombatWithZone();
+                    }
+                    if (_counter < _count)
+                    {
+                        context.Repeat(2s);
+                    }
+                });
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    bool _activated;
+    TaskScheduler _scheduler;
+    uint8 _count;
+    uint8 _counter;
 };
 
 class npc_ulduar_storm_tempered_keeper : public CreatureScript
@@ -230,12 +269,12 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(1, 2000); // checking Separation Anxiety, Charged Sphere
-            events.ScheduleEvent(2, urand(5000, 8000)); // Forked Lightning
-            events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20000 : 50000)); // Summon Charged Sphere
+            events.ScheduleEvent(1, 2s); // checking Separation Anxiety, Charged Sphere
+            events.ScheduleEvent(2, 5s, 8s); // Forked Lightning
+            events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20s : 50s)); // Summon Charged Sphere
             if (Creature* c = me->FindNearestCreature((me->GetEntry() == 33722 ? 33699 : 33722), 30.0f, true))
                 otherGUID = c->GetGUID();
             else
@@ -276,16 +315,16 @@ public:
                         if (c->IsSummon())
                             if (c->ToTempSummon()->GetSummonerGUID() != me->GetGUID())
                                 me->CastSpell(me, 63528, true);
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case 2:
                     me->CastSpell(me->GetVictim(), 63541, false);
-                    events.RepeatEvent(urand(10000, 14000));
+                    events.Repeat(10s, 14s);
                     break;
                 case 3:
                     if (!me->HasAura(63630))
                         me->CastSpell(me, 63527, false);
-                    events.RepeatEvent(60000);
+                    events.Repeat(1min);
                     break;
             }
 
@@ -318,9 +357,9 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, urand(5000, 8000)); // Flame Spray
-            events.ScheduleEvent(2, urand(3000, 6000)); // Machine Gun
-            events.ScheduleEvent(3, 1000); // Charged Leap
+            events.ScheduleEvent(1, 5s, 8s); // Flame Spray
+            events.ScheduleEvent(2, 3s, 6s); // Machine Gun
+            events.ScheduleEvent(3, 1s); // Charged Leap
         }
 
         void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
@@ -383,11 +422,11 @@ public:
                         break;
                     case 1:
                         me->CastSpell(me->GetVictim(), RAID_MODE(64717, 65241), false);
-                        events.RepeatEvent(urand(15000, 25000));
+                        events.Repeat(15s, 25s);
                         break;
                     case 2:
                         me->CastSpell(me->GetVictim(), RAID_MODE(64776, 65240), false);
-                        events.RepeatEvent(urand(10000, 15000));
+                        events.Repeat(10s, 15s);
                         break;
                     case 3:
                         {
@@ -395,10 +434,10 @@ public:
                             if (dist > 10.0f && dist < 40.0f)
                             {
                                 me->CastSpell(me->GetVictim(), 64779, false);
-                                events.RepeatEvent(25000);
+                                events.Repeat(25s);
                             }
                             else
-                                events.RepeatEvent(3000);
+                                events.Repeat(3s);
                         }
                         break;
                 }
@@ -512,13 +551,11 @@ struct npc_salvaged_siege_engine : public VehicleAI
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
-
     new spell_ulduar_energy_sap();
-    new npc_ulduar_snow_mound();
+    RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
     new npc_ulduar_storm_tempered_keeper();
     new npc_ulduar_arachnopod_destroyer();
     new spell_ulduar_arachnopod_damaged();
-
     new AreaTrigger_at_celestial_planetarium_enterance();
     new go_call_tram();
 

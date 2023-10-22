@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS `mail_server_template` (
   `itemCountA` int unsigned NOT NULL DEFAULT '0',
   `itemH` int unsigned NOT NULL DEFAULT '0',
   `itemCountH` int unsigned NOT NULL DEFAULT '0',
-  `subject` text NOT NULL,
-  `body` text NOT NULL,
+  `subject` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.mail_server_template: ~0 rows (approximately)
 DELETE FROM `mail_server_template`;
