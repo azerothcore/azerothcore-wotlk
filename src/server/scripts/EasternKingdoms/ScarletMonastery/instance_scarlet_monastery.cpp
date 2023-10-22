@@ -207,7 +207,8 @@ public:
                     if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
                     {
 
-                        //instance->DoUseDoorOrButton(chapelDoor->GetGUID());//Received //https://github.com/azerothcore/azerothcore-wotlk/commit/2779833768bbe9967006d6d16888dace05b4bcb6 Impact The door cannot be opened                       
+                        //instance->DoUseDoorOrButton(chapelDoor->GetGUID());//Received
+                        //https://github.com/azerothcore/azerothcore-wotlk/commit/2779833768bbe9967006d6d16888dace05b4bcb6 Impact The door cannot be opened
                         chapelDoor->SetGoState(GO_STATE_ACTIVE);
                         chapelDoor->SetLootState(GO_ACTIVATED);
                         chapelDoor->SetGameObjectFlag(GO_FLAG_IN_USE);
