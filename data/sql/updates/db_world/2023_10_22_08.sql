@@ -1,3 +1,4 @@
+-- DB update 2023_10_22_07 -> 2023_10_22_08
 ALTER TABLE `reputation_spillover_template`
     ADD COLUMN `faction5` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
     ADD COLUMN `rate_5` FLOAT NOT NULL DEFAULT '0',
