@@ -580,6 +580,8 @@ INSERT INTO  `creature`   (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId
 (139261, 16781, 0, 0, 571, 0, 0, 1, 1, 0, 6157.4091796875, -1023.6146240234375, 408.467071533203125, 5.619960308074951171, 120, 0, 0, 2138, 0, 0, 0, 0, 0, "", 50172, 0, NULL),
 (139262, 16781, 0, 0, 571, 0, 0, 1, 1, 0, 6159.4375, -1025.43212890625, 408.73101806640625, 2.268928050994873046, 120, 0, 0, 3941, 0, 0, 0, 0, 0, "", 50172, 0, NULL);
 
+UPDATE `creature` SET `CreateObject` = 1 WHERE `id1` = 16781 AND `guid` BETWEEN 139127 AND 139262;
+
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 1 AND `guid` BETWEEN 139127 AND 139262;
 INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (1, 139127),
