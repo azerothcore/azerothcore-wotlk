@@ -583,13 +583,10 @@ bool OPvPCapturePointNA::Update(uint32 diff)
 
     float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 60.0f;
 
-    for (uint32 team = 0; team < 2; ++team)
+    for (PlayerSet playerSet : m_activePlayers)
     {
-        for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
+        for (ObjectGuid playerGuid : playerSet)
         {
-            ObjectGuid playerGuid = *itr;
-            ++itr;
-
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                 if (!m_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
                     HandlePlayerLeave(player);
@@ -601,13 +598,12 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
     Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
 
-    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+    for (Player* const player : players)
     {
-        Player* const player = *itr;
         if (player->IsOutdoorPvPActive())
         {
             if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
-                HandlePlayerEnter(*itr);
+                HandlePlayerEnter(player);
         }
     }
 
