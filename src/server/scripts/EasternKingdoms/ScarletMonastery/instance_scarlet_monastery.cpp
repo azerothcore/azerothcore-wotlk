@@ -338,16 +338,14 @@ public:
                 Talk(3, playerWhoStartedAshbringer);
                 break;
             case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
-                // 03/29/2023 00:13:49.658 Number: 6862
                 if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
                 {
-                    // 03/29/2023 00:13:49.658
                     summonedMograine->SetFaction(FACTION_FRIENDLY);
                     summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
                     summonedMograine->SetSpeed(MOVE_WALK, 1.0f);
-                    summonedMograine->SetDisplayId(NPC_HIGHLORD_MOGRAINE_MOD);//
+                    summonedMograine->SetDisplayId(NPC_HIGHLORD_MOGRAINE_MOD);
                     summonedMograine->setActive(true);
-                    summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false); // Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
+                    summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false);//Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
                 }
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48546ms);
                 break;
@@ -757,7 +755,6 @@ public:
             SayAshbringer = false;
         }
 
-
         //Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
@@ -766,8 +763,8 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
                 //There is a delay in sniffing 1615ms
-                me->CastSpell(me, SPELL_TRANSFORM_GHOST); //The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
-                me->CastSpell(me, 57767, true);//
+                me->CastSpell(me, SPELL_TRANSFORM_GHOST);//The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
+                me->CastSpell(me, 57767, true);
                 //delay 10ms
                 me->SetDisplayId(16179);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
