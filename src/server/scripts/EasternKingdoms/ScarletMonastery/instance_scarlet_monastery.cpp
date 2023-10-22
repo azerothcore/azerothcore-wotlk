@@ -352,15 +352,11 @@ public:
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
                     summonedMograine->StopMovingOnCurrentPos();
-                    // 03/29/2023 00:14:38.204
-                    // 25 OneShotPoint
                     summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                    // 03/29/2023 00:14:38.418
                     summonedMograine->AI()->Talk(0, 214ms);
                     events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3024ms);
                     break;
                 case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
-                    // 03/29/2023 00:14:41.442
                     me->SetFacingToObject(summonedMograine);
                     events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 403ms);
                     break;
