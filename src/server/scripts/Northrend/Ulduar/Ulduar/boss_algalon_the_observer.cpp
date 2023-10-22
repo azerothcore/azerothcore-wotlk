@@ -388,6 +388,11 @@ public:
             _phaseTwo = false;
             _heraldOfTheTitans = true;
 
+            if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+            }
+
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
         }
