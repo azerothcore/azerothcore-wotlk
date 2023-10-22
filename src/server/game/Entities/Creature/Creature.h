@@ -82,6 +82,7 @@ public:
     [[nodiscard]] bool CanEnterWater() const override;
     [[nodiscard]] bool CanFly()  const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
     [[nodiscard]] bool CanHover() const { return GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || IsHovering(); }
+    [[nodiscard]] bool IsRooted() const { return GetMovementTemplate().IsRooted(); }
 
     MovementGeneratorType GetDefaultMovementType() const override { return m_defaultMovementType; }
     void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
@@ -165,6 +166,7 @@ public:
     [[nodiscard]] uint32 GetSpellCooldown(uint32 spell_id) const;
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
     [[nodiscard]] bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
+    void ClearProhibitedSpellTimers();
 
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
 
@@ -366,6 +368,7 @@ public:
 
     // Handling caster facing during spellcast
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
+    void ClearTarget() { SetTarget(); };
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     [[nodiscard]] bool IsMovementPreventedByCasting() const override;
@@ -397,6 +400,12 @@ public:
      *
      * */
     void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
+
+    /**
+     * @brief Returns true if the creature is able to cast the spell.
+     *
+     * */
+    bool CanCastSpell(uint32 spellID) const;
 
     std::string GetDebugInfo() const override;
 

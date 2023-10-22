@@ -237,58 +237,6 @@ enum ScarletMonasteryTrashMisc
     SPELL_FORGIVENESS = 28697,
 };
 
-class npc_scarlet_guard : public CreatureScript
-{
-public:
-    npc_scarlet_guard() : CreatureScript("npc_scarlet_guard") { }
-
-    struct npc_scarlet_guardAI : public SmartAI
-    {
-        npc_scarlet_guardAI(Creature* creature) : SmartAI(creature) { }
-
-        void Reset() override
-        {
-            SayAshbringer = false;
-        }
-
-        void SpellHit(Unit* who, SpellInfo const* spell) override
-        {
-            if (who && spell->Id == EFFECT_ASHBRINGER && !SayAshbringer)
-            {
-                me->SetFaction(FACTION_FRIENDLY);
-                me->GetMotionMaster()->Clear(); // stop patrolling
-                me->GetMotionMaster()->MoveIdle();
-                me->StopMoving();
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetFacingToObject(who);
-                Milliseconds delayKneel(urand(DELAY_MS_KNEEL_MIN, DELAY_MS_KNEEL_MAX));
-
-                me->m_Events.AddEventAtOffset([this, who]()
-                {
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
-
-                    if (urand(0, 1))
-                    {
-                        Milliseconds delayTalk(urand(DELAY_MS_TALK_MIN, DELAY_MS_TALK_MAX));
-                        Talk(SAY_WELCOME, who, delayTalk);
-                    }
-                }, delayKneel);
-
-                SayAshbringer = true;
-            }
-        }
-
-    private:
-        bool SayAshbringer = false;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
-    }
-};
-
 enum MograineEvents
 {
     EVENT_SPELL_CRUSADER_STRIKE     =   1,
@@ -736,121 +684,6 @@ class npc_fairbanks : public CreatureScript
 public:
     npc_fairbanks() : CreatureScript("npc_fairbanks") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->HasAura(AURA_OF_ASHBRINGER))
-            AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        SendGossipMenuFor(player, 100100, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*Sender*/, uint32 uiAction) override
-    {
-        if (!(player->HasAura(AURA_OF_ASHBRINGER)))
-            return true;
-
-        ClearGossipMenuFor(player);
-
-        switch (uiAction)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 100101, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 100102, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_4, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 100103, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                creature->HandleEmoteCommand(1);
-                creature->m_Events.AddEventAtOffset([creature]()
-                {
-                    creature->HandleEmoteCommand(EMOTE_ONESHOT_YES);
-                }, 2500ms);
-
-                creature->m_Events.AddEventAtOffset([creature]()
-                {
-                    creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                }, 5000ms);
-
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_5, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 100104, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_6, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 100105, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_7, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, 100106, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_8, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                SendGossipMenuFor(player, 100107, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 7:
-                creature->HandleEmoteCommand(5);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_9, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-                SendGossipMenuFor(player, 100108, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 8:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_10, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-                SendGossipMenuFor(player, 100109, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 9:
-                creature->HandleEmoteCommand(274);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_11, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-                SendGossipMenuFor(player, 100110, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 10:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_12, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, 100111, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 11:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_13, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                SendGossipMenuFor(player, 100112, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 12:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_14, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                SendGossipMenuFor(player, 100113, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 13:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_15, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
-                SendGossipMenuFor(player, 100114, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 14:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, GOSSIP_ITEM_FAIRBANKS_16, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
-                SendGossipMenuFor(player, 100115, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 15:
-                SendGossipMenuFor(player, 100116, creature->GetGUID());
-                /// @todo: we need to play these 3 emote in sequence, we play only the last one right now.
-                creature->HandleEmoteCommand(274);
-                creature->HandleEmoteCommand(1);
-                creature->HandleEmoteCommand(397);
-                return true;
-        }
-
-        return true;
-    }
-
     struct npc_fairbanksAI : public SmartAI
     {
         npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
@@ -868,7 +701,6 @@ public:
                     {
                         me->SetFaction(FACTION_FRIENDLY);
                         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
                         me->SetDisplayId(16179);
                         me->SetFacingToObject(player);
@@ -890,7 +722,6 @@ public:
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
-    new npc_scarlet_guard();
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();

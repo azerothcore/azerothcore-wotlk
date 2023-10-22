@@ -2451,6 +2451,27 @@ class spell_q4735_collect_rookery_egg : public SpellScript
     }
 };
 
+enum BookOfFelNames
+{
+    SPELL_METAMORPHOSIS   = 36298
+};
+
+class spell_q10651_q10692_book_of_fel_names : public SpellScript
+{
+    PrepareSpellScript(spell_q10651_q10692_book_of_fel_names);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitUnit()->HasAura(SPELL_METAMORPHOSIS))
+            GetHitUnit()->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q10651_q10692_book_of_fel_names::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
@@ -2522,4 +2543,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12919_gymers_throw);
     RegisterSpellScript(spell_q5056_summon_shy_rotam);
     RegisterSpellScript(spell_q4735_collect_rookery_egg);
+    RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
 }

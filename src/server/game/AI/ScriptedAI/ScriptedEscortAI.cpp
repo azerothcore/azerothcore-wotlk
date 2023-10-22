@@ -200,7 +200,6 @@ void npc_escortAI::ReturnToLastPoint()
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
-    me->RemoveAllAuras();
     me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);

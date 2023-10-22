@@ -32,7 +32,6 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -4917,6 +4916,192 @@ class spell_gen_curse_of_pain : public AuraScript
     }
 };
 
+enum SpiritofCompetition
+{
+    // Spells
+    SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT = 48056,
+    SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT      = 48057,
+    // Mail
+    MAIL_THE_COMPETITIORS_TABARD                   = 195,
+    MAIL_A_GOLD_MEDALLION                          = 196,
+    // NPC
+    NPC_SPIRIT_OF_COMPETITION                      = 27217,
+    // Items
+    ITEM_COMPETITORS_TABARD                        = 36941,
+    ITEM_GOLD_MEDALLION                            = 37297,
+};
+
+class spell_gen_spirit_of_competition_participant : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_participant);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_COMPETITORS_TABARD, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_THE_COMPETITIORS_TABARD)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_participant::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_gen_spirit_of_competition_winner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_winner);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_GOLD_MEDALLION, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_A_GOLD_MEDALLION)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_winner::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 27360 - Lord Valthalak's Amulet
+enum Valthalak
+{
+    SPELL_INSTILL_LORD_VALTHALAK_SPIRIT = 27360,
+    NPC_LORD_VALTHALAK                  = 16042
+};
+
+class spell_gen_valthalak_amulet : public SpellScript
+{
+    PrepareSpellScript(spell_gen_valthalak_amulet)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_LORD_VALTHALAK && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_valthalak_amulet::CheckCast);
+    }
+};
+
+enum ScourgeBanner
+{
+    GO_COMMAND_TENT = 176210,
+};
+
+class spell_gen_planting_scourge_banner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_planting_scourge_banner)
+
+    SpellCastResult CheckCast()
+    {
+        if (GameObject* tent = GetCaster()->FindNearestGameObject(GO_COMMAND_TENT, 20.0f))
+            if (tent->GetGoState() != GO_STATE_READY) // If tent is burned down
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_planting_scourge_banner::CheckCast);
+    }
+};
+
+enum Jubling
+{
+    SPELL_JUBLING_COOLDOWN_1_WEEK = 23852
+};
+
+// 23853 - Jubling Cooldown
+class spell_gen_jubling_cooldown : public SpellScript
+{
+    PrepareSpellScript(spell_gen_jubling_cooldown);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN_1_WEEK });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK); // 1 week
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_jubling_cooldown::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 12699 - Yeh'kinya's Bramble
+enum YehkinyaBramble
+{
+    NPC_VALE_SCREECHER       = 5307,
+    NPC_ROGUE_VALE_SCREECHER = 5308
+};
+
+class spell_gen_yehkinya_bramble : public SpellScript
+{
+    PrepareSpellScript(spell_gen_yehkinya_bramble)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if ((target->GetEntry() == NPC_VALE_SCREECHER || target->GetEntry() == NPC_ROGUE_VALE_SCREECHER) && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_yehkinya_bramble::CheckCast);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5063,4 +5248,10 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_threshalisk_charge);
     RegisterSpellScript(spell_gen_shriveling_gaze);
     RegisterSpellScript(spell_gen_curse_of_pain);
+    RegisterSpellScript(spell_gen_spirit_of_competition_participant);
+    RegisterSpellScript(spell_gen_spirit_of_competition_winner);
+    RegisterSpellScript(spell_gen_valthalak_amulet);
+    RegisterSpellScript(spell_gen_planting_scourge_banner);
+    RegisterSpellScript(spell_gen_jubling_cooldown);
+    RegisterSpellScript(spell_gen_yehkinya_bramble);
 }

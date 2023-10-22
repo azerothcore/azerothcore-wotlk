@@ -330,6 +330,7 @@ public:
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool IsStatisticAchievement(AchievementEntry const* achievement) const;
+    bool IsAverageCriteria(AchievementCriteriaEntry const* criteria) const;
 
     [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {

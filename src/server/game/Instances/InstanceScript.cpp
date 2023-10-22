@@ -17,7 +17,6 @@
 
 #include "InstanceScript.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
 #include "Group.h"
@@ -217,6 +216,11 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
         default:
             break;
     }
+}
+
+void InstanceScript::Update(uint32 diff)
+{
+    scheduler.Update(diff);
 }
 
 void InstanceScript::UpdateDoorState(GameObject* door)
