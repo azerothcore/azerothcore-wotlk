@@ -562,8 +562,32 @@ public:
     };
 };
 
+class at_karazhan_side_entrance : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_karazhan_side_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_side_entrance") { }
+
+    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (instance->GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
+            {
+                if (GameObject* door = instance->GetGameObject(DATA_GO_SIDE_ENTRANCE_DOOR))
+                {
+                    instance->HandleGameObject(ObjectGuid::Empty, true, door);
+                    door->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
 void AddSC_karazhan()
 {
     new npc_barnes();
     new npc_image_of_medivh();
+    new at_karazhan_side_entrance();
 }
