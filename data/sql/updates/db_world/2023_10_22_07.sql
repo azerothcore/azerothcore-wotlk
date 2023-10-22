@@ -1,3 +1,4 @@
+-- DB update 2023_10_22_06 -> 2023_10_22_07
 UPDATE `transports` SET `name` = 'Grom\'gol Base Camp, Stranglethorn Vale and Undercity, Tirisfal Glades (Zeppelin, Horde ("The Purple Princess"))' WHERE `entry` = 176495;
 UPDATE `transports` SET `name` = 'Auberdine, Darkshore and Stormwind Harbor (Boat, Alliance ("The Bravery"))' WHERE `entry` = 176310;
 UPDATE `transports` SET `name` = 'Auberdine, Darkshore and Rut\'theran Village, Teldrassil (Boat, Alliance ("The Moonspray"))' WHERE `entry` = 176244;
