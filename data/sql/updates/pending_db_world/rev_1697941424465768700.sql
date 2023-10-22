@@ -15,12 +15,6 @@ FROM `areatrigger_scripts`
 WHERE `entry` = 4089;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
  (4089, 'at_scarlet_monastery_cathedral_entrance');
-DELETE
-FROM `areatrigger`
-WHERE `entry`=4089;
-INSERT INTO `areatrigger` (`entry`, `map`, `x`, `y`, `z`, `radius`, `length`, `width`, `height`, `orientation`) VALUES
- (4089, 189, 864.623, 1321.6, 18.0683, 5, 0, 0, 0, 0);
-
 
 -- Scarlet Commander Mograine say--
 DELETE
