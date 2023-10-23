@@ -136,8 +136,6 @@ public:
         npc_batriderAI(Creature* creature) : ScriptedAI(creature)
         {
             // make the bat rider unattackable
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
@@ -148,7 +146,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void JustEngagedWith(Unit* who) override
+        void JustEngagedWith(Unit* /* who */) override
         {                    
             // schedule the bat rider to drop bombs
             events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
@@ -189,8 +187,6 @@ struct boss_jeklik : public BossAI
     
     void Reset() override
     {
-        LOG_ERROR("scripting", "Jeklk: Reset");
-        
         DoCastSelf(SPELL_GREEN_CHANNELING);
         me->SetHover(false);
         me->SetDisableGravity(false);
@@ -201,28 +197,20 @@ struct boss_jeklik : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        LOG_ERROR("scripting", "Jeklk: JustDied");
-
         _JustDied();
         Talk(SAY_DEATH);
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        LOG_ERROR("scripting", "Jeklk: EnterEvadeMode");
-        
         me->GetMotionMaster()->Clear();
         me->SetHomePosition(JeklikHomePosition);
         me->NearTeleportTo(JeklikHomePosition.GetPositionX(), JeklikHomePosition.GetPositionY(), JeklikHomePosition.GetPositionZ(), JeklikHomePosition.GetOrientation());
         BossAI::EnterEvadeMode(why);
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /* who */) override
     {
-        LOG_ERROR("scripting", "Jeklk: JustEngagedWith {}", 
-            who->GetName()
-        );
-        
         Talk(SAY_AGGRO);
         me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
         me->SetHover(true);
@@ -234,8 +222,6 @@ struct boss_jeklik : public BossAI
 
     void PathEndReached(uint32 /*pathId*/) override
     {
-        LOG_ERROR("scripting", "Jeklk: PathEndReached");
-
         me->SetHover(false);
         me->SetDisableGravity(false);
         _JustEngagedWith();
