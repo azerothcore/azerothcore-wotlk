@@ -62,16 +62,15 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (147500, 57, -12302.444, -1406.2711, 142.24767, NULL, 0, 2, 0, 100, 0),
 (147500, 58, -12288.755, -1392.7551, 145.27551, NULL, 0, 2, 0, 100, 0);
 
--- Update Gurubashi Bat Rider (14750) to add flying
-DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 14750);
-INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-(14750, 1, 0, 1, 0, 0, 0, NULL);
-
--- Update Gurubashi Bat Rider (14750)'s flying speed
-UPDATE `creature_template` SET `speed_flight` = 7 WHERE (`entry` = 14750);
-
--- Replace Frenzied Bloodseeker Bat (14965) AI setting with script
+-- Replace Gurubashi Bat Rider (14750)'s AI setting with script
 DELETE FROM `creature_template` WHERE (`entry` = 14750);
 INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `scale`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `spell_school_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
 (14750, 0, 0, 0, 0, 0, 15303, 0, 0, 0, 'Gurubashi Bat Rider', NULL, NULL, 0, 59, 61, 0, 28, 0, 2, 2.14286, 1, 7, 20, 1, 1, 0, 10, 2000, 2000, 1, 1, 1, 64, 2048, 0, 0, 0, 0, 0, 0, 7, 8, 14750, 0, 14750, 0, 0, 618, 3102, '', 1, 1, 10, 1, 1.15, 1, 0, 191, 1, 1019952987, 0, 0, 'npc_batrider', 12340);
 
+-- Remove Gurubashi Bat Rider (14750) SAI entries
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 14750);
+
+-- Remove Frentzied Bloodseeker Bat (14965) script
+DELETE FROM `creature_template` WHERE (`entry` = 14965);
+INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `scale`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `spell_school_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
+(14965, 0, 0, 0, 0, 0, 14562, 0, 3956, 0, 'Frenzied Bloodseeker Bat', NULL, NULL, 0, 60, 60, 0, 28, 0, 2, 2.14286, 1, 1, 18, 1, 0, 0, 1, 1000, 2000, 1, 1, 1, 0, 2048, 0, 24, 0, 0, 0, 0, 1, 9, 0, 0, 100003, 12825, 0, 0, 0, '', 1, 1, 2, 1, 1, 1, 0, 191, 1, 0, 0, 0, '', 12340);
