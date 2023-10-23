@@ -121,99 +121,61 @@ enum Misc
 Position const JeklikHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
 
 // Gurubashi Bat Rider (14750) that drops bombs
-struct npc_batrider : public ScriptedAI
+class npc_batrider : public CreatureScript
 {
-    npc_batrider(Creature* creature) : ScriptedAI(creature)
+public:
+    npc_batrider() : CreatureScript("npc_batrider") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        // if this is a temp summon of Jeklik, it's a boss bat rider
-        if 
-        (
-            creature->GetEntry() == NPC_BAT_RIDER &&
-            creature->IsSummon() &&
-            creature->ToTempSummon() &&
-            creature->ToTempSummon()->GetSummoner() &&
-            creature->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
-        )
+        return GetZulGurubAI<npc_batriderAI>(creature);
+    }
+
+    struct npc_batriderAI : public ScriptedAI
+    {
+        npc_batriderAI(Creature* creature) : ScriptedAI(creature)
         {
-            LOG_ERROR("scripting", "Bat Rider: mode: NPC_BAT_RIDER_MODE_BOSS");
-            _mode = NPC_BAT_RIDER_MODE_BOSS;
-
             // make the bat rider unattackable
-            //me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-            //me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
 
-            // keep the bat rider from attacking players
-            //me->SetReactState(REACT_PASSIVE);
 
-            // set movement parameters
-            //me->SetDefaultMovementType(MovementGeneratorType::WAYPOINT_MOTION_TYPE);
+        void Reset() override
+        {            
+            events.Reset();
+            me->GetMotionMaster()->Clear();
+        }
 
-            // load the loop points
-            WaypointPath const* path = sWaypointMgr->GetPath(PATH_BAT_RIDER_LOOP);
-            for (uint8 i = 0; i < path->size(); ++i)
+        void JustEngagedWith(Unit* who) override
+        {                    
+            // schedule the bat rider to drop bombs
+            events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            // if the creature isn't moving, run the loop
+            if (!me->isMoving())
             {
-                WaypointData const* node = path->at(i);
-                _pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                LOG_DEBUG("scripts.ai", "Bat Rider: not moving, re-running loop");
+                me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
+            }
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_BAT_RIDER_THROW_BOMB:
+                    DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
+                    events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 7s);
+                    break;
+                default:
+                    break;
             }
         }
-        else
-        {
-            LOG_ERROR("scripting", "Bat Rider: mode: NPC_BAT_RIDER_MODE_TRASH");
-            _mode = NPC_BAT_RIDER_MODE_TRASH;
-        }
-    }
-
-    void Reset() override
-    {
-        if (_mode == NPC_BAT_RIDER_MODE_TRASH) { return; }
-        
-        LOG_ERROR("scripting", "Bat Rider: Reset");
-        
-        events.Reset();
-        me->GetMotionMaster()->Clear();
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {        
-        if (_mode == NPC_BAT_RIDER_MODE_TRASH) { return; }
-        
-        LOG_ERROR("scripting", "Bat Rider: JustEngagedWith {}",
-            who->GetName()
-        );
-
-        // schedule the bat rider to drop bombs
-        events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (_mode == NPC_BAT_RIDER_MODE_TRASH) { return; }
-
-        events.Update(diff);
-
-        // if the creature isn't moving, run the loop
-        if (!me->isMoving())
-        {
-            LOG_ERROR("scripting", "Bat Rider: not moving, re-running loop");
-            me->GetMotionMaster()->MoveSplinePath(&_pathPoints);
-        }
-
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_BAT_RIDER_THROW_BOMB:
-                LOG_ERROR("scripting", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
-                DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
-                events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 7s);
-                break;
-            default:
-                break;
-        }
-    }
-
-private:
-    BatRiderMode _mode; // trash or boss summon
-    Movement::PointsArray _pathPoints; // the points of the loop the bat takes
+    };
 };
 
 
@@ -383,7 +345,8 @@ struct boss_jeklik : public BossAI
                         // summon up to 2 bat riders
                         if (batRiders.size() < 2)
                         {
-                            LOG_ERROR("scripting", "Jeklik: EVENT_SPAWN_FLYING_BATS");
+                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS ({} of 2)", batRiders.size() + 1);
+                            
                             // Yell
                             Talk(SAY_CALL_RIDERS);
                             
@@ -395,7 +358,7 @@ struct boss_jeklik : public BossAI
 
                                 // this creature (14750) is the same creature as the trash ones on the ground
                                 // we need to override the DB's setting of SmartAI
-                                batRider->SetAI(new npc_batrider(batRider));
+                                batRider->SetAI(new npc_batrider::npc_batriderAI(batRider));
                                 batRider->AI()->DoZoneInCombat();
                             }
                         }
@@ -438,6 +401,6 @@ class spell_batrider_bomb : public SpellScript
 void AddSC_boss_jeklik()
 {
     RegisterCreatureAI(boss_jeklik);
-    RegisterCreatureAI(npc_batrider);
+    new npc_batrider();
     RegisterSpellScript(spell_batrider_bomb);
 }
