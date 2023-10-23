@@ -32,7 +32,7 @@
 #include "World.h"
 #include "WorldModel.h"
 
-MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
+MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _delayedTeleport(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -230,8 +230,14 @@ void MotionTransport::Update(uint32 diff)
               3. transport moves from active to inactive grid
               4. the grid that transport is currently in unloads
             */
-            if (_staticPassengers.empty() && GetMap()->IsGridLoaded(GetPositionX(), GetPositionY())) // 2.
+            bool gridActive = GetMap()->IsGridLoaded(GetPositionX(), GetPositionY());
+
+            if (_staticPassengers.empty() && gridActive) // 2.
                 LoadStaticPassengers();
+            else if (!_staticPassengers.empty() && !gridActive)
+                // 4. - if transports stopped on grid edge, some passengers can remain in active grids
+                //      unload all static passengers otherwise passengers won't load correctly when the grid that transport is currently in becomes active
+                UnloadStaticPassengers();
         }
     }
 
@@ -248,18 +254,27 @@ void MotionTransport::DelayedUpdate(uint32  /*diff*/)
 
 void MotionTransport::UpdatePosition(float x, float y, float z, float o)
 {
-    if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
-        GetMap()->LoadGrid(x, y);
+    bool newActive = GetMap()->IsGridLoaded(x, y);
+    Cell oldCell(GetPositionX(), GetPositionY());
 
     Relocate(x, y, z, o);
     UpdateModelPosition();
 
     UpdatePassengerPositions(_passengers);
 
-    if (_staticPassengers.empty())
+    /* There are four possible scenarios that trigger loading/unloading passengers:
+      1. transport moves from inactive to active grid
+      2. the grid that transport is currently in becomes active
+      3. transport moves from active to inactive grid
+      4. the grid that transport is currently in unloads
+    */
+    if (_staticPassengers.empty() && newActive) // 1.
         LoadStaticPassengers();
+    else if (!_staticPassengers.empty() && !newActive && oldCell.DiffGrid(Cell(GetPositionX(), GetPositionY()))) // 3.
+        UnloadStaticPassengers();
     else
         UpdatePassengerPositions(_staticPassengers);
+    // 4. is handed by grid unload
 }
 
 void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
@@ -306,8 +321,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         {
             passenger->SetTransport(nullptr);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
-            passenger->m_movementInfo.transport.guid.Clear();
-            passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+            passenger->m_movementInfo.transport.Reset();
             if (passenger->ToUnit())
             {
                 passenger->ToUnit()->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
@@ -407,9 +421,6 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 
 void MotionTransport::LoadStaticPassengers()
 {
-    if (PassengersLoaded())
-        return;
-    SetPassengersLoaded(true);
     if (uint32 mapId = GetGOInfo()->moTransport.mapID)
     {
         CellObjectGuidsMap const& cells = sObjectMgr->GetMapObjectGuids(mapId, GetMap()->GetSpawnMode());
@@ -431,7 +442,6 @@ void MotionTransport::LoadStaticPassengers()
 
 void MotionTransport::UnloadStaticPassengers()
 {
-    SetPassengersLoaded(false);
     while (!_staticPassengers.empty())
     {
         WorldObject* obj = *_staticPassengers.begin();
@@ -542,10 +552,18 @@ void MotionTransport::DelayedTeleportTransport()
     _delayedTeleport = false;
 
     uint32 newMapId = _nextFrame->Node->mapid;
+    Map* newMap = sMapMgr->CreateBaseMap(newMapId);
+    GetMap()->RemoveFromMap<MotionTransport>(this, false);
+
     float x = _nextFrame->Node->x,
           y = _nextFrame->Node->y,
           z = _nextFrame->Node->z,
           o = _nextFrame->InitialOrientation;
+
+    if (!newMap->IsGridLoaded(x, y) && !_passengers.empty())
+        newMap->LoadGrid(x, y); // xinef: load before adding passengers to new map
+
+    SetMap(newMap);
 
     PassengerSet _passengersCopy = _passengers;
     for (PassengerSet::iterator itr = _passengersCopy.begin(); itr != _passengersCopy.end(); )
@@ -592,15 +610,8 @@ void MotionTransport::DelayedTeleportTransport()
         }
     }
 
-    Map* newMap = sMapMgr->CreateBaseMap(newMapId);
-    GetMap()->RemoveFromMap<MotionTransport>(this, false);
-    newMap->LoadGrid(x, y); // xinef: load before adding passengers to new map
-    SetMap(newMap);
-
     Relocate(x, y, z, o);
     GetMap()->AddToMap<MotionTransport>(this);
-
-    LoadStaticPassengers();
 }
 
 void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
@@ -631,7 +642,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
             case TYPEID_UNIT:
                 {
                     Creature* creature = passenger->ToCreature();
-                    GetMap()->CreatureRelocation(creature, x, y, z, o);
+                    GetMap()->CreatureRelocation(creature, x, y, z, o, false);
 
                     creature->GetTransportHomePosition(x, y, z, o);
                     CalculatePassengerPosition(x, y, z, &o);
@@ -643,7 +654,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
                 break;
             case TYPEID_GAMEOBJECT:
-                GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o);
+                GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
                 break;
             case TYPEID_DYNAMICOBJECT:
                 GetMap()->DynamicObjectRelocation(passenger->ToDynObject(), x, y, z, o);
@@ -780,7 +791,6 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
 
-    this->setActive(true);
     return true;
 }
 
@@ -915,7 +925,8 @@ void StaticTransport::UpdatePosition(float x, float y, float z, float o)
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
-    GetMap()->GameObjectRelocation(this, x, y, z, o); // this also relocates the model
+    Relocate(x, y, z, o);
+    UpdateModelPosition();
     UpdatePassengerPositions();
 }
 
@@ -942,17 +953,14 @@ void StaticTransport::UpdatePassengerPositions()
         switch (passenger->GetTypeId())
         {
             case TYPEID_UNIT:
-                GetMap()->CreatureRelocation(passenger->ToCreature(), x, y, z, o);
+                GetMap()->CreatureRelocation(passenger->ToCreature(), x, y, z, o, false);
                 break;
             case TYPEID_PLAYER:
                 if (passenger->IsInWorld())
-                {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                    passenger->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), z);
-                }
                 break;
             case TYPEID_GAMEOBJECT:
-                GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o);
+                GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
                 break;
             case TYPEID_DYNAMICOBJECT:
                 GetMap()->DynamicObjectRelocation(passenger->ToDynObject(), x, y, z, o);
@@ -1001,8 +1009,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         {
             passenger->SetTransport(nullptr);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
-            passenger->m_movementInfo.transport.guid.Clear();
-            passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+            passenger->m_movementInfo.transport.Reset();
         }
     }
 }
