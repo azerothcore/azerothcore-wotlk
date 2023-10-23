@@ -147,7 +147,7 @@ struct boss_jeklik : public BossAI
     
     void Reset() override
     {
-        DoCastSelf(SPELL_GREEN_CHANNELING);
+        DoCastSelf(SPELL_GREEN_CHANNELING, true);
         me->SetHover(false);
         me->SetDisableGravity(false);
         me->SetReactState(REACT_PASSIVE);
