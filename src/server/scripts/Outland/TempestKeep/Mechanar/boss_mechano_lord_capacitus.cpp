@@ -208,7 +208,11 @@ class spell_capacitus_polarity_shift : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
+        {
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
             target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, GetCaster()->GetGUID());
+        }
     }
 
     void Register() override

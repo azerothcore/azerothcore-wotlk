@@ -243,13 +243,13 @@ RUN mkdir -pv /azerothcore/env/dist/Cameras \
               /azerothcore/env/dist/vmaps
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
-  /azerothcore/env/dist/bin/map_extractor /azerothcore/env/dist/map_extractor
+  /azerothcore/env/dist/bin/map_extractor /azerothcore/env/dist/bin/map_extractor
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
-  /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/dist/mmaps_generator
+  /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/dist/bin/mmaps_generator
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
-  /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/dist/vmap4_assembler
+  /azerothcore/env/dist/bin/vmap4_assembler /azerothcore/env/dist/bin/vmap4_assembler
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build \
-  /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/dist/vmap4_extractor
+  /azerothcore/env/dist/bin/vmap4_extractor /azerothcore/env/dist/bin/vmap4_extractor

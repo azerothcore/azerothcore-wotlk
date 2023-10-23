@@ -18,7 +18,9 @@
 #include "GameObject.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "karazhan.h"
 #include "TaskScheduler.h"
 
@@ -40,31 +42,34 @@ enum Texts
 enum Spells
 {
     //Spells
-    SPELL_FROSTBOLT           = 29954,
-    SPELL_FIREBALL            = 29953,
-    SPELL_ARCMISSLE           = 29955,
-    SPELL_CHAINSOFICE         = 29991,
-    SPELL_DRAGONSBREATH       = 29964,
-    SPELL_MASSSLOW            = 30035,
-    SPELL_FLAME_WREATH        = 29946,
-    SPELL_AOE_CS              = 29961,
-    SPELL_PLAYERPULL          = 32265,
-    SPELL_AEXPLOSION          = 29973,
-    SPELL_MASS_POLY           = 29963,
-    SPELL_BLINK_CENTER        = 29967,
-    SPELL_CONJURE             = 29975,
-    SPELL_DRINK               = 30024,
-    SPELL_POTION              = 32453,
-    SPELL_AOE_PYROBLAST       = 29978,
+    SPELL_FROSTBOLT              = 29954,
+    SPELL_FIREBALL               = 29953,
+    SPELL_ARCMISSLE              = 29955,
+    SPELL_CHAINSOFICE            = 29991,
+    SPELL_DRAGONSBREATH          = 29964,
+    SPELL_MASSSLOW               = 30035,
+    SPELL_FLAME_WREATH           = 30004,
+    SPELL_FLAME_WREATH_RING      = 29946,
+    SPELL_FLAME_WREATH_RAN_THRU  = 29947, // You ran through the flames!
+    SPELL_FLAME_WREATH_EXPLOSION = 29949,
+    SPELL_AOE_CS                 = 29961,
+    SPELL_PLAYERPULL             = 32265,
+    SPELL_AEXPLOSION             = 29973,
+    SPELL_MASS_POLY              = 29963,
+    SPELL_BLINK_CENTER           = 29967,
+    SPELL_CONJURE                = 29975,
+    SPELL_DRINK                  = 30024,
+    SPELL_POTION                 = 32453,
+    SPELL_AOE_PYROBLAST          = 29978,
 
-    SPELL_SUMMON_WELEMENTAL_1 = 29962,
-    SPELL_SUMMON_WELEMENTAL_2 = 37051,
-    SPELL_SUMMON_WELEMENTAL_3 = 37052,
-    SPELL_SUMMON_WELEMENTAL_4 = 37053,
+    SPELL_SUMMON_WELEMENTAL_1    = 29962,
+    SPELL_SUMMON_WELEMENTAL_2    = 37051,
+    SPELL_SUMMON_WELEMENTAL_3    = 37052,
+    SPELL_SUMMON_WELEMENTAL_4    = 37053,
 
-    SPELL_SUMMON_BLIZZARD     = 29969, // Activates the Blizzard NPC
+    SPELL_SUMMON_BLIZZARD        = 29969, // Activates the Blizzard NPC
 
-    SPELL_SHADOW_PYRO         = 29978
+    SPELL_SHADOW_PYRO            = 29978
 };
 
 enum Creatures
@@ -81,19 +86,10 @@ enum SuperSpell
 
 enum Groups
 {
-    GROUP_FLAMEWREATH   = 0,
-    GROUP_DRINKING      = 1
+    GROUP_DRINKING      = 0
 };
 
 Position const roomCenter = {-11158.f, -1920.f};
-
-Position const elementalPos[4] =
-{
-    {-11168.1f, -1939.29f, 232.092f, 1.46f},
-    {-11138.2f, -1915.38f, 232.092f, 3.00f},
-    {-11161.7f, -1885.36f, 232.092f, 4.59f},
-    {-11192.4f, -1909.36f, 232.092f, 6.19f}
-};
 
 struct boss_shade_of_aran : public BossAI
 {
@@ -110,9 +106,6 @@ struct boss_shade_of_aran : public BossAI
         BossAI::Reset();
         _drinkScheduler.CancelAll();
         _lastSuperSpell = rand() % 3;
-
-        for (uint8 i = 0; i < 3; ++i)
-            FlameWreathTarget[i].Clear();
 
         CurrentNormalSpell = 0;
 
@@ -329,15 +322,7 @@ struct boss_shade_of_aran : public BossAI
         {
             if (!_drinking)
             {
-                switch (urand(0, 1))
-                {
-                    case 0:
-                        DoCastSelf(SPELL_AOE_CS);
-                        break;
-                    case 1:
-                        DoCastRandomTarget(SPELL_CHAINSOFICE);
-                        break;
-                }
+                urand(0, 1) ? DoCastSelf(SPELL_AOE_CS) : DoCastRandomTarget(SPELL_CHAINSOFICE);
             }
             context.Repeat(5s, 20s);
         }).Schedule(6s, [this](TaskContext context)
@@ -377,37 +362,10 @@ struct boss_shade_of_aran : public BossAI
                         DoCastSelf(SPELL_MASSSLOW, true);
                         DoCastSelf(SPELL_AEXPLOSION, false);
                         break;
-
                     case SUPER_FLAME:
                         Talk(SAY_FLAMEWREATH);
-
-                        scheduler.Schedule(20s, GROUP_FLAMEWREATH, [this](TaskContext)
-                        {
-                            scheduler.CancelGroup(GROUP_FLAMEWREATH);
-                        }).Schedule(500ms, GROUP_FLAMEWREATH, [this](TaskContext context)
-                        {
-                            for (uint8 i = 0; i < 3; ++i)
-                            {
-                                if (!FlameWreathTarget[i])
-                                    continue;
-
-                                Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
-                                if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
-                                {
-                                    unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
-                                    FlameWreathTarget[i].Clear();
-                                }
-                            }
-                            context.Repeat(500ms);
-                        });
-
-                        FlameWreathTarget[0].Clear();
-                        FlameWreathTarget[1].Clear();
-                        FlameWreathTarget[2].Clear();
-
-                        FlameWreathEffect();
+                        DoCastAOE(SPELL_FLAME_WREATH);
                         break;
-
                     case SUPER_BLIZZARD:
                         Talk(SAY_BLIZZARD);
                         DoCastAOE(SPELL_SUMMON_BLIZZARD);
@@ -430,41 +388,6 @@ struct boss_shade_of_aran : public BossAI
 
             context.Repeat(1min);
         });
-    }
-
-    void FlameWreathEffect()
-    {
-        std::vector<Unit*> targets;
-        ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-
-        if (t_list.empty())
-            return;
-
-        //store the threat list in a different container
-        for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-        {
-            Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            //only on alive players
-            if (target && target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                targets.push_back(target);
-        }
-
-        //cut down to size if we have more than 3 targets
-        while (targets.size() > 3)
-            targets.erase(targets.begin() + rand() % targets.size());
-
-        uint32 i = 0;
-        for (std::vector<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-        {
-            if (*itr)
-            {
-                FlameWreathTarget[i] = (*itr)->GetGUID();
-                FWTargPosX[i] = (*itr)->GetPositionX();
-                FWTargPosY[i] = (*itr)->GetPositionY();
-                DoCast((*itr), SPELL_FLAME_WREATH, true);
-                ++i;
-            }
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -514,10 +437,6 @@ private:
 
     uint32 _lastSuperSpell;
 
-    ObjectGuid FlameWreathTarget[3];
-    float FWTargPosX[3];
-    float FWTargPosY[3];
-
     uint32 CurrentNormalSpell;
 
     bool _arcaneCooledDown;
@@ -527,7 +446,84 @@ private:
     bool _hasDrunk;
 };
 
+// 30004 - Flame Wreath
+class spell_flamewreath : public SpellScript
+{
+    PrepareSpellScript(spell_flamewreath);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_WREATH_RING });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint8 maxSize = 3;
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
+
+        _targets = targets;
+    }
+
+    void HandleFinish()
+    {
+        for (auto const& target : _targets)
+        {
+            if (Unit* targetUnit = target->ToUnit())
+            {
+                GetCaster()->CastSpell(targetUnit, SPELL_FLAME_WREATH_RING, true);
+            }
+        }
+    }
+
+private:
+    std::list<WorldObject*> _targets;
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_flamewreath::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        AfterCast += SpellCastFn(spell_flamewreath::HandleFinish);
+    }
+};
+
+// 29946 - Flame Wreath (visual effect)
+class spell_flamewreath_aura : public AuraScript
+{
+    PrepareAuraScript(spell_flamewreath_aura);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_WREATH_RAN_THRU, SPELL_FLAME_WREATH_EXPLOSION });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && GetDuration())
+        {
+            if (Unit* target = GetTarget())
+            {
+                target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
+
+                target->m_Events.AddEventAtOffset([target] {
+                    target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
+                    target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
+                }, 1s);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_flamewreath_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_shade_of_aran()
 {
     RegisterKarazhanCreatureAI(boss_shade_of_aran);
+    RegisterSpellScript(spell_flamewreath);
+    RegisterSpellScript(spell_flamewreath_aura);
 }
