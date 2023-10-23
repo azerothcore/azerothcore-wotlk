@@ -195,7 +195,8 @@ void Map::LoadMap(int gx, int gy, bool reload)
             return;
 
         // load grid map for base map
-        m_parentMap->EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
+        if (!m_parentMap->GridMaps[gx][gy])
+            m_parentMap->EnsureGridCreated(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy));
 
         ((MapInstanced*)(m_parentMap))->AddGridMapReference(GridCoord(gx, gy));
         GridMaps[gx][gy] = m_parentMap->GridMaps[gx][gy];
@@ -2404,11 +2405,11 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
 GridMap* Map::GetGrid(float x, float y)
 {
     // half opt method
-    int gx = (int)(32 - x / SIZE_OF_GRIDS);                 //grid x
-    int gy = (int)(32 - y / SIZE_OF_GRIDS);                 //grid y
+    int gx = (int)(CENTER_GRID_ID - x / SIZE_OF_GRIDS);                 //grid x
+    int gy = (int)(CENTER_GRID_ID - y / SIZE_OF_GRIDS);                 //grid y
 
     // ensure GridMap is loaded
-    EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
+    EnsureGridCreated(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy));
 
     return GridMaps[gx][gy];
 }

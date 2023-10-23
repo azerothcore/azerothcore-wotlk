@@ -1421,7 +1421,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetOption<int32>("PreventAFKLogout", 0);
 
     // Unload grids to save memory. Can be disabled if enough memory is available to speed up moving players to new grids.
-    _bool_configs[CONFIG_GRID_UNLOAD] = sConfigMgr->GetBoolDefault("GridUnload", true);
+    _bool_configs[CONFIG_GRID_UNLOAD] = sConfigMgr->GetOption<bool>("GridUnload", true);
 
     // Preload all grids of all non-instanced maps
     _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetOption<bool>("PreloadAllNonInstancedMapGrids", false);
