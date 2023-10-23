@@ -64,6 +64,12 @@ enum BatIds
     NPC_BAT_RIDER               = 14750
 };
 
+enum BatRiderMode
+{
+    NPC_BAT_RIDER_MODE_TRASH    = 1,            // used when the bat rider is statically spanwed as a trash creature
+    NPC_BAT_RIDER_MODE_BOSS                     // used when the bat rider is spawned by the boss
+};
+
 enum Events
 {
     // Phase one
@@ -104,15 +110,15 @@ Position const SpawnBat[6] =
 };
 
 Position const SpawnBatRider = { -12301.689, -1371.2921, 145.09244 };
-Position const JeklikHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
+Position const BatRiderPathEnd = { -12288.755, -1392.7551, 145.27551 }; // the last point of the spline path in the DB
 
-enum PathID
+enum Misc
 {
     PATH_JEKLIK_INTRO = 145170,
     PATH_BAT_RIDER_LOOP = 147500
 };
 
-
+Position const JeklikHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
 
 // Gurubashi Bat Rider (14750) that drops bombs
 class npc_batrider : public CreatureScript
@@ -129,23 +135,41 @@ public:
     {
         npc_batriderAI(Creature* creature) : ScriptedAI(creature)
         {
-            LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor");
+            LOG_ERROR("scripting", "Bat Rider: constructor");
 
             // make the bat rider unattackable
+            //me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            //me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+
+            // keep the bat rider from attacking players
+            //me->SetReactState(REACT_PASSIVE);
+
+            // set movement parameters
+            //me->SetDefaultMovementType(MovementGeneratorType::WAYPOINT_MOTION_TYPE);
+
+            // load the loop points
+            WaypointPath const* path = sWaypointMgr->GetPath(PATH_BAT_RIDER_LOOP);
+            for (uint8 i = 0; i < path->size(); ++i)
+            {
+                WaypointData const* node = path->at(i);
+                _pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+            }
         }
 
+        Movement::PointsArray _pathPoints; // the points of the loop the bat takes
+
         void Reset() override
-        {            
-            LOG_DEBUG("scripts.ai", "Bat Rider: Reset");
+        {           
+            LOG_ERROR("scripting", "Bat Rider: Reset");
+            
             events.Reset();
             me->GetMotionMaster()->Clear();
         }
 
         void JustEngagedWith(Unit* who) override
-        {                    
-            LOG_DEBUG("scripts.ai", "Bat Rider: JustEngagedWith {}",
+        {                  
+            LOG_ERROR("scripting", "Bat Rider: JustEngagedWith {}",
                 who->GetName()
             );
 
@@ -160,14 +184,14 @@ public:
             // if the creature isn't moving, run the loop
             if (!me->isMoving())
             {
-                LOG_DEBUG("scripts.ai", "Bat Rider: not moving, re-running loop");
-                me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
+                LOG_ERROR("scripting", "Bat Rider: not moving, re-running loop");
+                me->GetMotionMaster()->MoveSplinePath(&_pathPoints);
             }
 
             switch (events.ExecuteEvent())
             {
                 case EVENT_BAT_RIDER_THROW_BOMB:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
+                    LOG_ERROR("scripting", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
                     DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
                     events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 7s);
                     break;
@@ -189,6 +213,8 @@ struct boss_jeklik : public BossAI
     
     void Reset() override
     {
+        LOG_ERROR("scripting", "Jeklik: Reset");
+        
         DoCastSelf(SPELL_GREEN_CHANNELING);
         me->SetHover(false);
         me->SetDisableGravity(false);
@@ -199,20 +225,28 @@ struct boss_jeklik : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        LOG_ERROR("scripting", "Jeklik: JustDied");
+
         _JustDied();
         Talk(SAY_DEATH);
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        LOG_ERROR("scripting", "Jeklik: EnterEvadeMode");
+        
         me->GetMotionMaster()->Clear();
         me->SetHomePosition(JeklikHomePosition);
         me->NearTeleportTo(JeklikHomePosition.GetPositionX(), JeklikHomePosition.GetPositionY(), JeklikHomePosition.GetPositionZ(), JeklikHomePosition.GetOrientation());
         BossAI::EnterEvadeMode(why);
     }
 
-    void JustEngagedWith(Unit* /* who */) override
+    void JustEngagedWith(Unit* who) override
     {
+        LOG_ERROR("scripting", "Jeklik: JustEngagedWith {}", 
+            who->GetName()
+        );
+        
         Talk(SAY_AGGRO);
         me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
         me->SetHover(true);
@@ -224,6 +258,8 @@ struct boss_jeklik : public BossAI
 
     void PathEndReached(uint32 /*pathId*/) override
     {
+        LOG_ERROR("scripting", "Jeklik: PathEndReached");
+
         me->SetHover(false);
         me->SetDisableGravity(false);
         _JustEngagedWith();
@@ -333,8 +369,7 @@ struct boss_jeklik : public BossAI
                         // summon up to 2 bat riders
                         if (batRiders.size() < 2)
                         {
-                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS ({} of 2)", batRiders.size() + 1);
-                            
+                            LOG_ERROR("scripting", "Jeklik: EVENT_SPAWN_FLYING_BATS");
                             // Yell
                             Talk(SAY_CALL_RIDERS);
                             
