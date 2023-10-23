@@ -19,6 +19,7 @@
 #include "MoveSplineInit.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SmartAI.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 #include "WaypointMgr.h"
@@ -112,7 +113,11 @@ enum PathID
     PATH_BAT_RIDER_LOOP = 147500
 };
 
-
+enum BatRiderMode
+{
+    BAT_RIDER_MODE_TRASH = 1,
+    BAT_RIDER_MODE_BOSS
+};
 
 // Gurubashi Bat Rider (14750) that drops bombs
 class npc_batrider : public CreatureScript
@@ -129,18 +134,45 @@ public:
     {
         npc_batriderAI(Creature* creature) : ScriptedAI(creature)
         {
-            LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor");
+            // if this is a summon of Jeklik, it is in boss mode
+            if
+            (
+                me->GetEntry() == NPC_BAT_RIDER &&
+                me->IsSummon() &&
+                me->ToTempSummon() &&
+                me->ToTempSummon()->GetSummoner() &&
+                me->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
+            )
+            {
+                LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor (BAT_RIDER_MODE_BOSS)");
+                _mode = BAT_RIDER_MODE_BOSS;
 
-            // make the bat rider unattackable
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                // make the bat rider unattackable
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            }
+            else
+            {
+                LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor (BAT_RIDER_MODE_TRASH)");
+                _mode = BAT_RIDER_MODE_TRASH;
+
+                // enable SmartAI for the creature, replacing this script
+                me->SetAI(new SmartAI(me));
+
+            }
         }
+
+        BatRiderMode _mode;
 
         void Reset() override
         {            
             LOG_DEBUG("scripts.ai", "Bat Rider: Reset");
+            if (_mode == BAT_RIDER_MODE_TRASH) { return; }
+            
             events.Reset();
+
             me->GetMotionMaster()->Clear();
+            
         }
 
         void JustEngagedWith(Unit* who) override
@@ -148,6 +180,7 @@ public:
             LOG_DEBUG("scripts.ai", "Bat Rider: JustEngagedWith {}",
                 who->GetName()
             );
+            if (_mode == BAT_RIDER_MODE_TRASH) { return; }
 
             // schedule the bat rider to drop bombs
             events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
@@ -155,6 +188,8 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (_mode == BAT_RIDER_MODE_TRASH) { return; }
+            
             events.Update(diff);
 
             // if the creature isn't moving, run the loop
@@ -346,7 +381,6 @@ struct boss_jeklik : public BossAI
 
                                 // this creature (14750) is the same creature as the trash ones on the ground
                                 // we need to override the DB's setting of SmartAI
-                                //batRider->SetAI(new npc_batrider::npc_batriderAI(batRider));
                                 batRider->AI()->DoZoneInCombat();
                             }
                         }
