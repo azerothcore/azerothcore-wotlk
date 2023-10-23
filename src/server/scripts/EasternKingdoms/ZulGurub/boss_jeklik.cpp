@@ -64,12 +64,6 @@ enum BatIds
     NPC_BAT_RIDER               = 14750
 };
 
-enum BatRiderMode
-{
-    NPC_BAT_RIDER_MODE_TRASH    = 1,            // used when the bat rider is statically spanwed as a trash creature
-    NPC_BAT_RIDER_MODE_BOSS                     // used when the bat rider is spawned by the boss
-};
-
 enum Events
 {
     // Phase one
@@ -110,15 +104,15 @@ Position const SpawnBat[6] =
 };
 
 Position const SpawnBatRider = { -12301.689, -1371.2921, 145.09244 };
-Position const BatRiderPathEnd = { -12288.755, -1392.7551, 145.27551 }; // the last point of the spline path in the DB
+Position const JeklikHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
 
-enum Misc
+enum PathID
 {
     PATH_JEKLIK_INTRO = 145170,
     PATH_BAT_RIDER_LOOP = 147500
 };
 
-Position const JeklikHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
+
 
 // Gurubashi Bat Rider (14750) that drops bombs
 class npc_batrider : public CreatureScript
@@ -135,19 +129,26 @@ public:
     {
         npc_batriderAI(Creature* creature) : ScriptedAI(creature)
         {
+            LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor");
+
             // make the bat rider unattackable
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
-
 
         void Reset() override
         {            
+            LOG_DEBUG("scripts.ai", "Bat Rider: Reset");
             events.Reset();
             me->GetMotionMaster()->Clear();
         }
 
-        void JustEngagedWith(Unit* /* who */) override
+        void JustEngagedWith(Unit* who) override
         {                    
+            LOG_DEBUG("scripts.ai", "Bat Rider: JustEngagedWith {}",
+                who->GetName()
+            );
+
             // schedule the bat rider to drop bombs
             events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
         }
@@ -166,6 +167,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_BAT_RIDER_THROW_BOMB:
+                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
                     DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
                     events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 7s);
                     break;
