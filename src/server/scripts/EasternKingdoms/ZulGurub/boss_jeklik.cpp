@@ -346,7 +346,7 @@ struct boss_jeklik : public BossAI
 
                                 // this creature (14750) is the same creature as the trash ones on the ground
                                 // we need to override the DB's setting of SmartAI
-                                batRider->SetAI(new npc_batrider::npc_batriderAI(batRider));
+                                //batRider->SetAI(new npc_batrider::npc_batriderAI(batRider));
                                 batRider->AI()->DoZoneInCombat();
                             }
                         }
