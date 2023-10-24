@@ -140,67 +140,59 @@ enum BatRiderMode
 // High Priestess Jeklik (14517)
 struct boss_jeklik : public BossAI
 {
-    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
+    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) 
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     // Bat Riders (14750)
     std::vector<Creature*> batRiders;
     
-    void Reset() override
+    void InitializeAI() override
     {
-        me->SetHover(false);
-        me->SetDisableGravity(false);
-        me->SetReactState(REACT_PASSIVE);
-        _Reset();
-        SetCombatMovement(false);
-        DoCastSelf(SPELL_GREEN_CHANNELING, true);
+        LOG_DEBUG("scripts.ai", "Jeklik: InitializeAI");
+        BossAI::InitializeAI();
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustReachedHome() override
     {
-        _JustDied();
-        Talk(SAY_DEATH);
-    }
+        LOG_DEBUG("scripts.ai", "Jeklik: JustReachedHome");
+        BossAI::JustReachedHome();
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        me->GetMotionMaster()->Clear();
         me->SetHomePosition(JeklikHomePosition);
-        me->NearTeleportTo(JeklikHomePosition.GetPositionX(), JeklikHomePosition.GetPositionY(), JeklikHomePosition.GetPositionZ(), JeklikHomePosition.GetOrientation());
-        BossAI::EnterEvadeMode(why);
+
+        // teleport back to home
+        float x, y, z, o;
+        JeklikHomePosition.GetPosition(x, y, z, o);
+
+        me->NearTeleportTo(x, y, z, o);
+
+        // Reset
         Reset();
     }
-
-    void JustEngagedWith(Unit* /* who */) override
+    
+    void Reset() override
     {
-        Talk(SAY_AGGRO);
-        me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
-        me->SetHover(true);
-        me->SetDisableGravity(true);
-        DoCastSelf(SPELL_BAT_FORM, true);
+        LOG_DEBUG("scripts.ai", "Jeklik: Reset");
+        BossAI::Reset();
 
-        me->GetMotionMaster()->MovePath(PATH_JEKLIK_INTRO, false);
-    }
-
-    void PathEndReached(uint32 /*pathId*/) override
-    {
-        me->SetHover(false);
         me->SetDisableGravity(false);
-        _JustEngagedWith();
-        SetCombatMovement(true);
-        me->SetReactState(REACT_AGGRESSIVE);
-        events.SetPhase(PHASE_ONE);
-        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 10s, 20s, PHASE_ONE);
-        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5s, 15s, PHASE_ONE);
-        events.ScheduleEvent(EVENT_BLOOD_LEECH, 5s, 15s, PHASE_ONE);
-        events.ScheduleEvent(EVENT_SONIC_BURST, 5s, 15s, PHASE_ONE);
-        events.ScheduleEvent(EVENT_SWOOP, 20s, PHASE_ONE);
-        events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
-    }
+        me->SetReactState(REACT_PASSIVE);
+        SetCombatMovement(false);
 
-    void DamageTaken(Unit* /*who*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-    {
-        if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
+        // casting effect
+        scheduler.Schedule(1s, [this](TaskContext)
         {
+            LOG_DEBUG("scripts.ai", "Jeklik: Reset (casting green channeling)");
+            DoCastSelf(SPELL_GREEN_CHANNELING, true);
+        });
+        
+        // at 50%, switch to phase 2
+        ScheduleHealthCheckEvent(50, [&] {
+            LOG_DEBUG("scripts.ai", "Jeklik: PHASE TWO");
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             DoResetThreatList();
             events.SetPhase(PHASE_TWO);
@@ -212,22 +204,60 @@ struct boss_jeklik : public BossAI
             events.ScheduleEvent(EVENT_MIND_FLAY, 10s, 30s, PHASE_TWO);
             events.ScheduleEvent(EVENT_GREATER_HEAL, 25s, PHASE_TWO);
             events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, PHASE_TWO);
+        });
+    }
 
-            return;
-        }
+    void JustEngagedWith(Unit* who) override
+    {
+        LOG_DEBUG("scripts.ai", "Jeklik: JustEngagedWith {}", who->GetName());
+        BossAI::JustEngagedWith(who);
+        
+        Talk(SAY_AGGRO);
+        DoZoneInCombat();
+
+        me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
+        me->SetDisableGravity(true);
+        DoCastSelf(SPELL_BAT_FORM, true);
+
+        me->GetMotionMaster()->MovePath(PATH_JEKLIK_INTRO, false);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        LOG_DEBUG("scripts.ai", "Jeklik: PathEndReached (pathId: {})", pathId);
+        BossAI::PathEndReached(pathId);
+
+        me->SetDisableGravity(false);
+        SetCombatMovement(true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        events.SetPhase(PHASE_ONE);
+        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 10s, 20s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_BLOOD_LEECH, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SONIC_BURST, 5s, 15s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SWOOP, 20s, PHASE_ONE);
+        events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
+
+        // this is the new home position
+        me->SetHomePosition(me->GetPosition());
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        LOG_DEBUG("scripts.ai", "Jeklik: JustDied");        
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
     }
 
     void UpdateAI(uint32 diff) override
     {
+        events.Update(diff);
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
         {
             return;
         }
-
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
 
         while (uint32 eventId = events.ExecuteEvent())
         {
@@ -235,30 +265,37 @@ struct boss_jeklik : public BossAI
             {
                 // Phase one
                 case EVENT_CHARGE_JEKLIK:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    // charge the nearest player that is at least 8 yards away (charge min distance)
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, -8.0f, false, false))
                     {
+                        LOG_DEBUG("scripts.ai", "Jeklik: EVENT_CHARGE_JEKLIK (target: {})", target->GetName());
                         DoCast(target, SPELL_CHARGE);
                         AttackStart(target);
                     }
                     events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 15s, 30s, PHASE_ONE);
                     break;
                 case EVENT_PIERCE_ARMOR:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_PIERCE_ARMOR");
                     DoCastVictim(SPELL_PIERCE_ARMOR);
                     events.ScheduleEvent(EVENT_PIERCE_ARMOR, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_BLOOD_LEECH:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_BLOOD_LEECH");
                     DoCastVictim(SPELL_BLOOD_LEECH);
                     events.ScheduleEvent(EVENT_BLOOD_LEECH, 10s, 20s, PHASE_ONE);
                     break;
                 case EVENT_SONIC_BURST:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SONIC_BURST");
                     DoCastVictim(SPELL_SONIC_BURST);
                     events.ScheduleEvent(EVENT_SONIC_BURST, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SWOOP:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SWOOP");
                     DoCastVictim(SPELL_SWOOP);
                     events.ScheduleEvent(EVENT_SWOOP, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SPAWN_BATS:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_BATS");
                     Talk(EMOTE_SUMMON_BATS);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         for (uint8 i = 0; i < 6; ++i)
@@ -268,33 +305,39 @@ struct boss_jeklik : public BossAI
                     break;
                     //Phase two
                 case EVENT_CURSE_OF_BLOOD:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_CURSE_OF_BLOOD");
                     DoCastSelf(SPELL_CURSE_OF_BLOOD);
                     events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 25s, 30s, PHASE_TWO);
                     break;
                 case EVENT_PSYCHIC_SCREAM:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_PSYCHIC_SCREAM");
                     DoCastVictim(SPELL_PSYCHIC_SCREAM);
                     events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, 35s, 45s, PHASE_TWO);
                     break;
                 case EVENT_SHADOW_WORD_PAIN:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SHADOW_WORD_PAIN");
                     DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
                     events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 12s, 18s, PHASE_TWO);
                     break;
                 case EVENT_MIND_FLAY:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_MIND_FLAY");
                     DoCastVictim(SPELL_MIND_FLAY);
                     events.ScheduleEvent(EVENT_MIND_FLAY, 20s, 40s, PHASE_TWO);
                     break;
                 case EVENT_GREATER_HEAL:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_GREATER_HEAL");
                     Talk(EMOTE_GREAT_HEAL);
                     me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_GREATER_HEAL);
                     events.ScheduleEvent(EVENT_GREATER_HEAL, 25s, PHASE_TWO);
                     break;
                 case EVENT_SPAWN_FLYING_BATS:
+                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS");
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         // summon up to 2 bat riders
                         if (batRiders.size() < 2)
                         {
-                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS ({} of 2)", batRiders.size() + 1);
+                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRiders.size() + 1);
                             
                             // Yell
                             Talk(SAY_CALL_RIDERS);
@@ -305,8 +348,12 @@ struct boss_jeklik : public BossAI
                                 // keep track of the bat riders
                                 batRiders.push_back(batRider);
                             }
+
+                            if (batRiders.size() == 1)
+                            {
+                                events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, 15s, PHASE_TWO);
+                            }
                         }
-                    events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, 15s, PHASE_TWO);
                     break;
                 default:
                     break;
