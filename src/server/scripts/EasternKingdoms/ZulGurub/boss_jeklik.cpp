@@ -147,12 +147,12 @@ struct boss_jeklik : public BossAI
     
     void Reset() override
     {
-        DoCastSelf(SPELL_GREEN_CHANNELING, true);
         me->SetHover(false);
         me->SetDisableGravity(false);
         me->SetReactState(REACT_PASSIVE);
         _Reset();
         SetCombatMovement(false);
+        DoCastSelf(SPELL_GREEN_CHANNELING, true);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -167,6 +167,7 @@ struct boss_jeklik : public BossAI
         me->SetHomePosition(JeklikHomePosition);
         me->NearTeleportTo(JeklikHomePosition.GetPositionX(), JeklikHomePosition.GetPositionY(), JeklikHomePosition.GetPositionZ(), JeklikHomePosition.GetOrientation());
         BossAI::EnterEvadeMode(why);
+        Reset();
     }
 
     void JustEngagedWith(Unit* /* who */) override
@@ -219,7 +220,9 @@ struct boss_jeklik : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
+        {
             return;
+        }
 
         events.Update(diff);
 
@@ -345,9 +348,11 @@ public:
                 // make the bat rider unattackable
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
 
-                // allow bat rider to fly
-                me->SetDisableGravity(true);
+                // make the bat rider move the correct speed
+                me->SetSpeed(MOVE_WALK, 5.0f, true);
+
             }
             // otherwise, trash mode
             else
@@ -434,7 +439,7 @@ public:
                     case EVENT_BAT_RIDER_THROW_BOMB:
                         LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
                         DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
-                        events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 7s);
+                        events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 8s);
                         break;
                     default:
                         break;
@@ -442,11 +447,8 @@ public:
             }
             else if (_mode == BAT_RIDER_MODE_TRASH)
             {
-                // evade if no victim and in combat
-                if (!me->GetVictim() && me->IsInCombat())
+                if (!UpdateVictim())
                 {
-                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                    Reset();
                     return;
                 }
                 
