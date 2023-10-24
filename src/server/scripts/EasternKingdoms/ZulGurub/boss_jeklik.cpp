@@ -68,7 +68,7 @@ enum Spells
     SPELL_BATTLE_COMMAND        = 5115,
     SPELL_INFECTED_BITE         = 16128,
     SPELL_PASSIVE_THRASH        = 8876,
-    SPELL_UNSTABLE_CONCOTION    = 24024
+    SPELL_UNSTABLE_CONCOCTION    = 24024
 };
 
 enum BatIds
@@ -546,7 +546,7 @@ struct npc_batrider : public CreatureAI
                 case EVENT_UNSTABLE_CONCOTION:
                     LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_UNSTABLE_CONCOTION");
                     Talk(EMOTE_LOW_HEALTH);
-                    DoCast(me, SPELL_UNSTABLE_CONCOTION);
+                    DoCast(me, SPELL_UNSTABLE_CONCOCTION);
                     break;
                 default:
                     break;
