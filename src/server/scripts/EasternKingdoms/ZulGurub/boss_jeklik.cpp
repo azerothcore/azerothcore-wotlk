@@ -127,7 +127,7 @@ Position const JeklikCaveHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.2863
 
 enum PathID
 {
-    PATH_JEKLIK_INTRO = 145170,
+    PATH_JEKLIK_INTRO   = 145170,
     PATH_BAT_RIDER_LOOP = 147500
 };
 
