@@ -355,7 +355,7 @@ struct boss_jeklik : public BossAI
                             Talk(SAY_CALL_RIDERS);
 
                             // only if the bat rider was successfully created
-                            if (Creature* batRider = me->SummonCreature(NPC_BAT_RIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                            if (me->SummonCreature(NPC_BAT_RIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
                                 // increase the counter
                                 batRidersCounter++;
