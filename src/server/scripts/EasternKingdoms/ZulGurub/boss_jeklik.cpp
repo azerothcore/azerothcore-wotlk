@@ -31,7 +31,7 @@ enum BossSays
     SAY_CALL_RIDERS             = 1,
     SAY_DEATH                   = 2,
     EMOTE_SUMMON_BATS           = 3,
-    EMOTE_GREAT_HEAL            = 4,
+    EMOTE_GREAT_HEAL            = 4
 };
 
 enum BatRiderSays
