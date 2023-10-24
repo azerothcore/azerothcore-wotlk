@@ -142,8 +142,8 @@ struct boss_jeklik : public BossAI
 {
     // Bat Riders (14750) counter
     uint8 batRidersCounter = 0;
-    
-    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) 
+
+    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK)
     {
         scheduler.SetValidator([this]
         {
@@ -173,7 +173,7 @@ struct boss_jeklik : public BossAI
         // Reset
         Reset();
     }
-    
+
     void Reset() override
     {
         LOG_DEBUG("scripts.ai", "Jeklik: Reset");
@@ -189,7 +189,7 @@ struct boss_jeklik : public BossAI
             LOG_DEBUG("scripts.ai", "Jeklik: Reset (casting green channeling)");
             DoCastSelf(SPELL_GREEN_CHANNELING, true);
         });
-        
+
         // at 50%, switch to phase 2
         ScheduleHealthCheckEvent(50, [&] {
             LOG_DEBUG("scripts.ai", "Jeklik: PHASE TWO");
@@ -211,7 +211,7 @@ struct boss_jeklik : public BossAI
     {
         LOG_DEBUG("scripts.ai", "Jeklik: JustEngagedWith {}", who->GetName());
         BossAI::JustEngagedWith(who);
-        
+
         Talk(SAY_AGGRO);
         DoZoneInCombat();
 
@@ -244,7 +244,7 @@ struct boss_jeklik : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: JustDied");        
+        LOG_DEBUG("scripts.ai", "Jeklik: JustDied");
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
     }
@@ -350,10 +350,10 @@ struct boss_jeklik : public BossAI
                         if (batRidersCounter < 2)
                         {
                             LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRidersCounter + 1);
-                            
+
                             // Yell
                             Talk(SAY_CALL_RIDERS);
-                            
+
                             // only if the bat rider was successfully created
                             if (Creature* batRider = me->SummonCreature(NPC_BAT_RIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
@@ -380,7 +380,7 @@ struct boss_jeklik : public BossAI
 struct npc_batrider : public CreatureAI
 {
     BatRiderMode _mode; // the version of this creature (trash or boss)
-    
+
     npc_batrider(Creature* creature) : CreatureAI(creature)
     {
         // if this is a summon of Jeklik, it is in boss mode
@@ -418,11 +418,11 @@ struct npc_batrider : public CreatureAI
     }
 
     void Reset() override
-    {            
+    {
         LOG_DEBUG("scripts.ai", "Bat Rider: Reset");
 
         CreatureAI::Reset();
-        
+
         switch (_mode)
         {
             case BAT_RIDER_MODE_BOSS:
@@ -440,13 +440,13 @@ struct npc_batrider : public CreatureAI
     }
 
     void JustEngagedWith(Unit* who) override
-    {                    
+    {
         LOG_DEBUG("scripts.ai", "Bat Rider: JustEngagedWith {}",
             who->GetName()
         );
 
         CreatureAI::JustEngagedWith(who);
-        
+
         switch (_mode)
         {
             case BAT_RIDER_MODE_BOSS:
@@ -508,7 +508,7 @@ struct npc_batrider : public CreatureAI
             {
                 return;
             }
-            
+
             // don't interrupt casting
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
