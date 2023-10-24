@@ -124,7 +124,6 @@ Position const SpawnBat[6] =
 
 Position const SpawnBatRider = { -12301.689, -1371.2921, 145.09244 };
 Position const JeklikCaveHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
-Position const JeklikGroundHomePosition = { -12273.9, -1407.77, 132.223 };
 
 enum PathID
 {
@@ -144,18 +143,13 @@ struct boss_jeklik : public BossAI
     // Bat Riders (14750) counter
     uint8 batRidersCounter = 0;
 
-    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
 
     void InitializeAI() override
     {
         LOG_DEBUG("scripts.ai", "Jeklik: InitializeAI");
         BossAI::InitializeAI();
+        me->SetHomePosition(JeklikCaveHomePosition);
     }
 
     void Reset() override
@@ -168,10 +162,17 @@ struct boss_jeklik : public BossAI
         BossAI::SetCombatMovement(false);
 
         // casting effect
-        scheduler.Schedule(1s, [this](TaskContext)
+        scheduler.Schedule(2s, [this](TaskContext)
         {
-            LOG_DEBUG("scripts.ai", "Jeklik: Reset (casting green channeling)");
+            LOG_DEBUG("scripts.ai", "Jeklik: Reset (cast green channeling)");
             DoCastSelf(SPELL_GREEN_CHANNELING, true);
+        });
+
+        // visibility
+        scheduler.Schedule(5s, [this](TaskContext)
+        {
+            LOG_DEBUG("scripts.ai", "Jeklik: Reset (become visible)");
+            me->SetVisible(true);
         });
     }
 
@@ -211,9 +212,6 @@ struct boss_jeklik : public BossAI
         events.ScheduleEvent(EVENT_SWOOP, 20s, PHASE_ONE);
         events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
 
-        // this is the new home position
-        me->SetHomePosition(JeklikGroundHomePosition);
-
         // at 50%, switch to phase 2
         ScheduleHealthCheckEvent(50, [&] {
             LOG_DEBUG("scripts.ai", "Jeklik: PHASE TWO");
@@ -235,68 +233,30 @@ struct boss_jeklik : public BossAI
     {
         LOG_DEBUG("scripts.ai", "Jeklik: EnterEvadeMode (why: {})", why);
 
-        // cancel any pending moves
-        me->GetMotionMaster()->Clear();
-
-        // cancel all pending events
-        events.CancelEventGroup(PHASE_ONE);
-        events.CancelEventGroup(PHASE_TWO);
-        scheduler.CancelAll();
-
-        // if we haven't entered a phase yet, just teleport home
-        if (!events.IsInPhase(1) && !events.IsInPhase(2))
+        if (why != EvadeReason::EVADE_REASON_NO_PATH)
         {
-            LOG_DEBUG("scripts.ai", "Jeklik: EnterEvadeMode before combat phases start, teleporting home.");
+            // make invisible to hide wonky-looking movement
+            me->SetVisible(false);
+
+            // cancel any pending moves
+            me->GetMotionMaster()->Clear();
+
+            // cancel all pending events
+            events.CancelEventGroup(PHASE_ONE);
+            events.CancelEventGroup(PHASE_TWO);
+            scheduler.CancelAll();
 
             // teleport back to cave
-            me->SetHomePosition(JeklikCaveHomePosition);
             float x, y, z, o;
             JeklikCaveHomePosition.GetPosition(x, y, z, o);
-            me->NearTeleportTo(x, y, z, o);
 
-            // reset after delay, or movement gets weird
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                LOG_DEBUG("scripts.ai", "Jeklik: EnterEvadeMode triggers Reset");
-                Reset();
-            });
-        }
-        else
-        {
-            me->GetMotionMaster()->MoveTargetedHome();
+            me->NearTeleportTo(x, y, z, o);
         }
 
         // enter evade mode
         CreatureAI::_EnterEvadeMode(why);
+        Reset();
     }
-
-    void JustReachedHome() override
-    {
-        LOG_DEBUG("scripts.ai", "Jeklik: JustReachedHome");
-
-        // if the home position is not the cave, set it to the cave and teleport there
-        if (me->GetHomePosition().GetPosition() != JeklikCaveHomePosition.GetPosition())
-        {
-            LOG_DEBUG("scripts.ai", "Jeklik: JustReachedHome (cave is the new home, teleporting there)");
-
-            me->SetHomePosition(JeklikCaveHomePosition);
-
-            // teleport back to cave
-            float x, y, z, o;
-            JeklikCaveHomePosition.GetPosition(x, y, z, o);
-
-            me->NearTeleportTo(x, y, z, o);
-
-            // reset after delay, or movement gets weird
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                LOG_DEBUG("scripts.ai", "Jeklik: EnterEvadeMode triggers Reset");
-                Reset();
-            });
-        }
-        BossAI::JustReachedHome();
-    }
-
 
     void JustDied(Unit* killer) override
     {
