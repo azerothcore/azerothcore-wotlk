@@ -1,7 +1,7 @@
 -- Gurubashi Bat Rider (14750) waypoints
 -- Flying loop
 DELETE FROM `waypoint_data` WHERE `id`=147500;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (147500, 0, -12288.004, -1391.931, 145.4913, NULL, 0, 2, 0, 100, 0),
 (147500, 1, -12268.26, -1407.0247, 145.51915, NULL, 0, 2, 0, 100, 0),
 (147500, 2, -12283.021, -1428.5464, 145.07469, NULL, 0, 2, 0, 100, 0),
@@ -63,17 +63,10 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (147500, 58, -12288.755, -1392.7551, 145.27551, NULL, 0, 2, 0, 100, 0);
 
 -- Replace Gurubashi Bat Rider (14750)'s AI setting with script
-DELETE FROM `creature_template` WHERE (`entry` = 14750);
-INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `scale`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `spell_school_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
-(14750, 0, 0, 0, 0, 0, 15303, 0, 0, 0, 'Gurubashi Bat Rider', NULL, NULL, 0, 59, 61, 0, 28, 0, 2, 2.14286, 1, 1, 20, 1, 1, 0, 10, 2000, 2000, 1, 1, 1, 64, 2048, 0, 0, 0, 0, 0, 0, 7, 8, 14750, 0, 14750, 0, 0, 618, 3102, '', 1, 1, 10, 1, 1.15, 1, 0, 191, 1, 1019952987, 0, 0, 'npc_batrider', 12340);
-
--- Update Gurubashi Bat Rider (14750) movement template to allow flying
-UPDATE `creature_template_movement` SET `Flight` = 1 WHERE (`CreatureId` = 14750);
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_batrider' WHERE (`entry` = 14750);
 
 -- Remove Gurubashi Bat Rider (14750) SAI entries
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 14750);
 
 -- Remove Frentzied Bloodseeker Bat (14965) script
-DELETE FROM `creature_template` WHERE (`entry` = 14965);
-INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `scale`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `spell_school_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
-(14965, 0, 0, 0, 0, 0, 14562, 0, 3956, 0, 'Frenzied Bloodseeker Bat', NULL, NULL, 0, 60, 60, 0, 28, 0, 2, 2.14286, 1, 1, 18, 1, 0, 0, 1, 1000, 2000, 1, 1, 1, 0, 2048, 0, 24, 0, 0, 0, 0, 1, 9, 0, 0, 100003, 12825, 0, 0, 0, '', 1, 1, 2, 1, 1, 1, 0, 191, 1, 0, 0, 0, '', 12340);
+UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 14965);
