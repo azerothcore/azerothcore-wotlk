@@ -1,3 +1,4 @@
+-- DB update 2023_10_24_00 -> 2023_10_25_00
 -- Wanton Hostess
 UPDATE `smart_scripts` SET `action_param1`=0, `comment`='Wanton Hostess - Between 0-50% Health - Remove All Auras' WHERE `entryorguid`=16459 AND `source_type`=0 AND `id`=4;
 
