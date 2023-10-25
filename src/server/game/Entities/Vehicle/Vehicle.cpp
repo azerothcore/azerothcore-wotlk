@@ -545,7 +545,8 @@ bool Vehicle::IsVehicleInUse()
 
 void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
 {
-    _me->GetMap()->LoadGrid(x, y);
+    if (!_me->GetMap()->IsGridLoaded(x, y))
+        _me->GetMap()->LoadGrid(x, y);
     _me->NearTeleportTo(x, y, z, ang, true);
 
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)

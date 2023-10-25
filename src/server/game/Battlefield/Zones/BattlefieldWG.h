@@ -1041,7 +1041,7 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
         2,
         {
             { 4448.138184f, 1974.998779f, 441.995911f, 1.967238f },
-            { 4448.713379f, 1955.148682f, 441.995178f, 0.380733f },
+            { 4486.3257f, 1954.6545f, 442.0783f, 0.349065840244293212f },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
@@ -1159,6 +1159,7 @@ struct BfWGGameObjectBuilding
             // Rebuild gameobject
             go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
+            go->setActive(false); // Everything is reset, no need keep active at this point.
         }
 
         // Update worldstate
@@ -1170,6 +1171,10 @@ struct BfWGGameObjectBuilding
     // Called when associated gameobject is damaged
     void Damaged()
     {
+        GameObject* go = m_WG->GetGameObject(m_Build);
+        if (go)
+            go->setActive(true);
+
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);
@@ -1193,6 +1198,10 @@ struct BfWGGameObjectBuilding
     // Called when associated gameobject is destroyed
     void Destroyed()
     {
+        GameObject* go = m_WG->GetGameObject(m_Build);
+        if (go)
+            go->setActive(true);
+
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);

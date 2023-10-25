@@ -32,7 +32,6 @@
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
-#include "DynamicVisibility.h"
 #include "Formulas.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -44,6 +43,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
+#include "MovementPacketBuilder.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -567,11 +567,19 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     // this code cant be placed inside EscortMovementGenerator, because we cant delete active MoveGen while it is updated
     SplineHandler handler(this);
     movespline->updateState(t_diff, handler);
-    // Xinef: Spline was cleared by StopMoving, return
-    if (!movespline->Initialized())
+
+    if (movespline->isCyclic())
     {
-        DisableSpline();
-        return;
+        m_splineSyncTimer.Update(t_diff);
+        if (m_splineSyncTimer.Passed())
+        {
+            m_splineSyncTimer.Reset(5000); // Retail value, do not change
+
+            WorldPacket data(SMSG_FLIGHT_SPLINE_SYNC, 4 + GetPackGUID().size());
+            Movement::PacketBuilder::WriteSplineSync(*movespline, data);
+            data.appendPackGUID(GetGUID());
+            SendMessageToSet(&data, true);
+        }
     }
 
     bool arrived = movespline->Finalized();
@@ -584,17 +592,11 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, movespline->GetAnimationType());
     }
 
-    // pussywizard: update always! not every 400ms, because movement generators need the actual position
-    //m_movesplineTimer.Update(t_diff);
-    //if (m_movesplineTimer.Passed() || arrived)
     UpdateSplinePosition();
 }
 
 void Unit::UpdateSplinePosition()
 {
-    //static uint32 const positionUpdateDelay = 400;
-
-    //m_movesplineTimer.Reset(positionUpdateDelay);
     Movement::Location loc = movespline->ComputePosition();
 
     if (movespline->onTransport)
@@ -607,16 +609,14 @@ void Unit::UpdateSplinePosition()
 
         if (TransportBase* transport = GetDirectTransport())
             transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
+        else
+            return;
     }
 
-    // Xinef: if we had spline running update orientation along with position
-    //if (HasUnitState(UNIT_STATE_CANNOT_TURN))
-    //    loc.orientation = GetOrientation();
+    if (HasUnitState(UNIT_STATE_CANNOT_TURN))
+        loc.orientation = GetOrientation();
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
-    else
-        ToCreature()->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
+    UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
 }
 
 void Unit::DisableSpline()
@@ -14115,6 +14115,11 @@ int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*
         gain = maxPower - curPower;
     }
 
+    if (GetAI())
+    {
+        GetAI()->OnPowerUpdate(power, gain, dVal, curPower);
+    }
+
     return gain;
 }
 
@@ -15704,15 +15709,9 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
 {
-    if (GetTransport())
-    {
-        GetTransport()->RemovePassenger(this);
-        SetTransport(nullptr);
-        m_movementInfo.transport.Reset();
-        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-    }
-
     CleanupBeforeRemoveFromMap(finalCleanup);
+
+    WorldObject::CleanupsBeforeDelete(finalCleanup);
 }
 
 void Unit::UpdateCharmAI()
@@ -20248,10 +20247,14 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
     if (!Acore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
-    float old_orientation = GetOrientation();
-    float current_z = GetPositionZ();
-    bool turn = (old_orientation != orientation);
-    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || current_z != z);
+    // Check if angular distance changed
+    bool const turn = G3D::fuzzyGt(M_PI - fabs(fabs(GetOrientation() - orientation) - M_PI), 0.0f);
+
+    // G3D::fuzzyEq won't help here, in some cases magnitudes differ by a little more than G3D::eps, but should be considered equal
+    bool const relocated = (teleport ||
+        std::fabs(GetPositionX() - x) > 0.001f ||
+        std::fabs(GetPositionY() - y) > 0.001f ||
+        std::fabs(GetPositionZ() - z) > 0.001f);
 
     if (!GetVehicle())
     {
@@ -20276,6 +20279,8 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetFarSightDistance())
             UpdateObjectVisibility(false);
     }
+
+    UpdatePositionData();
 
     return (relocated || turn);
 }
