@@ -752,7 +752,7 @@ public:
             if (!me->IsInCombat())
                 if (me->GetSpawnId())
                     if (!me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                        me->CastSpell(me, SPELL_CORRUPTION, false);
+                        me->CastSpell(me, SPELL_CORRUPTION, true);
 
             if (!UpdateVictim())
                 return;
