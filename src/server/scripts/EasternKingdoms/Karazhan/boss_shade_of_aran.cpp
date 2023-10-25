@@ -503,12 +503,15 @@ class spell_flamewreath_aura : public AuraScript
         {
             if (Unit* target = GetTarget())
             {
-                target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
+                if (target->IsPlayer())
+                {
+                    target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
 
-                target->m_Events.AddEventAtOffset([target] {
-                    target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
-                    target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
-                }, 1s);
+                    target->m_Events.AddEventAtOffset([target] {
+                        target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
+                        target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
+                    }, 1s);
+                }
             }
         }
     }
