@@ -103,7 +103,7 @@ enum Events
     EVENT_DEMO_SHOUT,
     EVENT_BATTLE_COMMAND,
     EVENT_INFECTED_BITE,
-    EVENT_UNSTABLE_CONCOTION
+    EVENT_UNSTABLE_CONCOCTION
 };
 
 enum Phase
@@ -523,7 +523,7 @@ struct npc_batrider : public CreatureAI
             // if health goes below 30%, cast Unstable Concotion
             if (me->HealthBelowPct(30))
             {
-                events.ScheduleEvent(EVENT_UNSTABLE_CONCOTION, 0);
+                events.ScheduleEvent(EVENT_UNSTABLE_CONCOCTION, 0);
             }
 
             // event handling
@@ -543,8 +543,8 @@ struct npc_batrider : public CreatureAI
                     DoCastVictim(SPELL_INFECTED_BITE);
                     events.ScheduleEvent(EVENT_INFECTED_BITE, 8s);
                     break;
-                case EVENT_UNSTABLE_CONCOTION:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_UNSTABLE_CONCOTION");
+                case EVENT_UNSTABLE_CONCOCTION:
+                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_UNSTABLE_CONCOCTION");
                     Talk(EMOTE_LOW_HEALTH);
                     DoCast(me, SPELL_UNSTABLE_CONCOCTION);
                     break;
