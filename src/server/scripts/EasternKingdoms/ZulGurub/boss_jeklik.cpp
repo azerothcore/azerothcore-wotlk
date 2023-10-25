@@ -161,18 +161,30 @@ struct boss_jeklik : public BossAI
         me->SetReactState(REACT_PASSIVE);
         BossAI::SetCombatMovement(false);
 
+        // once the path for her to come down to the ground starts, it appears to be near-impossible to stop it
+        // instead, simply wait the 3 seconds it takes the path to complete, then teleport her home
+        scheduler.Schedule(3s, [this](TaskContext)
+        {
+            // teleport back to cave
+            float x, y, z, o;
+            JeklikCaveHomePosition.GetPosition(x, y, z, o);
+
+            me->NearTeleportTo(x, y, z, o);
+        });
+
         // casting effect
-        scheduler.Schedule(2s, [this](TaskContext)
+        scheduler.Schedule(4s, [this](TaskContext)
         {
             LOG_DEBUG("scripts.ai", "Jeklik: Reset (cast green channeling)");
             DoCastSelf(SPELL_GREEN_CHANNELING, true);
         });
 
-        // visibility
+        // visibility and unlock root
         scheduler.Schedule(5s, [this](TaskContext)
         {
-            LOG_DEBUG("scripts.ai", "Jeklik: Reset (become visible)");
+            LOG_DEBUG("scripts.ai", "Jeklik: Reset (become visible and unroot)");
             me->SetVisible(true);
+            me->ClearUnitState(UNIT_STATE_ROOT);
         });
     }
 
@@ -238,19 +250,14 @@ struct boss_jeklik : public BossAI
             // make invisible to hide wonky-looking movement
             me->SetVisible(false);
 
-            // cancel any pending moves
+            // cancel any pending moves and stop moving
             me->GetMotionMaster()->Clear();
+            me->AddUnitState(UNIT_STATE_ROOT);
 
             // cancel all pending events
             events.CancelEventGroup(PHASE_ONE);
             events.CancelEventGroup(PHASE_TWO);
             scheduler.CancelAll();
-
-            // teleport back to cave
-            float x, y, z, o;
-            JeklikCaveHomePosition.GetPosition(x, y, z, o);
-
-            me->NearTeleportTo(x, y, z, o);
         }
 
         // enter evade mode
@@ -361,7 +368,7 @@ struct boss_jeklik : public BossAI
                     break;
                 case EVENT_SPAWN_FLYING_BATS:
                     LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS");
-                    if (SelectTarget(SelectTargetMethod::Random, 0))
+                    if (me->GetThreatMgr().GetThreatListSize())
                         // summon up to 2 bat riders
                         if (batRidersCounter < 2)
                         {
