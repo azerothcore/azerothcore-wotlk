@@ -48,7 +48,7 @@ namespace Movement
 
         uint8 m_mode{UninitializedMode};
         bool cyclic{false};
-        float initialOrientation;
+        float initialOrientation{0.f};
 
         enum
         {
@@ -198,7 +198,12 @@ namespace Movement
         }
 
         /** Returns length of the whole spline. */
-        [[nodiscard]] length_type length() const { return lengths[index_hi];}
+        [[nodiscard]] length_type length() const
+        {
+            if (lengths.empty())
+                return 0;
+            return lengths[index_hi];
+        }
         /** Returns length between given nodes. */
         [[nodiscard]] length_type length(index_type first, index_type last) const { return lengths[last] - lengths[first];}
         [[nodiscard]] length_type length(index_type Idx) const { return lengths[Idx];}
