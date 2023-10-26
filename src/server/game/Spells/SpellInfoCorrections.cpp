@@ -4594,7 +4594,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].DieSides = 1;
         spellInfo->Effects[EFFECT_1].MiscValue = 22;
         spellInfo->Effects[EFFECT_1].SpellClassMask[0] = 6;
-        spellInfo->Effects[EFFECT_1].BonusMultiplier = 0;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
