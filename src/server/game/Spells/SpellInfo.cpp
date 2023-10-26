@@ -502,8 +502,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
 
             if (canEffectScale)
             {
-                Creature const* creature = caster->ToCreature();
-                CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+                CreatureTemplate const* cInfo = caster->ToCreature()->GetCreatureTemplate();
 
                 CreatureBaseStats const* pCBS = sObjectMgr->GetCreatureBaseStats(caster->GetLevel(), caster->getClass());
                 float CBSPowerCreature = pCBS->BaseDamage[cInfo->expansion];
