@@ -30,10 +30,6 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class reset_commandscript : public CommandScript
@@ -45,48 +41,53 @@ public:
     {
         static ChatCommandTable resetCommandTable =
         {
-            { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "" },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
-            { "all",            SEC_CONSOLE,        true,  &HandleResetAllCommand,              "" }
+            { "achievements",   HandleResetAchievementsCommand, SEC_CONSOLE,       Console::Yes },
+            { "honor",          HandleResetHonorCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "level",          HandleResetLevelCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "spells",         HandleResetSpellsCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "stats",          HandleResetStatsCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "talents",        HandleResetTalentsCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "all",            HandleResetAllCommand,          SEC_CONSOLE,       Console::Yes }
         };
         static ChatCommandTable commandTable =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                              "", resetCommandTable }
+            { "reset", resetCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleResetAchievementsCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetAchievementsCommand(ChatHandler*, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
+        if (!target)
+        {
             return false;
+        }
 
-        if (target)
-            target->ResetAchievements();
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        if (playerTarget)
+            playerTarget->ResetAchievements();
         else
-            AchievementMgr::DeleteFromDB(targetGuid.GetCounter());
+            AchievementMgr::DeleteFromDB(target->GetGUID().GetCounter());
 
         return true;
     }
 
-    static bool HandleResetHonorCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetHonorCommand(ChatHandler*, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
             return false;
+        }
 
-        target->SetHonorPoints(0);
-        target->SetUInt32Value(PLAYER_FIELD_KILLS, 0);
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 0);
-        target->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
-        target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
-        target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        playerTarget->SetHonorPoints(0);
+        playerTarget->SetUInt32Value(PLAYER_FIELD_KILLS, 0);
+        playerTarget->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 0);
+        playerTarget->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
+        playerTarget->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
+        playerTarget->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
 
         return true;
     }
@@ -123,156 +124,145 @@ public:
         return true;
     }
 
-    static bool HandleResetLevelCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetLevelCommand(ChatHandler*, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        if (!HandleResetStatsOrLevelHelper(playerTarget))
             return false;
 
-        if (!HandleResetStatsOrLevelHelper(target))
-            return false;
-
-        uint8 oldLevel = target->GetLevel();
+        uint8 oldLevel = playerTarget->GetLevel();
 
         // set starting level
-        uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
+        uint32 startLevel = playerTarget->getClass() != CLASS_DEATH_KNIGHT
                             ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                             : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
-        target->_ApplyAllLevelScaleItemMods(false);
-        target->SetLevel(startLevel);
-        target->InitRunes();
-        target->InitStatsForLevel(true);
-        target->InitTaxiNodesForLevel();
-        target->InitGlyphsForLevel();
-        target->InitTalentForLevel();
-        target->SetUInt32Value(PLAYER_XP, 0);
+        playerTarget->_ApplyAllLevelScaleItemMods(false);
+        playerTarget->SetLevel(startLevel);
+        playerTarget->InitRunes();
+        playerTarget->InitStatsForLevel(true);
+        playerTarget->InitTaxiNodesForLevel();
+        playerTarget->InitGlyphsForLevel();
+        playerTarget->InitTalentForLevel();
+        playerTarget->SetUInt32Value(PLAYER_XP, 0);
 
-        target->_ApplyAllLevelScaleItemMods(true);
+        playerTarget->_ApplyAllLevelScaleItemMods(true);
 
         // reset level for pet
-        if (Pet* pet = target->GetPet())
+        if (Pet* pet = playerTarget->GetPet())
             pet->SynchronizeLevelWithOwner();
 
-        sScriptMgr->OnPlayerLevelChanged(target, oldLevel);
+        sScriptMgr->OnPlayerLevelChanged(playerTarget, oldLevel);
 
         return true;
     }
 
-    static bool HandleResetSpellsCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetSpellsCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
             return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
 
         if (target)
         {
-            target->resetSpells(/* bool myClassOnly */);
+            playerTarget->resetSpells(/* bool myClassOnly */);
 
-            ChatHandler(target->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
-            if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)
-                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(target).c_str());
+            ChatHandler(playerTarget->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
+            if (!handler->GetSession() || handler->GetSession()->GetPlayer() != playerTarget)
+                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(playerTarget).c_str());
         }
         else
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_RESET_SPELLS));
-            stmt->SetData(1, targetGuid.GetCounter());
+            stmt->SetData(1, playerTarget->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
 
-            handler->PSendSysMessage(LANG_RESET_SPELLS_OFFLINE, targetName.c_str());
+            handler->PSendSysMessage(LANG_RESET_SPELLS_OFFLINE, target->GetName());
         }
 
         return true;
     }
 
-    static bool HandleResetStatsCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetStatsCommand(ChatHandler*, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        if (!HandleResetStatsOrLevelHelper(playerTarget))
             return false;
 
-        if (!HandleResetStatsOrLevelHelper(target))
-            return false;
-
-        target->InitRunes();
-        target->InitStatsForLevel(true);
-        target->InitTaxiNodesForLevel();
-        target->InitGlyphsForLevel();
-        target->InitTalentForLevel();
+        playerTarget->InitRunes();
+        playerTarget->InitStatsForLevel(true);
+        playerTarget->InitTaxiNodesForLevel();
+        playerTarget->InitGlyphsForLevel();
+        playerTarget->InitTalentForLevel();
 
         return true;
     }
 
-    static bool HandleResetTalentsCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetTalentsCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        Player* targetPlayer = nullptr;
+
+        if (target)
         {
-            // Try reset talents as Hunter Pet
-            Creature* creature = handler->getSelectedCreature();
-            if (!*args && creature && creature->IsPet())
-            {
-                Unit* owner = creature->GetOwner();
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER && creature->ToPet()->IsPermanentPetFor(owner->ToPlayer()))
-                {
-                    creature->ToPet()->resetTalents();
-                    owner->ToPlayer()->SendTalentsInfoData(true);
-
-                    ChatHandler(owner->ToPlayer()->GetSession()).SendSysMessage(LANG_RESET_PET_TALENTS);
-                    if (!handler->GetSession() || handler->GetSession()->GetPlayer() != owner->ToPlayer())
-                        handler->PSendSysMessage(LANG_RESET_PET_TALENTS_ONLINE, handler->GetNameLink(owner->ToPlayer()).c_str());
-                }
-                return true;
-            }
-
+            targetPlayer = target->GetConnectedPlayer();
+        }
+        else
+        {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
+        if (targetPlayer)
         {
-            target->resetTalents(true);
-            target->SendTalentsInfoData(false);
-            ChatHandler(target->GetSession()).SendSysMessage(LANG_RESET_TALENTS);
-            if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)
-                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(target).c_str());
+            targetPlayer->resetTalents(true);
+            targetPlayer->SendTalentsInfoData(false);
+            ChatHandler(targetPlayer->GetSession()).SendSysMessage(LANG_RESET_TALENTS);
+            if (!handler->GetSession() || handler->GetSession()->GetPlayer() != targetPlayer)
+                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(targetPlayer).c_str());
 
-            Pet* pet = target->GetPet();
-            Pet::resetTalentsForAllPetsOf(target, pet);
+            Pet* pet = targetPlayer->GetPet();
+            Pet::resetTalentsForAllPetsOf(targetPlayer, pet);
             if (pet)
-                target->SendTalentsInfoData(true);
+                targetPlayer->SendTalentsInfoData(true);
             return true;
         }
-        else if (targetGuid)
+        else
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->SetData(0, uint16(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS));
-            stmt->SetData(1, targetGuid.GetCounter());
+            stmt->SetData(1, target->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
 
-            std::string nameLink = handler->playerLink(targetName);
+            std::string nameLink = handler->playerLink(target->GetName());
             handler->PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
             return true;
         }
-
-        handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-        handler->SetSentErrorMessage(true);
-        return false;
     }
 
-    static bool HandleResetAllCommand(ChatHandler* handler, char const* args)
+    static bool HandleResetAllCommand(ChatHandler* handler, std::string_view caseName)
     {
-        if (!*args)
-            return false;
-
-        std::string caseName = args;
-
         AtLoginFlags atLogin;
 
         // Command specially created as single command to prevent using short case names
@@ -292,7 +282,7 @@ public:
         }
         else
         {
-            handler->PSendSysMessage(LANG_RESETALL_UNKNOWN_CASE, args);
+            handler->PSendSysMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -303,7 +293,7 @@ public:
 
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
         HashMapHolder<Player>::MapType const& plist = ObjectAccessor::GetPlayers();
-        for (HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
+        for (auto itr = plist.begin(); itr != plist.end(); ++itr)
             itr->second->SetAtLoginFlag(atLogin);
 
         return true;

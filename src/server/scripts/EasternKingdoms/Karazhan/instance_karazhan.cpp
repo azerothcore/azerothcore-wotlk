@@ -34,8 +34,24 @@ const Position OptionalSpawn[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN  },
-    { NPC_MIDNIGHT,             DATA_MIDNIGHT }
+    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
+    { NPC_DOROTHEE,             DATA_DOROTHEE  },
+    { NPC_TITO,                 DATA_TITO      },
+    { NPC_ROAR,                 DATA_ROAR      },
+    { NPC_STRAWMAN,             DATA_STRAWMAN  },
+    { NPC_TINHEAD,              DATA_TINHEAD   },
+    { NPC_ROMULO,               DATA_ROMULO    },
+    { NPC_JULIANNE,             DATA_JULIANNE  },
+    { NPC_NIGHTBANE,            DATA_NIGHTBANE },
+    { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
+    { 0,                        0              }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_SIDE_ENTRANCE_DOOR, DATA_GO_SIDE_ENTRANCE_DOOR },
+    { 0,                     0                          }
 };
 
 class instance_karazhan : public InstanceMapScript
@@ -54,7 +70,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -112,6 +128,16 @@ public:
                     break;
                 case NPC_ECHO_OF_MEDIVH:
                     _echoOfMedivhGUID = creature->GetGUID();
+                    break;
+                case NPC_FIENDISH_IMP:
+                    if (Creature* terestrian = GetCreature(DATA_TERESTIAN))
+                    {
+                        if (terestrian->AI())
+                        {
+                            terestrian->AI()->JustSummoned(creature);
+                            creature->SetInCombatWithZone();
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -220,6 +246,9 @@ public:
                                 }
                             }
                             break;
+                        case DONE:
+                            HandleGameObject(m_uiGamesmansExitDoor, true);
+                            break;
                         }
                         default:
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
@@ -243,7 +272,6 @@ public:
                             piece->NearTeleportTo(x, y, z, o);
                             piece->AI()->DoAction(ACTION_CHESS_PIECE_RESET_ORIENTATION);
                             piece->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            piece->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             piece->AI()->Reset();
                         }
                     }
@@ -278,13 +306,11 @@ public:
                     {
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
-                        if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
@@ -350,11 +376,10 @@ public:
                     MastersTerraceDoor[1] = go->GetGUID();
                     break;
                 case GO_SIDE_ENTRANCE_DOOR:
-                    m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    else
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -399,6 +424,42 @@ public:
             return 0;
         }
 
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SCHEDULE_RAJ_CHECK)
+            {
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Creature* julliane = GetCreature(DATA_JULIANNE);
+                    Creature* romulo = GetCreature(DATA_ROMULO);
+
+                    if (julliane && romulo)
+                    {
+                        if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)
+                            && romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                        {
+                            julliane->KillSelf();
+                            julliane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            romulo->KillSelf();
+                            romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                        else
+                        {
+                            if (romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_RESS_ROMULO);
+                            }
+
+                            if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_DO_RESURRECT);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
@@ -419,8 +480,6 @@ public:
                     return m_uiLibraryDoor;
                 case DATA_GO_MASSIVE_DOOR:
                     return m_uiMassiveDoor;
-                case DATA_GO_SIDE_ENTRANCE_DOOR:
-                    return m_uiSideEntranceDoor;
                 case DATA_GO_GAME_DOOR:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
@@ -461,7 +520,6 @@ public:
         ObjectGuid m_uiNightBaneGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
-        ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar

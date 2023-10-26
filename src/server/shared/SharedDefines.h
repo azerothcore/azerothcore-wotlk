@@ -216,7 +216,7 @@ enum FactionTemplates
 #define MIN_REPUTATION_RANK (REP_HATED)
 #define MAX_REPUTATION_RANK 8
 
-#define MAX_SPILLOVER_FACTIONS 4
+#define MAX_SPILLOVER_FACTIONS 6
 
 enum MoneyConstants
 {
@@ -1381,8 +1381,8 @@ enum Targets
 {
     TARGET_UNIT_CASTER                 = 1,
     TARGET_UNIT_NEARBY_ENEMY           = 2,
-    TARGET_UNIT_NEARBY_PARTY           = 3,
-    TARGET_UNIT_NEARBY_ALLY            = 4,
+    TARGET_UNIT_NEARBY_ALLY            = 3,
+    TARGET_UNIT_NEARBY_PARTY           = 4,
     TARGET_UNIT_PET                    = 5,
     TARGET_UNIT_TARGET_ENEMY           = 6,
     TARGET_UNIT_SRC_AREA_ENTRY         = 7,

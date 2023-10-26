@@ -22,7 +22,6 @@
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Map.h"
@@ -32,6 +31,12 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 Battlefield::Battlefield()
 {
@@ -810,7 +815,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 
     // Set creature in world
     map->AddToMap(creature);
-    creature->setActive(true);
+    creature->SetFarVisible(true);
 
     return creature;
 }
@@ -835,7 +840,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 
     // Add to world
     map->AddToMap(go);
-    go->setActive(true);
+    go->SetFarVisible(true);
 
     return go;
 }

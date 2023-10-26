@@ -46,17 +46,6 @@ public:
             LoadBossBoundaries(boundaries);
         }
 
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-            {
-                if (GetBossState(i) == IN_PROGRESS)
-                    return true;
-            }
-
-            return false;
-        }
-
         void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
@@ -148,20 +137,6 @@ public:
             }
 
             return false;
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (InstanceScript::SetBossState(type, state))
-            {
-                return false;
-            }
-
-            if (state == DONE)
-            {
-                SaveToDB();
-            }
-            return true;
         }
 
         void DoAction(int32 action) override

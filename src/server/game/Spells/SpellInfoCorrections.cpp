@@ -57,6 +57,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Has Brewfest Mug
+    ApplySpellFix({ 42533 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(347); // 15 min
+    });
+
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellInfo* spellInfo)
     {
@@ -410,7 +416,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Marked for Death
     ApplySpellFix({ 53241, 53243, 53244, 53245, 53246 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(423937, 276955137, 2049);
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(399361, 276955137, 1);
     });
 
     ApplySpellFix({
@@ -592,6 +598,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY; // just a marker
     });
 
+    ApplySpellFix({
+        6940, // Hand of Sacrifice
+        64205 // Divine Sacrifice
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_DONT_CAUSE_SPELL_PUSHBACK;
+    });
+
     // Seal of Command trigger
     ApplySpellFix({ 20424 }, [](SpellInfo* spellInfo)
     {
@@ -662,7 +676,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Kill Command
-    ApplySpellFix({ 34027 }, [](SpellInfo* spellInfo)
+    // Kill Command, Overpower
+    ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 0;
     });
@@ -1011,14 +1026,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // summoned doomguard duration fix
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(6);
-    });
-
-    // Glyph of Voidwalker
-    ApplySpellFix({ 56247 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
-        spellInfo->Effects[EFFECT_0].MiscValue = SPELLMOD_EFFECT1;
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x8000000, 0, 0);
     });
 
     // Everlasting Affliction
@@ -1515,8 +1522,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
-    // Debris
-    ApplySpellFix({ 36449 }, [](SpellInfo* spellInfo)
+    // Debris - Debris Visual
+    ApplySpellFix({ 36449, 30632 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
     });
@@ -1525,12 +1532,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 30531 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
-    });
-
-    // Debris Visual
-    ApplySpellFix({ 30632 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_DYNOBJ_ALLY);
     });
 
     // Activate Sunblade Protecto
@@ -3913,12 +3914,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeCasterAuraSpell = 42299;
     });
 
-    // Catch the Wild Wolpertinger!
-    ApplySpellFix({ 41621 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
-    });
-
     // Brewfest quests
     ApplySpellFix({ 47134, 51798 }, [](SpellInfo* spellInfo)
     {
@@ -4516,6 +4511,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
+     // Silence
+    ApplySpellFix({ 18278 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
+    });
+
     // Absorb Life
     ApplySpellFix({ 34239 }, [](SpellInfo* spellInfo)
     {
@@ -4545,6 +4546,42 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 34290 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Mulgore Hatchling (periodic)
+    ApplySpellFix({ 62586 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 62585; // Mulgore Hatchling (fear)
+    });
+
+    // Poultryized!
+    ApplySpellFix({ 30504 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
+    // Torment of the Worgen
+    ApplySpellFix({ 30567 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcChance = 3;
+    });
+
+    // Summon Water Elementals
+    ApplySpellFix({ 29962, 37051, 37052, 37053 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+    });
+
+    // Instill Lord Valthalak's Spirit DND
+    ApplySpellFix({ 27360 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Holiday - Midsummer, Ribbon Pole Periodic Visual
+    ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
