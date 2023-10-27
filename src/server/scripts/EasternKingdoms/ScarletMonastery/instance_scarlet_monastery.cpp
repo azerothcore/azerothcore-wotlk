@@ -177,16 +177,16 @@ public:
                 if (commanderMograine)
                 {
                     std::list<Creature*> ScarletList;
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 4000.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 400.0f);
+                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 400.0f);
 
                     ScarletList.push_back(commanderMograine);
 
@@ -200,11 +200,9 @@ public:
                     if (commanderMograine->IsAlive())
                         commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
 
-                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 4000.0f))
+                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 250.0f))
                     {
 
-                        //instance->DoUseDoorOrButton(chapelDoor->GetGUID());//Received
-                        //https://github.com/azerothcore/azerothcore-wotlk/commit/2779833768bbe9967006d6d16888dace05b4bcb6 Impact The door cannot be opened
                         chapelDoor->SetGoState(GO_STATE_ACTIVE);
                         chapelDoor->SetLootState(GO_ACTIVATED);
                         chapelDoor->SetGameObjectFlag(GO_FLAG_IN_USE);
@@ -395,7 +393,7 @@ public:
             case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
                 summonedMograine->CastSpell(me, SPELL_FORGIVENESS, false);
                 //events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1010ms);
-                events.ScheduleEvent(EVENT_MOGRAINE_CASTSPELL, 1000ms); // case 14 hack fix time
+                events.ScheduleEvent(EVENT_MOGRAINE_CASTSPELL, 1000ms); // case 16 hack fix time
                 break;
             case EVENT_MOGRAINE_CASTSPELL:
                 // Hack fix The lightning effect of mograine being hit by a spell
@@ -488,9 +486,10 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            Talk(SAY_MO_KILL);
+            if (victim->GetTypeId() == TYPEID_PLAYER && !SayAshbringer)
+                Talk(SAY_MO_KILL);
         }
 
         void SpellHit(Unit* who, SpellInfo const* spell) override
@@ -634,9 +633,10 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            Talk(SAY_WH_KILL);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_WH_KILL);
         }
 
         void UpdateAI(uint32 diff) override
