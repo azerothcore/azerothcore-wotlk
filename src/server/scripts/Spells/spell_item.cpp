@@ -2805,7 +2805,7 @@ class spell_item_shimmering_vessel : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         if (Creature* target = GetHitCreature())
-            target->setDeathState(JUST_RESPAWNED);
+            target->setDeathState(DeathState::JustRespawned);
     }
 
     void Register() override

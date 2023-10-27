@@ -265,7 +265,7 @@ public:
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
                             piece->RemoveAllAuras();
-                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->setDeathState(DeathState::JustRespawned);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
