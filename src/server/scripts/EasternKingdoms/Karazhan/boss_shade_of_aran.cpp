@@ -211,6 +211,38 @@ struct boss_shade_of_aran : public BossAI
         }
     }
 
+    void OnPowerUpdate(Powers /*power*/, int32 /*gain*/, int32 /*updateVal*/, uint32 currentPower) override
+    {
+        // Should drink at 10%, need 10% mana for mass polymorph
+        if (!_hasDrunk && me->GetMaxPower(POWER_MANA) && (currentPower * 100 / me->GetMaxPower(POWER_MANA)) < 13)
+        {
+            _drinking = true;
+            _hasDrunk = true;
+            me->InterruptNonMeleeSpells(true);
+            Talk(SAY_DRINK);
+            DoCastAOE(SPELL_MASS_POLY);
+            me->SetReactState(REACT_PASSIVE);
+
+            // Start drinking after conjuring drinks
+            _drinkScheduler.Schedule(2s, GROUP_DRINKING, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_CONJURE);
+            }).Schedule(4s, GROUP_DRINKING, [this](TaskContext)
+            {
+                me->SetStandState(UNIT_STAND_STATE_SIT);
+                DoCastSelf(SPELL_DRINK);
+            }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
+                DoCastSelf(SPELL_AOE_PYROBLAST);
+                _drinkScheduler.CancelGroup(GROUP_DRINKING);
+                _drinking = false;
+            });
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -226,8 +258,6 @@ struct boss_shade_of_aran : public BossAI
             }
         }).Schedule(1s, [this](TaskContext context)
         {
-            context.Repeat(2s);
-
             if (!_drinking)
             {
                 if (me->IsNonMeleeSpellCast(false))
@@ -253,39 +283,6 @@ struct boss_shade_of_aran : public BossAI
                 {
                     Spells[AvailableSpells] = SPELL_FROSTBOLT;
                     ++AvailableSpells;
-                }
-
-                // Should drink at 10%, need 10% mana for mass polymorph
-                if (!_hasDrunk && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 13)
-                {
-                    _drinking = true;
-                    _hasDrunk = true;
-                    me->InterruptNonMeleeSpells(true);
-                    Talk(SAY_DRINK);
-                    DoCastAOE(SPELL_MASS_POLY);
-                    me->SetReactState(REACT_PASSIVE);
-
-                    // Start drinking after conjuring drinks
-                    _drinkScheduler.Schedule(2s, GROUP_DRINKING, [this](TaskContext)
-                    {
-                        DoCastSelf(SPELL_CONJURE);
-                    }).Schedule(4s, GROUP_DRINKING, [this](TaskContext)
-                    {
-                        me->SetStandState(UNIT_STAND_STATE_SIT);
-                        DoCastSelf(SPELL_DRINK);
-                    });
-
-                    _drinkScheduler.Schedule(10s, GROUP_DRINKING, [this](TaskContext)
-                    {
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
-                        DoCastSelf(SPELL_AOE_PYROBLAST);
-                        _drinkScheduler.CancelGroup(GROUP_DRINKING);
-                        _drinking = false;
-                    });
-
-                    return;
                 }
 
                 //If no available spells wait 1 second and try again
@@ -318,6 +315,7 @@ struct boss_shade_of_aran : public BossAI
                     }
                 }
             }
+            context.Repeat(2s);
         }).Schedule(5s, [this](TaskContext context)
         {
             if (!_drinking)
@@ -505,12 +503,15 @@ class spell_flamewreath_aura : public AuraScript
         {
             if (Unit* target = GetTarget())
             {
-                target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
+                if (target->IsPlayer())
+                {
+                    target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
 
-                target->m_Events.AddEventAtOffset([target] {
-                    target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
-                    target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
-                }, 1s);
+                    target->m_Events.AddEventAtOffset([target] {
+                        target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
+                        target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
+                    }, 1s);
+                }
             }
         }
     }

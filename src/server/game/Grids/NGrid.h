@@ -32,7 +32,7 @@ class AC_GAME_API GridInfo
 {
 public:
     GridInfo();
-    GridInfo(std::chrono::seconds expiry, bool unload = true);
+    GridInfo(time_t expiry, bool unload = true);
     TimeTracker const& getTimeTracker() const { return i_timer; }
     bool getUnloadLock() const { return i_unloadActiveLockCount || i_unloadExplicitLock || i_unloadReferenceLock; }
     void setUnloadExplicitLock(bool on) { i_unloadExplicitLock = on; }
@@ -73,7 +73,7 @@ class NGrid
 {
 public:
     typedef Grid<ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> GridType;
-    NGrid(uint32 id, int32 x, int32 y, std::chrono::seconds expiry, bool unload = true) :
+    NGrid(uint32 id, int32 x, int32 y, time_t expiry, bool unload = true) :
         i_gridId(id), i_GridInfo(GridInfo(expiry, unload)), i_x(x), i_y(y),
         i_cellstate(GRID_STATE_INVALID), i_GridObjectDataLoaded(false)
     { }
@@ -111,8 +111,8 @@ public:
     void setUnloadReferenceLock(bool on) { i_GridInfo.setUnloadReferenceLock(on); }
     void incUnloadActiveLock() { i_GridInfo.incUnloadActiveLock(); }
     void decUnloadActiveLock() { i_GridInfo.decUnloadActiveLock(); }
-    void ResetTimeTracker(std::chrono::seconds interval) { i_GridInfo.ResetTimeTracker(interval.count()); }
-    void UpdateTimeTracker(std::chrono::seconds diff) { i_GridInfo.UpdateTimeTracker(diff.count()); }
+    void ResetTimeTracker(time_t interval) { i_GridInfo.ResetTimeTracker(interval); }
+    void UpdateTimeTracker(time_t diff) { i_GridInfo.UpdateTimeTracker(diff); }
 
     /*
     template<class SPECIFIC_OBJECT> void AddWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
