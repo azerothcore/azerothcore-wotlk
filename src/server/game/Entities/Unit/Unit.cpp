@@ -16985,6 +16985,17 @@ void Unit::SetDisplayId(uint32 modelId)
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
+    // Set Race by modelId for non-players
+    if (GetTypeId() != TYPEID_PLAYER)
+    {
+        if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(modelId))
+        {
+            if (CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID))
+            {
+                SetByteValue(UNIT_FIELD_BYTES_0, 0, displayExtra->DisplayRaceID);
+            }
+        }
+    }
     sScriptMgr->OnDisplayIdChange(this, modelId);
 }
 
