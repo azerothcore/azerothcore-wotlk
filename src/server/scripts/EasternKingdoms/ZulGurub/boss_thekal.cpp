@@ -34,7 +34,7 @@ enum Spells
     SPELL_MORTALCLEAVE        = 22859,
     SPELL_SILENCE             = 22666,
     SPELL_TIGER_FORM          = 24169,
-    SPELL_RESURRECT           = 24173,
+    SPELL_RESURRECTION        = 24341,
     SPELL_FRENZY              = 8269,
     SPELL_FORCEPUNCH          = 24189,
     SPELL_CHARGE              = 24193,
@@ -153,15 +153,23 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
+            LOG_DEBUG("scripts.ai", "boss_thekalAI::DamageTaken(): {} received {} damage!",
+                me->GetName(), damage
+            );
+
             if (!me->HasAura(SPELL_TIGER_FORM) && damage >= me->GetHealth())
             {
+                LOG_DEBUG("scripts.ai", "boss_thekalAI::DamageTaken(): {} received a killing blow!",
+                    me->GetName()
+                );
+
                 damage = me->GetHealth() - 1;
 
                 if (!WasDead)
                 {
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                    me->SetStandState(UNIT_STAND_STATE_DEAD);
                     me->AttackStop();
                     DoResetThreatList();
                     WasDead = true;
@@ -228,12 +236,14 @@ public:
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
                     Talk(SAY_AGGRO);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
+                    DoCastSelf(SPELL_RESURRECTION, true);
+                    
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
                         DoCastSelf(SPELL_TIGER_FORM);
                         me->LoadEquipment(0, true);
+                        me->SetFullHealth();
                         me->SetReactState(REACT_AGGRESSIVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                         _scheduler.Schedule(30s, [this](TaskContext context) {
                             DoCastSelf(SPELL_FRENZY);
