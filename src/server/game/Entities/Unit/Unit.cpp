@@ -16992,7 +16992,7 @@ void Unit::SetDisplayId(uint32 modelId)
         {
             if (CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID))
             {
-                SetByteValue(UNIT_FIELD_BYTES_0, 0, displayExtra->DisplayRaceID);
+                setRace(displayExtra->DisplayRaceID);
             }
         }
     }
@@ -21154,6 +21154,8 @@ void Unit::setRace(uint8 race)
 {
     if (GetTypeId() == TYPEID_PLAYER)
         m_race = race;
+    else
+        SetByteValue(UNIT_FIELD_BYTES_0, 0, race);
 }
 
 // Check if unit in combat with specific unit
