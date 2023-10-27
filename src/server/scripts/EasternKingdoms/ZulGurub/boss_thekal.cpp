@@ -237,7 +237,7 @@ public:
                     Talk(SAY_AGGRO);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     DoCastSelf(SPELL_RESURRECTION, true);
-                    
+
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
                         DoCastSelf(SPELL_TIGER_FORM);
                         me->LoadEquipment(0, true);
