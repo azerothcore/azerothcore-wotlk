@@ -868,7 +868,7 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
 {
     outdoorpvp_na_halaa_creatures(Creature* creature) : ScriptedAI(creature) { }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if(halaaNPCHorde.size() != NA_HALAA_CREATURE_TEAM_SPAWN && halaaNPCAlly.size() != NA_HALAA_CREATURE_TEAM_SPAWN)
         {
