@@ -311,13 +311,13 @@ enum BaseModType
 
 #define MOD_END (PCT_MOD+1)
 
-enum DeathState
+enum class DeathState : uint8
 {
-    ALIVE       = 0,
-    JUST_DIED   = 1,
-    CORPSE      = 2,
-    DEAD        = 3,
-    JUST_RESPAWNED = 4,
+    Alive         = 0,
+    JustDied      = 1,
+    Corpse        = 2,
+    Dead          = 3,
+    JustRespawned = 4,
 };
 
 enum UnitState
@@ -1817,9 +1817,9 @@ public:
 
     void BuildHeartBeatMsg(WorldPacket* data) const;
 
-    [[nodiscard]] bool IsAlive() const { return (m_deathState == ALIVE); };
-    [[nodiscard]] bool isDying() const { return (m_deathState == JUST_DIED); };
-    [[nodiscard]] bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); };
+    [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
+    [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
+    [[nodiscard]] bool isDead() const { return (m_deathState == DeathState::Dead || m_deathState == DeathState::Corpse); };
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 

@@ -384,7 +384,7 @@ public:
         {
             if (param == ACTION_FERAL_RESPAWN)
             {
-                me->setDeathState(JUST_RESPAWNED);
+                me->setDeathState(DeathState::JustRespawned);
 
                 if (Player* target = SelectTargetFromPlayerList(200))
                     AttackStart(target);

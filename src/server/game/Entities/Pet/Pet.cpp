@@ -472,7 +472,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         else
         {
             if (!curHealth && getPetType() == HUNTER_PET)
-                setDeathState(JUST_DIED);
+                setDeathState(DeathState::JustDied);
             else
             {
                 SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
@@ -616,7 +616,7 @@ void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
 void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
 {
     Creature::setDeathState(s);
-    if (getDeathState() == CORPSE)
+    if (getDeathState() == DeathState::Corpse)
     {
         if (getPetType() == HUNTER_PET)
         {
@@ -632,7 +632,7 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
             //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
     }
-    else if (getDeathState() == ALIVE)
+    else if (getDeathState() == DeathState::Alive)
     {
         //RemoveUnitFlag(UNIT_FLAG_STUNNED);
         CastPetAuras(true);
@@ -651,7 +651,7 @@ void Pet::Update(uint32 diff)
 
     switch (m_deathState)
     {
-        case CORPSE:
+        case DeathState::Corpse:
             {
                 if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= GameTime::GetGameTime().count())
                 {
@@ -660,7 +660,7 @@ void Pet::Update(uint32 diff)
                 }
                 break;
             }
-        case ALIVE:
+        case DeathState::Alive:
             {
                 // unsummon pet that lost owner
                 Player* owner = GetOwner();

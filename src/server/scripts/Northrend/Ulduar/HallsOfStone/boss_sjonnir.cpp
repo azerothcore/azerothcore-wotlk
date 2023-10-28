@@ -153,7 +153,7 @@ public:
 
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     {
-                        brann->setDeathState(JUST_DIED);
+                        brann->setDeathState(DeathState::JustDied);
                         brann->Respawn();
                         brann->AI()->DoAction(5);
                     }
