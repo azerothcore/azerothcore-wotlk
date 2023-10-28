@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPNA.h"
+#include "GridNotifiers.h"
 #include "GameGraveyard.h"
 #include "Language.h"
 #include "MapMgr.h"
