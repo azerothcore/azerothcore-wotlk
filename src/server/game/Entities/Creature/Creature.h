@@ -54,6 +54,7 @@ public:
     float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
     void SetDisplayId(uint32 modelId) override;
+    void SetRaceByModelId(uint32 modelId);
 
     void DisappearAndDie();
 

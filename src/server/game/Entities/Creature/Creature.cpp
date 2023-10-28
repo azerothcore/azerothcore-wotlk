@@ -434,6 +434,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     SetDisplayId(displayID);
     SetNativeDisplayId(displayID);
 
+    SetRaceByModelId(displayID);
+
     // Load creature equipment
     if (!data)
     {
@@ -3437,6 +3439,17 @@ void Creature::SetDisplayId(uint32 modelId)
         combatReach = DEFAULT_COMBAT_REACH;
 
     SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetObjectScale());
+}
+
+void Creature::SetRaceByModelId(uint32 modelId)
+{
+    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(modelId))
+    {
+        if (CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID))
+        {
+            setRace(displayExtra->DisplayRaceID);
+        }
+    }
 }
 
 void Creature::SetTarget(ObjectGuid guid)
