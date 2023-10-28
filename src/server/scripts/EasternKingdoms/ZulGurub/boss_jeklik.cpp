@@ -96,7 +96,6 @@ enum Events
     EVENT_SPAWN_FLYING_BATS,
 
     // Bat Riders (Boss)
-    EVENT_BAT_RIDER_LOOP,
     EVENT_BAT_RIDER_THROW_BOMB,
 
     // Bat Riders (Trash)
@@ -147,14 +146,12 @@ struct boss_jeklik : public BossAI
 
     void InitializeAI() override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: InitializeAI");
         BossAI::InitializeAI();
         me->SetHomePosition(JeklikCaveHomePosition);
     }
 
     void Reset() override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: Reset");
         BossAI::Reset();
 
         me->SetDisableGravity(false);
@@ -176,14 +173,12 @@ struct boss_jeklik : public BossAI
         // casting effect
         scheduler.Schedule(4s, [this](TaskContext)
         {
-            LOG_DEBUG("scripts.ai", "Jeklik: Reset (cast green channeling)");
             DoCastSelf(SPELL_GREEN_CHANNELING, true);
         });
 
         // visibility and unlock root
         scheduler.Schedule(5s, [this](TaskContext)
         {
-            LOG_DEBUG("scripts.ai", "Jeklik: Reset (become visible and unroot)");
             me->SetVisible(true);
             me->ClearUnitState(UNIT_STATE_ROOT);
         });
@@ -191,7 +186,6 @@ struct boss_jeklik : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: JustEngagedWith {}", who->GetName());
         BossAI::JustEngagedWith(who);
 
         // cancel the casting effect if it hasn't happened already
@@ -209,10 +203,9 @@ struct boss_jeklik : public BossAI
 
     void PathEndReached(uint32 pathId) override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: PathEndReached (pathId: {})", pathId);
         BossAI::PathEndReached(pathId);
 
-        LOG_DEBUG("scripts.ai", "Jeklik: PHASE ONE");
+        LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE ONE");
 
         me->SetDisableGravity(false);
         SetCombatMovement(true);
@@ -227,7 +220,7 @@ struct boss_jeklik : public BossAI
 
         // at 50%, switch to phase 2
         ScheduleHealthCheckEvent(50, [&] {
-            LOG_DEBUG("scripts.ai", "Jeklik: PHASE TWO");
+            LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE TWO");
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             DoResetThreatList();
             events.SetPhase(PHASE_TWO);
@@ -244,8 +237,6 @@ struct boss_jeklik : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: EnterEvadeMode (why: {})", why);
-
         if (why != EvadeReason::EVADE_REASON_NO_PATH)
         {
             // make invisible to hide wonky-looking movement
@@ -268,7 +259,6 @@ struct boss_jeklik : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        LOG_DEBUG("scripts.ai", "Jeklik: JustDied");
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
     }
@@ -300,38 +290,34 @@ struct boss_jeklik : public BossAI
                     // charge the nearest player that is at least 8 yards away (charge min distance)
                     if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, -8.0f, false, false))
                     {
-                        LOG_DEBUG("scripts.ai", "Jeklik: EVENT_CHARGE_JEKLIK (target: {})", target->GetName());
+                        LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_CHARGE_JEKLIK (target: {})", target->GetName());
                         DoCast(target, SPELL_CHARGE);
                         AttackStart(target);
                     }
                     else
                     {
-                        LOG_DEBUG("scripts.ai", "Jeklik: EVENT_CHARGE_JEKLIK (no target available)");
+                        LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_CHARGE_JEKLIK (no target available)");
                     }
                     events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 15s, 30s, PHASE_ONE);
                     break;
                 case EVENT_PIERCE_ARMOR:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_PIERCE_ARMOR");
                     DoCastVictim(SPELL_PIERCE_ARMOR);
                     events.ScheduleEvent(EVENT_PIERCE_ARMOR, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_BLOOD_LEECH:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_BLOOD_LEECH");
                     DoCastVictim(SPELL_BLOOD_LEECH);
                     events.ScheduleEvent(EVENT_BLOOD_LEECH, 10s, 20s, PHASE_ONE);
                     break;
                 case EVENT_SONIC_BURST:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SONIC_BURST");
                     DoCastVictim(SPELL_SONIC_BURST);
                     events.ScheduleEvent(EVENT_SONIC_BURST, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SWOOP:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SWOOP");
                     DoCastVictim(SPELL_SWOOP);
                     events.ScheduleEvent(EVENT_SWOOP, 20s, 30s, PHASE_ONE);
                     break;
                 case EVENT_SPAWN_BATS:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_BATS");
+                    LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_SPAWN_BATS");
                     Talk(EMOTE_SUMMON_BATS);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         for (uint8 i = 0; i < 6; ++i)
@@ -341,39 +327,35 @@ struct boss_jeklik : public BossAI
                     break;
                 // PHASE_TWO
                 case EVENT_CURSE_OF_BLOOD:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_CURSE_OF_BLOOD");
                     DoCastSelf(SPELL_CURSE_OF_BLOOD);
                     events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 25s, 30s, PHASE_TWO);
                     break;
                 case EVENT_PSYCHIC_SCREAM:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_PSYCHIC_SCREAM");
                     DoCastVictim(SPELL_PSYCHIC_SCREAM);
                     events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, 35s, 45s, PHASE_TWO);
                     break;
                 case EVENT_SHADOW_WORD_PAIN:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SHADOW_WORD_PAIN");
                     DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
                     events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 12s, 18s, PHASE_TWO);
                     break;
                 case EVENT_MIND_FLAY:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_MIND_FLAY");
                     DoCastVictim(SPELL_MIND_FLAY);
                     events.ScheduleEvent(EVENT_MIND_FLAY, 20s, 40s, PHASE_TWO);
                     break;
                 case EVENT_GREATER_HEAL:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_GREATER_HEAL");
+                    LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_GREATER_HEAL");
                     Talk(EMOTE_GREAT_HEAL);
                     me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_GREATER_HEAL);
                     events.ScheduleEvent(EVENT_GREATER_HEAL, 25s, PHASE_TWO);
                     break;
                 case EVENT_SPAWN_FLYING_BATS:
-                    LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS");
                     if (me->GetThreatMgr().GetThreatListSize())
+                    {
                         // summon up to 2 bat riders
                         if (batRidersCount < 2)
                         {
-                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRidersCount + 1);
+                            LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRidersCount + 1);
 
                             // Yell
                             Talk(SAY_CALL_RIDERS);
@@ -390,6 +372,11 @@ struct boss_jeklik : public BossAI
                                 events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, 15s, PHASE_TWO);
                             }
                         }
+                        else
+                        {
+                            LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: EVENT_SPAWN_FLYING_BATS (No new bats, count already at {})", batRidersCount);
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -417,7 +404,7 @@ struct npc_batrider : public CreatureAI
             me->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
         )
         {
-            LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor (BAT_RIDER_MODE_BOSS)");
+            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_BOSS");
             _mode = BAT_RIDER_MODE_BOSS;
 
             // make the bat rider unattackable
@@ -435,7 +422,7 @@ struct npc_batrider : public CreatureAI
         // otherwise, trash mode
         else
         {
-            LOG_DEBUG("scripts.ai", "Bat Rider: npc_batriderAI constructor (BAT_RIDER_MODE_TRASH)");
+            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_TRASH");
             me->SetReactState(REACT_DEFENSIVE);
             _mode = BAT_RIDER_MODE_TRASH;
         }
@@ -443,8 +430,6 @@ struct npc_batrider : public CreatureAI
 
     void Reset() override
     {
-        LOG_DEBUG("scripts.ai", "Bat Rider: Reset");
-
         CreatureAI::Reset();
 
         switch (_mode)
@@ -465,10 +450,6 @@ struct npc_batrider : public CreatureAI
 
     void JustEngagedWith(Unit* who) override
     {
-        LOG_DEBUG("scripts.ai", "Bat Rider: JustEngagedWith {}",
-            who->GetName()
-        );
-
         CreatureAI::JustEngagedWith(who);
 
         switch (_mode)
@@ -492,22 +473,18 @@ struct npc_batrider : public CreatureAI
             // if the creature isn't moving, run the loop
             if (!me->isMoving())
             {
-                LOG_DEBUG("scripts.ai", "Bat Rider: not moving, running loop");
-                events.ScheduleEvent(EVENT_BAT_RIDER_LOOP, 0);
+                LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
+                // enable flying
+                me->SetDisableGravity(true);
+                // send the rider on its loop
+                me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
             }
 
             // event handling
             switch (events.ExecuteEvent())
             {
-                case EVENT_BAT_RIDER_LOOP:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BAT_RIDER_LOOP");
-                    // enable flying
-                    me->SetDisableGravity(true);
-                    // send the rider on its loop
-                    me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
-                    break;
                 case EVENT_BAT_RIDER_THROW_BOMB:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BAT_RIDER_THROW_BOMB");
+                    LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: EVENT_BAT_RIDER_THROW_BOMB");
                     DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
                     events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 8s);
                     break;
@@ -538,21 +515,17 @@ struct npc_batrider : public CreatureAI
             switch (events.ExecuteEvent())
             {
                 case EVENT_DEMO_SHOUT:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_DEMO_SHOUT");
                     DoCast(me, SPELL_DEMO_SHOUT);
                     break;
                 case EVENT_BATTLE_COMMAND:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_BATTLE_COMMAND");
                     DoCast(me, SPELL_BATTLE_COMMAND);
                     events.ScheduleEvent(EVENT_BATTLE_COMMAND, 25s);
                     break;
                 case EVENT_INFECTED_BITE:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_INFECTED_BITE");
                     DoCastVictim(SPELL_INFECTED_BITE);
                     events.ScheduleEvent(EVENT_INFECTED_BITE, 8s);
                     break;
                 case EVENT_UNSTABLE_CONCOCTION:
-                    LOG_DEBUG("scripts.ai", "Bat Rider: EVENT_UNSTABLE_CONCOCTION");
                     Talk(EMOTE_LOW_HEALTH);
                     DoCast(me, SPELL_UNSTABLE_CONCOCTION);
                     break;
