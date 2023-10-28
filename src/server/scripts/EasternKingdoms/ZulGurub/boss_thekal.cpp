@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
@@ -22,11 +23,11 @@
 
 enum Says
 {
-    SAY_AGGRO                 = 0,
-    SAY_DEATH                 = 1,
+    BOSS_SAY_AGGRO                 = 0,
+    BOSS_SAY_DEATH                 = 1,
+    BOSS_EMOTE_DIES                = 2,
 
-    EMOTE_ZEALOT_DIES         = 0,
-    EMOTE_THEKAL_DIES         = 2
+    ZEALOT_EMOTE_DIES              = 0
 };
 
 enum Spells
@@ -81,6 +82,8 @@ public:
 
         void Reset() override
         {
+            LOG_DEBUG("scripts.ai", "boss_thekalAI::Reset");
+
             _Reset();
             Initialize();
 
@@ -99,6 +102,31 @@ public:
                 zealot->AI()->Reset();
             }
 
+            // emote idle loop
+            _scheduler.Schedule(1s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote");
+                switch (urand(0, 2))
+                {
+                    case 0:
+                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_TALK");
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                        break;
+                    case 1:
+                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_POINT");
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                        break;
+                    case 2:
+                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_FLEX");
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_FLEX);
+                        break;
+                    default:
+                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - Default");
+                        break;
+                }
+                context.Repeat(3s, 25s);
+            });
+
             _scheduler.SetValidator([this]
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -108,7 +136,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
-            Talk(SAY_DEATH);
+            Talk(BOSS_SAY_DEATH);
 
             if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
             {
@@ -166,7 +194,7 @@ public:
                     DoResetThreatList();
                     WasDead = true;
                     CheckPhaseTransition();
-                    Talk(EMOTE_THEKAL_DIES);
+                    Talk(BOSS_EMOTE_DIES);
                 }
             }
 
@@ -230,7 +258,7 @@ public:
                     DoCastSelf(SPELL_RESURRECTION, true);
 
                     _scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
-                        Talk(SAY_AGGRO);
+                        Talk(BOSS_SAY_AGGRO);
                     });
 
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
@@ -345,7 +373,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(EMOTE_ZEALOT_DIES);
+            Talk(ZEALOT_EMOTE_DIES);
 
             if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
@@ -427,7 +455,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(EMOTE_ZEALOT_DIES);
+            Talk(ZEALOT_EMOTE_DIES);
 
             if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
