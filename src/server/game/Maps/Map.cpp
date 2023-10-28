@@ -195,7 +195,8 @@ void Map::LoadMap(int gx, int gy, bool reload)
             return;
 
         // load grid map for base map
-        m_parentMap->EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
+        if (!m_parentMap->GridMaps[gx][gy])
+            m_parentMap->EnsureGridCreated(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy));
 
         ((MapInstanced*)(m_parentMap))->AddGridMapReference(GridCoord(gx, gy));
         GridMaps[gx][gy] = m_parentMap->GridMaps[gx][gy];
@@ -460,7 +461,8 @@ void Map::EnsureGridCreated_i(const GridCoord& p)
     {
         LOG_DEBUG("maps", "Creating grid[{}, {}] for map {} instance {}", p.x_coord, p.y_coord, GetId(), i_InstanceId);
 
-        setNGrid(new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord, i_gridExpiry), p.x_coord, p.y_coord);
+        NGridType* ngrid = new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord, i_gridExpiry, sWorld->getBoolConfig(CONFIG_GRID_UNLOAD));
+        setNGrid(ngrid, p.x_coord, p.y_coord);
 
         // build a linkage between this map and NGridType
         buildNGridLinkage(getNGrid(p.x_coord, p.y_coord));
@@ -2403,11 +2405,11 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
 GridMap* Map::GetGrid(float x, float y)
 {
     // half opt method
-    int gx = (int)(32 - x / SIZE_OF_GRIDS);                 //grid x
-    int gy = (int)(32 - y / SIZE_OF_GRIDS);                 //grid y
+    int gx = (int)(CENTER_GRID_ID - x / SIZE_OF_GRIDS);                 //grid x
+    int gy = (int)(CENTER_GRID_ID - y / SIZE_OF_GRIDS);                 //grid y
 
     // ensure GridMap is loaded
-    EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
+    EnsureGridCreated(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy));
 
     return GridMaps[gx][gy];
 }
@@ -3135,7 +3137,7 @@ void Map::RemoveAllObjectsInRemoveList()
     //LOG_DEBUG("maps", "Object remover 1 check.");
     while (!i_objectsToRemove.empty())
     {
-        std::unordered_set<WorldObject*>::iterator itr = i_objectsToRemove.begin();
+        std::set<WorldObject*>::iterator itr = i_objectsToRemove.begin();
         WorldObject* obj = *itr;
 
         switch (obj->GetTypeId())
