@@ -141,7 +141,7 @@ enum BatRiderMode
 struct boss_jeklik : public BossAI
 {
     // Bat Riders (14750) counter
-    uint8 batRidersCounter = 0;
+    uint8 batRidersCount = 0;
 
     boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
 
@@ -160,6 +160,7 @@ struct boss_jeklik : public BossAI
         me->SetDisableGravity(false);
         me->SetReactState(REACT_PASSIVE);
         BossAI::SetCombatMovement(false);
+        batRidersCount = 0;
 
         // once the path for her to come down to the ground starts, it appears to be near-impossible to stop it
         // instead, simply wait the 3 seconds it takes the path to complete, then teleport her home
@@ -370,9 +371,9 @@ struct boss_jeklik : public BossAI
                     LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS");
                     if (me->GetThreatMgr().GetThreatListSize())
                         // summon up to 2 bat riders
-                        if (batRidersCounter < 2)
+                        if (batRidersCount < 2)
                         {
-                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRidersCounter + 1);
+                            LOG_DEBUG("scripts.ai", "Jeklik: EVENT_SPAWN_FLYING_BATS (Summoning {} of 2)", batRidersCount + 1);
 
                             // Yell
                             Talk(SAY_CALL_RIDERS);
@@ -381,10 +382,10 @@ struct boss_jeklik : public BossAI
                             if (me->SummonCreature(NPC_BAT_RIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
                                 // increase the counter
-                                batRidersCounter++;
+                                batRidersCount++;
                             }
 
-                            if (batRidersCounter == 1)
+                            if (batRidersCount == 1)
                             {
                                 events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10s, 15s, PHASE_TWO);
                             }
