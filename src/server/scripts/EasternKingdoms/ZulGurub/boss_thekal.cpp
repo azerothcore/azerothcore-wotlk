@@ -229,7 +229,7 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     DoCastSelf(SPELL_RESURRECTION, true);
 
-                    _scheduler.Schedule(250ms, [this](TaskContext /*context*/) {
+                    _scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
                         Talk(SAY_AGGRO);
                     });
 
