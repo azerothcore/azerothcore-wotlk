@@ -105,26 +105,14 @@ public:
             // emote idle loop
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 // pick a random emote from the list of available emotes
-                LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote");
-                switch (urand(0, 2))
-                {
-                    case 0:
-                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_TALK");
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        break;
-                    case 1:
-                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_POINT");
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                        break;
-                    case 2:
-                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - EMOTE_ONESHOT_FLEX");
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_FLEX);
-                        break;
-                    default:
-                        LOG_DEBUG("scripts.ai", "boss_thekalAI::Idle Emote - Default");
-                        break;
-                }
-                context.Repeat(3s, 25s);
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_TALK,
+                        EMOTE_ONESHOT_FLEX,
+                        EMOTE_ONESHOT_POINT
+                    )
+                );
+                context.Repeat(5s, 25s);
             });
 
             _scheduler.SetValidator([this]
@@ -220,9 +208,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
-                return;
-
             _scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
         }
@@ -335,7 +320,20 @@ public:
 
             _scheduler.SetValidator([this]
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+
+            // emote idle loop
+            _scheduler.Schedule(1s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_QUESTION,
+                        EMOTE_ONESHOT_YES,
+                        EMOTE_ONESHOT_NO
+                    )
+                );
+                context.Repeat(5s, 25s);
             });
         }
 
@@ -383,9 +381,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
-                return;
-
             _scheduler.Update(diff,
                 std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
         }
@@ -420,7 +415,20 @@ public:
 
             _scheduler.SetValidator([this]
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+
+            // emote idle loop
+            _scheduler.Schedule(1s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_TALK,
+                        EMOTE_ONESHOT_BEG,
+                        EMOTE_ONESHOT_YES
+                    )
+                );
+                context.Repeat(5s, 25s);
             });
         }
 
@@ -465,9 +473,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
-                return;
-
             _scheduler.Update(diff,
                 std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
         }
