@@ -868,9 +868,9 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
 {
     outdoorpvp_na_halaa_creatures(Creature* creature) : ScriptedAI(creature) { }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
-        if(halaaNPCHorde.size() != NA_HALAA_CREATURE_TEAM_SPAWN && halaaNPCAlly.size() != NA_HALAA_CREATURE_TEAM_SPAWN)
+        if (halaaNPCHorde.size() != NA_HALAA_CREATURE_TEAM_SPAWN && halaaNPCAlly.size() != NA_HALAA_CREATURE_TEAM_SPAWN)
         {
             std::list<Creature*> creatures;
             uint32 entry = 0;
@@ -886,11 +886,11 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
                     Creature* const c = *itr;
                     if (entry < NA_HALAA_CREATURE_TEAM_SPAWN)
                     {
-                        halaaNPCHorde[entry] = (c->GetSpawnId());
+                        halaaNPCHorde[entry] = c->GetSpawnId();
                     }
                     else
                     {
-                        halaaNPCAlly[entry - NA_HALAA_CREATURE_TEAM_SPAWN] = (c->GetSpawnId());
+                        halaaNPCAlly[entry - NA_HALAA_CREATURE_TEAM_SPAWN] = c->GetSpawnId();
                     }
                     c->AddObjectToRemoveList();
                     entry++;
@@ -900,7 +900,6 @@ struct outdoorpvp_na_halaa_creatures : public ScriptedAI
         }
         DoMeleeAttackIfReady();
     }
-    void Reset() override { }
 };
 
 void AddSC_outdoorpvp_na()
