@@ -32,27 +32,31 @@ enum Says
 
 enum Spells
 {
-    SPELL_MORTALCLEAVE        = 22859,
-    SPELL_SILENCE             = 22666,
-    SPELL_TIGER_FORM          = 24169,
-    SPELL_RESURRECTION        = 24341,
-    SPELL_FRENZY              = 8269,
-    SPELL_FORCEPUNCH          = 24189,
-    SPELL_CHARGE              = 24193,
-    SPELL_ENRAGE              = 8269,
-    SPELL_SUMMONTIGERS        = 24183,
+    // Boss - pre-fight
+    SPELL_SUMMONTIGERS                  = 24183,
+
+    // Boss
+    SPELL_CHARGE                        = 24193,
+    SPELL_ENRAGE                        = 8269,
+    SPELL_FORCEPUNCH                    = 24189,
+    SPELL_FRENZY                        = 8269,
+    SPELL_MORTALCLEAVE                  = 22859,
+    SPELL_RESURRECTION_IMPACT_VISUAL    = 24171,
+    SPELL_SILENCE                       = 22666,
+    SPELL_TIGER_FORM                    = 24169,
 
     // Zealot Lor'Khan Spells
-    SPELL_SHIELD              = 20545,
-    SPELL_BLOODLUST           = 24185,
-    SPELL_GREATERHEAL         = 24208,
-    SPELL_DISARM              = 6713,
+    SPELL_SHIELD                        = 20545,
+    SPELL_BLOODLUST                     = 24185,
+    SPELL_GREATERHEAL                   = 24208,
+    SPELL_DISARM                        = 6713,
+
     // Zealot Zath Spells
-    SPELL_SWEEPINGSTRIKES     = 18765,
-    SPELL_SINISTERSTRIKE      = 15581,
-    SPELL_GOUGE               = 12540,
-    SPELL_KICK                = 15614,
-    SPELL_BLIND               = 21060
+    SPELL_SWEEPINGSTRIKES               = 18765,
+    SPELL_SINISTERSTRIKE                = 15581,
+    SPELL_GOUGE                         = 12540,
+    SPELL_KICK                          = 15614,
+    SPELL_BLIND                         = 21060
 };
 
 enum Actions
@@ -82,13 +86,14 @@ public:
 
         void Reset() override
         {
-            LOG_DEBUG("scripts.ai", "boss_thekalAI::Reset");
-
             _Reset();
             Initialize();
 
+            _scheduler.CancelAll();
+
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->LoadEquipment(1, true);
 
@@ -103,7 +108,7 @@ public:
             }
 
             // emote idle loop
-            _scheduler.Schedule(1s, [this](TaskContext context) {
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
                 // pick a random emote from the list of available emotes
                 me->HandleEmoteCommand(
                     RAND(
@@ -208,8 +213,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff,
+            if (me->IsInCombat() && !UpdateVictim())
+            {
+                return;
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         void ReviveZealot(uint32 zealotData)
@@ -240,7 +256,7 @@ public:
             {
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoCastSelf(SPELL_RESURRECTION, true);
+                    DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
 
                     _scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
                         Talk(BOSS_SAY_AGGRO);
@@ -260,7 +276,8 @@ public:
                             DoCastVictim(SPELL_FORCEPUNCH);
                             context.Repeat(16s, 21s);
                         }).Schedule(12s, [this](TaskContext context) {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            // charge a random target that is at least 8 yards away (min range of charge is 8 yards)
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -8.0f))
                             {
                                 DoCast(target, SPELL_CHARGE);
                                 DoResetThreatList();
@@ -324,7 +341,7 @@ public:
             });
 
             // emote idle loop
-            _scheduler.Schedule(1s, [this](TaskContext context) {
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
                 // pick a random emote from the list of available emotes
                 me->HandleEmoteCommand(
                     RAND(
@@ -337,8 +354,10 @@ public:
             });
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        void JustEngagedWith(Unit* who) override
         {
+            _scheduler.CancelAll();
+
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
                 context.Repeat(1min);
@@ -381,8 +400,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+            if (me->IsInCombat() && !UpdateVictim())
+            {
+                return;
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
+                std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         private:
@@ -419,7 +449,7 @@ public:
             });
 
             // emote idle loop
-            _scheduler.Schedule(1s, [this](TaskContext context) {
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
                 // pick a random emote from the list of available emotes
                 me->HandleEmoteCommand(
                     RAND(
@@ -432,8 +462,10 @@ public:
             });
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        void JustEngagedWith(Unit* who) override
         {
+            _scheduler.CancelAll();
+
             _scheduler.Schedule(13s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SWEEPINGSTRIKES);
                 context.Repeat(1min);
@@ -473,8 +505,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+            if (me->IsInCombat() && !UpdateVictim())
+            {
+                return;
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
+                std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         private:
