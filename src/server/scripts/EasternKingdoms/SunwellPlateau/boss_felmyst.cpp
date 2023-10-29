@@ -145,8 +145,8 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 me->SetVisible(true);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                events2.ScheduleEvent(EVENT_INTRO_1, 3000);
+                //me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                //events2.ScheduleEvent(EVENT_INTRO_1, 3000);
             }
         }
 
@@ -163,7 +163,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            //me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if (events.Empty() && events2.Empty())
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
@@ -244,27 +244,27 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INTRO_1:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    events2.ScheduleEvent(EVENT_INTRO_2, 4000);
+                    //me->SetStandState(UNIT_STAND_STATE_STAND);
+                    events2.ScheduleEvent(EVENT_INTRO_2, 500);
                     break;
                 case EVENT_INTRO_2:
                     Talk(YELL_BIRTH);
                     me->SetDisableGravity(true);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SendMovementFlagUpdate();
-                    events2.ScheduleEvent(EVENT_INTRO_3, 1500);
+                    events2.ScheduleEvent(EVENT_INTRO_3, 500);
                     break;
                 case EVENT_INTRO_3:
-                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
-                    events2.ScheduleEvent(EVENT_INTRO_4, 2000);
+                    //me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
+                    events2.ScheduleEvent(EVENT_INTRO_4, 500);
                     break;
                 case EVENT_INTRO_4:
-                    events.ScheduleEvent(EVENT_LAND, 3000, 1);
+                    events.ScheduleEvent(EVENT_LAND, 500, 1);
                     events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
                     me->SetInCombatWithZone();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
-                    me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
+                    //me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
                     break;
             }
 
@@ -447,13 +447,13 @@ public:
         {
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
-
+/*
         void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
         }
-
+*/
         void UpdateAI(uint32 diff) override
         {
             if (timer)

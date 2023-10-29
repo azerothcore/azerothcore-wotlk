@@ -321,7 +321,7 @@ public:
             if (data == DONE)
             {
                 ++BossKilled;
-                if (QuestMinute && BossKilled >= DATA_HALAZZIEVENT)
+                if (QuestMinute && BossKilled >=  DATA_ZULJINEVENT)
                 {
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
