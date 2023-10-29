@@ -583,7 +583,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     if (!m_capturePoint)
         return false;
 
-    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius) - 60.0f;
+    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius);
 
     for (PlayerSet playerSet : m_activePlayers)
     {

@@ -223,3 +223,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_esES`, `locale_e
 -- NPC MODEL ID
 UPDATE `creature_model_info` SET `DisplayID_Other_Gender` = 0 WHERE `DisplayID` IN (18254, 18255, 18256, 18257);
 UPDATE `gameobject` SET `phaseMask` = 2 WHERE `guid` IN (100343, 100342, 100341);
+
+-- HALAA BANNER GAMEOBJECT RADIUS
+UPDATE `gameobject_template` SET `Data0` = 40 WHERE `entry` = 182210;
