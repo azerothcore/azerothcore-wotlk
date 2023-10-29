@@ -768,7 +768,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(JUST_DIED);
+                creature->setDeathState(DeathState::JustDied);
                 creature->Respawn();
             }
         }
@@ -920,7 +920,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(JUST_DIED);
+                creature->setDeathState(DeathState::JustDied);
                 creature->Respawn();
             }
 
@@ -994,7 +994,7 @@ public:
 
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
-            creature->setDeathState(JUST_DIED);
+            creature->setDeathState(DeathState::JustDied);
             creature->Respawn();
         }
 

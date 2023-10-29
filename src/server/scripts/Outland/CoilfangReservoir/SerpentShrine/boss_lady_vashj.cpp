@@ -373,7 +373,7 @@ public:
                 if (!Vashj || !Vashj->IsAlive() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, Vashj->ToCreature()->AI())->Phase != 3)
                 {
                     // remove
-                    me->setDeathState(DEAD);
+                    me->setDeathState(DeathState::Dead);
                     me->RemoveCorpse();
                     me->SetFaction(FACTION_FRIENDLY);
                 }
