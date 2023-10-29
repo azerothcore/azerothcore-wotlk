@@ -30,7 +30,7 @@
 #include "WorldSession.h"
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-    _dataSent(false), _module(nullptr), _initialized(false), _interrupted(false), _checkInProgress(false)
+    _dataSent(false), _module(nullptr), _initialized(false), _interrupted(false), _interruptedRecently(false), _checkInProgress(false)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
