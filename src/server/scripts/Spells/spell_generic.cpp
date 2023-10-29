@@ -5102,6 +5102,7 @@ class spell_gen_yehkinya_bramble : public SpellScript
     }
 };
 
+// 35244 - Choking Vines
 enum ChokingVines
 {
     SPELL_CHOKING_VINES = 35244,
