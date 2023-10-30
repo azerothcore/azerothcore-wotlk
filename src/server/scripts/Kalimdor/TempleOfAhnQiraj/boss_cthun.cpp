@@ -524,6 +524,20 @@ struct boss_cthun : public BossAI
             return;
         }
 
+        if (IsEveryoneAffectedByDigestiveAcid())
+        {
+            _acidTimer += diff;
+            if (_acidTimer >= 10000)  // 10 seconds
+            {
+                KillEveryone();
+                _acidTimer = 0;  // Reset timer
+            }
+        }
+        else
+        {
+            _acidTimer = 0;  // Reset timer
+        }
+
         me->SetTarget();
 
         scheduler.Update(diff);
@@ -585,6 +599,43 @@ struct boss_cthun : public BossAI
 
         //Body Phase
         uint8 _fleshTentaclesKilled;
+
+        //If no-one is outside
+        uint32 _acidTimer;
+
+        bool IsEveryoneAffectedByDigestiveAcid() const
+        {
+            Map* map = me->GetMap();
+            if (!map->IsDungeon())
+                return false;
+
+            Map::PlayerList const& playerList = map->GetPlayers();
+            for (const auto& itr : playerList)
+            {
+                if (Player* player = itr.GetSource())
+                {
+                    if (!player->HasAura(SPELL_DIGESTIVE_ACID))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        void KillEveryone()
+        {
+            Map* map = me->GetMap();
+            if (!map->IsDungeon())
+                return;
+
+            Map::PlayerList const& playerList = map->GetPlayers();
+            for (const auto& itr : playerList)
+            {
+                if (Player* player = itr.GetSource())
+                {
+                    player->KillSelf();
+                }
+            }
+        }
 };
 
 struct npc_eye_tentacle : public ScriptedAI
