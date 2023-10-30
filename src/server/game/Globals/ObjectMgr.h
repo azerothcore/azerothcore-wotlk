@@ -1021,6 +1021,7 @@ public:
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
     void LoadCreatureTemplate(Field* fields);
+    void LoadCreatureTemplatesFastCache();
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();

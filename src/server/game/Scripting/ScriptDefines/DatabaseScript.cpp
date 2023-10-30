@@ -25,3 +25,11 @@ void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
         script->OnAfterDatabasesLoaded(updateFlags);
     });
 }
+
+void ScriptMgr::OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore)
+{
+    ExecuteScript<DatabaseScript>([&](DatabaseScript* script)
+    {
+        script->OnAfterDatabaseLoadCreatureTemplates(creatureTemplateStore);
+    });
+}

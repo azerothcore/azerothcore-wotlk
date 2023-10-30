@@ -609,20 +609,7 @@ void ObjectMgr::LoadCreatureTemplates()
         ++count;
     } while (result->NextRow());
 
-    // pussywizard:
-    {
-        uint32 max = 0;
-        for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-            if (itr->first > max)
-                max = itr->first;
-        if (max)
-        {
-            _creatureTemplateStoreFast.clear();
-            _creatureTemplateStoreFast.resize(max + 1, nullptr);
-            for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-                _creatureTemplateStoreFast[itr->first] = &(itr->second);
-        }
-    }
+    LoadCreatureTemplatesFastCache();
 
     LoadCreatureTemplateResistances();
     LoadCreatureTemplateSpells();
@@ -750,6 +737,26 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.SpellSchoolImmuneMask = fields[68].Get<uint8>();
     creatureTemplate.flags_extra           = fields[69].Get<uint32>();
     creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
+}
+
+/**
+* @brief (Re)loads the fast Creature Template cache from the main cache. Does not reload from the DB.
+*/
+void ObjectMgr::LoadCreatureTemplatesFastCache()
+{
+    uint32 max = 0;
+    for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+        if (itr->first > max)
+            max = itr->first;
+    if (max)
+    {
+        _creatureTemplateStoreFast.clear();
+        _creatureTemplateStoreFast.resize(max + 1, nullptr);
+        for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+            _creatureTemplateStoreFast[itr->first] = &(itr->second);
+    }
+
+    sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
