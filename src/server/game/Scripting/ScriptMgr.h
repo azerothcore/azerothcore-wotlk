@@ -2034,9 +2034,9 @@ public:
     /**
      * @brief Called after all creature template data has been loaded from the database. This hook could be called multiple times, not just at server startup.
      *
-     * @param creatureTemplateStore Pointer to a modifiable vector of creature templates. Indexed by Entry ID.
+     * @param creatureTemplates Pointer to a modifiable vector of creature templates. Indexed by Entry ID.
      */
-    virtual void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> /*creatureTemplateStore*/) { }
+    virtual void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> /*creatureTemplates*/) { }
 
 };
 
