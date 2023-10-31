@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DynamicVisibility.h"
+#include "NGrid.h"
+#include "Random.h"
 
-uint8 DynamicVisibilityMgr::visibilitySettingsIndex = 0;
-
-void DynamicVisibilityMgr::Update(uint32 sessionCount)
+GridInfo::GridInfo() : i_timer(0), vis_Update(0, irand(0, DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
+i_unloadActiveLockCount(0), i_unloadExplicitLock(false), i_unloadReferenceLock(false)
 {
-    if (sessionCount >= (visibilitySettingsIndex + 1) * ((uint32)VISIBILITY_SETTINGS_PLAYER_INTERVAL) && visibilitySettingsIndex < VISIBILITY_SETTINGS_MAX_INTERVAL_NUM - 1)
-        ++visibilitySettingsIndex;
-    else if (visibilitySettingsIndex && sessionCount < visibilitySettingsIndex * ((uint32)VISIBILITY_SETTINGS_PLAYER_INTERVAL) - 100)
-        --visibilitySettingsIndex;
+}
+
+GridInfo::GridInfo(time_t expiry, bool unload /*= true */) : i_timer(expiry), vis_Update(0, irand(0, DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
+i_unloadActiveLockCount(0), i_unloadExplicitLock(!unload), i_unloadReferenceLock(false)
+{
 }

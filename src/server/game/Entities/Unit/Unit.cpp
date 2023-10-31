@@ -32,7 +32,6 @@
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
-#include "DynamicVisibility.h"
 #include "Formulas.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -44,6 +43,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
+#include "MovementPacketBuilder.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -247,7 +247,7 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_rootTimes = 0;
 
     m_state = 0;
-    m_deathState = ALIVE;
+    m_deathState = DeathState::Alive;
 
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
         m_currentSpells[i] = nullptr;
@@ -316,12 +316,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_duringRemoveFromWorld = false;
 
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
-
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_notify_mstime = 0;
-    m_delayed_unit_relocation_timer = 0;
-    m_delayed_unit_ai_notify_timer = 0;
-    bRequestForcedVisibilityUpdate = false;
 
     m_applyResilience = false;
     _instantCast = false;
@@ -410,32 +404,6 @@ void Unit::Update(uint32 p_time)
 
     if (!IsInWorld())
         return;
-
-    // pussywizard:
-    if (GetTypeId() != TYPEID_PLAYER || (!ToPlayer()->IsBeingTeleported() && !bRequestForcedVisibilityUpdate))
-    {
-        if (m_delayed_unit_relocation_timer)
-        {
-            if (m_delayed_unit_relocation_timer <= p_time)
-            {
-                m_delayed_unit_relocation_timer = 0;
-                //ExecuteDelayedUnitRelocationEvent();
-                FindMap()->i_objectsForDelayedVisibility.insert(this);
-            }
-            else
-                m_delayed_unit_relocation_timer -= p_time;
-        }
-        if (m_delayed_unit_ai_notify_timer)
-        {
-            if (m_delayed_unit_ai_notify_timer <= p_time)
-            {
-                m_delayed_unit_ai_notify_timer = 0;
-                ExecuteDelayedUnitAINotifyEvent();
-            }
-            else
-                m_delayed_unit_ai_notify_timer -= p_time;
-        }
-    }
 
     _UpdateSpells( p_time );
 
@@ -600,13 +568,26 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     SplineHandler handler(this);
     movespline->updateState(t_diff, handler);
     // Xinef: Spline was cleared by StopMoving, return
-    if (!movespline->Initialized())
-    {
+    if (!movespline->Initialized()) {
         DisableSpline();
         return;
     }
 
     bool arrived = movespline->Finalized();
+
+    if (movespline->isCyclic())
+    {
+        m_splineSyncTimer.Update(t_diff);
+        if (m_splineSyncTimer.Passed())
+        {
+            m_splineSyncTimer.Reset(5000); // Retail value, do not change
+
+            WorldPacket data(SMSG_FLIGHT_SPLINE_SYNC, 4 + GetPackGUID().size());
+            Movement::PacketBuilder::WriteSplineSync(*movespline, data);
+            data.appendPackGUID(GetGUID());
+            SendMessageToSet(&data, true);
+        }
+    }
 
     if (arrived)
     {
@@ -616,17 +597,11 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, movespline->GetAnimationType());
     }
 
-    // pussywizard: update always! not every 400ms, because movement generators need the actual position
-    //m_movesplineTimer.Update(t_diff);
-    //if (m_movesplineTimer.Passed() || arrived)
     UpdateSplinePosition();
 }
 
 void Unit::UpdateSplinePosition()
 {
-    //static uint32 const positionUpdateDelay = 400;
-
-    //m_movesplineTimer.Reset(positionUpdateDelay);
     Movement::Location loc = movespline->ComputePosition();
 
     if (movespline->onTransport)
@@ -639,16 +614,14 @@ void Unit::UpdateSplinePosition()
 
         if (TransportBase* transport = GetDirectTransport())
             transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
+        else
+            return;
     }
 
-    // Xinef: if we had spline running update orientation along with position
-    //if (HasUnitState(UNIT_STATE_CANNOT_TURN))
-    //    loc.orientation = GetOrientation();
+    if (HasUnitState(UNIT_STATE_CANNOT_TURN))
+        loc.orientation = GetOrientation();
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
-    else
-        ToCreature()->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
+    UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
 }
 
 void Unit::DisableSpline()
@@ -4562,7 +4535,7 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
     if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && IsTotem() && GetGUID() == aura->GetCasterGUID())
     {
         if (ToTotem()->GetSpell() == aura->GetId() && ToTotem()->GetTotemType() == TOTEM_PASSIVE)
-            ToTotem()->setDeathState(JUST_DIED);
+            ToTotem()->setDeathState(DeathState::JustDied);
     }
 
     // Remove aurastates only if were not found
@@ -8191,13 +8164,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             CastCustomSpell(this, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura, originalCaster);
                             break;
                         }
-                    // Shaman T8 Elemental 4P Bonus
-                    case 64928:
-                        {
-                            basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                            triggered_spell_id = 64930;            // Electrified
-                            break;
-                        }
                     // Shaman T9 Elemental 4P Bonus
                     case 67228:
                         {
@@ -11255,12 +11221,12 @@ void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellID, uint32 damage, Pow
 
 void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers powerType)
 {
-    victim->ModifyPower(powerType, damage, false);
+    int32 gainedPower = victim->ModifyPower(powerType, damage, false);
 
-    if (powerType != POWER_HAPPINESS)
+    if (powerType != POWER_HAPPINESS && gainedPower)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-        victim->getHostileRefMgr().threatAssist(this, float(damage) * 0.5f, spellInfo);
+        victim->getHostileRefMgr().threatAssist(this, float(gainedPower) * 0.5f, spellInfo);
     }
 
     SendEnergizeSpellLog(victim, spellID, damage, powerType);
@@ -14154,6 +14120,11 @@ int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*
         gain = maxPower - curPower;
     }
 
+    if (GetAI())
+    {
+        GetAI()->OnPowerUpdate(power, gain, dVal, curPower);
+    }
+
     return gain;
 }
 
@@ -14526,7 +14497,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     // death state needs to be updated before RemoveAllAurasOnDeath() calls HandleChannelDeathItem(..) so that
     // it can be used to check creation of death items (such as soul shards).
 
-    if (s != ALIVE && s != JUST_RESPAWNED)
+    if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
         CombatStop();
         GetThreatMgr().ClearAllThreat();
@@ -14541,7 +14512,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         RemoveAllAurasOnDeath();
     }
 
-    if (s == JUST_DIED)
+    if (s == DeathState::JustDied)
     {
         // remove aurastates allowing special moves
         ClearAllReactives();
@@ -14570,7 +14541,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         if (ZoneScript* zoneScript = GetZoneScript() ? GetZoneScript() : (ZoneScript*)GetInstanceScript())
             zoneScript->OnUnitDeath(this);
     }
-    else if (s == JUST_RESPAWNED)
+    else if (s == DeathState::JustRespawned)
     {
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
@@ -15449,9 +15420,9 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
 
 void Unit::SetHealth(uint32 val)
 {
-    if (getDeathState() == JUST_DIED)
+    if (getDeathState() == DeathState::JustDied)
         val = 0;
-    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DEAD)
+    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DeathState::Dead)
         val = 1;
     else
     {
@@ -15743,15 +15714,9 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
 {
-    if (GetTransport())
-    {
-        GetTransport()->RemovePassenger(this);
-        SetTransport(nullptr);
-        m_movementInfo.transport.Reset();
-        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-    }
-
     CleanupBeforeRemoveFromMap(finalCleanup);
+
+    WorldObject::CleanupsBeforeDelete(finalCleanup);
 }
 
 void Unit::UpdateCharmAI()
@@ -17524,13 +17489,17 @@ void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuar
         player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         player->SetPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
         // call MoveInLineOfSight for nearby contested guards
-        AddToNotify(NOTIFY_AI_RELOCATION);
+        Acore::AIRelocationNotifier notifier(*this);
+        Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
     }
-    if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+    for (Unit* unit : m_Controlled)
     {
-        AddUnitState(UNIT_STATE_ATTACK_PLAYER);
-        // call MoveInLineOfSight for nearby contested guards
-        AddToNotify(NOTIFY_AI_RELOCATION);
+        if (!unit->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+        {
+            unit->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
+            Acore::AIRelocationNotifier notifier(*unit);
+            Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+        }
     }
 }
 
@@ -18117,12 +18086,12 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
     if (!spiritOfRedemption)
     {
-        LOG_DEBUG("entities.unit", "SET JUST_DIED");
-        victim->setDeathState(JUST_DIED);
+        LOG_DEBUG("entities.unit", "SET DeathState::JustDied");
+        victim->setDeathState(DeathState::JustDied);
     }
 
     // Inform pets (if any) when player kills target)
-    // MUST come after victim->setDeathState(JUST_DIED); or pet next target
+    // MUST come after victim->setDeathState(DeathState::JustDied); or pet next target
     // selection will get stuck on same target and break pet react state
     if (player)
     {
@@ -19377,7 +19346,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
     }
 }
 
-void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
+void Unit::UpdateObjectVisibility(bool forced)
 {
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
@@ -19385,8 +19354,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
     {
         WorldObject::UpdateObjectVisibility(true);
         Acore::AIRelocationNotifier notifier(*this);
-        float radius = 60.0f;
-        Cell::VisitAllObjects(this, notifier, radius);
+        Cell::VisitAllObjects(this, notifier, GetVisibilityRange());
     }
 }
 
@@ -20137,8 +20105,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (HasUnitTypeMask(UNIT_MASK_ACCESSORY))
     {
         // Vehicle just died, we die too
-        if (vehicleBase->getDeathState() == JUST_DIED)
-            setDeathState(JUST_DIED);
+        if (vehicleBase->getDeathState() == DeathState::JustDied)
+            setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
         {
@@ -20284,10 +20252,14 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
     if (!Acore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
-    float old_orientation = GetOrientation();
-    float current_z = GetPositionZ();
-    bool turn = (old_orientation != orientation);
-    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || current_z != z);
+    // Check if angular distance changed
+    bool const turn = G3D::fuzzyGt(M_PI - fabs(fabs(GetOrientation() - orientation) - M_PI), 0.0f);
+
+    // G3D::fuzzyEq won't help here, in some cases magnitudes differ by a little more than G3D::eps, but should be considered equal
+    bool const relocated = (teleport ||
+        std::fabs(GetPositionX() - x) > 0.001f ||
+        std::fabs(GetPositionY() - y) > 0.001f ||
+        std::fabs(GetPositionZ() - z) > 0.001f);
 
     if (!GetVehicle())
     {
@@ -20312,6 +20284,8 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetFarSightDistance())
             UpdateObjectVisibility(false);
     }
+
+    UpdatePositionData();
 
     return (relocated || turn);
 }
@@ -20741,124 +20715,6 @@ bool ConflagrateAuraStateDelayEvent::Execute(uint64 /*e_time*/, uint32  /*p_time
             m_owner->ModifyAuraState(AURA_STATE_CONFLAGRATE, true);
 
     return true;
-}
-
-void Unit::ExecuteDelayedUnitRelocationEvent()
-{
-    this->RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
-    if (!this->IsInWorld() || this->IsDuringRemoveFromWorld())
-        return;
-
-    if (this->HasSharedVision())
-        for (SharedVisionList::const_iterator itr = this->GetSharedVisionList().begin(); itr != this->GetSharedVisionList().end(); ++itr)
-            if (Player* player = (*itr))
-            {
-                if (player->IsOnVehicle(this) || !player->IsInWorld() || player->IsDuringRemoveFromWorld()) // players on vehicles have their own event executed (due to passenger relocation)
-                    continue;
-                WorldObject* viewPoint = player;
-                if (player->m_seer && player->m_seer->IsInWorld())
-                    viewPoint = player->m_seer;
-                if (!viewPoint->IsPositionValid() || !player->IsPositionValid())
-                    continue;
-
-                if (Unit* active = viewPoint->ToUnit())
-                {
-                    //if (active->IsVehicle()) // always check original unit here, last notify position is not relocated
-                    //  active = player;
-
-                    float dx = active->m_last_notify_position.GetPositionX() - active->GetPositionX();
-                    float dy = active->m_last_notify_position.GetPositionY() - active->GetPositionY();
-                    float dz = active->m_last_notify_position.GetPositionZ() - active->GetPositionZ();
-                    float distsq = dx * dx + dy * dy + dz * dz;
-                    float mindistsq = DynamicVisibilityMgr::GetReqMoveDistSq(active->FindMap()->GetEntry()->map_type);
-                    if (distsq < mindistsq)
-                        continue;
-
-                    // this will be relocated below sharedvision!
-                    //active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
-                }
-
-                Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-                Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-                relocateNoLarge.SendToSelf();
-                Acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-                Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
-                relocateLarge.SendToSelf();
-            }
-
-    if (Player* player = this->ToPlayer())
-    {
-        WorldObject* viewPoint = player;
-        if (player->m_seer && player->m_seer->IsInWorld())
-            viewPoint = player->m_seer;
-
-        if (viewPoint->GetMapId() != player->GetMapId() || !viewPoint->IsPositionValid() || !player->IsPositionValid())
-            return;
-
-        if (Unit* active = viewPoint->ToUnit())
-        {
-            if (active->IsVehicle())
-                active = player;
-
-            if (!player->GetFarSightDistance())
-            {
-                float dx     = active->m_last_notify_position.GetPositionX() - active->GetPositionX();
-                float dy     = active->m_last_notify_position.GetPositionY() - active->GetPositionY();
-                float dz     = active->m_last_notify_position.GetPositionZ() - active->GetPositionZ();
-                float distsq = dx * dx + dy * dy + dz * dz;
-
-                float mindistsq = DynamicVisibilityMgr::GetReqMoveDistSq(active->FindMap()->GetEntry()->map_type);
-                if (distsq < mindistsq)
-                    return;
-
-                active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
-            }
-        }
-
-        Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-        Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-        relocateNoLarge.SendToSelf();
-
-        if (!player->GetFarSightDistance())
-        {
-            Acore::PlayerRelocationNotifier relocateLarge(*player, true); // visit only large objects; maximum distance
-            Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
-            relocateLarge.SendToSelf();
-        }
-
-        this->AddToNotify(NOTIFY_AI_RELOCATION);
-    }
-    else if (Creature* unit = this->ToCreature())
-    {
-        if (!unit->IsPositionValid())
-            return;
-
-        float dx = unit->m_last_notify_position.GetPositionX() - unit->GetPositionX();
-        float dy = unit->m_last_notify_position.GetPositionY() - unit->GetPositionY();
-        float dz = unit->m_last_notify_position.GetPositionZ() - unit->GetPositionZ();
-        float distsq = dx * dx + dy * dy + dz * dz;
-        float mindistsq = DynamicVisibilityMgr::GetReqMoveDistSq(unit->FindMap()->GetEntry()->map_type);
-        if (distsq < mindistsq)
-            return;
-
-        unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
-
-        Acore::CreatureRelocationNotifier relocate(*unit);
-        Cell::VisitAllObjects(unit, relocate, unit->GetVisibilityRange() + VISIBILITY_COMPENSATION);
-
-        this->AddToNotify(NOTIFY_AI_RELOCATION);
-    }
-}
-
-void Unit::ExecuteDelayedUnitAINotifyEvent()
-{
-    this->RemoveFromNotify(NOTIFY_AI_RELOCATION);
-    if (!this->IsInWorld() || this->IsDuringRemoveFromWorld())
-        return;
-
-    Acore::AIRelocationNotifier notifier(*this);
-    float radius = 60.0f;
-    Cell::VisitAllObjects(this, notifier, radius);
 }
 
 void Unit::SetInFront(WorldObject const* target)

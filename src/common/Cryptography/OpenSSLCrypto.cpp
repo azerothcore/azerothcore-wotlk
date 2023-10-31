@@ -16,6 +16,7 @@
  */
 
 #include "OpenSSLCrypto.h"
+#include "Errors.h"
 #include <openssl/crypto.h> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010000fL

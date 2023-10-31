@@ -366,6 +366,9 @@ public:
                 return;
             }
 
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_ALGALON, FAIL);
+
             ScriptedAI::EnterEvadeMode(why);
         }
 
@@ -384,6 +387,11 @@ public:
 
             _phaseTwo = false;
             _heraldOfTheTitans = true;
+
+            if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+            }
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
@@ -476,6 +484,7 @@ public:
 
             uint32 introDelay = 0;
             me->setActive(true);
+            me->SetFarVisible(true);
             me->SetInCombatWithZone();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToNPC(true);
@@ -1148,6 +1157,14 @@ public:
 
                 if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
+
+                if (Map* map = player->GetMap())
+                {
+                    if (InstanceMap* instanceMap = map->ToInstanceMap())
+                    {
+                        instanceMap->PermBindAllPlayers();
+                    }
+                }
             }
 
             return false;

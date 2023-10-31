@@ -389,6 +389,7 @@ public:
             if (action == ACTION_BALTHARUS_DEATH)
             {
                 me->setActive(true);
+                me->SetFarVisible(true);
                 _isIntro = false;
 
                 _events.ScheduleEvent(EVENT_XERESTRASZA_EVENT_0, 6s);

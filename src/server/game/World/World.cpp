@@ -44,7 +44,6 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
-#include "DynamicVisibility.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
@@ -108,6 +107,10 @@ uint32 World::m_worldLoopCounter = 0;
 float World::_maxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 float World::_maxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
 float World::_maxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
+
+int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+int32 World::m_visibility_notify_periodInInstances = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+int32 World::m_visibility_notify_periodInBGArenas = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
 Realm realm;
 
@@ -582,18 +585,6 @@ void World::LoadConfigSettings(bool reload)
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
 
-    _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = sConfigMgr->GetOption<float>("TargetPosRecalculateRange", 1.5f);
-    if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] < CONTACT_DISTANCE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be >= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], CONTACT_DISTANCE, CONTACT_DISTANCE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = CONTACT_DISTANCE;
-    }
-    else if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] > NOMINAL_MELEE_RANGE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be <= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], NOMINAL_MELEE_RANGE, NOMINAL_MELEE_RANGE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = NOMINAL_MELEE_RANGE;
-    }
-
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);
     if (_rate_values[RATE_DURABILITY_LOSS_ON_DEATH] < 0.0f)
     {
@@ -666,6 +657,14 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "PlayerSave.Stats.MinLevel ({}) must be in range 0..80. Using default, do not save character stats (0).", _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]);
         _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
     }
+    _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfigMgr->GetOption("GridCleanUpDelay", 5 * MINUTE * IN_MILLISECONDS);
+    if (_int_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
+    {
+        LOG_ERROR("server.loading", "GridCleanUpDelay ({}) must be greater {}. Use this minimal value.", _int_configs[CONFIG_INTERVAL_GRIDCLEAN], MIN_GRID_DELAY);
+        _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = MIN_GRID_DELAY;
+    }
+    if (reload)
+        sMapMgr->SetGridCleanUpDelay(_int_configs[CONFIG_INTERVAL_GRIDCLEAN]);
 
     _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 10);
     if (_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
@@ -1260,6 +1259,10 @@ void World::LoadConfigSettings(bool reload)
         _maxVisibleDistanceInBGArenas = MAX_VISIBILITY_DISTANCE;
     }
 
+    m_visibility_notify_periodOnContinents = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.OnContinents", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+    m_visibility_notify_periodInInstances = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.InInstances", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+    m_visibility_notify_periodInBGArenas = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.InBGArenas", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+
     ///- Load the CharDelete related config options
     _int_configs[CONFIG_CHARDELETE_METHOD]    = sConfigMgr->GetOption<int32>("CharDelete.Method", 0);
     _int_configs[CONFIG_CHARDELETE_MIN_LEVEL] = sConfigMgr->GetOption<int32>("CharDelete.MinLevel", 0);
@@ -1417,8 +1420,16 @@ void World::LoadConfigSettings(bool reload)
     // Prevent players AFK from being logged out
     _int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetOption<int32>("PreventAFKLogout", 0);
 
+    // Unload grids to save memory. Can be disabled if enough memory is available to speed up moving players to new grids.
+    _bool_configs[CONFIG_GRID_UNLOAD] = sConfigMgr->GetOption<bool>("GridUnload", true);
+
     // Preload all grids of all non-instanced maps
     _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetOption<bool>("PreloadAllNonInstancedMapGrids", false);
+    if (_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] && _bool_configs[CONFIG_GRID_UNLOAD])
+    {
+        LOG_ERROR("server.loading", "PreloadAllNonInstancedMapGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable base map pre-loading. Base map pre-loading disabled");
+        _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = false;
+    }
 
     // ICC buff override
     _int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetOption<int32>("ICC.Buff.Horde", 73822);
@@ -2161,21 +2172,14 @@ void World::SetInitialWorldSettings()
     {
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
 
-        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
-        {
-            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
-
-            if (mapEntry && !mapEntry->Instanceable())
+        sMapMgr->DoForAllMaps([](Map* map)
             {
-                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
-
-                if (map)
+                if (!map->Instanceable())
                 {
                     LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
                     map->LoadAllCells();
                 }
-            }
-        }
+            });
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
@@ -2250,8 +2254,6 @@ void World::Update(uint32 diff)
 
     // Record update if recording set in log and diff is greater then minimum set in log
     sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, GetActiveSessionCount());
-
-    DynamicVisibilityMgr::Update(GetActiveSessionCount());
 
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)

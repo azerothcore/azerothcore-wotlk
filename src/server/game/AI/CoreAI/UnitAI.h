@@ -353,10 +353,13 @@ public:
     // Called at any Damage from any attacker (before damage apply)
     // Note: it for recalculation damage or special reaction at damage
     // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
-    virtual void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/ ) {}
+    virtual void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
     // Called when the creature receives heal
     virtual void HealReceived(Unit* /*done_by*/, uint32& /*addhealth*/) {}
+
+    // Called when the creature power updates
+    virtual void OnPowerUpdate(Powers /*power*/, int32 /*updateVal*/, int32 /*gain*/, uint32 /*currPower*/) {}
 
     // Called when the unit heals
     virtual void HealDone(Unit* /*done_to*/, uint32& /*addhealth*/) {}

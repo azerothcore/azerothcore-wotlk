@@ -48,6 +48,12 @@ ObjectData const creatureData[] =
     { 0,                        0              }
 };
 
+ObjectData const gameObjectData[] =
+{
+    { GO_SIDE_ENTRANCE_DOOR, DATA_GO_SIDE_ENTRANCE_DOOR },
+    { 0,                     0                          }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -64,7 +70,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -240,6 +246,9 @@ public:
                                 }
                             }
                             break;
+                        case DONE:
+                            HandleGameObject(m_uiGamesmansExitDoor, true);
+                            break;
                         }
                         default:
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
@@ -256,7 +265,7 @@ public:
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
                             piece->RemoveAllAuras();
-                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->setDeathState(DeathState::JustRespawned);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
@@ -297,13 +306,11 @@ public:
                     {
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
-                        if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
@@ -369,11 +376,10 @@ public:
                     MastersTerraceDoor[1] = go->GetGUID();
                     break;
                 case GO_SIDE_ENTRANCE_DOOR:
-                    m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    else
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -418,6 +424,42 @@ public:
             return 0;
         }
 
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SCHEDULE_RAJ_CHECK)
+            {
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    Creature* julliane = GetCreature(DATA_JULIANNE);
+                    Creature* romulo = GetCreature(DATA_ROMULO);
+
+                    if (julliane && romulo)
+                    {
+                        if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)
+                            && romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                        {
+                            julliane->KillSelf();
+                            julliane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            romulo->KillSelf();
+                            romulo->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                        else
+                        {
+                            if (romulo->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_RESS_ROMULO);
+                            }
+
+                            if (julliane->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                            {
+                                julliane->AI()->DoAction(ACTION_DO_RESURRECT);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
@@ -438,8 +480,6 @@ public:
                     return m_uiLibraryDoor;
                 case DATA_GO_MASSIVE_DOOR:
                     return m_uiMassiveDoor;
-                case DATA_GO_SIDE_ENTRANCE_DOOR:
-                    return m_uiSideEntranceDoor;
                 case DATA_GO_GAME_DOOR:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
@@ -480,7 +520,6 @@ public:
         ObjectGuid m_uiNightBaneGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
-        ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar

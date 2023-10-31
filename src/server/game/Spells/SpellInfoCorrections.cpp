@@ -416,7 +416,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Marked for Death
     ApplySpellFix({ 53241, 53243, 53244, 53245, 53246 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(423937, 276955137, 2049);
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(399361, 276955137, 1);
     });
 
     ApplySpellFix({
@@ -1026,14 +1026,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // summoned doomguard duration fix
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(6);
-    });
-
-    // Glyph of Voidwalker
-    ApplySpellFix({ 56247 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
-        spellInfo->Effects[EFFECT_0].MiscValue = SPELLMOD_EFFECT1;
-        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x8000000, 0, 0);
     });
 
     // Everlasting Affliction
@@ -3922,12 +3914,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeCasterAuraSpell = 42299;
     });
 
-    // Catch the Wild Wolpertinger!
-    ApplySpellFix({ 41621 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
-    });
-
     // Brewfest quests
     ApplySpellFix({ 47134, 51798 }, [](SpellInfo* spellInfo)
     {
@@ -4580,7 +4566,25 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcChance = 3;
     });
 
-     // Basic Campfire
+    // Summon Water Elementals
+    ApplySpellFix({ 29962, 37051, 37052, 37053 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+    });
+
+    // Instill Lord Valthalak's Spirit DND
+    ApplySpellFix({ 27360 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Holiday - Midsummer, Ribbon Pole Periodic Visual
+    ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
+    });
+
+    // Basic Campfire
     ApplySpellFix({ 818 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
