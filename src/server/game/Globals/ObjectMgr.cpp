@@ -602,10 +602,6 @@ void ObjectMgr::LoadCreatureTemplates()
     _creatureTemplateStore.rehash(result->GetRowCount());
     _creatureTemplateStoreFast.clear();
 
-    // resize the fast cache to the highest creature id
-    uint32 highestCreatureId = result->Fetch()[0].Get<uint32>();
-    _creatureTemplateStoreFast.resize(highestCreatureId + 1, nullptr);
-
     uint32 count = 0;
     do
     {
@@ -641,6 +637,12 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     uint32 entry = fields[0].Get<uint32>();
 
     CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
+
+    // enlarge the fast cache as necessary
+    if (_creatureTemplateStoreFast.size() < entry + 1)
+    {
+        _creatureTemplateStoreFast.resize(entry + 1, nullptr);
+    }
 
     // load a pointer to this creatureTemplate into the fast cache
     _creatureTemplateStoreFast[entry] = &creatureTemplate;
