@@ -2024,7 +2024,20 @@ public:
 
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
+    /**
+     * @brief Called after all databases are loaded
+     *
+     * @param updateFlags Update flags from the loader
+     */
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
+
+    /**
+     * @brief Called after all creature template data has been loaded from the database. This hook could be called multiple times, not just at server startup.
+     *
+     * @param creatureTemplates Pointer to a modifiable vector of creature templates. Indexed by Entry ID.
+     */
+    virtual void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> /*creatureTemplates*/) { }
+
 };
 
 class WorldObjectScript : public ScriptObject
@@ -2671,6 +2684,7 @@ public: /* CommandSC */
 public: /* DatabaseScript */
 
     void OnAfterDatabasesLoaded(uint32 updateFlags);
+    void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore);
 
 public: /* WorldObjectScript */
 
