@@ -642,13 +642,6 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
 
     CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
 
-    // the fast cache should already be the right size, but just in case
-    if (_creatureTemplateStoreFast.size() < entry + 1)
-    {
-        LOG_WARN("server.loading", "Resizing fast cache from {} to {}. This should not be needed, file an issue.", _creatureTemplateStoreFast.size(), entry + 1);
-        _creatureTemplateStoreFast.resize(entry + 1, nullptr);
-    }
-
     // load a pointer to this creatureTemplate into the fast cache
     _creatureTemplateStoreFast[entry] = &creatureTemplate;
 
