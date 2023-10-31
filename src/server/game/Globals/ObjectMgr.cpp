@@ -591,7 +591,7 @@ void ObjectMgr::LoadCreatureTemplates()
                          "ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, "
 //                        64            65          66           67                    68                        69           70
                          "RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
-                         "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId;");
+                         "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
 
     if (!result)
     {
@@ -600,6 +600,11 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     _creatureTemplateStore.rehash(result->GetRowCount());
+    _creatureTemplateStoreFast.clear();
+
+    // resize the fast cache to the highest creature id
+    uint32 highestCreatureId = result->Fetch()[0].Get<uint32>();
+    _creatureTemplateStoreFast.resize(highestCreatureId + 1, nullptr);
 
     uint32 count = 0;
     do
@@ -609,7 +614,7 @@ void ObjectMgr::LoadCreatureTemplates()
         ++count;
     } while (result->NextRow());
 
-    LoadCreatureTemplatesFastCache();
+    sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
 
     LoadCreatureTemplateResistances();
     LoadCreatureTemplateSpells();
@@ -625,12 +630,29 @@ void ObjectMgr::LoadCreatureTemplates()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::LoadCreatureTemplate(Field* fields)
+/**
+* @brief Loads a creature template from a database result
+*
+* @param fields Database result
+* @param triggerHook If true, will trigger the OnAfterDatabaseLoadCreatureTemplates hook. Useful if you are not calling the hook yourself.
+*/
+void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
 {
     uint32 entry = fields[0].Get<uint32>();
 
     CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
 
+    // the fast cache should already be the right size, but just in case
+    if (_creatureTemplateStoreFast.size() < entry + 1)
+    {
+        LOG_WARN("server.loading", "Resizing fast cache from {} to {}. This should not be needed, file an issue.", _creatureTemplateStoreFast.size(), entry + 1);
+        _creatureTemplateStoreFast.resize(entry + 1, nullptr);
+    }
+
+    // load a pointer to this creatureTemplate into the fast cache
+    _creatureTemplateStoreFast[entry] = &creatureTemplate;
+
+    // build the creatureTemplate
     creatureTemplate.Entry = entry;
 
     for (uint8 i = 0; i < MAX_DIFFICULTY - 1; ++i)
@@ -737,26 +759,13 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.SpellSchoolImmuneMask = fields[68].Get<uint8>();
     creatureTemplate.flags_extra           = fields[69].Get<uint32>();
     creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
-}
 
-/**
-* @brief (Re)loads the fast Creature Template cache from the main cache. Does not reload from the DB.
-*/
-void ObjectMgr::LoadCreatureTemplatesFastCache()
-{
-    uint32 max = 0;
-    for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-        if (itr->first > max)
-            max = itr->first;
-    if (max)
+    // useful if the creature template load is being triggered from outside this class
+    if (triggerHook)
     {
-        _creatureTemplateStoreFast.clear();
-        _creatureTemplateStoreFast.resize(max + 1, nullptr);
-        for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-            _creatureTemplateStoreFast[itr->first] = &(itr->second);
+        sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
     }
 
-    sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
