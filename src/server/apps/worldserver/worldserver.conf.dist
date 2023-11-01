@@ -781,8 +781,8 @@ Metric.Enable = 0
 #
 #    Metric.Interval
 #        Description: Interval between every batch of data sent in seconds.
-#		      Longer interval means larger batch of data. If the batch
-#		      is too big, it might get rejected.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
 #        Default:     1 second
 #
 
