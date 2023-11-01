@@ -218,6 +218,7 @@ public:
             {
                 ObjectGuid::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                data.spawnId = guid;
                 data.id1 = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
                 data.posX = chr->GetTransOffsetX();
@@ -768,7 +769,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(DeathState::JustDied);
+                creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
         }
@@ -920,7 +921,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(DeathState::JustDied);
+                creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
 
@@ -994,7 +995,7 @@ public:
 
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
-            creature->setDeathState(DeathState::JustDied);
+            creature->setDeathState(JUST_DIED);
             creature->Respawn();
         }
 

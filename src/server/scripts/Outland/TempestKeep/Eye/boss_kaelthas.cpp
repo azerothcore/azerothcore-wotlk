@@ -214,7 +214,7 @@ public:
                         if (summon->GetSpawnId())
                         {
                             summon->SetReactState(REACT_PASSIVE);
-                            summon->setDeathState(DeathState::JustRespawned);
+                            summon->setDeathState(JUST_RESPAWNED);
                             summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         }
             }

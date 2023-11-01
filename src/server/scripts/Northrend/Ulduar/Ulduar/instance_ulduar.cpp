@@ -316,7 +316,7 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(DeathState::JustDied);
+                        creature->setDeathState(JUST_DIED);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;

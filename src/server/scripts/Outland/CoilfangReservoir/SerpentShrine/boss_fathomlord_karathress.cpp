@@ -65,13 +65,16 @@ enum Spells
 
 enum Misc
 {
-    MAX_ADVISORS                    = 2,
+    MAX_ADVISORS                    = 3,
     NPC_SEER_OLUM                   = 22820,
     GO_CAGE                         = 185952,
 };
 
-const Position advisorsPosition[MAX_ADVISORS] =
+const Position advisorsPosition[MAX_ADVISORS + 2] =
 {
+    {459.61f, -534.81f, -7.54f, 3.82f},
+    {463.83f, -540.23f, -7.54f, 3.15f},
+    {459.94f, -547.28f, -7.54f, 2.42f},
     {448.37f, -544.71f, -7.54f, 0.00f},
     {457.37f, -544.71f, -7.54f, 0.00f}
 };
@@ -91,13 +94,21 @@ struct boss_fathomlord_karathress : public BossAI
         BossAI::Reset();
         _recentlySpoken = false;
 
+        me->SummonCreature(NPC_FATHOM_GUARD_TIDALVESS, advisorsPosition[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+        me->SummonCreature(NPC_FATHOM_GUARD_SHARKKIS, advisorsPosition[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+        me->SummonCreature(NPC_FATHOM_GUARD_CARIBDIS, advisorsPosition[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+
         ScheduleHealthCheckEvent(75, [&]{
-            instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
-                if (fathomguard->IsAlive())
+            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            {
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                 {
-                    fathomguard->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
+                    if (summon->GetMaxHealth() > 500000)
+                    {
+                        summon->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
+                    }
                 }
-            });
+            }
             if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
             {
                 Talk(SAY_GAIN_BLESSING);
@@ -111,22 +122,19 @@ struct boss_fathomlord_karathress : public BossAI
         if (summon->GetEntry() == NPC_SEER_OLUM)
         {
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS - 1], false);
+            summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS + 1], false);
         }
     }
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
+        summons.Despawn(summon);
         if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
             Talk(SAY_GAIN_ABILITY1);
         if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
             Talk(SAY_GAIN_ABILITY2);
         if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
             Talk(SAY_GAIN_ABILITY3);
-        scheduler.Schedule(1s, [this, summon](TaskContext)
-        {
-            summons.Despawn(summon);
-        });
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -146,7 +154,7 @@ struct boss_fathomlord_karathress : public BossAI
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
-        me->SummonCreature(NPC_SEER_OLUM, advisorsPosition[MAX_ADVISORS-2], TEMPSUMMON_TIMED_DESPAWN, 3600000);
+        me->SummonCreature(NPC_SEER_OLUM, advisorsPosition[MAX_ADVISORS], TEMPSUMMON_TIMED_DESPAWN, 3600000);
         if (GameObject* gobject = me->FindNearestGameObject(GO_CAGE, 100.0f))
         {
             gobject->SetGoState(GO_STATE_ACTIVE);
@@ -199,6 +207,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
 {
     boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature), summons(creature)
     {
+        summons.clear();
+
         _instance = creature->GetInstanceScript();
 
         _scheduler.SetValidator([this]
@@ -214,7 +224,6 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         _scheduler.CancelAll();
 
         summons.DespawnAll();
-        summons.clear();
     }
 
     void JustSummoned(Creature* summon) override
@@ -223,12 +232,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         summons.Summon(summon);
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
-        {
-            karathress->Attack(who, false);
-        }
         _scheduler.Schedule(2500ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_HURL_TRIDENT);
@@ -263,7 +268,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
+            me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS);
         }
     }
 
@@ -411,12 +416,8 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         }
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
-        {
-            karathress->Attack(who, false);
-        }
         _scheduler.Schedule(10900ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_FROST_SHOCK);
@@ -438,7 +439,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
+            me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS);
         }
     }
 
@@ -488,12 +489,8 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         summons.Summon(summon);
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
-        {
-            karathress->Attack(who, false);
-        }
         _scheduler.Schedule(27900ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_WATER_BOLT_VOLLEY);
@@ -520,7 +517,7 @@ struct boss_fathomguard_caribdis : public ScriptedAI
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
-            me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
+            me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS);
         }
     }
 

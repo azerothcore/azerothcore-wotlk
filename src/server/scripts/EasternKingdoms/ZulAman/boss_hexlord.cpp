@@ -289,6 +289,9 @@ public:
             ResetTimer = 5000;
 
             SpawnAdds();
+
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 46916);
+            me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -360,7 +363,7 @@ public:
                 Creature* creature = (ObjectAccessor::GetCreature((*me), AddGUID[i]));
                 if (!creature || !creature->IsAlive())
                 {
-                    if (creature) creature->setDeathState(DeathState::Dead);
+                    if (creature) creature->setDeathState(DEAD);
                     creature = me->SummonCreature(AddEntry[i], Pos_X[i], POS_Y, POS_Z, ORIENT, TEMPSUMMON_DEAD_DESPAWN, 0);
                     if (creature) AddGUID[i] = creature->GetGUID();
                 }

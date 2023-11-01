@@ -199,25 +199,23 @@ namespace Movement
         return length;
     }
 
-    void SplineBase::init_spline(const Vector3* controls, index_type count, EvaluationMode m, float orientation)
+    void SplineBase::init_spline(const Vector3* controls, index_type count, EvaluationMode m)
     {
         m_mode = m;
         cyclic = false;
-        initialOrientation = orientation;
 
-        (this->*initializers[m_mode])(controls, count, 0);
+        (this->*initializers[m_mode])(controls, count, cyclic, 0);
     }
 
-    void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point, float orientation)
+    void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point)
     {
         m_mode = m;
         cyclic = true;
-        initialOrientation = orientation;
 
-        (this->*initializers[m_mode])(controls, count, cyclic_point);
+        (this->*initializers[m_mode])(controls, count, cyclic, cyclic_point);
     }
 
-    void SplineBase::InitLinear(const Vector3* controls, index_type count, index_type cyclic_point)
+    void SplineBase::InitLinear(const Vector3* controls, index_type count, bool cyclic, index_type cyclic_point)
     {
         ASSERT(count >= 2);
         const int real_size = count + 1;
@@ -237,7 +235,7 @@ namespace Movement
         index_hi = cyclic ? count : (count - 1);
     }
 
-    void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, index_type cyclic_point)
+    void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool cyclic, index_type cyclic_point)
     {
         const int real_size = count + (cyclic ? (1 + 2) : (1 + 1));
 
@@ -255,14 +253,14 @@ namespace Movement
             if (cyclic_point == 0)
                 points[0] = controls[count - 1];
             else
-                points[0] = controls[0] - G3D::Vector3{ std::cos(initialOrientation), std::sin(initialOrientation), 0.0f };
+                points[0] = controls[0].lerp(controls[1], -1);
 
             points[high_index + 1] = controls[cyclic_point];
             points[high_index + 2] = controls[cyclic_point + 1];
         }
         else
         {
-            points[0] = controls[0] - G3D::Vector3{ std::cos(initialOrientation), std::sin(initialOrientation), 0.0f };
+            points[0] = controls[0].lerp(controls[1], -1);
             points[high_index + 1] = controls[count - 1];
         }
 
@@ -270,7 +268,7 @@ namespace Movement
         index_hi = high_index + (cyclic ? 1 : 0);
     }
 
-    void SplineBase::InitBezier3(const Vector3* controls, index_type count, index_type /*cyclic_point*/)
+    void SplineBase::InitBezier3(const Vector3* controls, index_type count, bool /*cyclic*/, index_type /*cyclic_point*/)
     {
         index_type c = count / 3u * 3u;
         index_type t = c / 3u;

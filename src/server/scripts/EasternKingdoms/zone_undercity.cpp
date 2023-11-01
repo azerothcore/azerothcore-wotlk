@@ -1300,7 +1300,7 @@ public:
                     {
                         khanokGUID = temp->GetGUID();
                         if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
-                            khanok->setDeathState(DeathState::JustDied);
+                            khanok->setDeathState(JUST_DIED);
                     }
                     if (Unit* temp = me->SummonCreature(NPC_PUTRESS, AllianceSpawn[12].x, AllianceSpawn[12].y, AllianceSpawn[12].z, TEMPSUMMON_MANUAL_DESPAWN))
                     {

@@ -264,7 +264,7 @@ public:
                                 EnsureGridLoaded();
                                 thrall->SetVisible(false);
                                 Reposition(thrall);
-                                thrall->setDeathState(DeathState::Dead);
+                                thrall->setDeathState(DEAD);
                                 thrall->Respawn();
                                 thrall->SetVisible(true);
                                 SaveToDB();

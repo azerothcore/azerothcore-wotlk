@@ -646,7 +646,7 @@ public:
                         {
                             deathbringer->CastSpell(me, SPELL_RIDE_VEHICLE, true);
                             deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            deathbringer->setDeathState(DeathState::Alive);
+                            deathbringer->setDeathState(ALIVE);
                         }
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 4000);

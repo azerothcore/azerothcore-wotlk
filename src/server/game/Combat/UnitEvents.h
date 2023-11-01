@@ -92,13 +92,27 @@ private:
     };
     ThreatMgr* iThreatMgr;
 public:
-    ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = nullptr; }
+    ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iFValue(0.f), iThreatMgr(nullptr)
+    {
+        iHostileReference = nullptr;
+    }
 
-    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iFValue(0.f), iThreatMgr(nullptr)
+    {
+        iHostileReference = pHostileReference;
+    }
 
-    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, float pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; iFValue = pValue; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, float pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr)
+    {
+        iHostileReference = pHostileReference;
+        iFValue = pValue;
+    }
 
-    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; iBValue = pValue; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr)
+    {
+        iHostileReference = pHostileReference;
+        iBValue = pValue;
+    }
 
     [[nodiscard]] int32 getIValue() const { return iIValue; }
 

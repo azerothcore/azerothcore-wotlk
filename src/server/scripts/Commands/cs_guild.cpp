@@ -25,7 +25,12 @@ EndScriptData */
 #include "Chat.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Language.h"
 #include "ScriptMgr.h"
+
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 using namespace Acore::ChatCommands;
 
@@ -38,38 +43,50 @@ public:
     {
         static ChatCommandTable guildCommandTable =
         {
-            { "create",     HandleGuildCreateCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "delete",     HandleGuildDeleteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "invite",     HandleGuildInviteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "uninvite",   HandleGuildUninviteCommand, SEC_GAMEMASTER, Console::Yes },
-            { "rank",       HandleGuildRankCommand,     SEC_GAMEMASTER, Console::Yes },
-            { "rename",     HandleGuildRenameCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "info",       HandleGuildInfoCommand,     SEC_GAMEMASTER, Console::Yes }
+            { "create",         SEC_GAMEMASTER,     true,  &HandleGuildCreateCommand,           "" },
+            { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "" },
+            { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "" },
+            { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "" },
+            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
+            { "rename",         SEC_GAMEMASTER,     true,  &HandleGuildRenameCommand,           "" },
+            { "info",           SEC_GAMEMASTER,     true,  &HandleGuildInfoCommand,             "" }
         };
         static ChatCommandTable commandTable =
         {
-            { "guild", guildCommandTable }
+            { "guild",          SEC_GAMEMASTER,  true, nullptr,                                 "", guildCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    /** \brief GM command level 3 - Create a guild.
+     *
+     * This command allows a GM (level 3) to create a guild.
+     *
+     * The "args" parameter contains the name of the guild leader
+     * and then the name of the guild.
+     *
+     */
+    static bool HandleGuildCreateCommand(ChatHandler* handler, char const* args)
     {
-        if (!target)
-        {
-            target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
-
-        if (!target || !target->IsConnected())
-        {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+        if (!*args)
             return false;
-        }
 
-        Player* playerTarget = target->GetConnectedPlayer();
+        // if not guild name only (in "") then player name
+        Player* target;
+        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, &target))
+            return false;
 
-        if (playerTarget->GetGuildId())
+        char* tailStr = *args != '"' ? strtok(nullptr, "") : (char*)args;
+        if (!tailStr)
+            return false;
+
+        char* guildStr = handler->extractQuotedArg(tailStr);
+        if (!guildStr)
+            return false;
+
+        std::string guildName = guildStr;
+
+        if (target->GetGuildId())
         {
             handler->SendSysMessage(LANG_PLAYER_IN_GUILD);
             handler->SetSentErrorMessage(true);
@@ -91,7 +108,7 @@ public:
         }
 
         Guild* guild = new Guild;
-        if (!guild->Create(playerTarget, guildName))
+        if (!guild->Create(target, guildName))
         {
             delete guild;
             handler->SendSysMessage(LANG_GUILD_NOT_CREATED);
@@ -104,12 +121,16 @@ public:
         return true;
     }
 
-    static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
+    static bool HandleGuildDeleteCommand(ChatHandler* handler, char const* args)
     {
-        if (guildName.empty())
-        {
+        if (!*args)
             return false;
-        }
+
+        char* guildStr = handler->extractQuotedArg((char*)args);
+        if (!guildStr)
+            return false;
+
+        std::string guildName = guildStr;
 
         Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
         if (!targetGuild)
@@ -121,41 +142,41 @@ public:
         return true;
     }
 
-    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildInviteCommand(ChatHandler* handler, char const* args)
     {
-        if (!target)
-        {
-            target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
-
-        if (!target)
-        {
+        if (!*args)
             return false;
-        }
 
+        // if not guild name only (in "") then player name
+        ObjectGuid targetGuid;
+        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, nullptr, &targetGuid))
+            return false;
+
+        char* tailStr = *args != '"' ? strtok(nullptr, "") : (char*)args;
+        if (!tailStr)
+            return false;
+
+        char* guildStr = handler->extractQuotedArg(tailStr);
+        if (!guildStr)
+            return false;
+
+        std::string guildName = guildStr;
         Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
         if (!targetGuild)
             return false;
 
         // player's guild membership checked in AddMember before add
-        return targetGuild->AddMember(target->GetGUID());
+        return targetGuild->AddMember(targetGuid);
     }
 
-    static bool HandleGuildUninviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    static bool HandleGuildUninviteCommand(ChatHandler* handler, char const* args)
     {
-        if (!target)
-        {
-            target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
-
-        if (!target)
-        {
+        Player* target;
+        ObjectGuid targetGuid;
+        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
-        }
 
-        Player* playerTarget = target->GetConnectedPlayer();
-
-        uint32 guildId = playerTarget ? playerTarget->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(target->GetGUID());
+        uint32 guildId = target ? target->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(targetGuid);
         if (!guildId)
             return false;
 
@@ -163,7 +184,7 @@ public:
         if (!targetGuild)
             return false;
 
-        targetGuild->DeleteMember(target->GetGUID(), false, true, true);
+        targetGuild->DeleteMember(targetGuid, false, true, true);
         return true;
     }
 
@@ -186,15 +207,26 @@ public:
         return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
-    static bool HandleGuildRenameCommand(ChatHandler* handler, std::string_view oldGuildStr, std::string_view newGuildStr)
+    static bool HandleGuildRenameCommand(ChatHandler* handler, char const* _args)
     {
-        if (!oldGuildStr.empty())
+        if (!*_args)
+            return false;
+
+        char *args = (char *)_args;
+
+        char const* oldGuildStr = handler->extractQuotedArg(args);
+        if (!oldGuildStr)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (newGuildStr.empty())
+        char const* newGuildStr = handler->extractQuotedArg(strtok(nullptr, ""));
+        if (!newGuildStr)
         {
+            handler->SendSysMessage(LANG_INSERT_GUILD_NAME);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -224,40 +256,35 @@ public:
         return true;
     }
 
-    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, std::string_view>> const& guildIdentifier)
+    static bool HandleGuildInfoCommand(ChatHandler* handler, char const* args)
     {
         Guild* guild = nullptr;
 
-        if (guildIdentifier)
+        if (args && args[0] != '\0')
         {
-            if (ObjectGuid::LowType const* guid = std::get_if<ObjectGuid::LowType>(&*guildIdentifier))
-                guild = sGuildMgr->GetGuildById(*guid);
+            if (isNumeric(args))
+                guild = sGuildMgr->GetGuildById(strtoull(args, nullptr, 10));
             else
-                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<std::string_view>());
+                guild = sGuildMgr->GetGuildByName(args);
         }
-        else if (Optional<PlayerIdentifier> target = PlayerIdentifier::FromTargetOrSelf(handler); target && target->IsConnected())
-            guild = target->GetConnectedPlayer()->GetGuild();
+        else if (Player* target = handler->getSelectedPlayerOrSelf())
+            guild = target->GetGuild();
 
         if (!guild)
             return false;
 
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
-
         std::string guildMasterName;
         if (sCharacterCache->GetCharacterNameByGuid(guild->GetLeaderGUID(), guildMasterName))
+        {
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
+        }
 
-        // Format creation date
-        char createdDateStr[20];
-        time_t createdDate = guild->GetCreatedDate();
-        tm localTm;
-        strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", localtime_r(&createdDate, &localTm));
-
-        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date
+        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, Acore::Time::TimeToHumanReadable(Seconds(guild->GetCreatedDate())).c_str()); // Creation Date
         handler->PSendSysMessage(LANG_GUILD_INFO_MEMBER_COUNT, guild->GetMemberCount()); // Number of Members
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
-        handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the Day
+        handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the day
         handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
         return true;
     }

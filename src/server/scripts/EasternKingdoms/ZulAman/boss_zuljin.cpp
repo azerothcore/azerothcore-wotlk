@@ -285,7 +285,7 @@ public:
                     if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
                     {
                         temp->SetVisible(false);
-                        temp->setDeathState(DeathState::Dead);
+                        temp->setDeathState(DEAD);
                     }
                 }
                 SpiritGUID[i].Clear();

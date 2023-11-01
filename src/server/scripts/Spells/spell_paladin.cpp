@@ -80,18 +80,8 @@ enum PaladinSpells
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA    = 63531,
     SPELL_PALADIN_AURA_MASTERY_IMMUNE            = 64364,
 
-    SPELL_JUDGEMENTS_OF_THE_JUST                 = 68055,
-    SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT          = 31804,
-    SPELL_HOLY_VENGEANCE                         = 31803,
-    SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT         = 53733,
-    SPELL_BLOOD_CORRUPTION                       = 53742,
-
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
-
-    // Crystalforge Raiment - Tier 5 Holy 2 Set
-    SPELL_IMPROVED_JUDGEMENT                     = 37188,
-    SPELL_IMPROVED_JUDGEMENT_ENERGIZE            = 43838
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411
 };
 
 enum PaladinSpellIcons
@@ -882,34 +872,9 @@ public:
         GetCaster()->CastSpell(GetHitUnit(), _spellId, true);
         GetCaster()->CastSpell(GetHitUnit(), spellId2, true);
 
-        // Tier 5 Holy - 2 Set
-        if (GetCaster()->HasAura(SPELL_IMPROVED_JUDGEMENT))
-        {
-            GetCaster()->CastSpell(GetCaster(), SPELL_IMPROVED_JUDGEMENT_ENERGIZE, true);
-        }
-
         // Judgement of the Just
         if (GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
-        {
-            if (GetCaster()->CastSpell(GetHitUnit(), SPELL_JUDGEMENTS_OF_THE_JUST, true) && (spellId2 == SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT || spellId2 == SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT))
-            {
-                //hidden effect only cast when spellcast of judgements of the just is succesful
-                GetCaster()->CastSpell(GetHitUnit(), SealApplication(spellId2), true); //add hidden seal apply effect for vengeance and corruption
-            }
-        }
-    }
-
-    uint32 SealApplication(uint32 correspondingSpellId)
-    {
-        switch (correspondingSpellId)
-        {
-            case SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT:
-                return SPELL_HOLY_VENGEANCE;
-            case SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT:
-                return SPELL_BLOOD_CORRUPTION;
-            default:
-                return 0;
-        }
+            GetCaster()->CastSpell(GetHitUnit(), 68055, true);
     }
 
     void Register() override

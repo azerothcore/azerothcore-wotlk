@@ -19,7 +19,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "serpent_shrine.h"
-#include "TaskScheduler.h"
 
 enum Talk
 {
@@ -60,12 +59,18 @@ enum Misc
 
     NPC_GREYHEART_SPELLBINDER           = 21806,
     NPC_SHADOW_OF_LEOTHERAS             = 21875,
-};
 
-enum Groups
-{
-    GROUP_COMBAT                        = 1,
-    GROUP_DEMON                         = 2
+    EVENT_SPELL_BERSERK                 = 1,
+    EVENT_HEALTH_CHECK                  = 2,
+    EVENT_SWITCH_TO_DEMON               = 3,
+    EVENT_SPELL_WHIRLWIND               = 4,
+    EVENT_KILL_TALK                     = 5,
+    EVENT_SWITCH_TO_ELF                 = 6,
+    EVENT_SPELL_INSIDIOUS_WHISPER       = 7,
+    EVENT_SUMMON_DEMON                  = 8,
+    EVENT_RESTORE_FIGHT                 = 9,
+
+    EVENT_SPELL_SHADOW_BOLT             = 20
 };
 
 const Position channelersPos[MAX_CHANNELERS] =
@@ -75,231 +80,267 @@ const Position channelersPos[MAX_CHANNELERS] =
     {362.11f, -437.48f, 29.52f, 0.9f}
 };
 
-struct boss_leotheras_the_blind : public BossAI
+class boss_leotheras_the_blind : public CreatureScript
 {
-    boss_leotheras_the_blind(Creature* creature) : BossAI(creature, DATA_LEOTHERAS_THE_BLIND)
+public:
+    boss_leotheras_the_blind() : CreatureScript("boss_leotheras_the_blind") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
+        return GetSerpentShrineAI<boss_leotheras_the_blindAI>(creature);
     }
 
-    void Reset() override
+    struct boss_leotheras_the_blindAI : public BossAI
     {
-        BossAI::Reset();
-        DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
-        DoCastSelf(SPELL_DUAL_WIELD, true);
-        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-        me->LoadEquipment(0, true);
-        me->SetReactState(REACT_PASSIVE);
-        _recentlySpoken = false;
-        SummonChannelers();
+        boss_leotheras_the_blindAI(Creature* creature) : BossAI(creature, DATA_LEOTHERAS_THE_BLIND)
+        {
+        }
 
-        ScheduleHealthCheckEvent(15, [&]{
-            if (me->GetDisplayId() != me->GetNativeDisplayId())
-            {
-                //is currently in metamorphosis
-                DoResetThreatList();
-                me->LoadEquipment();
-                me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
-
-                scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
-            }
-            scheduler.CancelGroup(GROUP_DEMON);
-            scheduler.DelayAll(10s);
-
+        void Reset() override
+        {
+            BossAI::Reset();
+            me->CastSpell(me, SPELL_CLEAR_CONSUMING_MADNESS, true);
+            me->CastSpell(me, SPELL_DUAL_WIELD, true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->LoadEquipment(0, true);
             me->SetReactState(REACT_PASSIVE);
-            me->GetMotionMaster()->Clear();
-            me->StopMoving();
-            Talk(SAY_FINAL_FORM);
-
-            scheduler.Schedule(4s, [this](TaskContext)
-            {
-                DoCastSelf(SPELL_SUMMON_SHADOW_OF_LEOTHERAS);
-            }).Schedule(6s, [this](TaskContext)
-            {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-            });
-        });
-    }
-
-    void SummonChannelers()
-    {
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
-        DoCastSelf(SPELL_BANISH);
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
-
-        //probably needs a spell instead
-        summons.DespawnAll();
-        for (uint8 i = 0; i < MAX_CHANNELERS; ++i)
-        {
-            me->SummonCreature(NPC_GREYHEART_SPELLBINDER, channelersPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
         }
-    }
 
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        me->SetInCombatWithZone();
-        summons.Despawn(summon);
-        if (summon->GetEntry() == NPC_GREYHEART_SPELLBINDER)
+        void InitializeAI() override
         {
-            if (!summons.HasEntry(NPC_GREYHEART_SPELLBINDER))
-            {
-                me->RemoveAllAuras();
-                me->LoadEquipment();
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                Talk(SAY_AGGRO);
+            BossAI::InitializeAI();
+            SummonChannelers();
+        }
 
-                scheduler.Schedule(10min, [this](TaskContext)
+        void JustReachedHome() override
+        {
+            BossAI::JustReachedHome();
+            SummonChannelers();
+        }
+
+        void SummonChannelers()
+        {
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
+            me->CastSpell(me, SPELL_BANISH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
+
+            summons.DespawnAll();
+            for (uint8 i = 0; i < MAX_CHANNELERS; ++i)
+                me->SummonCreature(NPC_GREYHEART_SPELLBINDER, channelersPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        }
+
+        void MoveInLineOfSight(Unit*  /*who*/) override { }
+
+        void JustSummoned(Creature* summon) override
+        {
+            summons.Summon(summon);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit*) override
+        {
+            me->SetInCombatWithZone();
+            summons.Despawn(summon);
+            if (summon->GetEntry() == NPC_GREYHEART_SPELLBINDER)
+                if (!summons.HasEntry(NPC_GREYHEART_SPELLBINDER))
                 {
-                    DoCastSelf(SPELL_BERSERK);
-                });
+                    me->RemoveAllAuras();
+                    me->LoadEquipment();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    Talk(SAY_AGGRO);
 
-                ElfTime();
+                    events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
+                    events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
+                    events.ScheduleEvent(EVENT_SWITCH_TO_DEMON, 55000);
+                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 10000);
+                }
+        }
+
+        void KilledUnit(Unit*  /*victim*/) override
+        {
+            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            {
+                Talk(me->GetDisplayId() != me->GetNativeDisplayId() ? SAY_DEMON_SLAY : SAY_NIGHTELF_SLAY);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
             }
         }
-    }
 
-    void ElfTime()
-    {
-        scheduler.Schedule(25050ms, 32550ms, GROUP_COMBAT, [this](TaskContext context)
+        void JustDied(Unit* killer) override
         {
-            DoCastSelf(SPELL_WHIRLWIND);
-            context.Repeat(30250ms, 34900ms);
-        }).Schedule(60350ms, GROUP_DEMON, [this](TaskContext)
-        {
-            DoResetThreatList();
-            Talk(SAY_SWITCH_TO_DEMON);
-            DemonTime();
-        });
-    }
-
-    void DemonTime()
-    {
-        me->LoadEquipment(0, true);
-        me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
-        DoCastSelf(SPELL_METAMORPHOSIS, true);
-
-        scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
-        {
-            Talk(SAY_INNER_DEMONS);
-            me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
-        }).Schedule(60s, [this](TaskContext)
-        {
-            DoResetThreatList();
-            me->LoadEquipment();
-            me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
-            me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
-            ElfTime();
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        if (me->GetDisplayId() == me->GetNativeDisplayId())
-        {
-            DoMeleeAttackIfReady();
+            me->CastSpell(me, SPELL_CLEAR_CONSUMING_MADNESS, true);
+            Talk(SAY_DEATH);
+            BossAI::JustDied(killer);
         }
-        else if (me->isAttackReady(BASE_ATTACK))
+
+        void JustEngagedWith(Unit* who) override
         {
-            me->CastSpell(me->GetVictim(), SPELL_CHAOS_BLAST, false);
-            me->setAttackTimer(BASE_ATTACK, 2000);
+            BossAI::JustEngagedWith(who);
+            me->SetStandState(UNIT_STAND_STATE_KNEEL);
         }
-    }
-private:
-    bool _recentlySpoken;
+
+        void AttackStart(Unit* who) override
+        {
+            if (who && me->Attack(who, true))
+                me->GetMotionMaster()->MoveChase(who, me->GetDisplayId() == me->GetNativeDisplayId() ? 0.0f : 25.0f);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_BERSERK:
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_HEALTH_CHECK:
+                    if (me->HealthBelowPct(15))
+                    {
+                        if (me->GetDisplayId() != me->GetNativeDisplayId())
+                        {
+                            DoResetThreatList();
+                            me->LoadEquipment();
+                            me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+                            events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 10000);
+                        }
+                        events.CancelEvent(EVENT_SWITCH_TO_DEMON);
+                        events.CancelEvent(EVENT_SPELL_INSIDIOUS_WHISPER);
+                        events.DelayEvents(10000);
+                        events.ScheduleEvent(EVENT_SUMMON_DEMON, 4000);
+                        events.ScheduleEvent(EVENT_RESTORE_FIGHT, 6000);
+                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->GetMotionMaster()->Clear();
+                        me->StopMoving();
+                        Talk(SAY_FINAL_FORM);
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
+                    break;
+                case EVENT_SWITCH_TO_DEMON:
+                    DoResetThreatList();
+                    Talk(SAY_SWITCH_TO_DEMON);
+                    me->LoadEquipment(0, true);
+                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
+                    me->CastSpell(me, SPELL_METAMORPHOSIS, true);
+
+                    events.CancelEvent(EVENT_SPELL_WHIRLWIND);
+                    events.ScheduleEvent(EVENT_SPELL_INSIDIOUS_WHISPER, 25000);
+                    events.ScheduleEvent(EVENT_SWITCH_TO_ELF, 60000);
+                    break;
+                case EVENT_SWITCH_TO_ELF:
+                    DoResetThreatList();
+                    me->LoadEquipment();
+                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
+                    me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+                    events.ScheduleEvent(EVENT_SWITCH_TO_DEMON, 55000);
+                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 10000);
+                    break;
+                case EVENT_SPELL_WHIRLWIND:
+                    me->CastSpell(me, SPELL_WHIRLWIND, false);
+                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 27000);
+                    break;
+                case EVENT_SPELL_INSIDIOUS_WHISPER:
+                    Talk(SAY_INNER_DEMONS);
+                    me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
+                    break;
+                case EVENT_SUMMON_DEMON:
+                    me->CastSpell(me, SPELL_SUMMON_SHADOW_OF_LEOTHERAS, true);
+                    break;
+                case EVENT_RESTORE_FIGHT:
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    break;
+            }
+
+            if (me->GetDisplayId() == me->GetNativeDisplayId())
+                DoMeleeAttackIfReady();
+            else if (me->isAttackReady(BASE_ATTACK))
+            {
+                me->CastSpell(me->GetVictim(), SPELL_CHAOS_BLAST, false);
+                me->setAttackTimer(BASE_ATTACK, 2000);
+            }
+        }
+    };
 };
 
-struct npc_inner_demon : public ScriptedAI
+class npc_inner_demon : public CreatureScript
 {
-    npc_inner_demon(Creature* creature) : ScriptedAI(creature)
-    {
-        _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
+public:
+    npc_inner_demon() : CreatureScript("npc_inner_demon") { }
 
-        _instance = creature->GetInstanceScript();
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetSerpentShrineAI<npc_inner_demonAI>(creature);
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
+    struct npc_inner_demonAI : public ScriptedAI
     {
-        me->DespawnOrUnsummon(1);
-    }
-
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        if (!summoner)
-            return;
-
-        _scheduler.CancelAll();
-        _scheduler.Schedule(4s, [this](TaskContext context)
+        npc_inner_demonAI(Creature* creature) : ScriptedAI(creature)
         {
-            DoCastVictim(SPELL_SHADOW_BOLT);
-            context.Repeat(6s);
-        });
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
-        {
-            leotheras->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
-    }
 
-    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        ObjectGuid ownerGUID;
+        EventMap events;
+
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            if (!who || who->GetGUID() != leotheras->GetGUID())
-            {
+            me->DespawnOrUnsummon(1);
+        }
+
+        void IsSummonedBy(WorldObject* summoner) override
+        {
+            if (!summoner)
+                return;
+
+            ownerGUID = summoner->GetGUID();
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 4000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, ownerGUID))
+                unit->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
+        }
+
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (!who || who->GetGUID() != ownerGUID)
                 damage = 0;
+        }
+
+        bool CanAIAttack(Unit const* who) const override
+        {
+            return who->GetGUID() == ownerGUID;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_SHADOW_BOLT:
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 6000);
+                    break;
             }
+
+            DoMeleeAttackIfReady();
         }
-    }
-
-    bool CanAIAttack(Unit const* who) const override
-    {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
-        {
-            return who->GetGUID() == leotheras->GetGUID();
-        }
-        return false;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        _scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-private:
-    TaskScheduler _scheduler;
-    InstanceScript* _instance;
+    };
 };
 
 class spell_leotheras_whirlwind : public SpellScriptLoader
@@ -475,8 +516,8 @@ public:
 
 void AddSC_boss_leotheras_the_blind()
 {
-    RegisterSerpentShrineAI(boss_leotheras_the_blind);
-    RegisterSerpentShrineAI(npc_inner_demon);
+    new boss_leotheras_the_blind();
+    new npc_inner_demon();
     new spell_leotheras_whirlwind();
     new spell_leotheras_chaos_blast();
     new spell_leotheras_insidious_whisper();

@@ -225,9 +225,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         break;
                 }
             }
-            // Overwritten by SPELL_AURA_MOD_LANGUAGE auras (Affects only Say and Yell)
+            // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
             Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
-            if (!ModLangAuras.empty() && (type == CHAT_MSG_SAY || type == CHAT_MSG_YELL))
+            if (!ModLangAuras.empty())
                 lang = ModLangAuras.front()->GetMiscValue();
         }
 
@@ -407,6 +407,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
+                if (!sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, receiver))
+                {
+                    return;
+                }
+
+                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, receiver);
+
                 GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
@@ -451,6 +458,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
 
                         guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg);
                     }
                 }
             }

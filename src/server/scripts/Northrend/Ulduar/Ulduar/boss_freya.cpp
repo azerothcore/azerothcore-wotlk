@@ -1109,7 +1109,7 @@ public:
         {
             if (_isTrio && param == ACTION_RESPAWN_TRIO)
             {
-                me->setDeathState(DeathState::JustRespawned);
+                me->setDeathState(JUST_RESPAWNED);
                 Reset();
             }
         }

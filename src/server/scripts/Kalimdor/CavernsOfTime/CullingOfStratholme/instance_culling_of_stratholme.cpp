@@ -224,7 +224,7 @@ public:
                     if (!arthas->IsAlive())
                     {
                         EnsureGridLoaded();
-                        arthas->setDeathState(DeathState::Dead);
+                        arthas->setDeathState(DEAD);
                         arthas->Respawn();
                     }
                     else

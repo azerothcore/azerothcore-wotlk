@@ -301,6 +301,9 @@ void Creature::RemoveFromWorld()
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
 
+        if (Transport* transport = GetTransport())
+            transport->RemovePassenger(this, true);
+
         Unit::RemoveFromWorld();
 
         if (m_spawnId)
@@ -316,7 +319,7 @@ void Creature::DisappearAndDie()
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
     if (IsAlive())
-        setDeathState(DeathState::JustDied, true);
+        setDeathState(JUST_DIED, true);
     RemoveCorpse(false, true);
 }
 
@@ -342,11 +345,11 @@ void Creature::SearchFormation()
 
 void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
 {
-    if (getDeathState() != DeathState::Corpse)
+    if (getDeathState() != CORPSE)
         return;
 
     m_corpseRemoveTime = GameTime::GetGameTime().count();
-    setDeathState(DeathState::Dead);
+    setDeathState(DEAD);
     RemoveAllAuras();
     if (!skipVisibility) // pussywizard
         DestroyForNearbyPlayers(); // pussywizard: previous UpdateObjectVisibility()
@@ -362,15 +365,17 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
         //SaveRespawnTime();
     }
 
+    float x, y, z, o;
+    GetRespawnPosition(x, y, z, &o);
+    SetHomePosition(x, y, z, o);
+    SetPosition(x, y, z, o);
+
+    // xinef: relocate notifier
+    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+
     // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
     if (IsFalling())
         StopMoving();
-
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    UpdateAllowedPositionZ(x, y, z);
-    SetHomePosition(x, y, z, o);
-    GetMap()->CreatureRelocation(this, x, y, z, o);
 }
 
 /**
@@ -532,7 +537,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
-    float armor = stats->GenerateArmor(cInfo);
+    float armor = (float)stats->GenerateArmor(cInfo); /// @todo: Why is this treated as uint32 when it's a float?
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
     SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
     SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
@@ -575,12 +580,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    SetDetectionDistance(cInfo->detection_range);
-
-    // Update movement
-    if (IsRooted())
+    if (GetMovementTemplate().IsRooted())
+    {
         SetControlled(true, UNIT_STATE_ROOT);
-    UpdateMovementFlags();
+    }
+
+    SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
 
@@ -604,15 +609,15 @@ void Creature::Update(uint32 diff)
 
     switch (m_deathState)
     {
-        case DeathState::JustRespawned:
+        case JUST_RESPAWNED:
             // Must not be called, see Creature::setDeathState JUST_RESPAWNED -> ALIVE promoting.
-            LOG_ERROR("entities.unit", "Creature ({}) in wrong state: DeathState::JustRespawned (4)", GetGUID().ToString());
+            LOG_ERROR("entities.unit", "Creature ({}) in wrong state: JUST_RESPAWNED (4)", GetGUID().ToString());
             break;
-        case DeathState::JustDied:
+        case JUST_DIED:
             // Must not be called, see Creature::setDeathState JUST_DIED -> CORPSE promoting.
-            LOG_ERROR("entities.unit", "Creature ({}) in wrong state: DeathState::JustDead (1)", GetGUID().ToString());
+            LOG_ERROR("entities.unit", "Creature ({}) in wrong state: JUST_DEAD (1)", GetGUID().ToString());
             break;
-        case DeathState::Dead:
+        case DEAD:
         {
             time_t now = GameTime::GetGameTime().count();
             if (m_respawnTime <= now)
@@ -654,11 +659,11 @@ void Creature::Update(uint32 diff)
             }
             break;
         }
-        case DeathState::Corpse:
+        case CORPSE:
         {
             Unit::Update(diff);
             // deathstate changed on spells update, prevent problems
-            if (m_deathState != DeathState::Corpse)
+            if (m_deathState != CORPSE)
                 break;
 
             if (m_groupLootTimer && lootingGroupLowGUID)
@@ -683,7 +688,7 @@ void Creature::Update(uint32 diff)
             }
             break;
         }
-        case DeathState::Alive:
+        case ALIVE:
         {
             Unit::Update(diff);
 
@@ -1378,6 +1383,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         m_spawnId = sObjectMgr->GenerateCreatureSpawnId();
 
     CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_spawnId);
+    data.spawnId = m_spawnId;
 
     uint32 displayId = GetNativeDisplayId();
     uint32 npcflag = GetNpcFlags();
@@ -1483,9 +1489,6 @@ void Creature::SelectLevel(bool changelevel)
     uint8 minlevel = std::min(cInfo->maxlevel, cInfo->minlevel);
     uint8 maxlevel = std::max(cInfo->maxlevel, cInfo->minlevel);
     uint8 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
-
-    sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
-
     if (changelevel)
         SetLevel(level);
 
@@ -1720,12 +1723,12 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     m_wanderDistance = data->wander_distance;
 
     m_respawnDelay = data->spawntimesecs;
-    m_deathState = DeathState::Alive;
+    m_deathState = ALIVE;
 
     m_respawnTime  = GetMap()->GetCreatureRespawnTime(m_spawnId);
     if (m_respawnTime)                          // respawn on Update
     {
-        m_deathState = DeathState::Dead;
+        m_deathState = DEAD;
         if (CanFly())
         {
             float tz = map->GetHeight(GetPhaseMask(), data->posX, data->posY, data->posZ, true, MAX_FALL_DISTANCE);
@@ -1755,7 +1758,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     }
 
-    SetHealth(m_deathState == DeathState::Alive ? curhealth : 0);
+    SetHealth(m_deathState == ALIVE ? curhealth : 0);
 
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
@@ -1823,25 +1826,7 @@ void Creature::DeleteFromDB()
         return;
     }
 
-    CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
-    if (!data)
-        return;
-
-    CharacterDatabaseTransaction charTrans = CharacterDatabase.BeginTransaction();
-
-    sMapMgr->DoForAllMapsWithMapId(data->mapid,
-        [this, charTrans](Map* map) -> void
-        {
-            // despawn all active creatures, and remove their respawns
-            std::vector<Creature*> toUnload;
-            for (auto const& pair : Acore::Containers::MapEqualRange(map->GetCreatureBySpawnIdStore(), m_spawnId))
-                toUnload.push_back(pair.second);
-            for (Creature* creature : toUnload)
-                map->AddObjectToRemoveList(creature);
-            map->RemoveCreatureRespawnTime(m_spawnId);
-        }
-    );
-
+    GetMap()->RemoveCreatureRespawnTime(m_spawnId);
     sObjectMgr->DeleteCreatureData(m_spawnId);
 
     WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
@@ -1950,7 +1935,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
 {
     Unit::setDeathState(s, despawn);
 
-    if (s == DeathState::JustDied)
+    if (s == JUST_DIED)
     {
         _lastDamagedTime.reset();
 
@@ -1984,9 +1969,9 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (needsFalling)
             GetMotionMaster()->MoveFall(0, true);
 
-        Unit::setDeathState(DeathState::Corpse, despawn);
+        Unit::setDeathState(CORPSE, despawn);
     }
-    else if (s == DeathState::JustRespawned)
+    else if (s == JUST_RESPAWNED)
     {
         //if (IsPet())
         //    setActive(true);
@@ -2008,7 +1993,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
-        Unit::setDeathState(DeathState::Alive, despawn);
+        Unit::setDeathState(ALIVE, despawn);
 
         Motion_Initialize();
         LoadCreaturesAddon(true);
@@ -2024,14 +2009,14 @@ void Creature::Respawn(bool force)
     if (force)
     {
         if (IsAlive())
-            setDeathState(DeathState::JustDied);
-        else if (getDeathState() != DeathState::Corpse)
-            setDeathState(DeathState::Corpse);
+            setDeathState(JUST_DIED);
+        else if (getDeathState() != CORPSE)
+            setDeathState(CORPSE);
     }
 
     RemoveCorpse(false, false);
 
-    if (getDeathState() == DeathState::Dead)
+    if (getDeathState() == DEAD)
     {
         if (m_spawnId)
         {
@@ -2059,7 +2044,7 @@ void Creature::Respawn(bool force)
         loot.clear();
         SelectLevel();
 
-        setDeathState(DeathState::JustRespawned);
+        setDeathState(JUST_RESPAWNED);
 
         // MDic - Acidmanifesto
         // Do not override transform auras
@@ -2093,7 +2078,9 @@ void Creature::Respawn(bool force)
         m_respawnedTime = GameTime::GetGameTime().count();
     }
     m_respawnedTime = GameTime::GetGameTime().count();
-    UpdateObjectVisibility();
+    // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
+    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+    UpdateObjectVisibility(false);
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
@@ -2106,7 +2093,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     }
 
     if (IsAlive())
-        setDeathState(DeathState::JustDied, true);
+        setDeathState(JUST_DIED, true);
 
     // Xinef: set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
@@ -2766,14 +2753,6 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     return false;
 }
 
-void Creature::ClearProhibitedSpellTimers()
-{
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-    {
-        m_ProhibitSchoolTime[i] = 0;
-    }
-}
-
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)
 {
     CreatureSpellCooldown spellCooldown;
@@ -3075,7 +3054,10 @@ std::string const& Creature::GetNameForLocaleIdx(LocaleConstant loc_idx) const
 
 void Creature::SetPosition(float x, float y, float z, float o)
 {
-    UpdatePosition(x, y, z, o, false);
+    if (!Acore::IsValidMapCoord(x, y, z, o))
+        return;
+
+    GetMap()->CreatureRelocation(this, x, y, z, o);
 }
 
 bool Creature::IsDungeonBoss() const
@@ -3128,7 +3110,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
         return true;
     }
 
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
+    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !GetMovementTemplate().IsRooted())
     {
         if (IsLevitating())
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
@@ -3277,7 +3259,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/, bool updateAni
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
 
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
+    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !GetMovementTemplate().IsRooted())
     {
         if (IsLevitating())
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
@@ -3557,7 +3539,7 @@ bool Creature::IsMovementPreventedByCasting() const
 void Creature::SetCannotReachTarget(ObjectGuid const& cannotReach)
 {
     if (cannotReach == m_cannotReachTarget)
-    {
+{
         return;
     }
 

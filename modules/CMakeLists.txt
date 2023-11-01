@@ -37,6 +37,7 @@ set("AC_MODULE_LIST" "")
 set("AC_SCRIPTS_LIST" "")
 set(MOD_ELUNA_FOUND 0)
 set(MOD_ELUNA_PATH "")
+set(MOD_ACBOTS_FOUND 0)
 
 foreach(include ${AC_ADD_SCRIPTS_INCLUDE})
   set("AC_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AC_SCRIPTS_INCLUDES}")
@@ -79,6 +80,16 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
   # Use only static for mod-eluna
   if (SOURCE_MODULE MATCHES "mod-eluna")
     ConfigureElunaModule(${SOURCE_MODULE})
+  endif()
+
+  if (SOURCE_MODULE MATCHES "mod-acbots")
+    set(MOD_ACBOTS_FOUND 1)
+    target_compile_options(database
+      PRIVATE
+        -DMOD_ACBOTS)
+    target_compile_options(game-interface
+      INTERFACE
+        -DMOD_ACBOTS)
   endif()
 
   # Build the Graph values
@@ -280,6 +291,7 @@ add_library(modules STATIC
 target_link_libraries(modules
   PRIVATE
     acore-core-interface
+    mysql
   PUBLIC
     game-interface)
 
@@ -352,6 +364,12 @@ target_compile_options(modules
 target_compile_options(modules
   INTERFACE
     -DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
+
+if (MOD_ACBOTS_FOUND)
+  target_compile_options(modules
+      PRIVATE
+        -DMOD_ACBOTS)
+endif()
 
 if (MOD_ELUNA_FOUND)
   if (APPLE)

@@ -1257,7 +1257,7 @@ public:
     {
         if (spell->Id == SPELL_REVIVE_CHAMPION && !IsUndead)
         {
-            me->setDeathState(DeathState::JustRespawned);
+            me->setDeathState(JUST_RESPAWNED);
             uint32 newEntry = 0;
             switch (me->GetEntry())
             {

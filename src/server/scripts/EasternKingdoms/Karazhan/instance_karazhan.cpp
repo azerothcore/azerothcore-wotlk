@@ -48,12 +48,6 @@ ObjectData const creatureData[] =
     { 0,                        0              }
 };
 
-ObjectData const gameObjectData[] =
-{
-    { GO_SIDE_ENTRANCE_DOOR, DATA_GO_SIDE_ENTRANCE_DOOR },
-    { 0,                     0                          }
-};
-
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -70,7 +64,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
-            LoadObjectData(creatureData, gameObjectData);
+            LoadObjectData(creatureData, nullptr);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -265,7 +259,7 @@ public:
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
                             piece->RemoveAllAuras();
-                            piece->setDeathState(DeathState::JustRespawned);
+                            piece->setDeathState(JUST_RESPAWNED);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
@@ -306,11 +300,13 @@ public:
                     {
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
+                        if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
+                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, true);
+                        HandleGameObject(m_uiStageDoorLeftGUID, false);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
@@ -376,10 +372,11 @@ public:
                     MastersTerraceDoor[1] = go->GetGUID();
                     break;
                 case GO_SIDE_ENTRANCE_DOOR:
+                    m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    else
                         go->SetGameObjectFlag(GO_FLAG_LOCKED);
+                    else
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -480,6 +477,8 @@ public:
                     return m_uiLibraryDoor;
                 case DATA_GO_MASSIVE_DOOR:
                     return m_uiMassiveDoor;
+                case DATA_GO_SIDE_ENTRANCE_DOOR:
+                    return m_uiSideEntranceDoor;
                 case DATA_GO_GAME_DOOR:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
@@ -520,6 +519,7 @@ public:
         ObjectGuid m_uiNightBaneGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
+        ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar

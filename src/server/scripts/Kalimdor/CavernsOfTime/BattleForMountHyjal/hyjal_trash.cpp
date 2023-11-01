@@ -584,7 +584,7 @@ public:
             {
                 if ((faction == 0 && LastOverronPos == 17) || (faction == 1 && LastOverronPos == 21))
                 {
-                    me->setDeathState(DeathState::Dead);
+                    me->setDeathState(DEAD);
                     me->RemoveCorpse();
                 }
             }
@@ -685,7 +685,7 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK_UNARMED);
                 if ((faction == 0 && LastOverronPos == 17) || (faction == 1 && LastOverronPos == 21))
                 {
-                    me->setDeathState(DeathState::Dead);
+                    me->setDeathState(DEAD);
                     me->RemoveCorpse();
                 }
             }

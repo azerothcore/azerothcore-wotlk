@@ -325,7 +325,7 @@ public:
 
             if (id == 0)
             {
-                me->setDeathState(DeathState::JustDied);
+                me->setDeathState(JUST_DIED);
                 me->RemoveCorpse();
                 me->SetHealth(0);
             }

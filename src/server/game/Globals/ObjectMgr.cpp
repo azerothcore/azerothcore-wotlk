@@ -591,7 +591,7 @@ void ObjectMgr::LoadCreatureTemplates()
                          "ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, "
 //                        64            65          66           67                    68                        69           70
                          "RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
-                         "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
+                         "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId;");
 
     if (!result)
     {
@@ -600,7 +600,6 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     _creatureTemplateStore.rehash(result->GetRowCount());
-    _creatureTemplateStoreFast.clear();
 
     uint32 count = 0;
     do
@@ -610,7 +609,20 @@ void ObjectMgr::LoadCreatureTemplates()
         ++count;
     } while (result->NextRow());
 
-    sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
+    // pussywizard:
+    {
+        uint32 max = 0;
+        for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+            if (itr->first > max)
+                max = itr->first;
+        if (max)
+        {
+            _creatureTemplateStoreFast.clear();
+            _creatureTemplateStoreFast.resize(max + 1, nullptr);
+            for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+                _creatureTemplateStoreFast[itr->first] = &(itr->second);
+        }
+    }
 
     LoadCreatureTemplateResistances();
     LoadCreatureTemplateSpells();
@@ -626,28 +638,12 @@ void ObjectMgr::LoadCreatureTemplates()
     LOG_INFO("server.loading", " ");
 }
 
-/**
-* @brief Loads a creature template from a database result
-*
-* @param fields Database result
-* @param triggerHook If true, will trigger the OnAfterDatabaseLoadCreatureTemplates hook. Useful if you are not calling the hook yourself.
-*/
-void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
+void ObjectMgr::LoadCreatureTemplate(Field* fields)
 {
     uint32 entry = fields[0].Get<uint32>();
 
     CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
 
-    // enlarge the fast cache as necessary
-    if (_creatureTemplateStoreFast.size() < entry + 1)
-    {
-        _creatureTemplateStoreFast.resize(entry + 1, nullptr);
-    }
-
-    // load a pointer to this creatureTemplate into the fast cache
-    _creatureTemplateStoreFast[entry] = &creatureTemplate;
-
-    // build the creatureTemplate
     creatureTemplate.Entry = entry;
 
     for (uint8 i = 0; i < MAX_DIFFICULTY - 1; ++i)
@@ -754,13 +750,6 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     creatureTemplate.SpellSchoolImmuneMask = fields[68].Get<uint8>();
     creatureTemplate.flags_extra           = fields[69].Get<uint32>();
     creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
-
-    // useful if the creature template load is being triggered from outside this class
-    if (triggerHook)
-    {
-        sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
-    }
-
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -7687,8 +7676,8 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
 
     _repSpilloverTemplateStore.clear();                      // for reload case
 
-    uint32 count = 0; //                                0         1        2       3        4       5       6         7        8      9        10       11     12        13       14      15       16       17     18
-    QueryResult result = WorldDatabase.Query("SELECT faction, faction1, rate_1, rank_1, faction2, rate_2, rank_2, faction3, rate_3, rank_3, faction4, rate_4, rank_4, faction5, rate_5, rank_5, faction6, rate_6, rank_6 FROM reputation_spillover_template");
+    uint32 count = 0; //                                0         1        2       3        4       5       6         7        8      9        10       11     12
+    QueryResult result = WorldDatabase.Query("SELECT faction, faction1, rate_1, rank_1, faction2, rate_2, rank_2, faction3, rate_3, rank_3, faction4, rate_4, rank_4 FROM reputation_spillover_template");
 
     if (!result)
     {
@@ -7717,12 +7706,6 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         repTemplate.faction[3]          = fields[10].Get<uint16>();
         repTemplate.faction_rate[3]     = fields[11].Get<float>();
         repTemplate.faction_rank[3]     = fields[12].Get<uint8>();
-        repTemplate.faction[4]          = fields[13].Get<uint16>();
-        repTemplate.faction_rate[4]     = fields[14].Get<float>();
-        repTemplate.faction_rank[4]     = fields[15].Get<uint8>();
-        repTemplate.faction[5]          = fields[16].Get<uint16>();
-        repTemplate.faction_rate[5]     = fields[17].Get<float>();
-        repTemplate.faction_rank[5]     = fields[18].Get<uint8>();
 
         FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
 

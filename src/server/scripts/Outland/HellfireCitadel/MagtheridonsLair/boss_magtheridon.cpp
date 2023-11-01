@@ -166,7 +166,7 @@ struct boss_magtheridon : public BossAI
         {
             me->CastCustomSpell(SPELL_BLAZE, SPELLVALUE_MAX_TARGETS, 1);
             context.Repeat(11s, 39s);
-        }).Schedule(28300ms, [this](TaskContext context)
+        }).Schedule(40s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_QUAKE);
             _castingQuake = true;
@@ -175,33 +175,29 @@ struct boss_magtheridon : public BossAI
             me->SetOrientation(me->GetAngle(me->GetVictim()));
             me->SetTarget(ObjectGuid::Empty);
             scheduler.DelayAll(6999ms);
-            scheduler.Schedule(7s, [this](TaskContext)
+            scheduler.Schedule(7s, [this](TaskContext /*context*/)
             {
                 _castingQuake = false;
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
-            });
-            context.Repeat(56300ms, 64300ms);
-        }).Schedule(55650ms, [this](TaskContext context)
-        {
-            DoCastSelf(SPELL_BLAST_NOVA);
-            scheduler.DelayAll(10s);
+                DoCastSelf(SPELL_BLAST_NOVA);
 
-            _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
-            {
-                if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
+                _interruptScheduler.Schedule(50ms, GROUP_INTERRUPT_CHECK, [this](TaskContext context)
                 {
-                    Talk(SAY_BANISH);
-                    me->InterruptNonMeleeSpells(true);
-                    scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
-                }
-                else
-                    context.Repeat(50ms);
-            }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
-            {
-                _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                    if (me->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
+                    {
+                        Talk(SAY_BANISH);
+                        me->InterruptNonMeleeSpells(true);
+                        scheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                    }
+                    else
+                        context.Repeat(50ms);
+                }).Schedule(12s, GROUP_INTERRUPT_CHECK, [this](TaskContext /*context*/)
+                {
+                    _interruptScheduler.CancelGroup(GROUP_INTERRUPT_CHECK);
+                });
             });
-            context.Repeat(54350ms, 55400ms);
+            context.Repeat(53s, 56s);
         }).Schedule(22min, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_BERSERK, true);

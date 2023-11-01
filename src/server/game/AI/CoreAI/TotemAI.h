@@ -50,7 +50,7 @@ public:
     KillMagnetEvent(Unit& self) : _self(self) { }
     bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
-        _self.setDeathState(DeathState::JustDied);
+        _self.setDeathState(JUST_DIED);
         return true;
     }
 

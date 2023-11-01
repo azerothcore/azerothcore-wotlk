@@ -686,7 +686,7 @@ public:
                         me->DespawnOrUnsummon();
                     }
                     else
-                        me->setDeathState(DeathState::JustDied);
+                        me->setDeathState(JUST_DIED);
                 }
             }
         }

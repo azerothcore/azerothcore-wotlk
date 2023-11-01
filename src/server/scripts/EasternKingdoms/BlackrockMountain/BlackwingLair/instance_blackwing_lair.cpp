@@ -425,7 +425,6 @@ public:
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
-                            nefarius->SetFarVisible(true);
                             nefarius->Respawn();
                             nefarius->GetMotionMaster()->MoveTargetedHome();
                         }

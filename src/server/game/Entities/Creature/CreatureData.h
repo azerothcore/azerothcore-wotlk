@@ -292,7 +292,7 @@ struct CreatureBaseStats
 {
     uint32 BaseHealth[MAX_EXPANSIONS];
     uint32 BaseMana;
-    float  BaseArmor;
+    uint32 BaseArmor;
     uint32 AttackPower;
     uint32 RangedAttackPower;
     float BaseDamage[MAX_EXPANSIONS];
@@ -313,9 +313,9 @@ struct CreatureBaseStats
         return uint32(std::ceil(BaseMana * info->ModMana));
     }
 
-    float GenerateArmor(CreatureTemplate const* info) const
+    uint32 GenerateArmor(CreatureTemplate const* info) const
     {
-        return std::ceil(BaseArmor * info->ModArmor);
+        return uint32(std::ceil(BaseArmor * info->ModArmor));
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const
@@ -358,6 +358,7 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 struct CreatureData
 {
     CreatureData() = default;
+    ObjectGuid::LowType spawnId{0};
     uint32 id1{0};                                             // entry in creature_template
     uint32 id2{0};                                             // entry in creature_template
     uint32 id3{0};                                             // entry in creature_template
