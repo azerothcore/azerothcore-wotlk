@@ -28,7 +28,7 @@ class MapInstanced : public Map
 public:
     using InstancedMaps = std::unordered_map<uint32, Map*>;
 
-    MapInstanced(uint32 id, std::chrono::seconds expiry);
+    MapInstanced(uint32 id, time_t expiry);
     ~MapInstanced() override {}
 
     // functions overwrite Map versions

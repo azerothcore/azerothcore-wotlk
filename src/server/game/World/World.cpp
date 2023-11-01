@@ -44,7 +44,6 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
-#include "DynamicVisibility.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
@@ -1421,8 +1420,16 @@ void World::LoadConfigSettings(bool reload)
     // Prevent players AFK from being logged out
     _int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetOption<int32>("PreventAFKLogout", 0);
 
+    // Unload grids to save memory. Can be disabled if enough memory is available to speed up moving players to new grids.
+    _bool_configs[CONFIG_GRID_UNLOAD] = sConfigMgr->GetOption<bool>("GridUnload", true);
+
     // Preload all grids of all non-instanced maps
     _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetOption<bool>("PreloadAllNonInstancedMapGrids", false);
+    if (_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] && _bool_configs[CONFIG_GRID_UNLOAD])
+    {
+        LOG_ERROR("server.loading", "PreloadAllNonInstancedMapGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable base map pre-loading. Base map pre-loading disabled");
+        _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = false;
+    }
 
     // ICC buff override
     _int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetOption<int32>("ICC.Buff.Horde", 73822);
@@ -2165,21 +2172,14 @@ void World::SetInitialWorldSettings()
     {
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
 
-        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
-        {
-            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
-
-            if (mapEntry && !mapEntry->Instanceable())
+        sMapMgr->DoForAllMaps([](Map* map)
             {
-                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
-
-                if (map)
+                if (!map->Instanceable())
                 {
                     LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
                     map->LoadAllCells();
                 }
-            }
-        }
+            });
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
@@ -2254,8 +2254,6 @@ void World::Update(uint32 diff)
 
     // Record update if recording set in log and diff is greater then minimum set in log
     sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, GetActiveSessionCount());
-
-    DynamicVisibilityMgr::Update(GetActiveSessionCount());
 
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
