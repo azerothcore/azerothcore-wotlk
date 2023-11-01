@@ -318,6 +318,8 @@ public:
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
     void DoForAllMembers(std::function<void(Player*)> const& worker);
 
+    DataMap CustomData;
+
 protected:
     void _homebindIfInstance(Player* player);
     void _cancelHomebindIfInstance(Player* player);
