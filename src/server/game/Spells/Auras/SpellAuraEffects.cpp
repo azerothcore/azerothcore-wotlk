@@ -2362,6 +2362,17 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                 default:
                                     break;
                             }
+                            
+                            // equip random brewfest mug
+                            uint32 itemIds[5] = {
+                                2703,  // Monster - Item, Tankard Wooden
+                                2704,  // Monster - Item, Tankard Dirty
+                                2705,  // Monster - Item, Tankard Metal
+                                13861, // Monster - Item, Tankard Gold
+                                33963  // NPC Equip 33963
+                            };
+                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, itemIds[urand(0, 4)]);
+
                             break;
                         }
                     // Gossip NPC Appearance - Winter Veil
