@@ -546,6 +546,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             {
                 // Player not create (race/class/etc problem?)
                 SendCharCreate(CHAR_CREATE_ERROR);
+                
+                // Set a some variables to be used by clean
+                newChar->SetMap(sMapMgr->CreateMap(0, newChar.get()));
                 return;
             }
 
