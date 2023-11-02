@@ -2362,7 +2362,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                 default:
                                     break;
                             }
-                            
+
                             // equip random brewfest mug
                             uint32 itemIds[5] = {
                                 2703,  // Monster - Item, Tankard Wooden
