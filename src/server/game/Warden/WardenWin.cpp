@@ -264,11 +264,13 @@ bool WardenWin::IsCheckInProgress()
 */
 void WardenWin::ForceChecks()
 {
-    if (_dataSent)
+    if (_dataSent && !_interrupted)
     {
-        _interrupted = true;
         _interruptCounter++;
     }
+
+    _interrupted = true;
+    _interruptCounter++;
 
     RequestChecks();
 }
@@ -621,7 +623,6 @@ void WardenWin::HandleData(ByteBuffer& buff)
     }
 
     uint16 checkFailed = 0;
-    bool customPayload = false;
 
     for (uint16 const checkId : _CurrentChecks)
     {
@@ -631,7 +632,6 @@ void WardenWin::HandleData(ByteBuffer& buff)
         if (!rd && checkId >= WardenPayloadMgr::WardenPayloadOffsetMin)
         {
             rd = &_payloadMgr.CachedChecks.at(checkId);
-            customPayload = true;
         }
 
         uint8 const type = rd->Type;
@@ -750,22 +750,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     if (checkFailed > 0 && !_interrupted)
     {
-        if (_interruptedRecently && !customPayload)
-        {
-            LOG_DEBUG("warden", "Warden was interrupted by ForceChecks recently, ignoring results.");
-            _interruptedRecently = false;
-        }
-        else if(!_interruptedRecently)
-        {
-            ApplyPenalty(checkFailed, "");
-        }
+        ApplyPenalty(checkFailed, "");
     }
 
     if (_interrupted)
     {
         LOG_DEBUG("warden", "Warden was interrupted by ForceChecks, ignoring results.");
-
-        _interruptedRecently = true;
 
         _interruptCounter--;
 
