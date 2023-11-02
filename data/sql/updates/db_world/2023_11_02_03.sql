@@ -1,3 +1,4 @@
+-- DB update 2023_11_02_02 -> 2023_11_02_03
 -- Skullflame Shield / Demon Forged Breastplate proc on critical/normal/partial block
 -- Demon Forged Breastplate, Drain Life, Flamestrike
 DELETE FROM `spell_proc_event` WHERE `entry` IN (16611,18815,18816);
