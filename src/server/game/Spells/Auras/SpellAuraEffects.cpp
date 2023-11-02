@@ -2371,7 +2371,8 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                 13861, // Monster - Item, Tankard Gold
                                 33963  // NPC Equip 33963
                             };
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, itemIds[urand(0, 4)]);
+                            if (target->ToCreature())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, itemIds[urand(0, 4)]);
 
                             break;
                         }
