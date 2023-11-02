@@ -1,3 +1,4 @@
+-- DB update 2023_11_02_01 -> 2023_11_02_02
 -- Captive Child
 DELETE FROM `creature_addon` WHERE `guid`=78491;
 
