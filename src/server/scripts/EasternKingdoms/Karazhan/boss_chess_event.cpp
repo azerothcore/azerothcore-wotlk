@@ -506,7 +506,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
                 piece->CombatStop();
                 piece->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                piece->setDeathState(JUST_RESPAWNED);
+                piece->setDeathState(DeathState::JustRespawned);
                 piece->SetHealth(piece->GetMaxHealth());
                 break;
             }
@@ -528,7 +528,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
                 piece->CombatStop();
                 piece->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                piece->setDeathState(JUST_RESPAWNED);
+                piece->setDeathState(DeathState::JustRespawned);
                 piece->SetHealth(piece->GetMaxHealth());
                 break;
             }

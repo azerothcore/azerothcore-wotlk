@@ -158,7 +158,7 @@ public:
                     if (Mrfloppy->isDead())
                     {
                         me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                        Mrfloppy->setDeathState(ALIVE);
+                        Mrfloppy->setDeathState(DeathState::Alive);
                         Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                         Talk(SAY_VICTORY3);
                     }
