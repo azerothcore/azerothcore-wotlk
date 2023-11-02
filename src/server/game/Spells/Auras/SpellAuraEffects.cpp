@@ -2412,7 +2412,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                     target->SetDisplayId(target->getGender() == GENDER_MALE ? 18803 : 18802);
                                     break;
                                 case DisplayRace::Goblin:
-                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21067 : 19339);
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19342 : 19339);
                                 default:
                                     break;
                             }
@@ -2550,7 +2550,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                             switch (target->GetDisplayRace())
                             {
                                 case DisplayRace::BloodElf:
-                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21085 : 21085);
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21086 : 21085);
                                     break;
                                 case DisplayRace::Orc:
                                     target->SetDisplayId(target->getGender() == GENDER_MALE ? 16438 : 16436);
