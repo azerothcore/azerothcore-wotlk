@@ -153,7 +153,6 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     });
 }
 
-
 void ScriptMgr::OnAfterSpecSlotChanged(Player* player, uint8 newSlot)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
