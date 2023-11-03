@@ -360,7 +360,7 @@ public:
                 Creature* creature = (ObjectAccessor::GetCreature((*me), AddGUID[i]));
                 if (!creature || !creature->IsAlive())
                 {
-                    if (creature) creature->setDeathState(DEAD);
+                    if (creature) creature->setDeathState(DeathState::Dead);
                     creature = me->SummonCreature(AddEntry[i], Pos_X[i], POS_Y, POS_Z, ORIENT, TEMPSUMMON_DEAD_DESPAWN, 0);
                     if (creature) AddGUID[i] = creature->GetGUID();
                 }
