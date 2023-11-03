@@ -13,5 +13,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (4473,4475)) AND (`SourceId` = 2);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 4473, 2, 0, 1, 0, 34830, 1, 0, 0, 0, 0, '', 'Complete \'Triangulation Point One\' only if buff is present'),
-(22, 1, 4475, 2, 0, 1, 0, 34857, 1, 0, 0, 0, 0, '', 'Complete \'Triangulation Point Twp\' only if buff is present');
+(22, 1, 4473, 2, 0, 1, 0, 34830, 1, 0, 0, 0, 0, '', 'Run SAI for areatrigger 4473 only if \'Triangulation Point One\' only if buff is present'),
+(22, 1, 4475, 2, 0, 1, 0, 34857, 1, 0, 0, 0, 0, '', 'Run SAI for areatrigger 4475 only if \'Triangulation Point Two\' only if buff is present');
