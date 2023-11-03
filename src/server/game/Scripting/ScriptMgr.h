@@ -1033,6 +1033,9 @@ public:
     // Called when a player's talent points are reset (right before the reset is done)
     virtual void OnTalentsReset(Player* /*player*/, bool /*noCost*/) { }
 
+    // Called after a player switches specs using the dual spec system
+    virtual void OnAfterSpecSlotChanged(Player* /*player*/, uint8 /*newSlot*/) { }
+
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
     virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
@@ -2325,6 +2328,7 @@ public: /* PlayerScript */
     void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
     void OnPlayerTalentsReset(Player* player, bool noCost);
+    void OnAfterSpecSlotChanged(Player* player, uint8 newSlot);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnBeforeLootMoney(Player* player, Loot* loot);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
