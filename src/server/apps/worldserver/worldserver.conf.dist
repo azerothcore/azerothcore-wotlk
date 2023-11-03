@@ -1373,12 +1373,21 @@ DetectPosCollision = 1
 CheckGameObjectLoS = 1
 
 #
+#    GridUnload
+#        Description: Unload grids to save memory. Can be disabled if enough memory is available
+#                     to speed up moving players to new grids.
+#        Default:     1 - (enable, Unload grids)
+#                     0 - (disable, Do not unload grids)
+
+GridUnload = 1
+
+#
 #    PreloadAllNonInstancedMapGrids
-#        Description: Preload all grids on all non-instanced maps. This will take a great amount
-#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
-#                     but can increase performance if used on a server with a high amount of players.
-#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
-#                     in Hellfire Peninsula) on server start.
+#        Description: Preload all grids on all non-instanced maps. Requires GridUnload to be disabled.
+#                     This will take a great amount of additional RAM (ca. 9 GB) and causes the server
+#                     to take longer to start, but can increase performance if used on a server with a
+#                     high amount of players. It will also activate all creatures which are set active
+#                     (e.g. the Fel Reavers in Hellfire Peninsula) on server start.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
