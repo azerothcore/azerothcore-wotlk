@@ -328,7 +328,7 @@ void CreatureGroup::MemberEvaded(Creature* member)
 
             // schedule an immediate respawn (if all checks in Creature::Update pass)
             pMember->SetRespawnTime(0);
-            pMember->setDeathState(DEAD);
+            pMember->setDeathState(DeathState::Dead);
         }
     }
 }
