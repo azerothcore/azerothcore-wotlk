@@ -577,7 +577,7 @@ public:
             Precious()->RemoveCorpse(false, false);
             Precious()->SetPosition(current);
             Precious()->SetHomePosition(current);
-            Precious()->setDeathState(JUST_RESPAWNED);
+            Precious()->setDeathState(DeathState::JustRespawned);
             Precious()->UpdateObjectVisibility(true);
         }
 
