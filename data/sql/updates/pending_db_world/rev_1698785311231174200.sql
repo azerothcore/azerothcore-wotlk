@@ -52,7 +52,7 @@ DELETE FROM `game_event_creature` WHERE `guid` IN (240303, 121254, 121255, 12846
 -- remove all commoner spawns in Harvest Festival
 -- Harvest Festival runs parallel to Brewfest
 -- Commoners are already spawned and dressed for Brewfest in this period
-DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (@CID1, @CID2, @CID3, @CID4, @CID5, @CID6, @CID7, @CID8, @CID9, @CID10, @CID11)) AND `eventEntry` = 7;
+DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (@CID1, @CID2, @CID3, @CID4, @CID5, @CID6, @CID7, @CID8, @CID9, @CID10, @CID11)) AND `eventEntry` = 11;
 
 -- spawn commoners for all relevant events
 DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (@CID1, @CID2, @CID3, @CID4, @CID5, @CID6, @CID7, @CID8, @CID9, @CID10, @CID11)) AND `eventEntry` in (@GEVENT1, @GEVENT2, @GEVENT3, @GEVENT4, @GEVENT5, @GEVENT6, @GEVENT7, @GEVENT8, @GEVENT9, @GEVENT10, @GEVENT11);
