@@ -92,3 +92,4 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+.vscode/c_cpp_properties.json
