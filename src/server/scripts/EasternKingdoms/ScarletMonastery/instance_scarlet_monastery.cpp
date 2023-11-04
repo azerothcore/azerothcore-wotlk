@@ -56,7 +56,9 @@ enum DataTypes
     GAMEOBJECT_PUMPKIN_SHRINE = 6,
 
     DATA_VORREL = 7,
-    DATA_ARCANIST_DOAN = 8
+    DATA_ARCANIST_DOAN = 8,
+    TYPE_ASHBRINGER_EVENT,
+    DATA_DOOR_CHAPEL,
 };
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -84,6 +86,9 @@ public:
             case DOOR_HIGH_INQUISITOR_ID:
                 DoorHighInquisitorGUID = go->GetGUID();
                 break;
+            case DOOR_CHAPEL:
+                DoorChapelGUID = go->GetGUID();
+                break;
             default:
                 break;
             }
@@ -93,8 +98,21 @@ public:
         {
             switch (creature->GetEntry())
             {
+            case NPC_SCARLET_MYRIDON:
+            case NPC_SCARLET_DEFENDER:
+            case NPC_SCARLET_CENTURION:
+            case NPC_SCARLET_SORCERER:
+            case NPC_SCARLET_WIZARD:
+            case NPC_SCARLET_ABBOT:
+            case NPC_SCARLET_MONK:
+            case NPC_SCARLET_CHAMPION:
+            case NPC_SCARLET_CHAPLAIN:
+            case NPC_FAIRBANKS:
+                AshbringerNpcGUID.emplace(creature->GetGUID());
+                break;
             case NPC_COMMANDER_MOGRAINE:
                 MograineGUID = creature->GetGUID();
+                AshbringerNpcGUID.emplace(creature->GetGUID());
                 break;
             case NPC_INQUISITOR_WHITEMANE:
                 WhitemaneGUID = creature->GetGUID();
@@ -125,6 +143,22 @@ public:
             case DATA_HORSEMAN_EVENT:
                 encounter = data;
                 break;
+            case TYPE_ASHBRINGER_EVENT:
+                if (data == IN_PROGRESS)
+                {
+                    if (GameObject* go = instance->GetGameObject(DoorChapelGUID))
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                        go->SetLootState(GO_ACTIVATED);
+                        go->SetGameObjectFlag(GO_FLAG_IN_USE);
+                    }
+                    for (const auto& scarletCathedralNpcGuid : AshbringerNpcGUID)
+                        if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
+                            if (scarletNpc->IsAlive() && !scarletNpc->IsInCombat())
+                                scarletNpc->SetFaction(FACTION_FRIENDLY);
+                }
+                ashencounter = data;
+                break;
             default:
                 break;
             }
@@ -140,6 +174,8 @@ public:
                 return WhitemaneGUID;
             case DATA_DOOR_WHITEMANE:
                 return DoorHighInquisitorGUID;
+            case DATA_DOOR_CHAPEL:
+                return DoorChapelGUID;
             default:
                 return ObjectGuid::Empty;
                 break;
@@ -148,65 +184,50 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            if (type == TYPE_MOGRAINE_AND_WHITE_EVENT)
+            switch (type)
+            {
+            case TYPE_MOGRAINE_AND_WHITE_EVENT:
                 return encounter;
-            else if (type == DATA_HORSEMAN_EVENT)
+                break;
+            case DATA_HORSEMAN_EVENT:
                 return encounter;
-            return 0;
+                break;
+            case TYPE_ASHBRINGER_EVENT:
+                return ashencounter;
+                break;
+            default:
+                return 0;
+                break;
+            }
         }
     private:
         ObjectGuid DoorHighInquisitorGUID;
+        ObjectGuid DoorChapelGUID;
         ObjectGuid MograineGUID;
         ObjectGuid WhitemaneGUID;
-        uint32 encounter;
+        uint32 encounter{};
+        uint32 ashencounter{};
+        std::set<ObjectGuid> AshbringerNpcGUID;
     };
 };
 
-class at_scarlet_monastery_cathedral_entrance : public OnlyOnceAreaTriggerScript
+class at_scarlet_monastery_cathedral_entrance : public AreaTriggerScript
 {
 public:
-    at_scarlet_monastery_cathedral_entrance() : OnlyOnceAreaTriggerScript("at_scarlet_monastery_cathedral_entrance") {}
+    at_scarlet_monastery_cathedral_entrance() : AreaTriggerScript("at_scarlet_monastery_cathedral_entrance") {}
 
-    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (InstanceScript* instance = player->GetInstanceScript())
+        if (player->HasAura(AURA_OF_ASHBRINGER))
         {
-            if (player->HasAura(AURA_OF_ASHBRINGER))
+            if (InstanceScript* instance = player->GetInstanceScript())
             {
-                Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
-                if (commanderMograine)
+                if (instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
                 {
-                    std::list<Creature*> ScarletList;
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MYRIDON, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_DEFENDER, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CENTURION, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_SORCERER, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_WIZARD, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_ABBOT, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_MONK, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAMPION, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_SCARLET_CHAPLAIN, 400.0f);
-                    player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 400.0f);
-
-                    ScarletList.push_back(commanderMograine);
-
-                    if (!ScarletList.empty())
-                    {
-                        for (Creature* itr : ScarletList)
-                        {
-                            itr->SetFaction(FACTION_FRIENDLY);
-                        }
-                    }
+                    Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
                     if (commanderMograine->IsAlive())
                         commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
-
-                    if (GameObject* chapelDoor = player->FindNearestGameObject(DOOR_CHAPEL, 250.0f))
-                    {
-
-                        chapelDoor->SetGoState(GO_STATE_ACTIVE);
-                        chapelDoor->SetLootState(GO_ACTIVATED);
-                        chapelDoor->SetGameObjectFlag(GO_FLAG_IN_USE);
-                    }
+                    instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
                     return true;
                 }
             }
@@ -220,7 +241,7 @@ enum ScarletMonasteryTrashMisc
     SAY_WELCOME = 0,
     AURA_ASHBRINGER = 28282,
     NPC_HIGHLORD_MOGRAINE = 16062,
-    NPC_HIGHLORD_MOGRAINE_MOD = 16180,
+    MODEL_HIGHLORD_MOGRAINE = 16180,
     SPELL_COSMETIC_CHAIN = 45537,
     SPELL_COSMETIC_EXPLODE = 45935,
     SPELL_FORGIVENESS = 28697,
@@ -337,7 +358,7 @@ public:
                     summonedMograine->SetFaction(FACTION_FRIENDLY);
                     summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
                     summonedMograine->SetSpeed(MOVE_WALK, 1.0f);
-                    summonedMograine->SetDisplayId(NPC_HIGHLORD_MOGRAINE_MOD);
+                    summonedMograine->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
                     summonedMograine->setActive(true);
                     summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false);//Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
                 }
@@ -698,6 +719,7 @@ public:
             else Heal_Timer -= diff;
 
             events.Update(diff);
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
