@@ -757,7 +757,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
     }
 }
 
-void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
+void Map::Update(const uint32 t_diff)
 {
     if (t_diff)
         _dynamicTree.update(t_diff);
@@ -771,7 +771,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             //player->Update(t_diff);
             WorldSession* session = player->GetSession();
             MapSessionFilter updater(session);
-            session->Update(s_diff, updater);
+            session->Update(t_diff, updater);
         }
     }
 
@@ -799,7 +799,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             continue;
 
         // update players at tick
-        player->Update(s_diff);
+        player->Update(t_diff);
 
         VisitNearbyCellsOf(player, grid_object_update, world_object_update);
 
@@ -3522,9 +3522,9 @@ bool InstanceMap::AddPlayerToMap(Player* player)
     return true;
 }
 
-void InstanceMap::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread*/)
+void InstanceMap::Update(const uint32 t_diff)
 {
-    Map::Update(t_diff, s_diff);
+    Map::Update(t_diff);
 
     if (t_diff)
         if (instance_data)

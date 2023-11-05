@@ -29,6 +29,9 @@
 
 MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
+    // initialize instanced maps list
+    m_InstancedMaps.clear();
+
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS * sizeof(uint16));
 }
@@ -44,10 +47,10 @@ void MapInstanced::InitVisibilityDistance()
     }
 }
 
-void MapInstanced::Update(const uint32 t, const uint32 s_diff, bool /*thread*/)
+void MapInstanced::Update(const uint32 t)
 {
     // take care of loaded GridMaps (when unused, unload it!)
-    Map::Update(t, s_diff, false);
+    Map::Update(t);
 
     // update the instanced maps
     InstancedMaps::iterator i = m_InstancedMaps.begin();
@@ -65,9 +68,9 @@ void MapInstanced::Update(const uint32 t, const uint32 s_diff, bool /*thread*/)
         {
             // update only here, because it may schedule some bad things before delete
             if (sMapMgr->GetMapUpdater()->activated())
-                sMapMgr->GetMapUpdater()->schedule_update(*i->second, t, s_diff);
+                sMapMgr->GetMapUpdater()->schedule_update(*i->second, t);
             else
-                i->second->Update(t, s_diff);
+                i->second->Update(t);
             ++i;
         }
     }
@@ -261,8 +264,8 @@ bool MapInstanced::DestroyInstance(InstancedMaps::iterator& itr)
     sScriptMgr->OnDestroyInstance(this, itr->second);
 
     itr->second->UnloadAll();
-    // should only unload VMaps if this is the last instance
-    if (m_InstancedMaps.size() <= 1)
+    // should only unload VMaps if this is the last instance and grid unloading is enabled
+    if (m_InstancedMaps.size() <= 1 && sWorld->getBoolConfig(CONFIG_GRID_UNLOAD))
     {
         VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(itr->second->GetId());
         MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(itr->second->GetId());

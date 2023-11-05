@@ -338,7 +338,7 @@ public:
     void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
         TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor);
 
-    virtual void Update(const uint32, const uint32, bool thread = true);
+    virtual void Update(const uint32);
 
     [[nodiscard]] float GetVisibilityRange() const { return m_VisibleDistance; }
     void SetVisibilityRange(float range) { m_VisibleDistance = range; }
@@ -847,7 +847,7 @@ public:
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
     void AfterPlayerUnlinkFromMap() override;
-    void Update(const uint32, const uint32, bool thread = true) override;
+    void Update(const uint32) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, GuidList* globalSkipList = nullptr);
     [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
