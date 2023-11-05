@@ -198,7 +198,7 @@ void SellItemTask::Execute()
             auction->HouseId = AUCTIONHOUSE_NEUTRAL;
         else
         {
-            const AuctionHouseEntry* AHEntry = sAuctionMgr->GetAuctionHouseEntry(creature->GetCreatureTemplate()->faction);
+            AuctionHouseEntry const* AHEntry = sAuctionMgr->GetAuctionHouseEntry(creature->GetCreatureTemplate()->faction);
             auction->HouseId = AHEntry->houseId;
         }
 
