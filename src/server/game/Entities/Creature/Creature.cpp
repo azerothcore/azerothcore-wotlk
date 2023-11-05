@@ -2093,7 +2093,7 @@ void Creature::Respawn(bool force)
         m_respawnedTime = GameTime::GetGameTime().count();
     }
     m_respawnedTime = GameTime::GetGameTime().count();
-    UpdateObjectVisibility();
+    UpdateObjectVisibility(false);
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
