@@ -24,7 +24,7 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
+#include "AsyncAuctionMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -1275,22 +1275,15 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetOption<int32>("ItemDelete.ItemLevel", 80);
 
     _int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
-
     _int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
-
     _bool_configs[CONFIG_PLAYER_SETTINGS_ENABLED] = sConfigMgr->GetOption<bool>("EnablePlayerSettings", 0);
-
     _bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
-
     _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
-
     _bool_configs[CONFIG_QUEST_POI_ENABLED] = sConfigMgr->GetOption<bool>("QuestPOI.Enabled", true);
-
     _int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
-
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
-
     _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
+    _int_configs[CONFIG_AUCTION_ASYNC_THREADS] = sConfigMgr->GetOption<uint32>("Auction.Async.Threads", 2);
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
@@ -2166,6 +2159,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
+    // Initialize auctions
+    sAsyncAuctionMgr->Initialize();
+
     sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
@@ -2173,13 +2169,13 @@ void World::SetInitialWorldSettings()
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
 
         sMapMgr->DoForAllMaps([](Map* map)
+        {
+            if (!map->Instanceable())
             {
-                if (!map->Instanceable())
-                {
-                    LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
-                    map->LoadAllCells();
-                }
-            });
+                LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
+                map->LoadAllCells();
+            }
+        });
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
@@ -2333,7 +2329,10 @@ void World::Update(uint32 diff)
         sAuctionMgr->Update();
     }
 
-    AsyncAuctionListingMgr::Update(Milliseconds(diff));
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update async auction"));
+        sAsyncAuctionMgr->Update(Milliseconds{diff});
+    }
 
     if (currentGameTime > _mail_expire_check_timer)
     {
@@ -2341,8 +2340,10 @@ void World::Update(uint32 diff)
         _mail_expire_check_timer = currentGameTime + 6h;
     }
 
-    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
-    UpdateSessions(diff);
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
+        UpdateSessions(diff);
+    }
 
     /// <li> Handle weather updates when the timer has passed
     if (_timers[WUPDATE_WEATHERS].Passed())

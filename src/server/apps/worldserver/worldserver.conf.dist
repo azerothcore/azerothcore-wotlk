@@ -4271,6 +4271,13 @@ Rate.Auction.Deposit = 1
 Rate.Auction.Cut     = 1
 
 #
+#     Auction.Async.Threads
+#        Description: Number of threads to update async auction.
+#        Default:     1
+
+Auction.Async.Threads = 2
+
+#
 ###################################################################################################
 
 ###################################################################################################
