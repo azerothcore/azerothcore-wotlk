@@ -5102,6 +5102,40 @@ class spell_gen_yehkinya_bramble : public SpellScript
     }
 };
 
+// 35244 - Choking Vines
+enum ChokingVines
+{
+    SPELL_CHOKING_VINES = 35244,
+    SPELL_CHOKING_WOUND = 35247
+};
+
+class spell_gen_choking_vines : public AuraScript
+{
+    PrepareAuraScript(spell_gen_choking_vines);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHOKING_VINES, SPELL_CHOKING_WOUND });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (GetStackAmount() == GetSpellInfo()->StackAmount) // 5 stacks
+            {
+                target->RemoveAurasDueToSpell(SPELL_CHOKING_VINES);
+                target->CastSpell(target, SPELL_CHOKING_WOUND, true); // Unknown if it's a self cast or casted by the source on 5th
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_choking_vines::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5254,4 +5288,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_planting_scourge_banner);
     RegisterSpellScript(spell_gen_jubling_cooldown);
     RegisterSpellScript(spell_gen_yehkinya_bramble);
+    RegisterSpellScript(spell_gen_choking_vines);
 }

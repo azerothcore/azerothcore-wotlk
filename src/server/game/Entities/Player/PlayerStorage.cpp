@@ -5454,7 +5454,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if (HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_deathState = DEAD;
+        m_deathState = DeathState::Dead;
         AddUnitState(UNIT_STATE_ISOLATED);
     }
 
