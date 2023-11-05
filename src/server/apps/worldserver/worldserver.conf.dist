@@ -4273,7 +4273,7 @@ Rate.Auction.Cut     = 1
 #
 #     Auction.Async.Threads
 #        Description: Number of threads to update async auction.
-#        Default:     1
+#        Default:     2
 
 Auction.Async.Threads = 2
 
