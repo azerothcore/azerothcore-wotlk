@@ -23,11 +23,11 @@
 
 enum Says
 {
-    BOSS_SAY_AGGRO                 = 0,
-    BOSS_SAY_DEATH                 = 1,
-    BOSS_EMOTE_DIES                = 2,
+    SAY_AGGRO                      = 0,
+    SAY_DEATH                      = 1,
+    EMOTE_DIES                     = 2,
 
-    ZEALOT_EMOTE_DIES              = 0
+    EMOTE_ZEALOT_DIES              = 0
 };
 
 enum Spells
@@ -129,7 +129,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
-            Talk(BOSS_SAY_DEATH);
+            Talk(SAY_DEATH);
 
             if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
             {
@@ -187,7 +187,7 @@ public:
                     DoResetThreatList();
                     WasDead = true;
                     CheckPhaseTransition();
-                    Talk(BOSS_EMOTE_DIES);
+                    Talk(EMOTE_DIES);
                 }
             }
 
@@ -259,7 +259,7 @@ public:
                     DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
 
                     _scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
-                        Talk(BOSS_SAY_AGGRO);
+                        Talk(SAY_AGGRO);
                     });
 
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
@@ -390,7 +390,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(ZEALOT_EMOTE_DIES);
+            Talk(EMOTE_ZEALOT_DIES);
 
             if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
@@ -495,7 +495,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(ZEALOT_EMOTE_DIES);
+            Talk(EMOTE_ZEALOT_DIES);
 
             if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
