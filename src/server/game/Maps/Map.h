@@ -687,13 +687,13 @@ private:
     void RemoveDynamicObjectFromMoveList(DynamicObject* go);
 
     bool _creatureToMoveLock;
-    std::vector<Creature*> _creaturesToMove;
+    std::set<Creature*> _creaturesToMove;
 
     bool _gameObjectsToMoveLock;
-    std::vector<GameObject*> _gameObjectsToMove;
+    std::set<GameObject*> _gameObjectsToMove;
 
     bool _dynamicObjectsToMoveLock;
-    std::vector<DynamicObject*> _dynamicObjectsToMove;
+    std::set<DynamicObject*> _dynamicObjectsToMove;
 
     [[nodiscard]] bool IsGridLoaded(const GridCoord&) const;
     void EnsureGridCreated_i(const GridCoord&);

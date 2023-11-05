@@ -1166,7 +1166,7 @@ void Map::AddCreatureToMoveList(Creature* c, float x, float y, float z, float an
         return;
 
     if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _creaturesToMove.push_back(c);
+        _creaturesToMove.insert(c);
     c->SetNewCellPosition(x, y, z, ang);
 }
 
@@ -1185,7 +1185,7 @@ void Map::AddGameObjectToMoveList(GameObject* go, float x, float y, float z, flo
         return;
 
     if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _gameObjectsToMove.push_back(go);
+        _gameObjectsToMove.insert(go);
     go->SetNewCellPosition(x, y, z, ang);
 }
 
@@ -1204,7 +1204,7 @@ void Map::AddDynamicObjectToMoveList(DynamicObject* dynObj, float x, float y, fl
         return;
 
     if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _dynamicObjectsToMove.push_back(dynObj);
+        _dynamicObjectsToMove.insert(dynObj);
     dynObj->SetNewCellPosition(x, y, z, ang);
 }
 
@@ -1220,7 +1220,7 @@ void Map::RemoveDynamicObjectFromMoveList(DynamicObject* dynObj)
 void Map::MoveAllCreaturesInMoveList()
 {
     _creatureToMoveLock = true;
-    for (std::vector<Creature*>::iterator itr = _creaturesToMove.begin(); itr != _creaturesToMove.end(); ++itr)
+    for (std::set<Creature*>::iterator itr = _creaturesToMove.begin(); itr != _creaturesToMove.end(); ++itr)
     {
         Creature* c = *itr;
         if (c->FindMap() != this) //pet is teleported to another map
@@ -1277,7 +1277,7 @@ void Map::MoveAllCreaturesInMoveList()
 void Map::MoveAllGameObjectsInMoveList()
 {
     _gameObjectsToMoveLock = true;
-    for (std::vector<GameObject*>::iterator itr = _gameObjectsToMove.begin(); itr != _gameObjectsToMove.end(); ++itr)
+    for (std::set<GameObject*>::iterator itr = _gameObjectsToMove.begin(); itr != _gameObjectsToMove.end(); ++itr)
     {
         GameObject* go = *itr;
         if (go->FindMap() != this) //transport is teleported to another map
@@ -1323,7 +1323,7 @@ void Map::MoveAllGameObjectsInMoveList()
 void Map::MoveAllDynamicObjectsInMoveList()
 {
     _dynamicObjectsToMoveLock = true;
-    for (std::vector<DynamicObject*>::iterator itr = _dynamicObjectsToMove.begin(); itr != _dynamicObjectsToMove.end(); ++itr)
+    for (std::set<DynamicObject*>::iterator itr = _dynamicObjectsToMove.begin(); itr != _dynamicObjectsToMove.end(); ++itr)
     {
         DynamicObject* dynObj = *itr;
         if (dynObj->FindMap() != this) //transport is teleported to another map

@@ -62,7 +62,7 @@ public:
 
 protected:
     uint32 m_blockCount;
-    GuidVector m_outOfRangeGUIDs;
+    GuidSet m_outOfRangeGUIDs;
     ByteBuffer m_data;
 
     void Compress(void* dst, uint32* dst_size, void* src, int src_size);
