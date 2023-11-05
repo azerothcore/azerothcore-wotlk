@@ -1635,6 +1635,8 @@ private:
         unsigned short m_state;
     };
     std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList;
+
+    std::mutex _guidGeneratorMutex;
 };
 
 #define sObjectMgr ObjectMgr::instance()

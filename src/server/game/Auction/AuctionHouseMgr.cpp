@@ -449,6 +449,14 @@ void AuctionHouseObject::ForEachAuctions(std::function<void(AuctionEntry*)> cons
         fn(auction.get());
 }
 
+void AuctionHouseObject::ForEachAuctionsWrite(std::function<void(AuctionEntry*)> const& fn)
+{
+    std::unique_lock guard(_mutex);
+
+    for (auto const& [auctionID, auction] : _auctions)
+        fn(auction.get());
+}
+
 AuctionHouseMgr::~AuctionHouseMgr()
 {
     ClearItems();

@@ -55,7 +55,7 @@ struct fmt::formatter<StopWatch> : formatter<string_view>
     template<typename FormatContext>
     auto format(const StopWatch& sw, FormatContext& ctx) -> decltype(ctx.out())
     {
-        return formatter<string_view>::format(Acore::Time::ToTimeString(sw.Elapsed()), ctx);
+        return formatter<string_view>::format(Acore::Time::ToString(sw.Elapsed(), sw.GetOutCount()), ctx);
     }
 };
 

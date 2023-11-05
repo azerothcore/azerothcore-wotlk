@@ -6990,6 +6990,8 @@ void ObjectMgr::SetHighestGuids()
 
 uint32 ObjectMgr::GenerateAuctionID()
 {
+    std::lock_guard guard(_guidGeneratorMutex);
+
     if (_auctionId >= 0xFFFFFFFE)
     {
         LOG_ERROR("server.worldserver", "Auctions ids overflow!! Can't continue, shutting down server. ");

@@ -65,13 +65,12 @@ void AsyncAuctionMgr::Initialize()
     LOG_INFO("server.loading", "Initialize async auction...");
 
     _scheduler = std::make_unique<TaskScheduler>();
+    _queue = std::make_unique<ProducerConsumerQueue<AsyncAuctionOperation*>>();
 
     for (std::size_t i{}; i < sWorld->getIntConfig(CONFIG_AUCTION_ASYNC_THREADS); i++)
         _threads.emplace_back([this](){ ExecuteAsyncQueue(); });
 
     _threads.shrink_to_fit();
-
-    _queue = std::make_unique<ProducerConsumerQueue<AsyncAuctionOperation*>>();
 
     LOG_INFO("server.loading", ">> Async auction initialized in {}. Threads: {}", sw, sWorld->getIntConfig(CONFIG_AUCTION_ASYNC_THREADS));
     LOG_INFO("server.loading", " ");

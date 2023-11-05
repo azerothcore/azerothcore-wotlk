@@ -76,6 +76,7 @@ public:
 
     [[nodiscard]] std::size_t GetCount();
     void ForEachAuctions(std::function<void(AuctionEntry*)> const& fn);
+    void ForEachAuctionsWrite(std::function<void(AuctionEntry*)> const& fn);
     [[nodiscard]] AuctionEntry* GetAuction(uint32 id);
     void AddAuction(std::unique_ptr<AuctionEntry>&& auction);
     bool RemoveAuction(AuctionEntry* auction);
