@@ -67,12 +67,19 @@ void AsyncAuctionMgr::Initialize()
     _scheduler = std::make_unique<TaskScheduler>();
     _queue = std::make_unique<ProducerConsumerQueue<AsyncAuctionOperation*>>();
 
-    for (std::size_t i{}; i < sWorld->getIntConfig(CONFIG_AUCTION_ASYNC_THREADS); i++)
+    auto threadsCount = sWorld->getIntConfig(CONFIG_AUCTION_ASYNC_THREADS);
+    if (!threadsCount || threadsCount > 32)
+    {
+        LOG_ERROR("server.loading", "Async auction: Incorrect threads count: {}. Set 1.", threadsCount);
+        threadsCount = 1;
+    }
+
+    for (std::size_t i{}; i < threadsCount; i++)
         _threads.emplace_back([this](){ ExecuteAsyncQueue(); });
 
     _threads.shrink_to_fit();
 
-    LOG_INFO("server.loading", ">> Async auction initialized in {}. Threads: {}", sw, sWorld->getIntConfig(CONFIG_AUCTION_ASYNC_THREADS));
+    LOG_INFO("server.loading", ">> Async auction initialized in {}. Threads: {}", sw, threadsCount);
     LOG_INFO("server.loading", " ");
 }
 
