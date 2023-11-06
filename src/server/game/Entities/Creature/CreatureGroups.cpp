@@ -326,13 +326,22 @@ void CreatureGroup::MemberEvaded(Creature* member)
                 continue;
             }
 
-            // schedule an immediate respawn (if all checks in Creature::Update pass)
+            // make invisible temporarily
+            pMember->SetVisible(false);
+
             // get the components of the home position
             float x, y, z, o;
             pMember->GetHomePosition().GetPosition(x, y, z, o);
+
+            // teleport home
             pMember->NearTeleportTo(x, y, z, o);
-            pMember->SetRespawnTime(1);
+
+            // schedule an immediate respawn (if all checks in Creature::Update pass)
+            pMember->SetRespawnTime(0);
             pMember->setDeathState(DeathState::Dead);
+
+            // restore visibility
+            pMember->SetVisible(true);
         }
     }
 }
