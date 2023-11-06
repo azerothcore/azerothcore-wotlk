@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
@@ -22,36 +23,40 @@
 
 enum Says
 {
-    SAY_AGGRO                 = 0,
-    SAY_DEATH                 = 1,
+    SAY_AGGRO                      = 0,
+    SAY_DEATH                      = 1,
+    EMOTE_DIES                     = 2,
 
-    EMOTE_ZEALOT_DIES         = 0,
-    EMOTE_THEKAL_DIES         = 2
+    EMOTE_ZEALOT_DIES              = 0
 };
 
 enum Spells
 {
-    SPELL_MORTALCLEAVE        = 22859,
-    SPELL_SILENCE             = 22666,
-    SPELL_TIGER_FORM          = 24169,
-    SPELL_RESURRECT           = 24173,
-    SPELL_FRENZY              = 8269,
-    SPELL_FORCEPUNCH          = 24189,
-    SPELL_CHARGE              = 24193,
-    SPELL_ENRAGE              = 8269,
-    SPELL_SUMMONTIGERS        = 24183,
+    // Boss - pre-fight
+    SPELL_SUMMONTIGERS                  = 24183,
+
+    // Boss
+    SPELL_CHARGE                        = 24193,
+    SPELL_ENRAGE                        = 8269,
+    SPELL_FORCEPUNCH                    = 24189,
+    SPELL_FRENZY                        = 8269,
+    SPELL_MORTALCLEAVE                  = 22859,
+    SPELL_RESURRECTION_IMPACT_VISUAL    = 24171,
+    SPELL_SILENCE                       = 22666,
+    SPELL_TIGER_FORM                    = 24169,
 
     // Zealot Lor'Khan Spells
-    SPELL_SHIELD              = 20545,
-    SPELL_BLOODLUST           = 24185,
-    SPELL_GREATERHEAL         = 24208,
-    SPELL_DISARM              = 6713,
+    SPELL_SHIELD                        = 20545,
+    SPELL_BLOODLUST                     = 24185,
+    SPELL_GREATERHEAL                   = 24208,
+    SPELL_DISARM                        = 6713,
+
     // Zealot Zath Spells
-    SPELL_SWEEPINGSTRIKES     = 18765,
-    SPELL_SINISTERSTRIKE      = 15581,
-    SPELL_GOUGE               = 12540,
-    SPELL_KICK                = 15614,
-    SPELL_BLIND               = 21060
+    SPELL_SWEEPINGSTRIKES               = 18765,
+    SPELL_SINISTERSTRIKE                = 15581,
+    SPELL_GOUGE                         = 12540,
+    SPELL_KICK                          = 15614,
+    SPELL_BLIND                         = 21060
 };
 
 enum Actions
@@ -84,8 +89,11 @@ public:
             _Reset();
             Initialize();
 
+            _scheduler.CancelAll();
+
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->LoadEquipment(1, true);
 
@@ -98,6 +106,19 @@ public:
             {
                 zealot->AI()->Reset();
             }
+
+            // emote idle loop
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_TALK,
+                        EMOTE_ONESHOT_FLEX,
+                        EMOTE_ONESHOT_POINT
+                    )
+                );
+                context.Repeat(5s, 25s);
+            });
 
             _scheduler.SetValidator([this]
             {
@@ -161,12 +182,12 @@ public:
                 {
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                    me->SetStandState(UNIT_STAND_STATE_DEAD);
                     me->AttackStop();
                     DoResetThreatList();
                     WasDead = true;
                     CheckPhaseTransition();
-                    Talk(EMOTE_THEKAL_DIES);
+                    Talk(EMOTE_DIES);
                 }
             }
 
@@ -192,11 +213,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+            if (me->IsInCombat() && !UpdateVictim())
+            {
                 return;
-
-            _scheduler.Update(diff,
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
                 std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         void ReviveZealot(uint32 zealotData)
@@ -226,14 +255,19 @@ public:
             if (WasDead && _lorkhanDied && _zathDied)
             {
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
-                    Talk(SAY_AGGRO);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
+
+                    _scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
+                        Talk(SAY_AGGRO);
+                    });
 
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
                         DoCastSelf(SPELL_TIGER_FORM);
                         me->LoadEquipment(0, true);
+                        me->SetFullHealth();
                         me->SetReactState(REACT_AGGRESSIVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                         _scheduler.Schedule(30s, [this](TaskContext context) {
                             DoCastSelf(SPELL_FRENZY);
@@ -242,7 +276,8 @@ public:
                             DoCastVictim(SPELL_FORCEPUNCH);
                             context.Repeat(16s, 21s);
                         }).Schedule(12s, [this](TaskContext context) {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            // charge a random target that is at least 8 yards away (min range of charge is 8 yards)
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -8.0f))
                             {
                                 DoCast(target, SPELL_CHARGE);
                                 DoResetThreatList();
@@ -302,12 +337,27 @@ public:
 
             _scheduler.SetValidator([this]
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+
+            // emote idle loop
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_QUESTION,
+                        EMOTE_ONESHOT_YES,
+                        EMOTE_ONESHOT_NO
+                    )
+                );
+                context.Repeat(5s, 25s);
             });
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _scheduler.CancelAll();
+
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
                 context.Repeat(1min);
@@ -350,11 +400,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+            if (me->IsInCombat() && !UpdateVictim())
+            {
                 return;
-
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
+                std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         private:
@@ -387,12 +445,27 @@ public:
 
             _scheduler.SetValidator([this]
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+
+            // emote idle loop
+            _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+                // pick a random emote from the list of available emotes
+                me->HandleEmoteCommand(
+                    RAND(
+                        EMOTE_ONESHOT_TALK,
+                        EMOTE_ONESHOT_BEG,
+                        EMOTE_ONESHOT_YES
+                    )
+                );
+                context.Repeat(5s, 25s);
             });
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _scheduler.CancelAll();
+
             _scheduler.Schedule(13s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SWEEPINGSTRIKES);
                 context.Repeat(1min);
@@ -432,11 +505,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+            if (me->IsInCombat() && !UpdateVictim())
+            {
                 return;
-
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+            }
+            else if (me->IsInCombat())
+            {
+                _scheduler.Update(diff,
+                std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
+            else
+            {
+                _scheduler.Update(diff);
+            }
         }
 
         private:
