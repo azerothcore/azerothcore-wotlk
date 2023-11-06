@@ -327,7 +327,11 @@ void CreatureGroup::MemberEvaded(Creature* member)
             }
 
             // schedule an immediate respawn (if all checks in Creature::Update pass)
-            pMember->SetRespawnTime(0);
+            // get the components of the home position
+            float x, y, z, o;
+            pMember->GetHomePosition().GetPosition(x, y, z, o);
+            pMember->NearTeleportTo(x, y, z, o);
+            pMember->SetRespawnTime(1);
             pMember->setDeathState(DeathState::Dead);
         }
     }
