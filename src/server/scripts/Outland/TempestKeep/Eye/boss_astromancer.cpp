@@ -76,10 +76,8 @@ struct boss_high_astromancer_solarian : public BossAI
             scheduler.CancelAll();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
-                _voidBoltCooldown = true;
                 DoCastVictim(SPELL_VOID_BOLT);
                 context.Repeat(7s);
-                _voidBoltCooldown = false;
             }).Schedule(7s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_PSYCHIC_SCREAM);
@@ -93,7 +91,7 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         if (who && me->Attack(who, true))
         {
-            me->GetMotionMaster()->MoveChase(who, !_voidBoltCooldown ? 30.0f : 0.0f);
+            me->GetMotionMaster()->MoveChase(who, 0.0f);
         }
     }
 
@@ -158,6 +156,7 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(20s, [this](TaskContext)
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 Talk(SAY_SUMMON2);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
