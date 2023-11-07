@@ -70,6 +70,7 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         BossAI::Reset();
         me->SetModelVisible(true);
+        _visible = true;
 
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
@@ -129,6 +130,7 @@ struct boss_high_astromancer_solarian : public BossAI
             context.Repeat(40s);
         }).Schedule(50s, [this](TaskContext context)
         {
+            _visible = false;
             me->SetReactState(REACT_PASSIVE);
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
@@ -155,6 +157,7 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(20s, [this](TaskContext)
             {
+                _visible = true;
                 me->SetReactState(REACT_AGGRESSIVE);
                 Talk(SAY_SUMMON2);
                 summons.DoForAllSummons([&](WorldObject* summon)
@@ -193,6 +196,19 @@ struct boss_high_astromancer_solarian : public BossAI
         });
     }
 
+     void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (_visible)
+        {
+            DoMeleeAttackIfReady();
+        }
+    }
+
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
@@ -206,6 +222,8 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
+private:
+    bool _visible;
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public SpellScriptLoader
