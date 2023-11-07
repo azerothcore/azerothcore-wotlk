@@ -508,7 +508,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 float CBSPowerCreature = pCBS->BaseDamage[cInfo->expansion];
                 CreatureBaseStats const* spellCBS = sObjectMgr->GetCreatureBaseStats(_spellInfo->SpellLevel, caster->getClass());
                 float CBSPowerSpell = spellCBS->BaseDamage[cInfo->expansion];
-                value = value * (CBSPowerCreature / CBSPowerSpell);
+                value *= CBSPowerCreature / CBSPowerSpell;
             }
         }
     }
