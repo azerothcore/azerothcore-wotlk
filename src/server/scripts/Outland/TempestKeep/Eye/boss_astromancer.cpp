@@ -70,7 +70,6 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         BossAI::Reset();
         me->SetModelVisible(true);
-        _voidBoltCooldown = false;
 
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
@@ -207,8 +206,6 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
-private:
-    bool _voidBoltCooldown;
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public SpellScriptLoader
