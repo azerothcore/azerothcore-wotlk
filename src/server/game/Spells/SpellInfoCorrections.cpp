@@ -4602,6 +4602,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[0] = 6;
     });
 
+    // 46747 Fling torch
+    ApplySpellFix({ 46747 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
+    });
+    
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
