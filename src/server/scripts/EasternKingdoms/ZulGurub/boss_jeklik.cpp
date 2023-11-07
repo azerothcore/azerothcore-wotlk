@@ -515,10 +515,10 @@ struct npc_batrider : public CreatureAI
             switch (events.ExecuteEvent())
             {
                 case EVENT_DEMO_SHOUT:
-                    DoCast(me, SPELL_DEMO_SHOUT);
+                    DoCastSelf(SPELL_DEMO_SHOUT);
                     break;
                 case EVENT_BATTLE_COMMAND:
-                    DoCast(me, SPELL_BATTLE_COMMAND);
+                    DoCastSelf(SPELL_BATTLE_COMMAND);
                     events.ScheduleEvent(EVENT_BATTLE_COMMAND, 25s);
                     break;
                 case EVENT_INFECTED_BITE:
@@ -527,7 +527,7 @@ struct npc_batrider : public CreatureAI
                     break;
                 case EVENT_UNSTABLE_CONCOCTION:
                     Talk(EMOTE_LOW_HEALTH);
-                    DoCast(me, SPELL_UNSTABLE_CONCOCTION);
+                    DoCastSelf(SPELL_UNSTABLE_CONCOCTION);
                     break;
                 default:
                     break;
