@@ -318,7 +318,6 @@ enum Says
     SAY_MO_AB_TALK3,
     SAY_MO_AB_TALK4,
     SAY_MO_AB_TALK5,
-    SAY_MO_AB_TALK6,
 
     //Highlord Mograine Ashbringer Event Says
     SAY_HM_AB_TALK0 = 0,
