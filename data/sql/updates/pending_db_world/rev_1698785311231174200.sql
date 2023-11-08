@@ -1,4 +1,4 @@
--- fix commoner spawns and auras
+-- fix commoner spawns, auras and equips
 
 SET @GEVENT1  := 1;  -- Midsummer
 SET @GEVENT2  := 2;  -- Winter Veil
