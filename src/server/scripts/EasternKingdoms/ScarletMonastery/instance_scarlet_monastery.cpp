@@ -207,7 +207,7 @@ public:
         ObjectGuid WhitemaneGUID;
         uint32 encounter{};
         uint32 ashencounter{};
-        std::set<ObjectGuid> AshbringerNpcGUID;
+        GuidSet AshbringerNpcGUID;
     };
 };
 
@@ -314,6 +314,17 @@ enum Says
     SAY_MO_KILL = 1,
     SAY_MO_RESURRECTED = 2,
 
+    //Mograine Ashbringer Event says
+    SAY_MO_AB_TALK3,
+    SAY_MO_AB_TALK4,
+    SAY_MO_AB_TALK5,
+    SAY_MO_AB_TALK6,
+
+    //Highlord Mograine Ashbringer Event Says
+    SAY_HM_AB_TALK0 = 0,
+    SAY_HM_AB_TALK1,
+    SAY_HM_AB_TALK2,
+
     //Whitemane says
     SAY_WH_INTRO = 0,
     SAY_WH_KILL = 1,
@@ -340,7 +351,7 @@ public:
 
             switch (eventId)
             {
-            case  EVENT_MOGRAINE_FACING_PLAYER:
+            case EVENT_MOGRAINE_FACING_PLAYER:
                 me->SetFacingToObject(playerWhoStartedAshbringer);
                 events.ScheduleEvent(EVENT_MOGRAINE_KNEEL, 1s, 3s);
                 break;
@@ -350,7 +361,7 @@ public:
                 events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK3:
-                Talk(3, playerWhoStartedAshbringer);
+                me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer);
                 break;
             case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
                 if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
@@ -367,7 +378,7 @@ public:
             case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
                 summonedMograine->StopMovingOnCurrentPos();
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                summonedMograine->AI()->Talk(0, 214ms);
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK0, 214ms);
                 events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3024ms);
                 break;
             case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
@@ -381,12 +392,12 @@ public:
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK4:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                me->AI()->Talk(4, 209ms);
+                me->AI()->Talk(SAY_MO_AB_TALK4, 209ms);
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4636ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                summonedMograine->AI()->Talk(1, me, 10ms);
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK1, me, 10ms);
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3429ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE1:
@@ -408,7 +419,7 @@ public:
             case EVENT_MOGRAINE_EMOTE_TALK5:
                 me->SetSheath(SHEATH_STATE_UNARMED);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_BEG);
-                me->AI()->Talk(5, 214ms);
+                me->AI()->Talk(SAY_MO_AB_TALK5, 214ms);
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3022ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
@@ -422,8 +433,8 @@ public:
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 100ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
-                Unit::Kill(me, me, true);
-                summonedMograine->AI()->Talk(2, 2764ms);
+                me->KillSelf();
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK2, 2764ms);
                 instance->SetData(DATA_MOGRAINE, DONE);
                 summonedMograine->DespawnOrUnsummon(6190);
                 me->setActive(false);
@@ -582,11 +593,11 @@ public:
                 switch (eventId)
                 {
                 case EVENT_SPELL_CRUSADER_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
+                    DoCastVictim(SPELL_CRUSADER_STRIKE, true);
                     events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10s);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
+                    DoCastVictim(SPELL_HAMMER_OF_JUSTICE, true);
                     events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60s);
                     break;
                 case EVENT_PULL_CATHEDRAL:
