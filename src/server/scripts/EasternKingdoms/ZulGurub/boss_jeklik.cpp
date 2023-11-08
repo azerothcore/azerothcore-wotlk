@@ -25,84 +25,126 @@
 #include "WaypointMgr.h"
 #include "zulgurub.h"
 
-enum BossSays
+// High Priestess Jeklik (14517) - Main Boss
+namespace Jeklik
 {
-    SAY_AGGRO                   = 0,
-    SAY_CALL_RIDERS             = 1,
-    SAY_DEATH                   = 2,
-    EMOTE_SUMMON_BATS           = 3,
-    EMOTE_GREAT_HEAL            = 4
+    enum Says
+    {
+        SAY_AGGRO                   = 0,
+        SAY_CALL_RIDERS             = 1,
+        SAY_DEATH                   = 2,
+        EMOTE_SUMMON_BATS           = 3,
+        EMOTE_GREAT_HEAL            = 4
+    };
+
+    enum Spells
+    {
+        // Intro
+        SPELL_GREEN_CHANNELING      = 13540,
+        SPELL_BAT_FORM              = 23966,
+
+        // Phase one
+        SPELL_PIERCE_ARMOR          = 12097,
+        SPELL_BLOOD_LEECH           = 22644,
+        SPELL_CHARGE                = 22911,
+        SPELL_SONIC_BURST           = 23918,
+        SPELL_SWOOP                 = 23919,
+
+        // Phase two
+        SPELL_CURSE_OF_BLOOD        = 16098,
+        SPELL_PSYCHIC_SCREAM        = 22884,
+        SPELL_SHADOW_WORD_PAIN      = 23952,
+        SPELL_MIND_FLAY             = 23953,
+        SPELL_GREATER_HEAL          = 23954
+    };
+
+    enum Events
+    {
+        // Phase one
+        EVENT_BLOOD_LEECH           = 1,
+        EVENT_CHARGE_JEKLIK,
+        EVENT_PIERCE_ARMOR,
+        EVENT_SONIC_BURST,
+        EVENT_SPAWN_BATS,
+        EVENT_SWOOP,
+
+        // Phase two
+        EVENT_CURSE_OF_BLOOD,
+        EVENT_PSYCHIC_SCREAM,
+        EVENT_SHADOW_WORD_PAIN,
+        EVENT_MIND_FLAY,
+        EVENT_GREATER_HEAL,
+        EVENT_SPAWN_FLYING_BATS
+    };
+
+    enum SummonCreatureIds
+    {
+        NPC_BLOODSEEKER_BAT         = 11368,
+        NPC_BAT_RIDER               = 14750
+    };
+
+    enum Paths
+    {
+        PATH_INTRO                  = 145170
+    };
+
+    Position const CaveHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
+    Position const SpawnBatRiderPosition = { -12301.689, -1371.2921, 145.09244 };
+    Position const CaveBatSpawnPosition[6] =
+    {
+        { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
+        { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
+        { -12293.6220f, -1380.2640f, 144.8304f, 5.483f },
+        { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
+        { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
+        { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
+    };
 };
 
-enum BatRiderSays
+// Gurubashi Bat Rider (14750) - trash and boss summon are same creature ID
+namespace BatRider
 {
-    EMOTE_LOW_HEALTH            = 0
-};
+    enum Mode
+    {
+        MODE_TRASH                  = 1,
+        MODE_BOSS
+    };
 
-enum Spells
-{
-    // Intro
-    SPELL_GREEN_CHANNELING      = 13540,
-    SPELL_BAT_FORM              = 23966,
+    enum Says
+    {
+        EMOTE_LOW_HEALTH            = 0
+    };
 
-    // Phase one
-    SPELL_PIERCE_ARMOR          = 12097,
-    SPELL_BLOOD_LEECH           = 22644,
-    SPELL_CHARGE                = 22911,
-    SPELL_SONIC_BURST           = 23918,
-    SPELL_SWOOP                 = 23919,
+    enum Spells
+    {
+        // Bat Rider (Boss)
+        SPELL_THROW_LIQUID_FIRE     = 23970,
+        SPELL_SUMMON_LIQUID_FIRE    = 23971,
 
-    // Phase two
-    SPELL_CURSE_OF_BLOOD        = 16098,
-    SPELL_PSYCHIC_SCREAM        = 22884,
-    SPELL_SHADOW_WORD_PAIN      = 23952,
-    SPELL_MIND_FLAY             = 23953,
-    SPELL_GREATER_HEAL          = 23954,
+        // Bat Rider (Trash)
+        SPELL_DEMO_SHOUT            = 23511,
+        SPELL_BATTLE_COMMAND        = 5115,
+        SPELL_INFECTED_BITE         = 16128,
+        SPELL_PASSIVE_THRASH        = 8876,
+        SPELL_UNSTABLE_CONCOCTION   = 24024
+    };
 
-    // Bat Rider (Boss)
-    SPELL_THROW_LIQUID_FIRE     = 23970,
-    SPELL_SUMMON_LIQUID_FIRE    = 23971,
+    enum Events
+    {
+        // Bat Riders (Boss)
+        EVENT_BAT_RIDER_THROW_BOMB,
 
-    // Bat Rider (Trash)
-    SPELL_DEMO_SHOUT            = 23511,
-    SPELL_BATTLE_COMMAND        = 5115,
-    SPELL_INFECTED_BITE         = 16128,
-    SPELL_PASSIVE_THRASH        = 8876,
-    SPELL_UNSTABLE_CONCOCTION    = 24024
-};
+        // Bat Riders (Trash)
+        EVENT_DEMO_SHOUT,
+        EVENT_BATTLE_COMMAND,
+        EVENT_INFECTED_BITE,
+        EVENT_UNSTABLE_CONCOCTION
+    };
 
-enum BatIds
-{
-    NPC_BLOODSEEKER_BAT         = 11368,
-    NPC_BAT_RIDER               = 14750
-};
-
-enum Events
-{
-    // Phase one
-    EVENT_CHARGE_JEKLIK         = 1,
-    EVENT_PIERCE_ARMOR,
-    EVENT_BLOOD_LEECH,
-    EVENT_SONIC_BURST,
-    EVENT_SWOOP,
-    EVENT_SPAWN_BATS,
-
-    // Phase two
-    EVENT_CURSE_OF_BLOOD,
-    EVENT_PSYCHIC_SCREAM,
-    EVENT_SHADOW_WORD_PAIN,
-    EVENT_MIND_FLAY,
-    EVENT_GREATER_HEAL,
-    EVENT_SPAWN_FLYING_BATS,
-
-    // Bat Riders (Boss)
-    EVENT_BAT_RIDER_THROW_BOMB,
-
-    // Bat Riders (Trash)
-    EVENT_DEMO_SHOUT,
-    EVENT_BATTLE_COMMAND,
-    EVENT_INFECTED_BITE,
-    EVENT_UNSTABLE_CONCOCTION
+    enum Paths
+    {
+        PATH_LOOP       = 147500
+    };
 };
 
 enum Phase
@@ -111,32 +153,8 @@ enum Phase
     PHASE_TWO                   = 2
 };
 
-Position const SpawnBat[6] =
-{
-    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
-};
-
-Position const SpawnBatRider = { -12301.689, -1371.2921, 145.09244 };
-Position const JeklikCaveHomePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
-
-enum PathID
-{
-    PATH_JEKLIK_INTRO   = 145170,
-    PATH_BAT_RIDER_LOOP = 147500
-};
-
-enum BatRiderMode
-{
-    BAT_RIDER_MODE_TRASH = 1,
-    BAT_RIDER_MODE_BOSS
-};
-
 // High Priestess Jeklik (14517)
+using namespace Jeklik;
 struct boss_jeklik : public BossAI
 {
     // Bat Riders (14750) counter
@@ -147,7 +165,7 @@ struct boss_jeklik : public BossAI
     void InitializeAI() override
     {
         BossAI::InitializeAI();
-        me->SetHomePosition(JeklikCaveHomePosition);
+        me->SetHomePosition(CaveHomePosition);
     }
 
     void Reset() override
@@ -165,7 +183,7 @@ struct boss_jeklik : public BossAI
         {
             // teleport back to cave
             float x, y, z, o;
-            JeklikCaveHomePosition.GetPosition(x, y, z, o);
+            CaveHomePosition.GetPosition(x, y, z, o);
 
             me->NearTeleportTo(x, y, z, o);
         });
@@ -198,7 +216,7 @@ struct boss_jeklik : public BossAI
         me->SetDisableGravity(true);
         DoCastSelf(SPELL_BAT_FORM, true);
 
-        me->GetMotionMaster()->MovePath(PATH_JEKLIK_INTRO, false);
+        me->GetMotionMaster()->MovePath(PATH_INTRO, false);
     }
 
     void PathEndReached(uint32 pathId) override
@@ -321,7 +339,7 @@ struct boss_jeklik : public BossAI
                     Talk(EMOTE_SUMMON_BATS);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         for (uint8 i = 0; i < 6; ++i)
-                            if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                            if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, CaveBatSpawnPosition[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT))
                                 bat->AI()->AttackStart(target);
                     events.ScheduleEvent(EVENT_SPAWN_BATS, 30s, PHASE_ONE);
                     break;
@@ -361,7 +379,7 @@ struct boss_jeklik : public BossAI
                             Talk(SAY_CALL_RIDERS);
 
                             // only if the bat rider was successfully created
-                            if (me->SummonCreature(NPC_BAT_RIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                            if (me->SummonCreature(NPC_BAT_RIDER, SpawnBatRiderPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
                                 // increase the counter
                                 batRidersCount++;
@@ -388,155 +406,158 @@ struct boss_jeklik : public BossAI
 };
 
 // Gurubashi Bat Rider (14750) - trash and boss summon are same creature ID
-struct npc_batrider : public CreatureAI
+namespace BatRider
 {
-    BatRiderMode _mode; // the version of this creature (trash or boss)
-
-    npc_batrider(Creature* creature) : CreatureAI(creature)
+    struct npc_batrider : public CreatureAI
     {
-        // if this is a summon of Jeklik, it is in boss mode
-        if
-        (
-            me->GetEntry() == NPC_BAT_RIDER &&
-            me->IsSummon() &&
-            me->ToTempSummon() &&
-            me->ToTempSummon()->GetSummoner() &&
-            me->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
-        )
+        BatRiderMode _mode; // the version of this creature (trash or boss)
+
+        npc_batrider(Creature* creature) : CreatureAI(creature)
         {
-            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_BOSS");
-            _mode = BAT_RIDER_MODE_BOSS;
-
-            // make the bat rider unattackable
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-
-            // keep the bat from attacking players directly
-            me->SetReactState(REACT_PASSIVE);
-
-            // make the bat rider move the correct speed
-            me->SetSpeed(MOVE_WALK, 5.0f, true);
-
-        }
-        // otherwise, trash mode
-        else
-        {
-            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_TRASH");
-            me->SetReactState(REACT_DEFENSIVE);
-            _mode = BAT_RIDER_MODE_TRASH;
-        }
-    }
-
-    void Reset() override
-    {
-        CreatureAI::Reset();
-
-        switch (_mode)
-        {
-            case BAT_RIDER_MODE_BOSS:
-                events.Reset();
-                me->GetMotionMaster()->Clear();
-                break;
-            case BAT_RIDER_MODE_TRASH:
-                events.Reset();
-
-                // apply the Thrash (8876) spell to the bat rider (passive ability)
-                me->CastSpell(me, SPELL_PASSIVE_THRASH);
-
-                break;
-        }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        CreatureAI::JustEngagedWith(who);
-
-        switch (_mode)
-        {
-            case BAT_RIDER_MODE_BOSS:
-                events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
-                break;
-            case BAT_RIDER_MODE_TRASH:
-                events.ScheduleEvent(EVENT_DEMO_SHOUT, 1s);
-                events.ScheduleEvent(EVENT_BATTLE_COMMAND, 8s);
-                events.ScheduleEvent(EVENT_INFECTED_BITE, 6500ms);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        events.Update(diff);
-
-        if (_mode == BAT_RIDER_MODE_BOSS)
-        {
-            // if the creature isn't moving, run the loop
-            if (!me->isMoving())
+            // if this is a summon of Jeklik, it is in boss mode
+            if
+            (
+                me->GetEntry() == NPC_BAT_RIDER &&
+                me->IsSummon() &&
+                me->ToTempSummon() &&
+                me->ToTempSummon()->GetSummoner() &&
+                me->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
+            )
             {
-                LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
-                // enable flying
-                me->SetDisableGravity(true);
-                // send the rider on its loop
-                me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
+                LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_BOSS");
+                _mode = BAT_RIDER_MODE_BOSS;
+
+                // make the bat rider unattackable
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+
+                // keep the bat from attacking players directly
+                me->SetReactState(REACT_PASSIVE);
+
+                // make the bat rider move the correct speed
+                me->SetSpeed(MOVE_WALK, 5.0f, true);
+
             }
-
-            // event handling
-            switch (events.ExecuteEvent())
+            // otherwise, trash mode
+            else
             {
-                case EVENT_BAT_RIDER_THROW_BOMB:
-                    LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: EVENT_BAT_RIDER_THROW_BOMB");
-                    DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
-                    events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 8s);
+                LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BAT_RIDER_MODE_TRASH");
+                me->SetReactState(REACT_DEFENSIVE);
+                _mode = BAT_RIDER_MODE_TRASH;
+            }
+        }
+
+        void Reset() override
+        {
+            CreatureAI::Reset();
+
+            switch (_mode)
+            {
+                case BAT_RIDER_MODE_BOSS:
+                    events.Reset();
+                    me->GetMotionMaster()->Clear();
                     break;
-                default:
+                case BAT_RIDER_MODE_TRASH:
+                    events.Reset();
+
+                    // apply the Thrash (8876) spell to the bat rider (passive ability)
+                    me->CastSpell(me, SPELL_PASSIVE_THRASH);
+
                     break;
             }
         }
-        else if (_mode == BAT_RIDER_MODE_TRASH)
+
+        void JustEngagedWith(Unit* who) override
         {
-            if (!UpdateVictim())
-            {
-                return;
-            }
+            CreatureAI::JustEngagedWith(who);
 
-            // don't interrupt casting
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            switch (_mode)
             {
-                return;
+                case BAT_RIDER_MODE_BOSS:
+                    events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 2s);
+                    break;
+                case BAT_RIDER_MODE_TRASH:
+                    events.ScheduleEvent(EVENT_DEMO_SHOUT, 1s);
+                    events.ScheduleEvent(EVENT_BATTLE_COMMAND, 8s);
+                    events.ScheduleEvent(EVENT_INFECTED_BITE, 6500ms);
             }
-
-            // if health goes below 30%, cast Unstable Concotion
-            if (me->HealthBelowPct(30))
-            {
-                events.ScheduleEvent(EVENT_UNSTABLE_CONCOCTION, 0);
-            }
-
-            // event handling
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DEMO_SHOUT:
-                    DoCastSelf(SPELL_DEMO_SHOUT);
-                    break;
-                case EVENT_BATTLE_COMMAND:
-                    DoCastSelf(SPELL_BATTLE_COMMAND);
-                    events.ScheduleEvent(EVENT_BATTLE_COMMAND, 25s);
-                    break;
-                case EVENT_INFECTED_BITE:
-                    DoCastVictim(SPELL_INFECTED_BITE);
-                    events.ScheduleEvent(EVENT_INFECTED_BITE, 8s);
-                    break;
-                case EVENT_UNSTABLE_CONCOCTION:
-                    Talk(EMOTE_LOW_HEALTH);
-                    DoCastSelf(SPELL_UNSTABLE_CONCOCTION);
-                    break;
-                default:
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
         }
-    }
-};
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (_mode == BAT_RIDER_MODE_BOSS)
+            {
+                // if the creature isn't moving, run the loop
+                if (!me->isMoving())
+                {
+                    LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
+                    // enable flying
+                    me->SetDisableGravity(true);
+                    // send the rider on its loop
+                    me->GetMotionMaster()->MoveSplinePath(PATH_BAT_RIDER_LOOP);
+                }
+
+                // event handling
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_BAT_RIDER_THROW_BOMB:
+                        LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: EVENT_BAT_RIDER_THROW_BOMB");
+                        DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
+                        events.ScheduleEvent(EVENT_BAT_RIDER_THROW_BOMB, 8s);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (_mode == BAT_RIDER_MODE_TRASH)
+            {
+                if (!UpdateVictim())
+                {
+                    return;
+                }
+
+                // don't interrupt casting
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
+                }
+
+                // if health goes below 30%, cast Unstable Concotion
+                if (me->HealthBelowPct(30))
+                {
+                    events.ScheduleEvent(EVENT_UNSTABLE_CONCOCTION, 0);
+                }
+
+                // event handling
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_DEMO_SHOUT:
+                        DoCastSelf(SPELL_DEMO_SHOUT);
+                        break;
+                    case EVENT_BATTLE_COMMAND:
+                        DoCastSelf(SPELL_BATTLE_COMMAND);
+                        events.ScheduleEvent(EVENT_BATTLE_COMMAND, 25s);
+                        break;
+                    case EVENT_INFECTED_BITE:
+                        DoCastVictim(SPELL_INFECTED_BITE);
+                        events.ScheduleEvent(EVENT_INFECTED_BITE, 8s);
+                        break;
+                    case EVENT_UNSTABLE_CONCOCTION:
+                        Talk(EMOTE_LOW_HEALTH);
+                        DoCastSelf(SPELL_UNSTABLE_CONCOCTION);
+                        break;
+                    default:
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        }
+    };
+}
 
 class spell_batrider_bomb : public SpellScript
 {
