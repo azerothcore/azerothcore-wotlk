@@ -360,7 +360,8 @@ public:
                 events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK3:
-                me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer,43ms);
                 break;
             case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
                 if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
