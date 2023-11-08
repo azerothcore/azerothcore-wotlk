@@ -360,7 +360,7 @@ public:
                 events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK3:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                 me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer,43ms);
                 break;
             case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
