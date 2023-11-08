@@ -21144,6 +21144,18 @@ void Unit::setRace(uint8 race)
         m_race = race;
 }
 
+DisplayRace Unit::GetDisplayRaceFromModelId(uint32 modelId) const
+{
+    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(modelId))
+    {
+        if (CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID))
+        {
+            return DisplayRace(displayExtra->DisplayRaceID);
+        }
+    }
+    return DisplayRace::None;
+}
+
 // Check if unit in combat with specific unit
 bool Unit::IsInCombatWith(Unit const* who) const
 {
