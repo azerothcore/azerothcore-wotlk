@@ -225,7 +225,7 @@ public:
                 if (instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
                 {
                     Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
-                    if (commanderMograine->IsAlive())
+                    if (commanderMograine && commanderMograine->IsAlive())
                         commanderMograine->AI()->Talk(TALK_MOGRAINE_ASHBRBINGER_INTRO);
                     instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
                     return true;
