@@ -171,6 +171,7 @@ struct boss_thekal : public BossAI
     {
         if (!me->HasAura(SPELL_TIGER_FORM) && damage >= me->GetHealth())
         {
+            LOG_ERROR("scripts.ai", "boss_thekal:DamageTaken:: Thekal is about to die, playing dead instead.");
             damage = me->GetHealth() - 1;
 
             if (!_wasDead)
@@ -185,18 +186,13 @@ struct boss_thekal : public BossAI
                 Talk(EMOTE_DIES);
             }
         }
-
-        if (!_enraged && me->HealthBelowPctDamaged(20, damage) && me->HasAura(SPELL_TIGER_FORM))
-        {
-            DoCastSelf(SPELL_ENRAGE);
-            _enraged = true;
-        }
     }
 
     void DoAction(int32 action) override
     {
         if (action == ACTION_RESSURRECT)
         {
+            LOG_ERROR("scripts.ai", "boss_thekal:DoAction:: Thekal ressurrect himself!");
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RestoreFaction();
@@ -227,6 +223,7 @@ struct boss_thekal : public BossAI
     {
         if (Creature* zealot = instance->GetCreature(zealotData))
         {
+            LOG_ERROR("scripts.ai", "boss_thekal:ReviveZealot:: Reviving zealot {}", zealot->GetName());
             zealot->Respawn(true);
             zealot->SetInCombatWithZone();
             UpdateZealotStatus(zealotData, false);
@@ -249,7 +246,10 @@ struct boss_thekal : public BossAI
     {
         if (_wasDead && _lorkhanDied && _zathDied)
         {
+            LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal and zealots are dead, entering phase 2.");
+
             scheduler.Schedule(3s, [this](TaskContext /*context*/) {
+                LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Phase 2");
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
 
@@ -258,30 +258,46 @@ struct boss_thekal : public BossAI
                 });
 
                 scheduler.Schedule(6s, [this](TaskContext /*context*/) {
+                    LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal transforms.");
                     DoCastSelf(SPELL_TIGER_FORM);
                     me->LoadEquipment(0, true);
                     me->SetFullHealth();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
+                    LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Scheduling phase 2 abilities");
                     scheduler.Schedule(30s, [this](TaskContext context) {
+                        LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Frenzy");
                         DoCastSelf(SPELL_FRENZY);
                         context.Repeat();
                     }).Schedule(4s, [this](TaskContext context) {
+                        LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Force Punch");
                         DoCastVictim(SPELL_FORCEPUNCH);
                         context.Repeat(16s, 21s);
                     }).Schedule(12s, [this](TaskContext context) {
                         // charge a random target that is at least 8 yards away (min range of charge is 8 yards)
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -8.0f))
                         {
+                            LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Charge at {}", target->GetName());
                             DoCast(target, SPELL_CHARGE);
                             DoResetThreatList();
                             AttackStart(target);
                         }
+                        else
+                        {
+                            LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Charge attempted, no targets found.");
+                        }
                         context.Repeat(15s, 22s);
                     }).Schedule(25s, [this](TaskContext context) {
+                        LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Summon Tigers");
                         DoCastVictim(SPELL_SUMMONTIGERS, true);
                         context.Repeat(10s, 14s);
+                    });
+
+                    // schedule Enrage at 20% health
+                    ScheduleHealthCheckEvent(20, [this] {
+                        LOG_ERROR("scripts.ai", "boss_thekal:CheckPhaseTransition:: Thekal - Enrage @ 20%!");
+                        DoCastSelf(SPELL_ENRAGE);
                     });
                 });
             });
