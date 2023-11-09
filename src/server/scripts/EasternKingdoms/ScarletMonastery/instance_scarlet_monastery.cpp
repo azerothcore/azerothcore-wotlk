@@ -426,7 +426,7 @@ public:
                 //In Blizzard's servers, after "HIGHLORD_MOGRAINE" uses this spell, "MOGRAINE" will have a visual effect of lightning hits, and the visual effect after the hit is missing here and needs to be fixed
                 summonedMograine->CastSpell(me, SPELL_FORGIVENESS, false);
                 events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1000ms);
-                break;            
+                break;
             case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
                 me->KillSelf();
                 summonedMograine->AI()->Talk(SAY_HM_AB_TALK2, 2700ms);
