@@ -361,7 +361,7 @@ public:
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK3:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer,43ms);
+                me->AI()->Talk(SAY_MO_AB_TALK3, playerWhoStartedAshbringer);
                 break;
             case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
                 if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
@@ -373,70 +373,64 @@ public:
                     summonedMograine->setActive(true);
                     summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND, false);//Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
                 }
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48546ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48500ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
                 summonedMograine->StopMovingOnCurrentPos();
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                summonedMograine->AI()->Talk(SAY_HM_AB_TALK0, 214ms);
-                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3024ms);
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK0, 200ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3000ms);
                 break;
             case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
                 me->SetFacingToObject(summonedMograine);
-                events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 403ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 400ms);
                 break;
             case EVENT_MOGRAINE_UNIT_STAND_STATE_STAND:
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetSheath(SHEATH_STATE_MELEE);
-                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 809ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 800ms);
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK4:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                me->AI()->Talk(SAY_MO_AB_TALK4, 209ms);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4636ms);
+                me->AI()->Talk(SAY_MO_AB_TALK4, 200ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4600ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                summonedMograine->AI()->Talk(SAY_HM_AB_TALK1, me, 10ms);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3429ms);
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK1, me);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3400ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE1:
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3236ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3200ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE2:
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3243ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3200ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_EMOTE3:
                 summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3232ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3200ms);
                 break;
             case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2:
                 me->SetFacingToObject(summonedMograine);
-                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1210ms);
+                events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1200ms);
                 break;
             case EVENT_MOGRAINE_EMOTE_TALK5:
                 me->SetSheath(SHEATH_STATE_UNARMED);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_BEG);
-                me->AI()->Talk(SAY_MO_AB_TALK5, 214ms);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3022ms);
+                me->AI()->Talk(SAY_MO_AB_TALK5, 200ms);
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3000ms);
                 break;
             case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
+                //In Blizzard's servers, after "HIGHLORD_MOGRAINE" uses this spell, "MOGRAINE" will have a visual effect of lightning hits, and the visual effect after the hit is missing here and needs to be fixed
                 summonedMograine->CastSpell(me, SPELL_FORGIVENESS, false);
-                //events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1010ms);
-                events.ScheduleEvent(EVENT_MOGRAINE_CASTSPELL, 1000ms); // case 16 hack fix time
-                break;
-            case EVENT_MOGRAINE_CASTSPELL:
-                // Hack fix The lightning effect of mograine being hit by a spell
-                me->CastSpell(me, SPELL_COSMETIC_EXPLODE, false);
-                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 100ms);
-                break;
+                events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1000ms);
+                break;            
             case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
                 me->KillSelf();
-                summonedMograine->AI()->Talk(SAY_HM_AB_TALK2, 2764ms);
-                instance->SetData(DATA_MOGRAINE, DONE);
-                summonedMograine->DespawnOrUnsummon(6190);
+                summonedMograine->AI()->Talk(SAY_HM_AB_TALK2, 2700ms);
+                summonedMograine->DespawnOrUnsummon(6100);
                 me->setActive(false);
                 break;
             default:
@@ -792,7 +786,8 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
                 //There is a delay in sniffing 1615ms
-                me->CastSpell(me, SPELL_TRANSFORM_GHOST);//The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
+                //The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
+                me->CastSpell(me, SPELL_TRANSFORM_GHOST);
                 me->CastSpell(me, 57767, true);
                 //delay 10ms
                 me->SetDisplayId(16179);
