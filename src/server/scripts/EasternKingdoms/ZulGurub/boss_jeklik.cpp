@@ -390,8 +390,9 @@ struct npc_batrider : public CreatureAI
         else
         {
             LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_TRASH");
-            me->SetReactState(REACT_DEFENSIVE);
             _mode = BATRIDER_MODE_TRASH;
+
+            me->SetReactState(REACT_DEFENSIVE);
 
             // don't interrupt casting
             _scheduler.SetValidator([this]
@@ -433,21 +434,17 @@ struct npc_batrider : public CreatureAI
         }
         else if (_mode == BATRIDER_MODE_TRASH)
         {
-            // demo shout
+            // Demo Shout
             _scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_BATRIDER_DEMO_SHOUT);
-            });
-
-            // battle command
-            _scheduler.Schedule(8s, [this](TaskContext context)
+            // Battle Command
+            }).Schedule(8s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_BATRIDER_BATTLE_COMMAND);
                 context.Repeat(25s);
-            });
-
-            // infected bite
-            _scheduler.Schedule(6500ms, [this](TaskContext context)
+            // Infected Bite
+            }).Schedule(6500ms, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_BATRIDER_INFECTED_BITE);
                 context.Repeat(8s);
