@@ -201,7 +201,8 @@ struct boss_jeklik : public BossAI
         //
         LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE ONE");
         // Charge
-        scheduler.Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context) {
+        scheduler.Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context)
+        {
             // charge the nearest player that is at least 8 yards away (charge min distance)
             if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, -8.0f, false, false))
             {
@@ -215,23 +216,28 @@ struct boss_jeklik : public BossAI
             }
             context.Repeat(15s, 30s);
         // Pierce Armor
-        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context) {
+        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_PIERCE_ARMOR);
             context.Repeat(20s, 30s);
         // Blood Leech
-        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context) {
+        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_BLOOD_LEECH);
             context.Repeat(10s, 20s);
         // Sonic Burst
-        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context) {
+        }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_SONIC_BURST);
             context.Repeat(20s, 30s);
         // Swoop
-        }).Schedule(20s, PHASE_ONE, [this](TaskContext context) {
+        }).Schedule(20s, PHASE_ONE, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_SWOOP);
             context.Repeat(20s, 30s);
         // Spawn Cave Bats
-        }).Schedule(30s, PHASE_ONE, [this](TaskContext context) {
+        }).Schedule(30s, PHASE_ONE, [this](TaskContext context)
+        {
             Talk(EMOTE_SUMMON_BATS);
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
@@ -249,7 +255,8 @@ struct boss_jeklik : public BossAI
         //
         // Phase 2 (@ 50% health)
         //
-        ScheduleHealthCheckEvent(50, [&] {
+        ScheduleHealthCheckEvent(50, [&]
+        {
             LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE TWO");
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             DoResetThreatList();
@@ -257,29 +264,35 @@ struct boss_jeklik : public BossAI
             scheduler.CancelGroup(PHASE_ONE);
 
             // Curse of Blood
-            scheduler.Schedule(5s, 15s, PHASE_TWO, [this](TaskContext context) {
+            scheduler.Schedule(5s, 15s, PHASE_TWO, [this](TaskContext context)
+            {
                 DoCastSelf(SPELL_CURSE_OF_BLOOD);
                 context.Repeat(25s, 30s);
             // Psychic Scream
-            }).Schedule(25s, 35s, PHASE_TWO, [this](TaskContext context) {
+            }).Schedule(25s, 35s, PHASE_TWO, [this](TaskContext context)
+            {
                 DoCastVictim(SPELL_PSYCHIC_SCREAM);
                 context.Repeat(35s, 45s);
             // Shadow Word: Pain
-            }).Schedule(10s, 15s, PHASE_TWO, [this](TaskContext context) {
+            }).Schedule(10s, 15s, PHASE_TWO, [this](TaskContext context)
+            {
                 DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
                 context.Repeat(12s, 18s);
             // Mind Flay
-            }).Schedule(10s, 30s, PHASE_TWO, [this](TaskContext context) {
+            }).Schedule(10s, 30s, PHASE_TWO, [this](TaskContext context)
+            {
                 DoCastVictim(SPELL_MIND_FLAY);
                 context.Repeat(20s, 40s);
             // Greater Heal
-            }).Schedule(25s, PHASE_TWO, [this](TaskContext context) {
+            }).Schedule(25s, PHASE_TWO, [this](TaskContext context)
+            {
                 Talk(EMOTE_GREAT_HEAL);
                 me->InterruptNonMeleeSpells(false);
                 DoCastSelf(SPELL_GREATER_HEAL);
                 context.Repeat(25s);
             // Spawn Flying Bats
-            }).Schedule(10s, PHASE_TWO, [this](TaskContext context) {
+            }).Schedule(10s, PHASE_TWO, [this](TaskContext context)
+            {
                 if (me->GetThreatMgr().GetThreatListSize())
                 {
                     // summon up to 2 bat riders
