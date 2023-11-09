@@ -76,34 +76,6 @@ enum BatIds
     NPC_BATRIDER                        = 14750
 };
 
-enum Events
-{
-    // Phase one
-    EVENT_CHARGE_JEKLIK                 = 1,
-    EVENT_PIERCE_ARMOR,
-    EVENT_BLOOD_LEECH,
-    EVENT_SONIC_BURST,
-    EVENT_SWOOP,
-    EVENT_SPAWN_BATS,
-
-    // Phase two
-    EVENT_CURSE_OF_BLOOD,
-    EVENT_PSYCHIC_SCREAM,
-    EVENT_SHADOW_WORD_PAIN,
-    EVENT_MIND_FLAY,
-    EVENT_GREATER_HEAL,
-    EVENT_SPAWN_FLYING_BATS,
-
-    // Bat Riders (Boss)
-    EVENT_BATRIDER_THROW_BOMB,
-
-    // Bat Riders (Trash)
-    EVENT_BATRIDER_DEMO_SHOUT,
-    EVENT_BATRIDER_BATTLE_COMMAND,
-    EVENT_BATRIDER_INFECTED_BITE,
-    EVENT_BATRIDER_UNSTABLE_CONCOCTION
-};
-
 enum Phase
 {
     PHASE_ONE                           = 1,
@@ -227,6 +199,7 @@ struct boss_jeklik : public BossAI
         //
         // PHASE 1
         //
+        LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE ONE");
         // Charge
         scheduler.Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context) {
             // charge the nearest player that is at least 8 yards away (charge min distance)
@@ -315,7 +288,7 @@ struct boss_jeklik : public BossAI
                         LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Spawn Flying Bats (Summoning {} of 2)", batRidersCount + 1);
                         Talk(SAY_CALL_RIDERS);
                         // only if the bat rider was successfully created
-                        if (me->SummonCreature(NPC_BATRIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                        if (me->SummonCreature(NPC_BATRIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT))
                         {
                             // increase the counter
                             batRidersCount++;
@@ -367,6 +340,7 @@ struct boss_jeklik : public BossAI
 struct npc_batrider : public CreatureAI
 {
     BatRiderMode _mode; // the version of this creature (trash or boss)
+    TaskScheduler _scheduler;
 
     npc_batrider(Creature* creature) : CreatureAI(creature)
     {
@@ -394,6 +368,10 @@ struct npc_batrider : public CreatureAI
             // make the bat rider move the correct speed
             me->SetSpeed(MOVE_WALK, 5.0f, true);
 
+            // start the flight loop
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
         }
         // otherwise, trash mode
         else
@@ -401,6 +379,12 @@ struct npc_batrider : public CreatureAI
             LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_TRASH");
             me->SetReactState(REACT_DEFENSIVE);
             _mode = BATRIDER_MODE_TRASH;
+
+            // don't interrupt casting
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
     }
 
@@ -408,19 +392,16 @@ struct npc_batrider : public CreatureAI
     {
         CreatureAI::Reset();
 
-        switch (_mode)
+        _scheduler.CancelAll();
+
+        if (_mode == BATRIDER_MODE_BOSS)
         {
-            case BATRIDER_MODE_BOSS:
-                events.Reset();
-                me->GetMotionMaster()->Clear();
-                break;
-            case BATRIDER_MODE_TRASH:
-                events.Reset();
-
-                // apply the Thrash (8876) spell to the bat rider (passive ability)
-                me->CastSpell(me, SPELL_BATRIDER_PASSIVE_THRASH);
-
-                break;
+            me->GetMotionMaster()->Clear();
+        }
+        else if (_mode == BATRIDER_MODE_TRASH)
+        {
+            // apply the Thrash (8876) spell to the bat rider (passive ability)
+            me->CastSpell(me, SPELL_BATRIDER_PASSIVE_THRASH);
         }
     }
 
@@ -428,22 +409,54 @@ struct npc_batrider : public CreatureAI
     {
         CreatureAI::JustEngagedWith(who);
 
-        switch (_mode)
+        if (_mode == BATRIDER_MODE_BOSS)
         {
-            case BATRIDER_MODE_BOSS:
-                events.ScheduleEvent(EVENT_BATRIDER_THROW_BOMB, 2s);
-                break;
-            case BATRIDER_MODE_TRASH:
-                events.ScheduleEvent(EVENT_BATRIDER_DEMO_SHOUT, 1s);
-                events.ScheduleEvent(EVENT_BATRIDER_BATTLE_COMMAND, 8s);
-                events.ScheduleEvent(EVENT_BATRIDER_INFECTED_BITE, 6500ms);
+            // throw bomb
+            _scheduler.Schedule(2s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_BATRIDER_THROW_LIQUID_FIRE);
+                context.Repeat(8s);
+            });
+        }
+        else if (_mode == BATRIDER_MODE_TRASH)
+        {
+            // demo shout
+            _scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_BATRIDER_DEMO_SHOUT);
+            });
+
+            // battle command
+            _scheduler.Schedule(8s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_BATRIDER_BATTLE_COMMAND);
+                context.Repeat(25s);
+            });
+
+            // infected bite
+            _scheduler.Schedule(6500ms, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_BATRIDER_INFECTED_BITE);
+                context.Repeat(8s);
+            });
         }
     }
 
-    void UpdateAI(uint32 diff) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        events.Update(diff);
+        if (_mode == BATRIDER_MODE_TRASH)
+        {
+            // if health goes below 30%, cast unstable concoction
+            if (me->HealthBelowPctDamaged(30, damage))
+            {
+                _scheduler.CancelAll();
+                DoCastSelf(SPELL_BATRIDER_UNSTABLE_CONCOCTION);
+            }
+        }
+    }
 
+    void UpdateAI(uint32 /*diff*/) override
+    {
         if (_mode == BATRIDER_MODE_BOSS)
         {
             // if the creature isn't moving, run the loop
@@ -451,21 +464,10 @@ struct npc_batrider : public CreatureAI
             {
                 LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
                 // enable flying
-                me->SetDisableGravity(true);
+                me->SetCanFly(true);
+                //me->SetDisableGravity(true);
                 // send the rider on its loop
                 me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
-            }
-
-            // event handling
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BATRIDER_THROW_BOMB:
-                    LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: EVENT_BATRIDER_THROW_BOMB");
-                    DoCastRandomTarget(SPELL_BATRIDER_THROW_LIQUID_FIRE);
-                    events.ScheduleEvent(EVENT_BATRIDER_THROW_BOMB, 8s);
-                    break;
-                default:
-                    break;
             }
         }
         else if (_mode == BATRIDER_MODE_TRASH)
@@ -475,42 +477,10 @@ struct npc_batrider : public CreatureAI
                 return;
             }
 
-            // don't interrupt casting
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            // if health goes below 30%, cast Unstable Concoction
-            if (me->HealthBelowPct(30))
-            {
-                events.ScheduleEvent(EVENT_BATRIDER_UNSTABLE_CONCOCTION, 0);
-            }
-
-            // event handling
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BATRIDER_DEMO_SHOUT:
-                    DoCastSelf(SPELL_BATRIDER_DEMO_SHOUT);
-                    break;
-                case EVENT_BATRIDER_BATTLE_COMMAND:
-                    DoCastSelf(SPELL_BATRIDER_BATTLE_COMMAND);
-                    events.ScheduleEvent(EVENT_BATRIDER_BATTLE_COMMAND, 25s);
-                    break;
-                case EVENT_BATRIDER_INFECTED_BITE:
-                    DoCastVictim(SPELL_BATRIDER_INFECTED_BITE);
-                    events.ScheduleEvent(EVENT_BATRIDER_INFECTED_BITE, 8s);
-                    break;
-                case EVENT_BATRIDER_UNSTABLE_CONCOCTION:
-                    Talk(EMOTE_BATRIDER_LOW_HEALTH);
-                    DoCastSelf(SPELL_BATRIDER_UNSTABLE_CONCOCTION);
-                    break;
-                default:
-                    break;
-            }
-
             DoMeleeAttackIfReady();
         }
+
+        _scheduler.Update();
     }
 };
 
