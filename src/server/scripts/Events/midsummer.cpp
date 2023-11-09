@@ -754,9 +754,9 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
+        OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
         if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
-            OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     }
