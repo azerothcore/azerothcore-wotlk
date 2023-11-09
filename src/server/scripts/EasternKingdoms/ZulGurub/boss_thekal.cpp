@@ -103,7 +103,8 @@ struct boss_thekal : public BossAI
         }
 
         // emote idle loop
-        scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+        scheduler.Schedule(5s, 25s, [this](TaskContext context)
+        {
             // pick a random emote from the list of available emotes
             me->HandleEmoteCommand(
                 RAND(
@@ -142,13 +143,16 @@ struct boss_thekal : public BossAI
         _JustEngagedWith();
 
         scheduler.CancelAll();
-        scheduler.Schedule(4s, [this](TaskContext context) {
+        scheduler.Schedule(4s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_MORTALCLEAVE);
             context.Repeat(15s, 20s);
-        }).Schedule(9s, [this](TaskContext context) {
+        }).Schedule(9s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_SILENCE);
             context.Repeat(20s, 25s);
-        }).Schedule(16s, [this](TaskContext context) {
+        }).Schedule(16s, [this](TaskContext context)
+        {
             DoCastSelf(SPELL_BLOODLUST);
             context.Repeat(20s, 28s);
         });
@@ -159,7 +163,8 @@ struct boss_thekal : public BossAI
         UpdateZealotStatus(data, true);
         CheckPhaseTransition();
 
-        scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
+        scheduler.Schedule(10s, [this, data](TaskContext /*context*/)
+        {
             if (!_lorkhanDied || !_zathDied || !_wasDead)
             {
                 ReviveZealot(data);
@@ -245,28 +250,34 @@ struct boss_thekal : public BossAI
     {
         if (_wasDead && _lorkhanDied && _zathDied)
         {
-            scheduler.Schedule(3s, [this](TaskContext /*context*/) {
+            scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
 
-                scheduler.Schedule(50ms, [this](TaskContext /*context*/) {
+                scheduler.Schedule(50ms, [this](TaskContext /*context*/)
+                {
                     Talk(SAY_AGGRO);
                 });
 
-                scheduler.Schedule(6s, [this](TaskContext /*context*/) {
+                scheduler.Schedule(6s, [this](TaskContext /*context*/)
+                {
                     DoCastSelf(SPELL_TIGER_FORM);
                     me->LoadEquipment(0, true);
                     me->SetFullHealth();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
-                    scheduler.Schedule(30s, [this](TaskContext context) {
+                    scheduler.Schedule(30s, [this](TaskContext context)
+                    {
                         DoCastSelf(SPELL_FRENZY);
                         context.Repeat();
-                    }).Schedule(4s, [this](TaskContext context) {
+                    }).Schedule(4s, [this](TaskContext context)
+                    {
                         DoCastVictim(SPELL_FORCEPUNCH);
                         context.Repeat(16s, 21s);
-                    }).Schedule(12s, [this](TaskContext context) {
+                    }).Schedule(12s, [this](TaskContext context)
+                    {
                         // charge a random target that is at least 8 yards away (min range of charge is 8 yards)
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -8.0f))
                         {
@@ -275,13 +286,15 @@ struct boss_thekal : public BossAI
                             AttackStart(target);
                         }
                         context.Repeat(15s, 22s);
-                    }).Schedule(25s, [this](TaskContext context) {
+                    }).Schedule(25s, [this](TaskContext context)
+                    {
                         DoCastVictim(SPELL_SUMMONTIGERS, true);
                         context.Repeat(10s, 14s);
                     });
 
                     // schedule Enrage at 20% health
-                    ScheduleHealthCheckEvent(20, [this] {
+                    ScheduleHealthCheckEvent(20, [this]
+                    {
                         DoCastSelf(SPELL_ENRAGE);
                     });
                 });
@@ -289,7 +302,8 @@ struct boss_thekal : public BossAI
         }
         else
         {
-            scheduler.Schedule(10s, [this](TaskContext /*context*/) {
+            scheduler.Schedule(10s, [this](TaskContext /*context*/)
+            {
                 if (!(_wasDead && _lorkhanDied && _zathDied))
                 {
                     DoAction(ACTION_RESSURRECT);
@@ -324,7 +338,8 @@ struct npc_zealot_lorkhan : public ScriptedAI
         });
 
         // emote idle loop
-        _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+        _scheduler.Schedule(5s, 25s, [this](TaskContext context)
+        {
             // pick a random emote from the list of available emotes
             me->HandleEmoteCommand(
                 RAND(
@@ -341,10 +356,12 @@ struct npc_zealot_lorkhan : public ScriptedAI
     {
         _scheduler.CancelAll();
 
-        _scheduler.Schedule(1s, [this](TaskContext context) {
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
             DoCastSelf(SPELL_SHIELD);
             context.Repeat(1min);
-        }).Schedule(32s, [this](TaskContext context) {
+        }).Schedule(32s, [this](TaskContext context)
+        {
             Unit* thekal = instance->GetCreature(DATA_THEKAL);
             Unit* zath = instance->GetCreature(DATA_ZATH);
 
@@ -365,7 +382,8 @@ struct npc_zealot_lorkhan : public ScriptedAI
             }
 
             context.Repeat(15s, 20s);
-        }).Schedule(6s, [this](TaskContext context) {
+        }).Schedule(6s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_DISARM);
             context.Repeat(15s, 25s);
         });
@@ -421,7 +439,8 @@ struct npc_zealot_zath : public ScriptedAI
         });
 
         // emote idle loop
-        _scheduler.Schedule(5s, 25s, [this](TaskContext context) {
+        _scheduler.Schedule(5s, 25s, [this](TaskContext context)
+        {
             // pick a random emote from the list of available emotes
             me->HandleEmoteCommand(
                 RAND(
@@ -438,16 +457,20 @@ struct npc_zealot_zath : public ScriptedAI
     {
         _scheduler.CancelAll();
 
-        _scheduler.Schedule(13s, [this](TaskContext context) {
+        _scheduler.Schedule(13s, [this](TaskContext context)
+        {
             DoCastSelf(SPELL_SWEEPINGSTRIKES);
             context.Repeat(1min);
-        }).Schedule(16s, [this](TaskContext context) {
+        }).Schedule(16s, [this](TaskContext context)
+        {
             DoCastSelf(SPELL_BLOODLUST);
             context.Repeat(22s, 26s);
-        }).Schedule(8s, [this](TaskContext context) {
+        }).Schedule(8s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_SINISTERSTRIKE);
             context.Repeat(8s, 16s);
-        }).Schedule(25s, [this](TaskContext context) {
+        }).Schedule(25s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_GOUGE);
 
             if (DoGetThreat(me->GetVictim()))
@@ -456,10 +479,12 @@ struct npc_zealot_zath : public ScriptedAI
             }
 
             context.Repeat(17s, 27s);
-        }).Schedule(18s, [this](TaskContext context) {
+        }).Schedule(18s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_KICK);
             context.Repeat(15s, 25s);
-        }).Schedule(5s, [this](TaskContext context) {
+        }).Schedule(5s, [this](TaskContext context)
+        {
             DoCastVictim(SPELL_BLIND);
             context.Repeat(10s, 20s);
         });
