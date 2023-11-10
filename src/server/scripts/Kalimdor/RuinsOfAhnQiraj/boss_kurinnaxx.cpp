@@ -45,7 +45,6 @@ struct boss_kurinnaxx : public BossAI
     {
         me->m_CombatDistance = 50.0f;
 
-        // don't interrupt casting
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -56,7 +55,6 @@ struct boss_kurinnaxx : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        // schedule all abilities
         scheduler.Schedule(8s, 10s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_MORTAL_WOUND);
@@ -78,7 +76,6 @@ struct boss_kurinnaxx : public BossAI
             context.Repeat(16s);
         });
 
-        // enrage at 30%
         ScheduleHealthCheckEvent(30, [&]
         {
             DoCastSelf(SPELL_ENRAGE);
@@ -87,7 +84,6 @@ struct boss_kurinnaxx : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        // spawn Andorov (dialog with him initiates Rajaxx encounter)
         if (killer)
         {
             killer->GetMap()->LoadGrid(-9502.80f, 2042.65f); // Ossirian grid
@@ -98,7 +94,6 @@ struct boss_kurinnaxx : public BossAI
             }
         }
 
-        // Ossirian yell emote
         if (Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN))
         {
             ossirian->setActive(true);
