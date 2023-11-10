@@ -141,14 +141,12 @@ struct boss_jeklik : public BossAI
         // instead, simply wait the 3 seconds it takes the path to complete, then teleport her home
         scheduler.Schedule(3s, [this](TaskContext)
         {
-            // teleport back to cave
             float x, y, z, o;
             JeklikCaveHomePosition.GetPosition(x, y, z, o);
 
             me->NearTeleportTo(x, y, z, o);
         });
 
-        // casting effect
         scheduler.Schedule(4s, [this](TaskContext)
         {
             DoCastSelf(SPELL_GREEN_CHANNELING, true);
@@ -167,13 +165,11 @@ struct boss_jeklik : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        // don't interrupt casting
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
 
-        // cancel the casting effect if it hasn't happened already
         scheduler.CancelAll();
 
         Talk(SAY_AGGRO);
@@ -197,13 +193,11 @@ struct boss_jeklik : public BossAI
         scheduler.CancelAll();
 
         //
-        // PHASE 1
+        // Phase 1
         //
         LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE ONE");
-        // Charge
         scheduler.Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context)
         {
-            // charge the nearest player that is at least 8 yards away (charge min distance)
             if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, -8.0f, false, false))
             {
                 LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Charge successful (target: {})", target->GetName());
@@ -215,27 +209,22 @@ struct boss_jeklik : public BossAI
                 LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Charge failed (no target available)");
             }
             context.Repeat(15s, 30s);
-        // Pierce Armor
         }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
         {
             DoCastVictim(SPELL_PIERCE_ARMOR);
             context.Repeat(20s, 30s);
-        // Blood Leech
         }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
         {
             DoCastVictim(SPELL_BLOOD_LEECH);
             context.Repeat(10s, 20s);
-        // Sonic Burst
         }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SONIC_BURST);
             context.Repeat(20s, 30s);
-        // Swoop
         }).Schedule(20s, PHASE_ONE, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SWOOP);
             context.Repeat(20s, 30s);
-        // Spawn Cave Bats
         }).Schedule(30s, PHASE_ONE, [this](TaskContext context)
         {
             Talk(EMOTE_SUMMON_BATS);
@@ -263,34 +252,28 @@ struct boss_jeklik : public BossAI
 
             scheduler.CancelGroup(PHASE_ONE);
 
-            // Curse of Blood
             scheduler.Schedule(5s, 15s, PHASE_TWO, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_CURSE_OF_BLOOD);
                 context.Repeat(25s, 30s);
-            // Psychic Scream
             }).Schedule(25s, 35s, PHASE_TWO, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_PSYCHIC_SCREAM);
                 context.Repeat(35s, 45s);
-            // Shadow Word: Pain
             }).Schedule(10s, 15s, PHASE_TWO, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
                 context.Repeat(12s, 18s);
-            // Mind Flay
             }).Schedule(10s, 30s, PHASE_TWO, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_MIND_FLAY);
                 context.Repeat(20s, 40s);
-            // Greater Heal
             }).Schedule(25s, PHASE_TWO, [this](TaskContext context)
             {
                 Talk(EMOTE_GREAT_HEAL);
                 me->InterruptNonMeleeSpells(false);
                 DoCastSelf(SPELL_GREATER_HEAL);
                 context.Repeat(25s);
-            // Spawn Flying Bats
             }).Schedule(10s, PHASE_TWO, [this](TaskContext context)
             {
                 if (me->GetThreatMgr().GetThreatListSize())
@@ -303,7 +286,6 @@ struct boss_jeklik : public BossAI
                         // only if the bat rider was successfully created
                         if (me->SummonCreature(NPC_BATRIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT))
                         {
-                            // increase the counter
                             batRidersCount++;
                         }
                         if (batRidersCount == 1)
@@ -318,7 +300,6 @@ struct boss_jeklik : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        // enter evade mode
         BossAI::EnterEvadeMode(why);
 
         if (why != EvadeReason::EVADE_REASON_NO_PATH)
@@ -352,7 +333,7 @@ struct boss_jeklik : public BossAI
 // Gurubashi Bat Rider (14750) - trash and boss summon are same creature ID
 struct npc_batrider : public CreatureAI
 {
-    BatRiderMode _mode; // the version of this creature (trash or boss)
+    BatRiderMode _mode;     // the version of this creature (trash or boss)
     TaskScheduler _scheduler;
 
     npc_batrider(Creature* creature) : CreatureAI(creature)
@@ -370,23 +351,17 @@ struct npc_batrider : public CreatureAI
             LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_BOSS");
             _mode = BATRIDER_MODE_BOSS;
 
-            // make the bat rider unattackable
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
 
-            // keep the bat from attacking players directly
             me->SetReactState(REACT_PASSIVE);
 
-            // make the bat rider move the correct speed
             me->SetSpeed(MOVE_WALK, 5.0f, true);
 
-            // start the flight loop
             me->SetCanFly(true);
-            me->SetDisableGravity(true);
             me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
         }
-        // otherwise, trash mode
         else
         {
             LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_TRASH");
@@ -414,7 +389,6 @@ struct npc_batrider : public CreatureAI
         }
         else if (_mode == BATRIDER_MODE_TRASH)
         {
-            // apply the Thrash (8876) spell to the bat rider (passive ability)
             me->CastSpell(me, SPELL_BATRIDER_PASSIVE_THRASH);
         }
     }
@@ -425,7 +399,6 @@ struct npc_batrider : public CreatureAI
 
         if (_mode == BATRIDER_MODE_BOSS)
         {
-            // throw bomb
             _scheduler.Schedule(2s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_BATRIDER_THROW_LIQUID_FIRE);
@@ -434,16 +407,13 @@ struct npc_batrider : public CreatureAI
         }
         else if (_mode == BATRIDER_MODE_TRASH)
         {
-            // Demo Shout
             _scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_BATRIDER_DEMO_SHOUT);
-            // Battle Command
             }).Schedule(8s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_BATRIDER_BATTLE_COMMAND);
                 context.Repeat(25s);
-            // Infected Bite
             }).Schedule(6500ms, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_BATRIDER_INFECTED_BITE);
@@ -456,7 +426,6 @@ struct npc_batrider : public CreatureAI
     {
         if (_mode == BATRIDER_MODE_TRASH)
         {
-            // if health goes below 30%, cast unstable concoction
             if (me->HealthBelowPctDamaged(30, damage))
             {
                 _scheduler.CancelAll();
@@ -469,14 +438,10 @@ struct npc_batrider : public CreatureAI
     {
         if (_mode == BATRIDER_MODE_BOSS)
         {
-            // if the creature isn't moving, run the loop
             if (!me->isMoving())
             {
                 LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
-                // enable flying
                 me->SetCanFly(true);
-                //me->SetDisableGravity(true);
-                // send the rider on its loop
                 me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
             }
         }
