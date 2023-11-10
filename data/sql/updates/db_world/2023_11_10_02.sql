@@ -1,3 +1,4 @@
+-- DB update 2023_11_10_01 -> 2023_11_10_02
 -- fix commoner spawns, auras and equips
 
 SET @GEVENT1  := 1;  -- Midsummer
