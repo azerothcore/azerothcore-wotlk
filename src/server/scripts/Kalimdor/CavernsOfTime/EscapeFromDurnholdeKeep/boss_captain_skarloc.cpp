@@ -61,11 +61,13 @@ struct boss_captain_skarloc : public BossAI
     }
 
     SummonList summons;
+    bool _SpawnedAdds;
 
     void Reset() override
     {
         _Reset();
         summons.DespawnAll();
+        _SpawnedAdds = false;
     }
 
     void JustSummoned(Creature* summon) override
@@ -108,27 +110,31 @@ struct boss_captain_skarloc : public BossAI
         if (type != ESCORT_MOTION_TYPE)
             return;
 
-        // Xinef: we can rely here on internal counting
-        if (id == 1)
+        if (!_SpawnedAdds)
         {
-            me->SummonCreature(NPC_DURNHOLDE_MAGE, 2038.549f, 273.303f, 63.420f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
-            me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2032.810f, 269.416f, 63.561f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
-        }
-        else if (id == 2)
-        {
-            me->Dismount();
-            me->SetWalk(true);
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            if (id == 1)
             {
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                {
-                    summon->SetWalk(true);
-                }
+                me->SummonCreature(NPC_DURNHOLDE_WARDEN, 2038.549f, 273.303f, 63.420f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
+                me->SummonCreature(NPC_DURNHOLDE_VETERAN, 2032.810f, 269.416f, 63.561f, 5.30f, TEMPSUMMON_MANUAL_DESPAWN);
             }
-            if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+            else if (id == 2)
             {
-                mount->SetImmuneToNPC(true);
-                mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->Dismount();
+                me->SetWalk(true);
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                {
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                    {
+                        summon->SetWalk(true);
+                    }
+                }
+                if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    mount->SetImmuneToNPC(true);
+                    mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                }
+
+                _SpawnedAdds = true;
             }
         }
 
