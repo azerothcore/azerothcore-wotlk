@@ -32,14 +32,6 @@ enum Spells
     SPELL_THRASH            = 3391
 };
 
-enum Events
-{
-    EVENT_MORTAL_WOUND      = 1,
-    EVENT_SAND_TRAP         = 2,
-    EVENT_WIDE_SLASH        = 3,
-    EVENT_THRASH            = 4
-};
-
 enum Texts
 {
     SAY_KURINNAXX_DEATH     = 5 // Yell by 'Ossirian the Unscarred'
