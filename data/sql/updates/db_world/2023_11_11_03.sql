@@ -1,3 +1,4 @@
+-- DB update 2023_11_11_02 -> 2023_11_11_03
 -- Triangulation Point One / Two
 DELETE FROM `areatrigger_involvedrelation` WHERE `id` IN (4473,4475);
 
