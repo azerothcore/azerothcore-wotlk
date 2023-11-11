@@ -587,6 +587,6 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSerpentShrineAI(boss_fathomguard_sharkkis);
     RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
     RegisterSerpentShrineAI(boss_fathomguard_caribdis);
-    new spell_karathress_power_of_caribdis();
-    new spell_karathress_power_of_tidalvess();
+    RegisterSpellScript(spell_karathress_power_of_tidalvess);
+    RegisterSpellScript(spell_karathress_power_of_caribdis);
 }
