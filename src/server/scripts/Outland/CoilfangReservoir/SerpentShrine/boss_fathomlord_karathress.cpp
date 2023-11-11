@@ -113,6 +113,11 @@ struct boss_fathomlord_karathress : public BossAI
             summon->SetWalk(true);
             summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS - 1], false);
         }
+        else
+        {
+            summon->Attack(me->GetVictim(), false);
+            summon->SetInCombatWithZone();
+        }
     }
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
@@ -554,7 +559,9 @@ public:
         {
             PreventDefaultAction();
             if (Unit* victim = GetUnitOwner()->GetVictim())
+            {
                 GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            }
         }
 
         void Register() override
@@ -569,6 +576,32 @@ public:
     }
 };
 
+class spell_karathress_power_of_tidalvess : public SpellScriptLoader
+{
+public:
+    spell_karathress_power_of_tidalvess() : SpellScriptLoader("spell_karathress_power_of_tidalvess") { }
+    class spell_karathress_power_of_tidalvess_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_karathress_power_of_tidalvess_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            PreventDefaultAction();
+            GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_tidalvess_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_karathress_power_of_tidalvess_AuraScript();
+    }
+};
+
 void AddSC_boss_fathomlord_karathress()
 {
     RegisterSerpentShrineAI(boss_fathomlord_karathress);
@@ -576,4 +609,5 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
     RegisterSerpentShrineAI(boss_fathomguard_caribdis);
     new spell_karathress_power_of_caribdis();
+    new spell_karathress_power_of_tidalvess();
 }
