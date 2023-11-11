@@ -365,15 +365,17 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
         //SaveRespawnTime();
     }
 
+    float x, y, z, o;
+    GetRespawnPosition(x, y, z, &o);
+    SetHomePosition(x, y, z, o);
+    SetPosition(x, y, z, o);
+
+    // xinef: relocate notifier
+    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+
     // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
     if (IsFalling())
         StopMoving();
-
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    UpdateAllowedPositionZ(x, y, z);
-    SetHomePosition(x, y, z, o);
-    GetMap()->CreatureRelocation(this, x, y, z, o);
 }
 
 /**
@@ -2078,7 +2080,9 @@ void Creature::Respawn(bool force)
         m_respawnedTime = GameTime::GetGameTime().count();
     }
     m_respawnedTime = GameTime::GetGameTime().count();
-    UpdateObjectVisibility();
+    // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
+    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+    UpdateObjectVisibility(false);
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)

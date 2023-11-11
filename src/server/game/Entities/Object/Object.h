@@ -379,23 +379,14 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject() : _moveState(MAP_OBJECT_CELL_MOVE_NONE)
-    {
-        _newPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-    }
+    MovableMapObject()  = default;
 
 private:
-    Cell _currentCell;
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
-    MapObjectCellMoveState _moveState;
-    Position _newPosition;
-    void SetNewCellPosition(float x, float y, float z, float o)
-    {
-        _moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
-        _newPosition.Relocate(x, y, z, o);
-    }
+    Cell _currentCell;
+    MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -547,7 +538,7 @@ public:
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
-    virtual void UpdateObjectVisibility(bool forced = true);
+    virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
