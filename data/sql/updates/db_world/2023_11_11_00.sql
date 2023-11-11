@@ -1,3 +1,4 @@
+-- DB update 2023_11_10_02 -> 2023_11_11_00
 -- Thekal (14509)
 -- Update SAY_AGGRO to include emote ONESHOT_ROAR
 -- Update comments
