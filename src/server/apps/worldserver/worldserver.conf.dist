@@ -2062,6 +2062,13 @@ Rate.Damage.Fall = 1
 Rate.Talent = 1
 
 #
+#    Rate.Talent.Pet
+#        Description: Pet Talent point rate.
+#        Default:     1
+
+Rate.Talent.Pet = 1
+
+#
 #    Rate.Health
 #    Rate.Mana
 #    Rate.Rage.Income
