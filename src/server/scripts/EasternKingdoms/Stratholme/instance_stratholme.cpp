@@ -359,8 +359,8 @@ public:
                     {
                         if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
                         {
-                            barthilas->AI()->Talk(0);
-                            barthilas->GetMotionMaster()->MovePath(104350, false);
+                            barthilas->AI()->Talk(SAY_BARTHILAS_HELP);
+                            barthilas->GetMotionMaster()->MovePath(BARTHILAS_PATHID, false);
                         }
                         events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 10s);
                     }
