@@ -100,12 +100,11 @@ struct boss_leotheras_the_blind : public BossAI
             if (me->GetDisplayId() != me->GetNativeDisplayId())
             {
                 //is currently in metamorphosis
-                DoResetThreatList();
                 me->LoadEquipment();
                 me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
-
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
+            DoResetThreatList();
             scheduler.CancelGroup(GROUP_DEMON);
             scheduler.DelayAll(10s);
 
@@ -148,8 +147,8 @@ struct boss_leotheras_the_blind : public BossAI
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
-        summons.Despawn(summon);
         me->SetInCombatWithZone();
+        summons.Despawn(summon);
         if (summon->GetEntry() == NPC_GREYHEART_SPELLBINDER)
         {
             if (!summons.HasEntry(NPC_GREYHEART_SPELLBINDER))
@@ -172,6 +171,7 @@ struct boss_leotheras_the_blind : public BossAI
 
     void ElfTime()
     {
+        DoResetThreatList();
         me->InterruptNonMeleeSpells(false);
         scheduler.Schedule(25050ms, 32550ms, GROUP_COMBAT, [this](TaskContext context)
         {
@@ -187,6 +187,7 @@ struct boss_leotheras_the_blind : public BossAI
 
     void DemonTime()
     {
+        DoResetThreatList();
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
