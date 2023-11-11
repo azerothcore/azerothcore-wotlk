@@ -1,31 +1,32 @@
 -- Magistrate Barthilas
 -- move Position
-DELETE FROM `waypoints` WHERE `entry`=10435;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES 
-(10435, 1, 3696.79, -3605.93, 139.041, NULL, 0, NULL),
-(10435, 2, 3725.58, -3599.48, 142.367, NULL, 0, NULL);
+DELETE FROM `waypoint_data` WHERE `id`=104350;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (104350, 1, 3696.79, -3605.93, 139.041, NULL, 0, 1, 0, 100, 0),
+(104350, 2, 3725.58, -3599.48, 142.367, NULL, 1000, 1, 10435, 100, 0);
+
+-- Teleport after moving to the gate
+DELETE FROM `waypoint_scripts` WHERE `guid`=938;
+INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES (10435, 1, 6, 0, 1, 0, 4068.28, -3535.68, 122.771, 2.5, 938);
+
 
 -- magistrate barthilas
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10435;
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10435) AND (`source_type` = 0) AND (`id` IN (5,7,8,9,10,11,12,13,14,15,16));
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 10435);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
--- fix Cast Transformation
-(10435, 0, 5, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 16794, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Death - Cast Transformation'),
--- new add
-(10435, 0, 7, 0, 38, 0, 100, 769, 1, 1, 0, 0, 0, 0, 53, 1, 10435, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - Wp_Stat - On Waypoint Path.'),
-(10435, 0, 8, 0, 40, 0, 100, 512, 1, 10435, 0, 0, 0, 0, 54, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas  - waypoint_reached - Pointid1 pause 2s'),
-(10435, 0, 9, 0, 58, 0, 100, 512, 2, 10435, 0, 0, 0, 0, 80, 1043500, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Call Timed Actionlist #1043501. Updates always.'),
-(10435, 0, 10, 0, 38, 0, 100, 257, 1, 2, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 4068.28, -3535.68, 122.771, 2.5, 'Magistrate Barthilas - Telte'),
-(10435, 0, 11, 12, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Close Door'),
-(10435, 0, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Close Door'),
-(10435, 0, 13, 14, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Open Door'),
-(10435, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Open Door'),
-(10435, 0, 15, 16, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Open Door'),
-(10435, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 15, 175377, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Open Door');
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1043500);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1043500, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 62, 329, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 4068.28, -3535.68, 122.771, 2.5, 'Magistrate Barthilas - Delay telep'),
-(1043500, 9, 1, 0, 0, 0, 100, 257, 2000, 2000, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 4068.28, -3535.68, 122.771, 2.5, 'Magistrate Barthilas - Set Home');
+(10435, 0, 0, 0, 0, 0, 100, 0, 3000, 5000, 2000, 6000, 0, 0, 11, 16791, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Furious Anger'),
+(10435, 0, 1, 0, 0, 0, 100, 0, 6000, 10000, 12000, 21000, 0, 0, 11, 10887, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Crowd Pummel'),
+(10435, 0, 2, 0, 0, 0, 100, 0, 11000, 12000, 15000, 15000, 0, 0, 11, 14099, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Might Blow'),
+(10435, 0, 3, 0, 0, 0, 100, 0, 4000, 4000, 12000, 15000, 0, 0, 11, 16793, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Drain Blow'),
+(10435, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16794, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Death - Cast Transformation'),
+(10435, 0, 5, 6, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Gameobject ID 175377: Set gameobject state to ready'),
+(10435, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Gameobject ID 175372: Set gameobject state to ready'),
+(10435, 0, 7, 8, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Gameobject with guid 11165: Set gameobject state to active'),
+(10435, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Gameobject with guid 6852: Set gameobject state to active'),
+(10435, 0, 9, 10, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Gameobject with guid 11165 : Set gameobject state to active'),
+(10435, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Gameobject with guid 6852: Set gameobject state to active');
+
+
 
 -- Aurius
 -- Added Combat AI ready to fix the Aurius event to help players kill the baron Rivendare
@@ -37,9 +38,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10917, 0, 2, 0, 14, 0, 100, 0, 3000, 40, 12000, 16000, 0, 11, 13952, 0, 0, 0, 0, 0, 26, 40, 0, 0, 0, 0, 0, 0, 0, 'Aurius - Cast Holy Light on Friendly Missing HP'),
 (10917, 0, 3, 0, 2, 0, 100, 0, 0, 50, 21000, 28000, 0, 11, 13874, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aurius - Cast Divine Shield at 50% HP'),
 
+
+
 -- Entering the dungeon near Aurius he will stand up - turn around - salute
 (10917, 0, 4, 0, 101, 0, 100, 1, 1, 15, 0, 500, 500, 80, 1091700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aurius -Play_Emote - Emot Event');
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1091700);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1091700, 9, 0, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aurius - UNIT_STAND_STATE_STAND'),
@@ -52,14 +54,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- bile spewer
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10416;
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 10416);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10416) AND (`source_type` = 0) AND (`id` IN (4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10416, 0, 0, 2, 0, 0, 100, 0, 7000, 18000, 30000, 40000, 0, 0, 11, 16809, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - In Combat - Cast Spawn Bile Slime'),
-(10416, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - In Combat - Say Line 0'),
-(10416, 0, 2, 4, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 16865, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - On Death - Cast Spawn Bile Slimes'),
-(10416, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - On Death - Say Line 1'),
--- new add
-(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - Aggro - Close door');
+(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - AGGRO - Close Door');
+
 
 -- venom belcher
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10417;
