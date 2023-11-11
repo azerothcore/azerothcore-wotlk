@@ -61,13 +61,13 @@ struct boss_captain_skarloc : public BossAI
     }
 
     SummonList summons;
-    bool _SpawnedAdds;
+    bool _spawnedAdds;
 
     void Reset() override
     {
         _Reset();
         summons.DespawnAll();
-        _SpawnedAdds = false;
+        _spawnedAdds = false;
     }
 
     void JustSummoned(Creature* summon) override
@@ -110,7 +110,7 @@ struct boss_captain_skarloc : public BossAI
         if (type != ESCORT_MOTION_TYPE)
             return;
 
-        if (!_SpawnedAdds)
+        if (!_spawnedAdds)
         {
             if (id == 1)
             {
@@ -134,7 +134,7 @@ struct boss_captain_skarloc : public BossAI
                     mount->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
 
-                _SpawnedAdds = true;
+                _spawnedAdds = true;
             }
         }
 
