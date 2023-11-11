@@ -32,6 +32,10 @@
 template<class T>
 inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
 {
+    // Xinef: Update gameobjects only
+    if (i_gobjOnly)
+        return;
+
     for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         vis_guids.erase(iter->GetSource()->GetGUID());

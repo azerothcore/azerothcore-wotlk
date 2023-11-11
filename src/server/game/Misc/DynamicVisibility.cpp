@@ -15,29 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AC_PACKET_BUILDER_H
-#define AC_PACKET_BUILDER_H
+#include "DynamicVisibility.h"
 
-#include "Define.h"
+uint8 DynamicVisibilityMgr::visibilitySettingsIndex = 0;
 
-class ByteBuffer;
-namespace G3D
+void DynamicVisibilityMgr::Update(uint32 sessionCount)
 {
-    class Vector3;
+    if (sessionCount >= (visibilitySettingsIndex + 1) * ((uint32)VISIBILITY_SETTINGS_PLAYER_INTERVAL) && visibilitySettingsIndex < VISIBILITY_SETTINGS_MAX_INTERVAL_NUM - 1)
+        ++visibilitySettingsIndex;
+    else if (visibilitySettingsIndex && sessionCount < visibilitySettingsIndex * ((uint32)VISIBILITY_SETTINGS_PLAYER_INTERVAL) - 100)
+        --visibilitySettingsIndex;
 }
-
-namespace Movement
-{
-    using G3D::Vector3;
-
-    class MoveSpline;
-    class PacketBuilder
-    {
-        static void WriteCommonMonsterMovePart(const MoveSpline& mov, ByteBuffer& data);
-    public:
-        static void WriteMonsterMove(const MoveSpline& mov, ByteBuffer& data);
-        static void WriteStopMovement(Vector3 const& loc, uint32 splineId, ByteBuffer& data);
-        static void WriteCreate(const MoveSpline& mov, ByteBuffer& data);
-    };
-}
-#endif // AC_PACKET_BUILDER_H

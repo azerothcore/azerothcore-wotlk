@@ -311,7 +311,7 @@ class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
 public:
-    Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
+    Map(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
 
     [[nodiscard]] MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -346,17 +346,11 @@ public:
     virtual void InitVisibilityDistance();
 
     void PlayerRelocation(Player*, float x, float y, float z, float o);
-    void CreatureRelocation(Creature* creature, float x, float y, float z, float o, bool respawnRelocationOnFail = true);
-    void GameObjectRelocation(GameObject* go, float x, float y, float z, float o, bool respawnRelocationOnFail = true);
+    void CreatureRelocation(Creature* creature, float x, float y, float z, float o);
+    void GameObjectRelocation(GameObject* go, float x, float y, float z, float o);
     void DynamicObjectRelocation(DynamicObject* go, float x, float y, float z, float o);
 
     template<class T, class CONTAINER> void Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
-
-    [[nodiscard]] bool IsActiveGrid(float x, float y) const
-    {
-        GridCoord p = Acore::ComputeGridCoord(x, y);
-        return !getNGrid(p.x_coord, p.y_coord) || getNGrid(p.x_coord, p.y_coord)->GetGridState() == GRID_STATE_ACTIVE;
-    }
 
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
@@ -380,10 +374,10 @@ public:
 
     void ResetGridExpiry(NGridType& grid, float factor = 1) const
     {
-        grid.ResetTimeTracker(time_t(float(i_gridExpiry) * factor));
+        grid.ResetTimeTracker(std::chrono::duration_cast<std::chrono::seconds>(i_gridExpiry * factor));
     }
 
-    [[nodiscard]] time_t GetGridExpiry(void) const { return i_gridExpiry; }
+    [[nodiscard]] std::chrono::seconds GetGridExpiry(void) const { return i_gridExpiry; }
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
     static void InitStateMachine();
@@ -708,6 +702,9 @@ private:
     }
 
     bool EnsureGridLoaded(Cell const&);
+    [[nodiscard]] bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
+    void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
+
     void setNGrid(NGridType* grid, uint32 x, uint32 y);
     void ScriptsProcess();
 
@@ -753,7 +750,7 @@ private:
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
     GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
 
-    time_t i_gridExpiry;
+    std::chrono::seconds i_gridExpiry;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -842,7 +839,7 @@ enum InstanceResetMethod
 class InstanceMap : public Map
 {
 public:
-    InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
+    InstanceMap(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
     ~InstanceMap() override;
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
@@ -876,7 +873,7 @@ private:
 class BattlegroundMap : public Map
 {
 public:
-    BattlegroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent, uint8 spawnMode);
+    BattlegroundMap(uint32 id, std::chrono::seconds, uint32 InstanceId, Map* _parent, uint8 spawnMode);
     ~BattlegroundMap() override;
 
     bool AddPlayerToMap(Player*) override;
@@ -901,12 +898,11 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     const uint32 cell_x = cell.CellX();
     const uint32 cell_y = cell.CellY();
 
-    if (!cell.NoCreate())
+    if (!cell.NoCreate() || IsGridLoaded(GridCoord(x, y)))
+    {
         EnsureGridLoaded(cell);
-
-    NGridType* grid = getNGrid(x, y);
-    if (grid && grid->isGridObjectDataLoaded())
-        grid->VisitGrid(cell_x, cell_y, visitor);
+        getNGrid(x, y)->VisitGrid(cell_x, cell_y, visitor);
+    }
 }
 
 #endif

@@ -42,10 +42,16 @@ namespace Acore
     {
         Player& i_player;
         GuidUnorderedSet vis_guids;
-        std::set<Unit*> i_visibleNow;
+        std::vector<Unit*>& i_visibleNow;
+        bool i_gobjOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player) : i_player(player), vis_guids(player.m_clientGUIDs) {}
+        VisibleNotifier(Player& player, bool gobjOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
+        {
+            i_visibleNow.clear();
+        }
+
         template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
@@ -63,7 +69,7 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player) : VisibleNotifier(player) { }
+        PlayerRelocationNotifier(Player& player) : VisibleNotifier(player, false) { }
 
         template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(CreatureMapType&);

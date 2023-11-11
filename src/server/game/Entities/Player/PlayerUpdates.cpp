@@ -1521,11 +1521,17 @@ void Player::UpdatePotionCooldown(Spell* spell)
     SetLastPotionId(0);
 }
 
-template void Player::UpdateVisibilityOf(Player* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(DynamicObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Player* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(DynamicObject*      target,
+                                         UpdateData&         data,
+                                         std::vector<Unit*>& visibleNow);
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
@@ -1537,7 +1543,7 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     }
 
     // updates visibility of all objects around point of view for current player
-    Acore::VisibleNotifier notifier(*this);
+    Acore::VisibleNotifier notifier(*this, mapChange);
     Cell::VisitAllObjects(m_seer, notifier, GetSightRange());
     notifier.SendToSelf();   // send gathered data
 }
@@ -1558,13 +1564,15 @@ void Player::UpdateObjectVisibility(bool forced)
 }
 
 template <class T>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target, std::set<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     s64.insert(target->GetGUID());
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target, std::set<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing
     // when player moves far from its spawn point while riding it
@@ -1573,17 +1581,19 @@ inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target, std::set<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
-    v.insert(target);
+    v.push_back(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target, std::set<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
-    v.insert(target);
+    v.push_back(target);
 }
 
 template <class T>
@@ -1599,7 +1609,8 @@ inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 }
 
 template <class T>
-void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow)
+void Player::UpdateVisibilityOf(T* target, UpdateData& data,
+                                std::vector<Unit*>& visibleNow)
 {
     if (HaveAtClient(target))
     {
