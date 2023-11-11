@@ -567,13 +567,6 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     // this code cant be placed inside EscortMovementGenerator, because we cant delete active MoveGen while it is updated
     SplineHandler handler(this);
     movespline->updateState(t_diff, handler);
-    // Xinef: Spline was cleared by StopMoving, return
-    if (!movespline->Initialized()) {
-        DisableSpline();
-        return;
-    }
-
-    bool arrived = movespline->Finalized();
 
     if (movespline->isCyclic())
     {
@@ -588,6 +581,8 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
             SendMessageToSet(&data, true);
         }
     }
+
+    bool arrived = movespline->Finalized();
 
     if (arrived)
     {

@@ -768,9 +768,9 @@ private:
     void ProcessRelocationNotifies(uint32 diff);
 
     bool i_scriptLock;
-    std::set<WorldObject*> i_objectsToRemove;
+    std::unordered_set<WorldObject*> i_objectsToRemove;
     std::map<WorldObject*, bool> i_objectsToSwitch;
-    std::set<WorldObject*> i_worldObjects;
+    std::unordered_set<WorldObject*> i_worldObjects;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
