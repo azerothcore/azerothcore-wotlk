@@ -612,7 +612,7 @@ public:
                         SetData(TYPE_BARTHILAS_RUN, DONE);
                         SaveToDB();
                         break;
-                    }                    
+                    }
                 }
                 events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 4s);
                 break;
