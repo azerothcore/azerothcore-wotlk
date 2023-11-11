@@ -86,38 +86,40 @@ public:
                 if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
             if (GetData(TYPE_BARTHILAS_RUN) == DONE)
+            {
                 events.ScheduleEvent(EVENT_BARTHILAS_TEL_TO, 0ms);
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-            case NPC_BARON_RIVENDARE:
-                _baronRivendareGUID = creature->GetGUID();
-                break;
-            case NPC_VENOM_BELCHER:
-            case NPC_BILE_SPEWER:
-                if (_slaughterProgress == 0)
-                    ++_slaughterNPCs;
-                break;
-            case NPC_RAMSTEIN_THE_GORGER:
-                if (_slaughterProgress == 1)
-                    ++_slaughterNPCs;
-                break;
-            case NPC_MINDLESS_UNDEAD:
-                if (_slaughterProgress == 2)
-                    ++_slaughterNPCs;
-                break;
-            case NPC_BLACK_GUARD:
-                if (_slaughterProgress == 3)
-                    ++_slaughterNPCs;
-                break;
-            case NPC_BARTHILAS:
-                _barthilasGUID = creature->GetGUID();
-                break;
-            default:
-                break;
+                case NPC_BARON_RIVENDARE:
+                    _baronRivendareGUID = creature->GetGUID();
+                    break;
+                case NPC_VENOM_BELCHER:
+                case NPC_BILE_SPEWER:
+                    if (_slaughterProgress == 0)
+                        ++_slaughterNPCs;
+                    break;
+                case NPC_RAMSTEIN_THE_GORGER:
+                    if (_slaughterProgress == 1)
+                        ++_slaughterNPCs;
+                    break;
+                case NPC_MINDLESS_UNDEAD:
+                    if (_slaughterProgress == 2)
+                        ++_slaughterNPCs;
+                    break;
+                case NPC_BLACK_GUARD:
+                    if (_slaughterProgress == 3)
+                        ++_slaughterNPCs;
+                    break;
+                case NPC_BARTHILAS:
+                    _barthilasGUID = creature->GetGUID();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -156,22 +158,22 @@ public:
         {
             switch (unit->GetEntry())
             {
-            case NPC_VENOM_BELCHER:
-            case NPC_BILE_SPEWER:
-            case NPC_RAMSTEIN_THE_GORGER:
-            case NPC_MINDLESS_UNDEAD:
-            case NPC_BLACK_GUARD:
-                if (--_slaughterNPCs == 0)
-                {
-                    ++_slaughterProgress;
-                    ProcessSlaughterEvent();
-                    SaveToDB();
-                }
-                break;
-            case NPC_BARON_RIVENDARE:
-                events.CancelEvent(EVENT_BARON_TIME);
-                DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
-                break;
+                case NPC_VENOM_BELCHER:
+                case NPC_BILE_SPEWER:
+                case NPC_RAMSTEIN_THE_GORGER:
+                case NPC_MINDLESS_UNDEAD:
+                case NPC_BLACK_GUARD:
+                    if (--_slaughterNPCs == 0)
+                    {
+                        ++_slaughterProgress;
+                        ProcessSlaughterEvent();
+                        SaveToDB();
+                    }
+                    break;
+                case NPC_BARON_RIVENDARE:
+                    events.CancelEvent(EVENT_BARON_TIME);
+                    DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
+                    break;
             }
         }
 
@@ -179,81 +181,81 @@ public:
         {
             switch (go->GetEntry())
             {
-            case GO_CRUSADER_SQUARE_DOOR:
-            case GO_HOARD_DOOR:
-            case GO_HALL_OF_HIGH_COMMAND:
-            case GO_GAUNTLET_DOOR_1:
-            case GO_GAUNTLET_DOOR_2:
-                go->UpdateSaveToDb(true);
-                break;
-            case GO_ZIGGURAT_DOORS1:
-                go->UpdateSaveToDb(true);
-                _zigguratDoorsGUID1 = go->GetGUID();
-                if (GetData(TYPE_ZIGGURAT1) >= 1)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_ZIGGURAT_DOORS2:
-                go->UpdateSaveToDb(true);
-                _zigguratDoorsGUID2 = go->GetGUID();
-                if (GetData(TYPE_ZIGGURAT2) >= 1)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_ZIGGURAT_DOORS3:
-                go->UpdateSaveToDb(true);
-                _zigguratDoorsGUID3 = go->GetGUID();
-                if (GetData(TYPE_ZIGGURAT3) >= 1)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_GAUNTLET_GATE:
-                go->UpdateSaveToDb(true);
-                _gauntletGateGUID = go->GetGUID();
-                if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_SLAUGTHER_GATE:
-                go->UpdateSaveToDb(true);
-                _slaughterGateGUID = go->GetGUID();
-                if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_ZIGGURAT_DOORS4:
-                go->UpdateSaveToDb(true);
-                _zigguratDoorsGUID4 = go->GetGUID();
-                if (_slaughterProgress == 4)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_ZIGGURAT_DOORS5:
-                go->UpdateSaveToDb(true);
-                _zigguratDoorsGUID5 = go->GetGUID();
-                if (_slaughterProgress == 4)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_SLAUGHTER_GATE_SIDE:
-                go->UpdateSaveToDb(true);
-                if (_slaughterProgress >= 2)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_PORT_TRAP_GATE_1:
-                go->UpdateSaveToDb(true);
-                _trapGatesGUIDs[0] = go->GetGUID();
-                break;
-            case GO_PORT_TRAP_GATE_2:
-                go->UpdateSaveToDb(true);
-                _trapGatesGUIDs[1] = go->GetGUID();
-                break;
-            case GO_PORT_TRAP_GATE_3:
-                go->UpdateSaveToDb(true);
-                _trapGatesGUIDs[2] = go->GetGUID();
-                break;
-            case GO_PORT_TRAP_GATE_4:
-                go->UpdateSaveToDb(true);
-                _trapGatesGUIDs[3] = go->GetGUID();
-                break;
-            case GO_SERVICE_ENTRANCE:
-                _door_service_entrance = go->GetGUID();
-                break;
-            default:
-                break;
+                case GO_CRUSADER_SQUARE_DOOR:
+                case GO_HOARD_DOOR:
+                case GO_HALL_OF_HIGH_COMMAND:
+                case GO_GAUNTLET_DOOR_1:
+                case GO_GAUNTLET_DOOR_2:
+                    go->UpdateSaveToDb(true);
+                    break;
+                case GO_ZIGGURAT_DOORS1:
+                    go->UpdateSaveToDb(true);
+                    _zigguratDoorsGUID1 = go->GetGUID();
+                    if (GetData(TYPE_ZIGGURAT1) >= 1)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_ZIGGURAT_DOORS2:
+                    go->UpdateSaveToDb(true);
+                    _zigguratDoorsGUID2 = go->GetGUID();
+                    if (GetData(TYPE_ZIGGURAT2) >= 1)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_ZIGGURAT_DOORS3:
+                    go->UpdateSaveToDb(true);
+                    _zigguratDoorsGUID3 = go->GetGUID();
+                    if (GetData(TYPE_ZIGGURAT3) >= 1)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_GAUNTLET_GATE:
+                    go->UpdateSaveToDb(true);
+                    _gauntletGateGUID = go->GetGUID();
+                    if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_SLAUGTHER_GATE:
+                    go->UpdateSaveToDb(true);
+                    _slaughterGateGUID = go->GetGUID();
+                    if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_ZIGGURAT_DOORS4:
+                    go->UpdateSaveToDb(true);
+                    _zigguratDoorsGUID4 = go->GetGUID();
+                    if (_slaughterProgress == 4)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_ZIGGURAT_DOORS5:
+                    go->UpdateSaveToDb(true);
+                    _zigguratDoorsGUID5 = go->GetGUID();
+                    if (_slaughterProgress == 4)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_SLAUGHTER_GATE_SIDE:
+                    go->UpdateSaveToDb(true);
+                    if (_slaughterProgress >= 2)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_PORT_TRAP_GATE_1:
+                    go->UpdateSaveToDb(true);
+                    _trapGatesGUIDs[0] = go->GetGUID();
+                    break;
+                case GO_PORT_TRAP_GATE_2:
+                    go->UpdateSaveToDb(true);
+                    _trapGatesGUIDs[1] = go->GetGUID();
+                    break;
+                case GO_PORT_TRAP_GATE_3:
+                    go->UpdateSaveToDb(true);
+                    _trapGatesGUIDs[2] = go->GetGUID();
+                    break;
+                case GO_PORT_TRAP_GATE_4:
+                    go->UpdateSaveToDb(true);
+                    _trapGatesGUIDs[3] = go->GetGUID();
+                    break;
+                case GO_SERVICE_ENTRANCE:
+                    _door_service_entrance = go->GetGUID();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -292,78 +294,78 @@ public:
         {
             switch (type)
             {
-            case TYPE_BARON_RUN:
-            {
-                if (_baronRunProgress == DATA_BARON_RUN_NONE)
+                case TYPE_BARON_RUN:
                 {
-                    _baronRunProgress = DATA_BARON_RUN_GATE;
-                    _baronRunTime = 45;
-                    DoCastSpellOnPlayers(SPELL_BARON_ULTIMATUM);
-                    events.ScheduleEvent(EVENT_BARON_TIME, 60000);
-
-                    instance->LoadGrid(4035.83f, -3336.31f);
-                    if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
-                        baron->AI()->Talk(SAY_BARON_INIT_YELL);
-                }
-                break;
-            }
-            case TYPE_ZIGGURAT1:
-            {
-                if (data == _zigguratState1 + 1)
-                    ++_zigguratState1;
-
-                if (_zigguratState1 == 1)
-                    if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID1))
-                        ziggurat->SetGoState(GO_STATE_ACTIVE);
-
-                CheckZiggurats();
-                break;
-            }
-            case TYPE_ZIGGURAT2:
-            {
-                if (data == _zigguratState2 + 1)
-                    ++_zigguratState2;
-
-                if (_zigguratState2 == 1)
-                    if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID2))
-                        ziggurat->SetGoState(GO_STATE_ACTIVE);
-
-                CheckZiggurats();
-                break;
-            }
-            case TYPE_ZIGGURAT3:
-            {
-                if (data == _zigguratState3 + 1)
-                    ++_zigguratState3;
-
-                if (_zigguratState3 == 1)
-                    if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID3))
-                        ziggurat->SetGoState(GO_STATE_ACTIVE);
-
-                CheckZiggurats();
-                break;
-            }
-            case TYPE_BARON_FIGHT:
-            {
-                if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID5))
-                    gate->SetGoState(data == IN_PROGRESS ? GO_STATE_READY : GO_STATE_ACTIVE);
-                return;
-            }
-            case TYPE_MALLOW:
-                ++_postboxesOpened;
-                break;
-            case TYPE_BARTHILAS_RUN:
-                if (data == IN_PROGRESS)
-                {
-                    if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
+                    if (_baronRunProgress == DATA_BARON_RUN_NONE)
                     {
-                        barthilas->AI()->Talk(0);
-                        barthilas->GetMotionMaster()->MovePath(104350, false);
+                        _baronRunProgress = DATA_BARON_RUN_GATE;
+                        _baronRunTime = 45;
+                        DoCastSpellOnPlayers(SPELL_BARON_ULTIMATUM);
+                        events.ScheduleEvent(EVENT_BARON_TIME, 60000);
+
+                        instance->LoadGrid(4035.83f, -3336.31f);
+                        if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
+                            baron->AI()->Talk(SAY_BARON_INIT_YELL);
                     }
-                    events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 10s);
+                    break;
                 }
-                _barthilas_run_Progress = data;
-                break;
+                case TYPE_ZIGGURAT1:
+                {
+                    if (data == _zigguratState1 + 1)
+                        ++_zigguratState1;
+
+                    if (_zigguratState1 == 1)
+                        if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID1))
+                            ziggurat->SetGoState(GO_STATE_ACTIVE);
+
+                    CheckZiggurats();
+                    break;
+                }
+                case TYPE_ZIGGURAT2:
+                {
+                    if (data == _zigguratState2 + 1)
+                        ++_zigguratState2;
+
+                    if (_zigguratState2 == 1)
+                        if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID2))
+                            ziggurat->SetGoState(GO_STATE_ACTIVE);
+
+                    CheckZiggurats();
+                    break;
+                }
+                case TYPE_ZIGGURAT3:
+                {
+                    if (data == _zigguratState3 + 1)
+                        ++_zigguratState3;
+
+                    if (_zigguratState3 == 1)
+                        if (GameObject* ziggurat = instance->GetGameObject(_zigguratDoorsGUID3))
+                            ziggurat->SetGoState(GO_STATE_ACTIVE);
+
+                    CheckZiggurats();
+                    break;
+                }
+                case TYPE_BARON_FIGHT:
+                {
+                    if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID5))
+                        gate->SetGoState(data == IN_PROGRESS ? GO_STATE_READY : GO_STATE_ACTIVE);
+                    return;
+                }
+                case TYPE_MALLOW:
+                    ++_postboxesOpened;
+                    break;
+                case TYPE_BARTHILAS_RUN:
+                    if (data == IN_PROGRESS)
+                    {
+                        if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
+                        {
+                            barthilas->AI()->Talk(0);
+                            barthilas->GetMotionMaster()->MovePath(104350, false);
+                        }
+                        events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 10s);
+                    }
+                    _barthilas_run_Progress = data;
+                    break;
             }
 
             SaveToDB();
@@ -406,16 +408,16 @@ public:
         {
             switch (type)
             {
-            case TYPE_ZIGGURAT1:
-                return _zigguratState1;
-            case TYPE_ZIGGURAT2:
-                return _zigguratState2;
-            case TYPE_ZIGGURAT3:
-                return _zigguratState3;
-            case TYPE_MALLOW:
-                return _postboxesOpened;
-            case TYPE_BARTHILAS_RUN:
-                return _barthilas_run_Progress;
+                case TYPE_ZIGGURAT1:
+                    return _zigguratState1;
+                case TYPE_ZIGGURAT2:
+                    return _zigguratState2;
+                case TYPE_ZIGGURAT3:
+                    return _zigguratState3;
+                case TYPE_MALLOW:
+                    return _postboxesOpened;
+                case TYPE_BARTHILAS_RUN:
+                    return _barthilas_run_Progress;
             }
             return 0;
         }
@@ -423,7 +425,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-
+            //
             if (GetData(TYPE_BARTHILAS_RUN) == NOT_STARTED)
             {
                 if (GameObject* go = instance->GetGameObject(_door_service_entrance))
@@ -433,7 +435,9 @@ public:
                         if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
                         {
                             if (barthilas->IsAlive() && !barthilas->IsInCombat())
+                            {
                                 SetData(TYPE_BARTHILAS_RUN, IN_PROGRESS);
+                            }
                         }
                     }
                 }
@@ -497,137 +501,137 @@ public:
 
             switch (events.ExecuteEvent())
             {
-            case EVENT_GATE1_TRAP:
-                _gateTrapsCooldown[GATE1] = false;
-                break;
-            case EVENT_GATE2_TRAP:
-                _gateTrapsCooldown[GATE2] = false;
-                break;
-            case EVENT_GATE1_DELAY:
-                gate_delay(GATE1);
-                break;
-            case EVENT_GATE2_DELAY:
-                gate_delay(GATE2);
-                break;
-            case EVENT_GATE1_CRITTER_DELAY:
-                gate_critter_delay(GATE1);
-                break;
-            case EVENT_GATE2_CRITTER_DELAY:
-                gate_critter_delay(GATE2);
-                break;
-            case EVENT_BARON_TIME:
-            {
-                --_baronRunTime;
-                instance->LoadGrid(4035.83f, -3336.31f);
-                Creature* baron = instance->GetCreature(_baronRivendareGUID);
-                if (baron && !baron->IsInCombat())
+                case EVENT_GATE1_TRAP:
+                    _gateTrapsCooldown[GATE1] = false;
+                    break;
+                case EVENT_GATE2_TRAP:
+                    _gateTrapsCooldown[GATE2] = false;
+                    break;
+                case EVENT_GATE1_DELAY:
+                    gate_delay(GATE1);
+                    break;
+                case EVENT_GATE2_DELAY:
+                    gate_delay(GATE2);
+                    break;
+                case EVENT_GATE1_CRITTER_DELAY:
+                    gate_critter_delay(GATE1);
+                    break;
+                case EVENT_GATE2_CRITTER_DELAY:
+                    gate_critter_delay(GATE2);
+                    break;
+                case EVENT_BARON_TIME:
                 {
-                    switch (_baronRunTime)
+                    --_baronRunTime;
+                    instance->LoadGrid(4035.83f, -3336.31f);
+                    Creature* baron = instance->GetCreature(_baronRivendareGUID);
+                    if (baron && !baron->IsInCombat())
                     {
-                    case 10:
-                        baron->AI()->Talk(SAY_BARON_10M);
-                        break;
-                    case 5:
-                        baron->AI()->Talk(SAY_BARON_5M);
-                        if (Creature* ysida = baron->FindNearestCreature(NPC_YSIDA, 50.0f))
-                            ysida->AI()->SetData(1, 1);
-                        break;
-                    case 0:
-                        baron->AI()->Talk(SAY_BARON_0M);
-                        DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
-                        break;
+                        switch (_baronRunTime)
+                        {
+                            case 10:
+                                baron->AI()->Talk(SAY_BARON_10M);
+                                break;
+                            case 5:
+                                baron->AI()->Talk(SAY_BARON_5M);
+                                if (Creature* ysida = baron->FindNearestCreature(NPC_YSIDA, 50.0f))
+                                    ysida->AI()->SetData(1, 1);
+                                break;
+                            case 0:
+                                baron->AI()->Talk(SAY_BARON_0M);
+                                DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
+                                break;
+                        }
                     }
-                }
 
-                if (_baronRunTime > 0)
-                    events.ScheduleEvent(EVENT_BARON_TIME, 60s);
-                else
-                    events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 0ms);
-
-                SaveToDB();
-                break;
-            }
-            case EVENT_EXECUTE_PRISONER:
-            {
-                instance->LoadGrid(4035.83f, -3336.31f);
-                Creature* baron = instance->GetCreature(_baronRivendareGUID);
-                if (baron && baron->IsAlive())
-                {
-                    if (!baron->IsInCombat())
-                    {
-                        baron->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                        if (Creature* ysida = baron->FindNearestCreature(NPC_YSIDA, 50.0f))
-                            Unit::Kill(baron, ysida);
-                    }
+                    if (_baronRunTime > 0)
+                        events.ScheduleEvent(EVENT_BARON_TIME, 60s);
                     else
-                        events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 1s);
-                }
-                break;
-            }
-            case EVENT_SPAWN_MINDLESS:
-            {
-                Position pos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
-                instance->SummonCreature(NPC_MINDLESS_UNDEAD, pos);
-                break;
-            }
-            case EVENT_FORCE_SLAUGHTER_EVENT:
-            {
-                Map::PlayerList const& PlayerList = instance->GetPlayers();
-                if (!PlayerList.IsEmpty())
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (Player* player = i->GetSource())
-                            if (player->GetDistance2d(4034.97f, -3402.13f) < 50.0f)
-                            {
-                                ProcessSlaughterEvent();
-                                return;
-                            }
+                        events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 0ms);
 
-                events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 3s);
-                break;
-            }
-            case EVENT_SPAWN_BLACK_GUARD:
-            {
-                for (uint8 i = 0; i < 5; ++i)
-                    if (Creature* guard = instance->SummonCreature(NPC_BLACK_GUARD, BlackGuardPos[i]))
+                    SaveToDB();
+                    break;
+                }
+                case EVENT_EXECUTE_PRISONER:
+                {
+                    instance->LoadGrid(4035.83f, -3336.31f);
+                    Creature* baron = instance->GetCreature(_baronRivendareGUID);
+                    if (baron && baron->IsAlive())
                     {
-                        guard->SetWalk(true);
-                        guard->GetMotionMaster()->MovePoint(0, BlackGuardPos[i + 5]);
-                        guard->SetHomePosition(BlackGuardPos[i + 5]);
-                        if (i == 0 && guard->AI())
-                            guard->AI()->Talk(SAY_BLACK_GUARD_INIT);
+                        if (!baron->IsInCombat())
+                        {
+                            baron->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+                            if (Creature* ysida = baron->FindNearestCreature(NPC_YSIDA, 50.0f))
+                                Unit::Kill(baron, ysida);
+                        }
+                        else
+                            events.ScheduleEvent(EVENT_EXECUTE_PRISONER, 1s);
                     }
+                    break;
+                }
+                case EVENT_SPAWN_MINDLESS:
+                {
+                    Position pos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
+                    instance->SummonCreature(NPC_MINDLESS_UNDEAD, pos);
+                    break;
+                }
+                case EVENT_FORCE_SLAUGHTER_EVENT:
+                {
+                    Map::PlayerList const& PlayerList = instance->GetPlayers();
+                    if (!PlayerList.IsEmpty())
+                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            if (Player* player = i->GetSource())
+                                if (player->GetDistance2d(4034.97f, -3402.13f) < 50.0f)
+                                {
+                                    ProcessSlaughterEvent();
+                                    return;
+                                }
 
-                if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID4))
-                    gate->SetGoState(GO_STATE_ACTIVE);
-                break;
-            }
-            case EVENT_BARTHILAS_MOVE_END:
-                if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
-                {
-                    if (barthilas->isDead())
-                        break;
-                    if (barthilas->IsAlive()&& barthilas->GetPosition()== Position(4068.28f, -3535.67f, 122.771f, 2.50f))
-                    {
-                        barthilas->SetHomePosition(4068.28f, -3535.67f, 122.771f, 2.50f);
-                        SetData(TYPE_BARTHILAS_RUN, DONE);
-                        SaveToDB();
-                        break;
-                    }
+                    events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 3s);
+                    break;
                 }
-                events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 4s);
-                break;
-            case EVENT_BARTHILAS_TEL_TO:
-                if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
+                case EVENT_SPAWN_BLACK_GUARD:
                 {
-                    if (barthilas->IsAlive() && !barthilas->IsInCombat())
-                    {
-                        barthilas->NearTeleportTo(4068.284f, -3535.678f, 122.771f, 2.50f);
-                        barthilas->SetHomePosition(4068.284f, -3535.678f, 122.771f, 2.50f);
-                    }
+                    for (uint8 i = 0; i < 5; ++i)
+                        if (Creature* guard = instance->SummonCreature(NPC_BLACK_GUARD, BlackGuardPos[i]))
+                        {
+                            guard->SetWalk(true);
+                            guard->GetMotionMaster()->MovePoint(0, BlackGuardPos[i + 5]);
+                            guard->SetHomePosition(BlackGuardPos[i + 5]);
+                            if (i == 0 && guard->AI())
+                                guard->AI()->Talk(SAY_BLACK_GUARD_INIT);
+                        }
+
+                    if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID4))
+                        gate->SetGoState(GO_STATE_ACTIVE);
+                    break;
                 }
-                break;
-            default:
-                break;
+                case EVENT_BARTHILAS_MOVE_END:
+                    if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
+                    {
+                        if (barthilas->isDead())
+                            break;
+                        if (barthilas->IsAlive() && barthilas->GetPosition() == Position(4068.28f, -3535.67f, 122.771f, 2.50f))
+                        {
+                            barthilas->SetHomePosition(4068.28f, -3535.67f, 122.771f, 2.50f);
+                            SetData(TYPE_BARTHILAS_RUN, DONE);
+                            SaveToDB();
+                            break;
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 4s);
+                    break;
+                case EVENT_BARTHILAS_TEL_TO:
+                    if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
+                    {
+                        if (barthilas->IsAlive() && !barthilas->IsInCombat())
+                        {
+                            barthilas->NearTeleportTo(4068.284f, -3535.678f, 122.771f, 2.50f);
+                            barthilas->SetHomePosition(4068.284f, -3535.678f, 122.771f, 2.50f);
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
