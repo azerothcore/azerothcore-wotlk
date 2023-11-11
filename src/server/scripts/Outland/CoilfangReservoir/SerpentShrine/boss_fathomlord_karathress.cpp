@@ -120,20 +120,6 @@ struct boss_fathomlord_karathress : public BossAI
         }
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
-            Talk(SAY_GAIN_ABILITY1);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
-            Talk(SAY_GAIN_ABILITY2);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
-            Talk(SAY_GAIN_ABILITY3);
-        scheduler.Schedule(1s, [this, summon](TaskContext)
-        {
-            summons.Despawn(summon);
-        });
-    }
-
     void KilledUnit(Unit* /*victim*/) override
     {
         if (!_recentlySpoken)
@@ -269,6 +255,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY2);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -444,6 +432,8 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY1);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -526,6 +516,8 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY3);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
