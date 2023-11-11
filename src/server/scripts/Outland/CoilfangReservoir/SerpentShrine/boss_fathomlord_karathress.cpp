@@ -546,59 +546,38 @@ private:
     InstanceScript* _instance;
 };
 
-class spell_karathress_power_of_caribdis : public SpellScriptLoader
+class spell_karathress_power_of_tidalvess : public AuraScript
 {
-public:
-    spell_karathress_power_of_caribdis() : SpellScriptLoader("spell_karathress_power_of_caribdis") { }
+    PrepareAuraScript(spell_karathress_power_of_tidalvess);
 
-    class spell_karathress_power_of_caribdis_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_karathress_power_of_caribdis_AuraScript);
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* victim = GetUnitOwner()->GetVictim())
-            {
-                GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_karathress_power_of_caribdis_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_tidalvess::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_karathress_power_of_tidalvess : public SpellScriptLoader
+class spell_karathress_power_of_caribdis : public AuraScript
 {
-public:
-    spell_karathress_power_of_tidalvess() : SpellScriptLoader("spell_karathress_power_of_tidalvess") { }
-    class spell_karathress_power_of_tidalvess_AuraScript : public AuraScript
+    PrepareAuraScript(spell_karathress_power_of_caribdis);
+
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_karathress_power_of_tidalvess_AuraScript);
-
-        void OnPeriodic(AuraEffect const* aurEff)
+        PreventDefaultAction();
+        if (Unit* victim = GetUnitOwner()->GetVictim())
         {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_tidalvess_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_karathress_power_of_tidalvess_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
