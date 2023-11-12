@@ -8630,7 +8630,7 @@ bool ObjectMgr::LoadModuleStrings()
 
         uint32 entry = fields[1].Get<uint32>();
 
-        AcoreString& data = _moduleStringStore[entry];
+        ModuleString& data = _moduleStringStore[moduleid, entry];
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 

@@ -515,6 +515,15 @@ typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
 
+struct ModuleString
+{
+    std::vector<std::string> ModuleId;
+    uint32 entry{ 0 };
+    std::vector<std::string> Content;
+};
+
+typedef std::unordered_map<std::string, int32, ModuleString> ModuleStringContainer;
+
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
 
@@ -1015,6 +1024,7 @@ public:
     void InitializeSpellInfoPrecomputedData();
 
     bool LoadAcoreStrings();
+    bool LoadModuleStrings();
     void LoadBroadcastTexts();
     void LoadBroadcastTextLocales();
     void LoadCreatureClassLevelStats();
@@ -1324,6 +1334,17 @@ public:
     [[nodiscard]] LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
     void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
+    [[nodiscard]] ModuleString const* GetModuleString(std::string moduleid, uint32 entry) const
+    {
+        ModuleStringContainer::const_iterator itr = _moduleStringStore.find(moduleid);
+        if (itr == _moduleStringStore.end())
+            return nullptr;
+
+        return &itr->second;
+    }
+
+    [[nodiscard]] char const* GetModuleString(std::string moduleid, uint32 entry, LocaleConstant locale) const;
+
     // grid objects
     void AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data);
     void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
@@ -1604,6 +1625,7 @@ private:
     NpcTextLocaleContainer _npcTextLocaleStore;
     PageTextLocaleContainer _pageTextLocaleStore;
     AcoreStringContainer _acoreStringStore;
+    ModuleStringContainer _moduleStringStore;
     GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
     QuestGreetingLocaleContainer _questGreetingLocaleStore;

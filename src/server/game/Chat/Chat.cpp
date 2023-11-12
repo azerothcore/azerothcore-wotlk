@@ -46,7 +46,7 @@ char const* ChatHandler::GetAcoreString(uint32 entry) const
 
 char const* ChatHandler::GetModuleString(std::string moduleid, uint32 entry) const
 {
-    return m_session->GetAcoreString(moduleid, entry);
+    return m_session->GetModuleString(moduleid, entry);
 }
 
 bool ChatHandler::IsAvailable(uint32 securityLevel) const

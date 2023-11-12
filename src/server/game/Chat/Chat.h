@@ -52,6 +52,7 @@ public:
 
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;
+    virtual char const* GetModuleString(std::string moduleid, uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
