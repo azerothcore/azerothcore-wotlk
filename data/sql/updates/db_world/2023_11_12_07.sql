@@ -1,3 +1,4 @@
+-- DB update 2023_11_12_06 -> 2023_11_12_07
 -- Redeemed Hatchling SAI (Source: https://www.youtube.com/watch?v=zgalBODgYdA)
 SET @ID := 22339;
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = @ID;
