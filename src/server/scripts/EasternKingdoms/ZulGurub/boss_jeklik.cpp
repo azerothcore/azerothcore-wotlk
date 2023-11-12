@@ -195,18 +195,12 @@ struct boss_jeklik : public BossAI
         //
         // Phase 1
         //
-        LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE ONE");
         scheduler.Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, -8.0f, false, false))
             {
-                LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Charge successful (target: {})", target->GetName());
                 DoCast(target, SPELL_CHARGE);
                 AttackStart(target);
-            }
-            else
-            {
-                LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Charge failed (no target available)");
             }
             context.Repeat(15s, 30s);
         }).Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
@@ -246,7 +240,6 @@ struct boss_jeklik : public BossAI
         //
         ScheduleHealthCheckEvent(50, [&]
         {
-            LOG_DEBUG("scripts.ai", "boss_jeklik:: PHASE TWO");
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             DoResetThreatList();
 
@@ -281,7 +274,6 @@ struct boss_jeklik : public BossAI
                     // summon up to 2 bat riders
                     if (batRidersCount < 2)
                     {
-                        LOG_DEBUG("scripts.ai", "boss_jeklik::UpdateAI:: Spawn Flying Bats (Summoning {} of 2)", batRidersCount + 1);
                         Talk(SAY_CALL_RIDERS);
                         // only if the bat rider was successfully created
                         if (me->SummonCreature(NPC_BATRIDER, SpawnBatRider, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT))
@@ -348,7 +340,6 @@ struct npc_batrider : public CreatureAI
             me->ToTempSummon()->GetSummoner()->GetEntry() == NPC_PRIESTESS_JEKLIK
         )
         {
-            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_BOSS");
             _mode = BATRIDER_MODE_BOSS;
 
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -364,7 +355,6 @@ struct npc_batrider : public CreatureAI
         }
         else
         {
-            LOG_DEBUG("scripts.ai", "npc_batrider::constructor: BATRIDER_MODE_TRASH");
             _mode = BATRIDER_MODE_TRASH;
 
             me->SetReactState(REACT_DEFENSIVE);
@@ -440,7 +430,6 @@ struct npc_batrider : public CreatureAI
         {
             if (!me->isMoving())
             {
-                LOG_DEBUG("scripts.ai", "npc_batrider::UpdateAI: not moving, running loop");
                 me->SetCanFly(true);
                 me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
             }
