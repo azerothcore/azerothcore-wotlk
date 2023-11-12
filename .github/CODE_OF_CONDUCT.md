@@ -11,7 +11,7 @@ nationality, personal appearance, race, caste, color, religion, or sexual
 identity and orientation.
 
 We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+diverse, inclusive, fun, and healthy community.
 
 ## Our Standards
 
@@ -28,8 +28,9 @@ community include:
 
 Examples of unacceptable behavior include:
 
-* The use of sexualized language or imagery, and sexual attention or advances of
+* The use of sexualized imagery, and sexual attention or advances of
   any kind
+* The use of sexulized language which could reasonably be considered inappropriate.
 * Trolling, insulting or derogatory comments, and personal or political attacks
 * Public or private harassment
 * Publishing others' private information, such as a physical or email address,
@@ -47,20 +48,24 @@ or harmful.
 Community leaders have the right and responsibility to remove, edit, or reject
 comments, commits, code, wiki edits, issues, and other contributions that are
 not aligned to this Code of Conduct, and will communicate reasons for moderation
-decisions when appropriate.
+decisions if considered neccessary.
 
 ## Scope
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
-Examples of representing our community include using an official e-mail address,
-posting via an official social media account, or acting as an appointed
-representative at an online or offline event.
+This Code of Conduct applies within all community spaces, which includes but is not limited to AzerothCore
+managed sites and community spaces, and also applies when an individual is officially representing the 
+community in public spaces.
+
+Examples of representing our community include
+* Using an official e-mail address
+* Posting via an official social media account
+* Acting as an appointed representative at an online or offline event
+* Communicating within the WoW Emulation communities
 
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
+reported to the community leaders responsible for enforcement at the AzerothCore 
 [https://discord.gg/gkt4y2x][discord].
 All complaints will be reviewed and investigated promptly and fairly.
 
@@ -77,7 +82,7 @@ the consequences for any action they deem in violation of this Code of Conduct:
 **Community Impact**: Use of inappropriate language or other behavior deemed
 unprofessional or unwelcome in the community.
 
-**Consequence**: A private, written warning from community leaders, providing
+**Consequence**: A private or public, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the
 behavior was inappropriate. A public apology may be requested.
 
