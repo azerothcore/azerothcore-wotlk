@@ -1,3 +1,4 @@
+-- DB update 2023_11_12_02 -> 2023_11_12_03
 --
 DELETE FROM `creature_loot_template` WHERE `item` = 32897 AND `entry` IN (21218, 21220, 21221, 21229, 21230, 21231, 21232, 21251, 21263, 21298, 21299, 21301, 21339, 21863);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
