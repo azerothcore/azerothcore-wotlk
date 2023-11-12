@@ -4997,6 +4997,145 @@ class spell_gen_spirit_of_competition_winner : public SpellScript
     }
 };
 
+// 27360 - Lord Valthalak's Amulet
+enum Valthalak
+{
+    SPELL_INSTILL_LORD_VALTHALAK_SPIRIT = 27360,
+    NPC_LORD_VALTHALAK                  = 16042
+};
+
+class spell_gen_valthalak_amulet : public SpellScript
+{
+    PrepareSpellScript(spell_gen_valthalak_amulet)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_LORD_VALTHALAK && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_valthalak_amulet::CheckCast);
+    }
+};
+
+enum ScourgeBanner
+{
+    GO_COMMAND_TENT = 176210,
+};
+
+class spell_gen_planting_scourge_banner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_planting_scourge_banner)
+
+    SpellCastResult CheckCast()
+    {
+        if (GameObject* tent = GetCaster()->FindNearestGameObject(GO_COMMAND_TENT, 20.0f))
+            if (tent->GetGoState() != GO_STATE_READY) // If tent is burned down
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_planting_scourge_banner::CheckCast);
+    }
+};
+
+enum Jubling
+{
+    SPELL_JUBLING_COOLDOWN_1_WEEK = 23852
+};
+
+// 23853 - Jubling Cooldown
+class spell_gen_jubling_cooldown : public SpellScript
+{
+    PrepareSpellScript(spell_gen_jubling_cooldown);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN_1_WEEK });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK); // 1 week
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_jubling_cooldown::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 12699 - Yeh'kinya's Bramble
+enum YehkinyaBramble
+{
+    NPC_VALE_SCREECHER       = 5307,
+    NPC_ROGUE_VALE_SCREECHER = 5308
+};
+
+class spell_gen_yehkinya_bramble : public SpellScript
+{
+    PrepareSpellScript(spell_gen_yehkinya_bramble)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if ((target->GetEntry() == NPC_VALE_SCREECHER || target->GetEntry() == NPC_ROGUE_VALE_SCREECHER) && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_yehkinya_bramble::CheckCast);
+    }
+};
+
+// 35244 - Choking Vines
+enum ChokingVines
+{
+    SPELL_CHOKING_VINES = 35244,
+    SPELL_CHOKING_WOUND = 35247
+};
+
+class spell_gen_choking_vines : public AuraScript
+{
+    PrepareAuraScript(spell_gen_choking_vines);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHOKING_VINES, SPELL_CHOKING_WOUND });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (GetStackAmount() == GetSpellInfo()->StackAmount) // 5 stacks
+            {
+                target->RemoveAurasDueToSpell(SPELL_CHOKING_VINES);
+                target->CastSpell(target, SPELL_CHOKING_WOUND, true); // Unknown if it's a self cast or casted by the source on 5th
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_choking_vines::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5145,4 +5284,9 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_curse_of_pain);
     RegisterSpellScript(spell_gen_spirit_of_competition_participant);
     RegisterSpellScript(spell_gen_spirit_of_competition_winner);
+    RegisterSpellScript(spell_gen_valthalak_amulet);
+    RegisterSpellScript(spell_gen_planting_scourge_banner);
+    RegisterSpellScript(spell_gen_jubling_cooldown);
+    RegisterSpellScript(spell_gen_yehkinya_bramble);
+    RegisterSpellScript(spell_gen_choking_vines);
 }

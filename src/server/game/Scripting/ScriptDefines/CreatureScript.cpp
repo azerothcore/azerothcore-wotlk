@@ -148,7 +148,6 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
     ASSERT(creature);
 
     auto tempScript = ScriptRegistry<CreatureScript>::GetScriptById(creature->GetScriptId());
-    ClearGossipMenuFor(player);
     return tempScript ? tempScript->GetDialogStatus(player, creature) : DIALOG_STATUS_SCRIPTED_NO_STATUS;
 }
 

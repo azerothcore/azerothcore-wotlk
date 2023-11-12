@@ -22,6 +22,8 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 // Ours
 enum saeed
@@ -697,9 +699,6 @@ public:
                 {
                     Drained = true;
                     int32 uHpPct = int32(me->GetHealthPct());
-
-                    me->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
-
                     me->SetHealth(me->CountPctFromMaxHealth(uHpPct));
                     me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
                     me->SetInCombatWith(player);
@@ -911,6 +910,45 @@ public:
     }
 };
 
+class spell_q10190_battery_recharging_blaster : public SpellScript
+{
+    PrepareSpellScript(spell_q10190_battery_recharging_blaster);
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetHealthPct() <= 25.0f)
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q10190_battery_recharging_blaster::CheckCast);
+    }
+ };
+
+class spell_q10190_battery_recharging_blaster_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q10190_battery_recharging_blaster_aura);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (Creature* phasehunter = GetTarget()->ToCreature())
+            if (phasehunter->GetEntry() == NPC_PHASE_HUNTER_ENTRY)
+                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10190_battery_recharging_blaster_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_netherstorm()
 {
     // Ours
@@ -922,5 +960,5 @@ void AddSC_netherstorm()
     new npc_phase_hunter();
     new npc_bessy();
     new npc_maxx_a_million_escort();
-
+    RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
 }

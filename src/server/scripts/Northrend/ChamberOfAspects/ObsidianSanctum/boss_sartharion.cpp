@@ -874,7 +874,7 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_TENEBRON_DEATH);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
-                    instance->SetBossState(DATA_SHADRON, DONE);
+                    instance->SetBossState(DATA_TENEBRON, DONE);
                 }
                 break;
             }

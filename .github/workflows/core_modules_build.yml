@@ -34,7 +34,7 @@ jobs:
         || github.event.label.name == 'run-build')
       )
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
