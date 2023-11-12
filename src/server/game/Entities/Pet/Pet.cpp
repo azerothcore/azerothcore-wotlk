@@ -2240,7 +2240,7 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 
     sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
 
-    return points;
+    return uint8(points * sWorld->getRate(RATE_TALENT_PET));
 }
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)

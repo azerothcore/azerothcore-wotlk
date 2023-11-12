@@ -120,8 +120,6 @@ void WorldSession::HandleAuctionSellItem(WorldPackets::AuctionHouse::SellItem& p
 // Called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::PlaceBid& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
-
     if (!packet.AuctionID || !packet.Price)
         return; // Check for cheaters
 
@@ -131,8 +129,6 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::PlaceBid& p
 // Called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::RemoveItem& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
-
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(packet.Auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
@@ -202,22 +198,18 @@ void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::RemoveIte
 // Called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPackets::AuctionHouse::ListBidderItems& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
     sAsyncAuctionMgr->ListBidderItems(_player->GetGUID(), packet.Auctioneer, std::move(packet.OutbiddedAuctionIds));
 }
 
 // Sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPackets::AuctionHouse::ListOwnerItems& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
     sAsyncAuctionMgr->ListOwnerItems(_player->GetGUID(), packet.Auctioneer);
 }
 
 // Called when player clicks on search button
 void WorldSession::HandleAuctionListItems(WorldPackets::AuctionHouse::ListItems& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_ITEMS");
-
     // Remove fake death
     if (_player->HasUnitState(UNIT_STATE_DIED))
         _player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
@@ -227,6 +219,5 @@ void WorldSession::HandleAuctionListItems(WorldPackets::AuctionHouse::ListItems&
 
 void WorldSession::HandleAuctionListPendingSales(WorldPackets::AuctionHouse::ListPendingSales& /*packet*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_PENDING_SALES");
     SendPacket(WorldPackets::AuctionHouse::ListPendingSalesServer().Write());
 }

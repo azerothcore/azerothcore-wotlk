@@ -1159,7 +1159,6 @@ struct BfWGGameObjectBuilding
             // Rebuild gameobject
             go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
-            go->setActive(false); // Everything is reset, no need keep active at this point.
         }
 
         // Update worldstate
@@ -1171,10 +1170,6 @@ struct BfWGGameObjectBuilding
     // Called when associated gameobject is damaged
     void Damaged()
     {
-        GameObject* go = m_WG->GetGameObject(m_Build);
-        if (go)
-            go->setActive(true);
-
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);
@@ -1198,10 +1193,6 @@ struct BfWGGameObjectBuilding
     // Called when associated gameobject is destroyed
     void Destroyed()
     {
-        GameObject* go = m_WG->GetGameObject(m_Build);
-        if (go)
-            go->setActive(true);
-
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);

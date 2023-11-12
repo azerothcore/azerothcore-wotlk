@@ -219,8 +219,6 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_CORPSE_QUERY");
-
     if (!_player->HasCorpse())
     {
         WorldPacket data(MSG_CORPSE_QUERY, 1);
@@ -356,8 +354,6 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 /// Only _static_ data is sent in this packet !!!
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_PAGE_TEXT_QUERY");
-
     uint32 pageID;
     recvData >> pageID;
     recvData.read_skip<uint64>();                          // guid

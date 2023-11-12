@@ -484,7 +484,6 @@ public:
 
             uint32 introDelay = 0;
             me->setActive(true);
-            me->SetFarVisible(true);
             me->SetInCombatWithZone();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToNPC(true);

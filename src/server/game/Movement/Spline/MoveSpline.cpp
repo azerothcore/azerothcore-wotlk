@@ -125,13 +125,14 @@ namespace Movement
         if (args.flags.cyclic)
         {
             uint32 cyclic_point = 0;
-            if (splineflags.enter_cycle)
-                cyclic_point = 1;   // shouldn't be modified, came from client
-            spline.init_cyclic_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], cyclic_point, args.initialOrientation);
+            // MoveSplineFlag::Enter_Cycle support dropped
+            //if (splineflags & SPLINEFLAG_ENTER_CYCLE)
+            //cyclic_point = 1;   // shouldn't be modified, came from client
+            spline.init_cyclic_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], cyclic_point);
         }
         else
         {
-            spline.init_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], args.initialOrientation);
+            spline.init_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()]);
         }
 
         // init spline timestamps
@@ -203,7 +204,7 @@ namespace Movement
         if (!(exp)) \
         { \
             if (unit) \
-                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '{}' failed for GUID: {} Entry: {}", #exp, unit->GetGUID().ToString().c_str(), unit->GetEntry());\
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '{}' failed for {}", #exp, unit->GetGUID().ToString()); \
             else \
                 LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '{}' failed for cyclic spline continuation", #exp); \
             return false;\
@@ -272,41 +273,6 @@ namespace Movement
                     point_Idx = spline.first();
                     time_passed = time_passed % Duration();
                     result = Movement::MoveSpline::UpdateResult(Result_NextCycle | Result_JustArrived);
-
-                    // Remove first point from the path after one full cycle.
-                    // That point was the position of the unit prior to entering the cycle and it shouldn't be repeated with continuous cycles.
-                    if (splineflags.enter_cycle)
-                    {
-                        splineflags.enter_cycle = false;
-
-                        MoveSplineInitArgs args{ (size_t)spline.getPointCount() };
-                        args.path.assign(spline.getPoints().begin() + spline.first() + 1, spline.getPoints().begin() + spline.last());
-                        args.facing = facing;
-                        args.flags = splineflags;
-                        args.path_Idx_offset = point_Idx_offset;
-                        // MoveSplineFlag::Parabolic | MoveSplineFlag::Animation not supported currently
-                            //args.parabolic_amplitude = ?;
-                            //args.time_perc = ?;
-                        args.splineId = m_Id;
-                        args.initialOrientation = initialOrientation;
-                        args.velocity = 1.0f; // Calculated below
-                        args.HasVelocity = true;
-                        args.TransformForTransport = onTransport;
-                        if (args.Validate(nullptr))
-                        {
-                            // New cycle should preserve previous cycle's duration for some weird reason, even though
-                            // the path is really different now. Blizzard is weird. Or this was just a simple oversight.
-                            // Since our splines precalculate length with velocity in mind, if we want to find the desired
-                            // velocity, we have to make a fake spline, calculate its duration and then compare it to the
-                            // desired duration, thus finding out how much the velocity has to be increased for them to match.
-                            MoveSpline tempSpline;
-                            tempSpline.Initialize(args);
-                            args.velocity = (float)tempSpline.Duration() / Duration();
-
-                            if (args.Validate(nullptr))
-                                init_spline(args);
-                        }
-                    }
                 }
                 else
                 {
