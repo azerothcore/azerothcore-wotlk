@@ -780,11 +780,13 @@ Metric.Enable = 0
 
 #
 #    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
+#        Description: Interval between every batch of data sent in seconds.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
+#        Default:     1 second
 #
 
-Metric.Interval = 10
+Metric.Interval = 1
 
 #
 #    Metric.ConnectionInfo
