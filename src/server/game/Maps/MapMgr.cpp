@@ -36,7 +36,6 @@
 
 MapMgr::MapMgr()
 {
-    i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;
@@ -54,8 +53,6 @@ MapMgr* MapMgr::instance()
 
 void MapMgr::Initialize()
 {
-    Map::InitStateMachine();
-
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
 
     // Start mtmaps if needed
@@ -84,10 +81,10 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             ASSERT(entry);
 
             if (entry->Instanceable())
-                map = new MapInstanced(id, i_gridCleanUpDelay);
+                map = new MapInstanced(id);
             else
             {
-                map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY);
+                map = new Map(id, 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
@@ -303,8 +300,8 @@ bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
 
-    int gx = (MAX_NUMBER_OF_GRIDS - 1) - p.x_coord;
-    int gy = (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord;
+    int gx = 63 - p.x_coord;
+    int gy = 63 - p.y_coord;
 
     return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
 }
@@ -336,8 +333,6 @@ void MapMgr::UnloadAll()
 
     if (m_updater.activated())
         m_updater.deactivate();
-
-    Map::DeleteStateMachine();
 }
 
 void MapMgr::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)

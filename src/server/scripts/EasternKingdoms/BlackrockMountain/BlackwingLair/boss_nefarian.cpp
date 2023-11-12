@@ -327,7 +327,6 @@ public:
                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
                     {
                         nefarian->setActive(true);
-                        nefarian->SetFarVisible(true);
                         nefarian->SetCanFly(true);
                         nefarian->SetDisableGravity(true);
                         nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
