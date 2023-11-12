@@ -1,5 +1,6 @@
 -- CREATURES SIT:
-INSERT INTO creature_addon VALUES
+DELETE FROM `creature_addon` WHERE `guid` IN (1970898,1970880,1970879,1970878,1970894,1970895,1970896,1970927,1970877);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (1970898, 0, 0, 5, 0, 0, 0, NULL),
 (1970880, 0, 0, 5, 0, 0, 0, NULL),
 (1970879, 0, 0, 5, 0, 0, 0, NULL),
@@ -11,11 +12,3 @@ INSERT INTO creature_addon VALUES
 -- CREATURES SLEEP:
 (1970927, 0, 0, 3, 0, 0, 0, NULL),
 (1970877, 0, 0, 3, 0, 0, 0, NULL);
-
--- UNCLICKABLE CHAIRS:
-UPDATE `gameobject_template` SET `type` = 5, `Data0` = 0, `Data1` = 0 WHERE `entry` IN
-(187521, 187515, 187514, 187512, 187519, 187522, 187523);
-
--- UNCLICKABLE BED:
-UPDATE `gameobject_template` SET `type` = 5, `Data0` = 0, `Data1` = 0 WHERE
-(`entry` = 187526 );
