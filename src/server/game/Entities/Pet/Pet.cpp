@@ -2234,14 +2234,14 @@ void Pet::InitTalentForLevel()
 uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 {
     uint8 points = (level >= 20) ? ((level - 16) / 4) : 0;
-    points = uint8(points * sWorld->getRate(RATE_TALENT_PET));
+    
     // Mod points from owner SPELL_AURA_MOD_PET_TALENT_POINTS
     if (Unit* owner = GetOwner())
         points += owner->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
 
     sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
 
-    return points;
+    return uint8(points * sWorld->getRate(RATE_TALENT_PET));
 }
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
