@@ -1,12 +1,14 @@
 -- Magistrate Barthilas
 -- move Position
 DELETE FROM `waypoint_data` WHERE `id`=104350;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (104350, 1, 3696.79, -3605.93, 139.041, NULL, 0, 1, 0, 100, 0),
-(104350, 2, 3725.58, -3599.48, 142.367, NULL, 1000, 1, 10435, 100, 0);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (104350, 1, 3696.79, -3605.93, 139.041, NULL, 1000, 1, 0, 100, 0),
+(104350, 2, 3725.58, -3599.48, 142.367, NULL, 1000, 1, 104350, 100, 0);
 
 -- Teleport after moving to the gate
 DELETE FROM `waypoint_scripts` WHERE `guid`=938;
-INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES (10435, 1, 6, 0, 1, 0, 4068.28, -3535.68, 122.771, 2.5, 938);
+INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES 
+(104350, 1, 6, 329, 1, 0, 4068.28, -3535.68, 122.771, 2.5, 938);
+
 
 
 -- magistrate barthilas
