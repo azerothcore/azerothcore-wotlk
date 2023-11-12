@@ -1,3 +1,4 @@
+-- DB update 2023_11_11_04 -> 2023_11_12_00
 -- Gurubashi Bat Rider (14750) waypoints
 -- Flying loop
 DELETE FROM `waypoint_data` WHERE `id`=147500;
