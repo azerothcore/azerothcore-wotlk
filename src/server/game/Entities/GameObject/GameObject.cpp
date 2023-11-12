@@ -27,7 +27,6 @@
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
@@ -103,9 +102,18 @@ std::string const& GameObject::GetAIName() const
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
 
-void GameObject::CleanupsBeforeDelete(bool finalCleanup)
+void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
-    WorldObject::CleanupsBeforeDelete(finalCleanup);
+    if (GetTransport() && !ToTransport())
+    {
+        GetTransport()->RemovePassenger(this);
+        SetTransport(nullptr);
+        m_movementInfo.transport.Reset();
+        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
+
+    if (IsInWorld())
+        RemoveFromWorld();
 
     if (m_uint32Values)                                      // field array can be not exist if GameOBject not loaded
         RemoveFromOwner();
@@ -173,6 +181,9 @@ void GameObject::RemoveFromWorld()
         if (m_model)
             if (GetMap()->ContainsGameObjectModel(*m_model))
                 GetMap()->RemoveGameObjectModel(*m_model);
+
+        if (Transport* transport = GetTransport())
+            transport->RemovePassenger(this, true);
 
         // If linked trap exists, despawn it
         if (GameObject* linkedTrap = GetLinkedTrap())
@@ -877,11 +888,7 @@ void GameObject::Update(uint32 diff)
                 if (!m_spawnedByDefault)
                 {
                     m_respawnTime = 0;
-                    if (m_spawnId)
-                        DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
-                    else
-                        Delete();
-
+                    DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
                     return;
                 }
 
@@ -1177,31 +1184,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
 
 void GameObject::DeleteFromDB()
 {
-    if (!m_spawnId)
-    {
-        LOG_ERROR("entities.gameobject", "Trying to delete not saved gameobject: {}", GetGUID().ToString());
-        return;
-    }
-
-    GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
-    if (!data)
-        return;
-
-    CharacterDatabaseTransaction charTrans = CharacterDatabase.BeginTransaction();
-
-    sMapMgr->DoForAllMapsWithMapId(data->mapid,
-        [this, charTrans](Map* map) -> void
-        {
-            // despawn all active objects, and remove their respawns
-            std::vector<GameObject*> toUnload;
-            for (auto const& pair : Acore::Containers::MapEqualRange(map->GetGameObjectBySpawnIdStore(), m_spawnId))
-                toUnload.push_back(pair.second);
-            for (GameObject* obj : toUnload)
-                map->AddObjectToRemoveList(obj);
-            map->RemoveGORespawnTime(m_spawnId);
-        }
-    );
-
+    GetMap()->RemoveGORespawnTime(m_spawnId);
     sObjectMgr->DeleteGOData(m_spawnId);
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
@@ -2188,6 +2171,15 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     return dx < (info->maxX * scale) + radius && dx > (info->minX * scale) - radius
            && dy < (info->maxY * scale) + radius && dy > (info->minY * scale) - radius
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
+}
+
+void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
+{
+    dist += GetObjectSize();
+    if (includeMargin)
+        dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void GameObject::EventInform(uint32 eventId)

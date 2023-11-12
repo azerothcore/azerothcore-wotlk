@@ -100,12 +100,11 @@ struct boss_leotheras_the_blind : public BossAI
             if (me->GetDisplayId() != me->GetNativeDisplayId())
             {
                 //is currently in metamorphosis
-                DoResetThreatList();
                 me->LoadEquipment();
                 me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
-
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
+            DoResetThreatList();
             scheduler.CancelGroup(GROUP_DEMON);
             scheduler.DelayAll(10s);
 
@@ -172,6 +171,8 @@ struct boss_leotheras_the_blind : public BossAI
 
     void ElfTime()
     {
+        DoResetThreatList();
+        me->InterruptNonMeleeSpells(false);
         scheduler.Schedule(25050ms, 32550ms, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastSelf(SPELL_WHIRLWIND);
@@ -186,6 +187,8 @@ struct boss_leotheras_the_blind : public BossAI
 
     void DemonTime()
     {
+        DoResetThreatList();
+        me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
@@ -240,15 +243,17 @@ struct npc_inner_demon : public ScriptedAI
         _instance = creature->GetInstanceScript();
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
-    {
-        me->DespawnOrUnsummon(1);
-    }
-
     void IsSummonedBy(WorldObject* summoner) override
     {
         if (!summoner)
             return;
+
+        //summoner is always the affected player
+        _affectedPlayerGUID = summoner->GetGUID();
+        if (Unit* affectedPlayer = summoner->ToUnit())
+        {
+            me->Attack(affectedPlayer, true);
+        }
 
         _scheduler.CancelAll();
         _scheduler.Schedule(4s, [this](TaskContext context)
@@ -260,30 +265,23 @@ struct npc_inner_demon : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, _affectedPlayerGUID))
         {
-            leotheras->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
+            affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
     }
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+        if (!who || who->GetGUID() != _affectedPlayerGUID)
         {
-            if (!who || who->GetGUID() != leotheras->GetGUID())
-            {
-                damage = 0;
-            }
+            damage = 0;
         }
     }
 
     bool CanAIAttack(Unit const* who) const override
     {
-        if (Creature* leotheras = _instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
-        {
-            return who->GetGUID() == leotheras->GetGUID();
-        }
-        return false;
+        return who->GetGUID() == _affectedPlayerGUID;
     }
 
     void UpdateAI(uint32 diff) override
@@ -300,6 +298,7 @@ struct npc_inner_demon : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     InstanceScript* _instance;
+    ObjectGuid _affectedPlayerGUID;
 };
 
 class spell_leotheras_whirlwind : public SpellScriptLoader
@@ -373,7 +372,9 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             if (Unit* victim = GetCaster()->GetVictim())
+            {
                 unitList.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+            }
         }
 
         void Register() override
@@ -399,9 +400,15 @@ public:
         void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
+            {
                 if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                    if (Creature* leotheras = ObjectAccessor::GetCreature(*GetUnitOwner(), instance->GetGuidData(NPC_LEOTHERAS_THE_BLIND)))
+                {
+                    if (Creature* leotheras = instance->GetCreature(DATA_LEOTHERAS_THE_BLIND))
+                    {
                         leotheras->CastSpell(GetUnitOwner(), SPELL_CONSUMING_MADNESS, true);
+                    }
+                }
+            }
         }
 
         void Register() override
@@ -430,7 +437,9 @@ public:
         {
             PreventDefaultAction();
             if (Unit* victim = GetUnitOwner()->GetVictim())
+            {
                 GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            }
         }
 
         void Register() override
@@ -458,7 +467,9 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
+            {
                 Unit::Kill(GetCaster(), target);
+            }
         }
 
         void Register() override
