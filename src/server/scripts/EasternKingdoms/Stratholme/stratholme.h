@@ -31,7 +31,7 @@ enum DataTypes
     TYPE_ZIGGURAT3                      = 3,
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
-    TYPE_BARTHILAS_RUN,
+    TYPE_BARTHILAS_RUN                  = 6,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
@@ -106,13 +106,13 @@ enum MiscIds
     EVENT_GATE2_TRAP                    = 9,
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
-    EVENT_BARTHILAS_MOVE_END,
-    EVENT_BARTHILAS_TEL_TO,
+    EVENT_BARTHILAS_MOVE_END            = 12,
+    EVENT_BARTHILAS_TEL_TO              = 13,
 
     SPELL_BARON_ULTIMATUM               = 27861
 };
 
-enum WAYPOINT_DATA
+enum WaypointData
 {
     BARTHILAS_PATHID                    = 104350
 };
