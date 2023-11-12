@@ -556,6 +556,11 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
 {
     if (instance)
         SetBoundary(instance->GetBossBoundary(bossId));
+
+    scheduler.SetValidator([this]
+    {
+        return !me->HasUnitState(UNIT_STATE_CASTING);
+    });
 }
 
 bool BossAI::CanRespawn()
