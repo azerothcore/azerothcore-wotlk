@@ -573,6 +573,12 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT]);
         _rate_values[RATE_TALENT] = 1.0f;
     }
+    _rate_values[RATE_TALENT_PET] = sConfigMgr->GetOption<float>("Rate.Talent.Pet", 1.0f);
+    if (_rate_values[RATE_TALENT_PET] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
+        _rate_values[RATE_TALENT_PET] = 1.0f;
+    }
     _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
     if (_rate_values[RATE_MOVESPEED] < 0)
     {
