@@ -314,7 +314,7 @@ struct boss_jeklik : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        // ensures that the scheduler gets updated even out of combat
+        // ensures that the scheduler gets updated while resetting
         if (_isResetting)
         {
             scheduler.Update(diff);
