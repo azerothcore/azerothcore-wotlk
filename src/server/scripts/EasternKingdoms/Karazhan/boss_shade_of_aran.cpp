@@ -70,7 +70,9 @@ enum Spells
 
     SPELL_SUMMON_BLIZZARD        = 29969, // Activates the Blizzard NPC
 
-    SPELL_SHADOW_PYRO            = 29978
+    SPELL_SHADOW_PYRO            = 29978,
+
+    SPELL_ATIESH_VISUAL          = 31796
 };
 
 enum Creatures
@@ -92,8 +94,7 @@ enum Groups
 
 enum Misc
 {
-    ACTION_ATIESH_REACT          = 1,
-    ITEM_ATIESH = 22589
+    ACTION_ATIESH_REACT          = 1
 };
 
 Position const roomCenter = {-11158.f, -1920.f};
@@ -546,7 +547,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (player->HasItemOrGemWithIdEquipped(ITEM_ATIESH, 1))
+            if (player->HasAura(SPELL_ATIESH_VISUAL))
             {
                 if (Creature* aran = instance->GetCreature(DATA_ARAN))
                 {
