@@ -121,13 +121,13 @@ struct boss_captain_skarloc : public BossAI
             {
                 me->Dismount();
                 me->SetWalk(true);
-                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                summons.DoForAllSummons([&](WorldObject* summon)
                 {
-                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                    if (summon)
                     {
-                        summon->SetWalk(true);
+                        summon->ToCreature()->SetWalk(true);
                     }
-                }
+                });
                 if (Creature* mount = me->SummonCreature(NPC_SKARLOC_MOUNT, 2049.12f, 252.31f, 62.855f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
                 {
                     mount->SetImmuneToNPC(true);
@@ -146,17 +146,17 @@ struct boss_captain_skarloc : public BossAI
             {
                 me->SetImmuneToAll(false);
                 me->SetInCombatWithZone();
-                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                summons.DoForAllSummons([&](WorldObject* summon)
                 {
-                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                    if (Creature* adds = summon->ToCreature())
                     {
-                        if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
+                        if (adds->GetEntry() != NPC_SKARLOC_MOUNT)
                         {
-                            summon->SetImmuneToAll(false);
-                            summon->SetInCombatWithZone();
+                            adds->SetImmuneToAll(false);
+                            adds->SetInCombatWithZone();
                         }
                     }
-                }
+                });
             }, 8s);
         }
     }
