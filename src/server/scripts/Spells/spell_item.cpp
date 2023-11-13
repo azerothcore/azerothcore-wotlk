@@ -3948,6 +3948,31 @@ class spell_item_venomhide_feed : public SpellScript
     }
 };
 
+// 30077 - Carinda's Scroll of Retribution
+enum ScrollOfRetribution
+{
+    NPC_VIERA_SUNWHISPER    = 17226
+};
+
+class spell_item_scroll_of_retribution : public SpellScript
+{
+    PrepareSpellScript(spell_item_scroll_of_retribution)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_VIERA_SUNWHISPER)
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_scroll_of_retribution::CheckCast);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4069,4 +4094,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_elixir_of_shadows);
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
+    RegisterSpellScript(spell_item_scroll_of_retribution);
 }

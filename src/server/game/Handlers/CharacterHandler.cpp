@@ -537,7 +537,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             std::shared_ptr<Player> newChar(new Player(this), [](Player* ptr)
             {
-                ptr->CleanupsBeforeDelete();
+                // Only when player is created correctly do clean
+                if (ptr->HasAtLoginFlag(AT_LOGIN_FIRST))
+                {
+                    ptr->CleanupsBeforeDelete();
+                }
                 delete ptr;
             });
 

@@ -517,7 +517,6 @@ public:
             if (m_pInstance && !_encounterFinished)
                 m_pInstance->SetData(TYPE_THORIM, IN_PROGRESS);
             me->setActive(true);
-            me->SetFarVisible(true);
             DisableThorim(true);
             me->CastSpell(me, SPELL_SHEATH_OF_LIGHTNING, true);
             //me->CastSpell(me, SPELL_TOUCH_OF_DOMINION, true);

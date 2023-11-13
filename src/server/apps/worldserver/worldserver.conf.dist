@@ -780,11 +780,13 @@ Metric.Enable = 0
 
 #
 #    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
+#        Description: Interval between every batch of data sent in seconds.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
+#        Default:     1 second
 #
 
-Metric.Interval = 10
+Metric.Interval = 1
 
 #
 #    Metric.ConnectionInfo
@@ -938,13 +940,6 @@ ClientCacheVersion = 0
 #        Default:     10000 - (10 milliseconds, 0.01 second)
 
 SessionAddDelay = 10000
-
-#
-#    GridCleanUpDelay
-#        Description: Time (in milliseconds) grid clean up delay.
-#        Default:     300000 - (5 minutes)
-
-GridCleanUpDelay = 300000
 
 #
 #    CloseIdleConnections
@@ -1251,17 +1246,17 @@ Visibility.GroupMode = 1
 #    Visibility.Distance.Instances
 #    Visibility.Distance.BGArenas
 #        Description: Visibility distance to see other players or gameobjects.
-#                     Visibility on continents on retail ~100 yards. In BG/Arenas ~533.
-#                     For instances default ~170.
-#                     Max limited by grid size: 533.33333
+#                     Visibility on continents on retail ~90 yards. In BG/Arenas ~180.
+#                     For instances default ~120.
+#                     Max limited by active player zone: ~ 333
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
-#        Default:     100  - (Visibility.Distance.Continents)
-#                     170 - (Visibility.Distance.Instances)
-#                     533 - (Visibility.Distance.BGArenas)
+#        Default:     90  - (Visibility.Distance.Continents)
+#                     120 - (Visibility.Distance.Instances)
+#                     180 - (Visibility.Distance.BGArenas)
 
-Visibility.Distance.Continents = 100
-Visibility.Distance.Instances = 170
-Visibility.Distance.BGArenas = 533
+Visibility.Distance.Continents = 90
+Visibility.Distance.Instances = 120
+Visibility.Distance.BGArenas = 180
 
 #
 #    Visibility.Notify.Period.OnContinents
@@ -1373,21 +1368,12 @@ DetectPosCollision = 1
 CheckGameObjectLoS = 1
 
 #
-#    GridUnload
-#        Description: Unload grids to save memory. Can be disabled if enough memory is available
-#                     to speed up moving players to new grids.
-#        Default:     1 - (enable, Unload grids)
-#                     0 - (disable, Do not unload grids)
-
-GridUnload = 1
-
-#
 #    PreloadAllNonInstancedMapGrids
-#        Description: Preload all grids on all non-instanced maps. Requires GridUnload to be disabled.
-#                     This will take a great amount of additional RAM (ca. 9 GB) and causes the server
-#                     to take longer to start, but can increase performance if used on a server with a
-#                     high amount of players. It will also activate all creatures which are set active
-#                     (e.g. the Fel Reavers in Hellfire Peninsula) on server start.
+#        Description: Preload all grids on all non-instanced maps. This will take a great amount
+#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
+#                     but can increase performance if used on a server with a high amount of players.
+#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
+#                     in Hellfire Peninsula) on server start.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -2060,6 +2046,13 @@ Rate.Damage.Fall = 1
 #        Default:     1
 
 Rate.Talent = 1
+
+#
+#    Rate.Talent.Pet
+#        Description: Pet Talent point rate.
+#        Default:     1
+
+Rate.Talent.Pet = 1
 
 #
 #    Rate.Health
