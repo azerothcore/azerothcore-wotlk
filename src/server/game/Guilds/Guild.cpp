@@ -1441,7 +1441,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
         return;
 
     int32 memberLimit = sConfigMgr->GetOption<int32>("Guild.MemberLimit", 0);
-    if (player->GetGuild()->GetMemberCount() >= memberLimit && memberLimit != 0)
+    if (player->GetGuild()->GetMemberCount() >= memberLimit && memberLimit > 0)
     {
         player->SendSystemMessage("Guild has the maximum amount of members. Cannot send another invite.");
         SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_INTERNAL, name);
