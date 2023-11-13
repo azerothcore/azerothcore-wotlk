@@ -42,7 +42,6 @@ enum Texts
 
 enum Spells
 {
-    //Spells
     SPELL_FROSTBOLT              = 29954,
     SPELL_FIREBALL               = 29953,
     SPELL_ARCMISSLE              = 29955,
