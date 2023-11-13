@@ -16,6 +16,7 @@
  */
 
 #include "GameObject.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
