@@ -139,12 +139,16 @@ struct boss_shade_of_aran : public BossAI
         return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
     }
 
-    void DoAction(int32 actionId) override
+    void SetGUID(ObjectGuid guid, int32 id) override
     {
-        if (actionId == ACTION_ATIESH_REACT && !_atieshReaction)
+        if (id == ACTION_ATIESH_REACT && !_atieshReaction)
         {
             Talk(SAY_ATIESH);
             _atieshReaction = true;
+            if (Unit* atieshOwner = ObjectAccessor::GetUnit(*me, guid))
+            {
+                me->SetFacingToObject(atieshOwner);
+            }
         }
     }
 
@@ -545,8 +549,7 @@ public:
             {
                 if (Creature* aran = instance->GetCreature(DATA_ARAN))
                 {
-                    aran->SetFacingToObject(player);
-                    aran->AI()->DoAction(ACTION_ATIESH_REACT);
+                    aran->AI()->SetGUID(player->GetGUID(), ACTION_ATIESH_REACT);
                 }
             }
         }
