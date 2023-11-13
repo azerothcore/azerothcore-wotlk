@@ -49,20 +49,19 @@ void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleMoveWorldportAck()
 {
-    Player* player = GetPlayer();
     // ignore unexpected far teleports
-    if (!player->IsBeingTeleportedFar())
+    if (!GetPlayer()->IsBeingTeleportedFar())
         return;
 
-    player->SetSemaphoreTeleportFar(0);
+    GetPlayer()->SetSemaphoreTeleportFar(0);
 
     // get the teleport destination
-    WorldLocation const& loc = player->GetTeleportDest();
+    WorldLocation const& loc = GetPlayer()->GetTeleportDest();
 
     // possible errors in the coordinate validity check
     if (!MapMgr::IsValidMapCoord(loc))
     {
-        LogoutPlayer(false);
+        KickPlayer("!MapMgr::IsValidMapCoord(loc)");
         return;
     }
 
@@ -70,202 +69,198 @@ void WorldSession::HandleMoveWorldportAck()
     MapEntry const* mEntry = sMapStore.LookupEntry(loc.GetMapId());
     InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(loc.GetMapId());
 
-    Map* oldMap = player->GetMap();
-    if (player->IsInWorld())
+    Map* oldMap = GetPlayer()->GetMap();
+    if (GetPlayer()->IsInWorld())
     {
-        LOG_ERROR("network.opcode", "Player (Name {}) is still in world when teleported from map {} to new map {}", player->GetName(), oldMap->GetId(), loc.GetMapId());
-        oldMap->RemovePlayerFromMap(player, false);
+        LOG_ERROR("network.opcode", "Player (Name {}) is still in world when teleported from map {} to new map {}", GetPlayer()->GetName(), oldMap->GetId(), loc.GetMapId());
+        oldMap->RemovePlayerFromMap(GetPlayer(), false);
     }
 
     // reset instance validity, except if going to an instance inside an instance
-    if (!player->m_InstanceValid && !mInstance)
+    if (!GetPlayer()->m_InstanceValid && !mInstance)
     {
-        player->m_InstanceValid = true;
+        GetPlayer()->m_InstanceValid = true;
         // pussywizard: m_InstanceValid can be false only by leaving a group in an instance => so remove temp binds that could not be removed because player was still on the map!
-        if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), oldMap->GetId(), oldMap->GetDifficulty()))
-            sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), oldMap->GetId(), oldMap->GetDifficulty(), true);
+        if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(GetPlayer()->GetGUID(), oldMap->GetId(), oldMap->GetDifficulty()))
+            sInstanceSaveMgr->PlayerUnbindInstance(GetPlayer()->GetGUID(), oldMap->GetId(), oldMap->GetDifficulty(), true);
     }
 
     // relocate the player to the teleport destination
-    Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), player);
+    Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), GetPlayer());
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
-    if (!newMap || newMap->CannotEnter(player, false))
+    if (!newMap || newMap->CannotEnter(GetPlayer(), false))
     {
-        LOG_ERROR("network.opcode", "Map {} could not be created for player {}, porting player to homebind", loc.GetMapId(), player->GetGUID().ToString());
-        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+        LOG_ERROR("network.opcode", "Map {} could not be created for player {}, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString());
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
         return;
     }
 
-    float z = loc.GetPositionZ() + player->GetHoverHeight();
-    player->Relocate(loc.GetPositionX(), loc.GetPositionY(), z, loc.GetOrientation());
+    float z = loc.GetPositionZ() + GetPlayer()->GetHoverHeight();
+    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), z, loc.GetOrientation());
 
-    player->ResetMap();
-    player->SetMap(newMap);
+    GetPlayer()->ResetMap();
+    GetPlayer()->SetMap(newMap);
 
-    player->UpdatePositionData();
+    GetPlayer()->UpdatePositionData();
 
-    player->SendInitialPacketsBeforeAddToMap();
-    if (!player->GetMap()->AddPlayerToMap(player))
+    GetPlayer()->SendInitialPacketsBeforeAddToMap();
+    if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
         LOG_ERROR("network.opcode", "WORLD: failed to teleport player {} ({}) to map {} because of unknown reason!",
-            player->GetName(), player->GetGUID().ToString(), loc.GetMapId());
-        player->ResetMap();
-        player->SetMap(oldMap);
-        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString(), loc.GetMapId());
+        GetPlayer()->ResetMap();
+        GetPlayer()->SetMap(oldMap);
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
         return;
     }
 
     oldMap->AfterPlayerUnlinkFromMap();
 
     // pussywizard: transport teleport couldn't teleport us to the same map (some other teleport pending, reqs not met, etc.), but we still have transport set until player moves! clear it if map differs (crashfix)
-    if (Transport* t = player->GetTransport())
-        if (!t->IsInMap(player))
+    if (Transport* t = _player->GetTransport())
+        if (!t->IsInMap(_player))
         {
-            t->RemovePassenger(player);
-            player->m_transport = nullptr;
-            player->m_movementInfo.transport.Reset();
-            player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            t->RemovePassenger(_player);
+            _player->m_transport = nullptr;
+            _player->m_movementInfo.transport.Reset();
+            _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!player->getHostileRefMgr().IsEmpty())
-        player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
+    if (!_player->getHostileRefMgr().IsEmpty())
+        _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
-    CellCoord pair(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
+    CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
-        LogoutPlayer(false);
+        KickPlayer("!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid()");
         return;
     }
-
-    if (!newMap->IsGridLoaded(player->GetPositionX(), player->GetPositionY()))
-        newMap->LoadGrid(player->GetPositionX(), player->GetPositionY());
+    newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     // pussywizard: player supposed to enter bg map
-    if (player->InBattleground())
+    if (_player->InBattleground())
     {
         // but landed on another map, cleanup data
         if (!mEntry->IsBattlegroundOrArena())
-            player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+            _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
         // everything ok
-        else if (Battleground* bg = player->GetBattleground())
+        else if (Battleground* bg = _player->GetBattleground())
         {
-            if (player->IsInvitedForBattlegroundInstance()) // GMs are not invited, so they are not added to participants
-                bg->AddPlayer(player);
+            if (_player->IsInvitedForBattlegroundInstance()) // GMs are not invited, so they are not added to participants
+                bg->AddPlayer(_player);
         }
     }
 
     // pussywizard: arena spectator stuff
     {
-        if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
+        if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && _player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
         {
-            player->ClearReceivedSpectatorResetFor();
-            player->SetIsSpectator(true);
-            ArenaSpectator::SendCommand(player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
-            ((BattlegroundMap*)newMap)->GetBG()->AddSpectator(player);
-            ArenaSpectator::HandleResetCommand(player);
+            _player->ClearReceivedSpectatorResetFor();
+            _player->SetIsSpectator(true);
+            ArenaSpectator::SendCommand(_player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
+            ((BattlegroundMap*)newMap)->GetBG()->AddSpectator(_player);
+            ArenaSpectator::HandleResetCommand(_player);
         }
         else
-            player->SetIsSpectator(false);
+            _player->SetIsSpectator(false);
 
-        player->SetPendingSpectatorForBG(0);
+        GetPlayer()->SetPendingSpectatorForBG(0);
 
-        if (uint32 inviteInstanceId = player->GetPendingSpectatorInviteInstanceId())
+        if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
             if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId, BATTLEGROUND_TYPE_NONE))
-                tbg->RemoveToBeTeleported(player->GetGUID());
-            player->SetPendingSpectatorInviteInstanceId(0);
+                tbg->RemoveToBeTeleported(_player->GetGUID());
+            _player->SetPendingSpectatorInviteInstanceId(0);
         }
     }
 
-    // xinef: do this again, player can be teleported inside bg->AddPlayer(player)!!!!
-    CellCoord pair2(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
+    // xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
+    CellCoord pair2(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
         KickPlayer("!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid()");
         return;
     }
+    newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
-    if (!newMap->IsGridLoaded(player->GetPositionX(), player->GetPositionY()))
-        newMap->LoadGrid(player->GetPositionX(), player->GetPositionY());
-
-    player->SendInitialPacketsAfterAddToMap();
+    GetPlayer()->SendInitialPacketsAfterAddToMap();
 
     // flight fast teleport case
-    if (player->IsInFlight())
+    if (GetPlayer()->IsInFlight())
     {
-        if (!player->InBattleground())
+        if (!GetPlayer()->InBattleground())
         {
             // short preparations to continue flight
-            MovementGenerator* movementGenerator = player->GetMotionMaster()->top();
-            movementGenerator->Initialize(player);
+            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->top();
+            movementGenerator->Initialize(GetPlayer());
             return;
         }
 
         // battleground state prepare, stop flight
-        player->GetMotionMaster()->MovementExpired();
-        player->CleanupAfterTaxiFlight();
+        GetPlayer()->GetMotionMaster()->MovementExpired();
+        GetPlayer()->CleanupAfterTaxiFlight();
     }
 
     // resurrect character at enter into instance where his corpse exist after add to map
-    Corpse* corpse = player->GetMap()->GetCorpseByPlayer(player->GetGUID());
+    Corpse* corpse = GetPlayer()->GetMap()->GetCorpseByPlayer(GetPlayer()->GetGUID());
     if (corpse && corpse->GetType() != CORPSE_BONES)
     {
         if (mEntry->IsDungeon())
         {
-            player->ResurrectPlayer(0.5f);
-            player->SpawnCorpseBones();
+            GetPlayer()->ResurrectPlayer(0.5f);
+            GetPlayer()->SpawnCorpseBones();
         }
     }
 
     if (!corpse && mEntry->IsDungeon())
     {
         // resurrect character upon entering instance when the corpse is not available anymore
-        if (player->GetCorpseLocation().GetMapId() == mEntry->MapID)
+        if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
         {
-            player->ResurrectPlayer(0.5f);
-            player->RemoveCorpse();
+            GetPlayer()->ResurrectPlayer(0.5f);
+            GetPlayer()->RemoveCorpse();
         }
     }
 
     bool allowMount = !mEntry->IsDungeon() || mEntry->IsBattlegroundOrArena();
     if (mInstance)
     {
-        Difficulty diff = player->GetDifficulty(mEntry->IsRaid());
+        Difficulty diff = GetPlayer()->GetDifficulty(mEntry->IsRaid());
         if (MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID, diff))
             if (mapDiff->resetTime)
                 if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(mEntry->MapID, diff))
                 {
                     uint32 timeleft = uint32(timeReset - GameTime::GetGameTime().count());
-                    player->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
+                    GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
                 }
         allowMount = mInstance->AllowMount;
     }
 
     // mount allow check
     if (!allowMount)
-        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
-    player->GetZoneAndAreaId(newzone, newarea);
-    player->UpdateZone(newzone, newarea);
+    GetPlayer()->GetZoneAndAreaId(newzone, newarea);
+    GetPlayer()->UpdateZone(newzone, newarea);
 
     // honorless target
-    if (player->pvpInfo.IsHostile)
-        player->CastSpell(player, 2479, true);
+    if (GetPlayer()->pvpInfo.IsHostile)
+        GetPlayer()->CastSpell(GetPlayer(), 2479, true);
 
     // in friendly area
-    else if (player->IsPvP() && !player->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
-        player->UpdatePvP(false, false);
+    else if (GetPlayer()->IsPvP() && !GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
+        GetPlayer()->UpdatePvP(false, false);
 
     // resummon pet
-    player->ResummonPetTemporaryUnSummonedIfAny();
+    GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
 
     //lets process all delayed operations on successful teleport
-    player->ProcessDelayedOperations();
+    GetPlayer()->ProcessDelayedOperations();
 }
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)

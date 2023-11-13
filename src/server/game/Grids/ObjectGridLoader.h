@@ -53,23 +53,6 @@ private:
     uint32 i_corpses;
 };
 
-//Stop the creatures before unloading the NGrid
-class AC_GAME_API ObjectGridStoper
-{
-public:
-    void Visit(CreatureMapType& m);
-    template<class T> void Visit(GridRefMgr<T>&) { }
-};
-
-//Move the foreign creatures back to respawn positions before unloading the NGrid
-class AC_GAME_API ObjectGridEvacuator
-{
-public:
-    void Visit(CreatureMapType& m);
-    void Visit(GameObjectMapType& m);
-    template<class T> void Visit(GridRefMgr<T>&) { }
-};
-
 //Clean up and remove from world
 class ObjectGridCleaner
 {
