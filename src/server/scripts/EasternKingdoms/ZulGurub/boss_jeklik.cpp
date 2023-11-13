@@ -113,7 +113,7 @@ struct boss_jeklik : public BossAI
     // Bat Riders (14750) counter
     uint8 batRidersCount = 0;
 
-    bool _isResetting = false;
+    bool isResetting = false;
 
     boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
 
@@ -139,7 +139,7 @@ struct boss_jeklik : public BossAI
         BossAI::SetCombatMovement(false);
         batRidersCount = 0;
 
-        _isResetting = true; // causes scheduler to update even out of combat
+        isResetting = true; // causes scheduler to update even out of combat
 
         // once the path for her to come down to the ground starts, it appears to be near-impossible to stop it
         // instead, simply wait the 3 seconds it takes the path to complete, then teleport her home
@@ -162,7 +162,7 @@ struct boss_jeklik : public BossAI
         {
             me->SetVisible(true);
             me->ClearUnitState(UNIT_STATE_ROOT);
-            _isResetting = false;
+            isResetting = false;
         });
     }
 
@@ -315,7 +315,7 @@ struct boss_jeklik : public BossAI
     void UpdateAI(uint32 diff) override
     {
         // ensures that the scheduler gets updated while resetting
-        if (_isResetting)
+        if (isResetting)
         {
             scheduler.Update(diff);
         }
