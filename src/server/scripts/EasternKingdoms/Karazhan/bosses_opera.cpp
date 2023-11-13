@@ -183,6 +183,18 @@ struct boss_dorothee : public ScriptedAI
         }
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
+            }
+        }
+    }
+
     void Reset() override
     {
         titoDied = false;
