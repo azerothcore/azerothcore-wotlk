@@ -97,6 +97,7 @@ enum KZCreatures
     NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED    = 16152,
     NPC_MIDNIGHT                        = 16151,
     NPC_NIGHTBANE                       = 17225,
+    NPC_SHADE_OF_ARAN                   = 16524,
 
     // Trash
     NPC_COLDMIST_WIDOW                  = 16171,
