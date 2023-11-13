@@ -542,7 +542,7 @@ class at_karazhan_atiesh_aran : public AreaTriggerScript
 public:
     at_karazhan_atiesh_aran() : AreaTriggerScript("at_karazhan_atiesh_aran") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* areaTrigger) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
