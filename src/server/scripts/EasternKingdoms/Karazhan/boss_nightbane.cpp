@@ -223,9 +223,7 @@ struct boss_nightbane : public BossAI
         {
             if (id >= 8)
             {
-                //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
-                //doesn't need home position because we have to "despawn" boss on reset
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetInCombatWithZone();
                 return;
             }
@@ -337,6 +335,7 @@ struct boss_nightbane : public BossAI
             {
                 me->SetDisableGravity(false);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
             }
             else
