@@ -433,7 +433,7 @@ public:
                     {
                         if (player->isDead())
                             return true;
-                    }                    
+                    }
                 }
                 return false;
             }
@@ -451,7 +451,7 @@ public:
                     {
                         if (player->IsInCombat())
                             return false;
-                    }                    
+                    }
                 }
                 return true;
             }
@@ -532,13 +532,15 @@ public:
                 }
             }
 
-
+            //Players are dead and all players are not in combat
             if (dead() && all_noIsInCombat())
             {
+                //Destroy the Psychic Tower
                 if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                 {
                     if (GameObject* go = instance->GetGameObject(_slaughterGateGUID))
                     {
+                        //The door is closed
                         if (go->GetGoState() == GO_STATE_READY)
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
