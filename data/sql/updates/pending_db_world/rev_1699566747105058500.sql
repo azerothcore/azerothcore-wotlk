@@ -58,21 +58,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10416;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10416) AND (`source_type` = 0) AND (`id` IN (4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - AGGRO - Close Door');
+(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - AGGRO - Close Door');
 
 
 -- venom belcher
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10417;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10417) AND (`source_type` = 0) AND (`id` IN (2));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10417, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'Venom Belcher - Aggr - Close door');
+(10417, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Venom Belcher - Aggr - Close door');
 
 
 -- baron Rivendare
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10440;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10440) AND (`source_type` = 0) AND (`id` IN (20));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10440, 0, 20, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'Baron Ricendare - Aggro - Open Door');
+(10440, 0, 20, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Baron Ricendare - Aggro - Open Door');
 
 -- say --
 -- Magistrate Barthilas

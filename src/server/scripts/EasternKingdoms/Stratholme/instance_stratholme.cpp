@@ -422,6 +422,42 @@ public:
             return 0;
         }
 
+        bool dead()
+        {
+            Map::PlayerList const& lPlayers = instance->GetPlayers();
+            if (!lPlayers.IsEmpty())
+            {
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->isDead())
+                            return true;
+                    }                    
+                }
+                return false;
+            }
+            return false;
+        }
+
+        bool all_noIsInCombat()
+        {
+            Map::PlayerList const& lPlayers = instance->GetPlayers();
+            if (!lPlayers.IsEmpty())
+            {
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsInCombat())
+                            return false;
+                    }                    
+                }
+                return true;
+            }
+            return false;
+        }
+
         void Update(uint32 diff) override
         {
             events.Update(diff);
@@ -491,6 +527,21 @@ public:
                                 // set timer to spawn the plagued critters
                                 events.ScheduleEvent(EVENT_GATE2_CRITTER_DELAY, 2 * IN_MILLISECONDS);
                             }
+                        }
+                    }
+                }
+            }
+
+
+            if (dead() && all_noIsInCombat())
+            {
+                if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
+                {
+                    if (GameObject* go = instance->GetGameObject(_slaughterGateGUID))
+                    {
+                        if (go->GetGoState() == GO_STATE_READY)
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
                         }
                     }
                 }
@@ -610,7 +661,7 @@ public:
                     {
                         if (barthilas->isDead())
                             break;
-                        if (barthilas->IsAlive() && barthilas->GetPosition() == Position(4068.28f, -3535.67f, 122.771f, 2.50f))
+                        if (barthilas->IsAlive() && (barthilas->GetPosition()) == Position(4068.28f, -3535.67f, 122.771f, 2.50f))
                         {
                             barthilas->SetHomePosition(4068.28f, -3535.67f, 122.771f, 2.50f);
                             SetData(TYPE_BARTHILAS_RUN, DONE);
