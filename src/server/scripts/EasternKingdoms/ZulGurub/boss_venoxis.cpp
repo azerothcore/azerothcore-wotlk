@@ -33,43 +33,28 @@ enum Says
 
 enum Spells
 {
-    // troll form
+    // High Priest Venoxis (14507)
+    // All Phases
     SPELL_THRASH                    = 3391,
+
+    // Phase 1 - Troll Form
     SPELL_DISPEL_MAGIC              = 23859,
     SPELL_RENEW                     = 23895,
     SPELL_HOLY_NOVA                 = 23858,
     SPELL_HOLY_FIRE                 = 23860,
     SPELL_HOLY_WRATH                = 23979,
-    // snake form
+
+    // Transform
+    SPELL_VENOXIS_TRANSFORM         = 23849,
+
+    // Phase 2 - Snake Form
     SPELL_POISON_CLOUD              = 23861,
     SPELL_VENOM_SPIT                = 23862,
-
-    SPELL_PARASITIC_SERPENT         = 23865,
     SPELL_SUMMON_PARASITIC_SERPENT  = 23866,
-    SPELL_PARASITIC_SERPENT_TRIGGER = 23867,
-    // used when swapping event-stages
-    SPELL_VENOXIS_TRANSFORM         = 23849,    // 50% health - shapechange to cobra
-    SPELL_FRENZY                    = 8269,      // 20% health - frenzy
-    SPELL_POISON = 24097
-};
+    SPELL_FRENZY                    = 8269,
 
-enum Events
-{
-    // troll form
-    EVENT_THRASH                    = 1,
-    EVENT_DISPEL_MAGIC              = 2,
-    EVENT_RENEW                     = 3,
-    EVENT_HOLY_NOVA                 = 4,
-    EVENT_HOLY_FIRE                 = 5,
-    EVENT_HOLY_WRATH                = 6,
-    // phase-changing
-    EVENT_TRANSFORM                 = 7,
-    // snake form events
-    EVENT_POISON_CLOUD              = 8,
-    EVENT_VENOM_SPIT                = 9,
-    EVENT_PARASITIC_SERPENT         = 10,
-    EVENT_FRENZY                    = 11,
-    EVENT_POISON
+    // Razzashi Cobra (11373)
+    SPELL_COBRA_POISON              = 24097
 };
 
 enum Phases
@@ -80,212 +65,145 @@ enum Phases
 
 enum NPCs
 {
-    NPC_PARASITIC_SERPENT           = 14884,
-    NPC_RAZZASHI_COBRA    = 11373,
-    BOSS_VENOXIS          = 14507
+    BOSS_VENOXIS                    = 14507,
+    NPC_RAZZASHI_COBRA              = 11373,
+    NPC_PARASITIC_SERPENT           = 14884
 };
 
-class boss_venoxis : public CreatureScript
+Position const SpawnCobras[4] =
+{
+    { -12021.20f, -1719.73f, 39.34f, 0.85f },
+    { -12029.40f, -1714.54f, 39.36f, 0.68f },
+    { -12036.79f, -1704.27f, 40.06f, 0.45f },
+    { -12037.70f, -1694.20f, 39.35f, 0.27f }
+};
+
+// High Priest Venoxis (14507)
+struct boss_venoxis : public BossAI
 {
 public:
-    boss_venoxis() : CreatureScript("boss_venoxis") { }
+    boss_venoxis(Creature* creature) : BossAI(creature, DATA_VENOXIS) { }
 
-    struct boss_venoxisAI : public BossAI
+    void InitializeAI() override
     {
-        boss_venoxisAI(Creature* creature) : BossAI(creature, DATA_VENOXIS) { }
-
-        void Reset() override
+        scheduler.SetValidator([this]
         {
-            _Reset();
-            // remove all spells and auras from previous attempts
-            me->RemoveAllAuras();
-            me->SetReactState(REACT_PASSIVE);
-            // set some internally used variables to their defaults
-            _inMeleeRange = 0;
-            _transformed = false;
-            _frenzied = false;
-            events.SetPhase(PHASE_ONE);
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
 
-            SpawnCobras();
-        }
+        Reset();
+    }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_VENOXIS_DEATH);
-            me->RemoveAllAuras();
-        }
-
-        void SpawnCobras()
-        {
-            me->SummonCreature(NPC_RAZZASHI_COBRA, -12021.20f, -1719.73f, 39.34f, 0.85f, TEMPSUMMON_CORPSE_DESPAWN);
-            me->SummonCreature(NPC_RAZZASHI_COBRA, -12029.40f, -1714.54f, 39.36f, 0.68f, TEMPSUMMON_CORPSE_DESPAWN);
-            me->SummonCreature(NPC_RAZZASHI_COBRA, -12036.79f, -1704.27f, 40.06f, 0.45f, TEMPSUMMON_CORPSE_DESPAWN);
-            me->SummonCreature(NPC_RAZZASHI_COBRA, -12037.70f, -1694.20f, 39.35f, 0.27f, TEMPSUMMON_CORPSE_DESPAWN);
-        }
-
-        void SetCombatCombras()
-        {
-            std::list<Creature*> cobraList;
-            me->GetCreatureListWithEntryInGrid(cobraList, NPC_RAZZASHI_COBRA, 50.0f);
-
-            if (!cobraList.empty())
-            {
-                for (auto& cobras : cobraList)
-                {
-                    cobras->SetInCombatWithZone();
-                }
-            }
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            me->SetReactState(REACT_AGGRESSIVE);
-            // Always running events
-            events.ScheduleEvent(EVENT_THRASH, 5s);
-            // Phase one events (regular form)
-            events.ScheduleEvent(EVENT_HOLY_NOVA, 5s, 15s, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_DISPEL_MAGIC, 35s, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_FIRE, 10s, 20s, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_RENEW, 30s, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_WRATH, 15s, 25s, 0, PHASE_ONE);
-
-            events.SetPhase(PHASE_ONE);
-
-            // Set zone in combat
-            DoZoneInCombat();
-            SetCombatCombras();
-        }
-
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            // check if venoxis is ready to transform
-            if (!_transformed && !HealthAbovePct(50))
-            {
-                _transformed = true;
-                // schedule the event that changes our phase
-                events.ScheduleEvent(EVENT_TRANSFORM, 100ms);
-            }
-            // we're losing health, bad, go frenzy
-            else if (!_frenzied && !HealthAbovePct(20))
-            {
-                _frenzied = true;
-                events.ScheduleEvent(EVENT_FRENZY, 100ms);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            // return back to main code if we're still casting
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    // thrash is available in all phases
-                    case EVENT_THRASH:
-                        DoCast(me, SPELL_THRASH, true);
-                        events.ScheduleEvent(EVENT_THRASH, 10s, 20s);
-                        break;
-
-                    // troll form spells and Actions (first part)
-                    case EVENT_DISPEL_MAGIC:
-                        DoCast(me, SPELL_DISPEL_MAGIC);
-                        events.ScheduleEvent(EVENT_DISPEL_MAGIC, 15s, 20s, 0, PHASE_ONE);
-                        break;
-                    case EVENT_RENEW:
-                        DoCast(me, SPELL_RENEW);
-                        events.ScheduleEvent(EVENT_RENEW, 25s, 30s, 0, PHASE_ONE);
-                        break;
-                    case EVENT_HOLY_WRATH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
-                            DoCast(target, SPELL_HOLY_WRATH);
-                        events.ScheduleEvent(EVENT_HOLY_WRATH, 12s, 22s, 0, PHASE_ONE);
-                        break;
-                    case EVENT_HOLY_FIRE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_HOLY_FIRE);
-                        events.ScheduleEvent(EVENT_HOLY_FIRE, 10s, 24s, 0, PHASE_ONE);
-                        break;
-                    case EVENT_HOLY_NOVA:
-                        DoCastSelf(SPELL_HOLY_NOVA);
-                        events.ScheduleEvent(EVENT_HOLY_NOVA, 10s,  24s, 0, PHASE_ONE);
-                        break;
-
-                    //
-                    // snake form spells and Actions
-                    //
-
-                    case EVENT_VENOM_SPIT:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_VENOM_SPIT);
-                        events.ScheduleEvent(EVENT_VENOM_SPIT, 5s, 15s, 0, PHASE_TWO);
-                        break;
-                    case EVENT_POISON_CLOUD:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_POISON_CLOUD);
-                        events.ScheduleEvent(EVENT_POISON_CLOUD, 15s, 20s, 0, PHASE_TWO);
-                        break;
-                    case EVENT_PARASITIC_SERPENT:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_SUMMON_PARASITIC_SERPENT);
-                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 15s, 0, PHASE_TWO);
-                        break;
-                    case EVENT_FRENZY:
-                        // frenzy at 20% health
-                        DoCast(me, SPELL_FRENZY, true);
-                        break;
-
-                    //
-                    // shape and phase-changing
-                    //
-
-                    case EVENT_TRANSFORM:
-                        // shapeshift at 50% health
-                        DoCast(me, SPELL_VENOXIS_TRANSFORM);
-                        Talk(SAY_VENOXIS_TRANSFORM);
-                        DoResetThreatList();
-
-                        // phase two events (snakeform)
-                        events.ScheduleEvent(EVENT_VENOM_SPIT, 5s, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_POISON_CLOUD, 10s, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 30s, 0, PHASE_TWO);
-
-                        // transformed, start phase two
-                        events.SetPhase(PHASE_TWO);
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        uint8 _inMeleeRange;
-        bool _transformed;
-        bool _frenzied;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetZulGurubAI<boss_venoxisAI>(creature);
+        BossAI::Reset();
+
+        me->RemoveAllAuras();
+        me->SetReactState(REACT_PASSIVE);
+
+        _spawnCobras();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        me->SetReactState(REACT_AGGRESSIVE);
+
+        _setCobrasInCombat();
+
+        // Both phases
+        scheduler.Schedule(8s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_THRASH, true);
+            context.Repeat(10s, 20s);
+        });
+
+        //
+        // Phase 1 - Troll Form
+        //
+        scheduler.Schedule(5s, 15s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_HOLY_NOVA);
+            context.Repeat(10s, 24s);
+        }).Schedule(35s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_DISPEL_MAGIC);
+            context.Repeat(15s, 20s);
+        }).Schedule(10s, 20s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_HOLY_FIRE);
+            context.Repeat(10s, 24s);
+        }).Schedule(30s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_RENEW);
+            context.Repeat(25s, 30s);
+        }).Schedule(15s, 25s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_HOLY_WRATH);
+            context.Repeat(12s, 22s);
+        });
+
+        //
+        // Phase 2 - Snake Form (50% health)
+        //
+        ScheduleHealthCheckEvent(50, [&]
+        {
+            scheduler.CancelGroup(PHASE_ONE);
+
+            DoCastSelf(SPELL_VENOXIS_TRANSFORM);
+            Talk(SAY_VENOXIS_TRANSFORM);
+            DoResetThreatList();
+
+            scheduler.Schedule(5s, PHASE_TWO, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_VENOM_SPIT);
+                context.Repeat(5s, 15s);
+            }).Schedule(10s, PHASE_TWO, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_POISON_CLOUD);
+                context.Repeat(15s, 20s);
+            }).Schedule(30s, PHASE_TWO, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_SUMMON_PARASITIC_SERPENT);
+                context.Repeat(15s);
+            });
+
+            // frenzy at 20% health
+            ScheduleHealthCheckEvent(20, [&]
+            {
+                DoCastSelf(SPELL_FRENZY, true);
+            });
+        });
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_VENOXIS_DEATH);
+        me->RemoveAllAuras();       // removes transform
+    }
+
+private:
+    // Spawns the Razzashi Cobra adds before the encounter starts
+    void _spawnCobras()
+    {
+        for (uint8 i = 0; i < 4; ++i)
+        {
+            BossAI::JustSummoned(me->SummonCreature(NPC_RAZZASHI_COBRA, SpawnCobras[i], TEMPSUMMON_CORPSE_DESPAWN));
+        }
+    }
+
+    // Sets all Razzashi Cobras in combat with the zone
+    void _setCobrasInCombat()
+    {
+        BossAI::summons.DoForAllSummons([&](WorldObject* cobra)
+        {
+            cobra->ToCreature()->SetInCombatWithZone();
+        });
     }
 };
 
-/**
- * @brief Razzashi Cobra (11373) AI - Venoxis adds
- */
+// Razzashi Cobra (11373) - Venoxis adds
 struct npc_razzashi_cobra_venoxis : public CreatureAI
 {
 public:
@@ -293,11 +211,20 @@ public:
 
     void InitializeAI() override
     {
-        // don't interrupt casting
         _scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+
+        if (me->ToTempSummon() &&
+            me->ToTempSummon()->GetSummoner() &&
+            me->ToTempSummon()->GetSummoner()->ToCreature()
+        )
+        {
+            _venoxis = me->ToTempSummon()->GetSummoner()->ToCreature();
+        }
+
+        Reset();
     }
 
     void Reset() override
@@ -308,15 +235,15 @@ public:
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        Creature* venoxis = me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
-        if (venoxis)
+        if (_venoxis)
         {
-            venoxis->SetInCombatWithZone();
+            // Venoxis pulls with his adds
+            _venoxis->SetInCombatWithZone();
         }
 
         _scheduler.Schedule(8s, [this](TaskContext context)
         {
-            me->CastSpell(me->GetVictim(), SPELL_POISON);
+            me->CastSpell(me->GetVictim(), SPELL_COBRA_POISON);
             context.Repeat(15s);
         });
     }
@@ -340,10 +267,11 @@ public:
 
 private:
     TaskScheduler _scheduler;
+    Creature* _venoxis;
 };
 
 void AddSC_boss_venoxis()
 {
-    new boss_venoxis();
+    RegisterCreatureAI(boss_venoxis);
     RegisterCreatureAI(npc_razzashi_cobra_venoxis);
 }
