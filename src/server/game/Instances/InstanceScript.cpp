@@ -75,7 +75,7 @@ void InstanceScript::OnGameObjectCreate(GameObject* go)
 void InstanceScript::OnGameObjectRemove(GameObject* go)
 {
     RemoveObject(go);
-    RemoveObject(go);
+    RemoveDoor(go);
 }
 
 ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
