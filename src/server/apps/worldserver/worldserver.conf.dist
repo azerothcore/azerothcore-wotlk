@@ -3357,6 +3357,13 @@ Guild.BankTabCost4 = 25000000
 Guild.BankTabCost5 = 50000000#
 
 #
+#     Guild.MemberLimit
+#        Description: Do not allow inviting new players to the guild if the member limit is met or exceeded.
+#        Default:     0 - Disabled
+
+Guild.MemberLimit = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
