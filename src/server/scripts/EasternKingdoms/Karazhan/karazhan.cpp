@@ -34,6 +34,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 
 enum Spells
