@@ -62,6 +62,9 @@ enum PaladinSpells
     SPELL_PALADIN_JUDGEMENT_OF_LIGHT             = 20185,
     SPELL_PALADIN_JUDGEMENT_OF_WISDOM            = 20186,
 
+    SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL        = 20267,
+    SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA       = 20268,
+
     SPELL_PALADIN_GLYPH_OF_SALVATION             = 63225,
 
     SPELL_PALADIN_RIGHTEOUS_DEFENSE_TAUNT        = 31790,
@@ -939,6 +942,65 @@ class spell_pal_judgement_of_command : public SpellScript
     }
 };
 
+// 20185 - Judgement of Light
+class spell_pal_judgement_of_light_heal : public AuraScript
+{
+    PrepareAuraScript(spell_pal_judgement_of_light_heal);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* target = eventInfo.GetProcTarget();
+        int32 basepoints = target->CountPctFromMaxHealth(aurEff->GetAmount()); // 2% from max health
+        target->CastCustomSpell(target, SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL, &basepoints, nullptr, nullptr, true, nullptr); // self casted as source
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pal_judgement_of_light_heal::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 20186 - Judgement of Wisdom
+class spell_pal_judgement_of_wisdom_mana : public AuraScript
+{
+    PrepareAuraScript(spell_pal_judgement_of_wisdom_mana);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget()->getPowerType() == POWER_MANA;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if(GetCaster())
+        {
+            Unit* target = eventInfo.GetProcTarget();
+            int32 basepoints = CalculatePct(target->GetCreateMana(), 2); // 2% from base mana, DBC is incorrect - 1
+            target->CastCustomSpell(nullptr, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &basepoints, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_judgement_of_wisdom_mana::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_judgement_of_wisdom_mana::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 // -633 - Lay on Hands
 class spell_pal_lay_on_hands : public SpellScript
 {
@@ -1130,6 +1192,8 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScriptWithArgs(spell_pal_judgement, "spell_pal_judgement_of_light", SPELL_PALADIN_JUDGEMENT_OF_LIGHT);
     RegisterSpellScriptWithArgs(spell_pal_judgement, "spell_pal_judgement_of_wisdom", SPELL_PALADIN_JUDGEMENT_OF_WISDOM);
     RegisterSpellScript(spell_pal_judgement_of_command);
+    RegisterSpellScript(spell_pal_judgement_of_light_heal);
+    RegisterSpellScript(spell_pal_judgement_of_wisdom_mana);
     RegisterSpellScript(spell_pal_lay_on_hands);
     RegisterSpellScript(spell_pal_righteous_defense);
     RegisterSpellScript(spell_pal_seal_of_righteousness);
