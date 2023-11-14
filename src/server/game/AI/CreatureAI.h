@@ -25,7 +25,6 @@
 #include "TaskScheduler.h"
 #include "UnitAI.h"
 
-
 class WorldObject;
 class Unit;
 class Creature;
