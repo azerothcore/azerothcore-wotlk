@@ -138,7 +138,7 @@ COPY --chown=$USER_ID:GROUP_ID \
 
 USER $DOCKER_USER
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
 
 ###############
 # Auth Server #
