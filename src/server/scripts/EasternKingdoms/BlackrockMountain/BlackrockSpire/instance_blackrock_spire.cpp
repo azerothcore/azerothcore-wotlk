@@ -176,7 +176,7 @@ public:
                     creature->AI()->Talk(SAY_FINKLE_GANG);
                     break;
                 case NPC_CHROMATIC_ELITE_GUARD:
-                    AddMinion(creature, true);
+                    AddMinion(creature);
                     break;
             }
         }

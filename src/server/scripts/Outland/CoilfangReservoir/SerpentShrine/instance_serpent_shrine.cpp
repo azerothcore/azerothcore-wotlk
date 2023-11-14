@@ -86,7 +86,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_SHIELD_GENERATOR1:
                 case GO_SHIELD_GENERATOR2:
@@ -105,7 +105,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

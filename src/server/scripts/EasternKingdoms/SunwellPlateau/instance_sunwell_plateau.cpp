@@ -154,7 +154,7 @@ public:
                 case GO_FIRE_BARRIER:
                 case GO_MURUS_GATE_1:
                 case GO_MURUS_GATE_2:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_ICE_BARRIER:
                     IceBarrierGUID = go->GetGUID();
@@ -187,7 +187,7 @@ public:
                 case GO_BOSS_COLLISION_1:
                 case GO_BOSS_COLLISION_2:
                 case GO_FORCE_FIELD:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
                 default:
                     break;
