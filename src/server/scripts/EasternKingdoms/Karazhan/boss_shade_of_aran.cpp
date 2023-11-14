@@ -16,6 +16,7 @@
  */
 
 #include "GameObject.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
@@ -41,7 +42,6 @@ enum Texts
 
 enum Spells
 {
-    //Spells
     SPELL_FROSTBOLT              = 29954,
     SPELL_FIREBALL               = 29953,
     SPELL_ARCMISSLE              = 29955,
@@ -69,37 +69,38 @@ enum Spells
 
     SPELL_SUMMON_BLIZZARD        = 29969, // Activates the Blizzard NPC
 
-    SPELL_SHADOW_PYRO            = 29978
+    SPELL_SHADOW_PYRO            = 29978,
+
+    SPELL_ATIESH_VISUAL          = 31796
 };
 
 enum Creatures
 {
-    NPC_SHADOW_OF_ARAN  = 18254
+    NPC_SHADOW_OF_ARAN           = 18254
 };
 
 enum SuperSpell
 {
-    SUPER_FLAME = 0,
+    SUPER_FLAME                  = 0,
     SUPER_BLIZZARD,
     SUPER_AE,
 };
 
 enum Groups
 {
-    GROUP_DRINKING      = 0
+    GROUP_DRINKING               = 0
+};
+
+enum Misc
+{
+    ACTION_ATIESH_REACT          = 1
 };
 
 Position const roomCenter = {-11158.f, -1920.f};
 
 struct boss_shade_of_aran : public BossAI
 {
-    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN), _atieshReaction(false) { }
 
     void Reset() override
     {
@@ -137,6 +138,20 @@ struct boss_shade_of_aran : public BossAI
     bool CheckAranInRoom()
     {
         return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
+    }
+
+    void SetGUID(ObjectGuid guid, int32 id) override
+    {
+        if (id == ACTION_ATIESH_REACT && !_atieshReaction)
+        {
+            Talk(SAY_ATIESH);
+            _atieshReaction = true;
+            if (Unit* atieshOwner = ObjectAccessor::GetUnit(*me, guid))
+            {
+                me->PauseMovement(3000);
+                me->SetFacingToObject(atieshOwner);
+            }
+        }
     }
 
     void AttackStart(Unit* who) override
@@ -442,6 +457,7 @@ private:
     bool _frostCooledDown;
     bool _drinking;
     bool _hasDrunk;
+    bool _atieshReaction;
 };
 
 // 30004 - Flame Wreath
@@ -522,9 +538,32 @@ class spell_flamewreath_aura : public AuraScript
     }
 };
 
+class at_karazhan_atiesh_aran : public AreaTriggerScript
+{
+public:
+    at_karazhan_atiesh_aran() : AreaTriggerScript("at_karazhan_atiesh_aran") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (player->HasAura(SPELL_ATIESH_VISUAL))
+            {
+                if (Creature* aran = instance->GetCreature(DATA_ARAN))
+                {
+                    aran->AI()->SetGUID(player->GetGUID(), ACTION_ATIESH_REACT);
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_boss_shade_of_aran()
 {
     RegisterKarazhanCreatureAI(boss_shade_of_aran);
     RegisterSpellScript(spell_flamewreath);
     RegisterSpellScript(spell_flamewreath_aura);
+    new at_karazhan_atiesh_aran();
 }

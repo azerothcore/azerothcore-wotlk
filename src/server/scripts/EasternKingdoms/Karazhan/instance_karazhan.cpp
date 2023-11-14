@@ -35,6 +35,7 @@ const Position OptionalSpawn[] =
 ObjectData const creatureData[] =
 {
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_SHADE_OF_ARAN,        DATA_ARAN      },
     { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
     { NPC_DOROTHEE,             DATA_DOROTHEE  },
     { NPC_TITO,                 DATA_TITO      },
