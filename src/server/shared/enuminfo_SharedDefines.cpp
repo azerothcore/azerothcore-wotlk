@@ -186,7 +186,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
         case SPELL_ATTR0_AURA_IS_DEBUFF: return { "SPELL_ATTR0_AURA_IS_DEBUFF", "Is negative spell", "Forces the spell to be treated as a negative spell" };
         case SPELL_ATTR0_ALLOW_WHILE_SITTING: return { "SPELL_ATTR0_ALLOW_WHILE_SITTING", "Can be cast while sitting", "" };
         case SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL: return { "SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL", "Cannot be used in combat", "" };
-        case SPELL_ATTR0_NO_IMMUNITIES: return { "SPELL_ATTR0_NO_IMMUNITIES", "Pierce invulnerability", "Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute" };
+        case SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY: return { "SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY", "Pierce invulnerability", "Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute" };
         case SPELL_ATTR0_HEARTBEAT_RESIST: return { "SPELL_ATTR0_HEARTBEAT_RESIST", "Periodic resistance checks", "Periodically re-rolls against resistance to potentially expire aura early" };
         case SPELL_ATTR0_NO_AURA_CANCEL: return { "SPELL_ATTR0_NO_AURA_CANCEL", "Aura cannot be cancelled", "Prevents the player from voluntarily canceling a positive aura" };
         default: throw std::out_of_range("value");
@@ -230,7 +230,7 @@ AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(size_t index)
         case 26: return SPELL_ATTR0_AURA_IS_DEBUFF;
         case 27: return SPELL_ATTR0_ALLOW_WHILE_SITTING;
         case 28: return SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL;
-        case 29: return SPELL_ATTR0_NO_IMMUNITIES;
+        case 29: return SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         case 30: return SPELL_ATTR0_HEARTBEAT_RESIST;
         case 31: return SPELL_ATTR0_NO_AURA_CANCEL;
         default: throw std::out_of_range("index");
@@ -271,7 +271,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr0>::ToIndex(SpellAttr0 value)
         case SPELL_ATTR0_AURA_IS_DEBUFF: return 26;
         case SPELL_ATTR0_ALLOW_WHILE_SITTING: return 27;
         case SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL: return 28;
-        case SPELL_ATTR0_NO_IMMUNITIES: return 29;
+        case SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY: return 29;
         case SPELL_ATTR0_HEARTBEAT_RESIST: return 30;
         case SPELL_ATTR0_NO_AURA_CANCEL: return 31;
         default: throw std::out_of_range("value");

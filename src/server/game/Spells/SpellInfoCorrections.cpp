@@ -1128,7 +1128,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Arcane Blast, can't be dispelled
     ApplySpellFix({ 36032 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
     // Chilled (frost armor, ice armor proc)
@@ -2996,7 +2996,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 70672, 72455, 72832, 72833 }, [](SpellInfo* spellInfo)
     {
         // copied attributes from Green Ooze Channel
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
@@ -3134,7 +3134,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Sindragosa, Frost Aura
     ApplySpellFix({ 70084, 71050, 71051, 71052 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes &= ~SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
     // Ice Lock
@@ -3241,7 +3241,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(559); // 53 seconds
         spellInfo->ExcludeCasterAuraSpell = 0;
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         spellInfo->AttributesEx6 |= (SPELL_ATTR6_IGNORE_PHASE_SHIFT | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
     });
 
@@ -3262,7 +3262,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
         spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
     // Harvest Souls
@@ -3850,7 +3850,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Savory Deviate Delight (transformations), allow to mount while transformed
     ApplySpellFix({ 8219, 8220, 8221, 8222 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes &= ~SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
     // Clamlette Magnifique
@@ -4236,7 +4236,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 20038 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS);
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
@@ -4428,7 +4428,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Digestive Acid (Temporary)
     ApplySpellFix({ 26476 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });

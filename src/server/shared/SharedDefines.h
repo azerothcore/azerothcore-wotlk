@@ -407,7 +407,7 @@ enum SpellAttr0 : uint32
     SPELL_ATTR0_AURA_IS_DEBUFF                   = 0x04000000, // TITLE Is negative spell DESCRIPTION Forces the spell to be treated as a negative spell
     SPELL_ATTR0_ALLOW_WHILE_SITTING              = 0x08000000, // TITLE Can be cast while sitting
     SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL      = 0x10000000, // TITLE Cannot be used in combat
-    SPELL_ATTR0_NO_IMMUNITIES                    = 0x20000000, // TITLE Pierce invulnerability DESCRIPTION Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute
+    SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY                    = 0x20000000, // TITLE Pierce invulnerability DESCRIPTION Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute
     SPELL_ATTR0_HEARTBEAT_RESIST                 = 0x40000000, // TITLE Periodic resistance checks DESCRIPTION Periodically re-rolls against resistance to potentially expire aura early
     SPELL_ATTR0_NO_AURA_CANCEL                   = 0x80000000  // TITLE Aura cannot be cancelled DESCRIPTION Prevents the player from voluntarily canceling a positive aura
 };

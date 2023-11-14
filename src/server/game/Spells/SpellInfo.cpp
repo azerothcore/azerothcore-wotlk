@@ -1310,13 +1310,13 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 {
     // aura can't be pierced
-    if (!aura || aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (!aura || aura->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
     {
         return false;
     }
 
     // these spells pierce all avalible spells (Resurrection Sickness for example)
-    if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return true;
 
     // these spells (Cyclone for example) can pierce all...
@@ -1341,11 +1341,11 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
         return false;
 
     // These auras (like Divine Shield) can't be dispelled
-    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (aura->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return false;
 
     // These spells (like Mass Dispel) can dispell all auras
-    if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return true;
 
     // These auras (Cyclone for example) are not dispelable

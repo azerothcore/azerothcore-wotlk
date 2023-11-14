@@ -5576,7 +5576,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
             }
 
             // Banish should only be dispelled by Mass Dispel
-            if (aura->GetSpellInfo()->Mechanic == MECHANIC_BANISH && !dispelSpell->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+            if (aura->GetSpellInfo()->Mechanic == MECHANIC_BANISH && !dispelSpell->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
             {
                 continue;
             }
@@ -11003,7 +11003,7 @@ bool RedirectSpellEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
 {
     // Patch 1.2 notes: Spell Reflection no longer reflects abilities
-    if (spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY) || spellInfo->HasAttribute(SPELL_ATTR1_NO_REDIRECTION) || spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY) || spellInfo->HasAttribute(SPELL_ATTR1_NO_REDIRECTION) || spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return victim;
 
     Unit::AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
@@ -12751,7 +12751,7 @@ bool Unit::IsImmunedToDamage(SpellInfo const* spellInfo) const
         return false;
     }
 
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
     {
         return false;
     }
@@ -12784,7 +12784,7 @@ bool Unit::IsImmunedToDamage(Spell const* spell) const
         return false;
     }
 
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
     {
         return false;
     }
@@ -12831,7 +12831,7 @@ bool Unit::IsImmunedToSchool(SpellSchoolMask meleeSchoolMask) const
 
 bool Unit::IsImmunedToSchool(SpellInfo const* spellInfo) const
 {
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
     uint32 schoolMask = spellInfo->GetSchoolMask();
@@ -12855,7 +12855,7 @@ bool Unit::IsImmunedToSchool(SpellInfo const* spellInfo) const
 bool Unit::IsImmunedToSchool(Spell const* spell) const
 {
     SpellInfo const* spellInfo = spell->GetSpellInfo();
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
     {
         return false;
     }
@@ -12918,7 +12918,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
         return true;
     }
 
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
     if (spellInfo->Dispel)
@@ -12996,7 +12996,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     if (spellInfo->HasAttribute(SPELL_ATTR4_OWNER_POWER_SCALING))
         return false;
 
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
     //If m_immuneToEffect type contain this effect type, IMMUNE effect.
@@ -17043,7 +17043,7 @@ void Unit::RestoreDisplayId()
                 if (!handledAura)
                     handledAura = (*i);
                 // xinef: prefer negative/forced auras
-                if ((*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !aurApp->IsPositive())
+                if ((*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) || !aurApp->IsPositive())
                 {
                     handledAuraForced = (*i);
                     break;

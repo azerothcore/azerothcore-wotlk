@@ -2013,7 +2013,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             bool allow = true;
             if (target->getTransForm())
                 if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
-                    if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
+                    if (transformSpellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) || !transformSpellInfo->IsPositive())
                         allow = false;
 
             if (allow)
@@ -2167,7 +2167,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
     if (apply)
     {
         // update active transform spell only when transform or shapeshift not set or not overwriting negative by positive case
-        if (GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !target->GetModelForForm(target->GetShapeshiftForm(), GetId()) || !GetSpellInfo()->IsPositive())
+        if (GetSpellInfo()->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) || !target->GetModelForForm(target->GetShapeshiftForm(), GetId()) || !GetSpellInfo()->IsPositive())
         {
             // special case (spell specific functionality)
             if (GetMiscValue() == 0)
@@ -2725,7 +2725,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
 
         // update active transform spell only when transform or shapeshift not set or not overwriting negative by positive case
         SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm());
-        if (!transformSpellInfo || GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !GetSpellInfo()->IsPositive() || transformSpellInfo->IsPositive())
+        if (!transformSpellInfo || GetSpellInfo()->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) || !GetSpellInfo()->IsPositive() || transformSpellInfo->IsPositive())
             target->setTransForm(GetId());
 
         // polymorph case
