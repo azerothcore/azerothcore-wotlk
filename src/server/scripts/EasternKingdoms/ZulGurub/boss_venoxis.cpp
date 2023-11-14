@@ -52,9 +52,6 @@ enum Spells
     SPELL_VENOM_SPIT                = 23862,
     SPELL_SUMMON_PARASITIC_SERPENT  = 23866,
     SPELL_FRENZY                    = 8269,
-
-    // Razzashi Cobra (11373)
-    SPELL_COBRA_POISON              = 24097
 };
 
 enum Phases
@@ -68,14 +65,6 @@ enum NPCs
     BOSS_VENOXIS                    = 14507,
     NPC_RAZZASHI_COBRA              = 11373,
     NPC_PARASITIC_SERPENT           = 14884
-};
-
-Position const SpawnCobras[4] =
-{
-    { -12021.20f, -1719.73f, 39.34f, 0.85f },
-    { -12029.40f, -1714.54f, 39.36f, 0.68f },
-    { -12036.79f, -1704.27f, 40.06f, 0.45f },
-    { -12037.70f, -1694.20f, 39.35f, 0.27f }
 };
 
 // High Priest Venoxis (14507)
@@ -100,16 +89,12 @@ public:
 
         me->RemoveAllAuras();
         me->SetReactState(REACT_PASSIVE);
-
-        _spawnCobras();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
         me->SetReactState(REACT_AGGRESSIVE);
-
-        _setCobrasInCombat();
 
         // Both phases
         scheduler.Schedule(8s, [this](TaskContext context)
@@ -182,96 +167,9 @@ public:
         Talk(SAY_VENOXIS_DEATH);
         me->RemoveAllAuras();       // removes transform
     }
-
-private:
-    // Spawns the Razzashi Cobra adds before the encounter starts
-    void _spawnCobras()
-    {
-        for (uint8 i = 0; i < 4; ++i)
-        {
-            BossAI::JustSummoned(me->SummonCreature(NPC_RAZZASHI_COBRA, SpawnCobras[i], TEMPSUMMON_CORPSE_DESPAWN));
-        }
-    }
-
-    // Sets all Razzashi Cobras in combat with the zone
-    void _setCobrasInCombat()
-    {
-        BossAI::summons.DoForAllSummons([&](WorldObject* cobra)
-        {
-            cobra->ToCreature()->SetInCombatWithZone();
-        });
-    }
-};
-
-// Razzashi Cobra (11373) - Venoxis adds
-struct npc_razzashi_cobra_venoxis : public CreatureAI
-{
-public:
-    npc_razzashi_cobra_venoxis(Creature* creature) : CreatureAI(creature) {}
-
-    void InitializeAI() override
-    {
-        _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-
-        if (me->ToTempSummon() &&
-            me->ToTempSummon()->GetSummoner() &&
-            me->ToTempSummon()->GetSummoner()->ToCreature()
-        )
-        {
-            _venoxis = me->ToTempSummon()->GetSummoner()->ToCreature();
-        }
-
-        Reset();
-    }
-
-    void Reset() override
-    {
-        _scheduler.CancelAll();
-        CreatureAI::Reset();
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        if (_venoxis)
-        {
-            // Venoxis pulls with his adds
-            _venoxis->SetInCombatWithZone();
-        }
-
-        _scheduler.Schedule(8s, [this](TaskContext context)
-        {
-            me->CastSpell(me->GetVictim(), SPELL_COBRA_POISON);
-            context.Repeat(15s);
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        _scheduler.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
-
-        DoMeleeAttackIfReady();
-    }
-
-private:
-    TaskScheduler _scheduler;
-    Creature* _venoxis;
 };
 
 void AddSC_boss_venoxis()
 {
     RegisterCreatureAI(boss_venoxis);
-    RegisterCreatureAI(npc_razzashi_cobra_venoxis);
 }
