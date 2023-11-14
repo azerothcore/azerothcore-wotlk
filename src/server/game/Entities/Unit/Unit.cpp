@@ -5575,7 +5575,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
                     continue;
             }
 
-            // Banish should only be dispeled by Mass Dispel
+            // Banish should only be dispelled by Mass Dispel
             if (aura->GetSpellInfo()->Mechanic == MECHANIC_BANISH && !dispelSpell->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
             {
                 continue;
