@@ -283,72 +283,66 @@ public:
     }
 };
 
-class npc_razzashi_cobra_venoxis : public CreatureScript
+struct npc_razzashi_cobra_venoxis : public CreatureAI
 {
-public:
-    npc_razzashi_cobra_venoxis() : CreatureScript("npc_razzashi_cobra_venoxis") {}
+    npc_razzashi_cobra_venoxis(Creature* creature) : CreatureAI(creature) {}
 
-    struct npc_razzashi_cobra_venoxis_AI : public ScriptedAI
+    TaskScheduler _scheduler;
+
+    void InitializeAI() override
     {
-        npc_razzashi_cobra_venoxis_AI(Creature* creature) : ScriptedAI(creature) {}
-
-        EventMap events;
-
-        void Reset()
+        // don't interrupt casting
+        _scheduler.SetValidator([this]
         {
-            events.Reset();
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        void JustEngagedWith(Unit*)
-        {
-            events.ScheduleEvent(EVENT_POISON, 8s);
-
-            if (Creature* Venoxis = GetVenoxis())
-            {
-                Venoxis->SetInCombatWithZone();
-            }
-        }
-
-        Creature* GetVenoxis()
-        {
-            return me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_POISON:
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_POISON);
-                    events.ScheduleEvent(EVENT_POISON, 15s);
-                    break;
-                }
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return new npc_razzashi_cobra_venoxis_AI(creature);
+        _scheduler.CancelAll();
+        CreatureAI::Reset();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        if (Creature* Venoxis = GetVenoxis())
+        {
+            Venoxis->SetInCombatWithZone();
+        }
+
+        _scheduler.Schedule(8s, [this](TaskContext context) -> void
+        {
+            me->CastSpell(me->GetVictim(), SPELL_POISON);
+            context.Repeat(15s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+    Creature* GetVenoxis()
+    {
+        return me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
     }
 };
 
 void AddSC_boss_venoxis()
 {
     new boss_venoxis();
-    new npc_razzashi_cobra_venoxis();
+    RegisterCreatureAI(npc_razzashi_cobra_venoxis);
 }
