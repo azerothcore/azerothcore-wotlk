@@ -21,8 +21,9 @@
 #include "AreaBoundary.h"
 #include "Common.h"
 #include "Creature.h"
-#include "UnitAI.h"
 #include "EventMap.h"
+#include "TaskScheduler.h"
+#include "UnitAI.h"
 
 class WorldObject;
 class Unit;
@@ -72,6 +73,7 @@ protected:
     Creature* const me;
 
     EventMap events;
+    TaskScheduler scheduler;
 
     bool UpdateVictim();
     bool UpdateVictimWithGaze();
