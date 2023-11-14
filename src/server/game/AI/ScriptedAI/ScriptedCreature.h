@@ -494,9 +494,7 @@ protected:
 
     void TeleportCheaters();
 
-    EventMap events;
     SummonList summons;
-    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;
