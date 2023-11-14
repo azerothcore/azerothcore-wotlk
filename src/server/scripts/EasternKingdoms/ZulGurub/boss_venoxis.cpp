@@ -283,11 +283,13 @@ public:
     }
 };
 
+/**
+ * @brief Razzashi Cobra (11373) AI - Venoxis adds
+ */
 struct npc_razzashi_cobra_venoxis : public CreatureAI
 {
+public:
     npc_razzashi_cobra_venoxis(Creature* creature) : CreatureAI(creature) {}
-
-    TaskScheduler _scheduler;
 
     void InitializeAI() override
     {
@@ -306,12 +308,13 @@ struct npc_razzashi_cobra_venoxis : public CreatureAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Creature* Venoxis = GetVenoxis())
+        Creature* venoxis = me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
+        if (venoxis)
         {
-            Venoxis->SetInCombatWithZone();
+            venoxis->SetInCombatWithZone();
         }
 
-        _scheduler.Schedule(8s, [this](TaskContext context) -> void
+        _scheduler.Schedule(8s, [this](TaskContext context)
         {
             me->CastSpell(me->GetVictim(), SPELL_POISON);
             context.Repeat(15s);
@@ -335,10 +338,8 @@ struct npc_razzashi_cobra_venoxis : public CreatureAI
         DoMeleeAttackIfReady();
     }
 
-    Creature* GetVenoxis()
-    {
-        return me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
-    }
+private:
+    TaskScheduler _scheduler;
 };
 
 void AddSC_boss_venoxis()
