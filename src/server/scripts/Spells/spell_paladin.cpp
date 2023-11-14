@@ -958,7 +958,7 @@ class spell_pal_judgement_of_light_heal : public AuraScript
 
         Unit* target = eventInfo.GetProcTarget();
         int32 basepoints = target->CountPctFromMaxHealth(aurEff->GetAmount()); // 2% from max health
-        target->CastCustomSpell(target, SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL, &basepoints, nullptr, nullptr, true, nullptr); // self casted as source
+        target->CastCustomSpell(nullptr, SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL, &basepoints, nullptr, nullptr, true, nullptr); // self casted as source
     }
 
     void Register() override
