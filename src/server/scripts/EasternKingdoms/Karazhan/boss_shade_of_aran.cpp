@@ -148,6 +148,7 @@ struct boss_shade_of_aran : public BossAI
             _atieshReaction = true;
             if (Unit* atieshOwner = ObjectAccessor::GetUnit(*me, guid))
             {
+                me->PauseMovement(3000);
                 me->SetFacingToObject(atieshOwner);
             }
         }
