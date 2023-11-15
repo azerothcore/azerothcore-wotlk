@@ -21,6 +21,7 @@
 #include "Define.h"
 #include <fmt/format.h>
 #include <fmt/printf.h>
+#include <locale>
 
 namespace Acore
 {
