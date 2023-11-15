@@ -177,8 +177,7 @@ struct boss_twinemperorsAI : public BossAI
 
         if (IAmVeklor())
         {
-            scheduler
-                .Schedule(12s, GROUP_INTRO, [this](TaskContext /*context*/)
+            scheduler.Schedule(12s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
@@ -203,8 +202,7 @@ struct boss_twinemperorsAI : public BossAI
         }
         else
         {
-            scheduler
-                .Schedule(17s, GROUP_INTRO, [this](TaskContext /*context*/)
+            scheduler.Schedule(17s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
@@ -244,8 +242,7 @@ struct boss_twinemperorsAI : public BossAI
             if (!twin->IsInCombat())
                 twin->AI()->AttackStart(who);
 
-        scheduler
-            .Schedule(15min, [this](TaskContext /*context*/)
+        scheduler.Schedule(15min, [this](TaskContext /*context*/)
             {
                 if (IAmVeklor())
                 {
@@ -297,8 +294,7 @@ struct boss_veknilash : public boss_twinemperorsAI
 
         DoPlaySoundToSet(me, SOUND_VN_AGGRO);
 
-        scheduler
-            .Schedule(14s, [this](TaskContext context)
+        scheduler.Schedule(14s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_UPPERCUT, 0, me->GetMeleeReach(), true);
                 context.Repeat(4s, 15s);
@@ -328,8 +324,7 @@ struct boss_veklor : public boss_twinemperorsAI
 
         DoPlaySoundToSet(me, SOUND_VK_AGGRO);
 
-        scheduler
-            .Schedule(4s, [this](TaskContext context)
+        scheduler.Schedule(4s, [this](TaskContext context)
             {
                 if (me->GetVictim())
                 {
