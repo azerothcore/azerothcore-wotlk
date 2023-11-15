@@ -82,6 +82,8 @@ struct boss_leotheras_the_blind : public BossAI
         _recentlySpoken = false;
 
         ScheduleHealthCheckEvent(15, [&]{
+            me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+
             if (me->GetDisplayId() != me->GetNativeDisplayId())
             {
                 //is currently in metamorphosis
@@ -89,12 +91,15 @@ struct boss_leotheras_the_blind : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
+
             DoResetThreatList();
+            me->ClearTarget();
+            me->SendMeleeAttackStop();
             scheduler.CancelGroup(GROUP_DEMON);
             scheduler.DelayAll(10s);
 
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
             me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_KNEEL);
             me->GetMotionMaster()->Clear();
             me->StopMoving();
             Talk(SAY_FINAL_FORM);
@@ -106,7 +111,12 @@ struct boss_leotheras_the_blind : public BossAI
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->ResumeChasingVictim();
+
+                if (me->GetVictim())
+                {
+                    me->SendMeleeAttackStart(me->GetVictim());
+                }
             });
         });
     }
@@ -186,7 +196,10 @@ struct boss_leotheras_the_blind : public BossAI
 
         if (me->GetDisplayId() == me->GetNativeDisplayId())
         {
-            DoMeleeAttackIfReady();
+            if (me->GetReactState() != REACT_PASSIVE)
+            {
+                DoMeleeAttackIfReady();
+            }
         }
         else if (me->isAttackReady(BASE_ATTACK))
         {
