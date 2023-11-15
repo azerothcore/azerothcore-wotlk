@@ -92,6 +92,8 @@ struct boss_leotheras_the_blind : public BossAI
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
 
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
             DoResetThreatList();
             me->ClearTarget();
             me->SendMeleeAttackStop();
@@ -109,6 +111,7 @@ struct boss_leotheras_the_blind : public BossAI
                 DoCastSelf(SPELL_SUMMON_SHADOW_OF_LEOTHERAS);
             }).Schedule(6s, [this](TaskContext)
             {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->ResumeChasingVictim();
