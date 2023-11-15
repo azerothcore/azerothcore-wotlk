@@ -86,8 +86,7 @@ struct boss_fankriss : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        scheduler
-            .Schedule(7s, 14s, [this](TaskContext context)
+        scheduler.Schedule(7s, 14s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_MORTAL_WOUND);
                 context.Repeat();
