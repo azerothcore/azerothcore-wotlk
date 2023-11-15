@@ -3,10 +3,10 @@ SET @CGUID := 15013;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+3;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `unit_flags`, `dynamicflags`, `CreateObject`, `VerifiedBuild`) VALUES
-(@CGUID+0, 21806, 548, 3607, 3607, 3, 1, 0, 369.23431396484375, -446.472564697265625, 29.6020355224609375,  0.820574045181274414, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
-(@CGUID+1, 21806, 548, 3607, 3607, 3, 1, 0, 385.1583251953125,  -441.596710205078125, 29.61212921142578125, 2.810055494308471679, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
-(@CGUID+2, 21806, 548, 3607, 3607, 3, 1, 0, 373.21923828125,    -429.14776611328125,  29.60641860961914062, 5.049488067626953125, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
-(@CGUID+3, 21215, 548, 3607, 3607, 3, 1, 0, 376.5428466796875,  -438.630889892578125, 29.60830116271972656, 2.670353651046752929, 7200, 0, 0, 0,     0, 0, 0, 0, 1, 52148); -- 21215 (Area: 3607 - Difficulty: 4) CreateObject1 (Auras: 37546 - 37546)
+(@CGUID+0, 21806, 548, 3607, 3607, 1, 1, 0, 369.23431396484375, -446.472564697265625, 29.6020355224609375,  0.820574045181274414, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
+(@CGUID+1, 21806, 548, 3607, 3607, 1, 1, 0, 385.1583251953125,  -441.596710205078125, 29.61212921142578125, 2.810055494308471679, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
+(@CGUID+2, 21806, 548, 3607, 3607, 1, 1, 0, 373.21923828125,    -429.14776611328125,  29.60641860961914062, 5.049488067626953125, 7200, 0, 0, 29470, 0, 0, 0, 0, 1, 52148), -- 21806 (Area: 3607 - Difficulty: 4) CreateObject1
+(@CGUID+3, 21215, 548, 3607, 3607, 1, 1, 0, 376.5428466796875,  -438.630889892578125, 29.60830116271972656, 2.670353651046752929, 7200, 0, 0, 0,     0, 0, 0, 0, 1, 52148); -- 21215 (Area: 3607 - Difficulty: 4) CreateObject1 (Auras: 37546 - 37546)
 
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID+3;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `auras`) VALUES
