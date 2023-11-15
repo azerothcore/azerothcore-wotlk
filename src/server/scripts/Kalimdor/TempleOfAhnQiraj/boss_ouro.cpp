@@ -204,8 +204,7 @@ struct boss_ouro : public BossAI
         DoCastSelf(SPELL_SUMMON_SANDWORM_BASE, true);
         me->SetReactState(REACT_AGGRESSIVE);
         CastGroundRupture();
-        scheduler
-            .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
+        scheduler.Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
                     {
