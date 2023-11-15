@@ -56,23 +56,16 @@ enum Spells
 
 enum Misc
 {
-    MAX_CHANNELERS                      = 3,
-
-    NPC_GREYHEART_SPELLBINDER           = 21806,
     NPC_SHADOW_OF_LEOTHERAS             = 21875,
+    NPC_GREYHEART_SPELLBINDER           = 21806,
+
+    ACTION_CHECK_SPELLBINDERS           = 1
 };
 
 enum Groups
 {
     GROUP_COMBAT                        = 1,
     GROUP_DEMON                         = 2
-};
-
-const Position channelersPos[MAX_CHANNELERS] =
-{
-    {367.11f, -421.48f, 29.52f, 5.0f},
-    {380.11f, -435.48f, 29.52f, 2.5f},
-    {362.11f, -437.48f, 29.52f, 0.9f}
 };
 
 struct boss_leotheras_the_blind : public BossAI
@@ -90,11 +83,8 @@ struct boss_leotheras_the_blind : public BossAI
         BossAI::Reset();
         DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
         DoCastSelf(SPELL_DUAL_WIELD, true);
-        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-        me->LoadEquipment(0, true);
         me->SetReactState(REACT_PASSIVE);
         _recentlySpoken = false;
-        SummonChannelers();
 
         ScheduleHealthCheckEvent(15, [&]{
             if (me->GetDisplayId() != me->GetNativeDisplayId())
@@ -126,32 +116,16 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
-    void SummonChannelers()
-    {
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
-        DoCastSelf(SPELL_BANISH);
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
-
-        //probably needs a spell instead
-        summons.DespawnAll();
-        for (uint8 i = 0; i < MAX_CHANNELERS; ++i)
-        {
-            me->SummonCreature(NPC_GREYHEART_SPELLBINDER, channelersPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-        }
-    }
-
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
+    void DoAction(int32 actionId) override
     {
-        me->SetInCombatWithZone();
-        summons.Despawn(summon);
-        if (summon->GetEntry() == NPC_GREYHEART_SPELLBINDER)
+        if (actionId == ACTION_CHECK_SPELLBINDERS)
         {
-            if (!summons.HasEntry(NPC_GREYHEART_SPELLBINDER))
+            if (!me->FindNearestCreature(NPC_GREYHEART_SPELLBINDER, 200.0f, true))
             {
                 me->RemoveAllAuras();
                 me->LoadEquipment();
@@ -167,6 +141,12 @@ struct boss_leotheras_the_blind : public BossAI
                 ElfTime();
             }
         }
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit*) override
+    {
+        me->SetInCombatWithZone();
+        summons.Despawn(summon);
     }
 
     void ElfTime()
