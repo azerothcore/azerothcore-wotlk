@@ -2044,9 +2044,9 @@ void Creature::Respawn(bool force)
         m_respawnTime = 0;
         ResetPickPocketLootTime();
         loot.clear();
-        SelectLevel();
 
         setDeathState(DeathState::JustRespawned);
+        SelectLevel();
 
         // MDic - Acidmanifesto
         // Do not override transform auras
