@@ -115,6 +115,7 @@ struct boss_leotheras_the_blind : public BossAI
 
                 if (me->GetVictim())
                 {
+                    me->SetTarget(me->GetVictim()->GetGUID());
                     me->SendMeleeAttackStart(me->GetVictim());
                 }
             });
