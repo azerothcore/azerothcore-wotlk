@@ -110,11 +110,6 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-    }
-
     void DoAction(int32 actionId) override
     {
         if (actionId == ACTION_CHECK_SPELLBINDERS)
