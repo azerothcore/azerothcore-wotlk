@@ -2020,6 +2020,8 @@ void Creature::Respawn(bool force)
 
     if (getDeathState() == DeathState::Dead)
     {
+        setDeathState(DeathState::Respawning);
+
         if (m_spawnId)
         {
             GetMap()->RemoveCreatureRespawnTime(m_spawnId);
@@ -2045,8 +2047,8 @@ void Creature::Respawn(bool force)
         ResetPickPocketLootTime();
         loot.clear();
 
-        setDeathState(DeathState::JustRespawned);
         SelectLevel();
+        setDeathState(DeathState::JustRespawned);
 
         // MDic - Acidmanifesto
         // Do not override transform auras

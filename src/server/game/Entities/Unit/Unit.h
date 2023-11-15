@@ -317,7 +317,8 @@ enum class DeathState : uint8
     JustDied      = 1,
     Corpse        = 2,
     Dead          = 3,
-    JustRespawned = 4,
+    Respawning    = 4,
+    JustRespawned = 5,
 };
 
 enum UnitState
