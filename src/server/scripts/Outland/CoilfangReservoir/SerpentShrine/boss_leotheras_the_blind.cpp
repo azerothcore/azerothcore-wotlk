@@ -143,12 +143,6 @@ struct boss_leotheras_the_blind : public BossAI
         }
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        me->SetInCombatWithZone();
-        summons.Despawn(summon);
-    }
-
     void ElfTime()
     {
         DoResetThreatList();
