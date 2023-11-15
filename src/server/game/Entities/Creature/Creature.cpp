@@ -2020,8 +2020,6 @@ void Creature::Respawn(bool force)
 
     if (getDeathState() == DeathState::Dead)
     {
-        setDeathState(DeathState::Respawning);
-
         if (m_spawnId)
         {
             GetMap()->RemoveCreatureRespawnTime(m_spawnId);
@@ -2043,6 +2041,7 @@ void Creature::Respawn(bool force)
         }
 
         LOG_DEBUG("entities.unit", "Respawning creature {} (SpawnId: {}, {})", GetName(), GetSpawnId(), GetGUID().ToString());
+        setDeathState(DeathState::Respawning);
         m_respawnTime = 0;
         ResetPickPocketLootTime();
         loot.clear();
