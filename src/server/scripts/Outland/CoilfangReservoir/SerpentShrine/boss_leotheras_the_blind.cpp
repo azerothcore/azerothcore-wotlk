@@ -207,8 +207,15 @@ struct boss_leotheras_the_blind : public BossAI
         }
         else if (me->isAttackReady(BASE_ATTACK))
         {
-            me->CastSpell(me->GetVictim(), SPELL_CHAOS_BLAST, false);
-            me->setAttackTimer(BASE_ATTACK, 2000);
+            if (DoCastVictim(SPELL_CHAOS_BLAST) != SPELL_CAST_OK)
+            {
+                // Auto-attacks if there are no valid targets to cast his spell on f.e pet taunted.
+                DoMeleeAttackIfReady();
+            }
+            else
+            {
+                me->setAttackTimer(BASE_ATTACK, 2000);
+            }
         }
     }
 private:
