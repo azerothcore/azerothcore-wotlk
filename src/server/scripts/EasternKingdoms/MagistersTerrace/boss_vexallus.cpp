@@ -58,133 +58,122 @@ enum Misc
     EVENT_HEALTH_CHECK              = 3,
 };
 
-class boss_vexallus : public CreatureScript
+struct boss_vexallus : public ScriptedAI
 {
-public:
-    boss_vexallus() : CreatureScript("boss_vexallus") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_vexallus(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        return GetMagistersTerraceAI<boss_vexallusAI>(creature);
-    };
+        instance = creature->GetInstanceScript();
+    }
 
-    struct boss_vexallusAI : public ScriptedAI
+    InstanceScript* instance;
+    EventMap events;
+    SummonList summons;
+
+    uint8 IntervalHealthAmount;
+    bool Enraged;
+
+    void Reset() override
     {
-        boss_vexallusAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        summons.DespawnAll();
+        IntervalHealthAmount = 1;
+
+        instance->SetBossState(DATA_VEXALLUS, NOT_STARTED);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_KILL);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        summons.DespawnAll();
+        instance->SetBossState(DATA_VEXALLUS, DONE);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        instance->SetBossState(DATA_VEXALLUS, IN_PROGRESS);
+
+        events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
+        events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 5000);
+        events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
-            instance = creature->GetInstanceScript();
+            summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
         }
+        summons.Summon(summon);
+    }
 
-        InstanceScript* instance;
-        EventMap events;
-        SummonList summons;
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override
+    {
+        summons.Despawn(summon);
+        summon->DespawnOrUnsummon(1);
+        if (killer)
+            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
+    }
 
-        uint8 IntervalHealthAmount;
-        bool Enraged;
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
 
-        void Reset() override
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            summons.DespawnAll();
-            IntervalHealthAmount = 1;
+        case EVENT_HEALTH_CHECK:
+            //used for check, when Vexallus cast adds 85%, 70%, 55%, 40%
+            if (!HealthAbovePct(100 - INTERVAL_MODIFIER * IntervalHealthAmount))
+            {
+                if (IntervalHealthAmount++ == INTERVAL_SWITCH)
+                {
+                    events.Reset();
+                    me->CastSpell(me, SPELL_OVERLOAD, true);
+                    return;
+                }
 
-            instance->SetBossState(DATA_VEXALLUS, NOT_STARTED);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
-        }
+                Talk(SAY_ENERGY);
+                Talk(EMOTE_DISCHARGE_ENERGY);
 
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_KILL);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            summons.DespawnAll();
-            instance->SetBossState(DATA_VEXALLUS, DONE);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            instance->SetBossState(DATA_VEXALLUS, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
-            events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 5000);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
+                if (IsHeroic())
+                {
+                    me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_H1, false);
+                    me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_H2, false);
+                }
+                else
+                    me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_N, false);
+            }
+            events.ScheduleEvent(EVENT_HEALTH_CHECK, 0);
+            break;
+        case EVENT_SPELL_CHAIN_LIGHTNING:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-            {
-                summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-                summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
-            }
-            summons.Summon(summon);
+                me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H), false);
+            events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
+            break;
+        case EVENT_SPELL_ARCANE_SHOCK:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f))
+                me->CastSpell(target, DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H), false);
+            events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 8000);
+            break;
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* killer) override
-        {
-            summons.Despawn(summon);
-            summon->DespawnOrUnsummon(1);
-            if (killer)
-                killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_HEALTH_CHECK:
-                    //used for check, when Vexallus cast adds 85%, 70%, 55%, 40%
-                    if (!HealthAbovePct(100 - INTERVAL_MODIFIER * IntervalHealthAmount))
-                    {
-                        if (IntervalHealthAmount++ == INTERVAL_SWITCH)
-                        {
-                            events.Reset();
-                            me->CastSpell(me, SPELL_OVERLOAD, true);
-                            return;
-                        }
-
-                        Talk(SAY_ENERGY);
-                        Talk(EMOTE_DISCHARGE_ENERGY);
-
-                        if (IsHeroic())
-                        {
-                            me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_H1, false);
-                            me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_H2, false);
-                        }
-                        else
-                            me->CastSpell(me, SPELL_SUMMON_PURE_ENERGY_N, false);
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK, 0);
-                    break;
-                case EVENT_SPELL_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H), false);
-                    events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
-                    break;
-                case EVENT_SPELL_ARCANE_SHOCK:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H), false);
-                    events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 8000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_vexallus()
 {
-    new boss_vexallus();
+    RegisterMagistersTerraceCreatureAI(boss_vexallus);
 }
