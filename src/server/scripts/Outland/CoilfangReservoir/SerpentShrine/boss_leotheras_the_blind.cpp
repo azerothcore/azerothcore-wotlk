@@ -161,7 +161,7 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_METAMORPHOSIS, true);
 
         scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext context)
+        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
         {
             Talk(SAY_INNER_DEMONS);
             me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
