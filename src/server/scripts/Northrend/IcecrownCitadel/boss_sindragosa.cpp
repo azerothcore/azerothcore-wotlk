@@ -449,7 +449,6 @@ public:
             if (!damage || me->IsInEvadeMode())
                 return;
 
-          
             if (!_isThirdPhase)
             {
                 if (!HealthAbovePct(35))
