@@ -88,8 +88,6 @@ struct boss_nightbane : public BossAI
         me->SetWalk(false);
         me->setActive(true);
 
-        HandleTerraceDoors(true);
-
         _flying = false;
         _movement = false;
         _intro = true;
@@ -109,18 +107,11 @@ struct boss_nightbane : public BossAI
         me->GetMotionMaster()->MoveTakeoff(POINT_DESPAWN, -11013.246f, -1770.5212f, 166.50139f);
     }
 
-    void HandleTerraceDoors(bool open)
-    {
-        instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_1), open);
-        instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_2), open);
-    }
-
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
         _intro = false;
 
-        HandleTerraceDoors(false);
         Talk(YELL_AGGRO);
         ScheduleGround();
     }
@@ -195,12 +186,6 @@ struct boss_nightbane : public BossAI
     {
         if (!_intro && !_flying)
             ScriptedAI::AttackStart(who);
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        _JustDied();
-        HandleTerraceDoors(true);
     }
 
     void MoveInLineOfSight(Unit* who) override
