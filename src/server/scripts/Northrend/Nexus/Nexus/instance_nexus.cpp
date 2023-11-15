@@ -93,17 +93,17 @@ public:
                 case GO_TELESTRA_SPHERE:
                     if (GetBossState(DATA_TELESTRA_ORB) != DONE && GetBossState(DATA_MAGUS_TELESTRA_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject, true);
+                    AddDoor(gameObject);
                     break;
                 case GO_ANOMALUS_SPHERE:
                     if (GetBossState(DATA_ANOMALUS_ORB) != DONE && GetBossState(DATA_ANOMALUS_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject, true);
+                    AddDoor(gameObject);
                     break;
                 case GO_ORMOROK_SPHERE:
                     if (GetBossState(DATA_ORMOROK_ORB) != DONE && GetBossState(DATA_ORMOROK_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject, true);
+                    AddDoor(gameObject);
                     break;
             }
         }
@@ -115,7 +115,7 @@ public:
                 case GO_TELESTRA_SPHERE:
                 case GO_ANOMALUS_SPHERE:
                 case GO_ORMOROK_SPHERE:
-                    AddDoor(gameObject, false);
+                    RemoveDoor(gameObject);
                     break;
             }
         }

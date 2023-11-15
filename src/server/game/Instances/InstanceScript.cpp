@@ -56,26 +56,26 @@ void InstanceScript::SaveToDB()
 
 void InstanceScript::OnCreatureCreate(Creature* creature)
 {
-    AddObject(creature, true);
-    AddMinion(creature, true);
+    AddObject(creature);
+    AddMinion(creature);
 }
 
 void InstanceScript::OnCreatureRemove(Creature* creature)
 {
-    AddObject(creature, false);
-    AddMinion(creature, false);
+    RemoveObject(creature);
+    RemoveMinion(creature);
 }
 
 void InstanceScript::OnGameObjectCreate(GameObject* go)
 {
-    AddObject(go, true);
-    AddDoor(go, true);
+    AddObject(go);
+    AddDoor(go);
 }
 
 void InstanceScript::OnGameObjectRemove(GameObject* go)
 {
-    AddObject(go, false);
-    AddDoor(go, false);
+    RemoveObject(go);
+    RemoveDoor(go);
 }
 
 ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
@@ -262,6 +262,11 @@ void InstanceScript::AddObject(Creature* obj, bool add)
     }
 }
 
+void InstanceScript::RemoveObject(Creature* obj)
+{
+    AddObject(obj, false);
+}
+
 void InstanceScript::AddObject(GameObject* obj, bool add)
 {
     ObjectInfoMap::const_iterator j = _gameObjectInfo.find(obj->GetEntry());
@@ -269,6 +274,11 @@ void InstanceScript::AddObject(GameObject* obj, bool add)
     {
         AddObject(obj, j->second, add);
     }
+}
+
+void InstanceScript::RemoveObject(GameObject* obj)
+{
+    AddObject(obj, false);
 }
 
 void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
@@ -285,6 +295,11 @@ void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
             _objectGuids.erase(i);
         }
     }
+}
+
+void InstanceScript::RemoveObject(WorldObject* obj, uint32 type)
+{
+    AddObject(obj, type, false);
 }
 
 void InstanceScript::AddDoor(GameObject* door, bool add)
@@ -309,6 +324,11 @@ void InstanceScript::AddDoor(GameObject* door, bool add)
         UpdateDoorState(door);
 }
 
+void InstanceScript::RemoveDoor(GameObject* door)
+{
+    AddDoor(door, false);
+}
+
 void InstanceScript::AddMinion(Creature* minion, bool add)
 {
     MinionInfoMap::iterator itr = minions.find(minion->GetEntry());
@@ -319,6 +339,11 @@ void InstanceScript::AddMinion(Creature* minion, bool add)
         itr->second.bossInfo->minion.insert(minion);
     else
         itr->second.bossInfo->minion.erase(minion);
+}
+
+void InstanceScript::RemoveMinion(Creature* minion)
+{
+    AddMinion(minion, false);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)
