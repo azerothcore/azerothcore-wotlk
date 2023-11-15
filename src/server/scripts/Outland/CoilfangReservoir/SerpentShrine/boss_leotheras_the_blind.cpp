@@ -169,6 +169,7 @@ struct boss_leotheras_the_blind : public BossAI
     void DemonTime()
     {
         DoResetThreatList();
+        me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
