@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -114,20 +115,23 @@ struct boss_leotheras_the_blind : public BossAI
     {
         if (actionId == ACTION_CHECK_SPELLBINDERS)
         {
-            if (!me->FindNearestCreature(NPC_GREYHEART_SPELLBINDER, 200.0f, true))
+            if (CreatureGroup* formation = me->GetFormation())
             {
-                me->RemoveAllAuras();
-                me->LoadEquipment();
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                Talk(SAY_AGGRO);
-
-                scheduler.Schedule(10min, [this](TaskContext)
+                if (!formation->IsAnyMemberAlive(true))
                 {
-                    DoCastSelf(SPELL_BERSERK);
-                });
+                    me->RemoveAllAuras();
+                    me->LoadEquipment();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    Talk(SAY_AGGRO);
 
-                ElfTime();
+                    scheduler.Schedule(10min, [this](TaskContext)
+                    {
+                        DoCastSelf(SPELL_BERSERK);
+                    });
+
+                    ElfTime();
+                }
             }
         }
     }
@@ -157,7 +161,7 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_METAMORPHOSIS, true);
 
         scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
+        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext context)
         {
             Talk(SAY_INNER_DEMONS);
             me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
