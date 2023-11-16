@@ -231,8 +231,6 @@ struct npc_inner_demon : public ScriptedAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
-
-        _instance = creature->GetInstanceScript();
     }
 
     void IsSummonedBy(WorldObject* summoner) override
@@ -288,7 +286,6 @@ struct npc_inner_demon : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 private:
-    InstanceScript* _instance;
     ObjectGuid _affectedPlayerGUID;
 };
 
