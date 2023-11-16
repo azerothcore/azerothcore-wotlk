@@ -1,3 +1,4 @@
+-- DB update 2023_11_16_08 -> 2023_11_16_09
 -- Spawns for Razzashi Cobra (11373)
 DELETE FROM `creature` WHERE `guid` IN (52323, 52324, 52325, 52326);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
