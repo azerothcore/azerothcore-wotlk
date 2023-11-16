@@ -105,7 +105,7 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
             uint8 index = type == DATA_TELDRAM_SPHERE1 ? 0 : 1;
             if ((type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2) && teldaramSpheres[index] != DONE)
