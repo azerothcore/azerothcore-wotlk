@@ -337,7 +337,7 @@ void AddSC_instance_serpentshrine_cavern()
 {
     new instance_serpent_shrine();
     RegisterSpellScript(spell_serpentshrine_cavern_serpentshrine_parasite);
-    RegisterSpellScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger, spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura);
+    RegisterSpellAndAuraScriptPair(spell_serpentshrine_cavern_serpentshrine_parasite_trigger, spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura);
     RegisterSpellScript(spell_serpentshrine_cavern_infection);
     RegisterSpellScript(spell_serpentshrine_cavern_coilfang_water);
 }
