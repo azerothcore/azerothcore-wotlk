@@ -44,11 +44,6 @@ struct boss_kurinnaxx : public BossAI
     void InitializeAI() override
     {
         me->m_CombatDistance = 50.0f;
-
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void JustEngagedWith(Unit* who) override

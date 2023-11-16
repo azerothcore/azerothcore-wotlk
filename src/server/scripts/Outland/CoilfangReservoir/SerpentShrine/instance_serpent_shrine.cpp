@@ -31,6 +31,7 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
+    { NPC_LEOTHERAS_THE_BLIND,    DATA_LEOTHERAS_THE_BLIND    },
     { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
     { 0,                          0                           }
 };
@@ -86,7 +87,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_SHIELD_GENERATOR1:
                 case GO_SHIELD_GENERATOR2:
@@ -105,7 +106,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

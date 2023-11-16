@@ -35,6 +35,7 @@ const Position OptionalSpawn[] =
 ObjectData const creatureData[] =
 {
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_SHADE_OF_ARAN,        DATA_ARAN      },
     { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
     { NPC_DOROTHEE,             DATA_DOROTHEE  },
     { NPC_TITO,                 DATA_TITO      },
@@ -54,6 +55,13 @@ ObjectData const gameObjectData[] =
     { 0,                     0                          }
 };
 
+DoorData const doorData[] =
+{
+    { GO_MASTERS_TERRACE_DOOR,  DATA_NIGHTBANE, DOOR_TYPE_ROOM },
+    { GO_MASTERS_TERRACE_DOOR2, DATA_NIGHTBANE, DOOR_TYPE_ROOM },
+    { 0,                        0,              DOOR_TYPE_ROOM }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -71,6 +79,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -369,12 +378,6 @@ public:
                     else
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
-                case GO_MASTERS_TERRACE_DOOR:
-                    MastersTerraceDoor[0] = go->GetGUID();
-                    break;
-                case GO_MASTERS_TERRACE_DOOR2:
-                    MastersTerraceDoor[1] = go->GetGUID();
-                    break;
                 case GO_SIDE_ENTRANCE_DOOR:
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
@@ -486,10 +489,6 @@ public:
                     return m_uiGamesmansExitDoor;
                 case DATA_GO_NETHER_DOOR:
                     return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
                 case DATA_IMAGE_OF_MEDIVH:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
@@ -523,7 +522,6 @@ public:
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
         ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;

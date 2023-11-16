@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -56,10 +57,10 @@ enum Spells
 
 enum Misc
 {
-    MAX_CHANNELERS                      = 3,
-
-    NPC_GREYHEART_SPELLBINDER           = 21806,
     NPC_SHADOW_OF_LEOTHERAS             = 21875,
+    NPC_GREYHEART_SPELLBINDER           = 21806,
+
+    ACTION_CHECK_SPELLBINDERS           = 1
 };
 
 enum Groups
@@ -68,35 +69,21 @@ enum Groups
     GROUP_DEMON                         = 2
 };
 
-const Position channelersPos[MAX_CHANNELERS] =
-{
-    {367.11f, -421.48f, 29.52f, 5.0f},
-    {380.11f, -435.48f, 29.52f, 2.5f},
-    {362.11f, -437.48f, 29.52f, 0.9f}
-};
-
 struct boss_leotheras_the_blind : public BossAI
 {
-    boss_leotheras_the_blind(Creature* creature) : BossAI(creature, DATA_LEOTHERAS_THE_BLIND)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_leotheras_the_blind(Creature* creature) : BossAI(creature, DATA_LEOTHERAS_THE_BLIND) { }
 
     void Reset() override
     {
         BossAI::Reset();
         DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
         DoCastSelf(SPELL_DUAL_WIELD, true);
-        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-        me->LoadEquipment(0, true);
         me->SetReactState(REACT_PASSIVE);
         _recentlySpoken = false;
-        SummonChannelers();
 
         ScheduleHealthCheckEvent(15, [&]{
+            me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+
             if (me->GetDisplayId() != me->GetNativeDisplayId())
             {
                 //is currently in metamorphosis
@@ -104,12 +91,17 @@ struct boss_leotheras_the_blind : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
+
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
             DoResetThreatList();
+            me->ClearTarget();
+            me->SendMeleeAttackStop();
             scheduler.CancelGroup(GROUP_DEMON);
             scheduler.DelayAll(10s);
 
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
             me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_KNEEL);
             me->GetMotionMaster()->Clear();
             me->StopMoving();
             Talk(SAY_FINAL_FORM);
@@ -119,52 +111,41 @@ struct boss_leotheras_the_blind : public BossAI
                 DoCastSelf(SPELL_SUMMON_SHADOW_OF_LEOTHERAS);
             }).Schedule(6s, [this](TaskContext)
             {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->ResumeChasingVictim();
+
+                if (me->GetVictim())
+                {
+                    me->SetTarget(me->GetVictim()->GetGUID());
+                    me->SendMeleeAttackStart(me->GetVictim());
+                }
             });
         });
     }
 
-    void SummonChannelers()
+    void DoAction(int32 actionId) override
     {
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
-        DoCastSelf(SPELL_BANISH);
-        me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
-
-        //probably needs a spell instead
-        summons.DespawnAll();
-        for (uint8 i = 0; i < MAX_CHANNELERS; ++i)
+        if (actionId == ACTION_CHECK_SPELLBINDERS)
         {
-            me->SummonCreature(NPC_GREYHEART_SPELLBINDER, channelersPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-        }
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        me->SetInCombatWithZone();
-        summons.Despawn(summon);
-        if (summon->GetEntry() == NPC_GREYHEART_SPELLBINDER)
-        {
-            if (!summons.HasEntry(NPC_GREYHEART_SPELLBINDER))
+            if (CreatureGroup* formation = me->GetFormation())
             {
-                me->RemoveAllAuras();
-                me->LoadEquipment();
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                Talk(SAY_AGGRO);
-
-                scheduler.Schedule(10min, [this](TaskContext)
+                if (!formation->IsAnyMemberAlive(true))
                 {
-                    DoCastSelf(SPELL_BERSERK);
-                });
+                    me->RemoveAllAuras();
+                    me->LoadEquipment();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    Talk(SAY_AGGRO);
 
-                ElfTime();
+                    scheduler.Schedule(10min, [this](TaskContext)
+                    {
+                        DoCastSelf(SPELL_BERSERK);
+                    });
+
+                    ElfTime();
+                }
             }
         }
     }
@@ -188,6 +169,7 @@ struct boss_leotheras_the_blind : public BossAI
     void DemonTime()
     {
         DoResetThreatList();
+        me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
@@ -219,12 +201,22 @@ struct boss_leotheras_the_blind : public BossAI
 
         if (me->GetDisplayId() == me->GetNativeDisplayId())
         {
-            DoMeleeAttackIfReady();
+            if (me->GetReactState() != REACT_PASSIVE)
+            {
+                DoMeleeAttackIfReady();
+            }
         }
         else if (me->isAttackReady(BASE_ATTACK))
         {
-            me->CastSpell(me->GetVictim(), SPELL_CHAOS_BLAST, false);
-            me->setAttackTimer(BASE_ATTACK, 2000);
+            if (DoCastVictim(SPELL_CHAOS_BLAST) != SPELL_CAST_OK)
+            {
+                // Auto-attacks if there are no valid targets to cast his spell on f.e pet taunted.
+                DoMeleeAttackIfReady();
+            }
+            else
+            {
+                me->setAttackTimer(BASE_ATTACK, 2000);
+            }
         }
     }
 private:

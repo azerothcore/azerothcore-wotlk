@@ -54,8 +54,6 @@ enum KZDataTypes
     DATA_GO_GAME_DOOR               = 24,
     DATA_GO_GAME_EXIT_DOOR          = 25,
     DATA_IMAGE_OF_MEDIVH            = 26,
-    DATA_MASTERS_TERRACE_DOOR_1     = 27,
-    DATA_MASTERS_TERRACE_DOOR_2     = 28,
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
     DATA_PRINCE                     = 30,
     DATA_SPAWN_OPERA_DECORATIONS    = 31,
@@ -97,6 +95,7 @@ enum KZCreatures
     NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED    = 16152,
     NPC_MIDNIGHT                        = 16151,
     NPC_NIGHTBANE                       = 17225,
+    NPC_SHADE_OF_ARAN                   = 16524,
 
     // Trash
     NPC_COLDMIST_WIDOW                  = 16171,

@@ -6077,7 +6077,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
 
             DispelChargesList dispelList;
-            target->GetDispellableAuraList(m_caster, dispelMask, dispelList);
+            target->GetDispellableAuraList(m_caster, dispelMask, dispelList, m_spellInfo);
+
             if (dispelList.empty())
                 return SPELL_FAILED_NOTHING_TO_DISPEL;
         }
