@@ -213,7 +213,6 @@ public:
     private:
         uint32 eventTimer;
         uint8  waveId;
-    public:
         bool   _isBrazierExtinguished;
     };
 
