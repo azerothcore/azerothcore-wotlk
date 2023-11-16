@@ -1,3 +1,4 @@
+-- DB update 2023_11_16_07 -> 2023_11_16_08
 -- Arcane Annihilator
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|32768, `mechanic_immune_mask` = `mechanic_immune_mask`|8397338  WHERE (`entry` = 18856);
 
