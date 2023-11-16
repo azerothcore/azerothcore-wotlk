@@ -55,6 +55,14 @@ ObjectData const gameObjectData[] =
     { 0,                     0                          }
 };
 
+DoorData const doorData[] =
+{
+    { GO_MASTERS_TERRACE_DOOR,  DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_MASTERS_TERRACE_DOOR2, DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_NETHERSPACE_DOOR,      DATA_MALCHEZAAR, DOOR_TYPE_ROOM },
+    { 0,                        0,              DOOR_TYPE_ROOM  }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -72,6 +80,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -187,6 +196,7 @@ public:
                 case NPC_SHADIKITH_THE_GLIDER:
                 case NPC_ROKAD_THE_RAVAGER:
                     SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    instance->ToInstanceMap()->PermBindAllPlayers();
                     break;
                 default:
                     break;
@@ -249,6 +259,7 @@ public:
                             break;
                         case DONE:
                             HandleGameObject(m_uiGamesmansExitDoor, true);
+                            instance->ToInstanceMap()->PermBindAllPlayers();
                             break;
                         }
                         default:
@@ -363,19 +374,6 @@ public:
                 case GO_GAMESMAN_HALL_EXIT_DOOR:
                     m_uiGamesmansExitDoor = go->GetGUID();
                     break;
-                case GO_NETHERSPACE_DOOR:
-                    m_uiNetherspaceDoor = go->GetGUID();
-                    if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
-                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    break;
-                case GO_MASTERS_TERRACE_DOOR:
-                    MastersTerraceDoor[0] = go->GetGUID();
-                    break;
-                case GO_MASTERS_TERRACE_DOOR2:
-                    MastersTerraceDoor[1] = go->GetGUID();
-                    break;
                 case GO_SIDE_ENTRANCE_DOOR:
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
@@ -485,12 +483,6 @@ public:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
                     return m_uiGamesmansExitDoor;
-                case DATA_GO_NETHER_DOOR:
-                    return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
                 case DATA_IMAGE_OF_MEDIVH:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
@@ -523,8 +515,6 @@ public:
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
-        ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;

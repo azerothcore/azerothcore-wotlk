@@ -78,13 +78,7 @@ const Position advisorsPosition[MAX_ADVISORS] =
 
 struct boss_fathomlord_karathress : public BossAI
 {
-    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS) { }
 
     void Reset() override
     {
@@ -192,7 +186,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     {
         _instance = creature->GetInstanceScript();
 
-        _scheduler.SetValidator([this]
+        scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
@@ -202,7 +196,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
         summons.DespawnAll();
         summons.clear();
@@ -220,7 +214,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         {
             karathress->Attack(who, false);
         }
-        _scheduler.Schedule(2500ms, [this](TaskContext context)
+
+        scheduler.Schedule(2500ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_HURL_TRIDENT);
             context.Repeat(5s);
@@ -267,13 +262,12 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
 
 private:
-    TaskScheduler _scheduler;
     InstanceScript* _instance;
 };
 
