@@ -49,31 +49,27 @@ public:
             LoadDoorData(doorData);
         }
 
-        void OnGameObjectCreate(GameObject* pGo) override
+        void OnGameObjectCreate(GameObject* go) override
         {
-            switch (pGo->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_TELDARAM_PLATFORM:
                 {
-                    taldaramPlatform_GUID = pGo->GetGUID();
-                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
-                    {
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
-                    }
-
+                    taldaramPlatform_GUID = go->GetGUID();
+                    HandleGameObject(ObjectGuid::Empty, IsAllSpheresActivated(), go);
                     break;
                 }
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (GetPersistentData(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    if (GetPersistentData(go->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                        go->SetGoState(GO_STATE_ACTIVE);
+                        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     else
                     {
-                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     break;
@@ -114,7 +110,8 @@ public:
 
         bool IsAllSpheresActivated() const
         {
-            return GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE;
+            return GetBossState(DATA_PRINCE_TALDARAM) == DONE ||
+                (GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE);
         }
     };
 
