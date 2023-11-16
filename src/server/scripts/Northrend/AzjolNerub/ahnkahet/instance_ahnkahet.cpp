@@ -79,6 +79,8 @@ public:
                     break;
                 }
             }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
