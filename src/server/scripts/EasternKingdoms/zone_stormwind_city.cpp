@@ -18,13 +18,12 @@
 /* ScriptData
 SDName: Stormwind_City
 SD%Complete: 100
-SDComment: Quest support: 1640, 1447, 4185, 11223, 434.
+SDComment: Quest support: 1447, 4185, 11223, 434.
 SDCategory: Stormwind City
 EndScriptData */
 
 /* ContentData
 npc_archmage_malin
-npc_bartleby
 npc_tyrion
 npc_tyrion_spybot
 npc_marzon_silent_blade
