@@ -84,7 +84,6 @@ struct boss_malchezaar : public BossAI
         clearweapons();
         relays.clear();
         infernalTargets.clear();
-        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
     void clearweapons()
@@ -149,7 +148,6 @@ struct boss_malchezaar : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
     }
 
     void SpawnInfernal(Creature* relay, Creature* target)
@@ -192,8 +190,6 @@ struct boss_malchezaar : public BossAI
 
         me->GetCreaturesWithEntryInRange(relays, 250.0f, NPC_INFERNAL_RELAY);
         me->GetCreaturesWithEntryInRange(infernalTargets, 100.0f, NPC_INFERNAL_TARGET);
-
-        instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
 
         scheduler.Schedule(30s, [this](TaskContext context)
         {
@@ -282,7 +278,7 @@ struct npc_netherspite_infernal : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     void KilledUnit(Unit* who) override
@@ -306,7 +302,7 @@ struct npc_netherspite_infernal : public ScriptedAI
             me->SetDisplayId(me->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
-            _scheduler.Schedule(4s, [this](TaskContext /*context*/)
+            scheduler.Schedule(4s, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_HELLFIRE);
             });
@@ -317,9 +313,6 @@ struct npc_netherspite_infernal : public ScriptedAI
     {
         damage = 0;
     }
-
-    private:
-        TaskScheduler _scheduler;
 };
 
 struct npc_malchezaar_axe : public ScriptedAI
@@ -337,7 +330,7 @@ struct npc_malchezaar_axe : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
-        _scheduler.Schedule(7500ms, [this](TaskContext context)
+        scheduler.Schedule(7500ms, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
             {
@@ -358,12 +351,9 @@ struct npc_malchezaar_axe : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
-
-    private:
-        TaskScheduler _scheduler;
 };
 
 // 30843 - Enfeeble
