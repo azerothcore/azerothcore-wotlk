@@ -66,6 +66,11 @@ enum AhnKahetActions
     ACTION_REMOVE_PRISON            = -1
 };
 
+enum AhnKahetTexts
+{
+    SAY_SPHERE_ACTIVATED            = 0
+};
+
 template <class AI, class T>
 inline AI* GetAhnKahetAI(T* obj)
 {

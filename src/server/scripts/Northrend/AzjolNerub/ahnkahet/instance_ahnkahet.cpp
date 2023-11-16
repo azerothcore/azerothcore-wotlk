@@ -22,6 +22,12 @@
 #include "ahnkahet.h"
 #include <array>
 
+ObjectData const creatureData[] =
+{
+    { NPC_PRINCE_TALDARAM, DATA_PRINCE_TALDARAM },
+    { 0,                   0                    }
+};
+
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
@@ -33,29 +39,8 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
             teldaramSpheres.fill(NOT_STARTED);
-        }
-
-        void OnCreatureCreate(Creature* pCreature) override
-        {
-            switch (pCreature->GetEntry())
-            {
-                case NPC_ELDER_NADOX:
-                    elderNadox_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_PRINCE_TALDARAM:
-                    princeTaldaram_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_JEDOGA_SHADOWSEEKER:
-                    jedogaShadowseeker_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_HERALD_JOLAZJ:
-                    heraldVolazj_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_AMANITAR:
-                    amanitar_GUID = pCreature->GetGUID();
-                    break;
-            }
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -122,20 +107,23 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2)
+            uint8 index = type == DATA_TELDRAM_SPHERE1 ? 0 : 1;
+            if ((type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2) && teldaramSpheres[index] != DONE)
             {
-
-                teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
+                teldaramSpheres[index] = DONE;
                 SaveToDB();
 
-                if (IsAllSpheresActivated())
+                if (Creature* taldaram = GetCreature(DATA_PRINCE_TALDARAM))
                 {
-                    HandleGameObject(taldaramPlatform_GUID, true, nullptr);
-
-                    Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
-                    if (teldaram && teldaram->IsAlive())
+                    if (taldaram->IsAlive())
                     {
-                        teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                        taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
+
+                        if (IsAllSpheresActivated())
+                        {
+                            HandleGameObject(taldaramPlatform_GUID, true, nullptr);
+                            taldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                        }
                     }
                 }
             }
@@ -154,25 +142,6 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_ELDER_NADOX:
-                    return elderNadox_GUID;
-                case DATA_PRINCE_TALDARAM:
-                    return princeTaldaram_GUID;
-                case DATA_JEDOGA_SHADOWSEEKER:
-                    return jedogaShadowseeker_GUID;
-                case DATA_HERALD_VOLAZJ:
-                    return heraldVolazj_GUID;
-                case DATA_AMANITAR:
-                    return amanitar_GUID;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
         void ReadSaveDataMore(std::istringstream& data) override
         {
             data >> teldaramSpheres[0];
@@ -188,12 +157,6 @@ public:
         }
 
     private:
-        ObjectGuid elderNadox_GUID;
-        ObjectGuid princeTaldaram_GUID;
-        ObjectGuid jedogaShadowseeker_GUID;
-        ObjectGuid heraldVolazj_GUID;
-        ObjectGuid amanitar_GUID;
-
         // Teldaram related
         ObjectGuid taldaramPlatform_GUID;
         ObjectGuid taldaramGate_GUID;
