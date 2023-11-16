@@ -212,7 +212,7 @@ struct boss_taldaram : public BossAI
         BossAI::InitializeAI();
 
         // Event not started
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetPersistentData(DATA_TELDRAM_SPHERE2) != DONE)
         {
             me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
@@ -226,7 +226,7 @@ struct boss_taldaram : public BossAI
             return;
         }
 
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE)
         {
             DoAction(ACTION_REMOVE_PRISON_AT_RESET);
         }

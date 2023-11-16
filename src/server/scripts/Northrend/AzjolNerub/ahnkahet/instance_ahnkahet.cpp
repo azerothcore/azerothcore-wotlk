@@ -20,7 +20,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "ahnkahet.h"
-#include <array>
 
 ObjectData const creatureData[] =
 {
@@ -35,12 +34,12 @@ public:
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {
-        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
+        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap)
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, nullptr);
-            teldaramSpheres.fill(NOT_STARTED);
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -60,7 +59,7 @@ public:
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (teldaramSpheres.at(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    if (GetPersistentData(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                         pGo->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
@@ -97,20 +96,16 @@ public:
                 HandleGameObject(taldaramGate_GUID, true);
             }
 
-            if (canSaveBossStates)
-            {
-                SaveToDB();
-            }
-
             return true;
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
         {
             uint8 index = type == DATA_TELDRAM_SPHERE1 ? 0 : 1;
-            if ((type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2) && teldaramSpheres[index] != DONE)
+
+            if ((type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2) && GetPersistentData(index) != DONE)
             {
-                teldaramSpheres[index] = DONE;
+                StorePersistentData(index, DONE);
                 SaveToDB();
 
                 if (Creature* taldaram = GetCreature(DATA_PRINCE_TALDARAM))
@@ -129,43 +124,14 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_TELDRAM_SPHERE1:
-                    return teldaramSpheres.at(0);
-                case DATA_TELDRAM_SPHERE2:
-                    return teldaramSpheres.at(1);
-            }
-
-            return 0;
-        }
-
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> teldaramSpheres[0];
-            data >> teldaramSpheres[1];
-
-            canSaveBossStates = true;
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << teldaramSpheres[0] << ' '
-                << teldaramSpheres[1];
-        }
-
     private:
         // Teldaram related
         ObjectGuid taldaramPlatform_GUID;
         ObjectGuid taldaramGate_GUID;
-        std::array<uint32, 2> teldaramSpheres;  // Used to identify activation status for sphere activation
-        bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
 
         bool IsAllSpheresActivated() const
         {
-            return teldaramSpheres.at(0) == DONE && teldaramSpheres.at(1) == DONE;
+            return GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE;
         }
     };
 
