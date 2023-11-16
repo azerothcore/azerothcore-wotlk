@@ -195,6 +195,7 @@ public:
                 case NPC_SHADIKITH_THE_GLIDER:
                 case NPC_ROKAD_THE_RAVAGER:
                     SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    instance->ToInstanceMap()->PermBindAllPlayers();
                     break;
                 default:
                     break;
@@ -257,6 +258,7 @@ public:
                             break;
                         case DONE:
                             HandleGameObject(m_uiGamesmansExitDoor, true);
+                            instance->ToInstanceMap()->PermBindAllPlayers();
                             break;
                         }
                         default:
