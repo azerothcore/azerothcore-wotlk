@@ -27,6 +27,12 @@ ObjectData const creatureData[] =
     { 0,                   0                    }
 };
 
+DoorData const doorData[] =
+{
+    { GO_TELDARAM_DOOR, DATA_PRINCE_TALDARAM, DOOR_TYPE_PASSAGE },
+    { 0,                0,                    DOOR_TYPE_ROOM    }
+};
+
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
@@ -40,6 +46,7 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -71,32 +78,7 @@ public:
 
                     break;
                 }
-                case GO_TELDARAM_DOOR:
-                {
-                    taldaramGate_GUID = pGo->GetGUID(); // Web gate past Prince Taldaram
-                    if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
-                    {
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
-                    }
-
-                    break;
-                }
             }
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-            {
-                return false;
-            }
-
-            if (type == DATA_PRINCE_TALDARAM && state == DONE)
-            {
-                HandleGameObject(taldaramGate_GUID, true);
-            }
-
-            return true;
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
@@ -127,7 +109,6 @@ public:
     private:
         // Teldaram related
         ObjectGuid taldaramPlatform_GUID;
-        ObjectGuid taldaramGate_GUID;
 
         bool IsAllSpheresActivated() const
         {
