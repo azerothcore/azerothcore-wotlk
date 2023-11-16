@@ -1,3 +1,4 @@
+-- DB update 2023_11_16_02 -> 2023_11_16_03
 --
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI', `ScriptName` = '' WHERE `entry` IN (193093, 193094); 
 
