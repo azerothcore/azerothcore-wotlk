@@ -150,13 +150,10 @@ public:
             }
 
             scheduler.Update(diff, [this]
-                {
-                    DoMeleeAttackIfReady();
-                });
+            {
+                DoMeleeAttackIfReady();
+            });
         }
-
-        protected:
-            TaskScheduler _scheduler;
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
