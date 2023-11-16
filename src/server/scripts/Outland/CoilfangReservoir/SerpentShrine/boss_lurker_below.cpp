@@ -226,7 +226,6 @@ public:
     }
 };
 
-
 class spell_lurker_below_spout : public AuraScript
 {
     PrepareAuraScript(spell_lurker_below_spout);
