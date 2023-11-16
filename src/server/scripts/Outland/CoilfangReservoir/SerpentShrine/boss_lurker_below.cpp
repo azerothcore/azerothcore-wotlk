@@ -63,13 +63,7 @@ const Position positions[MAX_SUMMONS] =
 
 struct boss_the_lurker_below : public BossAI
 {
-    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
 
     void Reset() override
     {
