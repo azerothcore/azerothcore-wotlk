@@ -50,7 +50,7 @@ public:
         void Reset() override
         {
             _inEnrage = false;
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
         }
 
         void KilledUnit(Unit* victim) override
@@ -73,7 +73,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            _scheduler.Schedule(1ms, [this](TaskContext context)
+            scheduler.Schedule(1ms, [this](TaskContext context)
             {
                 if (!HealthAbovePct(20))
                 {
@@ -129,7 +129,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -137,7 +137,6 @@ public:
         }
 
     private:
-        TaskScheduler _scheduler;
         bool _inEnrage;
     };
 
