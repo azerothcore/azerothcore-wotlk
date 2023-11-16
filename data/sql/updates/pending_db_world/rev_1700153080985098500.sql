@@ -7,11 +7,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (12174, 2086, 0, 33, 43, 1, 1, -14607.7, 332.715, 3.69033, 1.83259, 0, 0, 0.793353, 0.608762, 180, 100, 1, '', 0, NULL);
 
 DELETE FROM `pool_template` WHERE `entry`=136;
-INSERT INTO `pool_template` VALUES
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (136, 1, 'Bloodsail Charts - Stranglethorn Vale');
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (12154,12165,12167,12174);
-INSERT INTO `pool_gameobject` VALUES
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (12154, 136, 0, 'Bloodsail Charts'),
 (12165, 136, 0, 'Bloodsail Charts'),
 (12167, 136, 0, 'Bloodsail Charts'),
