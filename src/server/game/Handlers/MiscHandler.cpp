@@ -1117,7 +1117,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     if (AccountMgr::IsAdminAccount(GetSecurity()))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
 }
 
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
@@ -1128,7 +1128,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!AccountMgr::IsAdminAccount(GetSecurity()))
     {
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
 
