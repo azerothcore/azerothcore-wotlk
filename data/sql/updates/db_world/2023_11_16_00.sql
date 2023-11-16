@@ -1,3 +1,4 @@
+-- DB update 2023_11_15_02 -> 2023_11_16_00
 -- Quest "Hilary's Necklace" --> Completion Event
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry` = 8962;
 
