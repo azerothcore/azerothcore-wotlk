@@ -721,7 +721,7 @@ enum AcoreStrings
     LANG_NOT_ENOUGH_GOLD                = 801,
     LANG_NOT_FREE_TRADE_SLOTS           = 802,
     LANG_NOT_PARTNER_FREE_TRADE_SLOTS   = 803,
-    LANG_YOU_NOT_HAVE_PERMISSION        = 804,
+    LANG_PERMISSION_DENIED              = 804,  //  You do not have permission to perform this function.
     LANG_UNKNOWN_LANGUAGE               = 805,
     LANG_NOT_LEARNED_LANGUAGE           = 806,
     LANG_NEED_CHARACTER_NAME            = 807,
