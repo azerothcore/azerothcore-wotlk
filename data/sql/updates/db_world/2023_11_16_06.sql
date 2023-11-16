@@ -1,3 +1,4 @@
+-- DB update 2023_11_16_05 -> 2023_11_16_06
 -- Bloodsail Charts
 DELETE FROM `gameobject` WHERE (`id` = 2086);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
