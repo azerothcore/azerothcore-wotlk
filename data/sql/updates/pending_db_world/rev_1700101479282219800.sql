@@ -6,7 +6,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (6090, 0, 0, 1, 19, 0, 100, 0, 1640, 0, 0, 0, 0, 0, 2, 168, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - On Quest \'Beat Bartleby\' Taken - Set Faction 168'),
 (6090, 0, 1, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - On Quest \'Beat Bartleby\' Taken - Start Attacking'),
 (6090, 0, 2, 3, 2, 0, 100, 0, 0, 15, 0, 0, 0, 0, 15, 1640, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - Between 15-15% Health - Quest Credit \'Beat Bartleby\''),
-(6090, 0, 3, 4, 61, 0, 100, 0, 2, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - Between 15-15% Health - Evade'),
+(6090, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - Between 0-15% Health - Evade'),
 (6090, 0, 4, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - On Quest \'Beat Bartleby\' Taken - Set Invincibility Hp 15%'),
 (6090, 0, 5, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - On Reset - Set Faction 84'),
 (6090, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bartleby - On Quest \'Beat Bartleby\' Taken - Store Targetlist');
