@@ -1,3 +1,4 @@
+-- DB update 2023_11_17_01 -> 2023_11_17_02
 -- Update gameobject 187559 'Horde Bonfire' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 187559) AND (`guid` IN (76320));
