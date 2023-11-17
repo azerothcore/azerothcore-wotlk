@@ -1,3 +1,4 @@
+-- DB update 2023_11_16_10 -> 2023_11_17_00
 -- Update gameobject 188352 'Flame of Shattrath' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 188352) AND (`guid` IN (54943));
