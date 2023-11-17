@@ -91,7 +91,7 @@ struct boss_pandemonius : public BossAI
                     context.DelayGroup(GROUP_VOID_BLAST, 500ms);
                 }
             })
-            .Schedule(0s, [this](TaskContext context)
+            .Schedule(0s, [this](TaskContext)
             {
                 PullRoom();
             });
