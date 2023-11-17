@@ -21,6 +21,7 @@
 #include "Define.h"
 #include <fmt/format.h>
 #include <fmt/printf.h>
+#include <locale>
 
 namespace Acore
 {
@@ -39,17 +40,20 @@ namespace Acore
         }
     }
 
+    template<typename... Args>
+    using FormatString = fmt::format_string<Args...>;
+
     // Default string format function.
     template<typename... Args>
-    inline std::string StringFormatFmt(std::string_view fmt, Args&&... args)
+    inline std::string StringFormatFmt(FormatString<Args...> fmt, Args&&... args)
     {
         try
         {
             return fmt::format(fmt, std::forward<Args>(args)...);
         }
-        catch (const fmt::format_error& formatError)
+        catch (std::exception const& e)
         {
-            return fmt::format("An error occurred formatting string \"{}\": {}", fmt, formatError.what());
+            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
         }
     }
 
@@ -75,5 +79,10 @@ namespace Acore::String
 
     AC_COMMON_API std::string AddSuffixIfNotExists(std::string str, const char suffix);
 }
+
+// Add support enum for fmt
+//template <typename T, std::enable_if_t<std::is_enum_v<T>, int> = 0>
+template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>
+auto format_as(T f) { return fmt::underlying(f); }
 
 #endif

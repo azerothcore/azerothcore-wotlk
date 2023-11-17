@@ -56,7 +56,6 @@
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
-#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
@@ -574,6 +573,12 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT]);
         _rate_values[RATE_TALENT] = 1.0f;
     }
+    _rate_values[RATE_TALENT_PET] = sConfigMgr->GetOption<float>("Rate.Talent.Pet", 1.0f);
+    if (_rate_values[RATE_TALENT_PET] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
+        _rate_values[RATE_TALENT_PET] = 1.0f;
+    }
     _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
     if (_rate_values[RATE_MOVESPEED] < 0)
     {
@@ -582,18 +587,6 @@ void World::LoadConfigSettings(bool reload)
     }
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
-
-    _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = sConfigMgr->GetOption<float>("TargetPosRecalculateRange", 1.5f);
-    if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] < CONTACT_DISTANCE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be >= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], CONTACT_DISTANCE, CONTACT_DISTANCE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = CONTACT_DISTANCE;
-    }
-    else if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] > NOMINAL_MELEE_RANGE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be <= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], NOMINAL_MELEE_RANGE, NOMINAL_MELEE_RANGE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = NOMINAL_MELEE_RANGE;
-    }
 
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);
     if (_rate_values[RATE_DURABILITY_LOSS_ON_DEATH] < 0.0f)

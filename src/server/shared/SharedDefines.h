@@ -105,6 +105,33 @@ enum Races
 
 #define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
 
+// DisplayRace values from CreatureDisplayInfoExtra.dbc
+enum class DisplayRace : uint8
+{
+    None              = 0,
+    Human             = 1,
+    Orc               = 2,
+    Dwarf             = 3,
+    NightElf          = 4,
+    Undead            = 5,
+    Tauren            = 6,
+    Gnome             = 7,
+    Troll             = 8,
+    Goblin            = 9,
+    BloodElf          = 10,
+    Draenei           = 11,
+    FelOrc            = 12,
+    Naga              = 13,
+    Broken            = 14,
+    Skeleton          = 15,
+    Vrykul            = 16,
+    Tuskarr           = 17,
+    ForestTroll       = 18,
+    Taunka            = 19,
+    NorthrendSkeleton = 20,
+    IceTroll          = 21
+};
+
 // Class value is index in ChrClasses.dbc
 // EnumUtils: DESCRIBE THIS
 enum Classes
@@ -216,7 +243,7 @@ enum FactionTemplates
 #define MIN_REPUTATION_RANK (REP_HATED)
 #define MAX_REPUTATION_RANK 8
 
-#define MAX_SPILLOVER_FACTIONS 4
+#define MAX_SPILLOVER_FACTIONS 6
 
 enum MoneyConstants
 {
@@ -1381,8 +1408,8 @@ enum Targets
 {
     TARGET_UNIT_CASTER                 = 1,
     TARGET_UNIT_NEARBY_ENEMY           = 2,
-    TARGET_UNIT_NEARBY_PARTY           = 3,
-    TARGET_UNIT_NEARBY_ALLY            = 4,
+    TARGET_UNIT_NEARBY_ALLY            = 3,
+    TARGET_UNIT_NEARBY_PARTY           = 4,
     TARGET_UNIT_PET                    = 5,
     TARGET_UNIT_TARGET_ENEMY           = 6,
     TARGET_UNIT_SRC_AREA_ENTRY         = 7,

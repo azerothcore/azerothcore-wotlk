@@ -395,8 +395,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 //this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
-
     ObjectGuid auctioneer;
     uint32 auctionId;
     uint32 price;
@@ -528,8 +526,6 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 //this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
-
     ObjectGuid auctioneer;
     uint32 auctionId;
     recvData >> auctioneer;
@@ -603,8 +599,6 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 //called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
-
     ObjectGuid guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
@@ -683,8 +677,6 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
 
 void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
-
     _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS(); // pussywizard
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
@@ -716,8 +708,6 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 //this void is called when player clicks on search button
 void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_ITEMS");
-
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
@@ -773,8 +763,6 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_PENDING_SALES");
-
     recvData.read_skip<uint64>();
 
     uint32 count = 0;

@@ -741,7 +741,7 @@ public:
                         break;
                     case 11:
                         Talk(EMOTE_DIES);
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->SetHealth(0);
                         return;
                     }

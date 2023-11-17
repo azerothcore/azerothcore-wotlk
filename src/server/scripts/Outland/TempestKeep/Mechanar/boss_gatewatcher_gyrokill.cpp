@@ -36,13 +36,7 @@ enum Spells
 
 struct boss_gatewatcher_gyrokill : public BossAI
 {
-    boss_gatewatcher_gyrokill(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_gatewatcher_gyrokill(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL) { }
 
     void JustDied(Unit* /*killer*/) override
     {

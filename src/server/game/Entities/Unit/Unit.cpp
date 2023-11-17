@@ -39,7 +39,6 @@
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "MapMgr.h"
 #include "MoveSpline.h"
@@ -248,7 +247,7 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_rootTimes = 0;
 
     m_state = 0;
-    m_deathState = ALIVE;
+    m_deathState = DeathState::Alive;
 
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
         m_currentSpells[i] = nullptr;
@@ -4563,7 +4562,7 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
     if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && IsTotem() && GetGUID() == aura->GetCasterGUID())
     {
         if (ToTotem()->GetSpell() == aura->GetId() && ToTotem()->GetTotemType() == TOTEM_PASSIVE)
-            ToTotem()->setDeathState(JUST_DIED);
+            ToTotem()->setDeathState(DeathState::JustDied);
     }
 
     // Remove aurastates only if were not found
@@ -5530,7 +5529,7 @@ Aura* Unit::GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID, ObjectGu
     return aurApp ? aurApp->GetBase() : nullptr;
 }
 
-void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList)
+void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList, SpellInfo const* dispelSpell)
 {
     // we should not be able to dispel diseases if the target is affected by unholy blight
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
@@ -5574,6 +5573,12 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
                 //               negative auras if non-friendly target
                 if (itr->second->IsPositive() == positive)
                     continue;
+            }
+
+            // Banish should only be dispelled by Mass Dispel
+            if (aura->GetSpellInfo()->Mechanic == MECHANIC_BANISH && !dispelSpell->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+            {
+                continue;
             }
 
             // The charges / stack amounts don't count towards the total number of auras that can be dispelled.
@@ -8192,13 +8197,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             CastCustomSpell(this, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura, originalCaster);
                             break;
                         }
-                    // Shaman T8 Elemental 4P Bonus
-                    case 64928:
-                        {
-                            basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                            triggered_spell_id = 64930;            // Electrified
-                            break;
-                        }
                     // Shaman T9 Elemental 4P Bonus
                     case 67228:
                         {
@@ -9627,7 +9625,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         // Cast positive spell on enemy target
         case 7099:  // Curse of Mending
         case 39703: // Curse of Mending
-        case 29494: // Temptation
         case 20233: // Improved Lay on Hands (cast on target)
             {
                 target = victim;
@@ -11256,12 +11253,12 @@ void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellID, uint32 damage, Pow
 
 void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers powerType)
 {
-    victim->ModifyPower(powerType, damage, false);
+    int32 gainedPower = victim->ModifyPower(powerType, damage, false);
 
-    if (powerType != POWER_HAPPINESS)
+    if (powerType != POWER_HAPPINESS && gainedPower)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-        victim->getHostileRefMgr().threatAssist(this, float(damage) * 0.5f, spellInfo);
+        victim->getHostileRefMgr().threatAssist(this, float(gainedPower) * 0.5f, spellInfo);
     }
 
     SendEnergizeSpellLog(victim, spellID, damage, powerType);
@@ -13957,6 +13954,9 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     // additional checks - only PvP case
     if (playerAffectingAttacker && playerAffectingTarget)
     {
+        if (!IsPvP() && bySpell && bySpell->IsAffectingArea() && !bySpell->HasAttribute(SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK))
+            return false;
+
         if (target->IsPvP())
             return true;
 
@@ -14150,6 +14150,11 @@ int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*
     {
         SetPower(power, maxPower, withPowerUpdate);
         gain = maxPower - curPower;
+    }
+
+    if (GetAI())
+    {
+        GetAI()->OnPowerUpdate(power, gain, dVal, curPower);
     }
 
     return gain;
@@ -14524,7 +14529,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     // death state needs to be updated before RemoveAllAurasOnDeath() calls HandleChannelDeathItem(..) so that
     // it can be used to check creation of death items (such as soul shards).
 
-    if (s != ALIVE && s != JUST_RESPAWNED)
+    if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
         CombatStop();
         GetThreatMgr().ClearAllThreat();
@@ -14539,7 +14544,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         RemoveAllAurasOnDeath();
     }
 
-    if (s == JUST_DIED)
+    if (s == DeathState::JustDied)
     {
         // remove aurastates allowing special moves
         ClearAllReactives();
@@ -14568,7 +14573,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         if (ZoneScript* zoneScript = GetZoneScript() ? GetZoneScript() : (ZoneScript*)GetInstanceScript())
             zoneScript->OnUnitDeath(this);
     }
-    else if (s == JUST_RESPAWNED)
+    else if (s == DeathState::JustRespawned)
     {
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
@@ -15447,9 +15452,9 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
 
 void Unit::SetHealth(uint32 val)
 {
-    if (getDeathState() == JUST_DIED)
+    if (getDeathState() == DeathState::JustDied)
         val = 0;
-    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DEAD)
+    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DeathState::Dead)
         val = 1;
     else
     {
@@ -18115,12 +18120,12 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
     if (!spiritOfRedemption)
     {
-        LOG_DEBUG("entities.unit", "SET JUST_DIED");
-        victim->setDeathState(JUST_DIED);
+        LOG_DEBUG("entities.unit", "SET DeathState::JustDied");
+        victim->setDeathState(DeathState::JustDied);
     }
 
     // Inform pets (if any) when player kills target)
-    // MUST come after victim->setDeathState(JUST_DIED); or pet next target
+    // MUST come after victim->setDeathState(DeathState::JustDied); or pet next target
     // selection will get stuck on same target and break pet react state
     if (player)
     {
@@ -20135,8 +20140,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (HasUnitTypeMask(UNIT_MASK_ACCESSORY))
     {
         // Vehicle just died, we die too
-        if (vehicleBase->getDeathState() == JUST_DIED)
-            setDeathState(JUST_DIED);
+        if (vehicleBase->getDeathState() == DeathState::JustDied)
+            setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
         {
@@ -20222,7 +20227,7 @@ bool Unit::CanSwim() const
     // Mirror client behavior, if this method returns false then client will not use swimming animation and for players will apply gravity as if there was no water
     if (HasUnitFlag(UNIT_FLAG_CANNOT_SWIM))
         return false;
-    if (HasUnitFlag(UNIT_FLAG_POSSESSED)) // is player
+    if (HasUnitFlag(UNIT_FLAG_POSSESSED) || HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)) // is player
         return true;
     if (HasUnitFlag2(UNIT_FLAG2_UNUSED_6))
         return false;
@@ -21285,6 +21290,18 @@ void Unit::setRace(uint8 race)
 {
     if (GetTypeId() == TYPEID_PLAYER)
         m_race = race;
+}
+
+DisplayRace Unit::GetDisplayRaceFromModelId(uint32 modelId) const
+{
+    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(modelId))
+    {
+        if (CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID))
+        {
+            return DisplayRace(displayExtra->DisplayRaceID);
+        }
+    }
+    return DisplayRace::None;
 }
 
 // Check if unit in combat with specific unit

@@ -15,16 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaBoundary.h"
 #include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
 #include "Spell.h"
 #include "TemporarySummon.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 // Spell summary for ScriptedAI::SelectSpell
 struct TSpellSummary
@@ -552,6 +556,13 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
 {
     if (instance)
         SetBoundary(instance->GetBossBoundary(bossId));
+
+    // Prevents updating the scheduler's timer while the creature is casting.
+    // Clear it in the script if you need it to update while the creature is casting.
+    scheduler.SetValidator([this]
+    {
+        return !me->HasUnitState(UNIT_STATE_CASTING);
+    });
 }
 
 bool BossAI::CanRespawn()

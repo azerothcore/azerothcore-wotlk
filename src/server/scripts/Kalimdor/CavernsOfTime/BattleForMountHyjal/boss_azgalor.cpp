@@ -245,7 +245,7 @@ public:
                     Creature* boss = ObjectAccessor::GetCreature(*me, AzgalorGUID);
                     if (!boss || boss->isDead())
                     {
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->RemoveCorpse();
                         return;
                     }
