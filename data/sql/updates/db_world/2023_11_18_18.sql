@@ -1,3 +1,4 @@
+-- DB update 2023_11_18_17 -> 2023_11_18_18
 -- Update remaining Midsummer city flames with sniffed values
 DELETE FROM `gameobject` WHERE (`id` IN (181332, 181333, 181334, 181335, 181336, 181337, 188128, 188129)) AND (`guid` BETWEEN 242656 AND 242663);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
