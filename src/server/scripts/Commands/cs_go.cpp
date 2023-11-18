@@ -343,7 +343,7 @@ public:
         float y = locationValues[1];
         float z = locationValues.size() >= 3 ? locationValues[2] : std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
         // map ID (locationValues[3]) already handled above
-        float o = locationValues.size() >= 5 ? locationValues[4] : 0.0f;
+        float o = locationValues.size() >= 5 ? locationValues[4] : player->GetOrientation();
 
         if (!MapMgr::IsValidMapCoord(mapId, x, y, z, o))
         {
