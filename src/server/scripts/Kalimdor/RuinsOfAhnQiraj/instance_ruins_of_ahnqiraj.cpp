@@ -84,7 +84,23 @@ public:
         {
             if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
             {
-                if (!_andorovGUID)
+                Map::PlayerList const &playerList = instance->GetPlayers();
+
+                if (playerList.IsEmpty())
+                    return;
+
+                bool anyPlayerInCombat = false;
+                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                {
+                    Player* player = itr->GetSource();
+                    if (player && player->IsInCombat())
+                    {
+                        anyPlayerInCombat = true;
+                        break;
+                    }
+                }
+
+                if (!anyPlayerInCombat && !_andorovGUID)
                 {
                     player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
                 }
