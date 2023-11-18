@@ -1,3 +1,4 @@
+-- DB update 2023_11_17_04 -> 2023_11_18_00
 -- Update gameobject 187914 'Alliance Bonfire' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 187914) AND (`guid` IN (76314));
