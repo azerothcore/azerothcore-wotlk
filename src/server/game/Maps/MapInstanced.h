@@ -32,7 +32,7 @@ public:
     ~MapInstanced() override {}
 
     // functions overwrite Map versions
-    void Update(const uint32, const uint32, bool thread = true) override;
+    void Update(const uint32) override;
     void DelayedUpdate(const uint32 diff) override;
     //void RelocationNotify();
     void UnloadAll() override;

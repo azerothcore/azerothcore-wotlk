@@ -33,15 +33,15 @@ public:
 class MapUpdateRequest : public UpdateRequest
 {
 public:
-    MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
-        : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
+    MapUpdateRequest(Map& m, MapUpdater& u, uint32 d)
+        : m_map(m), m_updater(u), m_diff(d)
     {
     }
 
     void call() override
     {
         METRIC_TIMER("map_update_time_diff", METRIC_TAG("map_id", std::to_string(m_map.GetId())));
-        m_map.Update(m_diff, s_diff);
+        m_map.Update(m_diff);
         m_updater.update_finished();
     }
 
@@ -49,7 +49,6 @@ private:
     Map& m_map;
     MapUpdater& m_updater;
     uint32 m_diff;
-    uint32 s_diff;
 };
 
 class LFGUpdateRequest : public UpdateRequest
@@ -67,7 +66,7 @@ private:
     uint32 m_diff;
 };
 
-MapUpdater::MapUpdater(): pending_requests(0)
+MapUpdater::MapUpdater(): _cancelationToken(false), pending_requests(0)
 {
 }
 
@@ -107,13 +106,13 @@ void MapUpdater::wait()
     guard.unlock();
 }
 
-void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
+void MapUpdater::schedule_update(Map& map, uint32 diff)
 {
     std::lock_guard<std::mutex> guard(_lock);
 
     ++pending_requests;
 
-    _queue.Push(new MapUpdateRequest(map, *this, diff, s_diff));
+    _queue.Push(new MapUpdateRequest(map, *this, diff));
 }
 
 void MapUpdater::schedule_lfg_update(uint32 diff)

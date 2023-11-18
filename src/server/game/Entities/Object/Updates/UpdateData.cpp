@@ -24,14 +24,11 @@
 #include "WorldPacket.h"
 #include "zlib.h"
 
-UpdateData::UpdateData() : m_blockCount(0)
-{
-    m_outOfRangeGUIDs.reserve(15);
-}
+UpdateData::UpdateData() : m_blockCount(0) { }
 
 void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
 {
-    m_outOfRangeGUIDs.push_back(guid);
+    m_outOfRangeGUIDs.insert(guid);
 }
 
 void UpdateData::AddUpdateBlock(const ByteBuffer& block)

@@ -37,8 +37,7 @@
 MapMgr::MapMgr()
 {
     i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
-    i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
-    mapUpdateStep = 0;
+    i_timer.SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     _nextInstanceId = 0;
 }
 
@@ -246,11 +245,11 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
 void MapMgr::Update(uint32 diff)
 {
-    for (uint8 i = 0; i < 4; ++i)
-        i_timer[i].Update(diff);
+    i_timer.Update(diff);
+    if (!i_timer.Passed())
+        return;
 
     // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
-    //if (mapUpdateStep == 0)
     {
         if (m_updater.activated())
         {
@@ -265,34 +264,18 @@ void MapMgr::Update(uint32 diff)
     MapMapType::iterator iter = i_maps.begin();
     for (; iter != i_maps.end(); ++iter)
     {
-        bool full = mapUpdateStep < 3 && ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
         if (m_updater.activated())
-            m_updater.schedule_update(*iter->second, uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+            m_updater.schedule_update(*iter->second, uint32(i_timer.GetCurrent()));
         else
-            iter->second->Update(uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+            iter->second->Update(uint32(i_timer.GetCurrent()));
     }
-
     if (m_updater.activated())
         m_updater.wait();
 
-    if (mapUpdateStep < 3)
-    {
-        for (iter = i_maps.begin(); iter != i_maps.end(); ++iter)
-        {
-            bool full = ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
-            if (full)
-                iter->second->DelayedUpdate(uint32(i_timer[mapUpdateStep].GetCurrent()));
-        }
+    for (iter = i_maps.begin(); iter != i_maps.end(); ++iter)
+        iter->second->DelayedUpdate(uint32(i_timer.GetCurrent()));
 
-        i_timer[mapUpdateStep].SetCurrent(0);
-        ++mapUpdateStep;
-    }
-
-    if (mapUpdateStep == 3 && i_timer[3].Passed())
-    {
-        mapUpdateStep = 0;
-        i_timer[3].SetCurrent(0);
-    }
+    i_timer.SetCurrent(0);
 }
 
 void MapMgr::DoDelayedMovesAndRemoves()

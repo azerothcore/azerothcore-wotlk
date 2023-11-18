@@ -338,7 +338,7 @@ public:
     void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
         TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor);
 
-    virtual void Update(const uint32, const uint32, bool thread = true);
+    virtual void Update(const uint32);
 
     [[nodiscard]] float GetVisibilityRange() const { return m_VisibleDistance; }
     void SetVisibilityRange(float range) { m_VisibleDistance = range; }
@@ -687,13 +687,13 @@ private:
     void RemoveDynamicObjectFromMoveList(DynamicObject* go);
 
     bool _creatureToMoveLock;
-    std::vector<Creature*> _creaturesToMove;
+    std::set<Creature*> _creaturesToMove;
 
     bool _gameObjectsToMoveLock;
-    std::vector<GameObject*> _gameObjectsToMove;
+    std::set<GameObject*> _gameObjectsToMove;
 
     bool _dynamicObjectsToMoveLock;
-    std::vector<DynamicObject*> _dynamicObjectsToMove;
+    std::set<DynamicObject*> _dynamicObjectsToMove;
 
     [[nodiscard]] bool IsGridLoaded(const GridCoord&) const;
     void EnsureGridCreated_i(const GridCoord&);
@@ -847,7 +847,7 @@ public:
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
     void AfterPlayerUnlinkFromMap() override;
-    void Update(const uint32, const uint32, bool thread = true) override;
+    void Update(const uint32) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, GuidList* globalSkipList = nullptr);
     [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
