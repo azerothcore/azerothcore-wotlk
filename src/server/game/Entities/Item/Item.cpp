@@ -26,9 +26,9 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "WorldPacket.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
+#include "WorldPacket.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
