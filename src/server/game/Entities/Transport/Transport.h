@@ -68,8 +68,6 @@ public:
     PassengerSet const& GetStaticPassengers() const { return _staticPassengers; }
     void UnloadStaticPassengers();
     void UnloadNonStaticPassengers();
-    void SetPassengersLoaded(bool loaded) { _passengersLoaded = loaded; }
-    bool PassengersLoaded() const { return _passengersLoaded; }
 
     KeyFrameVec const& GetKeyFrames() const { return _transportInfo->keyFrames; }
     void EnableMovement(bool enabled);
@@ -104,7 +102,6 @@ private:
 
     PassengerSet _staticPassengers;
     mutable std::mutex Lock;
-    bool _passengersLoaded;
     bool _delayedTeleport;
 };
 

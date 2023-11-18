@@ -25,8 +25,9 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "VMapFactory.h"
+#include "VMapMgr2.h"
 
-MapInstanced::MapInstanced(uint32 id, std::chrono::seconds expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
+MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
     // initialize instanced maps list
     m_InstancedMaps.clear();
@@ -262,6 +263,15 @@ bool MapInstanced::DestroyInstance(InstancedMaps::iterator& itr)
     sScriptMgr->OnDestroyInstance(this, itr->second);
 
     itr->second->UnloadAll();
+    // should only unload VMaps if this is the last instance
+    if (m_InstancedMaps.size() <= 1)
+    {
+        VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(itr->second->GetId());
+        MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(itr->second->GetId());
+        // in that case, unload grids of the base map, too
+        // so in the next map creation, (EnsureGridCreated actually) VMaps will be reloaded
+        Map::UnloadAll();
+    }
 
     // erase map
     delete itr->second;

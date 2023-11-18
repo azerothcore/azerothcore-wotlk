@@ -32,7 +32,6 @@
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
-#include "DynamicVisibility.h"
 #include "Formulas.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -615,10 +614,7 @@ void Unit::UpdateSplinePosition()
     //if (HasUnitState(UNIT_STATE_CANNOT_TURN))
     //    loc.orientation = GetOrientation();
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
-    else
-        ToCreature()->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
+    UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
 }
 
 void Unit::DisableSpline()
@@ -15716,15 +15712,9 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
 {
-    if (GetTransport())
-    {
-        GetTransport()->RemovePassenger(this);
-        SetTransport(nullptr);
-        m_movementInfo.transport.Reset();
-        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-    }
-
     CleanupBeforeRemoveFromMap(finalCleanup);
+
+    WorldObject::CleanupsBeforeDelete(finalCleanup);
 }
 
 void Unit::UpdateCharmAI()
@@ -20256,10 +20246,14 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
     if (!Acore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
-    float old_orientation = GetOrientation();
-    float current_z = GetPositionZ();
-    bool turn = (old_orientation != orientation);
-    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || current_z != z);
+    // Check if angular distance changed
+    bool const turn = G3D::fuzzyGt(M_PI - fabs(fabs(GetOrientation() - orientation) - M_PI), 0.0f);
+
+    // G3D::fuzzyEq won't help here, in some cases magnitudes differ by a little more than G3D::eps, but should be considered equal
+    bool const relocated = (teleport ||
+        std::fabs(GetPositionX() - x) > 0.001f ||
+        std::fabs(GetPositionY() - y) > 0.001f ||
+        std::fabs(GetPositionZ() - z) > 0.001f);
 
     if (!GetVehicle())
     {
