@@ -1092,6 +1092,9 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     // delay creature move for grid/cell to grid/cell moves
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+
         #ifdef ACORE_DEBUG
             LOG_DEBUG("maps", "Creature {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", creature->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
@@ -1120,6 +1123,9 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
     // delay creature move for grid/cell to grid/cell moves
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+
         #ifdef ACORE_DEBUG
             LOG_DEBUG("maps", "GameObject {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", go->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
@@ -1147,6 +1153,9 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
     // delay creature move for grid/cell to grid/cell moves
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+
         #ifdef ACORE_DEBUG
             LOG_DEBUG("maps", "GameObject {} added to moving list from grid[{}, {}]cell[{}, {}] to grid[{}, {}]cell[{}, {}].", dynObj->GetGUID().ToString().c_str(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
