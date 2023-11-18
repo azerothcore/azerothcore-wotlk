@@ -19,8 +19,8 @@
 #define AZEROTHCORE_WORLDMOCK_H
 
 #include "ArenaSpectator.h"
-#include "IWorld.h"
 #include "Duration.h"
+#include "IWorld.h"
 #include "gmock/gmock.h"
 
 #pragma GCC diagnostic push

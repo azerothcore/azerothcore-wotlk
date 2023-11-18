@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"
 

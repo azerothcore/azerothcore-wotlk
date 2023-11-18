@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SpellInfo.h"
 #include "DBCStores.h"
 #include "DBCStructure.h"
 #include "GameGraveyard.h"
+#include "SpellInfo.h"
 #include "SpellMgr.h"
 
 inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellInfo*))
@@ -4612,6 +4612,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 36146 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Force of Neltharaku
+    ApplySpellFix({ 38762 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
