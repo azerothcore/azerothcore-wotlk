@@ -209,6 +209,11 @@ public:
                         }
                     }
                 }
+
+                if (creature->GetEntry() == NPC_ANDOROV)
+                {
+                    _andorovGUID.Clear();
+                }
             }
         }
 

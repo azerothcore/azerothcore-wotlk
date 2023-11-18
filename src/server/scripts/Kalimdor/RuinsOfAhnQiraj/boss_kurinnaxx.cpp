@@ -82,6 +82,7 @@ struct boss_kurinnaxx : public BossAI
         if (killer)
         {
             killer->GetMap()->LoadGrid(-9502.80f, 2042.65f); // Ossirian grid
+            killer->GetMap()->LoadGrid(-8594.29f, 1446.59f); // Andorov grid
 
             if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
