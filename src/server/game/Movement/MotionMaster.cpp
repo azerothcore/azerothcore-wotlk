@@ -30,8 +30,8 @@
 #include "PointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
-#include "WaypointMovementGenerator.h"
 #include "WaypointMgr.h"
+#include "WaypointMovementGenerator.h"
 
 inline MovementGenerator* GetIdleMovementGenerator()
 {

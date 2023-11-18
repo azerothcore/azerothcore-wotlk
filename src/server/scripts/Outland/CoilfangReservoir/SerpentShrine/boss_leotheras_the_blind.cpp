@@ -19,8 +19,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "serpent_shrine.h"
 #include "TaskScheduler.h"
+#include "serpent_shrine.h"
 
 enum Talk
 {

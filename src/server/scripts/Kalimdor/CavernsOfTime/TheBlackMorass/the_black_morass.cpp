@@ -17,9 +17,9 @@
 
 #include "the_black_morass.h"
 #include "MoveSplineInit.h"
-#include "SmartAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SmartAI.h"
 
 enum medivhMisc
 {
