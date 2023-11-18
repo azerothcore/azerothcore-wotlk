@@ -30,7 +30,7 @@
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
-    m_TypeId = OUTDOOR_PVP_SI;
+    _typeId = OUTDOOR_PVP_SI;
     m_Gathered_A = 0;
     m_Gathered_H = 0;
     m_LastController = TEAM_NEUTRAL;
