@@ -126,7 +126,6 @@ struct boss_pandemonius : public BossAI
             }
         creatureList.clear();
     }
-
 };
 
 void AddSC_boss_pandemonius()
