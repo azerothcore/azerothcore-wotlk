@@ -1,3 +1,4 @@
+-- DB update 2023_11_18_16 -> 2023_11_18_17
 -- Update remaining gameobjects 'Alliance Bonfire' with sniffed values
 DELETE FROM `gameobject` WHERE (`id` IN (187922, 187924, 187925, 187926, 187927, 187928, 187929, 187930, 187935, 187938, 187939, 187940, 187941, 187942, 187943, 187944, 187945, 187946, 194032, 194035, 194036, 194038, 194040, 194044, 194045, 194049)) AND (`guid` IN (76308, 76335, 76311, 76303, 76330, 76307, 76329, 76352, 76345, 76319, 76321, 76313, 76354, 76359, 76326, 76301, 76323, 76342, 76368, 76372, 76367, 76362, 76365, 76376, 76370, 76375));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
