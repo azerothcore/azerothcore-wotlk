@@ -316,7 +316,7 @@ public:
             return false;
         }
 
-        // create a new vector of floats that only contains args that look like floats
+        // create a new vector of floats that only contains args that look like floats (or integer for mapId)
         std::vector<float> floatValues;
         for (const std::wstring& value : delimitedValues)
         {
