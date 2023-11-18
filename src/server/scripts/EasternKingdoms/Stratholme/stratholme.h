@@ -116,6 +116,7 @@ enum WaypointData
 {
     BARTHILAS_PATHID                    = 104350
 };
+
 template <class AI, class T>
 inline AI* GetStratholmeAI(T* obj)
 {

@@ -49,6 +49,10 @@ static const Position aGateTrap[] =
     {3919.88f, -3547.34f, 134.269f, 2.94961f}   // Undead side
 };
 
+Position const MindlessUndeadPos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
+Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 0.2521562f };
+Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
+
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
 
 class instance_stratholme : public InstanceMapScript
@@ -130,8 +134,7 @@ public:
                 if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
                     baron->AI()->Talk(SAY_BRAON_SUMMON_RAMSTEIN);
 
-                Position pos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
-                instance->SummonCreature(NPC_RAMSTEIN_THE_GORGER, pos);
+                instance->SummonCreature(NPC_RAMSTEIN_THE_GORGER, SlaughterPos);
             }
             if (_slaughterProgress == 2)
             {
@@ -364,7 +367,7 @@ public:
                         }
                         events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 10s);
                     }
-                    _barthilas_run_Progress = data;
+                    _barthilasrunProgress = data;
                     break;
             }
 
@@ -380,7 +383,7 @@ public:
             data >> _zigguratState3;
             data >> _slaughterProgress;
             data >> _postboxesOpened;
-            data >> _barthilas_run_Progress;
+            data >> _barthilasrunProgress;
             if (_baronRunTime)
             {
                 events.ScheduleEvent(EVENT_BARON_TIME, 60000);
@@ -401,7 +404,7 @@ public:
                 << _zigguratState3 << ' '
                 << _slaughterProgress << ' '
                 << _postboxesOpened << ' '
-                << _barthilas_run_Progress;
+                << _barthilasrunProgress;
         }
 
         uint32 GetData(uint32 type) const override
@@ -417,12 +420,12 @@ public:
                 case TYPE_MALLOW:
                     return _postboxesOpened;
                 case TYPE_BARTHILAS_RUN:
-                    return _barthilas_run_Progress;
+                    return _barthilasrunProgress;
             }
             return 0;
         }
 
-        bool dead()
+        bool PlayDead()
         {
             Map::PlayerList const& lPlayers = instance->GetPlayers();
             if (!lPlayers.IsEmpty())
@@ -440,7 +443,7 @@ public:
             return false;
         }
 
-        bool all_noIsInCombat()
+        bool NoPlayersInCombat()
         {
             Map::PlayerList const& lPlayers = instance->GetPlayers();
             if (!lPlayers.IsEmpty())
@@ -461,7 +464,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            //
+
             if (GetData(TYPE_BARTHILAS_RUN) == NOT_STARTED)
             {
                 if (GameObject* go = instance->GetGameObject(_door_service_entrance))
@@ -532,10 +535,10 @@ public:
                 }
             }
 
-            //Players are dead and all players are not in combat
-            if (dead() && all_noIsInCombat())
+            // Players are dead and no players are in combat
+            if (PlayDead() && NoPlayersInCombat())
             {
-                //Destroy the Psychic Tower
+                // Destroy the Psychic Tower
                 if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                 {
                     if (GameObject* go = instance->GetGameObject(_slaughterGateGUID))
@@ -623,8 +626,7 @@ public:
                 }
                 case EVENT_SPAWN_MINDLESS:
                 {
-                    Position pos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
-                    instance->SummonCreature(NPC_MINDLESS_UNDEAD, pos);
+                    instance->SummonCreature(NPC_MINDLESS_UNDEAD, MindlessUndeadPos);
                     break;
                 }
                 case EVENT_FORCE_SLAUGHTER_EVENT:
@@ -663,9 +665,9 @@ public:
                     {
                         if (barthilas->isDead())
                             break;
-                        if (barthilas->IsAlive() && (barthilas->GetPosition()) == Position(4068.28f, -3535.67f, 122.771f, 2.50f))
+                        if (barthilas->IsAlive() && (barthilas->GetPosition()) == BarthilasPos)
                         {
-                            barthilas->SetHomePosition(4068.28f, -3535.67f, 122.771f, 2.50f);
+                            barthilas->SetHomePosition(BarthilasPos);
                             SetData(TYPE_BARTHILAS_RUN, DONE);
                             SaveToDB();
                             break;
@@ -678,8 +680,9 @@ public:
                     {
                         if (barthilas->IsAlive() && !barthilas->IsInCombat())
                         {
-                            barthilas->NearTeleportTo(4068.284f, -3535.678f, 122.771f, 2.50f);
-                            barthilas->SetHomePosition(4068.284f, -3535.678f, 122.771f, 2.50f);
+                            Position barthilasTelPosis = BarthilasPos;
+                            barthilas->NearTeleportTo(barthilasTelPosis);
+                            barthilas->SetHomePosition(BarthilasPos);
                         }
                     }
                     break;
@@ -696,7 +699,7 @@ public:
         uint32 _zigguratState3;
         uint32 _slaughterProgress;
         uint32 _slaughterNPCs;
-        uint32 _barthilas_run_Progress{};
+        uint32 _barthilasrunProgress{};
         uint32 _postboxesOpened;
         EventMap events;
 

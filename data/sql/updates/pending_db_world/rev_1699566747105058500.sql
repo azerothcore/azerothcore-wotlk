@@ -21,12 +21,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10435, 0, 2, 0, 0, 0, 100, 0, 11000, 12000, 15000, 15000, 0, 0, 11, 14099, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Might Blow'),
 (10435, 0, 3, 0, 0, 0, 100, 0, 4000, 4000, 12000, 15000, 0, 0, 11, 16793, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast Drain Blow'),
 (10435, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16794, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Death - Cast Transformation'),
-(10435, 0, 5, 6, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Gameobject ID 175377: Set gameobject state to ready'),
-(10435, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Gameobject ID 175372: Set gameobject state to ready'),
-(10435, 0, 7, 8, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Gameobject with guid 11165: Set gameobject state to active'),
-(10435, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Gameobject with guid 6852: Set gameobject state to active'),
-(10435, 0, 9, 10, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Gameobject with guid 11165 : Set gameobject state to active'),
-(10435, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Gameobject with guid 6852: Set gameobject state to active');
+(10435, 0, 5, 6, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Aggro - Gameobject ID 175377: Set gameobject state to ready'),
+(10435, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Aggro - Gameobject ID 175372: Set gameobject state to ready'),
+(10435, 0, 7, 8, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Aeath - Gameobject with guid 11165: Set gameobject state to active'),
+(10435, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Death - Gameobject with guid 6852: Set gameobject state to active'),
+(10435, 0, 9, 10, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Reset - Gameobject with guid 11165 : Set gameobject state to active'),
+(10435, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Reset - Gameobject with guid 6852: Set gameobject state to active');
 
 
 
@@ -58,21 +58,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10416;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10416) AND (`source_type` = 0) AND (`id` IN (4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - AGGRO - Close Door');
+(10416, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Bile Spewer - On Aggro - Close Door');
 
 
 -- venom belcher
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10417;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10417) AND (`source_type` = 0) AND (`id` IN (2));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10417, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Venom Belcher - Aggr - Close door');
+(10417, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Venom Belcher - On Aggro - Close door');
 
 
 -- baron Rivendare
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10440;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10440) AND (`source_type` = 0) AND (`id` IN (20));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10440, 0, 20, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6908, 0, 0, 0, 0, 0, 0, 0, 'Baron Ricendare - Aggro - Open Door');
+(10440, 0, 20, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6911, 0, 0, 0, 0, 0, 0, 0, 'baron Rivendare - On Aggro - Open Door');
 
 -- say --
 -- Magistrate Barthilas
