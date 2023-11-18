@@ -20217,7 +20217,6 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
         SendTeleportPacket(pos);
         UpdatePosition(x, y, z, orientation, true);
         UpdateObjectVisibility();
-        GetMotionMaster()->ReinitializeMovement();
     }
 }
 
