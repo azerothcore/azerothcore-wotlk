@@ -295,14 +295,14 @@ public:
      * @brief Teleports the GM to the specified world coordinates, optionally specifying map ID and orientation.
      *
      * @param handler The ChatHandler that is handling the command.
-     * @param inputCoords The coordinates to teleport to in format "x y z [mapId [orientation]]".
+     * @param args The coordinates to teleport to in format "x y z [mapId [orientation]]".
      * @return true The command was successful.
      * @return false The command was unsuccessful (show error or syntax)
      */
-    static bool HandleGoXYZCommand(ChatHandler* handler, Tail inputCoords)
+    static bool HandleGoXYZCommand(ChatHandler* handler, Tail args)
     {
         std::wstring wInputCoords;
-        if (!Utf8toWStr(inputCoords, wInputCoords))
+        if (!Utf8toWStr(args, wInputCoords))
         {
             return false;
         }
