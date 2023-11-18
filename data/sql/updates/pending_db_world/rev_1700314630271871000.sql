@@ -1,30 +1,5 @@
 -- Update remaining gameobjects 'Alliance Bonfire' with sniffed values
-DELETE FROM `gameobject` WHERE (`id` = 187922) AND (`guid` = 76308);
-DELETE FROM `gameobject` WHERE (`id` = 187924) AND (`guid` = 76335);
-DELETE FROM `gameobject` WHERE (`id` = 187925) AND (`guid` = 76311);
-DELETE FROM `gameobject` WHERE (`id` = 187926) AND (`guid` = 76303);
-DELETE FROM `gameobject` WHERE (`id` = 187927) AND (`guid` = 76330);
-DELETE FROM `gameobject` WHERE (`id` = 187928) AND (`guid` = 76307);
-DELETE FROM `gameobject` WHERE (`id` = 187929) AND (`guid` = 76329);
-DELETE FROM `gameobject` WHERE (`id` = 187930) AND (`guid` = 76352);
-DELETE FROM `gameobject` WHERE (`id` = 187935) AND (`guid` = 76345);
-DELETE FROM `gameobject` WHERE (`id` = 187938) AND (`guid` = 76319);
-DELETE FROM `gameobject` WHERE (`id` = 187939) AND (`guid` = 76321);
-DELETE FROM `gameobject` WHERE (`id` = 187940) AND (`guid` = 76313);
-DELETE FROM `gameobject` WHERE (`id` = 187941) AND (`guid` = 76354);
-DELETE FROM `gameobject` WHERE (`id` = 187942) AND (`guid` = 76359);
-DELETE FROM `gameobject` WHERE (`id` = 187943) AND (`guid` = 76326);
-DELETE FROM `gameobject` WHERE (`id` = 187944) AND (`guid` = 76301);
-DELETE FROM `gameobject` WHERE (`id` = 187945) AND (`guid` = 76323);
-DELETE FROM `gameobject` WHERE (`id` = 187946) AND (`guid` = 76342);
-DELETE FROM `gameobject` WHERE (`id` = 194032) AND (`guid` = 76368);
-DELETE FROM `gameobject` WHERE (`id` = 194035) AND (`guid` = 76372);
-DELETE FROM `gameobject` WHERE (`id` = 194036) AND (`guid` = 76367);
-DELETE FROM `gameobject` WHERE (`id` = 194038) AND (`guid` = 76362);
-DELETE FROM `gameobject` WHERE (`id` = 194040) AND (`guid` = 76365);
-DELETE FROM `gameobject` WHERE (`id` = 194044) AND (`guid` = 76376);
-DELETE FROM `gameobject` WHERE (`id` = 194045) AND (`guid` = 76370);
-DELETE FROM `gameobject` WHERE (`id` = 194049) AND (`guid` = 76375);
+DELETE FROM `gameobject` WHERE (`id` IN (187922, 187924, 187925, 187926, 187927, 187928, 187929, 187930, 187935, 187938, 187939, 187940, 187941, 187942, 187943, 187944, 187945, 187946, 194032, 194035, 194036, 194038, 194040, 194044, 194045, 194049)) AND (`guid` IN (76308, 76335, 76311, 76303, 76330, 76307, 76329, 76352, 76345, 76319, 76321, 76313, 76354, 76359, 76326, 76301, 76323, 76342, 76368, 76372, 76367, 76362, 76365, 76376, 76370, 76375));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (76301, 187944, 0, 0, 0, 1, 1, -14288.125, 61.80620574951171875, 0.688359975814819335, 1.378809213638305664, 0, 0, 0.636077880859375, 0.771624863147735595, 120, 255, 1, "", 50063, NULL),
 (76303, 187926, 0, 0, 0, 1, 1, -10704.7568359375, -1146.3802490234375, 24.79087257385253906, 2.094393253326416015, 0, 0, 0.866024971008300781, 0.50000077486038208, 120, 255, 1, "", 50063, NULL),
