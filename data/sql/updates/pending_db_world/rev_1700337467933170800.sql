@@ -7,5 +7,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (12396, 0, 1, 0, 0, 0, 100, 0, 12000, 15000, 20000, 25000, 0, 0, 11, 16727, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - In Combat - Cast \'War Stomp\''),
 (12396, 0, 2, 0, 0, 0, 100, 0, 2000, 4000, 25000, 32000, 0, 0, 11, 20812, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - In Combat - Cast \'Cripple\''),
 (12396, 0, 3, 0, 0, 0, 100, 0, 7000, 14000, 17000, 22000, 0, 0, 11, 15090, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - In Combat - Cast \'Dispel Magic\''),
-(12396, 0, 4, 5, 8, 0, 100, 512, 23019, 0, 0, 0, 0, 0, 50, 179644, 180, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - On Spellhit \'Crystal Prison Dummy DND\' - Summon Gameobject \'Imprisoned Doomguard\''),
-(12396, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - On Spellhit \'Crystal Prison Dummy DND\' - Despawn Instant');
+(12396, 0, 4, 5, 8, 0, 100, 0, 23019, 0, 0, 0, 0, 0, 50, 179644, 180, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - On Spellhit \'Crystal Prison Dummy DND\' - Summon Gameobject \'Imprisoned Doomguard\''),
+(12396, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doomguard Commander - On Spellhit \'Crystal Prison Dummy DND\' - Despawn Instant');
