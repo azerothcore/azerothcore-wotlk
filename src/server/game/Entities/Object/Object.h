@@ -379,14 +379,23 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject()  = default;
+    MovableMapObject() : _moveState(MAP_OBJECT_CELL_MOVE_NONE)
+    {
+        _newPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+    }
 
 private:
+    Cell _currentCell;
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
-    Cell _currentCell;
-    MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
+    MapObjectCellMoveState _moveState;
+    Position _newPosition;
+    void SetNewCellPosition(float x, float y, float z, float o)
+    {
+        _moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+        _newPosition.Relocate(x, y, z, o);
+    }
 };
 
 class WorldObject : public Object, public WorldLocation

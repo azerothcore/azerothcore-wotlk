@@ -417,7 +417,6 @@ void Player::Update(uint32 p_time)
     {
         bRequestForcedVisibilityUpdate = false;
         UpdateObjectVisibility(true, true);
-        m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
 }
@@ -1550,20 +1549,10 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
         m_seer = this;
     }
 
-    Acore::VisibleNotifier notifierNoLarge(
-        *this, mapChange,
-        false); // visit only objects which are not large; default distance
-    Cell::VisitAllObjects(m_seer, notifierNoLarge,
-                          GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-    notifierNoLarge.SendToSelf();
-
-    Acore::VisibleNotifier notifierLarge(
-        *this, mapChange, true); // visit only large objects; maximum distance
-    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
-    notifierLarge.SendToSelf();
-
-    if (mapChange)
-        m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+    // updates visibility of all objects around point of view for current player
+    Acore::VisibleNotifier notifier(*this, mapChange);
+    Cell::VisitAllObjects(m_seer, notifier, GetSightRange());
+    notifier.SendToSelf();   // send gathered data
 }
 
 void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
@@ -1574,9 +1563,9 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
-    else if (!isBeingLoaded())
+    else
     {
-        if (!fromUpdate) // pussywizard:
+        if (!isBeingLoaded() && !fromUpdate) // pussywizard:
         {
             bRequestForcedVisibilityUpdate = true;
             return;
