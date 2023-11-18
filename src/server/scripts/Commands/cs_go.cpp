@@ -307,46 +307,45 @@ public:
             return false;
         }
 
-        // split args by space
-        std::vector<std::wstring> delimitedValues;
-        boost::split(delimitedValues, wInputCoords, boost::is_any_of(L" "));
-
-        if (delimitedValues.size() < 2)
+        // extract float and integer values from the input
+        std::vector<float> locationValues;
+        std::wregex floatRegex(L"(-?\\d+(?:\\.\\d+)?)");
+        std::wsregex_iterator floatRegexIterator(wInputCoords.begin(), wInputCoords.end(), floatRegex);
+        std::wsregex_iterator end;
+        while (floatRegexIterator != end)
         {
-            return false;
-        }
+            std::wsmatch match = *floatRegexIterator;
+            std::wstring matchStr = match.str();
 
-        // create a new vector of floats that only contains args that look like floats (or integer for mapId)
-        std::vector<float> floatValues;
-        for (const std::wstring& value : delimitedValues)
-        {
-            std::wsmatch match;
-            if (std::regex_match(value, match, std::wregex(L"(^\\-?[0-9]*[\\.]?[0-9]*$)")))
+            // try to convert the match to a float
+            try
             {
-                if (std::stof(value)) // ensures that the leading `.` doesn't get put into the vector
-                {
-                    floatValues.push_back(std::stof(value));
-                }
+                locationValues.push_back(std::stof(matchStr));
             }
+            // if the match is not a float, do not add it to the vector
+            catch (std::invalid_argument const&){}
+
+            ++floatRegexIterator;
         }
 
-        if (floatValues.size() < 2)
+        // X and Y are required
+        if (locationValues.size() < 2)
         {
             return false;
         }
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        uint32 mapId = floatValues.size() >= 4 ? uint32(floatValues[3]) : player->GetMapId();
+        uint32 mapId = locationValues.size() >= 4 ? uint32(locationValues[3]) : player->GetMapId();
         Map const* map = sMapMgr->CreateBaseMap(mapId);
 
-        float x = floatValues[0];
-        float y = floatValues[1];
-        float z = floatValues.size() >= 3 ? floatValues[2] : std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
-        // map ID (floatValues[3]) already handled above
-        float o = floatValues.size() >= 5 ? floatValues[4] : 0.0f;
+        float x = locationValues[0];
+        float y = locationValues[1];
+        float z = locationValues.size() >= 3 ? locationValues[2] : std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
+        // map ID (locationValues[3]) already handled above
+        float o = locationValues.size() >= 5 ? locationValues[4] : 0.0f;
 
-        if (!MapMgr::IsValidMapCoord(mapId, x, y))
+        if (!MapMgr::IsValidMapCoord(mapId, x, y, z, o))
         {
             handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
             handler->SetSentErrorMessage(true);
