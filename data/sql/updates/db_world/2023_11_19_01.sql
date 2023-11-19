@@ -1,3 +1,4 @@
+-- DB update 2023_11_19_00 -> 2023_11_19_01
 -- Doomguard Commander
 DELETE FROM `spell_script_names` WHERE `spell_id`=23019;
 
