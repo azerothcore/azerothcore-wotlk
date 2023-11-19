@@ -68,7 +68,7 @@ public:
         }
 
         guildName = guild_commandscript::_RemoveQuotes(guildName);
-        
+
         if (guildName.empty())
         {
             return false;
@@ -114,7 +114,7 @@ public:
     static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
     {
         guildName = guild_commandscript::_RemoveQuotes(guildName);
-        
+
         if (guildName.empty())
         {
             return false;
@@ -143,7 +143,7 @@ public:
         }
 
         guildName = guild_commandscript::_RemoveQuotes(guildName);
-        
+
         if (guildName.empty())
         {
             return false;
