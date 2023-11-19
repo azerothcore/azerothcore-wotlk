@@ -50,7 +50,7 @@ static const Position aGateTrap[] =
 };
 
 Position const MindlessUndeadPos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
-Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 0.2521562f };
+Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 2.478367567062377929f };
 Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
 
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
