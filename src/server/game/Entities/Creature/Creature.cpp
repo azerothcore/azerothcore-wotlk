@@ -3736,6 +3736,15 @@ bool Creature::CanCastSpell(uint32 spellID) const
     return true;
 }
 
+ObjectGuid Creature::GetSummonerGUID() const
+{
+    if (TempSummon const* temp = ToTempSummon())
+        return temp->GetSummonerGUID();
+
+    LOG_DEBUG("entities.unit", "Creature::GetSummonerGUID() called by creature that is not a summon. Creature: {} ({})", GetEntry(), GetName());
+    return ObjectGuid::Empty;
+}
+
 std::string Creature::GetDebugInfo() const
 {
     std::stringstream sstr;
