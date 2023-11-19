@@ -3736,6 +3736,14 @@ bool Creature::CanCastSpell(uint32 spellID) const
     return true;
 }
 
+ObjectGuid Creature::GetSummonerGUID() const
+{
+    if (TempSummon const* temp = ToTempSummon())
+        return temp->GetSummonerGUID();
+
+    return ObjectGuid::Empty;
+}
+
 std::string Creature::GetDebugInfo() const
 {
     std::stringstream sstr;

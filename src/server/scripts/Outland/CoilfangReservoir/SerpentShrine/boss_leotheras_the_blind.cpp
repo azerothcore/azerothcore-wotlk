@@ -248,7 +248,7 @@ struct npc_inner_demon : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, SummonerGUID()))
+        if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, me->GetSummonerGUID()))
         {
             affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
@@ -256,7 +256,7 @@ struct npc_inner_demon : public ScriptedAI
 
     bool CanReceiveDamage(Unit* attacker)
     {
-        return attacker && attacker->GetGUID() == SummonerGUID();
+        return attacker && attacker->GetGUID() == me->GetSummonerGUID();
     }
 
     void OnCalculateMeleeDamageReceived(uint32& damage, Unit* attacker) override
@@ -285,15 +285,7 @@ struct npc_inner_demon : public ScriptedAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        return who->GetGUID() == SummonerGUID();
-    }
-
-    ObjectGuid SummonerGUID() const 
-    {
-        if (TempSummon* temp = me->ToTempSummon())
-            return temp->GetSummonerGUID();
-
-        return ObjectGuid::Empty;
+        return who->GetGUID() == me->GetSummonerGUID();
     }
 
     void UpdateAI(uint32 diff) override
