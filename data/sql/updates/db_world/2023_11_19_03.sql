@@ -1,3 +1,4 @@
+-- DB update 2023_11_19_02 -> 2023_11_19_03
 -- Update gameobject 181021 'Hanging, Door - Val' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 181021) AND (`guid` IN (50650, 50651, 50652, 50653, 50654, 50655, 50656, 50657, 50658, 50659, 50660, 50661, 50662, 50663, 50664, 50665, 50666, 50667, 50668, 50669, 50670, 50671, 50672, 50673, 50674));

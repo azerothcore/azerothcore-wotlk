@@ -1,3 +1,4 @@
+-- DB update 2023_11_19_03 -> 2023_11_19_04
 -- Update gameobject 181300 'Standing, Large - MFF' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 181300) AND (`guid` IN (17171, 17176, 28161, 28168));
