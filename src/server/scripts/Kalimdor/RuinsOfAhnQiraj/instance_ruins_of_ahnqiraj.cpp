@@ -102,7 +102,12 @@ public:
 
                 if (!anyPlayerInCombat && !_andorovGUID)
                 {
-                    player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                    instance->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
+                    Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                    if (creature)
+                    {
+                        creature->setActive(true);
+                    }
                 }
             }
         }
