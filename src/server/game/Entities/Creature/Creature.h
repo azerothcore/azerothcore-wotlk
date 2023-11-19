@@ -411,7 +411,7 @@ public:
     * @brief Helper to get the creature's summoner GUID, if it is a summon
     *
     * */
-    ObjectGuid GetSummonerGUID() const;
+    [[nodiscard]] ObjectGuid GetSummonerGUID() const;
 
     std::string GetDebugInfo() const override;
 
