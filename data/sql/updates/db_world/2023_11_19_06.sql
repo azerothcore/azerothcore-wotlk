@@ -1,3 +1,4 @@
+-- DB update 2023_11_19_05 -> 2023_11_19_06
 -- Update `.go xyz` syntax
 DELETE FROM `command` WHERE `name`='go xyz';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
