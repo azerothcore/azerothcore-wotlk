@@ -12,9 +12,10 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Here you can use Number: 838 to calculate the path
 -- Number: 838 WayPoints[0] and WayPoints[1]
-//Position: X: 3674.6128 Y: -3610.5562 Z: 137.76337 Recalculate the route
+-- Position: X: 3674.6128 Y: -3610.5562 Z: 137.76337 Recalculate the route
 (104350, 6, 3678.456,-3608.3418,138.1705, NULL, 0, 1, 0, 100, 0),
 (104350, 7, 3684.206,-3605.5918,138.4205, NULL, 0, 1, 0, 100, 0),
+
 -- Number: 820 of 6 and 7 still need to be kept?
 -- (104350, 6, 3684.042,-3605.555,138.17798, NULL, 0, 1, 0, 100, 0),
 -- (104350, 7, 3684.3516,-3605.4714,137.87234, NULL, 0, 1, 0, 100, 0),
