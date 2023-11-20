@@ -82,32 +82,15 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
+            if (GetBossState(DATA_KURINNAXX) == DONE &&
+                GetBossState(DATA_RAJAXX) != DONE &&
+                _rajaxWaveCounter == 0 &&                       // if non-zero, encounter is in progress
+                !_andorovGUID)                                  // cleared if he is dead
             {
-                Map::PlayerList const &playerList = instance->GetPlayers();
-
-                if (playerList.IsEmpty())
-                    return;
-
-                bool anyPlayerInCombat = false;
-                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                instance->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
+                if (Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
-                    Player* player = itr->GetSource();
-                    if (player && player->IsInCombat())
-                    {
-                        anyPlayerInCombat = true;
-                        break;
-                    }
-                }
-
-                if (!anyPlayerInCombat && !_andorovGUID)
-                {
-                    instance->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
-                    Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
-                    if (creature)
-                    {
-                        creature->setActive(true);
-                    }
+                    creature->setActive(true);
                 }
             }
         }

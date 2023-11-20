@@ -86,8 +86,7 @@ struct boss_kurinnaxx : public BossAI
 
             if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
-                if (creature)
+                if (Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
                     creature->setActive(true);
                 }
