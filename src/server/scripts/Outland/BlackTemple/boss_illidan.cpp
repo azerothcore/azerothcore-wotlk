@@ -137,10 +137,7 @@ enum Misc
 
 enum Events
 {
-    EVENT_SPELL_FLAME_CRASH             = 1,
     EVENT_SPELL_BERSERK                 = 2,
-    EVENT_SPELL_DRAW_SOUL               = 3,
-    EVENT_SPELL_PARASITIC_SHADOWFIEND   = 4,
     EVENT_SPELL_AGONIZING_FLAMES        = 5,
     EVENT_SPELL_FRENZY                  = 6,
 
@@ -207,6 +204,12 @@ const Position airHoverPos[MAX_EYE_BEAM_POS] =
     {656.86f, 344.07f, 356.0f, 0.0f}
 };
 
+enum Phases
+{
+    PHASE_ONE = 1,
+    PHASE_TWO = 2
+};
+
 class boss_illidan_stormrage : public CreatureScript
 {
 public:
@@ -214,9 +217,7 @@ public:
 
     struct boss_illidan_stormrageAI : public BossAI
     {
-        boss_illidan_stormrageAI(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE)
-        {
-        }
+        boss_illidan_stormrageAI(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE) { }
 
         EventMap events2;
         uint8 beamPosId;
@@ -230,6 +231,27 @@ public:
             me->LoadEquipment(0, true);
             me->SetImmuneToAll(true);
             beamPosId = urand(0, 3);
+        }
+
+        void ScheduleTasks(uint8 phase)
+        {
+            switch (phase)
+            {
+                case PHASE_ONE:
+                    scheduler.Schedule(15s, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_FLAME_CRASH);
+                        context.Repeat(25s);
+                    }).Schedule(30s, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_DRAW_SOUL);
+                        context.Repeat(40s);
+                    }).Schedule(20s, [this](TaskContext context)
+                    {
+                        DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND);
+                        context.Repeat(30s);
+                    });
+            }
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -308,9 +330,6 @@ public:
 
         void ScheduleNormalEvents(uint8 phase)
         {
-            events.ScheduleEvent(EVENT_SPELL_FLAME_CRASH, 15000);
-            events.ScheduleEvent(EVENT_SPELL_DRAW_SOUL, 30000);
-            events.ScheduleEvent(EVENT_SPELL_PARASITIC_SHADOWFIEND, 20000);
             events.ScheduleEvent(EVENT_SAY_TAUNT, 40000);
             if (phase >= 3)
             {
@@ -486,19 +505,9 @@ public:
                     Talk(SAY_ILLIDAN_ENRAGE);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case EVENT_SPELL_FLAME_CRASH:
-                    me->CastSpell(me->GetVictim(), SPELL_FLAME_CRASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_FLAME_CRASH, 25000);
-                    break;
-                case EVENT_SPELL_DRAW_SOUL:
-                    me->CastSpell(me->GetVictim(), SPELL_DRAW_SOUL, false);
-                    events.ScheduleEvent(EVENT_SPELL_DRAW_SOUL, 40000);
-                    break;
-                case EVENT_SPELL_PARASITIC_SHADOWFIEND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        me->CastSpell(target, SPELL_PARASITIC_SHADOWFIEND, false);
-                    events.ScheduleEvent(EVENT_SPELL_PARASITIC_SHADOWFIEND, 30000);
-                    break;
+
+
+
                 case EVENT_SAY_TAUNT:
                     Talk(SAY_ILLIDAN_TAUNT);
                     events.ScheduleEvent(EVENT_SAY_TAUNT, urand(30000, 60000));
