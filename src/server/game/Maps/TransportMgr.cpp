@@ -461,13 +461,14 @@ void TransportMgr::SpawnContinentTransports()
                 float x = fields[1].Get<float>();
                 float y = fields[2].Get<float>();
 
-                MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-                if (mapEntry && !mapEntry->Instanceable())
-                    if (Map* map = sMapMgr->CreateBaseMap(mapId))
+                sMapMgr->DoForAllMapsWithMapId(mapId, [x, y, &count](Map* map)
                     {
-                        map->LoadGrid(x, y);
-                        ++count;
-                    }
+                        if (!map->Instanceable())
+                        {
+                            map->LoadGrid(x, y);
+                            ++count;
+                        }
+                    });
             } while (result2->NextRow());
         }
 

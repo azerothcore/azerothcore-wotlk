@@ -459,14 +459,13 @@ void Map::EnsureGridCreated_i(const GridCoord& p)
     if (!getNGrid(p.x_coord, p.y_coord))
     {
         LOG_DEBUG("maps", "Creating grid[{}, {}] for map {} instance {}", p.x_coord, p.y_coord, GetId(), i_InstanceId);
-
-        NGridType* ngrid = new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord, i_gridExpiry, sWorld->getBoolConfig(CONFIG_GRID_UNLOAD));
-        setNGrid(ngrid, p.x_coord, p.y_coord);
+        // pussywizard: moved setNGrid to the end of the function
+        NGridType* ngt = new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord, i_gridExpiry, sWorld->getBoolConfig(CONFIG_GRID_UNLOAD));
 
         // build a linkage between this map and NGridType
-        buildNGridLinkage(getNGrid(p.x_coord, p.y_coord));
+        buildNGridLinkage(ngt); // pussywizard: getNGrid(x, y) changed to: ngt
 
-        getNGrid(p.x_coord, p.y_coord)->SetGridState(GRID_STATE_IDLE);
+        ngt->SetGridState(GRID_STATE_IDLE);
 
         //z coord
         int gx = (MAX_NUMBER_OF_GRIDS - 1) - p.x_coord;
@@ -476,6 +475,9 @@ void Map::EnsureGridCreated_i(const GridCoord& p)
         {
             LoadMapAndVMap(gx, gy);
         }
+
+        // pussywizard: moved here
+        setNGrid(ngt, p.x_coord, p.y_coord);
     }
 }
 
