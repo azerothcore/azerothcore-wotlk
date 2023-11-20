@@ -318,7 +318,7 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timer, std::function<void()> ex
         return;
     }
 
-    scheduler.Schedule(timer, [this, exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timer, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 
