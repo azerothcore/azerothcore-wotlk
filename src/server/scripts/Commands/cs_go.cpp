@@ -31,6 +31,9 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "TicketMgr.h"
 
+#include <regex>
+#include "boost/algorithm/string.hpp"
+
 using namespace Acore::ChatCommands;
 
 class go_commandscript : public CommandScript
@@ -288,34 +291,68 @@ public:
         return true;
     }
 
-    //teleport at coordinates, including Z and orientation
-    static bool HandleGoXYZCommand(ChatHandler* handler, float x, float y, Optional<float> z, Optional<uint32> id, Optional<float> o)
+    /**
+     * @brief Teleports the GM to the specified world coordinates, optionally specifying map ID and orientation.
+     *
+     * @param handler The ChatHandler that is handling the command.
+     * @param args The coordinates to teleport to in format "x y z [mapId [orientation]]".
+     * @return true The command was successful.
+     * @return false The command was unsuccessful (show error or syntax)
+     */
+    static bool HandleGoXYZCommand(ChatHandler* handler, Tail args)
     {
+        std::wstring wInputCoords;
+        if (!Utf8toWStr(args, wInputCoords))
+        {
+            return false;
+        }
+
+        // extract float and integer values from the input
+        std::vector<float> locationValues;
+        std::wregex floatRegex(L"(-?\\d+(?:\\.\\d+)?)");
+        std::wsregex_iterator floatRegexIterator(wInputCoords.begin(), wInputCoords.end(), floatRegex);
+        std::wsregex_iterator end;
+        while (floatRegexIterator != end)
+        {
+            std::wsmatch match = *floatRegexIterator;
+            std::wstring matchStr = match.str();
+
+            // try to convert the match to a float
+            try
+            {
+                locationValues.push_back(std::stof(matchStr));
+            }
+            // if the match is not a float, do not add it to the vector
+            catch (std::invalid_argument const&){}
+
+            ++floatRegexIterator;
+        }
+
+        // X and Y are required
+        if (locationValues.size() < 2)
+        {
+            return false;
+        }
+
         Player* player = handler->GetSession()->GetPlayer();
-        uint32 mapId = id.value_or(player->GetMapId());
 
-        if (z)
+        uint32 mapId = locationValues.size() >= 4 ? uint32(locationValues[3]) : player->GetMapId();
+        Map const* map = sMapMgr->CreateBaseMap(mapId);
+
+        float x = locationValues[0];
+        float y = locationValues[1];
+        float z = locationValues.size() >= 3 ? locationValues[2] : std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
+        // map ID (locationValues[3]) already handled above
+        float o = locationValues.size() >= 5 ? locationValues[4] : player->GetOrientation();
+
+        if (!MapMgr::IsValidMapCoord(mapId, x, y, z, o))
         {
-            if (!MapMgr::IsValidMapCoord(mapId, x, y, *z))
-            {
-                handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-        }
-        else
-        {
-            if (!MapMgr::IsValidMapCoord(mapId, x, y))
-            {
-                handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-            Map const* map = sMapMgr->CreateBaseMap(mapId);
-            z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
+            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
-        return DoTeleport(handler, { x, y, *z, o.value_or(0.0f) }, mapId);
+        return DoTeleport(handler, { x, y, z, o }, mapId);
     }
 
     static bool HandleGoTicketCommand(ChatHandler* handler, uint32 ticketId)

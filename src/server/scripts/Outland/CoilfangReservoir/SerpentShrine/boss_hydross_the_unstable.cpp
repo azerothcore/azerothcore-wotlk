@@ -36,6 +36,8 @@ enum Spells
     SPELL_CLEANSING_FIELD       = 37934,
     SPELL_BLUE_BEAM             = 38015,
     SPELL_ELEMENTAL_SPAWNIN     = 25035,
+    SPELL_PURIFY_ELEMENTAL      = 36461,
+    SPELL_SUMMON_ELEMENTAL      = 36459,
 
     SPELL_SUMMON_CORRUPTED1     = 38188,
     SPELL_SUMMON_CORRUPTED2     = 38189,
@@ -68,24 +70,36 @@ enum Spells
 enum Misc
 {
     GROUP_ABILITIES                 = 1,
+    GROUP_OOC_PURIFY_ELEMENTALS     = 2,
+
+    NPC_PURIFIED_WATER_ELEMENTAL    = 21260,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
+    NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253
+};
+
+enum WaterElementalPathIds
+{
+    PATH_CENTER                     = 5,
+    PATH_END                        = 12
 };
 
 struct boss_hydross_the_unstable : public BossAI
 {
-    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE), _recentlySpoken(false) { }
 
     void Reset() override
     {
-        BossAI::Reset();
-
+        _Reset();
         _recentlySpoken = false;
+        SummonTaintedElementalOOC();
+    }
+
+    void SummonTaintedElementalOOC()
+    {
+        me->m_Events.AddEventAtOffset([this] {
+            DoCastAOE(SPELL_SUMMON_ELEMENTAL);
+            SummonTaintedElementalOOC();
+        }, 12s, 12s, GROUP_OOC_PURIFY_ELEMENTALS);
     }
 
     void JustReachedHome() override
@@ -94,6 +108,27 @@ struct boss_hydross_the_unstable : public BossAI
         if (!me->HasAura(SPELL_BLUE_BEAM))
         {
             me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
+        }
+    }
+
+    void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
+    {
+        if (movementType == WAYPOINT_MOTION_TYPE)
+        {
+            if (pathId == PATH_CENTER)
+            {
+                summon->SetFacingToObject(me);
+                DoCast(summon, SPELL_PURIFY_ELEMENTAL);
+
+                // Happens even if Hydross is dead, so completely detached to the spell, which is nothing but a dummy anyways.
+                summon->m_Events.AddEventAtOffset([summon] {
+                    summon->UpdateEntry(NPC_PURIFIED_WATER_ELEMENTAL);
+                }, 1s);
+            }
+            else if (pathId == PATH_END)
+            {
+                summon->DespawnOrUnsummon();
+            }
         }
     }
 
@@ -193,6 +228,7 @@ struct boss_hydross_the_unstable : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         SetForm(false, true);
+        me->m_Events.CancelEventGroup(GROUP_OOC_PURIFY_ELEMENTALS);
 
         scheduler.Schedule(1s, [this](TaskContext context)
         {
@@ -222,13 +258,18 @@ struct boss_hydross_the_unstable : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        BossAI::JustSummoned(summon);
+
         summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
-        summon->SetInCombatWithZone();
 
         if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
         {
             summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+        }
+        else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
+        {
+            summon->SetOwnerGUID(me->GetGUID());
+            summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
         }
         else
         {
