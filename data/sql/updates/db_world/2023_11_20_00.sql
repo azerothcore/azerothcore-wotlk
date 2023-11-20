@@ -1,3 +1,4 @@
+-- DB update 2023_11_19_06 -> 2023_11_20_00
 UPDATE `quest_template_addon` SET `SpecialFlags` = 2 WHERE (`ID` = 4964);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 6266;
