@@ -355,6 +355,7 @@ struct ScriptedAI : public CreatureAI
 
     bool IsUniqueTimedEventDone(uint32 id) const { return _uniqueTimedEvents.find(id) != _uniqueTimedEvents.end(); }
     void SetUniqueTimedEventDone(uint32 id) { _uniqueTimedEvents.insert(id); }
+    void ResetUniqueTimedEvent(uint32 id) { _uniqueTimedEvents.erase(id); }
     void ClearUniqueTimedEventsDone() { _uniqueTimedEvents.clear(); }
     void ScheduleTimedEvent(Milliseconds timer, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0);
 
