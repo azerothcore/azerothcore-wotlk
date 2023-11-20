@@ -2102,8 +2102,10 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 
     if (forceRespawnTimer > Seconds::zero())
     {
-        m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
-        m_respawnDelay = forceRespawnTimer.count();
+        if (GetMap())
+        {
+            GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
+        }
     }
 }
 
