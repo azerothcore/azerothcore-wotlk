@@ -8,6 +8,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 UPDATE `gameobject_template` SET  `ScriptName` = '' WHERE `entry` = 176195;
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 5151;
+DELETE FROM `spell_script_names` WHERE `spell_id` = 17176;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(5151, 'spell_panther_cage_key');
+(17176, 'spell_panther_cage_key');
+
