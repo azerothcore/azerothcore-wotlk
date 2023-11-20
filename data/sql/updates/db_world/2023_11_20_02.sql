@@ -1,3 +1,4 @@
+-- DB update 2023_11_20_01 -> 2023_11_20_02
 --
 DELETE FROM `spell_target_position` WHERE `id` = 36459;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
