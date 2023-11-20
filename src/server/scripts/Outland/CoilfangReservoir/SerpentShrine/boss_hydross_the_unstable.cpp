@@ -119,6 +119,11 @@ struct boss_hydross_the_unstable : public BossAI
             {
                 summon->SetFacingToObject(me);
                 DoCast(summon, SPELL_PURIFY_ELEMENTAL);
+
+                // Happens even if Hydross is dead, so completely detached to the spell, which is nothing but a dummy anyways.
+                summon->m_Events.AddEventAtOffset([summon] {
+                    summon->UpdateEntry(NPC_PURIFIED_WATER_ELEMENTAL);
+                }, 1s);
             }
             else if (pathId == PATH_END)
             {
@@ -249,14 +254,6 @@ struct boss_hydross_the_unstable : public BossAI
         {
             _recentlySpoken = false;
         });
-    }
-
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_PURIFY_ELEMENTAL && target->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
-        {
-            target->ToCreature()->UpdateEntry(NPC_PURIFIED_WATER_ELEMENTAL);
-        }
     }
 
     void JustSummoned(Creature* summon) override
