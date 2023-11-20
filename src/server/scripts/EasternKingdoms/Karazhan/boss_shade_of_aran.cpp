@@ -22,8 +22,8 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "karazhan.h"
 #include "TaskScheduler.h"
+#include "karazhan.h"
 
 enum Texts
 {

@@ -16,9 +16,9 @@
  */
 
 #include "WardenPayloadMgr.h"
-#include "StringFormat.h"
 #include "Errors.h"
 #include "Log.h"
+#include "StringFormat.h"
 
 WardenPayloadMgr::WardenPayloadMgr() { }
 

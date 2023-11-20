@@ -364,6 +364,13 @@ public:
     // Called when the unit heals
     virtual void HealDone(Unit* /*done_to*/, uint32& /*addhealth*/) {}
 
+    // Called during damage calculations
+    virtual void OnCalculateMeleeDamageReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
+    virtual void OnCalculateSpellDamageReceived(int32& /*damage*/, Unit* /*attacker*/) {}
+
+    // Called during calculation when receiving periodic healing or damage (DoT or HoT)
+    virtual void OnCalculatePeriodicTickReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
+
     void AttackStartCaster(Unit* victim, float dist);
 
     SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
