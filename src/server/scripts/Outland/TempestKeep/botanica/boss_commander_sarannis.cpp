@@ -62,7 +62,7 @@ struct boss_commander_sarannis : public BossAI
             ScheduleReinforcements();
         }
 
-        ScheduleTimedAction(20s, [&] {
+        ScheduleTimedEvent(20s, [&] {
             if (roll_chance_i(50))
             {
                 Talk(SAY_ARCANE_RESONANCE);
@@ -70,7 +70,7 @@ struct boss_commander_sarannis : public BossAI
             DoCastVictim(SPELL_ARCANE_RESONANCE);
         }, 27s);
 
-        ScheduleTimedAction(10s, [&] {
+        ScheduleTimedEvent(10s, [&] {
             if (roll_chance_i(50))
             {
                 Talk(SAY_ARCANE_DEVASTATION);
