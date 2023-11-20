@@ -23,3 +23,5 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,12,-142.09798,-404.16937,0.4633386,0,0,0,0,100,0),
 (@PATH,13,-146.7672,-423.9643,1.0743836,0,0,0,0,100,0);
 
+DELETE FROM `creature_addon` WHERE `guid` IN (81027, 82865, 82967, 93788);
+DELETE FROM `linked_respawn` WHERE `guid` IN (81027, 82865, 82967, 93788);
