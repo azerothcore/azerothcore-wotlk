@@ -313,7 +313,7 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY
 
 void ScriptedAI::ScheduleTimedEvent(Milliseconds timer, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax, uint32 uniqueId)
 {
-    if (uniqueId && IsUniqueTimedActionDone(uniqueId))
+    if (uniqueId && IsUniqueTimedEventDone(uniqueId))
     {
         return;
     }
@@ -330,7 +330,7 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timer, std::function<void()> ex
 
     if (uniqueId)
     {
-        SetUniqueTimedActionDone(uniqueId);
+        SetUniqueTimedEventDone(uniqueId);
     }
 }
 
