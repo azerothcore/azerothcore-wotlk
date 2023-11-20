@@ -250,101 +250,68 @@ private:
     bool _recentlySpoken;
 };
 
-class spell_hydross_cleansing_field_aura : public SpellScriptLoader
+class spell_hydross_cleansing_field_aura : public AuraScript
 {
-public:
-    spell_hydross_cleansing_field_aura() : SpellScriptLoader("spell_hydross_cleansing_field_aura") { }
+    PrepareAuraScript(spell_hydross_cleansing_field_aura);
 
-    class spell_hydross_cleansing_field_aura_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_cleansing_field_aura_AuraScript)
+        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-        }
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hydross_cleansing_field_aura_AuraScript();
+        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_hydross_cleansing_field_command : public SpellScriptLoader
+class spell_hydross_cleansing_field_command : public AuraScript
 {
-public:
-    spell_hydross_cleansing_field_command() : SpellScriptLoader("spell_hydross_cleansing_field_command") { }
+    PrepareAuraScript(spell_hydross_cleansing_field_command);
 
-    class spell_hydross_cleansing_field_command_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_cleansing_field_command_AuraScript)
+        if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
+            GetTarget()->InterruptNonMeleeSpells(false);
+        else
+            GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
-                GetTarget()->InterruptNonMeleeSpells(false);
-            else
-                GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hydross_cleansing_field_command_AuraScript();
+        AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_hydross_mark_of_hydross : public SpellScriptLoader
+class spell_hydross_mark_of_hydross : public AuraScript
 {
-public:
-    spell_hydross_mark_of_hydross() : SpellScriptLoader("spell_hydross_mark_of_hydross") { }
+    PrepareAuraScript(spell_hydross_mark_of_hydross);
 
-    class spell_hydross_mark_of_hydross_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_mark_of_hydross_AuraScript)
+        GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hydross_mark_of_hydross_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_hydross_the_unstable()
 {
     RegisterSerpentShrineAI(boss_hydross_the_unstable);
-    new spell_hydross_cleansing_field_aura();
-    new spell_hydross_cleansing_field_command();
-    new spell_hydross_mark_of_hydross();
+    RegisterSpellScript(spell_hydross_cleansing_field_aura);
+    RegisterSpellScript(spell_hydross_cleansing_field_command);
+    RegisterSpellScript(spell_hydross_mark_of_hydross);
 }

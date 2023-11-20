@@ -6077,7 +6077,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
 
             DispelChargesList dispelList;
-            target->GetDispellableAuraList(m_caster, dispelMask, dispelList);
+            target->GetDispellableAuraList(m_caster, dispelMask, dispelList, m_spellInfo);
+
             if (dispelList.empty())
                 return SPELL_FAILED_NOTHING_TO_DISPEL;
         }
@@ -7494,9 +7495,9 @@ SpellCastResult Spell::CheckItems()
                     // Xinef: Apply item level restriction if the enchanting spell has max level restrition set
                     if (m_CastItem && m_spellInfo->MaxLevel > 0)
                     {
-                        if (item->GetTemplate()->ItemLevel < m_CastItem->GetTemplate()->RequiredLevel)
+                        if (item->GetTemplate()->RequiredLevel < m_CastItem->GetTemplate()->RequiredLevel)
                             return SPELL_FAILED_LOWLEVEL;
-                        if (item->GetTemplate()->ItemLevel > m_spellInfo->MaxLevel)
+                        if (item->GetTemplate()->RequiredLevel > m_spellInfo->MaxLevel)
                             return SPELL_FAILED_HIGHLEVEL;
                     }
 

@@ -153,6 +153,14 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     });
 }
 
+void ScriptMgr::OnAfterSpecSlotChanged(Player* player, uint8 newSlot)
+{
+    ExecuteScript<PlayerScript>([=](PlayerScript* script)
+    {
+        script->OnAfterSpecSlotChanged(player, newSlot);
+    });
+}
+
 void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -325,6 +333,14 @@ void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnUpdate(player, p_time);
+    });
+}
+
+void ScriptMgr::OnAfterPlayerUpdate(Player* player, uint32 diff)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnAfterUpdate(player, diff);
     });
 }
 

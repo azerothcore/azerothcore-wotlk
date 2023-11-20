@@ -16,8 +16,8 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
 
 ObjectData const creatureData[] =

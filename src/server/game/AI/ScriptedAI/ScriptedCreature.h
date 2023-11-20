@@ -21,8 +21,8 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "InstanceScript.h"
 #include "EventMap.h"
+#include "InstanceScript.h"
 #include "TaskScheduler.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
@@ -494,9 +494,7 @@ protected:
 
     void TeleportCheaters();
 
-    EventMap events;
     SummonList summons;
-    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;

@@ -106,11 +106,13 @@ void ScriptMgr::Unload()
     SCR_CLEAR<ItemScript>();
     SCR_CLEAR<LootScript>();
     SCR_CLEAR<MailScript>();
+    SCR_CLEAR<MetricScript>();
     SCR_CLEAR<MiscScript>();
     SCR_CLEAR<MovementHandlerScript>();
     SCR_CLEAR<OutdoorPvPScript>();
     SCR_CLEAR<PetScript>();
     SCR_CLEAR<PlayerScript>();
+    SCR_CLEAR<PlayerbotScript>();
     SCR_CLEAR<ServerScript>();
     SCR_CLEAR<SpellSC>();
     SCR_CLEAR<SpellScriptLoader>();
@@ -193,7 +195,9 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
                 !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
-                !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
+                !ScriptRegistry<DatabaseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<MetricScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PlayerbotScript>::GetScriptById(sid))
                 {
                     LOG_ERROR("sql.sql", "Script named '{}' is assigned in the database, but has no code!", scriptName);
                 }
@@ -596,6 +600,16 @@ AllGameObjectScript::AllGameObjectScript(const char* name) : ScriptObject(name)
     ScriptRegistry<AllGameObjectScript>::AddScript(this);
 }
 
+MetricScript::MetricScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<MetricScript>::AddScript(this);
+}
+
+PlayerbotScript::PlayerbotScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<PlayerbotScript>::AddScript(this);
+}
+
 // Specialize for each script type class like so:
 template class AC_GAME_API ScriptRegistry<AccountScript>;
 template class AC_GAME_API ScriptRegistry<AchievementCriteriaScript>;
@@ -628,11 +642,13 @@ template class AC_GAME_API ScriptRegistry<InstanceMapScript>;
 template class AC_GAME_API ScriptRegistry<ItemScript>;
 template class AC_GAME_API ScriptRegistry<LootScript>;
 template class AC_GAME_API ScriptRegistry<MailScript>;
+template class AC_GAME_API ScriptRegistry<MetricScript>;
 template class AC_GAME_API ScriptRegistry<MiscScript>;
 template class AC_GAME_API ScriptRegistry<MovementHandlerScript>;
 template class AC_GAME_API ScriptRegistry<OutdoorPvPScript>;
 template class AC_GAME_API ScriptRegistry<PetScript>;
 template class AC_GAME_API ScriptRegistry<PlayerScript>;
+template class AC_GAME_API ScriptRegistry<PlayerbotScript>;
 template class AC_GAME_API ScriptRegistry<ServerScript>;
 template class AC_GAME_API ScriptRegistry<SpellSC>;
 template class AC_GAME_API ScriptRegistry<SpellScriptLoader>;

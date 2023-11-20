@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "gruuls_lair.h"
-#include "PassiveAI.h"
 
 enum Yells
 {

@@ -322,10 +322,6 @@ public:
     static float GetMaxVisibleDistanceInInstances()     { return _maxVisibleDistanceInInstances;  }
     static float GetMaxVisibleDistanceInBGArenas()      { return _maxVisibleDistanceInBGArenas;   }
 
-    static int32 GetVisibilityNotifyPeriodOnContinents() { return m_visibility_notify_periodOnContinents; }
-    static int32 GetVisibilityNotifyPeriodInInstances()  { return m_visibility_notify_periodInInstances;  }
-    static int32 GetVisibilityNotifyPeriodInBGArenas()   { return m_visibility_notify_periodInBGArenas;   }
-
     // our: needed for arena spectator subscriptions
     uint32 GetNextWhoListUpdateDelaySecs() override;
 
@@ -341,6 +337,9 @@ public:
     // used World DB version
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
+#ifdef MOD_PLAYERBOTS
+    [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
+#endif
 
     void UpdateAreaDependentAuras() override;
 
@@ -370,6 +369,9 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
+
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
+
 private:
     static std::atomic_long _stopEvent;
     static uint8 _exitCode;
@@ -413,10 +415,6 @@ private:
     static float _maxVisibleDistanceInInstances;
     static float _maxVisibleDistanceInBGArenas;
 
-    static int32 m_visibility_notify_periodOnContinents;
-    static int32 m_visibility_notify_periodInInstances;
-    static int32 m_visibility_notify_periodInBGArenas;
-
     std::string _realmName;
 
     // CLI command holder to be thread safe
@@ -439,9 +437,13 @@ private:
 
     // used versions
     std::string _dbVersion;
+#ifdef MOD_PLAYERBOTS
+    std::string m_PlayerbotsDBRevision;
+#endif
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.

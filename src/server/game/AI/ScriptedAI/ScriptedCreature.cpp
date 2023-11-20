@@ -556,6 +556,13 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
 {
     if (instance)
         SetBoundary(instance->GetBossBoundary(bossId));
+
+    // Prevents updating the scheduler's timer while the creature is casting.
+    // Clear it in the script if you need it to update while the creature is casting.
+    scheduler.SetValidator([this]
+    {
+        return !me->HasUnitState(UNIT_STATE_CASTING);
+    });
 }
 
 bool BossAI::CanRespawn()

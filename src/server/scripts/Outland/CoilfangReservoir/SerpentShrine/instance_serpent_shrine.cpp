@@ -31,6 +31,7 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
+    { NPC_LEOTHERAS_THE_BLIND,    DATA_LEOTHERAS_THE_BLIND    },
     { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
     { 0,                          0                           }
 };
@@ -86,7 +87,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_SHIELD_GENERATOR1:
                 case GO_SHIELD_GENERATOR2:
@@ -105,7 +106,7 @@ public:
                 case GO_COILFANG_BRIDGE1:
                 case GO_COILFANG_BRIDGE2:
                 case GO_COILFANG_BRIDGE3:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }
@@ -207,185 +208,136 @@ public:
     }
 };
 
-class spell_serpentshrine_cavern_serpentshrine_parasite : public SpellScriptLoader
+class spell_serpentshrine_cavern_serpentshrine_parasite : public AuraScript
 {
-public:
-    spell_serpentshrine_cavern_serpentshrine_parasite() : SpellScriptLoader("spell_serpentshrine_cavern_serpentshrine_parasite") { }
+    PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite);
 
-    class spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript)
+        if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_serpentshrine_cavern_serpentshrine_parasite_trigger : public SpellScriptLoader
+class spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura : public AuraScript
 {
-public:
-    spell_serpentshrine_cavern_serpentshrine_parasite_trigger() : SpellScriptLoader("spell_serpentshrine_cavern_serpentshrine_parasite_trigger") { }
+    PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura);
 
-    class spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript();
+        if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
     }
 
-    class spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript);
-
-        void HandleApplyAura(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Creature* target = GetHitCreature())
-                target->DespawnOrUnsummon(1);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_serpentshrine_cavern_infection : public SpellScriptLoader
+class spell_serpentshrine_cavern_serpentshrine_parasite_trigger : public SpellScript
 {
-public:
-    spell_serpentshrine_cavern_infection() : SpellScriptLoader("spell_serpentshrine_cavern_infection") { }
+    PrepareSpellScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger);
 
-    class spell_serpentshrine_cavern_infection_AuraScript : public AuraScript
+    void HandleApplyAura(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_serpentshrine_cavern_infection_AuraScript)
+        PreventHitDefaultEffect(effIndex);
+        if (Creature* target = GetHitCreature())
+            target->DespawnOrUnsummon(1);
+    }
 
-        void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTarget()->GetInstanceScript())
-            {
-                CustomSpellValues values;
-                values.AddSpellMod(SPELLVALUE_MAX_TARGETS, 1);
-                values.AddSpellMod(SPELLVALUE_BASE_POINT0, aurEff->GetAmount() + 500);
-                values.AddSpellMod(SPELLVALUE_BASE_POINT1, aurEff->GetAmount() + 500);
-                GetTarget()->CastCustomSpell(SPELL_RAMPART_INFECTION, values, GetTarget(), TRIGGERED_FULL_MASK, nullptr);
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_infection_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_serpentshrine_cavern_infection_AuraScript();
+        OnEffectHitTarget += SpellEffectFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
-class spell_serpentshrine_cavern_coilfang_water : public SpellScriptLoader
+class spell_serpentshrine_cavern_infection : public AuraScript
 {
-public:
-    spell_serpentshrine_cavern_coilfang_water() : SpellScriptLoader("spell_serpentshrine_cavern_coilfang_water") { }
+    PrepareAuraScript(spell_serpentshrine_cavern_infection);
 
-    class spell_serpentshrine_cavern_coilfang_water_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_serpentshrine_cavern_coilfang_water_AuraScript)
-
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTarget()->GetInstanceScript())
         {
-            if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                if (instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE)
-                    if (instance->GetData(DATA_ALIVE_KEEPERS) == 0)
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
+            CustomSpellValues values;
+            values.AddSpellMod(SPELLVALUE_MAX_TARGETS, 1);
+            values.AddSpellMod(SPELLVALUE_BASE_POINT0, aurEff->GetAmount() + 500);
+            values.AddSpellMod(SPELLVALUE_BASE_POINT1, aurEff->GetAmount() + 500);
+            GetTarget()->CastCustomSpell(SPELL_RAMPART_INFECTION, values, GetTarget(), TRIGGERED_FULL_MASK, nullptr);
         }
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
-        }
-
-        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
-        {
-            InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
-            if (!instance || instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE)
-                return;
-
-            isPeriodic = true;
-            amplitude = 8 * IN_MILLISECONDS;
-        }
-
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
-            if (!instance || GetUnitOwner()->GetMapId() != 548)
-            {
-                SetDuration(0);
-                return;
-            }
-
-            if (instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE || instance->GetData(DATA_ALIVE_KEEPERS) == 0 || GetUnitOwner()->GetPositionZ() > -20.5f || !GetUnitOwner()->IsInWater())
-                return;
-
-            for (uint8 i = 0; i < 3; ++i)
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FRENZY_WATER, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_serpentshrine_cavern_coilfang_water_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_infection::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_serpentshrine_cavern_coilfang_water : public AuraScript
+{
+    PrepareAuraScript(spell_serpentshrine_cavern_coilfang_water);
+
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+            if (instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE)
+                if (instance->GetData(DATA_ALIVE_KEEPERS) == 0)
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
+        if (!instance || instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE)
+            return;
+
+        isPeriodic = true;
+        amplitude = 8 * IN_MILLISECONDS;
+    }
+
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
+        if (!instance || GetUnitOwner()->GetMapId() != 548)
+        {
+            SetDuration(0);
+            return;
+        }
+
+        if (instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE || instance->GetData(DATA_ALIVE_KEEPERS) == 0 || GetUnitOwner()->GetPositionZ() > -20.5f || !GetUnitOwner()->IsInWater())
+            return;
+
+        for (uint8 i = 0; i < 3; ++i)
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FRENZY_WATER, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_serpentshrine_cavern_coilfang_water::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_coilfang_water::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_serpentshrine_cavern_coilfang_water::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_serpentshrine_cavern_coilfang_water::HandlePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
 void AddSC_instance_serpentshrine_cavern()
 {
     new instance_serpent_shrine();
-    new spell_serpentshrine_cavern_serpentshrine_parasite();
-    new spell_serpentshrine_cavern_serpentshrine_parasite_trigger();
-    new spell_serpentshrine_cavern_infection();
-    new spell_serpentshrine_cavern_coilfang_water();
+    RegisterSpellScript(spell_serpentshrine_cavern_serpentshrine_parasite);
+    RegisterSpellAndAuraScriptPair(spell_serpentshrine_cavern_serpentshrine_parasite_trigger, spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura);
+    RegisterSpellScript(spell_serpentshrine_cavern_infection);
+    RegisterSpellScript(spell_serpentshrine_cavern_coilfang_water);
 }

@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "serpent_shrine.h"
 #include "TaskScheduler.h"
+#include "serpent_shrine.h"
 
 enum Talk
 {
@@ -78,13 +78,7 @@ const Position advisorsPosition[MAX_ADVISORS] =
 
 struct boss_fathomlord_karathress : public BossAI
 {
-    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS) { }
 
     void Reset() override
     {
@@ -113,20 +107,11 @@ struct boss_fathomlord_karathress : public BossAI
             summon->SetWalk(true);
             summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS - 1], false);
         }
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
-            Talk(SAY_GAIN_ABILITY1);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
-            Talk(SAY_GAIN_ABILITY2);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
-            Talk(SAY_GAIN_ABILITY3);
-        scheduler.Schedule(1s, [this, summon](TaskContext)
+        else
         {
-            summons.Despawn(summon);
-        });
+            summon->Attack(me->GetVictim(), false);
+            summon->SetInCombatWithZone();
+        }
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -201,7 +186,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
     {
         _instance = creature->GetInstanceScript();
 
-        _scheduler.SetValidator([this]
+        scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
@@ -211,7 +196,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
         summons.DespawnAll();
         summons.clear();
@@ -229,7 +214,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         {
             karathress->Attack(who, false);
         }
-        _scheduler.Schedule(2500ms, [this](TaskContext context)
+
+        scheduler.Schedule(2500ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_HURL_TRIDENT);
             context.Repeat(5s);
@@ -264,6 +250,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY2);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -274,13 +262,12 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
 
 private:
-    TaskScheduler _scheduler;
     InstanceScript* _instance;
 };
 
@@ -439,6 +426,8 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY1);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -521,6 +510,8 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY3);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -541,31 +532,38 @@ private:
     InstanceScript* _instance;
 };
 
-class spell_karathress_power_of_caribdis : public SpellScriptLoader
+class spell_karathress_power_of_tidalvess : public AuraScript
 {
-public:
-    spell_karathress_power_of_caribdis() : SpellScriptLoader("spell_karathress_power_of_caribdis") { }
+    PrepareAuraScript(spell_karathress_power_of_tidalvess);
 
-    class spell_karathress_power_of_caribdis_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_karathress_power_of_caribdis_AuraScript);
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* victim = GetUnitOwner()->GetVictim())
-                GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_karathress_power_of_caribdis_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_tidalvess::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_karathress_power_of_caribdis : public AuraScript
+{
+    PrepareAuraScript(spell_karathress_power_of_caribdis);
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* victim = GetUnitOwner()->GetVictim())
+        {
+            GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -575,5 +573,6 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSerpentShrineAI(boss_fathomguard_sharkkis);
     RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
     RegisterSerpentShrineAI(boss_fathomguard_caribdis);
-    new spell_karathress_power_of_caribdis();
+    RegisterSpellScript(spell_karathress_power_of_tidalvess);
+    RegisterSpellScript(spell_karathress_power_of_caribdis);
 }

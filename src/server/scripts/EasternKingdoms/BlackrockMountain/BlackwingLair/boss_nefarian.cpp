@@ -23,9 +23,9 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
-#include "TaskScheduler.h"
 
 enum Events
 {
@@ -327,7 +327,6 @@ public:
                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
                     {
                         nefarian->setActive(true);
-                        nefarian->SetFarVisible(true);
                         nefarian->SetCanFly(true);
                         nefarian->SetDisableGravity(true);
                         nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);

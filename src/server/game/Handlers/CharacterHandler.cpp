@@ -35,6 +35,7 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "MotdMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -45,7 +46,6 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "MotdMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
@@ -59,19 +59,9 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-class LoginQueryHolder : public CharacterDatabaseQueryHolder
+LoginQueryHolder::LoginQueryHolder(uint32 accountId, ObjectGuid guid) : m_accountId(accountId), m_guid(guid)
 {
-private:
-    uint32 m_accountId;
-    ObjectGuid m_guid;
-public:
-    LoginQueryHolder(uint32 accountId, ObjectGuid guid)
-        : m_accountId(accountId), m_guid(guid) { }
-
-    ObjectGuid GetGuid() const { return m_guid; }
-    uint32 GetAccountId() const { return m_accountId; }
-    bool Initialize();
-};
+}
 
 bool LoginQueryHolder::Initialize()
 {
@@ -537,7 +527,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             std::shared_ptr<Player> newChar(new Player(this), [](Player* ptr)
             {
-                ptr->CleanupsBeforeDelete();
+                // Only when player is created correctly do clean
+                if (ptr->HasAtLoginFlag(AT_LOGIN_FIRST))
+                {
+                    ptr->CleanupsBeforeDelete();
+                }
                 delete ptr;
             });
 
@@ -561,7 +555,12 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             newChar->SaveToDB(characterTransaction, true, false);
             createInfo->CharCount++;
 
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
+            stmt->SetData(0, GetAccountId());
+            stmt->SetData(1, realm.Id.Realm);
+            trans->Append(stmt);
+
+            stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
             stmt->SetData(0, createInfo->CharCount);
             stmt->SetData(1, GetAccountId());
             stmt->SetData(2, realm.Id.Realm);
@@ -785,6 +784,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 {
+    m_playerLoading = true;
     ObjectGuid playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
@@ -898,8 +898,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     CharacterDatabase.Execute(stmt);
 
     LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
-    loginStmt->SetData(0, realm.Id.Realm);
-    loginStmt->SetData(1, GetAccountId());
+    loginStmt->SetData(0, GetAccountId());
     LoginDatabase.Execute(loginStmt);
 
     pCurrChar->SetInGameTime(GameTime::GetGameTimeMS().count());
@@ -1244,8 +1243,6 @@ void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player* /*pCurrChar*/)
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
-    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_FACTION_ATWAR");
-
     uint32 repListID;
     uint8  flag;
 
@@ -1292,7 +1289,6 @@ void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_WATCHED_FACTION");
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
@@ -1300,7 +1296,6 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recvData >> replistid >> inactive;

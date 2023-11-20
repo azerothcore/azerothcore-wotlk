@@ -34,6 +34,9 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -585,9 +588,30 @@ public:
     }
 };
 
+class spell_karazhan_temptation : public AuraScript
+{
+    PrepareAuraScript(spell_karazhan_temptation);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (eventInfo.GetActionTarget())
+        {
+            GetTarget()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_karazhan_temptation::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_karazhan()
 {
     new npc_barnes();
     new npc_image_of_medivh();
     new at_karazhan_side_entrance();
+    RegisterSpellScript(spell_karazhan_temptation);
 }

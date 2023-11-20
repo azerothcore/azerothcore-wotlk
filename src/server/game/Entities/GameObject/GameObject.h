@@ -21,10 +21,10 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "G3D/Quat.h"
+#include "GameObjectData.h"
 #include "LootMgr.h"
 #include "Object.h"
 #include "SharedDefines.h"
-#include "GameObjectData.h"
 #include "Unit.h"
 #include <array>
 
@@ -288,6 +288,8 @@ public:
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
+
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }

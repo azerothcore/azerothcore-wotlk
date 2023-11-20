@@ -18,8 +18,8 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
-#include "EventProcessor.h"
 #include "EnumFlag.h"
+#include "EventProcessor.h"
 #include "FollowerRefMgr.h"
 #include "FollowerReference.h"
 #include "HostileRefMgr.h"
@@ -1438,6 +1438,8 @@ public:
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+    [[nodiscard]] DisplayRace GetDisplayRaceFromModelId(uint32 modelId) const;
+    [[nodiscard]] DisplayRace GetDisplayRace() const { return GetDisplayRaceFromModelId(GetDisplayId()); };
 
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
@@ -1510,6 +1512,7 @@ public:
 
     ReputationRank GetReactionTo(Unit const* target, bool checkOriginalFaction = false) const;
     ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target) const;
+    static ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, FactionTemplateEntry const* targetFactionTemplateEntry);
 
     bool IsHostileTo(Unit const* unit) const;
     [[nodiscard]] bool IsHostileToPlayers() const;
@@ -1755,6 +1758,7 @@ public:
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id);
+    void SendPlaySpellVisual(ObjectGuid guid, uint32 id);
     void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
@@ -1993,7 +1997,7 @@ public:
     AuraApplication* GetAuraApplicationOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
     [[nodiscard]] Aura* GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
 
-    void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList);
+    void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList, SpellInfo const* dispelSpell);
 
     [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster = ObjectGuid::Empty) const;
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
@@ -2143,7 +2147,7 @@ public:
     // common function for visibility checks for player/creatures with detection code
     [[nodiscard]] uint32 GetPhaseByAuras() const;
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;// overwrite WorldObject::SetPhaseMask
-    void UpdateObjectVisibility(bool forced = true) override;
+    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
 
     SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
     uint32 m_lastSanctuaryTime;
@@ -2417,6 +2421,14 @@ public:
     void AddPointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.insert(sup); }
     void RemovePointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.erase(sup); }
     static void HandleSafeUnitPointersOnDelete(Unit* thisUnit);
+    // Relocation Nofier optimization
+    Position m_last_notify_position;
+    uint32 m_last_notify_mstime;
+    uint16 m_delayed_unit_relocation_timer;
+    uint16 m_delayed_unit_ai_notify_timer;
+    bool bRequestForcedVisibilityUpdate;
+    void ExecuteDelayedUnitRelocationEvent();
+    void ExecuteDelayedUnitAINotifyEvent();
 
     // cooldowns
     [[nodiscard]] virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
@@ -2464,6 +2476,10 @@ public:
     [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
 
     std::string GetDebugInfo() const override;
+    void SetCannotReachTargetUnit(bool target, bool isChase);
+    [[nodiscard]] bool CanNotReachTarget() const;
+
+    bool m_cannotReachTarget;
 
     [[nodiscard]] uint32 GetOldFactionId() const { return _oldFactionId; }
 
@@ -2575,7 +2591,7 @@ private:
     uint32 m_state;                                     // Even derived shouldn't modify
     uint32 m_CombatTimer;
     uint32 m_lastManaUse;                               // msecs
-    TimeTrackerSmall m_splineSyncTimer;
+    //TimeTrackerSmall m_movesplineTimer;
 
     Diminishing m_Diminishing;
     // Manage all Units that are threatened by us

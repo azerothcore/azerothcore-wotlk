@@ -159,6 +159,8 @@ struct npc_midsummer_torch_target : public ScriptedAI
         int8 num = urand(0, posVec.size() - 1);
         Position pos;
         pos.Relocate(posVec.at(num));
+        me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
 
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
     }
@@ -204,7 +206,7 @@ class spell_gen_crab_disguise : public AuraScript
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_crab_disguise::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -754,9 +756,9 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
+        OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
         if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
-            OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     }

@@ -20,11 +20,11 @@
 #include "GroupMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
+#include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
-#include "Pet.h"
-#include "ScriptMgr.h"
 //#include "WorldStatePackets.h"
 
 void ArenaScore::AppendToPacket(WorldPacket& data)

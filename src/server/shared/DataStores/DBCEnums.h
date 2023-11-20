@@ -48,7 +48,7 @@ struct DBCPosition3D
 // also see MAX_LEVEL and GT_MAX_LEVEL define
 #define STRONG_MAX_LEVEL 255
 
-enum BattlegroundBracketId                                  // bracketId for level ranges
+enum BattlegroundBracketId          // bracketId for level ranges
 {
     BG_BRACKET_ID_FIRST          = 0,
     BG_BRACKET_ID_LAST           = 15

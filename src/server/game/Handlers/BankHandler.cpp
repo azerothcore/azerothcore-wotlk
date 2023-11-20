@@ -46,8 +46,6 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
 
-    LOG_DEBUG("network", "WORLD: Received CMSG_BANKER_ACTIVATE");
-
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_BANKER);

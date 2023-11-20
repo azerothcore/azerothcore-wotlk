@@ -20,9 +20,9 @@
 #include "GroupMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "MiscPackets.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -60,8 +60,6 @@ void WorldSession::SendPartyResult(PartyOperation operation, const std::string& 
 
 void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_INVITE");
-
     std::string membername;
     recvData >> membername;
     recvData.read_skip<uint32>();
@@ -229,8 +227,6 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_ACCEPT");
-
     recvData.read_skip<uint32>();
     Group* group = GetPlayer()->GetGroupInvite();
 
@@ -291,8 +287,6 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_DECLINE");
-
     Group* group = GetPlayer()->GetGroupInvite();
     if (!group)
         return;
@@ -314,8 +308,6 @@ void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_UNINVITE_GUID");
-
     ObjectGuid guid;
     std::string reason, name;
     recvData >> guid;
@@ -389,8 +381,6 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_UNINVITE");
-
     std::string membername;
     recvData >> membername;
 
@@ -436,8 +426,6 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_SET_LEADER");
-
     ObjectGuid guid;
     recvData >> guid;
 
@@ -457,8 +445,6 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_DISBAND");
-
     Group* grp = GetPlayer()->GetGroup();
     if (!grp)
         return;
@@ -480,8 +466,6 @@ void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_LOOT_METHOD");
-
     uint32 lootMethod;
     ObjectGuid lootMaster;
     uint32 lootThreshold;
@@ -544,8 +528,6 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
 
 void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_MINIMAP_PING");
-
     if (!GetPlayer()->GetGroup())
         return;
 
@@ -581,8 +563,6 @@ void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& 
 
 void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_RAID_TARGET_UPDATE");
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -620,8 +600,6 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_RAID_CONVERT");
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -647,8 +625,6 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_CHANGE_SUB_GROUP");
-
     // we will get correct pointer for group here, so we don't have to check if group is BG raid
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -686,8 +662,6 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_ASSISTANT_LEADER");
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -707,8 +681,6 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePartyAssignmentOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_PARTY_ASSIGNMENT");
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -741,8 +713,6 @@ void WorldSession::HandlePartyAssignmentOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_RAID_READY_CHECK");
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -986,7 +956,6 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
     ObjectGuid Guid;
     recvData >> Guid;
 
@@ -1127,8 +1096,6 @@ void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_OPT_OUT_OF_LOOT");
-
     uint32 passOnLoot;
     recvData >> passOnLoot; // 1 always pass, 0 do not pass
 

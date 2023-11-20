@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -36,7 +37,6 @@
 #include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "VehicleDefines.h"
-#include "GossipDef.h"
 #include <functional>
 #include <limits>
 #include <map>
@@ -865,6 +865,7 @@ public:
         return nullptr;
     }
 
+    [[nodiscard]] AreaTriggerTeleportContainer const& GetAllAreaTriggerTeleports() const { return _areaTriggerTeleportStore; }
     [[nodiscard]] AreaTriggerTeleport const* GetAreaTriggerTeleport(uint32 trigger) const
     {
         AreaTriggerTeleportContainer::const_iterator itr = _areaTriggerTeleportStore.find(trigger);
@@ -1020,7 +1021,7 @@ public:
     void LoadCreatureClassLevelStats();
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
-    void LoadCreatureTemplate(Field* fields);
+    void LoadCreatureTemplate(Field* fields, bool triggerHook = false);
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();

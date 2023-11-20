@@ -45,10 +45,6 @@ struct boss_thorngrin_the_tender : public BossAI
     {
         me->m_SightDistance = 100.0f;
         _intro = false;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void Reset() override
