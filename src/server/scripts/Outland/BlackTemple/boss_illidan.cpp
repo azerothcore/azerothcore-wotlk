@@ -238,19 +238,17 @@ public:
             switch (phase)
             {
                 case PHASE_ONE:
-                    scheduler.Schedule(15s, [this](TaskContext context)
-                    {
+                    ScheduleTimedEvent(15s, [&] {
                         DoCastVictim(SPELL_FLAME_CRASH);
-                        context.Repeat(25s);
-                    }).Schedule(30s, [this](TaskContext context)
-                    {
+                    }, 25s);
+
+                    ScheduleTimedEvent(30s, [&] {
                         DoCastVictim(SPELL_DRAW_SOUL);
-                        context.Repeat(40s);
-                    }).Schedule(20s, [this](TaskContext context)
-                    {
+                    }, 40s);
+
+                    ScheduleTimedEvent(20s, [&] {
                         DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND);
-                        context.Repeat(30s);
-                    });
+                    }, 30s);
             }
         }
 
