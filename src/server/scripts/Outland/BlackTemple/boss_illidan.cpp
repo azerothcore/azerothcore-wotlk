@@ -207,7 +207,10 @@ const Position airHoverPos[MAX_EYE_BEAM_POS] =
 enum Phases
 {
     PHASE_ONE = 1,
-    PHASE_TWO = 2
+    PHASE_TWO,
+    PHASE_THREE,
+    PHASE_FOUR,
+    PHASE_FIVE
 };
 
 class boss_illidan_stormrage : public CreatureScript
@@ -249,7 +252,33 @@ public:
                     ScheduleTimedEvent(20s, [&] {
                         DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND);
                     }, 30s);
+
+                    ScheduleTimedEvent(40s, [&] {
+                        Talk(SAY_ILLIDAN_TAUNT);
+                    }, 30s, 60s);
+                case PHASE_THREE:
+                    ScheduleTimedEvent(60s, [&] {
+                        DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
+                        me->GetThreatMgr().ResetAllThreat();
+                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 35.0f);
+                        scheduler.CancelAll();
+                        events.ScheduleEvent(EVENT_SPELL_SHADOW_BLAST, 11000);
+                        events.ScheduleEvent(EVENT_MOVE_MAIEV, 5000);
+                        events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
+                        events.ScheduleEvent(EVENT_SPELL_FLAME_BURST, 21000);
+                        events.ScheduleEvent(EVENT_SPELL_SHADOW_DEMONS, 36000);
+                        events.ScheduleEvent(EVENT_REMOVE_DEMON_FORM, 60000);
+                    }, 0s, 0s, PHASE_FOUR);
+                case PHASE_FIVE:
             }
+
+            if (phase >= 3)
+            {
+                events.ScheduleEvent(EVENT_PHASE_4_START, 60000);
+                events.ScheduleEvent(EVENT_SPELL_AGONIZING_FLAMES, 10000);
+            }
+            if (phase >= 5)
+                events.ScheduleEvent(EVENT_SPELL_FRENZY, 40000);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -326,23 +355,11 @@ public:
             }
         }
 
-        void ScheduleNormalEvents(uint8 phase)
-        {
-            events.ScheduleEvent(EVENT_SAY_TAUNT, 40000);
-            if (phase >= 3)
-            {
-                events.ScheduleEvent(EVENT_PHASE_4_START, 60000);
-                events.ScheduleEvent(EVENT_SPELL_AGONIZING_FLAMES, 10000);
-            }
-            if (phase >= 5)
-                events.ScheduleEvent(EVENT_SPELL_FRENZY, 40000);
-        }
-
         void JustEngagedWith(Unit* who) override
         {
             summons.DespawnAll();
             BossAI::JustEngagedWith(who);
-            ScheduleNormalEvents(1);
+            ScheduleTasks(PHASE_ONE);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 25 * MINUTE * IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SUMMON_MINIONS, 1000);
             events.ScheduleEvent(EVENT_PHASE_2_START, 1000);
@@ -506,10 +523,7 @@ public:
 
 
 
-                case EVENT_SAY_TAUNT:
-                    Talk(SAY_ILLIDAN_TAUNT);
-                    events.ScheduleEvent(EVENT_SAY_TAUNT, urand(30000, 60000));
-                    break;
+
                 case EVENT_SPELL_FRENZY:
                     Talk(SAY_ILLIDAN_FRENZY);
                     me->CastSpell(me, SPELL_FRENZY, false);
@@ -558,7 +572,7 @@ public:
                         maiev->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         maiev->AI()->AttackStart(me);
                     }
-                    ScheduleNormalEvents(5);
+                    ScheduleTasks(PHASE_FIVE);
                     break;
                 // ///////////////////////////
                 // PHASE 2
@@ -630,23 +644,14 @@ public:
                     me->SetTarget(me->GetVictim()->GetGUID());
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    ScheduleNormalEvents(3);
+                    ScheduleTasks(PHASE_THREE);
                     events.ScheduleEvent(EVENT_PHASE_5_START, 1000);
                     break;
                 // ///////////////////////////
                 // PHASE 4
                 // ///////////////////////////
                 case EVENT_PHASE_4_START:
-                    me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->GetThreatMgr().ResetAllThreat();
-                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 35.0f);
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_BLAST, 11000);
-                    events.ScheduleEvent(EVENT_MOVE_MAIEV, 5000);
-                    events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
-                    events.ScheduleEvent(EVENT_SPELL_FLAME_BURST, 21000);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_DEMONS, 36000);
-                    events.ScheduleEvent(EVENT_REMOVE_DEMON_FORM, 60000);
+
                     break;
                 case EVENT_SPELL_SHADOW_BLAST:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOW_BLAST, false);
@@ -665,14 +670,14 @@ public:
                     events.Reset();
                     if (summons.HasEntry(NPC_MAIEV_SHADOWSONG))
                     {
-                        ScheduleNormalEvents(5);
+                        ScheduleTasks(PHASE_FIVE);
                         events.DelayEvents(11000);
                         events.ScheduleEvent(EVENT_MOVE_MAIEV, 10000);
                         events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
                     }
                     else
                     {
-                        ScheduleNormalEvents(3);
+                        ScheduleTasks(PHASE_THREE);
                         events.ScheduleEvent(EVENT_PHASE_5_START, 1000);
                         events.DelayEvents(11000);
                         events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
