@@ -236,7 +236,7 @@ public:
             beamPosId = urand(0, 3);
         }
 
-        void ScheduleTasks(uint8 phase)
+        void ScheduleTask(uint8 phase)
         {
             switch (phase)
             {
@@ -270,6 +270,8 @@ public:
                         events.ScheduleEvent(EVENT_REMOVE_DEMON_FORM, 60000);
                     }, 0s, 0s, PHASE_FOUR);
                 case PHASE_FIVE:
+                default:
+                    break;
             }
 
             if (phase >= 3)
@@ -359,7 +361,7 @@ public:
         {
             summons.DespawnAll();
             BossAI::JustEngagedWith(who);
-            ScheduleTasks(PHASE_ONE);
+            ScheduleTask(PHASE_ONE);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 25 * MINUTE * IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SUMMON_MINIONS, 1000);
             events.ScheduleEvent(EVENT_PHASE_2_START, 1000);
@@ -572,7 +574,7 @@ public:
                         maiev->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         maiev->AI()->AttackStart(me);
                     }
-                    ScheduleTasks(PHASE_FIVE);
+                    ScheduleTask(PHASE_FIVE);
                     break;
                 // ///////////////////////////
                 // PHASE 2
@@ -644,7 +646,7 @@ public:
                     me->SetTarget(me->GetVictim()->GetGUID());
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    ScheduleTasks(PHASE_THREE);
+                    ScheduleTask(PHASE_THREE);
                     events.ScheduleEvent(EVENT_PHASE_5_START, 1000);
                     break;
                 // ///////////////////////////
@@ -670,14 +672,14 @@ public:
                     events.Reset();
                     if (summons.HasEntry(NPC_MAIEV_SHADOWSONG))
                     {
-                        ScheduleTasks(PHASE_FIVE);
+                        ScheduleTask(PHASE_FIVE);
                         events.DelayEvents(11000);
                         events.ScheduleEvent(EVENT_MOVE_MAIEV, 10000);
                         events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
                     }
                     else
                     {
-                        ScheduleTasks(PHASE_THREE);
+                        ScheduleTask(PHASE_THREE);
                         events.ScheduleEvent(EVENT_PHASE_5_START, 1000);
                         events.DelayEvents(11000);
                         events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
