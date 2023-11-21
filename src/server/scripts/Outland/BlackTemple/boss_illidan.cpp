@@ -234,6 +234,10 @@ public:
             me->LoadEquipment(0, true);
             me->SetImmuneToAll(true);
             beamPosId = urand(0, 3);
+
+            ScheduleHealthCheckEvent(90, [&] {
+                Talk(SAY_ILLIDAN_MINION);
+            });
         }
 
         void ScheduleTask(uint8 phase)
@@ -259,15 +263,13 @@ public:
                 case PHASE_THREE:
                     ScheduleTimedEvent(60s, [&] {
                         DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
-                        me->GetThreatMgr().ResetAllThreat();
+                        DoResetThreat(me);
                         me->GetMotionMaster()->MoveChase(me->GetVictim(), 35.0f);
                         scheduler.CancelAll();
                         events.ScheduleEvent(EVENT_SPELL_SHADOW_BLAST, 11000);
                         events.ScheduleEvent(EVENT_MOVE_MAIEV, 5000);
                         events.ScheduleEvent(EVENT_FINISH_TRANSFORM, 10500);
-                        events.ScheduleEvent(EVENT_SPELL_FLAME_BURST, 21000);
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_DEMONS, 36000);
-                        events.ScheduleEvent(EVENT_REMOVE_DEMON_FORM, 60000);
+
                     }, 0s, 0s, PHASE_FOUR);
                 case PHASE_FIVE:
                 default:
@@ -281,6 +283,13 @@ public:
             }
             if (phase >= 5)
                 events.ScheduleEvent(EVENT_SPELL_FRENZY, 40000);
+        }
+
+        void ScheduleDemonFormTasks()
+        {
+            events.ScheduleEvent(EVENT_SPELL_FLAME_BURST, 21000);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_DEMONS, 36000);
+            events.ScheduleEvent(EVENT_REMOVE_DEMON_FORM, 60000);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -509,7 +518,7 @@ public:
                 case EVENT_SUMMON_MINIONS:
                     if (me->HealthBelowPct(90))
                     {
-                        Talk(SAY_ILLIDAN_MINION);
+
                         events2.ScheduleEvent(EVENT_SUMMON_MINIONS2, 10000);
                         break;
                     }
