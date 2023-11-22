@@ -1281,6 +1281,8 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
 
+    _bool_configs[CONFIG_TBC_DAILY_RBG_ARENA_POINT_REWARD] = sConfigMgr->GetOption<bool>("DailyRBGArenaPointsAtLevel70.Enable", false);
+
     _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
 
     ///- Read the "Data" directory from the config file

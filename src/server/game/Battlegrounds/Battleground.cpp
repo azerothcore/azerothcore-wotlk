@@ -860,8 +860,9 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             {
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
 
+                uint8 arenaPointsMinLevel = sWorld->getBoolConfig(CONFIG_TBC_DAILY_RBG_ARENA_POINT_REWARD) ? 70 : BG_AWARD_ARENA_POINTS_MIN_LEVEL;
                 // Xinef: check player level and not bracket level if (CanAwardArenaPoints())
-                if (player->GetLevel() >= BG_AWARD_ARENA_POINTS_MIN_LEVEL)
+                if (player->GetLevel() >= arenaPointsMinLevel)
                     player->ModifyArenaPoints(winner_arena);
 
                 if (!player->GetRandomWinner())
