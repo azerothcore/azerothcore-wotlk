@@ -4356,11 +4356,11 @@ TeleportTimeoutNear = 25
 TeleportTimeoutFar = 45
 
 #
-#    DailyRBGArenaPointsAtLevel70.Enable
+#    DailyRBGArenaPoints.MinLevel
 #        Description: Allows gaining arena points on the first RBG win at level 70.
-#        Default: 0 - (Disabled)
+#        Default: 71 - (Blizzlike)
 
-DailyRBGArenaPointsAtLevel70.Enable = 0
+DailyRBGArenaPoints.MinLevel = 71
 
 #
 ###################################################################################################
