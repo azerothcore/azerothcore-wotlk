@@ -1,3 +1,4 @@
+-- DB update 2023_11_20_09 -> 2023_11_22_00
 -- Scarlet Monastery - add sniffed gameobject spawns for 181354 'Floating, Medium - MFF'
 DELETE FROM `gameobject` WHERE (`id` = 181354) AND (`guid` BETWEEN 12530 AND 12551);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
