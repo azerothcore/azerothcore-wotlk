@@ -66,6 +66,7 @@ enum Spells
     SPELL_MOUTH_TENTACLE                        = 26332,
     SPELL_EXIT_STOMACH_KNOCKBACK                = 25383,
     SPELL_DIGESTIVE_ACID                        = 26476,
+    SPELL_PORT_OUT_STOMACH_EFFECT               = 26648,    // used to kill players inside the stomach on evade
 
     // Tentacles
     SPELL_SUBMERGE_VISUAL                       = 26234,
@@ -89,7 +90,8 @@ enum Actions
 
 enum TaskGroups
 {
-    GROUP_BEAM_PHASE = 1
+    GROUP_BEAM_PHASE = 1,
+    STOMACH_DEATH = 2
 };
 
 enum Phases
@@ -388,6 +390,7 @@ struct boss_cthun : public BossAI
     boss_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
+        map = me->GetMap();
     }
 
     void Reset() override
@@ -396,6 +399,7 @@ struct boss_cthun : public BossAI
         WisperTimer = 90000;
 
         _fleshTentaclesKilled = 0;
+        _stomachDeathScheduled = false;
 
         //Reset flags
         me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
@@ -500,10 +504,6 @@ struct boss_cthun : public BossAI
             //WisperTimer
             if (WisperTimer <= diff)
             {
-                Map* map = me->GetMap();
-                if (!map->IsDungeon())
-                    return;
-
                 //Play random sound to the zone
                 Map::PlayerList const& PlayerList = map->GetPlayers();
 
@@ -526,16 +526,25 @@ struct boss_cthun : public BossAI
 
         if (IsEveryoneAffectedByDigestiveAcid())
         {
-            _acidTimer += diff;
-            if (_acidTimer >= 10000)  // 10 seconds
+            if (!_stomachDeathScheduled)
             {
-                KillEveryone();
-                _acidTimer = 0;  // Reset timer
+                scheduler.Schedule(10s, STOMACH_DEATH, [this](TaskContext /*context*/)
+                {
+                    map->DoForAllPlayers([&](Player* player)
+                    {
+                        player->CastSpell(player, SPELL_PORT_OUT_STOMACH_EFFECT, false);
+                    });
+                });
+                _stomachDeathScheduled = true;
             }
         }
         else
         {
-            _acidTimer = 0;  // Reset timer
+            if (_stomachDeathScheduled)
+            {
+                scheduler.CancelGroup(STOMACH_DEATH);
+                _stomachDeathScheduled = false;
+            }
         }
 
         me->SetTarget();
@@ -601,14 +610,13 @@ struct boss_cthun : public BossAI
         uint8 _fleshTentaclesKilled;
 
         //If no-one is outside
-        uint32 _acidTimer;
+        bool _stomachDeathScheduled;
+
+        //Map variable
+        Map* map;
 
         bool IsEveryoneAffectedByDigestiveAcid() const
         {
-            Map* map = me->GetMap();
-            if (!map->IsDungeon())
-                return false;
-
             Map::PlayerList const& playerList = map->GetPlayers();
             for (const auto& itr : playerList)
             {
@@ -621,21 +629,6 @@ struct boss_cthun : public BossAI
             return true;
         }
 
-        void KillEveryone()
-        {
-            Map* map = me->GetMap();
-            if (!map->IsDungeon())
-                return;
-
-            Map::PlayerList const& playerList = map->GetPlayers();
-            for (const auto& itr : playerList)
-            {
-                if (Player* player = itr.GetSource())
-                {
-                    player->KillSelf();
-                }
-            }
-        }
 };
 
 struct npc_eye_tentacle : public ScriptedAI
