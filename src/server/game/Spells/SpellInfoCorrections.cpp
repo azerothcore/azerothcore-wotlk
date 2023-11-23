@@ -57,11 +57,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
-    // Quest A Fall From Grace
+    // Scarlet Raven Priest Image
     ApplySpellFix({ 48763, 48761 }, [](SpellInfo* spellInfo)
-        {
-            spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_SPELL_ATTACK; // Aura state correction
-        });
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_SPELL_ATTACK;
+    });
 
     // Has Brewfest Mug
     ApplySpellFix({ 42533 }, [](SpellInfo* spellInfo)
