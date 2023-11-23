@@ -1410,7 +1410,7 @@ public:
                             break;
                         case 25:
                             Talk(PLANE_EMOTE);
-                            DoCastSelf(AURA_ENGINE, false);
+                            DoCastSelf(AURA_ENGINE);
                             break;
                     }
             pointId++;
