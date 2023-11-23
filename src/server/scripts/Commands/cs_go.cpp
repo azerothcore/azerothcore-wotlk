@@ -36,11 +36,6 @@ EndScriptData */
 
 using namespace Acore::ChatCommands;
 
-enum Maps
-{
-    FIRST_MAP_ID    = 0,
-    LAST_MAP_ID     = 724
-};
 class go_commandscript : public CommandScript
 {
 public:
