@@ -19,111 +19,87 @@
 #include "ScriptedCreature.h"
 #include "blood_furnace.h"
 
-enum eEnums
+enum Says
 {
-    SAY_AGGRO                   = 0,
-    SAY_KILL                    = 1,
-    SAY_DIE                     = 2,
-
-    SPELL_EXPLODING_BREAKER     = 30925,
-    SPELL_DOMINATION            = 30923,
-
-    EVENT_SPELL_EXPLODING       = 1,
-    EVENT_SPELL_DOMINATION      = 2
+    SAY_AGGRO               = 0,
+    SAY_KILL                = 1,
+    SAY_DIE                 = 2
 };
 
-class boss_the_maker : public CreatureScript
+enum Spells
 {
-public:
-    boss_the_maker() : CreatureScript("boss_the_maker")
+    SPELL_EXPLODING_BEAKER  = 30925,
+    SPELL_DOMINATION        = 30923
+};
+
+struct boss_the_maker : public BossAI
+{
+    boss_the_maker(Creature* creature) : BossAI(creature, DATA_THE_MAKER)
     {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_the_makerAI : public ScriptedAI
+    void Reset() override
     {
-        boss_the_makerAI(Creature* creature) : ScriptedAI(creature)
+        _Reset();
+        if (instance)
         {
-            instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* instance;
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            if (!instance)
-                return;
-
             instance->SetData(DATA_THE_MAKER, NOT_STARTED);
             instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_EXPLODING, 6000);
-            events.ScheduleEvent(EVENT_SPELL_DOMINATION, 120000);
-
-            if (!instance)
-                return;
-
-            instance->SetData(DATA_THE_MAKER, IN_PROGRESS);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), false);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
-                Talk(SAY_KILL);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DIE);
-
-            if (!instance)
-                return;
-
-            instance->SetData(DATA_THE_MAKER, DONE);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR3), true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_EXPLODING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_EXPLODING_BREAKER, false);
-                    events.RepeatEvent(urand(7000, 11000));
-                    break;
-                case EVENT_SPELL_DOMINATION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_DOMINATION, false);
-                    events.RepeatEvent(120000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBloodFurnaceAI<boss_the_makerAI>(creature);
+        Talk(SAY_AGGRO);
+        _JustEngagedWith();
+        instance->SetData(DATA_THE_MAKER, IN_PROGRESS);
+        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), false);
+        scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_EXPLODING_BEAKER);
+            context.Repeat(7s, 11s);
+        }).Schedule(2min, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_DOMINATION);
+            context.Repeat(2min);
+        });
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+        {
+            Talk(SAY_KILL);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DIE);
+        _JustDied();
+        instance->SetData(DATA_THE_MAKER, DONE);
+        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
+        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR3), true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_the_maker()
 {
-    new boss_the_maker();
+    RegisterBloodFurnaceCreatureAI(boss_the_maker);
 }

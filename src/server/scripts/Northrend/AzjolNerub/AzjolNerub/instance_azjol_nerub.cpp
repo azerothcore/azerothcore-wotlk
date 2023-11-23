@@ -32,7 +32,8 @@ DoorData const doorData[] =
 ObjectData const creatureData[] =
 {
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR_THE_GATEWATCHER_EVENT },
-    { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 }
+    { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 },
+    { 0,                            0                                   }
 };
 
 BossBoundaryData const boundaries =
@@ -86,7 +87,7 @@ public:
                 case GO_ANUBARAK_DOORS1:
                 case GO_ANUBARAK_DOORS2:
                 case GO_ANUBARAK_DOORS3:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
             }
         }
@@ -99,7 +100,7 @@ public:
                 case GO_ANUBARAK_DOORS1:
                 case GO_ANUBARAK_DOORS2:
                 case GO_ANUBARAK_DOORS3:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

@@ -26,7 +26,6 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -340,7 +339,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
         //else wander_distance will be 15, so creatures move maximum=10
         //creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         creature->GetMotionMaster()->Initialize();
-        creature->setDeathState(JUST_DIED);
+        creature->setDeathState(DeathState::JustDied);
         creature->Respawn();
         //TODO: find a way to add a motionmaster without killing the creature (i
         //just copied this code from a gm-command

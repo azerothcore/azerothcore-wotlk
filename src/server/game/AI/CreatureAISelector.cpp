@@ -15,14 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "CreatureAISelector.h"
+#include "Creature.h"
 #include "CreatureAIFactory.h"
 
 #include "MovementGenerator.h"
 
 #include "GameObject.h"
-#include "GameObjectAIFactory.h"
 
 #include "ScriptMgr.h"
 

@@ -614,6 +614,7 @@ public:
     void SetAllowedLooters(GuidUnorderedSet const looters);
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+    void RemoveAllowedLooter(ObjectGuid guid);
 
     std::string GetDebugInfo() const override;
 

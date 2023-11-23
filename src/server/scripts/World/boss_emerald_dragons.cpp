@@ -193,9 +193,9 @@ public:
 
         void ScheduleEvents()
         {
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
 
-            _scheduler.Schedule(1s, [this](TaskContext context)
+            scheduler.Schedule(1s, [this](TaskContext context)
             {
                 // Chase target, but don't attack - otherwise just roam around
                 if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
@@ -251,13 +251,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
         }
 
     private:
         ObjectGuid _targetGUID;
         ObjectGuid _dragonGUID;
-        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

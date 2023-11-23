@@ -156,7 +156,7 @@ public:
                 case GO_ILLIDAN_GATE:
                 case GO_ILLIDAN_DOOR_R:
                 case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
             }
         }
@@ -178,7 +178,7 @@ public:
                 case GO_ILLIDAN_GATE:
                 case GO_ILLIDAN_DOOR_R:
                 case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

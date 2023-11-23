@@ -46,20 +46,9 @@ enum Yells
     SAY_DEATH                      = 4
 };
 
-enum Creatures
-{
-    NPC_NETHER_CHARGE               = 20405
-};
-
 struct boss_mechano_lord_capacitus : public BossAI
 {
-    boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS) { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -127,7 +116,6 @@ struct boss_mechano_lord_capacitus : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
         summon->GetMotionMaster()->MoveRandom(30.0f);
     }
 };
@@ -150,16 +138,20 @@ class spell_capacitus_polarity_charge : public SpellScript
     void HandleTargets(std::list<WorldObject*>& targetList)
     {
         uint8 count = 0;
-        for (std::list<WorldObject*>::iterator ihit = targetList.begin(); ihit != targetList.end(); ++ihit)
-            if ((*ihit)->GetGUID() != GetCaster()->GetGUID())
-                if (Player* target = (*ihit)->ToPlayer())
+        for (auto& ihit : targetList)
+            if (ihit->GetGUID() != GetCaster()->GetGUID())
+                if (Player* target = ihit->ToPlayer())
                     if (target->HasAura(GetTriggeringSpell()->Id))
                         ++count;
 
+        uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
         if (count)
         {
-            uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
             GetCaster()->SetAuraStack(spellId, GetCaster(), count);
+        }
+        else
+        {
+            GetCaster()->RemoveAurasDueToSpell(spellId);
         }
     }
 
@@ -180,6 +172,29 @@ class spell_capacitus_polarity_charge : public SpellScript
     }
 };
 
+class spell_capacitus_polarity_charge_aura : public AuraScript
+{
+    PrepareAuraScript(spell_capacitus_polarity_charge_aura);
+
+    void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+        {
+            Unit* target = GetTarget();
+            if (!target)
+                return;
+
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_capacitus_polarity_charge_aura::HandleAfterRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 class spell_capacitus_polarity_shift : public SpellScript
 {
     PrepareSpellScript(spell_capacitus_polarity_shift);
@@ -187,7 +202,11 @@ class spell_capacitus_polarity_shift : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
+        {
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
             target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, GetCaster()->GetGUID());
+        }
     }
 
     void Register() override
@@ -200,5 +219,6 @@ void AddSC_boss_mechano_lord_capacitus()
 {
     RegisterMechanarCreatureAI(boss_mechano_lord_capacitus);
     RegisterSpellScript(spell_capacitus_polarity_charge);
+    RegisterSpellScript(spell_capacitus_polarity_charge_aura);
     RegisterSpellScript(spell_capacitus_polarity_shift);
 }

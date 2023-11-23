@@ -21,14 +21,17 @@
 #include "SpellScript.h"
 #include "blood_furnace.h"
 
-enum eEnums
+enum Say
 {
-    SAY_AGGRO               = 0,
+    SAY_AGGRO               = 0
+};
 
+enum Spells
+{
     SPELL_SLIME_SPRAY       = 30913,
     SPELL_POISON_CLOUD      = 30916,
     SPELL_POISON_BOLT       = 30917,
-    SPELL_POISON            = 30914,
+    SPELL_POISON            = 30914
 };
 
 struct boss_broggok : public BossAI
@@ -52,7 +55,6 @@ struct boss_broggok : public BossAI
     void JustSummoned(Creature* summoned) override
     {
         summons.Summon(summoned);
-
         summoned->SetFaction(FACTION_MONSTER_2);
         summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         summoned->CastSpell(summoned, SPELL_POISON, true, 0, 0, me->GetGUID());
@@ -80,7 +82,6 @@ struct boss_broggok : public BossAI
                     DoCastSelf(SPELL_POISON_CLOUD);
                     context.Repeat(20s);
                 });
-
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
@@ -106,7 +107,6 @@ public:
                 }
             }
         }
-
         go->UseDoorOrButton();
         return false;
     }
@@ -121,6 +121,7 @@ class spell_broggok_poison_cloud : public AuraScript
     {
         if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
             return false;
+
         return true;
     }
 
@@ -142,6 +143,6 @@ class spell_broggok_poison_cloud : public AuraScript
 void AddSC_boss_broggok()
 {
     RegisterBloodFurnaceCreatureAI(boss_broggok);
-    new go_broggok_lever();
     RegisterSpellScript(spell_broggok_poison_cloud);
+    new go_broggok_lever();
 }

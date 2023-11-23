@@ -300,6 +300,7 @@ public:
 
     void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
     CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
+    CompletedAchievementMap const& GetCompletedAchievements();
 
 private:
     enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST, PROGRESS_RESET };
@@ -329,6 +330,7 @@ public:
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool IsStatisticAchievement(AchievementEntry const* achievement) const;
+    bool IsAverageCriteria(AchievementCriteriaEntry const* criteria) const;
 
     [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {
