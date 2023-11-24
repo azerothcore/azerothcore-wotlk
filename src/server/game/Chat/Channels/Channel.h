@@ -271,6 +271,8 @@ private:
     void SendToOne(WorldPacket* data, ObjectGuid who);
     void SendToAllWatching(WorldPacket* data);
 
+    bool ShouldAnnouncePlayer(const Player* pPlayer) const;
+
     [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
     [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
 

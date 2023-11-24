@@ -67,6 +67,13 @@ public:
             return false;
         }
 
+        guildName = guild_commandscript::_RemoveQuotes(guildName);
+
+        if (guildName.empty())
+        {
+            return false;
+        }
+
         Player* playerTarget = target->GetConnectedPlayer();
 
         if (playerTarget->GetGuildId())
@@ -106,6 +113,8 @@ public:
 
     static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
     {
+        guildName = guild_commandscript::_RemoveQuotes(guildName);
+
         if (guildName.empty())
         {
             return false;
@@ -129,6 +138,13 @@ public:
         }
 
         if (!target)
+        {
+            return false;
+        }
+
+        guildName = guild_commandscript::_RemoveQuotes(guildName);
+
+        if (guildName.empty())
         {
             return false;
         }
@@ -188,12 +204,10 @@ public:
 
     static bool HandleGuildRenameCommand(ChatHandler* handler, std::string_view oldGuildStr, std::string_view newGuildStr)
     {
-        if (!oldGuildStr.empty())
-        {
-            return false;
-        }
+        oldGuildStr = guild_commandscript::_RemoveQuotes(oldGuildStr);
+        newGuildStr = guild_commandscript::_RemoveQuotes(newGuildStr);
 
-        if (newGuildStr.empty())
+        if (oldGuildStr.empty() || newGuildStr.empty())
         {
             return false;
         }
@@ -260,6 +274,20 @@ public:
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the Day
         handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
         return true;
+    }
+private:
+    static std::string_view _RemoveQuotes(std::string_view inputString)
+    {
+        if (inputString.starts_with('"') && inputString.ends_with('"'))
+        {
+            inputString.remove_prefix(1);
+            inputString.remove_suffix(1);
+            return inputString;
+        }
+        else
+        {
+            return "";
+        }
     }
 };
 

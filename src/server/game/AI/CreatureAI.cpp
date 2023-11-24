@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaBoundary.h"
 #include "CreatureAI.h"
+#include "AreaBoundary.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
@@ -24,8 +24,8 @@
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "Vehicle.h"
 #include "ScriptMgr.h"
+#include "Vehicle.h"
 #include "ZoneScript.h"
 
 //Disable CreatureAI when charmed

@@ -2112,8 +2112,10 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 
     if (forceRespawnTimer > Seconds::zero())
     {
-        m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
-        m_respawnDelay = forceRespawnTimer.count();
+        if (GetMap())
+        {
+            GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
+        }
     }
 }
 
@@ -3741,6 +3743,15 @@ bool Creature::CanCastSpell(uint32 spellID) const
     }
 
     return true;
+}
+
+ObjectGuid Creature::GetSummonerGUID() const
+{
+    if (TempSummon const* temp = ToTempSummon())
+        return temp->GetSummonerGUID();
+
+    LOG_DEBUG("entities.unit", "Creature::GetSummonerGUID() called by creature that is not a summon. Creature: {} ({})", GetEntry(), GetName());
+    return ObjectGuid::Empty;
 }
 
 std::string Creature::GetDebugInfo() const

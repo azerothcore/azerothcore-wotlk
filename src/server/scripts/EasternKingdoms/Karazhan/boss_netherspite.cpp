@@ -18,9 +18,9 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "karazhan.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum Emotes
 {

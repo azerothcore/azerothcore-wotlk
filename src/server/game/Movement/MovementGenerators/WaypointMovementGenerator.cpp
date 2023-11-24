@@ -263,6 +263,19 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
             AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
         }
     }
+    else
+    {
+        if (TempSummon* tempSummon = creature->ToTempSummon())
+        {
+            if (Unit* owner = tempSummon->GetSummonerUnit())
+            {
+                if (UnitAI* AI = owner->GetAI())
+                {
+                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+                }
+            }
+        }
+    }
 }
 
 //----------------------------------------------------//

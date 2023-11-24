@@ -773,6 +773,8 @@ void Map::Update(const uint32 t_diff)
         }
     }
 
+    _creatureRespawnScheduler.Update(t_diff);
+
     /// update active cells around players and active objects
     resetMarkedCells();
 
@@ -4203,6 +4205,17 @@ void Map::RemoveOldCorpses()
         RemoveCorpse(bones);
         delete bones;
     }
+}
+
+void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+{
+    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
+    {
+        if (Creature* creature = GetCreature(creatureGuid))
+        {
+            creature->Respawn();
+        }
+    });
 }
 
 void Map::SendZoneDynamicInfo(Player* player)

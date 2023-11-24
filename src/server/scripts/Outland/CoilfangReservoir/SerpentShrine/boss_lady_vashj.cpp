@@ -66,26 +66,6 @@ enum Misc
     POINT_HOME                      = 1,
 };
 
-class startFollow : public BasicEvent
-{
-public:
-    startFollow(Unit* owner) : _owner(owner)  { }
-
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
-    {
-        if (InstanceScript* instance = _owner->GetInstanceScript())
-        {
-            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetGuidData(NPC_LADY_VASHJ)))
-            {
-                _owner->GetMotionMaster()->MoveFollow(vashj, 3.0f, vashj->GetAngle(_owner), MOTION_SLOT_CONTROLLED);
-            }
-        }
-        return true;
-    }
-private:
-    Unit* _owner;
-};
-
 struct boss_lady_vashj : public BossAI
 {
     boss_lady_vashj(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
@@ -147,16 +127,11 @@ struct boss_lady_vashj : public BossAI
         {
             summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
         }
-        else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
-        {
-            summon->SetWalk(true);
-            summon->m_Events.AddEvent(new startFollow(summon), summon->m_Events.CalculateTime(0));
-        }
         else if (summon->GetEntry() == NPC_TOXIC_SPOREBAT)
         {
             summon->GetMotionMaster()->MoveRandom(30.0f);
         }
-        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
+        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL && summon->GetEntry() != NPC_ENCHANTED_ELEMENTAL)
         {
             summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
         }
