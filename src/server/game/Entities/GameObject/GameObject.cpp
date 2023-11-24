@@ -105,7 +105,11 @@ std::string const& GameObject::GetAIName() const
 
 void GameObject::CleanupsBeforeDelete(bool finalCleanup)
 {
-    WorldObject::CleanupsBeforeDelete(finalCleanup);
+    if (GetTransport() && !ToTransport())
+        GetTransport()->RemovePassenger(this, true);
+
+    if (IsInWorld())
+        RemoveFromWorld();
 
     if (m_uint32Values)                                      // field array can be not exist if GameOBject not loaded
         RemoveFromOwner();
@@ -2188,6 +2192,12 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     return dx < (info->maxX * scale) + radius && dx > (info->minX * scale) - radius
            && dy < (info->maxY * scale) + radius && dy > (info->minY * scale) - radius
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
+}
+
+void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, Player const* skipped_rcvr) const
+{
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void GameObject::EventInform(uint32 eventId)

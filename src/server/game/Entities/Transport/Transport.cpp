@@ -925,8 +925,7 @@ void StaticTransport::UpdatePosition(float x, float y, float z, float o)
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
-    Relocate(x, y, z, o);
-    UpdateModelPosition();
+    GetMap()->GameObjectRelocation(this, x, y, z, o); // this also relocates the model
     UpdatePassengerPositions();
 }
 

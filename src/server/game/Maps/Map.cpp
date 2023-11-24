@@ -446,8 +446,6 @@ void Map::DeleteFromWorld(Player* player)
 
 void Map::EnsureGridCreated(const GridCoord& p)
 {
-    if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
-        return;
     std::lock_guard<std::mutex> guard(GridLock);
     EnsureGridCreated_i(p);
 }
@@ -760,8 +758,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
 
 void Map::Update(const uint32 t_diff)
 {
-    if (t_diff)
-        _dynamicTree.update(t_diff);
+    _dynamicTree.update(t_diff);
 
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
@@ -3536,9 +3533,8 @@ void InstanceMap::Update(const uint32 t_diff)
 {
     Map::Update(t_diff);
 
-    if (t_diff)
-        if (instance_data)
-            instance_data->Update(t_diff);
+    if (instance_data)
+        instance_data->Update(t_diff);
 }
 
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
