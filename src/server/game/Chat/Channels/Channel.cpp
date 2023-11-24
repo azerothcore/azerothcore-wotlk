@@ -938,9 +938,9 @@ void Channel::SendToAllWatching(WorldPacket* data)
         (*i)->GetSession()->SendPacket(data);
 }
 
-bool Channel::ShouldAnnouncePlayer(const Player* pPlayer) const
+bool Channel::ShouldAnnouncePlayer(Player const* player) const
 {
-    return !(AccountMgr::IsGMAccount(pPlayer->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
+    return !(AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
 }
 
 void Channel::Voice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
