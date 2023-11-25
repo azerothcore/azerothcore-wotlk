@@ -17,7 +17,7 @@
 
 #include "Containers.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"

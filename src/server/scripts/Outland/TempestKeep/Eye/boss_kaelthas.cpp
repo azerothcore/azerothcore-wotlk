@@ -16,7 +16,7 @@
  */
 
 #include "Opcodes.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "WorldPacket.h"
 #include "the_eye.h"

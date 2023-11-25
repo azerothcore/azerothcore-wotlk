@@ -24,7 +24,7 @@ EndScriptData */
 
 #include "BattlefieldMgr.h"
 #include "Chat.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 using namespace Acore::ChatCommands;
 

@@ -19,7 +19,7 @@
 #include "BattlefieldMgr.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "vault_of_archavon.h"

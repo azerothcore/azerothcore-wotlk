@@ -15,12 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Errors.h"
+#include "Map.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
 {
     ASSERT(map);
 
-    auto tempScript = ScriptRegistry<InstanceMapScript>::GetScriptById(map->GetScriptId());
+    auto tempScript = ScriptRegistry<InstanceMapScript>::Instance()->GetScriptById(map->GetScriptId());
     return tempScript ? tempScript->GetInstanceScript(map) : nullptr;
 }

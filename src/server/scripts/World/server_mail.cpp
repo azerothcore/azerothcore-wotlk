@@ -18,7 +18,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "QueryResult.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 class ServerMailReward : public PlayerScript
 {

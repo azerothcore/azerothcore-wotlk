@@ -34,7 +34,7 @@
 #include "Group.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"

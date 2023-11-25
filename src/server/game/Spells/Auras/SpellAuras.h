@@ -233,9 +233,9 @@ public:
     bool CallScriptEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     void CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
 
-    AuraScript* GetScriptByName(std::string const& scriptName) const;
+    AuraScript* GetScriptByName(std::string_view scriptName) const;
 
-    std::list<AuraScript*> m_loadedScripts;
+    std::vector<AuraScript*> m_loadedScripts;
 
     virtual std::string GetDebugInfo() const;
 

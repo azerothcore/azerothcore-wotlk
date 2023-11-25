@@ -27,7 +27,7 @@ npc_rinji
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 

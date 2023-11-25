@@ -15,12 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ConditionMgr.h"
+#include "Errors.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
 {
     ASSERT(condition);
 
-    auto tempScript = ScriptRegistry<ConditionScript>::GetScriptById(condition->ScriptId);
+    auto tempScript = ScriptRegistry<ConditionScript>::Instance()->GetScriptById(condition->ScriptId);
     return tempScript ? tempScript->OnConditionCheck(condition, sourceInfo) : true;
 }

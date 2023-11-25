@@ -19,7 +19,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 

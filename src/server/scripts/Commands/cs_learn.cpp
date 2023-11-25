@@ -27,7 +27,7 @@ EndScriptData */
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 

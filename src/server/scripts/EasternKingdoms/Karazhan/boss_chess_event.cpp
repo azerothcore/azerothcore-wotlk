@@ -17,18 +17,14 @@
 
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Unit.h"
 #include "World.h"
 #include "karazhan.h"
-
 #include <array>
 
 enum EchoOfMedivhGossipOptions

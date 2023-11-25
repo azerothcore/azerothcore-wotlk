@@ -25,7 +25,7 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"

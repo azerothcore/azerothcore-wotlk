@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Errors.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
 {
@@ -77,16 +79,11 @@ void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 bool ScriptMgr::OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell)
 {
     auto ret = IsValidBoolScript<PlayerScript>([player, mapId, zoneId, bySpell](PlayerScript* script)
-        {
-            return !script->OnCanPlayerFlyInZone(player, mapId, zoneId, bySpell);
-        });
-
-    if (ret && *ret)
     {
-        return false;
-    }
+        return !script->OnCanPlayerFlyInZone(player, mapId, zoneId, bySpell);
+    });
 
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
@@ -188,16 +185,11 @@ void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim, uin
 bool ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
-        {
-            return !script->OnReputationChange(player, factionID, standing, incremental);
-        });
-
-    if (ret && *ret)
     {
-        return false;
-    }
+        return !script->OnReputationChange(player, factionID, standing, incremental);
+    });
 
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)
@@ -423,12 +415,7 @@ bool ScriptMgr::OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, fl
         return !script->OnBeforeTeleport(player, mapid, x, y, z, orientation, options, target);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnPlayerUpdateFaction(Player* player)
@@ -470,12 +457,7 @@ bool ScriptMgr::OnBeforeAchievementComplete(Player* player, AchievementEntry con
         return !script->OnBeforeAchiComplete(player, achievement);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
@@ -493,12 +475,7 @@ bool ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntr
         return !script->OnBeforeCriteriaProgress(player, criteria);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
@@ -509,7 +486,7 @@ void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry cons
     });
 }
 
-void ScriptMgr::OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
+void ScriptMgr::OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData const* achiData)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
@@ -517,7 +494,7 @@ void ScriptMgr::OnAchievementSave(CharacterDatabaseTransaction trans, Player* pl
     });
 }
 
-void ScriptMgr::OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
+void ScriptMgr::OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress const* criteriaData)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
@@ -698,12 +675,7 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid Battlemast
         return !script->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
@@ -713,12 +685,7 @@ bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
         return script->ShouldBeRewardedWithMoneyInsteadOfExp(player);
     });
 
-    if (ret && *ret)
-    {
-        return true;
-    }
-
-    return false;
+    return ReturnValidBool(ret, true);
 }
 
 void ScriptMgr::OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration)
@@ -815,12 +782,7 @@ bool ScriptMgr::OnBeforePlayerQuestComplete(Player* player, uint32 quest_id)
         return !script->OnBeforeQuestComplete(player, quest_id);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 void ScriptMgr::OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue)
 {
@@ -845,12 +807,7 @@ bool ScriptMgr::CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid,
         return !script->CanJoinInArenaQueue(player, BattlemasterGuid, arenaslot, BGTypeID, joinAsGroup, IsRated, err);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action)
@@ -860,12 +817,7 @@ bool ScriptMgr::CanBattleFieldPort(Player* player, uint8 arenaType, Battleground
         return !script->CanBattleFieldPort(player, arenaType, BGTypeID, action);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanGroupInvite(Player* player, std::string& membername)
@@ -875,12 +827,7 @@ bool ScriptMgr::CanGroupInvite(Player* player, std::string& membername)
         return !script->CanGroupInvite(player, membername);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanGroupAccept(Player* player, Group* group)
@@ -890,12 +837,7 @@ bool ScriptMgr::CanGroupAccept(Player* player, Group* group)
         return !script->CanGroupAccept(player, group);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
@@ -905,12 +847,7 @@ bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
         return !script->CanSellItem(player, item, creature);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item)
@@ -920,12 +857,7 @@ bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid 
         return !script->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSendErrorAlreadyLooted(Player* player)
@@ -990,12 +922,7 @@ bool ScriptMgr::CanGiveMailRewardAtGiveLevel(Player* player, uint8 level)
         return !script->CanGiveMailRewardAtGiveLevel(player, level);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid)
@@ -1013,12 +940,7 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
         return !script->CanRepopAtGraveyard(player);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure)
@@ -1065,12 +987,7 @@ bool ScriptMgr::CanAreaExploreAndOutdoor(Player* player)
         return !script->CanAreaExploreAndOutdoor(player);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title)
@@ -1112,12 +1029,7 @@ bool ScriptMgr::CanArmorDamageModifier(Player* player)
         return !script->CanArmorDamageModifier(player);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv)
@@ -1135,12 +1047,7 @@ bool ScriptMgr::CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item,
         return !script->CanApplyWeaponDependentAuraDamageMod(player, item, attackType, aura, apply);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change)
@@ -1150,12 +1057,7 @@ bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, I
         return !script->CanApplyEquipSpell(player, spellInfo, item, apply, form_change);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff)
@@ -1165,12 +1067,7 @@ bool ScriptMgr::CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff)
         return !script->CanApplyEquipSpellsItemSet(player, eff);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
@@ -1180,12 +1077,7 @@ bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttac
         return !script->CanCastItemCombatSpell(player, target, attType, procVictim, procEx, item, proto);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
@@ -1195,12 +1087,7 @@ bool ScriptMgr::CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets
         return !script->CanCastItemUseSpell(player, item, targets, cast_count, glyphIndex);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS)
@@ -1218,12 +1105,7 @@ bool ScriptMgr::CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pIt
         return !script->CanEquipItem(player, slot, dest, pItem, swap, not_loading);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanUnequipItem(Player* player, uint16 pos, bool swap)
@@ -1233,12 +1115,7 @@ bool ScriptMgr::CanUnequipItem(Player* player, uint16 pos, bool swap)
         return !script->CanUnequipItem(player, pos, swap);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result)
@@ -1248,12 +1125,7 @@ bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryR
         return !script->CanUseItem(player, proto, result);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update)
@@ -1263,12 +1135,7 @@ bool ScriptMgr::CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool
         return !script->CanSaveEquipNewItem(player, item, pos, update);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)
@@ -1278,12 +1145,7 @@ bool ScriptMgr::CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot 
         return !script->CanApplyEnchantment(player, item, slot, apply, apply_dur, ignore_condition);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnGetQuestRate(Player* player, float& result)
@@ -1301,12 +1163,7 @@ bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinf
         return !script->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest)
@@ -1316,12 +1173,7 @@ bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8
         return !script->CheckItemInSlotAtLoadInventory(player, item, slot, err, dest);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
@@ -1331,12 +1183,7 @@ bool ScriptMgr::NotAvoidSatisfy(Player* player, DungeonProgressionRequirements c
         return !script->NotAvoidSatisfy(player, ar, target_map, report);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::NotVisibleGloballyFor(Player* player, Player const* u)
@@ -1346,12 +1193,7 @@ bool ScriptMgr::NotVisibleGloballyFor(Player* player, Player const* u)
         return !script->NotVisibleGloballyFor(player, u);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result)
@@ -1410,12 +1252,7 @@ bool ScriptMgr::NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamIn
         return !script->NotSetArenaTeamInfoField(player, slot, type, value);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment)
@@ -1425,12 +1262,7 @@ bool ScriptMgr::CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dung
         return !script->CanJoinLfg(player, roles, dungeons, comment);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck)
@@ -1440,12 +1272,7 @@ bool ScriptMgr::CanEnterMap(Player* player, MapEntry const* entry, InstanceTempl
         return !script->CanEnterMap(player, entry, instance, mapDiff, loginCheck);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanInitTrade(Player* player, Player* target)
@@ -1455,12 +1282,7 @@ bool ScriptMgr::CanInitTrade(Player* player, Player* target)
         return !script->CanInitTrade(player, target);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
@@ -1478,22 +1300,6 @@ void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibi
         script->OnSetServerSideVisibilityDetect(player, type, sec);
     });
 }
-
-//void ScriptMgr::OnGiveHonorPoints(Player* player, float& honor, Unit* victim)
-//{
-//    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-//    {
-//        script->OnGiveHonorPoints(player, honor, victim);
-//    });
-//}
-//
-//void ScriptMgr::OnAfterResurrect(Player* player, float restore_percent, bool applySickness)
-//{
-//    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-//    {
-//        script->OnAfterResurrect(player, restore_percent, applySickness);
-//    });
-//}
 
 void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool applySickness)
 {
@@ -1518,12 +1324,7 @@ bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, s
         return !script->CanPlayerUseChat(player, type, language, msg);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver)
@@ -1533,12 +1334,7 @@ bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, s
         return !script->CanPlayerUseChat(player, type, language, msg, receiver);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Group* group)
@@ -1548,12 +1344,7 @@ bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, s
         return !script->CanPlayerUseChat(player, type, language, msg, group);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Guild* guild)
@@ -1563,12 +1354,7 @@ bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, s
         return !script->CanPlayerUseChat(player, type, language, msg, guild);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Channel* channel)
@@ -1578,12 +1364,7 @@ bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, s
         return !script->CanPlayerUseChat(player, type, language, msg, channel);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnPlayerLearnTalents(Player* player, uint32 talentId, uint32 talentRank, uint32 spellid)
@@ -1674,12 +1455,7 @@ bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
         return !script->AnticheatHandleDoubleJump(player, mover);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
@@ -1689,10 +1465,5 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
         return !script->AnticheatCheckMovementInfo(player, movementInfo, mover, jump);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

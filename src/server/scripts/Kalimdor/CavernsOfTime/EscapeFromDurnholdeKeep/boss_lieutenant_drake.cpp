@@ -16,7 +16,7 @@
  */
 
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
 #include "old_hillsbrad.h"

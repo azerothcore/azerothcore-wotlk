@@ -17,7 +17,8 @@
 
 #include "the_slave_pens.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "ScriptObject.h"
 
 class at_quagmirran_lair : public AreaTriggerScript
 {

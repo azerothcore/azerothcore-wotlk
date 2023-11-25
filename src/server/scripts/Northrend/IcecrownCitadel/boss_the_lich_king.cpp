@@ -22,13 +22,14 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "icecrown_citadel.h"
 
 enum Texts

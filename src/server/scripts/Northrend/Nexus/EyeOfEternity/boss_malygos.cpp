@@ -21,6 +21,7 @@
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptObject.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"

@@ -29,7 +29,7 @@ go_mausoleum_trigger
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 
 /*######

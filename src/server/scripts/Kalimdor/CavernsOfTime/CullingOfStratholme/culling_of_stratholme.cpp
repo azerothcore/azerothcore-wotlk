@@ -18,7 +18,7 @@
 #include "culling_of_stratholme.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"

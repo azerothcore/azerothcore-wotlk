@@ -19,7 +19,7 @@
 #include "Group.h"
 #include "Guild.h"
 #include "Log.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 class ChatLogScript : public PlayerScript
 {

@@ -17,10 +17,11 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
-void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
+void ScriptMgr::OnPlayerMove(Player* player, MovementInfo* movementInfo, uint32 opcode)
 {
-    ExecuteScript<MovementHandlerScript>([&](MovementHandlerScript* script)
+    ExecuteScript<MovementHandlerScript>([player, movementInfo, opcode](MovementHandlerScript* script)
     {
         script->OnPlayerMove(player, movementInfo, opcode);
     });

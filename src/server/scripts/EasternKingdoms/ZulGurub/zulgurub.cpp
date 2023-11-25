@@ -16,7 +16,7 @@
  */
 
 #include "GridNotifiers.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 
 enum Spells

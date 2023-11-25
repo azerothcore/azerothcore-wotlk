@@ -17,7 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "shattered_halls.h"
 
 ObjectData const creatureData[] =

@@ -28,6 +28,7 @@
 #include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "MapInstanced.h"
+#include "MapMgr.h"
 #include "Metric.h"
 #include "MiscPackets.h"
 #include "Object.h"
@@ -76,7 +77,7 @@ Map::~Map()
     }
 
     if (!m_scriptSchedule.empty())
-        sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
+        sMapMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
     //MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId());
     MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);

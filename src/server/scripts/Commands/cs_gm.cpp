@@ -30,7 +30,7 @@ EndScriptData */
 #include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "World.h"
 #include "WorldSession.h"
 

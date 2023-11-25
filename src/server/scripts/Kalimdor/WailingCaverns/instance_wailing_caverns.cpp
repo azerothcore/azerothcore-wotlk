@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "wailing_caverns.h"
 
 class instance_wailing_caverns : public InstanceMapScript

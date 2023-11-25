@@ -23,7 +23,7 @@ SDCategory: Creatures
 EndScriptData */
 
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 
 #define GENERIC_CREATURE_COOLDOWN   5000

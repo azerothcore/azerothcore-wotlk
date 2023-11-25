@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "MapRefMgr.h"
@@ -57,7 +58,7 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         if (iter->first == 0)
             immedScript = true;
 
-        sScriptMgr->IncreaseScheduledScriptsCount();
+        sMapMgr->IncreaseScheduledScriptsCount();
     }
     ///- If one of the effects should be immediate, launch the script execution
     if (/*start &&*/ immedScript && !i_scriptLock)
@@ -85,7 +86,7 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     sa.script = &script;
     m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(GameTime::GetGameTime().count() + delay), sa));
 
-    sScriptMgr->IncreaseScheduledScriptsCount();
+    sMapMgr->IncreaseScheduledScriptsCount();
 
     ///- If effects should be immediate, launch the script execution
     if (delay == 0 && !i_scriptLock)
@@ -112,9 +113,9 @@ inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* targe
 
         if (!player)
             LOG_ERROR("maps.script", "{} neither source nor target object is player (source: TypeId: {}, Entry: {}, GUID: {}; target: TypeId: {}, Entry: {}, GUID: {}), skipping.",
-                           scriptInfo->GetDebugInfo(),
-                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString() : "",
-                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString() : "");
+                           scriptInfo->GetDebugInfo().c_str(),
+                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString().c_str() : "",
+                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString().c_str() : "");
     }
     return player;
 }
@@ -145,9 +146,9 @@ inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* t
 
         if (!creature)
             LOG_ERROR("maps.script", "{} neither source nor target are creatures (source: TypeId: {}, Entry: {}, GUID: {}; target: TypeId: {}, Entry: {}, GUID: {}), skipping.",
-                           scriptInfo->GetDebugInfo(),
-                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString() : "",
-                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString() : "");
+                           scriptInfo->GetDebugInfo().c_str(),
+                           source ? source->GetTypeId() : 0, source ? source->GetEntry() : 0, source ? source->GetGUID().ToString().c_str() : "",
+                           target ? target->GetTypeId() : 0, target ? target->GetEntry() : 0, target ? target->GetGUID().ToString().c_str() : "");
     }
     return creature;
 }
@@ -532,7 +533,7 @@ void Map::ScriptsProcess()
                         else
                         {
                             LOG_ERROR("maps.script", "{} neither source nor target is player (source: {}; target: {}), skipping.",
-                                           step.script->GetDebugInfo(), source->GetGUID().ToString(), target->GetGUID().ToString());
+                                           step.script->GetDebugInfo().c_str(), source->GetGUID().ToString().c_str(), target->GetGUID().ToString().c_str());
                             break;
                         }
                     }
@@ -663,7 +664,7 @@ void Map::ScriptsProcess()
 
             case SCRIPT_COMMAND_CAST_SPELL:
                 {
-                    /// @todo: Allow gameobjects to be targets and casters
+                    // TODO: Allow gameobjects to be targets and casters
                     if (!source && !target)
                     {
                         LOG_ERROR("maps.script", "{} source and target objects are nullptr.", step.script->GetDebugInfo());
@@ -824,7 +825,7 @@ void Map::ScriptsProcess()
                         LOG_ERROR("maps.script", "{} creature is already dead ({})", step.script->GetDebugInfo(), cSource->GetGUID().ToString());
                     else
                     {
-                        cSource->setDeathState(DeathState::JustDied);
+                        cSource->setDeathState(DeathState::Dead);
                         if (step.script->Kill.RemoveCorpse == 1)
                             cSource->RemoveCorpse();
                     }
@@ -902,6 +903,6 @@ void Map::ScriptsProcess()
 
         m_scriptSchedule.erase(iter);
         iter = m_scriptSchedule.begin();
-        sScriptMgr->DecreaseScheduledScriptCount();
+        sMapMgr->DecreaseScheduledScriptCount();
     }
 }

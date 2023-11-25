@@ -23,7 +23,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"

@@ -31,7 +31,7 @@
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 using namespace Acore::ChatCommands;
 

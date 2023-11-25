@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnAccountLogin(uint32 accountId)
 {
@@ -89,10 +90,5 @@ bool ScriptMgr::CanAccountCreateCharacter(uint32 accountId, uint8 charRace, uint
         return !script->CanAccountCreateCharacter(accountId, charRace, charClass);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

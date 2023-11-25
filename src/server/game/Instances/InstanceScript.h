@@ -52,7 +52,7 @@ enum EncounterFrameType
     ENCOUNTER_FRAME_REFRESH_FRAMES      = 7,    // Xinef: can be used to refresh frames after unit was destroyed from client and send back (phase changes)
 };
 
-enum EncounterState
+enum EncounterState : uint8
 {
     NOT_STARTED   = 0,
     IN_PROGRESS   = 1,

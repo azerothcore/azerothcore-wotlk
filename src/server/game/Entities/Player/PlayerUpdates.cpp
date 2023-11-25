@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementMgr.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -35,6 +36,7 @@
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
 

@@ -18,6 +18,7 @@
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
 #include "MiscPackets.h"

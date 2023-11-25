@@ -24,7 +24,7 @@ EndScriptData */
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TemporarySummon.h"
 #include "zulaman.h"
 

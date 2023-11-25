@@ -17,7 +17,7 @@
 
 #include "GameObjectAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
 #include "SpellScript.h"

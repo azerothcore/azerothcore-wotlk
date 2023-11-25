@@ -15,8 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Errors.h"
+#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
 {
@@ -29,10 +32,8 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
     });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
-    auto tempScript = ScriptRegistry<AreaTriggerScript>::GetScriptById(sObjectMgr->GetAreaTriggerScriptId(trigger->entry));
+    auto tempScript = ScriptRegistry<AreaTriggerScript>::Instance()->GetScriptById(sObjectMgr->GetAreaTriggerScriptId(trigger->entry));
     return tempScript ? tempScript->OnTrigger(player, trigger) : false;
 }

@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
 {

@@ -17,7 +17,7 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "ruby_sanctum.h"

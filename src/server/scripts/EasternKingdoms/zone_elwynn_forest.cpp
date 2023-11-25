@@ -19,7 +19,7 @@
 #include "CreatureGroups.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 
 enum COG_Paths

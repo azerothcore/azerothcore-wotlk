@@ -29,7 +29,7 @@ EndScriptData */
 #include "Pet.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "StringConvert.h"
 
 using namespace Acore::ChatCommands;

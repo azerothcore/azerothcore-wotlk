@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 bool ScriptMgr::CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid)
 {
@@ -25,12 +26,7 @@ bool ScriptMgr::CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid)
         return !script->CanAddMember(team, PlayerGuid);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points)
@@ -48,10 +44,5 @@ bool ScriptMgr::CanSaveToDB(ArenaTeam* team)
         return !script->CanSaveToDB(team);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

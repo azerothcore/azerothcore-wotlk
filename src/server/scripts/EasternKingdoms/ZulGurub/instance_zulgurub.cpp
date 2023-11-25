@@ -22,9 +22,10 @@ SDComment: Missing reset function after killing a boss for Ohgan, Thekal.
 SDCategory: Zul'Gurub
 EndScriptData */
 
+#include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "zulgurub.h"
 
 DoorData const doorData[] =

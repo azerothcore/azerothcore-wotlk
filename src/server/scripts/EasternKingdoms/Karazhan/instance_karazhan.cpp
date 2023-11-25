@@ -20,7 +20,7 @@
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "karazhan.h"

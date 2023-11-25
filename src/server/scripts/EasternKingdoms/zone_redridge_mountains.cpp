@@ -22,7 +22,7 @@ SDComment: Support for quest 219.
 Script Data End */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 

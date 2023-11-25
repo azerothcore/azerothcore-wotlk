@@ -35,7 +35,7 @@ EndScriptData */
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -278,7 +278,7 @@ public:
 
     static bool HandleReloadAllScriptsCommand(ChatHandler* handler)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->PSendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -959,7 +959,7 @@ public:
 
     static bool HandleReloadEventScriptsCommand(ChatHandler* handler)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -977,7 +977,7 @@ public:
 
     static bool HandleReloadWpScriptsCommand(ChatHandler* handler)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -1004,7 +1004,7 @@ public:
 
     static bool HandleReloadSpellScriptsCommand(ChatHandler* handler)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);

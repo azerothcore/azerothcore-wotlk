@@ -18,7 +18,7 @@
 #include "GameTime.h"
 #include "Group.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 

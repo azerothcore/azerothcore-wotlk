@@ -17,7 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 

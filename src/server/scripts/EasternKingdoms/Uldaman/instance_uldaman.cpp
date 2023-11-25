@@ -17,7 +17,7 @@
 
 #include "CreatureAI.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 #include "uldaman.h"
 

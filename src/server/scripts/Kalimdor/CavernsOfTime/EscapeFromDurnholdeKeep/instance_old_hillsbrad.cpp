@@ -18,7 +18,7 @@
 #include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "old_hillsbrad.h"
 
 static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =

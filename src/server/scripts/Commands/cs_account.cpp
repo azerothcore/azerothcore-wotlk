@@ -32,6 +32,7 @@ EndScriptData */
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"

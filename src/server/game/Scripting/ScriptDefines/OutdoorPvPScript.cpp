@@ -15,13 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Errors.h"
 #include "OutdoorPvPMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
 {
     ASSERT(data);
 
-    auto tempScript = ScriptRegistry<OutdoorPvPScript>::GetScriptById(data->ScriptId);
+    auto tempScript = ScriptRegistry<OutdoorPvPScript>::Instance()->GetScriptById(data->ScriptId);
     return tempScript ? tempScript->GetOutdoorPvP() : nullptr;
 }

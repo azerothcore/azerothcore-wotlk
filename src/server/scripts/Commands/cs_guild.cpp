@@ -25,7 +25,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 using namespace Acore::ChatCommands;
 

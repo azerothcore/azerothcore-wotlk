@@ -16,7 +16,7 @@
  */
 
 #include "utgarde_pinnacle.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Unit.h"

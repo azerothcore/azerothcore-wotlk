@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Errors.h"
 #include "ScriptMgr.h"
 
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)

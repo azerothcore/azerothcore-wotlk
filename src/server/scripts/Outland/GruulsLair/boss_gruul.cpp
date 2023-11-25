@@ -16,7 +16,7 @@
  */
 
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "gruuls_lair.h"

@@ -32,7 +32,7 @@ EndScriptData */
 #include "Player.h"
 #include "PlayerDump.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "Timer.h"
 #include "World.h"
 #include "WorldSession.h"

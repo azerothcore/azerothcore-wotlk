@@ -17,7 +17,7 @@
 
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "Vehicle.h"

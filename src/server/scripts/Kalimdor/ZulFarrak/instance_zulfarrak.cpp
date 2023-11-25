@@ -18,7 +18,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TemporarySummon.h"
 #include "zulfarrak.h"
 

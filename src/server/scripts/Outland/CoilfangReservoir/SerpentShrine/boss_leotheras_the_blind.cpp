@@ -17,7 +17,7 @@
 
 #include "CreatureGroups.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"

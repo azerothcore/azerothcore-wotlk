@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
 {
@@ -33,10 +34,5 @@ bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
         return !script->CanExecuteCommand(handler, cmdStr);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

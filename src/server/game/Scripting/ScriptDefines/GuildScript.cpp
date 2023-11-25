@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {
@@ -114,10 +115,5 @@ bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, 
         return !script->CanGuildSendBankList(guild, session, tabId, sendAllSlots);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

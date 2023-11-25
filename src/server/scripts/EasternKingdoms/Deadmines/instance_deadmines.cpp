@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "deadmines.h"
 
 class instance_deadmines : public InstanceMapScript

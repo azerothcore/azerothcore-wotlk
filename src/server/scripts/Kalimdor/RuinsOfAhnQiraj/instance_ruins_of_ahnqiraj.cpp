@@ -18,7 +18,7 @@
 #include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
 

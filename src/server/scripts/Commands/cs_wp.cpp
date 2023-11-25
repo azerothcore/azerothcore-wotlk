@@ -26,7 +26,7 @@ EndScriptData */
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "WaypointMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU

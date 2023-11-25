@@ -22,7 +22,7 @@
 
 #include "PassiveAI.h"
 #include "PetAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "TotemAI.h"
 

@@ -19,7 +19,7 @@
 #include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 #include "Unit.h"
 #include "sunken_temple.h"

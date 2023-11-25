@@ -18,7 +18,7 @@
 #include "GameTime.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;

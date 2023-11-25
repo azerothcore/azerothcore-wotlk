@@ -17,7 +17,7 @@
 
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "the_underbog.h"
 
 ObjectData const creatureData[] =
