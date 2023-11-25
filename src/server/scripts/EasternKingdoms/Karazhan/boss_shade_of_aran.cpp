@@ -44,7 +44,7 @@ enum Spells
 {
     SPELL_FROSTBOLT              = 29954,
     SPELL_FIREBALL               = 29953,
-    SPELL_ARCANE_MISSILE         = 29955, 
+    SPELL_ARCANE_MISSILE         = 29955,
     SPELL_CHAINSOFICE            = 29991,
     SPELL_DRAGONSBREATH          = 29964,
     SPELL_MASSSLOW               = 30035,
@@ -308,15 +308,17 @@ struct boss_shade_of_aran : public BossAI
                 DoCastSelf(SPELL_BLINK_CENTER, true);
 
                 std::vector<uint32> superSpells = { SPELL_SUMMON_BLIZZARD, SPELL_AEXPLOSION, SPELL_FLAME_WREATH };
+
+                // Workaround for SelectRandomContainerElementIf
                 std::vector<uint32> allowedSpells;
                 std::copy_if(superSpells.begin(), superSpells.end(), std::back_inserter(allowedSpells), [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
-
-               //  SelectRandomContainerElementIf produces:
-               //       Selected Super Spell: 3722304989 
-               //       superSpells elements : 29969 29973 30004
-               //  _lastSuperSpell = Acore::Containers::SelectRandomContainerElementIf(superSpells, [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
-
                 _lastSuperSpell = allowedSpells[urand(0, allowedSpells.size() - 1)];
+
+                //  SelectRandomContainerElementIf produces unexpected output. Reintroduce when issue is resolved:
+                //  Sample results:
+                //       Selected Super Spell: 3722304989 
+                //       superSpells elements : 29969 29973 30004
+                //  _lastSuperSpell = Acore::Containers::SelectRandomContainerElementIf(superSpells, [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
 
                 me->InterruptNonMeleeSpells(true); // Super spell should have prio over normal spells
 
