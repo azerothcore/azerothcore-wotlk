@@ -91,7 +91,7 @@ enum Actions
 enum TaskGroups
 {
     GROUP_BEAM_PHASE = 1,
-    STOMACH_DEATH = 2
+    GROUP_STOMACH_DEATH = 2
 };
 
 enum Phases
@@ -396,7 +396,7 @@ struct boss_cthun : public BossAI
     void Reset() override
     {
         //One random wisper every 90 - 300 seconds
-        WisperTimer = 90000;
+        _whisperTimer = 90000;
 
         _fleshTentaclesKilled = 0;
         _stomachDeathScheduled = false;
@@ -501,11 +501,11 @@ struct boss_cthun : public BossAI
         if (!UpdateVictim())
         {
             //No target so we'll use this section to do our random wispers instance wide
-            //WisperTimer
-            if (WisperTimer <= diff)
+            //WhisperTimer
+            if (_whisperTimer <= diff)
             {
                 //Play random sound to the zone
-                Map::PlayerList const& PlayerList = map->GetPlayers();
+                Map::PlayerList const& PlayerList = _map->GetPlayers();
 
                 if (!PlayerList.IsEmpty())
                 {
@@ -517,20 +517,20 @@ struct boss_cthun : public BossAI
                 }
 
                 //One random wisper every 90 - 300 seconds
-                WisperTimer = urand(90000, 300000);
+                _whisperTimer = urand(90000, 300000);
             }
-            else WisperTimer -= diff;
+            else _whisperTimer -= diff;
 
             return;
         }
 
-        if (IsEveryoneAffectedByDigestiveAcid())
+        if (_IsEveryoneAffectedByDigestiveAcid())
         {
             if (!_stomachDeathScheduled)
             {
-                scheduler.Schedule(10s, STOMACH_DEATH, [this](TaskContext /*context*/)
+                scheduler.Schedule(10s, GROUP_STOMACH_DEATH, [this](TaskContext /*context*/)
                 {
-                    map->DoForAllPlayers([&](Player* player)
+                    _map->DoForAllPlayers([&](Player* player)
                     {
                         player->CastSpell(player, SPELL_PORT_OUT_STOMACH_EFFECT, false);
                     });
@@ -542,7 +542,7 @@ struct boss_cthun : public BossAI
         {
             if (_stomachDeathScheduled)
             {
-                scheduler.CancelGroup(STOMACH_DEATH);
+                scheduler.CancelGroup(GROUP_STOMACH_DEATH);
                 _stomachDeathScheduled = false;
             }
         }
@@ -604,7 +604,7 @@ struct boss_cthun : public BossAI
 
     private:
         //Out of combat whisper timer
-        uint32 WisperTimer;
+        uint32 _whisperTimer;
 
         //Body Phase
         uint8 _fleshTentaclesKilled;
@@ -613,11 +613,11 @@ struct boss_cthun : public BossAI
         bool _stomachDeathScheduled;
 
         //Map variable
-        Map* map;
+        Map* _map;
 
-        bool IsEveryoneAffectedByDigestiveAcid() const
+        bool _IsEveryoneAffectedByDigestiveAcid() const
         {
-            Map::PlayerList const& playerList = map->GetPlayers();
+            Map::PlayerList const& playerList = _map->GetPlayers();
             for (const auto& itr : playerList)
             {
                 if (Player* player = itr.GetSource())
