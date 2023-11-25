@@ -16,8 +16,8 @@
  */
 
 #include "ScriptMgr.h"
-#include "SpellScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Says

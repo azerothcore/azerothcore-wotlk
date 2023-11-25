@@ -42,24 +42,13 @@ enum Spells
 
 struct boss_lieutenant_drake : public BossAI
 {
-    boss_lieutenant_drake(Creature* creature) : BossAI(creature, DATA_LIEUTENANT_DRAKE)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_lieutenant_drake(Creature* creature) : BossAI(creature, DATA_LIEUTENANT_DRAKE) { }
 
     void InitializeAI() override
     {
         runSecondPath = false;
         pathId = me->GetEntry() * 10;
         me->GetMotionMaster()->MovePath(pathId, false);
-    }
-
-    void Reset() override
-    {
-        _Reset();
     }
 
     void JustEngagedWith(Unit* /*who*/) override

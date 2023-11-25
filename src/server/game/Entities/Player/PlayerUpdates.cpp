@@ -311,7 +311,7 @@ void Player::Update(uint32 p_time)
         RegenerateAll();
     }
 
-    if (m_deathState == JUST_DIED)
+    if (m_deathState == DeathState::JustDied)
         KillPlayer();
 
     if (m_nextSave)

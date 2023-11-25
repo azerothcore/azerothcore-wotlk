@@ -754,6 +754,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         }
     }
 
+    _creatureRespawnScheduler.Update(t_diff);
+
     if (!t_diff)
     {
         for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
@@ -3693,6 +3695,17 @@ void Map::RemoveOldCorpses()
         RemoveCorpse(bones);
         delete bones;
     }
+}
+
+void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+{
+    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
+    {
+        if (Creature* creature = GetCreature(creatureGuid))
+        {
+            creature->Respawn();
+        }
+    });
 }
 
 void Map::SendZoneDynamicInfo(Player* player)

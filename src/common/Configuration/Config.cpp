@@ -32,6 +32,7 @@ namespace
     std::vector<std::string> _additonalFiles;
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
+    std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
 
     // Check system configs like *server.conf*
@@ -120,7 +121,7 @@ namespace
             auto const& itr = fileConfigs.find(confOption);
             if (itr != fileConfigs.end())
             {
-                PrintError(file, "> Config::LoadFile: Dublicate key name '{}' in config file '{}'", confOption, file);
+                PrintError(file, "> Config::LoadFile: Duplicate key name '{}' in config file '{}'", confOption, file);
                 return true;
             }
 
@@ -283,9 +284,14 @@ namespace
         return result;
     }
 
+    std::string GetEnvVarName(std::string const& configName)
+    {
+        return "AC_" + IniKeyToEnvVarKey(configName);
+    }
+
     Optional<std::string> EnvVarForIniKey(std::string const& key)
     {
-        std::string envKey = "AC_" + IniKeyToEnvVarKey(key);
+        std::string envKey = GetEnvVarName(key);
         char* val = std::getenv(envKey.c_str());
         if (!val)
             return std::nullopt;
@@ -330,6 +336,29 @@ bool ConfigMgr::Reload()
     return true;
 }
 
+// Check the _envVarCache if the env var is there
+// if not, check the env for the value
+Optional<std::string> GetEnvFromCache(std::string const& configName, std::string const& envVarName)
+{
+    auto foundInCache = _envVarCache.find(envVarName);
+    Optional<std::string> foundInEnv;
+    // If it's not in the cache
+    if (foundInCache == _envVarCache.end())
+    {
+        // Check the env itself
+        foundInEnv = EnvVarForIniKey(configName);
+        if (foundInEnv)
+        {
+            // If it's found in the env, put it in the cache
+            _envVarCache.emplace(envVarName, *foundInEnv);
+        }
+        // Return the result of checking env
+        return foundInEnv;
+    }
+
+    return foundInCache->second;
+}
+
 std::vector<std::string> ConfigMgr::OverrideWithEnvVariablesIfAny()
 {
     std::lock_guard<std::mutex> lock(_configLock);
@@ -357,28 +386,30 @@ template<class T>
 T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLogs /*= true*/) const
 {
     std::string strValue;
+
     auto const& itr = _configOptions.find(name);
-    if (itr == _configOptions.end())
+    bool notFound = itr == _configOptions.end();
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
+    if (envVar)
     {
-        Optional<std::string> envVar = EnvVarForIniKey(name);
-        if (!envVar)
+        // If showLogs and this key/value pair wasn't found in the currently saved config
+        if (showLogs && (notFound || itr->second != envVar->c_str()))
         {
-            if (showLogs)
-            {
-                LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file.",
-                    name, _filename, name, Acore::ToString(def));
-            }
-
-            return def;
-        }
-
-        if (showLogs)
-        {
-            LOG_WARN("server.loading", "Missing property {} in config file {}, recovered with environment '{}' value.",
-                name, _filename, envVar->c_str());
+            LOG_INFO("server.loading", "> Config: Found config value '{}' from environment variable '{}'.", name, envVarName );
+            AddKey(name, envVar->c_str(), "ENVIRONMENT", false, false);
         }
 
         strValue = *envVar;
+    }
+    else if (notFound)
+    {
+        if (showLogs)
+        {
+            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, _filename, name, Acore::ToString(def), envVarName);
+        }
+        return def;
     }
     else
     {
@@ -404,24 +435,26 @@ template<>
 std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
 {
     auto const& itr = _configOptions.find(name);
-    if (itr == _configOptions.end())
+    bool notFound = itr == _configOptions.end();
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
+    if (envVar)
     {
-        Optional<std::string> envVar = EnvVarForIniKey(name);
-        if (envVar)
+        // If showLogs and this key/value pair wasn't found in the currently saved config
+        if (showLogs && (notFound || itr->second != envVar->c_str()))
         {
-            if (showLogs)
-            {
-                LOG_WARN("server.loading", "Missing property {} in config file {}, recovered with environment '{}' value.",
-                    name, _filename, envVar->c_str());
-            }
-
-            return *envVar;
+            LOG_INFO("server.loading", "> Config: Found config value '{}' from environment variable '{}'.", name, envVarName);
+            AddKey(name, *envVar, "ENVIRONMENT", false, false);
         }
 
+        return *envVar;
+    }
+    else if (notFound)
+    {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file.",
-                name, _filename, name, def);
+            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, _filename, name, def, envVarName);
         }
 
         return def;

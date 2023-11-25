@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 #include "steam_vault.h"
 
 enum Texts

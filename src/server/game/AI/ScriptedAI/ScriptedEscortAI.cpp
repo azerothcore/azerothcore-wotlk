@@ -200,7 +200,6 @@ void npc_escortAI::ReturnToLastPoint()
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
-    me->RemoveAllAuras();
     me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);
@@ -260,7 +259,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
 
                     if (m_bCanInstantRespawn)
                     {
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->Respawn();
                     }
                     else
@@ -300,7 +299,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
             {
                 if (m_bCanInstantRespawn)
                 {
-                    me->setDeathState(JUST_DIED);
+                    me->setDeathState(DeathState::JustDied);
                     me->Respawn();
                 }
                 else

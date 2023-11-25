@@ -1930,13 +1930,6 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         case 48542:                                         // Revitalize
             damage = int32(CalculatePct(unitTarget->GetMaxPower(power), damage));
             break;
-        case 67490:                                         // Runic Mana Injector (mana gain increased by 25% for engineers - 3.2.0 patch change)
-            {
-                if (Player* player = m_caster->ToPlayer())
-                    if (player->HasSkill(SKILL_ENGINEERING))
-                        AddPct(damage, 25);
-                break;
-            }
         case 71132:                                         // Glyph of Shadow Word: Pain
             damage = int32(CalculatePct(unitTarget->GetCreateMana(), 1));  // set 1 as value, missing in dbc
             break;
@@ -2581,7 +2574,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     uint32 dispelMask  = SpellInfo::GetDispelMask(DispelType(dispel_type));
 
     DispelChargesList dispel_list;
-    unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list);
+    unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list, m_spellInfo);
     if (dispel_list.empty())
         return;
 
@@ -3836,7 +3829,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             caster->RewardPlayerAndGroupAtEvent(18388, unitTarget);
                             if (Creature* target = unitTarget->ToCreature())
                             {
-                                target->setDeathState(CORPSE);
+                                target->setDeathState(DeathState::Corpse);
                                 target->RemoveCorpse();
                             }
                         }
@@ -5254,7 +5247,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
     pet->ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
     pet->RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
-    pet->setDeathState(ALIVE);
+    pet->setDeathState(DeathState::Alive);
     pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED))); // xinef: just in case
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
     pet->SetDisplayId(pet->GetNativeDisplayId());
@@ -6064,8 +6057,11 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         Position pos;
 
         // xinef: do not use precalculated position for effect summon pet in this function
-        // it means it was cast by NPC and should have its position overridden
-        if (totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        // it means it was cast by NPC and should have its position overridden unless the
+        // target position is specified in the DB AND the effect has no or zero radius
+        if ((totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
+            (GetSpellInfo()->Effects[i].TargetA.GetTarget() == TARGET_DEST_DB &&
+            (!GetSpellInfo()->Effects[i].HasRadius() || GetSpellInfo()->Effects[i].RadiusEntry->RadiusMax == 0)))
         {
             pos = *destTarget;
         }

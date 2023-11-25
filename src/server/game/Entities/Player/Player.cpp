@@ -75,7 +75,9 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
 #include "TicketMgr.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -85,8 +87,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -383,6 +383,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     SetPendingBind(0, 0);
 
     _activeCheats = CHEAT_NONE;
+
+    m_creationTime = 0s;
 
     _cinematicMgr = new CinematicMgr(this);
 
@@ -1008,7 +1010,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
 
     bool cur = IsAlive();
 
-    if (s == JUST_DIED)
+    if (s == DeathState::JustDied)
     {
         if (!cur)
         {
@@ -1023,7 +1025,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
 
         clearResurrectRequestData();
 
-        //FIXME: is pet dismissed at dying or releasing spirit? if second, add setDeathState(DEAD) to HandleRepopRequestOpcode and define pet unsummon here with (s == DEAD)
+        //FIXME: is pet dismissed at dying or releasing spirit? if second, add setDeathState(DeathState::Dead) to HandleRepopRequestOpcode and define pet unsummon here with (s == DEAD)
         RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
         // save value before aura remove in Unit::setDeathState
@@ -1043,7 +1045,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
         ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH, 0);
     }
     // xinef: enable passive area auras!
-    else if (s == ALIVE)
+    else if (s == DeathState::Alive)
         ClearUnitState(UNIT_STATE_ISOLATED);
 
     Unit::setDeathState(s);
@@ -1052,7 +1054,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
         ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "STA", IsAlive() ? 1 : 0);
 
     // restore resurrection spell id for player after aura remove
-    if (s == JUST_DIED && cur && ressSpellId)
+    if (s == DeathState::JustDied && cur && ressSpellId)
         SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
 
     if (IsAlive() && !cur)
@@ -1292,6 +1294,8 @@ uint8 Player::GetChatTag() const
         tag |= CHAT_TAG_DND;
     if (isAFK())
         tag |= CHAT_TAG_AFK;
+    if (IsCommentator())
+        tag |= CHAT_TAG_COM;
     if (IsDeveloper())
         tag |= CHAT_TAG_DEV;
 
@@ -4398,7 +4402,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
-    setDeathState(ALIVE);
+    setDeathState(DeathState::Alive);
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
     SetWaterWalking(false);
@@ -4465,7 +4469,7 @@ void Player::KillPlayer()
 
     StopMirrorTimers();                                     //disable timers(bars)
 
-    setDeathState(CORPSE);
+    setDeathState(DeathState::Corpse);
     //SetUnitFlag(UNIT_FLAG_NOT_IN_PVP);
 
     ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
@@ -4649,7 +4653,7 @@ void Player::DurabilityLossAll(double percent, bool inventory)
 
 void Player::DurabilityLoss(Item* item, double percent)
 {
-    if(!item)
+    if(!item || percent == 0.0)
         return;
 
     uint32 pMaxDurability = item ->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
@@ -13550,8 +13554,13 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
-bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const
+bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 {
+    if (!sScriptMgr->OnCanPlayerFlyInZone(this, mapid,zone,bySpell))
+    {
+        return false;
+    }
+
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
     if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
@@ -15174,6 +15183,8 @@ void Player::ActivateSpec(uint8 spec)
         else
             ++iter;
     }
+
+    sScriptMgr->OnAfterSpecSlotChanged(this, GetActiveSpec());
 }
 
 void Player::LoadActions(PreparedQueryResult result)

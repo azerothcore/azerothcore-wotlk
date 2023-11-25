@@ -267,9 +267,6 @@ public:
     uint32 Acc{0};
     uint32 ArenaTeamId{0};
     std::string IP{};
-    uint32 DamageDone{0};
-    uint32 HealingDone{0};
-    uint32 KillingBlows{0};
 };
 
 enum BGHonorMode
@@ -279,7 +276,6 @@ enum BGHonorMode
     BG_HONOR_MODE_NUM
 };
 
-#define BG_AWARD_ARENA_POINTS_MIN_LEVEL 71
 #define ARENA_TIMELIMIT_POINTS_LOSS    -16
 #define ARENA_READY_MARKER_ENTRY 301337
 

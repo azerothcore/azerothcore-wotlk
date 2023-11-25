@@ -51,6 +51,8 @@ struct boss_high_botanist_freywinn : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        scheduler.ClearValidator();
+
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
