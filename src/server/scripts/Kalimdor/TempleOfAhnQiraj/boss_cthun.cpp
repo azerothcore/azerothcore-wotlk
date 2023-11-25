@@ -390,7 +390,7 @@ struct boss_cthun : public BossAI
     boss_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
-        map = me->GetMap();
+        _map = me->GetMap();
     }
 
     void Reset() override
