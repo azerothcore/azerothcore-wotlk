@@ -949,6 +949,32 @@ class spell_q10190_battery_recharging_blaster_aura : public AuraScript
     }
 };
 
+enum Veraku
+{
+    NPC_VERAKU               = 18544,
+    SPELL_CHALLENGE_VERAKU   = 34895
+};
+
+class spell_challenge_veraku : public SpellScript
+{
+public:
+    PrepareSpellScript(spell_challenge_veraku);
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* veraku = caster->FindNearestCreature(NPC_VERAKU, 100.0f))
+                if (!veraku->HasAura(SPELL_CHALLENGE_VERAKU))
+                    return SPELL_FAILED_CASTER_AURASTATE;
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_challenge_veraku::CheckRequirement);
+    }
+};
+
 void AddSC_netherstorm()
 {
     // Ours
@@ -961,4 +987,5 @@ void AddSC_netherstorm()
     new npc_bessy();
     new npc_maxx_a_million_escort();
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
+    RegisterSpellScript(spell_challenge_veraku);
 }
