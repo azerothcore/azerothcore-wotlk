@@ -107,7 +107,7 @@ struct boss_shade_of_aran : public BossAI
         BossAI::Reset();
         // Reset the mana of the boss fully before resetting drinking
         // If this was omitted, the boss would start drinking on reset if the mana was low on a wipe
-        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA)); 
+        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
         _drinkScheduler.CancelAll();
 
         _lastSuperSpell = 0;
@@ -206,9 +206,7 @@ struct boss_shade_of_aran : public BossAI
         // Should drink at 10%, need 10% mana for mass polymorph
         if (!_hasDrunk && me->GetMaxPower(POWER_MANA) && (currentPower * 100 / me->GetMaxPower(POWER_MANA)) < 13.5)
         {
-            
             _hasDrunk = true;
-
             me->SetReactState(REACT_PASSIVE);
 
             // Start drinking after conjuring drinks
@@ -291,7 +289,6 @@ struct boss_shade_of_aran : public BossAI
                 }
             }
             context.Repeat(2s);
-            
         }).Schedule(5s, [this](TaskContext context)
         {
             if (!_drinking)
@@ -316,7 +313,7 @@ struct boss_shade_of_aran : public BossAI
 
                 //  SelectRandomContainerElementIf produces unexpected output. Reintroduce when issue is resolved:
                 //  Sample results:
-                //       Selected Super Spell: 3722304989 
+                //       Selected Super Spell: 3722304989
                 //       superSpells elements : 29969 29973 30004
                 //  _lastSuperSpell = Acore::Containers::SelectRandomContainerElementIf(superSpells, [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
 
