@@ -12,7 +12,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25300, 9, 8, 0, 0, 0, 100, 0, 79, 79, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'William Pestle - On Script - Say Line 1'),
 (25300, 9, 9, 0, 0, 0, 100, 0, 3132, 3132, 0, 0, 0, 0, 81, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'William Pestle - On Script - Set Npc Flag 3');
 
---QUEST 114  creature 251
+-- QUEST 114  creature 251
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 251;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 251);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
