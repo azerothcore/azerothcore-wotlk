@@ -238,13 +238,6 @@ struct npc_inner_demon : public ScriptedAI
         if (!summoner)
             return;
 
-        //summoner is always the affected player
-        _affectedPlayerGUID = summoner->GetGUID();
-        if (Unit* affectedPlayer = summoner->ToUnit())
-        {
-            me->Attack(affectedPlayer, true);
-        }
-
         scheduler.CancelAll();
         scheduler.Schedule(4s, [this](TaskContext context)
         {
@@ -255,15 +248,36 @@ struct npc_inner_demon : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, _affectedPlayerGUID))
+        if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, me->GetSummonerGUID()))
         {
             affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
     }
 
-    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    bool CanReceiveDamage(Unit* attacker)
     {
-        if (!who || who->GetGUID() != _affectedPlayerGUID)
+        return attacker && attacker->GetGUID() == me->GetSummonerGUID();
+    }
+
+    void OnCalculateMeleeDamageReceived(uint32& damage, Unit* attacker) override
+    {
+        if (!CanReceiveDamage(attacker))
+        {
+            damage = 0;
+        }
+    }
+
+    void OnCalculateSpellDamageReceived(int32& damage, Unit* attacker) override
+    {
+        if (!CanReceiveDamage(attacker))
+        {
+            damage = 0;
+        }
+    }
+
+    void OnCalculatePeriodicTickReceived(uint32& damage, Unit* attacker) override
+    {
+        if (!CanReceiveDamage(attacker))
         {
             damage = 0;
         }
@@ -271,7 +285,7 @@ struct npc_inner_demon : public ScriptedAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        return who->GetGUID() == _affectedPlayerGUID;
+        return who->GetGUID() == me->GetSummonerGUID();
     }
 
     void UpdateAI(uint32 diff) override
@@ -285,8 +299,6 @@ struct npc_inner_demon : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-private:
-    ObjectGuid _affectedPlayerGUID;
 };
 
 class spell_leotheras_whirlwind : public SpellScript

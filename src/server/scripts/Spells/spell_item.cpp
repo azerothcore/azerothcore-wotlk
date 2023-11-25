@@ -2853,40 +2853,6 @@ class spell_item_purify_helboar_meat : public SpellScript
     }
 };
 
-enum CrystalPrison
-{
-    OBJECT_IMPRISONED_DOOMGUARD     = 179644,
-};
-
-class spell_item_crystal_prison_dummy_dnd : public SpellScript
-{
-    PrepareSpellScript(spell_item_crystal_prison_dummy_dnd);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        if (!sObjectMgr->GetGameObjectTemplate(OBJECT_IMPRISONED_DOOMGUARD))
-            return false;
-        return true;
-    }
-
-    void HandleDummy(SpellEffIndex /* effIndex */)
-    {
-        if (Creature* target = GetHitCreature())
-        {
-            if (target->isDead() && !target->IsPet())
-            {
-                GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - GameTime::GetGameTime().count()));
-                target->DespawnOrUnsummon();
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_crystal_prison_dummy_dnd::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 enum ReindeerTransformation
 {
     SPELL_FLYING_REINDEER_310                   = 44827,
@@ -4063,7 +4029,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_refocus);
     RegisterSpellScript(spell_item_shimmering_vessel);
     RegisterSpellScript(spell_item_purify_helboar_meat);
-    RegisterSpellScript(spell_item_crystal_prison_dummy_dnd);
     RegisterSpellScript(spell_item_reindeer_transformation);
     RegisterSpellScript(spell_item_nigh_invulnerability);
     RegisterSpellScript(spell_item_poultryizer);

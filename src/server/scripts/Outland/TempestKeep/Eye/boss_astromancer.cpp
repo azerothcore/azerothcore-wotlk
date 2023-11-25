@@ -116,19 +116,19 @@ struct boss_high_astromancer_solarian : public BossAI
         BossAI::JustEngagedWith(who);
         me->CallForHelp(105.0f);
 
-        scheduler.Schedule(3s, [this](TaskContext context)
+        scheduler.Schedule(3650ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
-            context.Repeat(3s);
-        }).Schedule(1s, [this](TaskContext context)
+            context.Repeat(800ms, 7300ms);
+        }).Schedule(21800ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_WRATH_OF_THE_ASTROMANCER, 0, 100.0f);
-            context.Repeat(22s);
-        }).Schedule(40s, [this](TaskContext context)
+            context.Repeat(21800ms, 23350ms);
+        }).Schedule(33900ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_BLINDING_LIGHT);
-            context.Repeat(40s);
-        }).Schedule(50s, [this](TaskContext context)
+            context.Repeat(33900ms, 48100ms);
+        }).Schedule(52100ms, [this](TaskContext context)
         {
             _visible = false;
             me->SetReactState(REACT_PASSIVE);
@@ -192,7 +192,7 @@ struct boss_high_astromancer_solarian : public BossAI
                     me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
                 }
             }
-            context.Repeat(50s);
+            context.Repeat(67500ms, 71200ms);
         });
     }
 

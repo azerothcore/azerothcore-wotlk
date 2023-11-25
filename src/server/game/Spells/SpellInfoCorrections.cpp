@@ -57,6 +57,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Scarlet Raven Priest Image
+    ApplySpellFix({ 48763, 48761 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_SPELL_ATTACK;
+    });
+
     // Has Brewfest Mug
     ApplySpellFix({ 42533 }, [](SpellInfo* spellInfo)
     {
@@ -4618,6 +4624,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 38762 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    });
+
+    // Spotlight
+    ApplySpellFix({ 29683, 32214 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
