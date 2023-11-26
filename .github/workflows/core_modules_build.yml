@@ -28,6 +28,8 @@ jobs:
       && !github.event.pull_request.draft
       && (
         github.ref == 'refs/heads/master'
+        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
+        || github.event.label.name == 'file-cpp'
         || contains(github.event.pull_request.labels.*.name, 'run-build')
         || github.event.label.name == 'run-build')
       )
