@@ -618,7 +618,7 @@ struct boss_cthun : public BossAI
         bool _IsEveryoneAffectedByDigestiveAcid() const
         {
             Map::PlayerList const& playerList = _map->GetPlayers();
-            for (const auto& itr : playerList)
+            for (auto const& itr : playerList)
             {
                 if (Player* player = itr.GetSource())
                 {
