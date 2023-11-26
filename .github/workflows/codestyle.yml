@@ -1,9 +1,9 @@
-name: check-codestyle
+name: Codestyle
 on:
   pull_request:
 
 jobs:
-  check-codestyle:
+  triage:
     strategy:
       fail-fast: false
       matrix:
