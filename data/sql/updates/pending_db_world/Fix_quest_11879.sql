@@ -5,10 +5,11 @@ INSERT INTO `areatrigger_scripts` (`entry` , `ScriptName`) VALUES
 (4896, 'SmartTrigger');
 -- Wooly Mammoth Bull SAI
 UPDATE `creature_template` SET `npcflag`= 16777216 WHERE  `entry`= 25743;
-DELETE FROM `smart_scripts` WHERE `entryorguid`= 25743 AND `source_type`= 0 AND `id` IN (2,3);
-INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(25743,0,2,0,27,0,100,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Wooly Mammoth Bull - On Passenger board - Set react state passive'),
-(25743,0,3,0,28,0,100,0,0,0,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,'Wooly Mammoth Bull - On Passenger remove - Despawn');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25743);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25743, 0, 0, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 46221, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Wooly Mammoth Bull - On Death - Cast Animal Blood'),
+(25743, 0, 1, 0, 27, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wooly Mammoth Bull - On Passenger board - Set react state passive'),
+(25743, 0, 2, 0, 28, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wooly Mammoth Bull - On Passenger remove - Despawn');
 -- Wooly Mammoth Bull Vehicle condition
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`= 16 AND `SourceEntry`= 25743;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
