@@ -1410,8 +1410,7 @@ public:
                             break;
                         case 25:
                             Talk(PLANE_EMOTE);
-                            DoCast(AURA_ENGINE);
-                            me->SetUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
+                            DoCastSelf(AURA_ENGINE);
                             break;
                     }
             pointId++;
