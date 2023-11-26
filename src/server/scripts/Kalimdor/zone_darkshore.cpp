@@ -455,7 +455,10 @@ public:
             _playerGUID.Clear();
         }
 
-        void Reset() override {}
+        void Reset() override
+        {
+            me->SetStandState(0);
+        }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
