@@ -10,7 +10,6 @@ jobs:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
-    name: check codestyle
     steps:
       - uses: actions/checkout@v4
       - name: Check core codestyle
