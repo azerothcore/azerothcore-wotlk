@@ -681,9 +681,12 @@ public:
             }
 
             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr) {
-                if (Player* p = itr->GetSource()) {
-                    if (!p->GetVehicle()) {
+            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            {
+                if (Player* p = itr->GetSource())
+                {
+                    if (!p->GetVehicle())
+                    {
                         // At least one player is outside a cannon, return without resetting event.
                         return;
                     }
