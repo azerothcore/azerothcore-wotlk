@@ -318,7 +318,7 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax
         return;
     }
 
-    scheduler.Schedule(timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 

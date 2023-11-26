@@ -360,10 +360,10 @@ struct ScriptedAI : public CreatureAI
 
     // Schedules a timed event using task scheduler.
     void ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0);
-    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0) { ScheduleTimedEvent(0s, timerMax, exec, 0s, 0s, uniqueId); };
+    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, uint32 uniqueId = 0) { ScheduleTimedEvent(0s, timerMax, exec, 0s, 0s, uniqueId); };
 
     // Schedules a timed event using task scheduler that never repeats. Requires an unique non-zero ID.
-    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(timer, exec, 0s, 0s, uniqueId); };
+    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(0s, timer, exec, 0s, 0s, uniqueId); };
 
     bool HealthBelowPct(uint32 pct) const { return me->HealthBelowPct(pct); }
     bool HealthAbovePct(uint32 pct) const { return me->HealthAbovePct(pct); }
