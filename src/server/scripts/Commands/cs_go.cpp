@@ -337,10 +337,19 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
 
         uint32 mapId = locationValues.size() >= 4 ? uint32(locationValues[3]) : player->GetMapId();
-        Map const* map = sMapMgr->CreateBaseMap(mapId);
 
         float x = locationValues[0];
         float y = locationValues[1];
+
+        if (mapId == MAPID_INVALID)
+        {
+            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Map const* map = sMapMgr->CreateBaseMap(mapId);
+
         float z = locationValues.size() >= 3 ? locationValues[2] : std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
         // map ID (locationValues[3]) already handled above
         float o = locationValues.size() >= 5 ? locationValues[4] : player->GetOrientation();

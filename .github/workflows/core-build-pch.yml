@@ -1,4 +1,4 @@
-name: core
+name: pch-build
 on:
   push:
     branches:
@@ -19,26 +19,11 @@ jobs:
         include:
           - os: ubuntu-20.04
             compiler: clang12
-          - os: ubuntu-20.04
-            compiler: clang11
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-          - os: ubuntu-20.04
-            compiler: gcc10
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (
-        github.ref == 'refs/heads/master'
-        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
-        || github.event.label.name == 'file-cpp'
-        || contains(github.event.pull_request.labels.*.name, 'run-build')
-        || github.event.label.name == 'run-build')
-      )
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - name: Cache
@@ -54,7 +39,7 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core.sh
+        run: source ./apps/ci/ci-conf-core-pch.sh
       - name: Process pending sql
         run: bash bin/acore-db-pendings
       - name: Build
