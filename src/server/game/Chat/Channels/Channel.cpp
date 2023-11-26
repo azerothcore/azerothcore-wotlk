@@ -198,8 +198,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
     player->JoinedChannel(this);
 
-    if (_announce && (!AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) ||
-                      !sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL)))
+    if (_announce && ShouldAnnouncePlayer(player))
     {
         WorldPacket data;
         MakeJoined(&data, guid);
@@ -276,8 +275,7 @@ void Channel::LeaveChannel(Player* player, bool send)
     bool changeowner = playersStore[guid].IsOwner();
 
     playersStore.erase(guid);
-    if (_announce && (!AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) ||
-                      !sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL)))
+    if (_announce && ShouldAnnouncePlayer(player))
     {
         WorldPacket data;
         MakeLeft(&data, guid);
@@ -422,8 +420,6 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
         }
     }
 
-    bool notify = !(AccountMgr::IsGMAccount(sec) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
-
     if (ban)
     {
         if (!IsBanned(victim))
@@ -431,7 +427,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             bannedStore[victim] = GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION;
             AddChannelBanToDB(victim, GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION);
 
-            if (notify)
+            if (ShouldAnnouncePlayer(player))
             {
                 WorldPacket data;
                 MakePlayerBanned(&data, victim, good);
@@ -439,7 +435,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             }
         }
     }
-    else if (notify)
+    else if (ShouldAnnouncePlayer(player))
     {
         WorldPacket data;
         MakePlayerKicked(&data, victim, good);
@@ -896,18 +892,11 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
         uint8 oldFlag = pinfo.flags;
         pinfo.SetOwner(true);
 
-        bool notify = true;
         Player* player = ObjectAccessor::FindPlayer(_ownerGUID);
-
-        if (player)
-        {
-            uint32 sec = player->GetSession()->GetSecurity();
-            notify = !(AccountMgr::IsGMAccount(sec) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
-        }
 
         WorldPacket data;
 
-        if (notify)
+        if (ShouldAnnouncePlayer(player))
         {
             MakeModeChange(&data, _ownerGUID, oldFlag);
             SendToAll(&data);
@@ -915,7 +904,7 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
 
         FlagsNotify(pinfo.plrPtr);
 
-        if (exclaim && notify)
+        if (exclaim && ShouldAnnouncePlayer(player))
         {
             MakeOwnerChanged(&data, _ownerGUID);
             SendToAll(&data);
@@ -947,6 +936,11 @@ void Channel::SendToAllWatching(WorldPacket* data)
 {
     for (PlayersWatchingContainer::const_iterator i = playersWatchingStore.begin(); i != playersWatchingStore.end(); ++i)
         (*i)->GetSession()->SendPacket(data);
+}
+
+bool Channel::ShouldAnnouncePlayer(Player const* player) const
+{
+    return !(AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
 }
 
 void Channel::Voice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)

@@ -50,7 +50,6 @@ enum KZDataTypes
     DATA_GO_STAGEDOORRIGHT          = 20,
     DATA_GO_LIBRARY_DOOR            = 21,
     DATA_GO_MASSIVE_DOOR            = 22,
-    DATA_GO_NETHER_DOOR             = 23,
     DATA_GO_GAME_DOOR               = 24,
     DATA_GO_GAME_EXIT_DOOR          = 25,
     DATA_IMAGE_OF_MEDIVH            = 26,

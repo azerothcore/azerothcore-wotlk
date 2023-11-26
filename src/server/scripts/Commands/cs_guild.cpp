@@ -53,7 +53,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -64,6 +64,11 @@ public:
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (guildName.empty())
+        {
             return false;
         }
 
@@ -104,7 +109,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
+    static bool HandleGuildDeleteCommand(ChatHandler*, QuotedString guildName)
     {
         if (guildName.empty())
         {
@@ -121,7 +126,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -129,6 +134,11 @@ public:
         }
 
         if (!target)
+        {
+            return false;
+        }
+
+        if (guildName.empty())
         {
             return false;
         }
@@ -186,14 +196,9 @@ public:
         return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
-    static bool HandleGuildRenameCommand(ChatHandler* handler, std::string_view oldGuildStr, std::string_view newGuildStr)
+    static bool HandleGuildRenameCommand(ChatHandler* handler, QuotedString oldGuildStr, QuotedString newGuildStr)
     {
-        if (!oldGuildStr.empty())
-        {
-            return false;
-        }
-
-        if (newGuildStr.empty())
+        if (oldGuildStr.empty() || newGuildStr.empty())
         {
             return false;
         }
@@ -224,7 +229,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, std::string_view>> const& guildIdentifier)
+    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, QuotedString>> const& guildIdentifier)
     {
         Guild* guild = nullptr;
 
@@ -233,7 +238,7 @@ public:
             if (ObjectGuid::LowType const* guid = std::get_if<ObjectGuid::LowType>(&*guildIdentifier))
                 guild = sGuildMgr->GetGuildById(*guid);
             else
-                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<std::string_view>());
+                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<QuotedString>());
         }
         else if (Optional<PlayerIdentifier> target = PlayerIdentifier::FromTargetOrSelf(handler); target && target->IsConnected())
             guild = target->GetConnectedPlayer()->GetGuild();

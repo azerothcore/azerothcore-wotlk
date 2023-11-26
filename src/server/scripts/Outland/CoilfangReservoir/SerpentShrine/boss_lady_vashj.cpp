@@ -66,26 +66,6 @@ enum Misc
     POINT_HOME                      = 1,
 };
 
-class startFollow : public BasicEvent
-{
-public:
-    startFollow(Unit* owner) : _owner(owner)  { }
-
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
-    {
-        if (InstanceScript* instance = _owner->GetInstanceScript())
-        {
-            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetGuidData(NPC_LADY_VASHJ)))
-            {
-                _owner->GetMotionMaster()->MoveFollow(vashj, 3.0f, vashj->GetAngle(_owner), MOTION_SLOT_CONTROLLED);
-            }
-        }
-        return true;
-    }
-private:
-    Unit* _owner;
-};
-
 struct boss_lady_vashj : public BossAI
 {
     boss_lady_vashj(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
@@ -147,16 +127,11 @@ struct boss_lady_vashj : public BossAI
         {
             summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
         }
-        else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
-        {
-            summon->SetWalk(true);
-            summon->m_Events.AddEvent(new startFollow(summon), summon->m_Events.CalculateTime(0));
-        }
         else if (summon->GetEntry() == NPC_TOXIC_SPOREBAT)
         {
             summon->GetMotionMaster()->MoveRandom(30.0f);
         }
-        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
+        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL && summon->GetEntry() != NPC_ENCHANTED_ELEMENTAL)
         {
             summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
         }
@@ -286,226 +261,80 @@ private:
     std::chrono::seconds _batTimer;
 };
 
-/*
-
-//Toxic Sporebat
-//Toxic Spores: Used in Phase 3 by the Spore Bats, it creates a contaminated green patch of ground, dealing about 2775-3225 nature damage every second to anyone who stands in it.
-//deprecated -- adds do work
-class npc_toxic_sporebat : public CreatureScript
+class spell_lady_vashj_magic_barrier : public AuraScript
 {
-public:
-    npc_toxic_sporebat() : CreatureScript("npc_toxic_sporebat") { }
+    PrepareAuraScript(spell_lady_vashj_magic_barrier);
 
-    CreatureAI* GetAI(Creature* creature) const
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return GetInstanceAI<npc_toxic_sporebatAI>(creature);
+        Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(5));
     }
 
-    struct npc_toxic_sporebatAI : public ScriptedAI
+    void Register() override
     {
-        npc_toxic_sporebatAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-            EnterEvadeMode();
-        }
-
-        InstanceScript* instance;
-
-        uint32 MovementTimer;
-        uint32 ToxicSporeTimer;
-        uint32 BoltTimer;
-        uint32 CheckTimer;
-
-        void Reset()
-        {
-            me->SetDisableGravity(true);
-            me->SetFaction(FACTION_MONSTER);
-            MovementTimer = 0;
-            ToxicSporeTimer = 5000;
-            BoltTimer = 5500;
-            CheckTimer = 1000;
-        }
-
-        void MoveInLineOfSight(Unit* who)
-
-        {
-        }
-
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if (type != POINT_MOTION_TYPE)
-                return;
-
-            if (id == 1)
-                MovementTimer = 0;
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            // Random movement
-            if (MovementTimer <= diff)
-            {
-                uint32 rndpos = rand()%8;
-                me->GetMotionMaster()->MovePoint(1, SporebatWPPos[rndpos][0], SporebatWPPos[rndpos][1], SporebatWPPos[rndpos][2]);
-                MovementTimer = 6000;
-            } else MovementTimer -= diff;
-
-            // toxic spores
-            if (BoltTimer <= diff)
-            {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                {
-                    if (Creature* trig = me->SummonCreature(TOXIC_SPORES_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
-                    {
-                        trig->SetFaction(FACTION_MONSTER);
-                        trig->CastSpell(trig, SPELL_TOXIC_SPORES, true);
-                    }
-                }
-                BoltTimer = 10000+rand()%5000;
-            }
-            else BoltTimer -= diff;
-
-            // CheckTimer
-            if (CheckTimer <= diff)
-            {
-                // check if vashj is death
-                Unit* Vashj = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LADYVASHJ));
-                if (!Vashj || !Vashj->IsAlive() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, Vashj->ToCreature()->AI())->Phase != 3)
-                {
-                    // remove
-                    me->setDeathState(DeathState::Dead);
-                    me->RemoveCorpse();
-                    me->SetFaction(FACTION_FRIENDLY);
-                }
-
-                CheckTimer = 1000;
-            }
-            else
-                CheckTimer -= diff;
-        }
-    };
-
-};
-*/
-
-class spell_lady_vashj_magic_barrier : public SpellScriptLoader
-{
-public:
-    spell_lady_vashj_magic_barrier() : SpellScriptLoader("spell_lady_vashj_magic_barrier") { }
-
-    class spell_lady_vashj_magic_barrier_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_lady_vashj_magic_barrier_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(5));
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_lady_vashj_magic_barrier_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SCHOOL_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_lady_vashj_magic_barrier_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_lady_vashj_magic_barrier::HandleEffectRemove, EFFECT_0, SPELL_AURA_SCHOOL_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_lady_vashj_remove_tainted_cores : public SpellScriptLoader
+class spell_lady_vashj_remove_tainted_cores : public SpellScript
 {
-public:
-    spell_lady_vashj_remove_tainted_cores() : SpellScriptLoader("spell_lady_vashj_remove_tainted_cores") { }
+    PrepareSpellScript(spell_lady_vashj_remove_tainted_cores);
 
-    class spell_lady_vashj_remove_tainted_cores_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_lady_vashj_remove_tainted_cores_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        PreventHitDefaultEffect(effIndex);
+        if (Player* target = GetHitPlayer())
         {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* target = GetHitPlayer())
-            {
-                target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
-            }
+            target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_remove_tainted_cores_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_lady_vashj_remove_tainted_cores_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_remove_tainted_cores::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_lady_vashj_summon_sporebat : public SpellScriptLoader
+class spell_lady_vashj_summon_sporebat : public SpellScript
 {
-public:
-    spell_lady_vashj_summon_sporebat() : SpellScriptLoader("spell_lady_vashj_summon_sporebat") { }
+    PrepareSpellScript(spell_lady_vashj_summon_sporebat);
 
-    class spell_lady_vashj_summon_sporebat_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_lady_vashj_summon_sporebat_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_SPOREBAT1, SPELL_SUMMON_SPOREBAT2, SPELL_SUMMON_SPOREBAT3, SPELL_SUMMON_SPOREBAT4), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_SPOREBAT1, SPELL_SUMMON_SPOREBAT2, SPELL_SUMMON_SPOREBAT3, SPELL_SUMMON_SPOREBAT4), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_summon_sporebat_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_lady_vashj_summon_sporebat_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_summon_sporebat::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_lady_vashj_spore_drop_effect : public SpellScriptLoader
+class spell_lady_vashj_spore_drop_effect : public SpellScript
 {
-public:
-    spell_lady_vashj_spore_drop_effect() : SpellScriptLoader("spell_lady_vashj_spore_drop_effect") { }
+    PrepareSpellScript(spell_lady_vashj_spore_drop_effect);
 
-    class spell_lady_vashj_spore_drop_effect_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_lady_vashj_spore_drop_effect_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
         {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
-            }
+            target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_spore_drop_effect_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_lady_vashj_spore_drop_effect_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_spore_drop_effect::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_lady_vashj()
 {
     RegisterSerpentShrineAI(boss_lady_vashj);
-    new spell_lady_vashj_magic_barrier();
-    new spell_lady_vashj_remove_tainted_cores();
-    new spell_lady_vashj_summon_sporebat();
-    new spell_lady_vashj_spore_drop_effect();
+    RegisterSpellScript(spell_lady_vashj_magic_barrier);
+    RegisterSpellScript(spell_lady_vashj_remove_tainted_cores);
+    RegisterSpellScript(spell_lady_vashj_summon_sporebat);
+    RegisterSpellScript(spell_lady_vashj_spore_drop_effect);
 }

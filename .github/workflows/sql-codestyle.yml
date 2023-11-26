@@ -1,9 +1,8 @@
-name: Check pending SQL
+name: SQL Codestyle
 on:
   pull_request:
-
 jobs:
-  check-pending-sql:
+  triage:
     runs-on: ubuntu-latest
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:

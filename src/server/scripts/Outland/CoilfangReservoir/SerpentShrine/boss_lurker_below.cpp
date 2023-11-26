@@ -63,13 +63,7 @@ const Position positions[MAX_SUMMONS] =
 
 struct boss_the_lurker_below : public BossAI
 {
-    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
 
     void Reset() override
     {
@@ -226,49 +220,38 @@ public:
     }
 };
 
-class spell_lurker_below_spout : public SpellScriptLoader
+class spell_lurker_below_spout : public AuraScript
 {
-public:
-    spell_lurker_below_spout() : SpellScriptLoader("spell_lurker_below_spout") { }
+    PrepareAuraScript(spell_lurker_below_spout);
 
-    class spell_lurker_below_spout_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_lurker_below_spout_AuraScript);
+        SetDuration(13000);
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SetDuration(13000);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* creature = GetUnitOwner()->ToCreature())
-            {
-                creature->resetAttackTimer();
-                creature->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = creature->GetVictim())
-                    creature->SetTarget(target->GetGUID());
-            }
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
-            GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_lurker_below_spout_AuraScript();
+        if (Creature* creature = GetUnitOwner()->ToCreature())
+        {
+            creature->resetAttackTimer();
+            creature->SetReactState(REACT_AGGRESSIVE);
+            if (Unit* target = creature->GetVictim())
+                creature->SetTarget(target->GetGUID());
+        }
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
+        GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -286,29 +269,18 @@ private:
     Unit* _caster;
 };
 
-class spell_lurker_below_spout_cone : public SpellScriptLoader
+class spell_lurker_below_spout_cone : public SpellScript
 {
-public:
-    spell_lurker_below_spout_cone() : SpellScriptLoader("spell_lurker_below_spout_cone") { }
+    PrepareSpellScript(spell_lurker_below_spout_cone);
 
-    class spell_lurker_below_spout_cone_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_lurker_below_spout_cone_SpellScript);
+        targets.remove_if(HasInLineCheck(GetCaster()));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(HasInLineCheck(GetCaster()));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lurker_below_spout_cone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_lurker_below_spout_cone_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lurker_below_spout_cone::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
     }
 };
 
@@ -316,6 +288,6 @@ void AddSC_boss_the_lurker_below()
 {
     RegisterSerpentShrineAI(boss_the_lurker_below);
     new go_strange_pool();
-    new spell_lurker_below_spout();
-    new spell_lurker_below_spout_cone();
+    RegisterSpellScript(spell_lurker_below_spout);
+    RegisterSpellScript(spell_lurker_below_spout_cone);
 }
