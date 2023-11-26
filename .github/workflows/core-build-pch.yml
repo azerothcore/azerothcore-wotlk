@@ -1,4 +1,4 @@
-name: main-pch
+name: pch-build
 on:
   push:
     branches:

@@ -1,4 +1,4 @@
-name: main-nopch
+name: nopch-build
 on:
   push:
     branches:
