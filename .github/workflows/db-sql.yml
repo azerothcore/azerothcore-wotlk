@@ -1,4 +1,4 @@
-name: build-db
+name: db-sql
 on:
   push:
     branches:
@@ -24,6 +24,8 @@ jobs:
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
+      - name: Check pending SQL
+        run: source ./apps/ci/ci-pending.sh
       - name: Cache
         uses: actions/cache@v3
         env:
