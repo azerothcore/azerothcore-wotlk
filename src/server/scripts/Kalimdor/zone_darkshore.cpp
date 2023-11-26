@@ -457,7 +457,7 @@ public:
 
         void Reset() override
         {
-            me->SetStandState(0);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
