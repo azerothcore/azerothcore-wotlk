@@ -504,11 +504,7 @@ public:
         void JustRespawned() override
         {
             me->SetImmuneToAll(true);
-        }
-
-        void Reset() override
-        {
-            me->RestoreFaction();
+            npc_escortAI::JustRespawned();
         }
 
         void JustDied(Unit* /*killer*/) override
