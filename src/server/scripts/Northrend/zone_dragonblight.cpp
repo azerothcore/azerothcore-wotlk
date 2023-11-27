@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// revert
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
