@@ -43,14 +43,14 @@ jobs:
       # If you're wanting containers without mod-eluna, the best solution is to
       # build them locally (such as with `docker compose build`)
       - name: Download Eluna
-        if: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
+        if: env.RUNNING_ON_PRIMARY_BRANCH == 'true'
         uses: actions/checkout@v4
         with:
           repository: azerothcore/mod-eluna
           path: modules/mod-eluna
 
       - name: Login to Docker Hub
-        if: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
+        if: env.RUNNING_ON_PRIMARY_BRANCH == 'true'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -108,8 +108,8 @@ jobs:
           push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
           dockerfile: apps/docker/Dockerfile.dev-server
 
-      - name: Repository Dispatch
-        if: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
+      - name: Trigger acore-docker CI
+        if: env.RUNNING_ON_PRIMARY_BRANCH == 'true'
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.ACORE_DOCKER_REPO_ACCESS_TOKEN }}
