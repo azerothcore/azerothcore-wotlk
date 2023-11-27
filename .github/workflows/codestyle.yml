@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
-    name: C++ Codestyle
+    name: C++
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4

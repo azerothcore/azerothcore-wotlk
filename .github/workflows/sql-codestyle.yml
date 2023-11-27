@@ -1,11 +1,11 @@
-name: SQL Codestyle
+name: Codestyle
 on:
   pull_request:
 
 jobs:
   triage:
     runs-on: ubuntu-latest
-    name: SQL Codestyle
+    name: SQL
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
