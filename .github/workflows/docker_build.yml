@@ -103,7 +103,7 @@ jobs:
       - name: build dev-server
         uses: ./.github/actions/docker-tag-and-build
         with:
-          component-name: dev-server
+          component-name: dev
           version: ${{ steps.version.outputs.version }}
           push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
           dockerfile: apps/docker/Dockerfile.dev-server
