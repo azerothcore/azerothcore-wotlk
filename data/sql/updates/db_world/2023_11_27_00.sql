@@ -1,3 +1,4 @@
+-- DB update 2023_11_26_14 -> 2023_11_27_00
 -- Update Midsummer relevant gameobject spawns in "The Slave Pens" with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (187882, 188142, 188067)) AND (`guid` IN (220100, 220101, 220102, 220103, 220104, 220105, 220106, 220111, 220112));
