@@ -4,11 +4,7 @@ on:
 
 jobs:
   triage:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     name: C++
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
