@@ -1,5 +1,5 @@
 -- Wooly Mammoth Bull SAI
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25743);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25743);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25743, 0, 0, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 46221, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Wooly Mammoth Bull - On Death - Cast Animal Blood'),
 (25743, 0, 1, 0, 27, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wooly Mammoth Bull - On Passenger board - Set react state passive'),
@@ -22,13 +22,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25802, 0, 0, 'You challenge Kaw, destroyer of mammoths? Then face me and feel my thunder!', 14, 0, 100, 0, 0, 0, 25071, 0, 'Kaw the Mammoth Destroyer'),
 (25802, 1, 0, 'Kaw\'s halberd breaks in two and falls to the ground!', 41, 0, 100, 0, 0, 930, 25087, 0, 'Kaw the Mammoth Destroyer Death');
 -- Kaw SAI
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25802);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25802);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25802, 0, 0, 0, 101, 0, 100, 1, 1, 25, 0, 0, 0, 0, 80, 2580200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On Min Players in Range - Run Script (No Repeat)'),
 (25802, 0, 1, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 46310, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On Just Died - Cast \'Drop War Halberd\''),
 (25802, 0, 2, 0, 6, 0, 100, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On just died - Alert Message');
 -- Kaw SAI Timed Actionlists
-DELETE FROM `smart_scripts` WHERE (`entryorguid`= 2580200);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2580200) AND (`source_type` = 9);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (2580200, 9, 1, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw - Timed - Enable Running'),
 (2580200, 9, 3, 0, 0, 0, 100, 1, 2500, 2500, 0, 0, 0, 0, 11, 46260, 2, 0, 0, 0, 0, 19, 25881, 100, 0, 0, 0, 0, 0, 0, 'Kaw - Timed - Mount to Moria'),
@@ -41,11 +41,11 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 -- Moria NON_ATTACKABLE until the start of the event
 UPDATE `creature_template` SET `unit_flags` = 770 WHERE (`entry` = 25881);
 -- Moria SAI
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25881);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25881);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25881, 0, 0, 0, 27, 0, 100, 1, 0, 0, 0, 0, 0, 0, 19, 770, 0, 0, 0, 0, 0, 19, 25802, 100, 0, 0, 0, 0, 0, 0, 'Moria - Passenger Boarded - Remove Flags Immune To Kaw'),
 (25881, 0, 1, 0, 1, 0, 100, 1, 0, 0, 0, 0, 0, 0, 28, 46260, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moria - Out of Combat - Remove Aura \'Riding Wooly Mammoth Bull\''),
 (25881, 0, 2, 0, 27, 0, 100, 1, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 100, 0, 0, 0, 0, 0, 0, 0, 'Moria - Passenger Boarded - Attak Start On Player'),
 (25881, 0, 3, 0, 27, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 770, 0, 0, 0, 0, 0, 19, 25881, 0, 0, 0, 0, 0, 0, 0, 'Moria - Passenger Boarded - Remove Flags Immune To Moria');
 -- Delete old Action List Moria
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2588100);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2588100);
