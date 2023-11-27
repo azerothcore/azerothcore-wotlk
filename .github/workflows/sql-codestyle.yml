@@ -1,6 +1,10 @@
 name: Codestyle
 on:
   pull_request:
+    paths:
+      - data/**
+      - "!README.md"
+      - "!docs/**"
 
 jobs:
   triage:
