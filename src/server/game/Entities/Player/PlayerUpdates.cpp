@@ -412,13 +412,6 @@ void Player::Update(uint32 p_time)
         SetHasDelayedTeleport(false);
         TeleportTo(teleportStore_dest, teleportStore_options);
     }
-
-    if (!IsBeingTeleported() && bRequestForcedVisibilityUpdate)
-    {
-        bRequestForcedVisibilityUpdate = false;
-        UpdateObjectVisibility(true, true);
-        RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
-    }
 }
 
 void Player::UpdateMirrorTimers()
@@ -1549,7 +1542,7 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     notifier.SendToSelf();   // send gathered data
 }
 
-void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
+void Player::UpdateObjectVisibility(bool forced)
 {
     // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
     if (!IsInWorld())
@@ -1559,11 +1552,6 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else
     {
-        if (!isBeingLoaded() && !fromUpdate) // pussywizard:
-        {
-            bRequestForcedVisibilityUpdate = true;
-            return;
-        }
         Unit::UpdateObjectVisibility(true);
         UpdateVisibilityForPlayer();
     }
