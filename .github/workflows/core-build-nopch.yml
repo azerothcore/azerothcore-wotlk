@@ -22,7 +22,7 @@ jobs:
           - os: ubuntu-20.04
             compiler: gcc10
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-nopch
     env:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
