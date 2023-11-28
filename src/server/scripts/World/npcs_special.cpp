@@ -460,11 +460,11 @@ struct SpawnAssociation
 enum AirFoceBots
 {
     SPELL_GUARDS_MARK               = 38067,
-    AURA_DURATION_TIME_LEFT         = 5000
+    AURA_DURATION_TIME_LEFT         = 30000
 };
 
 float const RANGE_TRIPWIRE          = 15.0f;
-float const RANGE_GUARDS_MARK       = 50.0f;
+float const RANGE_GUARDS_MARK       = 100.0f;
 
 SpawnAssociation spawnAssociations[] =
 {
@@ -566,6 +566,13 @@ public:
             return nullptr;
         }
 
+        void UpdateAI(uint32 diff) override
+        {
+            ScriptedAI::UpdateAI(diff);
+
+            inLineOfSightSinceLastUpdate.clear();
+        }
+
         void MoveInLineOfSight(Unit* who) override
 
         {
@@ -590,6 +597,10 @@ public:
                 {
                     case SPAWNTYPE_ALARMBOT:
                         {
+                            // handle only 1 change for world update for each target
+                            if (!inLineOfSightSinceLastUpdate.insert(who->GetGUID()).second)
+                                return;
+
                             if (!who->IsWithinDistInMap(me, RANGE_GUARDS_MARK))
                                 return;
 
@@ -641,6 +652,7 @@ public:
                 }
             }
         }
+        GuidSet inLineOfSightSinceLastUpdate;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
