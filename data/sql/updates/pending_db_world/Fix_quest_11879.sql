@@ -19,7 +19,7 @@ UPDATE `creature_template` SET `unit_flags` = 770 WHERE (`entry` = 25802);
 -- Kaw speach on event start
 DELETE FROM `creature_text` WHERE `CreatureID`= 25802;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
-(25802, 0, 0, 'You challenge Kaw, destroyer of mammoths? Then face me and feel my thunder!', 14, 0, 100, 0, 0, 0, 25071, 0, 'Kaw the Mammoth Destroyer'),
+(25802, 0, 0, 'You challenge Kaw, destroyer of mammoths? Then face me and feel my thunder!', 14, 0, 100, 22, 0, 0, 25071, 0, 'Kaw the Mammoth Destroyer'),
 (25802, 1, 0, 'Kaw\'s halberd breaks in two and falls to the ground!', 41, 0, 100, 0, 0, 930, 25087, 0, 'Kaw the Mammoth Destroyer Death');
 -- Kaw SAI
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25802);
