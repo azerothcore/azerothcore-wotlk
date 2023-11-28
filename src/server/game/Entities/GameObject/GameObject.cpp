@@ -103,7 +103,7 @@ std::string const& GameObject::GetAIName() const
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
 
-void GameObject::CleanupsBeforeDelete(bool finalCleanup)
+void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
     if (GetTransport() && !ToTransport())
         GetTransport()->RemovePassenger(this, true);
