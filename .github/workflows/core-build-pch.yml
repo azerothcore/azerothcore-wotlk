@@ -20,7 +20,7 @@ jobs:
           - os: ubuntu-20.04
             compiler: clang12
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-pch
     env:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
