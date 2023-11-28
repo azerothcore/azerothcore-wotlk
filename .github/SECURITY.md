@@ -55,7 +55,6 @@ Versions of Ubuntu:
 
 | Ubuntu version | Supported          |
 | -------------- | ------------------ |
-| 22.04          | :white_check_mark: |
 | 20.04          | :white_check_mark: |
 | 18.04 and lower| :red_circle:       |
 
