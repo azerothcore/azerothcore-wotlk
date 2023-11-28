@@ -1,3 +1,4 @@
+-- DB update 2023_11_27_00 -> 2023_11_28_00
 -- Update Midsummer relevant gameobject spawns in "The Zoram Strand" with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (187918, 187988, 187989, 188048, 188049, 188050, 188137, 188138)) AND (`guid` IN (50561, 50562, 50563, 50569, 50570, 50980, 50982, 50983, 53591, 53608, 53609, 54031, 54032, 54033, 54034, 54944, 54945));
