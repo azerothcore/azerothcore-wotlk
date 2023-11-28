@@ -1,4 +1,4 @@
-name: core
+name: nopch-build
 on:
   push:
     branches:
@@ -20,25 +20,12 @@ jobs:
           - os: ubuntu-20.04
             compiler: clang12
           - os: ubuntu-20.04
-            compiler: clang11
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-          - os: ubuntu-20.04
             compiler: gcc10
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-nopch
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (
-        github.ref == 'refs/heads/master'
-        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
-        || github.event.label.name == 'file-cpp'
-        || contains(github.event.pull_request.labels.*.name, 'run-build')
-        || github.event.label.name == 'run-build')
-      )
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - name: Cache

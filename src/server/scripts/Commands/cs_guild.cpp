@@ -53,7 +53,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -66,8 +66,6 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        guildName = guild_commandscript::_RemoveQuotes(guildName);
 
         if (guildName.empty())
         {
@@ -111,10 +109,8 @@ public:
         return true;
     }
 
-    static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
+    static bool HandleGuildDeleteCommand(ChatHandler*, QuotedString guildName)
     {
-        guildName = guild_commandscript::_RemoveQuotes(guildName);
-
         if (guildName.empty())
         {
             return false;
@@ -130,7 +126,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -141,8 +137,6 @@ public:
         {
             return false;
         }
-
-        guildName = guild_commandscript::_RemoveQuotes(guildName);
 
         if (guildName.empty())
         {
@@ -202,11 +196,8 @@ public:
         return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
-    static bool HandleGuildRenameCommand(ChatHandler* handler, std::string_view oldGuildStr, std::string_view newGuildStr)
+    static bool HandleGuildRenameCommand(ChatHandler* handler, QuotedString oldGuildStr, QuotedString newGuildStr)
     {
-        oldGuildStr = guild_commandscript::_RemoveQuotes(oldGuildStr);
-        newGuildStr = guild_commandscript::_RemoveQuotes(newGuildStr);
-
         if (oldGuildStr.empty() || newGuildStr.empty())
         {
             return false;
@@ -238,7 +229,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, std::string_view>> const& guildIdentifier)
+    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, QuotedString>> const& guildIdentifier)
     {
         Guild* guild = nullptr;
 
@@ -247,7 +238,7 @@ public:
             if (ObjectGuid::LowType const* guid = std::get_if<ObjectGuid::LowType>(&*guildIdentifier))
                 guild = sGuildMgr->GetGuildById(*guid);
             else
-                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<std::string_view>());
+                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<QuotedString>());
         }
         else if (Optional<PlayerIdentifier> target = PlayerIdentifier::FromTargetOrSelf(handler); target && target->IsConnected())
             guild = target->GetConnectedPlayer()->GetGuild();
@@ -274,20 +265,6 @@ public:
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the Day
         handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
         return true;
-    }
-private:
-    static std::string_view _RemoveQuotes(std::string_view inputString)
-    {
-        if (inputString.starts_with('"') && inputString.ends_with('"'))
-        {
-            inputString.remove_prefix(1);
-            inputString.remove_suffix(1);
-            return inputString;
-        }
-        else
-        {
-            return "";
-        }
     }
 };
 
