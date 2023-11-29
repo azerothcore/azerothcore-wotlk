@@ -541,12 +541,13 @@ public:
             lootId = gameObjectInfo->fishinghole.lootId;
 
         handler->PSendSysMessage(LANG_GOINFO_ENTRY, entry);
+        if (gameObject)
+            handler->PSendSysMessage("GUID: %u", gameObject->GetGUID().GetCounter());
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
         if (gameObject)
         {
-            handler->PSendSysMessage("GUID: %u", gameObject->GetGUID().GetCounter());
             handler->PSendSysMessage("LootMode: %u", gameObject->GetLootMode());
             handler->PSendSysMessage("LootState: %u", gameObject->getLootState());
             handler->PSendSysMessage("GOState: %u", gameObject->GetGoState());
