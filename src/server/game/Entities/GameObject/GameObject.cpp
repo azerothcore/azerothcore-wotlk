@@ -2816,7 +2816,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
         return;
 
     bool forcedFlags = GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.groupLootRules && HasLootRecipient();
-    bool targetIsGM = target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity());
+    bool targetIsGM = target->IsGameMaster() && target->GetSession()->IsGMAccount();
 
     ByteBuffer fieldBuffer;
 
