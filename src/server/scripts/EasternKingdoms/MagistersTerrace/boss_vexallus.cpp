@@ -73,7 +73,7 @@ struct boss_vexallus : public BossAI
                 DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
         });
 
-        ScheduleHealthCheckEvent(10, [&]
+        ScheduleHealthCheckEvent(20, [&]
         {
             scheduler.CancelAll();
             DoCastSelf(SPELL_OVERLOAD, true);
