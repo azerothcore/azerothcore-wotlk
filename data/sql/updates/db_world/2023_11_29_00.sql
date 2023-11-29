@@ -1,3 +1,4 @@
+-- DB update 2023_11_28_00 -> 2023_11_29_00
 -- Instructor Razuvious Event
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (2835700,2835701,-129391,12939100,-129390,12939000,28391) AND `action_type`=48;
 -- Acherus Necromancer SAI
