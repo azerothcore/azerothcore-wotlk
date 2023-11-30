@@ -126,7 +126,7 @@ public:
         if (!name.data())
             return false;
 
-        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\"", name.data());
+        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1" , name.data());
         if (!result)
         {
             handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
