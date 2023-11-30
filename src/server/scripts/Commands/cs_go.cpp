@@ -134,8 +134,7 @@ public:
             return false;
         }
 
-        Field const* fields = result->Fetch();
-        uint32 entry = fields[0].Get<uint32>();
+        uint32 entry = result->Fetch()[0].Get<uint32>();
         CreatureData const* spawnpoint = GetCreatureData(handler, entry);
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
