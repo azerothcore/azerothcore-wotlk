@@ -136,6 +136,12 @@ public:
 
         uint32 entry = result->Fetch()[0].Get<uint32>();
         CreatureData const* spawnpoint = GetCreatureData(handler, entry);
+        if (!spawnpoint)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
