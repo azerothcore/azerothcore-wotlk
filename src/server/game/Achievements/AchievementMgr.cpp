@@ -140,8 +140,8 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
             {
-                SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(aura.spell_id);
-                if (!spellEntry)
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(aura.spell_id);
+                if (!spellInfo)
                 {
                     LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: {} Type: {}) for data type {} ({}) has wrong spell id in value1 ({}), ignored.",
                                      criteria->ID, criteria->requiredType, (dataType == ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA ? "ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA" : "ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA"), dataType, aura.spell_id);
@@ -153,7 +153,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
                                      criteria->ID, criteria->requiredType, (dataType == ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA ? "ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA" : "ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA"), dataType, aura.effect_idx);
                     return false;
                 }
-                if (!spellEntry->Effects[aura.effect_idx].ApplyAuraName)
+                if (!spellInfo->Effects[aura.effect_idx].ApplyAuraName)
                 {
                     LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: {} Type: {}) for data type {} ({}) has non-aura spell effect (ID: {} Effect: {}), ignores.",
                                      criteria->ID, criteria->requiredType, (dataType == ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA ? "ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA" : "ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA"), dataType, aura.spell_id, aura.effect_idx);

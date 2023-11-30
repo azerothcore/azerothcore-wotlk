@@ -1952,7 +1952,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({
             SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
