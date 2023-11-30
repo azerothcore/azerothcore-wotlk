@@ -655,7 +655,9 @@ enum WintergardeGryphon
 
     QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
     GO_TEMP_GRYPHON_STATION                     = 188679,
-    AREA_WINTERGARDE_KEEP                       = 4177
+    AREA_WINTERGARDE_KEEP                       = 4177,
+    AREA_THE_CARRION_FIELDS                     = 4188,
+    AREA_WINTERGARDE_MINE                       = 4178
 };
 
 class npc_wintergarde_gryphon : public VehicleAI
@@ -712,6 +714,23 @@ public:
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
+
+        if (me->GetAreaId() != AREA_WINTERGARDE_KEEP && me->GetAreaId() != AREA_THE_CARRION_FIELDS && me->GetAreaId() != AREA_WINTERGARDE_MINE)
+        {
+            if (Vehicle* gryphon = me->GetVehicleKit())
+            {
+                Unit* player = gryphon->GetPassenger(0);
+
+                if (Creature* seat = player->ToCreature())
+                {
+                    seat->ExitVehicle();
+                    seat->DespawnOrUnsummon();
+                }
+                me->CastSpell(player, VEHICLE_SPELL_PARACHUTE, true);
+                events.ScheduleEvent(EVENT_TAKE_OFF, 0s);
+            }
+        }
+
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
