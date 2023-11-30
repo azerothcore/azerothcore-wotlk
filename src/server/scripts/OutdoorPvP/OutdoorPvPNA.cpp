@@ -88,6 +88,7 @@ uint32 OPvPCapturePointNA::GetAliveGuardsCount()
         auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
         for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
             if (itr2->second->IsAlive() && (itr2->second->GetEntry() == NA_HALAANI_GUARD_A || itr2->second->GetEntry() == NA_HALAANI_GUARD_H))
+                ++cnt;
     }
     return cnt;
 }
