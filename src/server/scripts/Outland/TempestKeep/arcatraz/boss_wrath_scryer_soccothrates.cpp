@@ -67,11 +67,6 @@ struct boss_wrath_scryer_soccothrates : public BossAI
     boss_wrath_scryer_soccothrates(Creature* creature) : BossAI(creature, DATA_SOCCOTHRATES)
     {
         preFight = instance->GetBossState(DATA_DALLIAH) == DONE;
-
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void Reset() override
@@ -79,7 +74,6 @@ struct boss_wrath_scryer_soccothrates : public BossAI
         _Reset();
         events2.Reset();
         me->CastSpell(me, SPELL_FEL_IMMOLATION, true);
-        me->SetImmuneToAll(false);
 
         ScheduleHealthCheckEvent(25, [&]
         {
@@ -96,8 +90,6 @@ struct boss_wrath_scryer_soccothrates : public BossAI
     void InitializeAI() override
     {
         BossAI::InitializeAI();
-        if (!preFight)
-            me->SetImmuneToAll(true);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -129,10 +121,12 @@ struct boss_wrath_scryer_soccothrates : public BossAI
             }
         }
 
-        scheduler.Schedule(11s, 12s, [this](TaskContext context)
+        scheduler.Schedule(30s, 35s, [this](TaskContext context)
         {
+            scheduler.DelayAll(5s);
             me->CastSpell(me, SPELL_KNOCK_AWAY, false);
             Talk(SAY_KNOCK_AWAY);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
 
             scheduler.Schedule(4600ms, [this](TaskContext)
             {
@@ -141,10 +135,7 @@ struct boss_wrath_scryer_soccothrates : public BossAI
 
                 scheduler.Schedule(300ms, [this](TaskContext context2)
                 {
-                    if (me->GetVictim() && !me->IsWithinMeleeRange(me->GetVictim()))
-                    {
-                        DoCastAOE(SPELL_FELFIRE, true);
-                    }
+                    DoCastAOE(SPELL_FELFIRE, true);
 
                     if (context2.GetRepeatCounter() <= 6)
                     {
@@ -153,8 +144,8 @@ struct boss_wrath_scryer_soccothrates : public BossAI
                 });
             });
 
-            context.Repeat();
-        }).Schedule(12s, 14s, [this](TaskContext context)
+            context.Repeat(20s, 35s);
+        }).Schedule(8500ms, 22s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_FELFIRE_SHOCK);
             context.Repeat();

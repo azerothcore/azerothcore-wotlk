@@ -32,6 +32,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "TaskScheduler.h"
 #include "Timer.h"
 #include <bitset>
 #include <list>
@@ -593,6 +594,10 @@ public:
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+
+    TaskScheduler _creatureRespawnScheduler;
+
+    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
 
     void LoadCorpseData();
     void DeleteCorpseData();

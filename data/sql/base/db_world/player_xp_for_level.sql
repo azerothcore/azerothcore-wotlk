@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
   `Level` tinyint unsigned NOT NULL,
   `Experience` int unsigned NOT NULL,
   PRIMARY KEY (`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.player_xp_for_level: 79 rows
+-- Dumping data for table acore_world.player_xp_for_level: ~79 rows (approximately)
 DELETE FROM `player_xp_for_level`;
-/*!40000 ALTER TABLE `player_xp_for_level` DISABLE KEYS */;
 INSERT INTO `player_xp_for_level` (`Level`, `Experience`) VALUES
 	(1, 400),
 	(2, 900),
@@ -105,7 +104,6 @@ INSERT INTO `player_xp_for_level` (`Level`, `Experience`) VALUES
 	(77, 1637400),
 	(78, 1653900),
 	(79, 1670800);
-/*!40000 ALTER TABLE `player_xp_for_level` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -30,6 +30,7 @@
 #include "PointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
+#include "WaypointMgr.h"
 #include "WaypointMovementGenerator.h"
 
 inline MovementGenerator* GetIdleMovementGenerator()
@@ -344,6 +345,32 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     init.Launch();
 }
 
+void MotionMaster::MoveForwards(Unit* target, float dist)
+{
+    //like movebackwards, but without the inversion
+    if (!target)
+    {
+        return;
+    }
+
+    Position const& pos = target->GetPosition();
+    float angle = target->GetAngle(_owner);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true, true))
+    {
+        return;
+    }
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z, false);
+    init.SetFacing(target);
+    init.Launch();
+}
+
 void MotionMaster::MoveCircleTarget(Unit* target)
 {
     if (!target)
@@ -420,6 +447,21 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     {
         Mutate(new EscortMovementGenerator<Creature>(path), MOTION_SLOT_ACTIVE);
     }
+}
+
+void MotionMaster::MoveSplinePath(uint32 path_id)
+{
+    // convert the path id to a Movement::PointsArray*
+    Movement::PointsArray* points = new Movement::PointsArray();
+    WaypointPath const* path = sWaypointMgr->GetPath(path_id);
+    for (uint8 i = 0; i < path->size(); ++i)
+    {
+        WaypointData const* node = path->at(i);
+        points->push_back(G3D::Vector3(node->x, node->y, node->z));
+    }
+
+    // pass the new PointsArray* to the appropriate MoveSplinePath function
+    MoveSplinePath(points);
 }
 
 void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)

@@ -19,13 +19,16 @@
 #include "ScriptedCreature.h"
 #include "the_black_morass.h"
 
-enum Enums
+enum Text
 {
     SAY_AGGRO                   = 1,
     SAY_BANISH                  = 2,
     SAY_SLAY                    = 3,
-    SAY_DEATH                   = 4,
+    SAY_DEATH                   = 4
+};
 
+enum Spells
+{
     SPELL_HASTEN                = 31458,
     SPELL_MORTAL_WOUND          = 31464,
     SPELL_WING_BUFFET           = 31475,
@@ -46,7 +49,6 @@ struct boss_temporus : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-
         scheduler.Schedule(12s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_HASTEN);
@@ -69,7 +71,6 @@ struct boss_temporus : public BossAI
                 context.Repeat(30s);
             });
         }
-
         OwnTalk(SAY_AGGRO);
     }
 
@@ -98,7 +99,6 @@ struct boss_temporus : public BossAI
                 return;
             }
         }
-
         ScriptedAI::MoveInLineOfSight(who);
     }
 };

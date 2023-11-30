@@ -276,14 +276,32 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (gateOpened)
+            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
             {
-                summons.DoZoneInCombat();
-            }
-            else if (Unit* target = me->SelectNearestTarget(50.0f))
-            {
-                AttackStart(target);
-                DoZoneInCombat();
+                if (gateOpened)
+                {
+                    summon->AI()->AttackStart(target);
+                    summon->CallForHelp(40.0f);
+                }
+                else
+                {
+                    if (summon->GetEntry() == NPC_LIVING_TRAINEE ||
+                        summon->GetEntry() == NPC_LIVING_KNIGHT  ||
+                        summon->GetEntry() == NPC_LIVING_RIDER   )
+                    {
+                        if (IN_LIVE_SIDE(target))
+                        {
+                            summon->AI()->AttackStart(target);
+                        }
+                    }
+                    else
+                    {
+                        if (!IN_LIVE_SIDE(target))
+                        {
+                            summon->AI()->AttackStart(target);
+                        }
+                    }
+                }
             }
         }
 
@@ -489,7 +507,6 @@ public:
                         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                         me->SetImmuneToPC(false);
                         me->RemoveAllAuras();
-                        summons.DoZoneInCombat();
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, 1s);
                         events.ScheduleEvent(EVENT_HARVEST_SOUL, 5s, 15s);
                         events.ScheduleEvent(EVENT_TELEPORT, 20s);
@@ -504,7 +521,6 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        summons.DoZoneInCombat();
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
                     }
@@ -571,20 +587,6 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!attacker || !IsOnSameSide(attacker))
-            {
-                damage = 0;
-            }
-
-            if (!me->IsInCombat())
-            {
-                me->CallForHelp(25.0f);
-                AttackStart(attacker);
-            }
-        }
-
         void JustDied(Unit*) override
         {
             switch (me->GetEntry())
@@ -634,9 +636,9 @@ public:
                 case EVENT_SHADOW_MARK:
                     if (Unit* victim = me->GetVictim())
                     {
-                        if (!victim->HasAura(SPELL_SHADOW_MARK))
+                        if (victim->IsWithinDist(me, 10))
                         {
-                            me->CastSpell(me->GetVictim(), SPELL_SHADOW_MARK, false);
+                            me->CastSpell(victim, SPELL_SHADOW_MARK, false);
                         }
                     }
                     events.Repeat(5s, 7s);

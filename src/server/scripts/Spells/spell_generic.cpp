@@ -32,7 +32,6 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -2030,8 +2029,7 @@ class spell_gen_animal_blood : public AuraScript
     {
         if (Unit* owner = GetUnitOwner())
         {
-            if (owner->IsInWater())
-                owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+            owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
         }
     }
 
@@ -2039,6 +2037,27 @@ class spell_gen_animal_blood : public AuraScript
     {
         AfterEffectApply += AuraEffectApplyFn(spell_gen_animal_blood::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_animal_blood::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 63471 - Spawn Blood Pool
+class spell_spawn_blood_pool : public SpellScript
+{
+    PrepareSpellScript(spell_spawn_blood_pool);
+
+    void SetDest(SpellDestination &dest)
+    {
+        Unit* caster = GetCaster();
+        LiquidData liquidStatus = caster->GetMap()->GetLiquidData(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), caster->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+
+        float level = liquidStatus.Level > INVALID_HEIGHT ? liquidStatus.Level : caster->GetPositionZ();
+        Position pos = Position(caster->GetPositionX(), caster->GetPositionY(), level, caster->GetOrientation());
+        dest.Relocate(pos);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_spawn_blood_pool::SetDest, EFFECT_0, TARGET_DEST_CASTER);
     }
 };
 
@@ -3643,7 +3662,9 @@ class spell_gen_ds_flush_knockback : public SpellScript
    60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
    38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
    66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
-   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp) */
+   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp)
+   33711/38794 - Murmur's Touch
+   */
 class spell_gen_count_pct_from_max_hp : public SpellScript
 {
     PrepareSpellScript(spell_gen_count_pct_from_max_hp)
@@ -4792,6 +4813,329 @@ class spell_freezing_circle : public SpellScript
     }
 };
 
+// 35385 - Threshalisk Charge
+enum Threshalisk
+{
+    SPELL_THRESHALISK_CHARGE = 35385,
+    SPELL_RUSHING_CHARGE     = 35382,
+};
+
+class spell_gen_threshalisk_charge : public SpellScript
+{
+    PrepareSpellScript(spell_gen_threshalisk_charge);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_THRESHALISK_CHARGE });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Creature* caster = GetCaster()->ToCreature())
+        {
+            if (Unit* victim = caster->GetVictim())
+            {
+                if (caster->GetReactState() != REACT_PASSIVE)
+                {
+                    caster->CastSpell(victim, GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, true);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_threshalisk_charge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 37589 - Shriveling Gaze
+enum ShrivelingGaze
+{
+    SPELL_SHRIVELING_GAZE         = 37589,
+    SPELL_SHRIVELING_GAZE_REMOVAL = 30023, // Serverside - Gushing Wound Removal
+};
+
+class spell_gen_shriveling_gaze : public AuraScript
+{
+    PrepareAuraScript(spell_gen_shriveling_gaze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHRIVELING_GAZE });
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        ModStackAmount(20);
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_shriveling_gaze::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_shriveling_gaze::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 38048 - Curse of Pain
+enum CurseOfPain
+{
+    SPELL_CURSE_OF_PAIN           = 38048,
+};
+
+class spell_gen_curse_of_pain : public AuraScript
+{
+    PrepareAuraScript(spell_gen_curse_of_pain);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CURSE_OF_PAIN });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target && target->ToPlayer())
+        {
+            if (target->GetHealthPct() < 50.f)
+            {
+                target->RemoveAurasDueToSpell(SPELL_CURSE_OF_PAIN);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_curse_of_pain::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+enum SpiritofCompetition
+{
+    // Spells
+    SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT = 48056,
+    SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT      = 48057,
+    // Mail
+    MAIL_THE_COMPETITIORS_TABARD                   = 195,
+    MAIL_A_GOLD_MEDALLION                          = 196,
+    // NPC
+    NPC_SPIRIT_OF_COMPETITION                      = 27217,
+    // Items
+    ITEM_COMPETITORS_TABARD                        = 36941,
+    ITEM_GOLD_MEDALLION                            = 37297,
+};
+
+class spell_gen_spirit_of_competition_participant : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_participant);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_COMPETITORS_TABARD, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_THE_COMPETITIORS_TABARD)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_participant::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_gen_spirit_of_competition_winner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_spirit_of_competition_winner);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT, true);
+
+            Item* item = Item::CreateItem(ITEM_GOLD_MEDALLION, 1);
+            if (!item)
+                return;
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            MailDraft(MAIL_A_GOLD_MEDALLION)
+                .AddItem(item)
+                .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_spirit_of_competition_winner::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 27360 - Lord Valthalak's Amulet
+enum Valthalak
+{
+    SPELL_INSTILL_LORD_VALTHALAK_SPIRIT = 27360,
+    NPC_LORD_VALTHALAK                  = 16042
+};
+
+class spell_gen_valthalak_amulet : public SpellScript
+{
+    PrepareSpellScript(spell_gen_valthalak_amulet)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_LORD_VALTHALAK && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_valthalak_amulet::CheckCast);
+    }
+};
+
+enum ScourgeBanner
+{
+    GO_COMMAND_TENT = 176210,
+};
+
+class spell_gen_planting_scourge_banner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_planting_scourge_banner)
+
+    SpellCastResult CheckCast()
+    {
+        if (GameObject* tent = GetCaster()->FindNearestGameObject(GO_COMMAND_TENT, 20.0f))
+            if (tent->GetGoState() != GO_STATE_READY) // If tent is burned down
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_planting_scourge_banner::CheckCast);
+    }
+};
+
+enum Jubling
+{
+    SPELL_JUBLING_COOLDOWN_1_WEEK = 23852
+};
+
+// 23853 - Jubling Cooldown
+class spell_gen_jubling_cooldown : public SpellScript
+{
+    PrepareSpellScript(spell_gen_jubling_cooldown);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_JUBLING_COOLDOWN_1_WEEK });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->CastSpell(target, SPELL_JUBLING_COOLDOWN_1_WEEK); // 1 week
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_jubling_cooldown::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 12699 - Yeh'kinya's Bramble
+enum YehkinyaBramble
+{
+    NPC_VALE_SCREECHER       = 5307,
+    NPC_ROGUE_VALE_SCREECHER = 5308
+};
+
+class spell_gen_yehkinya_bramble : public SpellScript
+{
+    PrepareSpellScript(spell_gen_yehkinya_bramble)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if ((target->GetEntry() == NPC_VALE_SCREECHER || target->GetEntry() == NPC_ROGUE_VALE_SCREECHER) && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_yehkinya_bramble::CheckCast);
+    }
+};
+
+// 35244 - Choking Vines
+enum ChokingVines
+{
+    SPELL_CHOKING_VINES = 35244,
+    SPELL_CHOKING_WOUND = 35247
+};
+
+class spell_gen_choking_vines : public AuraScript
+{
+    PrepareAuraScript(spell_gen_choking_vines);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHOKING_VINES, SPELL_CHOKING_WOUND });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (GetStackAmount() == GetSpellInfo()->StackAmount) // 5 stacks
+            {
+                target->RemoveAurasDueToSpell(SPELL_CHOKING_VINES);
+                target->CastSpell(target, SPELL_CHOKING_WOUND, true); // Unknown if it's a self cast or casted by the source on 5th
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_choking_vines::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4858,6 +5202,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_feign_death_no_prevent_emotes);
     RegisterSpellScript(spell_pvp_trinket_wotf_shared_cd);
     RegisterSpellScript(spell_gen_animal_blood);
+    RegisterSpellScript(spell_spawn_blood_pool);
     RegisterSpellScript(spell_gen_divine_storm_cd_reset);
     RegisterSpellScript(spell_gen_profession_research);
     RegisterSpellScript(spell_gen_clone);
@@ -4934,4 +5279,14 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScript(spell_gen_basic_campfire);
     RegisterSpellScript(spell_freezing_circle);
+    RegisterSpellScript(spell_gen_threshalisk_charge);
+    RegisterSpellScript(spell_gen_shriveling_gaze);
+    RegisterSpellScript(spell_gen_curse_of_pain);
+    RegisterSpellScript(spell_gen_spirit_of_competition_participant);
+    RegisterSpellScript(spell_gen_spirit_of_competition_winner);
+    RegisterSpellScript(spell_gen_valthalak_amulet);
+    RegisterSpellScript(spell_gen_planting_scourge_banner);
+    RegisterSpellScript(spell_gen_jubling_cooldown);
+    RegisterSpellScript(spell_gen_yehkinya_bramble);
+    RegisterSpellScript(spell_gen_choking_vines);
 }

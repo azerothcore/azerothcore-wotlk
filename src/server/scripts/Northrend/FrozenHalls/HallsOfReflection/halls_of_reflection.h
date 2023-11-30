@@ -50,6 +50,7 @@ enum Data
     ACTION_STOP_LK_FIGHT,
     ACTION_DELETE_ICE_WALL,
     DATA_WAVE_NUMBER,
+    DATA_LK_BATTLE,// in progress
 };
 
 enum Creatures
@@ -84,6 +85,7 @@ enum Creatures
     NPC_SKY_REAVER_KORM_BLACKSKAR                 = 30824,
     NPC_ALTAR_BUNNY                               = 37704,
     NPC_QUEL_DELAR                                = 37158,
+
 };
 
 enum GameObjects
@@ -263,8 +265,14 @@ enum hMisc
     SPELL_HOR_START_QUEST_ALLY                    = 71351,
     SPELL_HOR_START_QUEST_HORDE                   = 71542,
     SPELL_SHADOWMOURNE_VISUAL                     = 72523,
-    SPELL_ARCANE_CAST_VISUAL                      = 65633,
+    SPELL_UTHER_DESPAWN                           = 70693, //Sniffed
     SPELL_WELL_OF_SOULS_VISUAL                    = 72630,
+    SPELL_SUMMON_SOULS                            = 72711, //Sniffed Sylvanas
+
+    //Battle of LK
+    SPELL_BLIDING_RETREAT                         = 70199, //Sniffed LK
+    SPELL_SOUL_REAPER                             = 69410, //Sniffed LK
+    SPELL_EVASION                                 = 70190, //Sniffed Sylvanas
 
     // Frostsworn General
     EVENT_ACTIVATE_REFLECTIONS                    = 1,
@@ -310,18 +318,24 @@ const uint32 allowedCompositions[8][5] =
     {NPC_WAVE_MERCENARY, NPC_WAVE_MAGE, NPC_WAVE_PRIEST, NPC_WAVE_FOOTMAN, NPC_WAVE_FOOTMAN}
 };
 
-const Position CenterPos = {5309.459473f, 2006.478516f, 711.595459f, 0.0f};
-const Position SpawnPos              = {5262.540527f, 1949.693726f, 707.695007f, 0.808736f}; // Jaina/Sylvanas Beginning Position
-const Position LoralenFollowPos      = {5283.234863f, 1990.946777f, 707.695679f, 0.929097f};
-const Position MoveThronePos         = {5306.952148f, 1998.499023f, 709.341431f, 1.277278f}; // Jaina/Sylvanas walks to throne
-const Position UtherSpawnPos         = {5308.310059f, 2003.857178f, 709.341431f, 4.650315f};
+const Position CenterPos             = {5309.459473f, 2006.478516f, 711.595459f, 0.0f};
+const Position SpawnPos              = {5263.22412f, 1950.95544f, 707.695862f, 0.808736f}; // Jaina/Sylvanas Beginning Position
+const Position LoralenMidleFollowPos = {5274.25634f, 1976.04760f, 707.694763f, 0.929097f}; // Sniffed
+const Position LoralenFollowPos      = {5283.29296f, 1992.43078f, 707.694763f, 0.549238f}; // Sniffed
+const Position LoralenFollowLk1      = {5292.94921f, 2008.25451f, 707.695801f, 1.047967f}; // Sniffed
+const Position LoralenFollowLk2      = {5298.94335f, 2016.37097f, 707.695801f, 0.694538f}; // Sniffed
+const Position LoralenFollowLk3      = {5336.94044f, 2040.21814f, 707.695801f, 0.439284f}; // Sniffed
+const Position LoralenFollowLkFinal  = {5361.96777f, 2065.68310f, 707.693848f, 0.831989f}; // Sniffed
+const Position LoralenDeadPos        = {5369.71289f, 2083.6330f, 707.695129f, 0.188739f}; // Sniffed
+const Position MoveThronePos         = {5306.98535f, 1998.10302f, 709.341187f, 1.277278f}; // Jaina/Sylvanas walks to throne
+const Position UtherSpawnPos         = {5308.310059f, 2003.857178f, 709.341431f, 4.650315f}; // Uther starting position
 const Position LichKingSpawnPos      = {5362.917480f, 2062.307129f, 707.695374f, 3.945812f};
-const Position LichKingMoveThronePos = {5312.080566f, 2009.172119f, 709.341431f, 3.973301f}; // Lich King walks to throne
-const Position LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away
+const Position LichKingMoveMidlelThronePos   = {5333.48437f, 2032.02648f, 707.695679f, 3.973301f}; // Lich King moves and hits Uther [sniff]
+const Position LichKingMoveThronePos   = {5312.79638f, 2010.07141f, 709.3942183f, 3.973301f}; // Lich King walks to throne [sniff]
+const Position LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away [sniff]
 const Position FalricMovePos         = {5284.161133f, 2030.691650f, 709.319336f, 5.489386f};
 const Position MarwynMovePos         = {5335.330078f, 1982.376221f, 709.319580f, 2.339942f};
-const Position SylvanasFightPos      = {5557.508301f, 2263.920654f, 733.011230f, 3.624075f};
-const Position LeaderEscapePos       = {5577.654785f, 2235.347412f, 733.011230f, 2.359576f};
+const Position LeaderEscapePos       = {5576.80566f, 2235.55004f, 733.012268f, 2.782125f}; //Sniff
 const Position ShipMasterSummonPos   = {5262.773926f, 1669.980103f, 715.000000f, 0.000000f};
 const Position WalkCaveInPos         = {5267.594238f, 1678.750000f, 784.302856f, 1.041739f};
 const Position AllyPortalPos         = {5205.015625f, 1605.680298f, 806.444458f, 0.884375f};

@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.milling_loot_template
 DROP TABLE IF EXISTS `milling_loot_template`;
 CREATE TABLE IF NOT EXISTS `milling_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.milling_loot_template: 45 rows
+-- Dumping data for table acore_world.milling_loot_template: ~45 rows (approximately)
 DELETE FROM `milling_loot_template`;
-/*!40000 ALTER TABLE `milling_loot_template` DISABLE KEYS */;
 INSERT INTO `milling_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(765, 11900, 11900, 100, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(785, 11901, 11901, 100, 0, 1, 0, 1, 1, '(ReferenceTable)'),
@@ -79,7 +78,6 @@ INSERT INTO `milling_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Qu
 	(37921, 11916, 11916, 100, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(39969, 11915, 11915, 100, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(39970, 11915, 11915, 100, 0, 1, 0, 1, 1, '(ReferenceTable)');
-/*!40000 ALTER TABLE `milling_loot_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

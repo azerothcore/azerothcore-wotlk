@@ -38,8 +38,8 @@ template<class SocketType>
 class NetworkThread
 {
 public:
-    NetworkThread() : _connections(0), _stopped(false), _thread(nullptr), _ioContext(1),
-        _acceptSocket(_ioContext), _updateTimer(_ioContext) { }
+    NetworkThread() :
+        _ioContext(1), _acceptSocket(_ioContext), _updateTimer(_ioContext) { }
 
     virtual ~NetworkThread()
     {
@@ -48,7 +48,6 @@ public:
         if (_thread)
         {
             Wait();
-            delete _thread;
         }
     }
 
@@ -63,7 +62,7 @@ public:
         if (_thread)
             return false;
 
-        _thread = new std::thread(&NetworkThread::Run, this);
+        _thread = std::make_unique<std::thread>([this]() { NetworkThread::Run(); });
         return true;
     }
 
@@ -71,12 +70,15 @@ public:
     {
         ASSERT(_thread);
 
-        _thread->join();
-        delete _thread;
-        _thread = nullptr;
+        if (_thread->joinable())
+        {
+            _thread->join();
+        }
+
+        _thread.reset();
     }
 
-    int32 GetConnectionCount() const
+    [[nodiscard]] int32 GetConnectionCount() const
     {
         return _connections;
     }
@@ -86,7 +88,7 @@ public:
         std::lock_guard<std::mutex> lock(_newSocketsLock);
 
         ++_connections;
-        _newSockets.push_back(sock);
+        _newSockets.emplace_back(sock);
         SocketAdded(sock);
     }
 
@@ -111,7 +113,9 @@ protected:
                 --_connections;
             }
             else
-                _sockets.push_back(sock);
+            {
+                _sockets.emplace_back(sock);
+            }
         }
 
         _newSockets.clear();
@@ -121,8 +125,8 @@ protected:
     {
         LOG_DEBUG("misc", "Network Thread Starting");
 
-        _updateTimer.expires_from_now(boost::posix_time::milliseconds(10));
-        _updateTimer.async_wait(std::bind(&NetworkThread<SocketType>::Update, this));
+        _updateTimer.expires_from_now(boost::posix_time::milliseconds(1));
+        _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
         _ioContext.run();
 
         LOG_DEBUG("misc", "Network Thread exits");
@@ -135,8 +139,8 @@ protected:
         if (_stopped)
             return;
 
-        _updateTimer.expires_from_now(boost::posix_time::milliseconds(10));
-        _updateTimer.async_wait(std::bind(&NetworkThread<SocketType>::Update, this));
+        _updateTimer.expires_from_now(boost::posix_time::milliseconds(1));
+        _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
 
         AddNewSockets();
 
@@ -158,12 +162,12 @@ protected:
     }
 
 private:
-    typedef std::vector<std::shared_ptr<SocketType>> SocketContainer;
+    using SocketContainer = std::vector<std::shared_ptr<SocketType>>;
 
-    std::atomic<int32> _connections;
-    std::atomic<bool> _stopped;
+    std::atomic<int32> _connections{};
+    std::atomic<bool> _stopped{};
 
-    std::thread* _thread;
+    std::unique_ptr<std::thread> _thread;
 
     SocketContainer _sockets;
 

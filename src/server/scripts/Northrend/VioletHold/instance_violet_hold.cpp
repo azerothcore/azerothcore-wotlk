@@ -23,7 +23,9 @@
 enum vYells
 {
     CYANIGOSA_SAY_SPAWN       = 3,
-    SAY_SINCLARI_1            = 0
+    SAY_SINCLARI_LEAVING      = 0,
+    SAY_SINCLARI_DOOR_LOCK    = 1,
+    SAY_SINCLARI_COMPLETE     = 2,
 };
 
 class instance_violet_hold : public InstanceMapScript
@@ -214,7 +216,7 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
-                            c->AI()->Talk(SAY_SINCLARI_1);
+                            c->AI()->Talk(SAY_SINCLARI_LEAVING);
                         events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
                     }
                     break;
@@ -251,7 +253,12 @@ public:
                         EncounterStatus = DONE;
                         HandleGameObject(GO_MainGateGUID, true);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
-                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); }
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_COMPLETE);
+                            c->DespawnOrUnsummon();
+                            c->SetRespawnTime(3);
+                        }
                     }
                     SaveToDB();
                     if (WaveCount < 18)
@@ -440,8 +447,14 @@ public:
                     break;
                 case EVENT_START_ENCOUNTER:
                     {
+                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        }
                         if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
+                        {
                             c->RemoveAllAuras(); // just to be sure...
+                        }
                         GateHealth = 100;
                         HandleGameObject(GO_MainGateGUID, false);
                         DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);

@@ -18,15 +18,14 @@
 DROP TABLE IF EXISTS `pool_quest`;
 CREATE TABLE IF NOT EXISTS `pool_quest` (
   `entry` int unsigned NOT NULL DEFAULT '0',
-  `pool_entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `description` varchar(255) DEFAULT NULL,
+  `pool_entry` int unsigned NOT NULL DEFAULT '0',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`entry`),
   KEY `idx_guid` (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_quest: 162 rows
+-- Dumping data for table acore_world.pool_quest: ~162 rows (approximately)
 DELETE FROM `pool_quest`;
-/*!40000 ALTER TABLE `pool_quest` DISABLE KEYS */;
 INSERT INTO `pool_quest` (`entry`, `pool_entry`, `description`) VALUES
 	(236, 385, 'Fueling the Demolishers'),
 	(11354, 356, 'Wanted: Nazan\'s Riding Crop'),
@@ -190,7 +189,6 @@ INSERT INTO `pool_quest` (`entry`, `pool_entry`, `description`) VALUES
 	(24629, 348, 'A Perfect Puff of Perfume'),
 	(24635, 348, 'A Cloudlet of Classy Cologne'),
 	(24636, 348, 'Bonbon Blitz');
-/*!40000 ALTER TABLE `pool_quest` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

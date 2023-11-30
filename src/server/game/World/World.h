@@ -141,8 +141,6 @@ enum WorldStates
     WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
 };
 
-#define WORLD_SLEEP_CONST 10
-
 // xinef: petitions storage
 struct PetitionData
 {
@@ -339,8 +337,6 @@ public:
     // used World DB version
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
-
-    void LoadMotd() override;
 
     void UpdateAreaDependentAuras() override;
 

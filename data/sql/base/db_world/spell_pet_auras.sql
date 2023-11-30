@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.spell_pet_auras
 DROP TABLE IF EXISTS `spell_pet_auras`;
 CREATE TABLE IF NOT EXISTS `spell_pet_auras` (
-  `spell` mediumint unsigned NOT NULL COMMENT 'dummy spell id',
+  `spell` int unsigned NOT NULL COMMENT 'dummy spell id',
   `effectId` tinyint unsigned NOT NULL DEFAULT '0',
-  `pet` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'pet id; 0 = all',
-  `aura` mediumint unsigned NOT NULL COMMENT 'pet aura id',
+  `pet` int unsigned NOT NULL DEFAULT '0' COMMENT 'pet id; 0 = all',
+  `aura` int unsigned NOT NULL COMMENT 'pet aura id',
   PRIMARY KEY (`spell`,`effectId`,`pet`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_pet_auras: 49 rows
+-- Dumping data for table acore_world.spell_pet_auras: ~49 rows (approximately)
 DELETE FROM `spell_pet_auras`;
-/*!40000 ALTER TABLE `spell_pet_auras` DISABLE KEYS */;
 INSERT INTO `spell_pet_auras` (`spell`, `effectId`, `pet`, `aura`) VALUES
 	(19028, 0, 0, 25228),
 	(19578, 0, 0, 19579),
@@ -77,7 +76,6 @@ INSERT INTO `spell_pet_auras` (`spell`, `effectId`, `pet`, `aura`) VALUES
 	(56317, 1, 0, 57482),
 	(56318, 0, 0, 57458),
 	(56318, 1, 0, 57475);
-/*!40000 ALTER TABLE `spell_pet_auras` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

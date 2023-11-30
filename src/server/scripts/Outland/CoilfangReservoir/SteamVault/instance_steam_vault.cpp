@@ -19,6 +19,19 @@
 #include "ScriptMgr.h"
 #include "steam_vault.h"
 
+enum MainChambersAccessPanelSays
+{
+    SAY_FAINT_ECHO  = 0,
+    SAY_LOUD_RUMBLE = 1
+};
+
+MinionData const minionData[] =
+{
+    { NPC_NAGA_DISTILLER,          DATA_WARLORD_KALITHRESH  },
+    { NPC_THESPIA_WATER_ELEMENTAL, DATA_HYDROMANCER_THESPIA },
+    { 0,                            0                       }
+};
+
 class go_main_chambers_access_panel : public GameObjectScript
 {
 public:
@@ -28,11 +41,16 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
+            Creature* doorController = instance->GetCreature(DATA_DOOR_CONTROLLER);
             if (go->GetEntry() == GO_ACCESS_PANEL_HYDRO)
             {
                 if (instance->GetBossState(DATA_HYDROMANCER_THESPIA) == DONE)
                 {
                     go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    if (doorController && doorController->IsAIEnabled)
+                    {
+                        doorController->AI()->Talk(SAY_FAINT_ECHO);
+                    }
                 }
             }
             else
@@ -40,12 +58,31 @@ public:
                 if (instance->GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
                 {
                     go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    if (doorController && doorController->IsAIEnabled)
+                    {
+                        doorController->AI()->Talk(SAY_FAINT_ECHO);
+                    }
                 }
             }
 
             if (instance->GetBossState(DATA_HYDROMANCER_THESPIA) == DONE && instance->GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
             {
-                if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
+                if (doorController)
+                {
+                    if (doorController->IsAIEnabled)
+                    {
+                        doorController->AI()->Talk(SAY_LOUD_RUMBLE);
+                    }
+
+                    doorController->m_Events.AddEventAtOffset([instance]()
+                    {
+                        if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
+                        {
+                            instance->HandleGameObject(ObjectGuid::Empty, true, mainGate);
+                        }
+                    }, 4s);
+                }
+                else if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
                 {
                     instance->HandleGameObject(ObjectGuid::Empty, true, mainGate);
                 }
@@ -60,14 +97,17 @@ public:
 
 ObjectData const creatureData[] =
 {
-    { NPC_MEKGINEER_STEAMRIGGER, DATA_MEKGINEER_STEAMRIGGER }
+    { NPC_MEKGINEER_STEAMRIGGER,    DATA_MEKGINEER_STEAMRIGGER  },
+    { NPC_DOOR_CONTROLLER,          DATA_DOOR_CONTROLLER        },
+    { 0,                            0                           }
 };
 
 ObjectData const objectData[] =
 {
     { GO_ACCESS_PANEL_HYDRO, DATA_ACCESS_PANEL_HYDROMANCER },
     { GO_ACCESS_PANEL_MEK,   DATA_ACCESS_PANEL_MEKGINEER   },
-    { GO_MAIN_CHAMBERS_DOOR, DATA_MAIN_CHAMBERS_DOOR       }
+    { GO_MAIN_CHAMBERS_DOOR, DATA_MAIN_CHAMBERS_DOOR       },
+    { 0,                     0,                            }
 };
 
 class instance_steam_vault : public InstanceMapScript
@@ -82,6 +122,7 @@ public:
             SetHeaders(DataHeaders);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, objectData);
+            LoadMinionData(minionData);
         }
 
         void OnGameObjectCreate(GameObject* go) override

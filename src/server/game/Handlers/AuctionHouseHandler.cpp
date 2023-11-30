@@ -395,8 +395,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 //this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
-
     ObjectGuid auctioneer;
     uint32 auctionId;
     uint32 price;
@@ -421,6 +419,12 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
+
+    if (!sScriptMgr->CanPlaceAuctionBid(player, auction))
+    {
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
 
     if (!auction || auction->owner == player->GetGUID())
     {
@@ -522,8 +526,6 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 //this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
-
     ObjectGuid auctioneer;
     uint32 auctionId;
     recvData >> auctioneer;
@@ -597,8 +599,6 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 //called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
-
     ObjectGuid guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
@@ -662,23 +662,22 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     recvData >> listfrom;       // not used in fact (this list does not have page control in client)
 
     // pussywizard:
-    const uint32 delay = 4500;
-    const uint32 now = GameTime::GetGameTimeMS().count();
+    const Milliseconds now = GameTime::GetGameTimeMS();
     if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
         return;
-    uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
+
+    const Milliseconds delay = Milliseconds(4500);
+    Milliseconds diff = GetMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
     if (diff > delay)
         diff = delay;
 
-    _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay - diff));
+    _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual executing will change this to getMSTime of that moment
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID()), _player->m_Events.CalculateTime(delay.count() - diff.count()));
 }
 
 void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
-
-    _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS().count(); // pussywizard
+    _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS(); // pussywizard
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
@@ -709,8 +708,6 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 //this void is called when player clicks on search button
 void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_ITEMS");
-
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
@@ -751,23 +748,21 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     }
 
     // pussywizard:
-    const uint32 delay = 2000;
-    const uint32 now = GameTime::GetGameTimeMS().count();
-    uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
+    const Milliseconds delay = 2s;
+    const Milliseconds now = GameTime::GetGameTimeMS();
+    Milliseconds diff = GetMSTimeDiff(_lastAuctionListItemsMSTime, now);
     if (diff > delay)
     {
         diff = delay;
     }
     _lastAuctionListItemsMSTime = now + delay - diff;
     std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-    AsyncAuctionListingMgr::GetTempList().push_back(AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID,
-        auctionMainCategory, auctionSubCategory, quality, getAll, sortOrder));
+    AsyncAuctionListingMgr::GetTempList().emplace_back(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID,
+        auctionMainCategory, auctionSubCategory, quality, getAll, sortOrder);
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_PENDING_SALES");
-
     recvData.read_skip<uint64>();
 
     uint32 count = 0;

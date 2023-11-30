@@ -25,30 +25,28 @@
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
 public:
-    AuctionListOwnerItemsDelayEvent(ObjectGuid _creatureGuid, ObjectGuid guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
+    AuctionListOwnerItemsDelayEvent(ObjectGuid _creatureGuid, ObjectGuid guid) : creatureGuid(_creatureGuid), playerguid(guid) {}
     ~AuctionListOwnerItemsDelayEvent() override {}
 
     bool Execute(uint64 e_time, uint32 p_time) override;
     void Abort(uint64 /*e_time*/) override {}
-    bool getOwner() { return owner; }
 
 private:
     ObjectGuid creatureGuid;
     ObjectGuid playerguid;
-    bool owner;
 };
 
 class AuctionListItemsDelayEvent
 {
 public:
-    AuctionListItemsDelayEvent(uint32 msTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax,
+    AuctionListItemsDelayEvent(Milliseconds pickupTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax,
         uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll, AuctionSortOrderVector sortOrder) :
-        _msTimer(msTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax),_usable(usable),
+        _pickupTimer(pickupTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax),_usable(usable),
         _auctionSlotID(auctionSlotID), _auctionMainCategory(auctionMainCategory), _auctionSubCategory(auctionSubCategory), _quality(quality), _getAll(getAll), _sortOrder(sortOrder) { }
 
     bool Execute();
 
-    uint32 _msTimer;
+    Milliseconds _pickupTimer;
     ObjectGuid _playerguid;
     ObjectGuid _creatureguid;
     std::string _searchedname;
@@ -67,23 +65,17 @@ public:
 class AsyncAuctionListingMgr
 {
 public:
-    static void Update(uint32 diff) { auctionListingDiff += diff; }
-    static uint32 GetDiff() { return auctionListingDiff; }
-    static void ResetDiff() { auctionListingDiff = 0; }
-    static bool IsAuctionListingAllowed() { return auctionListingAllowed; }
-    static void SetAuctionListingAllowed(bool a) { auctionListingAllowed = a; }
-
+    static void Update(Milliseconds diff) { auctionListingDiff += diff; }
+    static Milliseconds GetDiff() { return auctionListingDiff; }
+    static void ResetDiff() { auctionListingDiff = Milliseconds::zero(); }
     static std::list<AuctionListItemsDelayEvent>& GetList() { return auctionListingList; }
     static std::list<AuctionListItemsDelayEvent>& GetTempList() { return auctionListingListTemp; }
-    static std::mutex& GetLock() { return auctionListingLock; }
     static std::mutex& GetTempLock() { return auctionListingTempLock; }
 
 private:
-    static uint32 auctionListingDiff;
-    static bool auctionListingAllowed;
+    static Milliseconds auctionListingDiff;
     static std::list<AuctionListItemsDelayEvent> auctionListingList;
     static std::list<AuctionListItemsDelayEvent> auctionListingListTemp;
-    static std::mutex auctionListingLock;
     static std::mutex auctionListingTempLock;
 };
 

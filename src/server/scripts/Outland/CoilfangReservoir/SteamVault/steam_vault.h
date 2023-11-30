@@ -36,7 +36,8 @@ enum steamVault
 
     DATA_ACCESS_PANEL_HYDROMANCER       = 4,
     DATA_ACCESS_PANEL_MEKGINEER         = 5,
-    DATA_MAIN_CHAMBERS_DOOR             = 6
+    DATA_MAIN_CHAMBERS_DOOR             = 6,
+    DATA_DOOR_CONTROLLER                = 7
 };
 
 enum steamVaultNPCGO
@@ -47,6 +48,13 @@ enum steamVaultNPCGO
 
     NPC_MEKGINEER_STEAMRIGGER           = 17796,
     NPC_WARLORD_KALITHRESH              = 17798,
+    NPC_DOOR_CONTROLLER                 = 20926
+};
+
+enum Creatures
+{
+    NPC_NAGA_DISTILLER                  = 17954,
+    NPC_THESPIA_WATER_ELEMENTAL         = 17917
 };
 
 template <class AI, class T>

@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `game_event_battleground_holiday` (
   `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
   `bgflag` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_battleground_holiday: 6 rows
+-- Dumping data for table acore_world.game_event_battleground_holiday: ~6 rows (approximately)
 DELETE FROM `game_event_battleground_holiday`;
-/*!40000 ALTER TABLE `game_event_battleground_holiday` DISABLE KEYS */;
 INSERT INTO `game_event_battleground_holiday` (`eventEntry`, `bgflag`) VALUES
 	(18, 2),
 	(19, 4),
@@ -32,7 +31,6 @@ INSERT INTO `game_event_battleground_holiday` (`eventEntry`, `bgflag`) VALUES
 	(21, 128),
 	(53, 512),
 	(54, 1073741824);
-/*!40000 ALTER TABLE `game_event_battleground_holiday` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

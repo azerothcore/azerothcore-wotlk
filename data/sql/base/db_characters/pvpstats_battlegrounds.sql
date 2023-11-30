@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `pvpstats_battlegrounds` (
   `type` tinyint unsigned NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.pvpstats_battlegrounds: ~0 rows (approximately)
 DELETE FROM `pvpstats_battlegrounds`;

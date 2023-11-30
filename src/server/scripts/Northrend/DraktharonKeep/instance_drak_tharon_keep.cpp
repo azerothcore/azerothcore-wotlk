@@ -50,7 +50,7 @@ public:
                 case GO_NOVOS_CRYSTAL_2:
                 case GO_NOVOS_CRYSTAL_3:
                 case GO_NOVOS_CRYSTAL_4:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
             }
         }
@@ -63,7 +63,7 @@ public:
                 case GO_NOVOS_CRYSTAL_2:
                 case GO_NOVOS_CRYSTAL_3:
                 case GO_NOVOS_CRYSTAL_4:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

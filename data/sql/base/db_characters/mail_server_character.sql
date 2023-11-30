@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `mail_server_character` (
   `guid` int unsigned NOT NULL,
   `mailId` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`mailId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.mail_server_character: ~0 rows (approximately)
 DELETE FROM `mail_server_character`;

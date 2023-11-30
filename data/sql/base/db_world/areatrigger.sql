@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger` (
   `height` float NOT NULL DEFAULT '0' COMMENT 'Most commonly used when size is 0, but not always',
   `orientation` float NOT NULL DEFAULT '0' COMMENT 'Most commonly used when size is 0, but not always',
   PRIMARY KEY (`entry`)
-) ENGINE=InnoDB AUTO_INCREMENT=5873 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5873 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.areatrigger: ~1,217 rows (approximately)
 DELETE FROM `areatrigger`;

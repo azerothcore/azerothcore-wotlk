@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `vehicle_dbc` (
   `MsslTrgtArcWidth` float NOT NULL DEFAULT '0',
   `MsslTrgtImpactRadius_1` float NOT NULL DEFAULT '0',
   `MsslTrgtImpactRadius_2` float NOT NULL DEFAULT '0',
-  `MsslTrgtArcTexture` varchar(100) DEFAULT NULL,
-  `MsslTrgtImpactTexture` varchar(100) DEFAULT NULL,
-  `MsslTrgtImpactModel_1` varchar(100) DEFAULT NULL,
-  `MsslTrgtImpactModel_2` varchar(100) DEFAULT NULL,
+  `MsslTrgtArcTexture` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactTexture` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactModel_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactModel_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `CameraYawOffset` float NOT NULL DEFAULT '0',
   `UilocomotionType` int NOT NULL DEFAULT '0',
   `MsslTrgtImpactTexRadius` float NOT NULL DEFAULT '0',
@@ -58,12 +58,10 @@ CREATE TABLE IF NOT EXISTS `vehicle_dbc` (
   `PowerDisplayID_2` int NOT NULL DEFAULT '0',
   `PowerDisplayID_3` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.vehicle_dbc: 0 rows
+-- Dumping data for table acore_world.vehicle_dbc: ~0 rows (approximately)
 DELETE FROM `vehicle_dbc`;
-/*!40000 ALTER TABLE `vehicle_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `vehicle_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

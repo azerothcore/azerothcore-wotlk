@@ -107,7 +107,7 @@ public:
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
-                    AddDoor(gameobject, true);
+                    AddDoor(gameobject);
                     break;
             }
         }
@@ -121,7 +121,7 @@ public:
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
-                    AddDoor(gameobject, false);
+                    RemoveDoor(gameobject);
                     break;
             }
         }

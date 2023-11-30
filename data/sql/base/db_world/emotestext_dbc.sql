@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `emotestext_dbc`;
 CREATE TABLE IF NOT EXISTS `emotestext_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name` varchar(100) DEFAULT NULL,
+  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `EmoteID` int NOT NULL DEFAULT '0',
   `EmoteText_1` int NOT NULL DEFAULT '0',
   `EmoteText_2` int NOT NULL DEFAULT '0',
@@ -37,12 +37,10 @@ CREATE TABLE IF NOT EXISTS `emotestext_dbc` (
   `EmoteText_15` int NOT NULL DEFAULT '0',
   `EmoteText_16` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.emotestext_dbc: 0 rows
+-- Dumping data for table acore_world.emotestext_dbc: ~0 rows (approximately)
 DELETE FROM `emotestext_dbc`;
-/*!40000 ALTER TABLE `emotestext_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `emotestext_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

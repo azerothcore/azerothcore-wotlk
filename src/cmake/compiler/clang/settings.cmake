@@ -131,7 +131,7 @@ if(BUILD_SHARED_LIBS)
         -fvisibility=hidden)
 
     # --no-undefined to throw errors when there are undefined symbols
-    # (caused through missing WARHEAD_*_API macros).
+    # (caused through missing ACORE_*_API macros).
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --no-undefined")
 
     message(STATUS "Clang: Disallow undefined symbols")

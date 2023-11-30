@@ -18,9 +18,9 @@
 #include "ChannelMgr.h"
 #include "Log.h"
 #include "Player.h"
-#include "World.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
+#include "World.h"
 
 ChannelMgr::~ChannelMgr()
 {
@@ -106,7 +106,7 @@ void ChannelMgr::LoadChannels()
         ++count;
     } while (result->NextRow());
 
-    for (auto pair : toDelete)
+    for (auto& pair : toDelete)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
         stmt->SetData(0, pair.first);

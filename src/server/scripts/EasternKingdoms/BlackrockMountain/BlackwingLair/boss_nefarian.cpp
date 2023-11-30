@@ -23,9 +23,9 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
-#include "TaskScheduler.h"
 
 enum Events
 {
@@ -1243,7 +1243,7 @@ class spell_shadowblink : public SpellScript
             return;
         }
 
-        for (auto itr : spellPos)
+        for (auto& itr : spellPos)
         {
             float distTarget = target->GetDistance2d(itr.second.m_positionX, itr.second.m_positionY);
             if (distTarget <= 30.f)

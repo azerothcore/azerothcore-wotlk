@@ -30,7 +30,8 @@ ObjectData const creatureData[] =
 {
     { NPC_DALLIAH,      DATA_DALLIAH          },
     { NPC_SOCCOTHRATES, DATA_SOCCOTHRATES     },
-    { NPC_MELLICHAR,    DATA_WARDEN_MELLICHAR }
+    { NPC_MELLICHAR,    DATA_WARDEN_MELLICHAR },
+    { 0,                0                     }
 };
 
 class instance_arcatraz : public InstanceMapScript
@@ -54,7 +55,7 @@ public:
             {
                 case GO_CONTAINMENT_CORE_SECURITY_FIELD_ALPHA:
                 case GO_CONTAINMENT_CORE_SECURITY_FIELD_BETA:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_STASIS_POD_ALPHA:
                     StasisPodGUIDs[0] = go->GetGUID();

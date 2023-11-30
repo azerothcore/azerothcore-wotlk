@@ -19,9 +19,9 @@ DROP TABLE IF EXISTS `worldstates`;
 CREATE TABLE IF NOT EXISTS `worldstates` (
   `entry` int unsigned NOT NULL DEFAULT '0',
   `value` int unsigned NOT NULL DEFAULT '0',
-  `comment` tinytext,
+  `comment` tinytext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`entry`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Variable Saves';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Variable Saves';
 
 -- Dumping data for table acore_characters.worldstates: ~102 rows (approximately)
 DELETE FROM `worldstates`;

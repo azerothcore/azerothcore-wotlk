@@ -27,6 +27,9 @@
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,
+    DATA_LIEUTENANT_DRAKE   = 1,
+    DATA_CAPTAIN_SKARLOC    = 2,
+    DATA_EPOCH_HUNTER       = 3,
 
     DATA_BOMBS_PLACED       = 10,
     DATA_THRALL_REPOSITION  = 11,
@@ -71,7 +74,7 @@ enum MiscIds
 
     ENCOUNTER_PROGRESS_NONE             = 0,
     ENCOUNTER_PROGRESS_BARRELS          = 1,
-    ENCOUNTER_PROGRESS_DRAKE_KILLED     = 2,
+    //ENCOUNTER_PROGRESS_DRAKE_KILLED     = 2, No longer used. Kept as reference as DB might rely on the existing order.
     ENCOUNTER_PROGRESS_THRALL_ARMORED   = 3,
     ENCOUNTER_PROGRESS_AMBUSHES_1       = 4,
     ENCOUNTER_PROGRESS_SKARLOC_KILLED   = 5,
@@ -94,5 +97,7 @@ inline AI* GetOldHillsbradAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, OldHillsbradScriptName);
 }
+
+#define RegisterOldHillsbradCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetOldHillsbradAI)
 
 #endif

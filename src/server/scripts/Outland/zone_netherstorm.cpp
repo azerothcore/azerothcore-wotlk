@@ -15,27 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Netherstorm
-SD%Complete: 80
-SDComment: Quest support: 10337, 10438, 10652 (special flight paths), 10198, 10191
-SDCategory: Netherstorm
-EndScriptData */
-
-/* ContentData
-npc_commander_dawnforge
-npc_bessy
-npc_maxx_a_million
-go_captain_tyralius_prison
-EndContentData */
-
 #include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 
 // Ours
 enum saeed
@@ -59,7 +47,11 @@ enum saeed
 
     QUEST_DIMENSIUS_DEVOURING       = 10439,
 
-    SPELL_DIMENSIUS_TRANSFORM       = 35939
+    SPELL_DIMENSIUS_TRANSFORM       = 35939,
+
+    GOSSIP_MENU_SAEED               = 8228,
+    TEXT_NPC_SAEED_DEFAULT          = 10229,
+    TEXT_NPC_SAEED_START_FIGHT      = 10232,
 };
 
 class npc_captain_saeed : public CreatureScript
@@ -280,12 +272,12 @@ public:
         if (player->GetQuestStatus(QUEST_DIMENSIUS_DEVOURING) == QUEST_STATUS_INCOMPLETE)
         {
             if (!creature->AI()->GetData(1))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_MENU_SAEED, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_MENU_SAEED, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, creature->AI()->GetData(1) ? TEXT_NPC_SAEED_START_FIGHT : TEXT_NPC_SAEED_DEFAULT, creature->GetGUID());
 
         return true;
     }
@@ -588,56 +580,6 @@ public:
 };
 
 /*######
-## npc_professor_dabiri
-######*/
-enum ProfessorDabiriData
-{
-    SPELL_PHASE_DISTRUPTOR  = 35780,
-
-    //WHISPER_DABIRI          = 0, not existing in database
-
-    QUEST_DIMENSIUS         = 10439,
-    QUEST_ON_NETHERY_WINGS  = 10438,
-};
-
-#define GOSSIP_ITEM "I need a new phase distruptor, Professor"
-
-class npc_professor_dabiri : public CreatureScript
-{
-public:
-    npc_professor_dabiri() : CreatureScript("npc_professor_dabiri") { }
-
-    //OnQuestAccept:
-    //if (quest->GetQuestId() == QUEST_DIMENSIUS)
-    //creature->AI()->Talk(WHISPER_DABIRI, player);
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            creature->CastSpell(player, SPELL_PHASE_DISTRUPTOR, false);
-            CloseGossipMenuFor(player);
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_ON_NETHERY_WINGS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(29778))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
-
-/*######
 ## npc_phase_hunter
 ######*/
 
@@ -757,9 +699,6 @@ public:
                 {
                     Drained = true;
                     int32 uHpPct = int32(me->GetHealthPct());
-
-                    me->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
-
                     me->SetHealth(me->CountPctFromMaxHealth(uHpPct));
                     me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
                     me->SetInCombatWith(player);
@@ -971,6 +910,45 @@ public:
     }
 };
 
+class spell_q10190_battery_recharging_blaster : public SpellScript
+{
+    PrepareSpellScript(spell_q10190_battery_recharging_blaster);
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetHealthPct() <= 25.0f)
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q10190_battery_recharging_blaster::CheckCast);
+    }
+ };
+
+class spell_q10190_battery_recharging_blaster_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q10190_battery_recharging_blaster_aura);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (Creature* phasehunter = GetTarget()->ToCreature())
+            if (phasehunter->GetEntry() == NPC_PHASE_HUNTER_ENTRY)
+                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10190_battery_recharging_blaster_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_netherstorm()
 {
     // Ours
@@ -979,9 +957,8 @@ void AddSC_netherstorm()
     // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
-    new npc_professor_dabiri();
     new npc_phase_hunter();
     new npc_bessy();
     new npc_maxx_a_million_escort();
-
+    RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
 }

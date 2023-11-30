@@ -17,20 +17,19 @@
 -- Dumping structure for table acore_world.achievement_reward
 DROP TABLE IF EXISTS `achievement_reward`;
 CREATE TABLE IF NOT EXISTS `achievement_reward` (
-  `ID` mediumint unsigned NOT NULL DEFAULT '0',
-  `TitleA` mediumint unsigned NOT NULL DEFAULT '0',
-  `TitleH` mediumint unsigned NOT NULL DEFAULT '0',
-  `ItemID` mediumint unsigned NOT NULL DEFAULT '0',
-  `Sender` mediumint unsigned NOT NULL DEFAULT '0',
-  `Subject` varchar(255) DEFAULT NULL,
-  `Body` text,
-  `MailTemplateID` mediumint unsigned DEFAULT '0',
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `TitleA` int unsigned NOT NULL DEFAULT '0',
+  `TitleH` int unsigned NOT NULL DEFAULT '0',
+  `ItemID` int unsigned NOT NULL DEFAULT '0',
+  `Sender` int unsigned NOT NULL DEFAULT '0',
+  `Subject` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Body` text COLLATE utf8mb4_unicode_ci,
+  `MailTemplateID` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.achievement_reward: 103 rows
+-- Dumping data for table acore_world.achievement_reward: ~103 rows (approximately)
 DELETE FROM `achievement_reward`;
-/*!40000 ALTER TABLE `achievement_reward` DISABLE KEYS */;
 INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES
 	(13, 0, 0, 41426, 16128, 'Level 80', 'Congratulations on your conviction to reach the 80th season of adventure. You are undoubtedly dedicated to the cause of ridding Azeroth of the evils which have plagued us.$B$BAnd while the journey thus far has been no minor feat, the true battle lies ahead.$B$BFight on!$B$BRhonin', 0),
 	(45, 0, 0, 43348, 28070, 'You\'ve Been Around!', 'Well, look at ye!$B$BAnd I thought I had seen some things in this icy place! It seems obvious to this dwarf that you have the fire of the explorer burning in your eyes.$B$BWear this tabard with pride. That way your friends will know who to ask for directions when the time comes!$B$BKeep on the move!$B$BBrann Bronzebeard', 0),
@@ -135,7 +134,6 @@ INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, 
 	(4603, 0, 0, 51955, 37120, 'Glory of the Icecrown Raider', '$N,$B$BAs the Lich King\'s influence wanes, some of his more powerful minions have wrested free of his grasp.$B$BThis frost wyrm drake my men captured is a prime example. She has a will of her own and then some.$B$BOne of my men lost an arm breaking her in, but she now takes to riders fairly well -- provided they themselves are skilled and strong willed.$B$BPlease accept this magnificent beast as a gift from the Knights of the Ebon Blade. It was an honor to fight along your side in this greatest of battles.$B$BWith honor,$BDarion Mograine.', 0),
 	(4784, 0, 0, 0, 37942, 'Emblem Quartermasters in Dalaran\'s Silver Enclave', 'Your achievements in Northrend have not gone unnoticed, friend.$B$BThe Emblems you have earned may be used to purchase equipment from the various Emblem Quartermasters in Dalaran.$B$BYou may find us there, in the Silver Enclave, where each variety of Emblem has its own quartermaster.$B$BWe look forward to your arrival!', 0),
 	(4785, 0, 0, 0, 37941, 'Emblem Quartermasters in Dalaran\'s Sunreaver Sanctuary', 'Your achievements in Northrend have not gone unnoticed, friend.$B$BThe Emblems you have earned may be used to purchase equipment from the various Emblem Quartermasters in Dalaran.$B$BYou may find us there, in the Sunreaver Sanctuary, where each variety of Emblem has its own quartermaster.$B$BWe look forward to your arrival!', 0);
-/*!40000 ALTER TABLE `achievement_reward` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

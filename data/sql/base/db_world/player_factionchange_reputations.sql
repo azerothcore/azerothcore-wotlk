@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_reputations` (
   `alliance_id` int unsigned NOT NULL,
   `horde_id` int unsigned NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.player_factionchange_reputations: 15 rows
+-- Dumping data for table acore_world.player_factionchange_reputations: ~15 rows (approximately)
 DELETE FROM `player_factionchange_reputations`;
-/*!40000 ALTER TABLE `player_factionchange_reputations` DISABLE KEYS */;
 INSERT INTO `player_factionchange_reputations` (`alliance_id`, `horde_id`) VALUES
 	(47, 530),
 	(54, 81),
@@ -41,7 +40,6 @@ INSERT INTO `player_factionchange_reputations` (`alliance_id`, `horde_id`) VALUE
 	(1068, 1064),
 	(1094, 1124),
 	(1126, 1067);
-/*!40000 ALTER TABLE `player_factionchange_reputations` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

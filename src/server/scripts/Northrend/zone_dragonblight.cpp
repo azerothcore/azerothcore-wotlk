@@ -25,8 +25,8 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 
@@ -702,7 +702,6 @@ public:
                     }
                 }
 
-            me->RemoveVehicleKit(); // not Crash (;
             events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
             me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
         }

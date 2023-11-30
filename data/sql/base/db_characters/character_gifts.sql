@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `character_gifts` (
   `flags` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.character_gifts: ~0 rows (approximately)
 DELETE FROM `character_gifts`;

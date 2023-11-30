@@ -68,6 +68,7 @@ char constexpr GtOCTRegenHPfmt[] = "df";
 char constexpr GtRegenHPPerSptfmt[] = "df";
 char constexpr GtRegenMPPerSptfmt[] = "df";
 char constexpr Holidaysfmt[] = "niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiixxsiix";
+char constexpr Itemfmt[] = "niiiiiii";
 char constexpr ItemBagFamilyfmt[] = "nxxxxxxxxxxxxxxxxx";
 char constexpr ItemDisplayTemplateEntryfmt[] = "nxxxxsxxxxxxxxxxxxxxxxxxx";
 //char constexpr ItemCondExtCostsEntryfmt[] = "xiii";

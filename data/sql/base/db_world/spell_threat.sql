@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.spell_threat
 DROP TABLE IF EXISTS `spell_threat`;
 CREATE TABLE IF NOT EXISTS `spell_threat` (
-  `entry` mediumint unsigned NOT NULL,
+  `entry` int unsigned NOT NULL,
   `flatMod` int DEFAULT NULL,
   `pctMod` float NOT NULL DEFAULT '1' COMMENT 'threat multiplier for damage/healing',
   `apPctMod` float NOT NULL DEFAULT '0' COMMENT 'additional threat bonus from attack power',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_threat: 107 rows
+-- Dumping data for table acore_world.spell_threat: ~107 rows (approximately)
 DELETE FROM `spell_threat`;
-/*!40000 ALTER TABLE `spell_threat` DISABLE KEYS */;
 INSERT INTO `spell_threat` (`entry`, `flatMod`, `pctMod`, `apPctMod`) VALUES
 	(78, 5, 1, 0),
 	(284, 10, 1, 0),
@@ -135,7 +134,6 @@ INSERT INTO `spell_threat` (`entry`, `flatMod`, `pctMod`, `apPctMod`) VALUES
 	(60089, 638, 1, 0),
 	(63611, 0, 0, 0),
 	(65142, 0, 0, 0);
-/*!40000 ALTER TABLE `spell_threat` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

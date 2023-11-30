@@ -17,16 +17,15 @@
 -- Dumping structure for table acore_world.skill_discovery_template
 DROP TABLE IF EXISTS `skill_discovery_template`;
 CREATE TABLE IF NOT EXISTS `skill_discovery_template` (
-  `spellId` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the discoverable spell',
-  `reqSpell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'spell requirement',
+  `spellId` int unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the discoverable spell',
+  `reqSpell` int unsigned NOT NULL DEFAULT '0' COMMENT 'spell requirement',
   `reqSkillValue` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'skill points requirement',
   `chance` float NOT NULL DEFAULT '0' COMMENT 'chance to discover',
   PRIMARY KEY (`spellId`,`reqSpell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Skill Discovery System';
 
--- Dumping data for table acore_world.skill_discovery_template: 347 rows
+-- Dumping data for table acore_world.skill_discovery_template: ~347 rows (approximately)
 DELETE FROM `skill_discovery_template`;
-/*!40000 ALTER TABLE `skill_discovery_template` DISABLE KEYS */;
 INSERT INTO `skill_discovery_template` (`spellId`, `reqSpell`, `reqSkillValue`, `chance`) VALUES
 	(28580, 0, 0, 0.1),
 	(28581, 0, 0, 0.1),
@@ -375,7 +374,6 @@ INSERT INTO `skill_discovery_template` (`spellId`, `reqSpell`, `reqSkillValue`, 
 	(64318, 64323, 0, 100),
 	(65245, 64323, 0, 100),
 	(68166, 61288, 350, 100);
-/*!40000 ALTER TABLE `skill_discovery_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

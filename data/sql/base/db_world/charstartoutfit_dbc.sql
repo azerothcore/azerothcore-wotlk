@@ -95,12 +95,10 @@ CREATE TABLE IF NOT EXISTS `charstartoutfit_dbc` (
   `InventoryType_23` int NOT NULL DEFAULT '0',
   `InventoryType_24` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.charstartoutfit_dbc: 0 rows
+-- Dumping data for table acore_world.charstartoutfit_dbc: ~0 rows (approximately)
 DELETE FROM `charstartoutfit_dbc`;
-/*!40000 ALTER TABLE `charstartoutfit_dbc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `charstartoutfit_dbc` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

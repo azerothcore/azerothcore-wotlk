@@ -17,7 +17,6 @@
 
 #include "Vehicle.h"
 #include "BattlefieldWG.h"
-#include "CreatureAI.h"
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
@@ -388,22 +387,19 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             && unit->GetTypeId() == TYPEID_PLAYER
             && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
     {
-        try
+        // Removed try catch + ABORT() here, and make it as simple condition check.
+        if (!_me->SetCharmedBy(unit, CHARM_TYPE_VEHICLE))
         {
-            if (!_me->SetCharmedBy(unit, CHARM_TYPE_VEHICLE))
-                ABORT();
-        }
-        catch (...)
-        {
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy()!");
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). not null: {}", _me ? 1 : 0);
+            // I assume SetCharmedBy should always be true.
+            // If not, let's log some debug info.
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). not null: {}", _me ? 1 : 0);
             if (!_me)
                 return false;
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is: {}!", _me->IsInWorld());
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is2: {}!", _me->IsDuringRemoveFromWorld());
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit {}!", _me->GetName());
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). typeid: {}!", _me->GetTypeId());
-            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit {}, typeid: {}, in world: {}, duringremove: {} has wrong CharmType! Charmer {}, typeid: {}, in world: {}, duringremove: {}.", _me->GetName(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Is: {}!", _me->IsInWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Is2: {}!", _me->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Unit {}!", _me->GetName());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). typeid: {}!", _me->GetTypeId());
+            LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Unit {}, typeid: {}, in world: {}, duringremove: {} has wrong CharmType! Charmer {}, typeid: {}, in world: {}, duringremove: {}.", _me->GetName(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
     }

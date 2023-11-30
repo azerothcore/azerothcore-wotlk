@@ -19,7 +19,6 @@
 #include "CellImpl.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
@@ -602,7 +601,7 @@ void SmartAI::MovepointReached(uint32 id)
     if (mLastWP)
     {
         me->SetPosition(mLastWP->x, mLastWP->y, mLastWP->z, me->GetOrientation());
-        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+        me->SetHomePosition(me->GetPosition());
     }
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
@@ -811,20 +810,6 @@ void SmartAI::JustSummoned(Creature* creature)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT, creature);
     GetScript()->AddCreatureSummon(creature->GetGUID());
-
-    if (me->IsEngaged() && !creature->IsInEvadeMode())
-    {
-        if (Unit* victim = me->GetVictim())
-        {
-            creature->SetInCombatWith(victim);
-            victim->SetInCombatWith(creature);
-
-            if (creature->CanHaveThreatList())
-            {
-                creature->AddThreat(victim, 0.0f);
-            }
-        }
-    }
 }
 
 void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)

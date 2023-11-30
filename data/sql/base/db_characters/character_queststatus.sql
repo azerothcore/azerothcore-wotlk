@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `character_queststatus` (
   `itemcount6` smallint unsigned NOT NULL DEFAULT '0',
   `playercount` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`quest`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 
 -- Dumping data for table acore_characters.character_queststatus: ~0 rows (approximately)
 DELETE FROM `character_queststatus`;

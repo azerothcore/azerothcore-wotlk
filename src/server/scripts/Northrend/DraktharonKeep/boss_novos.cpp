@@ -132,7 +132,7 @@ public:
             me->CastSpell(me, SPELL_ARCANE_FIELD, true);
             me->CastSpell(me, SPELL_DESPAWN_CRYSTAL_HANDLER, true);
 
-            for (auto itr : npcSummon)
+            for (auto& itr : npcSummon)
             {
                 uint32 summonEntry;
                 Position summonPos;

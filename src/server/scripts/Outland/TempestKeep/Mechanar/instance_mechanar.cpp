@@ -50,7 +50,7 @@ public:
                 case GO_DOOR_MOARG_1:
                 case GO_DOOR_MOARG_2:
                 case GO_DOOR_NETHERMANCER:
-                    AddDoor(gameObject, true);
+                    AddDoor(gameObject);
                     break;
                 default:
                     break;
@@ -64,7 +64,7 @@ public:
                 case GO_DOOR_MOARG_1:
                 case GO_DOOR_MOARG_2:
                 case GO_DOOR_NETHERMANCER:
-                    AddDoor(gameObject, false);
+                    RemoveDoor(gameObject);
                     break;
                 default:
                     break;

@@ -332,6 +332,8 @@ public:
     WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
+    bool IsGMAccount() const;
+
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }
@@ -349,6 +351,7 @@ public:
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
     void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
+    void SendAreaTriggerMessage(uint32 entry, ...);
     void SendSetPhaseShift(uint32 phaseShift);
     void SendQueryTimeResponse();
 
@@ -1057,8 +1060,8 @@ public:                                                 // opcodes handlers
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-    uint32 _lastAuctionListItemsMSTime;
-    uint32 _lastAuctionListOwnerItemsMSTime;
+    Milliseconds _lastAuctionListItemsMSTime;
+    Milliseconds _lastAuctionListOwnerItemsMSTime;
 
     void HandleTeleportTimeout(bool updateInSessions);
     bool HandleSocketClosed();

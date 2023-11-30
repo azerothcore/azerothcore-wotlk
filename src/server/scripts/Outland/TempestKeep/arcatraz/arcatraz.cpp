@@ -67,8 +67,7 @@ enum MillhouseEvents
 
     EVENT_MILL_CHECK_HEALTH     = 20,
     EVENT_MILL_PYROBLAST        = 21,
-    EVENT_MILL_BASE_SPELL       = 22,
-    EVENT_MILL_ICEBLOCK         = 23
+    EVENT_MILL_BASE_SPELL       = 22
 };
 
 class npc_millhouse_manastorm : public CreatureScript
@@ -81,6 +80,7 @@ public:
         npc_millhouse_manastormAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            _usedIceblock = false;
         }
 
         InstanceScript* instance;
@@ -101,6 +101,7 @@ public:
         void Reset() override
         {
             events.Reset();
+            _usedIceblock = false;
         }
 
         void AttackStart(Unit* who) override
@@ -124,7 +125,16 @@ public:
             events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
             events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 2000);
-            events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->HealthBelowPctDamaged(50, damage) && !_usedIceblock)
+            {
+                _usedIceblock = true;
+                Talk(SAY_ICEBLOCK);
+                DoCastSelf(SPELL_ICEBLOCK, true);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -208,15 +218,6 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
                     events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
                     break;
-                case EVENT_MILL_ICEBLOCK:
-                    if (me->GetDistance(me->GetVictim()) < 5.0f)
-                    {
-                        Talk(SAY_ICEBLOCK);
-                        me->CastSpell(me, SPELL_ICEBLOCK, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
-                    break;
                 case EVENT_MILL_BASE_SPELL:
                     switch (RAND(SPELL_FIREBALL, SPELL_ARCANE_MISSILES, SPELL_FROSTBOLT))
                     {
@@ -240,6 +241,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+        private:
+            bool _usedIceblock;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -345,7 +349,10 @@ public:
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))
                 {
-                    instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    if (IsHeroic())
+                    {
+                        instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    }
                     creature->AI()->Talk(SAY_COMPLETE);
                     creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }

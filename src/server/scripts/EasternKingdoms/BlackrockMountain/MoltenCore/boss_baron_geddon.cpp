@@ -168,20 +168,19 @@ public:
                 int32 multiplier = 1;
                 switch (aurEff->GetTickNumber())
                 {
-                    case 2:
                     case 3:
+                    case 4:
                         multiplier = 2;
                         break;
-                    case 4:
                     case 5:
-                        multiplier = 3;
-                        break;
                     case 6:
-                    case 7:
                         multiplier = 4;
                         break;
+                    case 7:
+                        multiplier = 6;
+                        break;
                     case 8:
-                        multiplier = 5;
+                        multiplier = 10;
                         break;
                 }
 

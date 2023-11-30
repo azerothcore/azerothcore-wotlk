@@ -19,8 +19,8 @@
 #define AZEROTHCORE_WORLDMOCK_H
 
 #include "ArenaSpectator.h"
-#include "IWorld.h"
 #include "Duration.h"
+#include "IWorld.h"
 #include "gmock/gmock.h"
 
 #pragma GCC diagnostic push
@@ -111,7 +111,6 @@ public:
     MOCK_METHOD(LocaleConstant, GetAvailableDbcLocale, (LocaleConstant locale), (const));
     MOCK_METHOD(void, LoadDBVersion, ());
     MOCK_METHOD(char const *, GetDBVersion, (), (const));
-    MOCK_METHOD(void, LoadMotd, ());
     MOCK_METHOD(void, UpdateAreaDependentAuras, ());
     MOCK_METHOD(uint32, GetCleaningFlags, (), (const));
     MOCK_METHOD(void, SetCleaningFlags, (uint32 flags), ());

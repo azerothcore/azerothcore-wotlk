@@ -17,22 +17,21 @@
 -- Dumping structure for table acore_world.mail_loot_template
 DROP TABLE IF EXISTS `mail_loot_template`;
 CREATE TABLE IF NOT EXISTS `mail_loot_template` (
-  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
-  `Item` mediumint unsigned NOT NULL DEFAULT '0',
-  `Reference` mediumint NOT NULL DEFAULT '0',
+  `Entry` int unsigned NOT NULL DEFAULT '0',
+  `Item` int unsigned NOT NULL DEFAULT '0',
+  `Reference` int NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` tinyint NOT NULL DEFAULT '0',
   `LootMode` smallint unsigned NOT NULL DEFAULT '1',
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.mail_loot_template: 105 rows
+-- Dumping data for table acore_world.mail_loot_template: ~105 rows (approximately)
 DELETE FROM `mail_loot_template`;
-/*!40000 ALTER TABLE `mail_loot_template` DISABLE KEYS */;
 INSERT INTO `mail_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(84, 21746, 0, 100, 0, 1, 0, 1, 1, 'Lucky Red Envelope'),
 	(85, 21746, 0, 100, 0, 1, 0, 1, 1, 'Lucky Red Envelope'),
@@ -139,7 +138,6 @@ INSERT INTO `mail_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(271, 46544, 0, 100, 0, 1, 0, 1, 1, 'Curious Wolvar Pup'),
 	(286, 47840, 0, 100, 0, 1, 0, 1, 1, 'Relentless Gladiator\'s Frost Wyrm'),
 	(287, 50435, 0, 100, 0, 1, 0, 1, 1, 'Wrathful Gladiator\'s Frost Wyrm');
-/*!40000 ALTER TABLE `mail_loot_template` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

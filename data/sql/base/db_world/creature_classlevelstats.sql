@@ -29,13 +29,12 @@ CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
   `damage_base` float NOT NULL DEFAULT '0',
   `damage_exp1` float NOT NULL DEFAULT '0',
   `damage_exp2` float NOT NULL DEFAULT '0',
-  `comment` text,
+  `comment` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`level`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_classlevelstats: 400 rows
+-- Dumping data for table acore_world.creature_classlevelstats: ~400 rows (approximately)
 DELETE FROM `creature_classlevelstats`;
-/*!40000 ALTER TABLE `creature_classlevelstats` DISABLE KEYS */;
 INSERT INTO `creature_classlevelstats` (`level`, `class`, `basehp0`, `basehp1`, `basehp2`, `basemana`, `basearmor`, `attackpower`, `rangedattackpower`, `damage_base`, `damage_exp1`, `damage_exp2`, `comment`) VALUES
 	(1, 1, 42, 1, 1, 0, 8, 9, 1, 0.1321, 0.1321, 0.1321, NULL),
 	(1, 2, 41, 1, 1, 60, 7, 9, 1, 0.2381, 0.2381, 0.2381, NULL),
@@ -437,7 +436,6 @@ INSERT INTO `creature_classlevelstats` (`level`, `class`, `basehp0`, `basehp1`, 
 	(100, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, NULL),
 	(100, 4, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, NULL),
 	(100, 8, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, NULL);
-/*!40000 ALTER TABLE `creature_classlevelstats` ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

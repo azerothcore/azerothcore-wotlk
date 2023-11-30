@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   `mapId` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
   `phaseMask` int unsigned NOT NULL DEFAULT '1',
   `displayId` int unsigned NOT NULL DEFAULT '0',
-  `itemCache` text NOT NULL,
+  `itemCache` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `bytes1` int unsigned NOT NULL DEFAULT '0',
   `bytes2` int unsigned NOT NULL DEFAULT '0',
   `guildId` int unsigned NOT NULL DEFAULT '0',
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   KEY `idx_type` (`corpseType`),
   KEY `idx_instance` (`instanceId`),
   KEY `idx_time` (`time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Death System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Death System';
 
 -- Dumping data for table acore_characters.corpse: ~0 rows (approximately)
 DELETE FROM `corpse`;

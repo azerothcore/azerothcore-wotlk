@@ -174,7 +174,7 @@ public:
                     return;
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
-                Talk(TEXT_BK_AGGRO);
+                Talk(SAY_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
                 if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
@@ -209,7 +209,7 @@ public:
                     {
                         case 2:
                             me->SetDisplayId(MODEL_SKELETON);
-                            Talk(TEXT_BK_SKELETON_RES);
+                            Talk(SAY_BK_PHASE_2);
                             me->CastSpell(me, SPELL_ARMY_DEAD, false);
 
                             events.Reset();
@@ -220,7 +220,7 @@ public:
                             break;
                         case 3:
                             me->SetDisplayId(MODEL_GHOST);
-                            Talk(TEXT_BK_GHOST_RES);
+                            Talk(SAY_BK_PHASE_3);
 
                             events.Reset();
                             events.ScheduleEvent(EVENT_SPELL_DEATH_BITE, 2s);
@@ -251,8 +251,8 @@ public:
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
-                            ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL);
-
+                            if (urand(0, 1))
+                                ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); /// @todo: Multiple variations + not always happening, from video sources, needs sniff to transition from DB.
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
                     if( me->GetVictim() )
@@ -307,17 +307,14 @@ public:
         {
             if( victim->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
-                    Talk(TEXT_BK_SLAIN_1);
-                else
-                    Talk(TEXT_BK_SLAIN_2);
+                Talk(SAY_BK_KILL_PLAYER);
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
-            Talk(TEXT_BK_DEATH);
+            Talk(SAY_BK_DEATH);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
             if( me->ToTempSummon() )

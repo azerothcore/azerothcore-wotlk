@@ -20,19 +20,19 @@ CREATE TABLE IF NOT EXISTS `pvpstats_players` (
   `battleground_id` bigint unsigned NOT NULL,
   `character_guid` int unsigned NOT NULL,
   `winner` bit(1) NOT NULL,
-  `score_killing_blows` mediumint unsigned NOT NULL,
-  `score_deaths` mediumint unsigned NOT NULL,
-  `score_honorable_kills` mediumint unsigned NOT NULL,
-  `score_bonus_honor` mediumint unsigned NOT NULL,
-  `score_damage_done` mediumint unsigned NOT NULL,
-  `score_healing_done` mediumint unsigned NOT NULL,
-  `attr_1` mediumint unsigned NOT NULL DEFAULT '0',
-  `attr_2` mediumint unsigned NOT NULL DEFAULT '0',
-  `attr_3` mediumint unsigned NOT NULL DEFAULT '0',
-  `attr_4` mediumint unsigned NOT NULL DEFAULT '0',
-  `attr_5` mediumint unsigned NOT NULL DEFAULT '0',
+  `score_killing_blows` int unsigned DEFAULT NULL,
+  `score_deaths` int unsigned DEFAULT NULL,
+  `score_honorable_kills` int unsigned DEFAULT NULL,
+  `score_bonus_honor` int unsigned DEFAULT NULL,
+  `score_damage_done` int unsigned DEFAULT NULL,
+  `score_healing_done` int unsigned DEFAULT NULL,
+  `attr_1` int unsigned DEFAULT '0',
+  `attr_2` int unsigned DEFAULT '0',
+  `attr_3` int unsigned DEFAULT '0',
+  `attr_4` int unsigned DEFAULT '0',
+  `attr_5` int unsigned DEFAULT '0',
   PRIMARY KEY (`battleground_id`,`character_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.pvpstats_players: ~0 rows (approximately)
 DELETE FROM `pvpstats_players`;

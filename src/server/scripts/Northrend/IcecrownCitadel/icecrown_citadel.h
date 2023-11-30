@@ -144,6 +144,7 @@ enum DataTypes
     DATA_PUTRICIDE_TRAP_STATE       = 254,
     DATA_HAS_LIMITED_ATTEMPTS       = 255,
     DATA_LK_HC_AVAILABLE            = 256,
+    DATA_SINDRAGOSA_INTRO           = 257,
 
     DATA_BPC_TRASH_DIED             = 300,
 };

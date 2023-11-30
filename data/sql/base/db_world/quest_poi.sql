@@ -25,14 +25,13 @@ CREATE TABLE IF NOT EXISTS `quest_poi` (
   `Floor` int unsigned NOT NULL DEFAULT '0',
   `Priority` int unsigned NOT NULL DEFAULT '0',
   `Flags` int unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` mediumint DEFAULT NULL,
+  `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`QuestID`,`id`),
   KEY `idx` (`QuestID`,`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_poi: 18,771 rows
+-- Dumping data for table acore_world.quest_poi: ~18,907 rows (approximately)
 DELETE FROM `quest_poi`;
-/*!40000 ALTER TABLE `quest_poi` DISABLE KEYS */;
 INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
 	(1, 0, -1, 0, 23, 0, 0, 1, 0),
 	(2, 0, 4, 1, 43, 0, 0, 1, 0),
@@ -2558,8 +2557,8 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(1108, 0, 4, 0, 17, 0, 0, 1, 0),
 	(1108, 1, 4, 0, 17, 0, 0, 1, 0),
 	(1108, 2, -1, 0, 17, 0, 0, 1, 0),
-	(1109, 1, -1, 0, 20, 1497, 0, 1, 0),
 	(1109, 0, 4, 1, 11, 1717, 0, 1, 0),
+	(1109, 1, -1, 0, 20, 1497, 0, 1, 0),
 	(1110, 0, 4, 1, 61, 0, 0, 1, 0),
 	(1110, 1, 4, 1, 61, 0, 0, 1, 0),
 	(1110, 2, 4, 1, 61, 0, 0, 3, 0),
@@ -3324,7 +3323,9 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(1942, 0, -1, 0, 30, 0, 0, 1, 0),
 	(1943, 0, -1, 1, 4, 0, 0, 1, 0),
 	(1944, 0, -1, 1, 4, 0, 0, 1, 0),
+	(1944, 1, 4, 1, 43, 0, 0, 1, 0),
 	(1945, 0, -1, 1, 11, 0, 0, 1, 0),
+	(1945, 1, 4, 1, 43, 0, 0, 1, 0),
 	(1946, 0, -1, 1, 11, 0, 0, 1, 0),
 	(1947, 0, -1, 1, 141, 0, 0, 1, 0),
 	(1948, 0, 13, 0, 16, 0, 0, 1, 0),
@@ -4027,6 +4028,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(3443, 1, 4, 0, 28, 0, 0, 1, 0),
 	(3443, 2, -1, 0, 28, 0, 0, 1, 0),
 	(3444, 0, 4, 1, 11, 0, 0, 1, 0),
+	(3444, 1, -1, 1, 161, 0, 0, 1, 0),
 	(3445, 0, -1, 1, 161, 0, 0, 1, 0),
 	(3448, 0, -1, 0, 341, 0, 0, 3, 0),
 	(3449, 0, 4, 1, 181, 0, 0, 1, 0),
@@ -5764,6 +5766,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(6661, 0, 0, 0, 24, 0, 0, 1, 0),
 	(6661, 1, -1, 0, 24, 0, 0, 1, 0),
 	(6662, 0, -1, 0, 0, 0, 0, 0, 0),
+	(6662, 1, -1, 0, 0, 0, 0, 0, 0),
 	(6681, 0, 1, 0, 15, 0, 0, 1, 0),
 	(6681, 1, -1, 0, 15, 0, 0, 1, 0),
 	(6701, 0, 4, 0, 15, 0, 0, 1, 0),
@@ -6704,6 +6707,10 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(8310, 3, 6, 1, 261, 0, 0, 1, 0),
 	(8310, 4, -1, 1, 261, 0, 0, 1, 0),
 	(8311, 0, -1, 0, 30, 0, 0, 1, 0),
+	(8311, 1, 4, 0, 301, 0, 0, 3, 12340),
+	(8311, 2, 5, 0, 341, 0, 0, 3, 12340),
+	(8311, 3, 6, 0, 341, 0, 0, 3, 12340),
+	(8311, 4, 7, 1, 381, 0, 0, 3, 12340),
 	(8312, 0, -1, 1, 321, 0, 0, 1, 0),
 	(8312, 1, 5, 1, 4, 0, 0, 3, 0),
 	(8312, 2, 4, 1, 321, 0, 0, 3, 0),
@@ -10025,7 +10032,8 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(9940, 2, 2, 530, 477, 0, 0, 1, 0),
 	(9940, 3, -1, 530, 477, 0, 0, 1, 0),
 	(9941, 0, -1, 530, 478, 0, 0, 1, 0),
-	(9942, 0, -1, 530, 478, 0, 0, 1, 0),
+	(9942, 0, -1, 530, 478, 0, 0, 1, 0);
+INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
 	(9943, 0, -1, 530, 478, 0, 0, 1, 0),
 	(9944, 0, -1, 530, 477, 0, 0, 1, 0),
 	(9945, 0, 0, 530, 477, 0, 0, 1, 0),
@@ -10033,8 +10041,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(9945, 2, -1, 530, 477, 0, 0, 1, 0),
 	(9946, 0, 4, 530, 477, 0, 0, 1, 0),
 	(9946, 1, -1, 530, 477, 0, 0, 1, 0),
-	(9947, 0, -1, 530, 478, 0, 0, 1, 0);
-INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
+	(9947, 0, -1, 530, 478, 0, 0, 1, 0),
 	(9948, 0, 0, 530, 477, 0, 0, 1, 0),
 	(9948, 1, 13, 530, 477, 0, 0, 1, 0),
 	(9948, 2, -1, 530, 477, 0, 0, 1, 0),
@@ -12972,7 +12979,11 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(11355, 0, -1, 571, 491, 0, 0, 1, 0),
 	(11355, 1, 0, 571, 491, 0, 0, 1, 0),
 	(11356, 0, -1, 0, 30, 0, 0, 1, 0),
+	(11356, 1, -1, 0, 27, 0, 0, 1, 12340),
+	(11356, 2, -1, 530, 464, 0, 0, 1, 12340),
 	(11357, 0, -1, 0, 20, 0, 0, 1, 0),
+	(11357, 1, -1, 1, 4, 0, 0, 1, 12340),
+	(11357, 2, -1, 530, 462, 0, 0, 1, 12340),
 	(11358, 0, 0, 571, 491, 0, 0, 1, 0),
 	(11358, 1, -1, 571, 491, 0, 0, 1, 0),
 	(11359, 0, 0, 571, 491, 0, 0, 1, 0),
@@ -18793,20 +18804,7 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(25470, 1, -1, 1, 4, 0, 0, 1, 0),
 	(25480, 0, 0, 1, 4, 0, 0, 1, 0),
 	(25480, 1, -1, 1, 4, 0, 0, 1, 0),
-	(25495, 0, -1, 1, 4, 0, 0, 1, 0),
-	(1944, 1, 4, 1, 43, 0, 0, 1, 0),
-	(1945, 1, 4, 1, 43, 0, 0, 1, 0),
-	(3444, 1, -1, 1, 161, 0, 0, 1, 0),
-	(8311, 1, 4, 0, 301, 0, 0, 3, 12340),
-	(8311, 2, 5, 0, 341, 0, 0, 3, 12340),
-	(8311, 3, 6, 0, 341, 0, 0, 3, 12340),
-	(8311, 4, 7, 1, 381, 0, 0, 3, 12340),
-	(11356, 1, -1, 0, 27, 0, 0, 1, 12340),
-	(11356, 2, -1, 530, 464, 0, 0, 1, 12340),
-	(11357, 1, -1, 1, 4, 0, 0, 1, 12340),
-	(11357, 2, -1, 530, 462, 0, 0, 1, 12340),
-	(6662, 1, -1, 0, 0, 0, 0, 0, 0);
-/*!40000 ALTER TABLE `quest_poi` ENABLE KEYS */;
+	(25495, 0, -1, 1, 4, 0, 0, 1, 0);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

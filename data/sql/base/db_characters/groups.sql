@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `masterLooterGuid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Groups';
 
 -- Dumping data for table acore_characters.groups: ~0 rows (approximately)
 DELETE FROM `groups`;

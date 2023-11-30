@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `item_loot_storage` (
   `is_underthreshold` tinyint unsigned NOT NULL,
   `needs_quest` tinyint unsigned NOT NULL,
   `conditionLootId` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_characters.item_loot_storage: ~0 rows (approximately)
 DELETE FROM `item_loot_storage`;

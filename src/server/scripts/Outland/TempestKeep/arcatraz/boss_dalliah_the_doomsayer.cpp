@@ -44,23 +44,24 @@ enum Spells
 
 struct boss_dalliah_the_doomsayer : public BossAI
 {
-    boss_dalliah_the_doomsayer(Creature* creature) : BossAI(creature, DATA_DALLIAH), _percentHealthCheck(false) { }
+    boss_dalliah_the_doomsayer(Creature* creature) : BossAI(creature, DATA_DALLIAH) { }
 
     void Reset() override
     {
         _Reset();
-        _percentHealthCheck = false;
-        me->SetImmuneToAll(false);
+
+        ScheduleHealthCheckEvent(25, [&]
+        {
+            if (Creature* soccothrates = instance->GetCreature(DATA_SOCCOTHRATES))
+            {
+                soccothrates->AI()->Talk(SAY_DALLIAH_25_PERCENT);
+            }
+        });
     }
 
     void InitializeAI() override
     {
         BossAI::InitializeAI();
-
-        if (instance->GetBossState(DATA_SOCCOTHRATES) != DONE)
-        {
-            me->SetImmuneToAll(true);
-        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -90,15 +91,15 @@ struct boss_dalliah_the_doomsayer : public BossAI
             }
         }
 
-        scheduler.Schedule(1s, 4s, [this](TaskContext context)
+        scheduler.Schedule(8s, 12s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_GIFT_OF_THE_DOOMSAYER);
-            context.Repeat(16s, 21s);
-        }).Schedule(7s, 9s, [this](TaskContext context)
+            context.Repeat(17s, 35s);
+        }).Schedule(20s, 30s, [this](TaskContext context)
         {
             Talk(SAY_WHIRLWIND);
             DoCastAOE(SPELL_WHIRLWIND);
-            context.Repeat(19s, 21s);
+            context.Repeat();
 
             scheduler.Schedule(7s, [this](TaskContext)
             {
@@ -109,24 +110,11 @@ struct boss_dalliah_the_doomsayer : public BossAI
 
         if (IsHeroic())
         {
-            scheduler.Schedule(11s, 16s, [this](TaskContext context)
+            scheduler.Schedule(11s, 30s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SHADOW_WAVE);
-                context.Repeat(11s, 16s);
+                context.Repeat();
             });
-        }
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (me->HealthBelowPctDamaged(25, damage) && !_percentHealthCheck)
-        {
-            if (Creature* soccothrates = instance->GetCreature(DATA_SOCCOTHRATES))
-            {
-                soccothrates->AI()->Talk(SAY_DALLIAH_25_PERCENT);
-            }
-
-            _percentHealthCheck = true;
         }
     }
 
@@ -137,9 +125,6 @@ struct boss_dalliah_the_doomsayer : public BossAI
             Talk(SAY_SLAY);
         }
     }
-
-private:
-    bool _percentHealthCheck;
 };
 
 void AddSC_boss_dalliah_the_doomsayer()
