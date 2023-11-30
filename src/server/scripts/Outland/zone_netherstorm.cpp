@@ -960,6 +960,11 @@ class spell_challenge_veraku : public SpellScript
 public:
     PrepareSpellScript(spell_challenge_veraku);
 
+    bool Validate(SpellInfo const* /*SpellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHALLENGE_VERAKU });
+    }
+
     SpellCastResult CheckRequirement()
     {
         if (Unit* caster = GetCaster())
