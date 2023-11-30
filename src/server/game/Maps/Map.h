@@ -426,6 +426,9 @@ public:
     bool CreatureRespawnRelocation(Creature* c, bool diffGridOnly);
     bool GameObjectRespawnRelocation(GameObject* go, bool diffGridOnly);
 
+    // assert print helper
+    bool CheckGridIntegrity(Creature* c, bool moved) const;
+
     [[nodiscard]] uint32 GetInstanceId() const { return i_InstanceId; }
     [[nodiscard]] uint8 GetSpawnMode() const { return (i_spawnMode); }
 

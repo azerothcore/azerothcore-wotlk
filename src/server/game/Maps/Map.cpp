@@ -1083,6 +1083,8 @@ void Map::PlayerRelocation(Player* player, float x, float y, float z, float o)
 
 void Map::CreatureRelocation(Creature* creature, float x, float y, float z, float o, bool respawnRelocationOnFail)
 {
+    ASSERT(CheckGridIntegrity(creature, false));
+
     Cell old_cell = creature->GetCurrentCell();
     Cell new_cell(x, y);
 
@@ -1110,11 +1112,16 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
         creature->UpdatePositionData();
         RemoveCreatureFromMoveList(creature);
     }
+
+    ASSERT(CheckGridIntegrity(creature, true));
 }
 
 void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float o, bool respawnRelocationOnFail)
 {
+    Cell integrity_check(go->GetPositionX(), go->GetPositionY());
     Cell old_cell = go->GetCurrentCell();
+
+    ASSERT(integrity_check == old_cell);
     Cell new_cell(x, y);
 
     if (!respawnRelocationOnFail && !getNGrid(new_cell.GridX(), new_cell.GridY()))
@@ -1140,11 +1147,18 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
         go->UpdateObjectVisibility(false);
         RemoveGameObjectFromMoveList(go);
     }
+
+    old_cell = go->GetCurrentCell();
+    integrity_check = Cell(go->GetPositionX(), go->GetPositionY());
+    ASSERT(integrity_check == old_cell);
 }
 
 void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float z, float o)
 {
+    Cell integrity_check(dynObj->GetPositionX(), dynObj->GetPositionY());
     Cell old_cell = dynObj->GetCurrentCell();
+
+    ASSERT(integrity_check == old_cell);
     Cell new_cell(x, y);
 
     if (!getNGrid(new_cell.GridX(), new_cell.GridY()))
@@ -1169,6 +1183,10 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
         dynObj->UpdateObjectVisibility(false);
         RemoveDynamicObjectFromMoveList(dynObj);
     }
+
+    old_cell = dynObj->GetCurrentCell();
+    integrity_check = Cell(dynObj->GetPositionX(), dynObj->GetPositionY());
+    ASSERT(integrity_check == old_cell);
 }
 
 void Map::AddCreatureToMoveList(Creature* c, float x, float y, float z, float ang)
@@ -2948,6 +2966,23 @@ bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidDa
 {
     float minHeightInWater = searcher->GetMinHeightInWater();
     return liquidData.Level > INVALID_HEIGHT && liquidData.Level > liquidData.DepthLevel && liquidData.Level - liquidData.DepthLevel >= minHeightInWater;
+}
+
+bool Map::CheckGridIntegrity(Creature* c, bool moved) const
+{
+    Cell const& cur_cell = c->GetCurrentCell();
+    Cell xy_cell(c->GetPositionX(), c->GetPositionY());
+    if (xy_cell != cur_cell)
+    {
+        LOG_DEBUG("maps", "Creature {} X: {} Y: {} ({}) is in grid[{}, {}]cell[{}, {}] instead of grid[{}, {}]cell[{}, {}]",
+            c->GetGUID().ToString().c_str(),
+            c->GetPositionX(), c->GetPositionY(), (moved ? "final" : "original"),
+            cur_cell.GridX(), cur_cell.GridY(), cur_cell.CellX(), cur_cell.CellY(),
+            xy_cell.GridX(), xy_cell.GridY(), xy_cell.CellX(), xy_cell.CellY());
+        return true; // not crash at error, just output error in debug mode
+    }
+
+    return true;
 }
 
 char const* Map::GetMapName() const
