@@ -47,6 +47,7 @@ public:
         {
             { "creature",      HandleGoCreatureSpawnIdCommand,   SEC_MODERATOR,  Console::No },
             { "creature id",   HandleGoCreatureCIdCommand,       SEC_MODERATOR,  Console::No },
+            { "creature name", HandleGoCreatureNameCommand,      SEC_MODERATOR,  Console::No },
             { "gameobject",    HandleGoGameObjectSpawnIdCommand, SEC_MODERATOR,  Console::No },
             { "gameobject id", HandleGoGameObjectGOIdCommand,    SEC_MODERATOR,  Console::No },
             { "graveyard",     HandleGoGraveyardCommand,         SEC_MODERATOR,  Console::No },
@@ -116,6 +117,26 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+    }
+
+    static bool HandleGoCreatureNameCommand(ChatHandler* handler, Tail name)
+    {
+        if (!name.data())
+            return false;
+
+        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\"", name.data());
+        if (!result)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Field const* fields = result->Fetch();
+        uint32 entry = fields[0].Get<uint32>();
+        CreatureData const* spawnpoint = GetCreatureData(handler, entry);
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
