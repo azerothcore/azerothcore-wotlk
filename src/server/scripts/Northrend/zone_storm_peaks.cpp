@@ -1146,7 +1146,7 @@ public:
                 if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
                 {
                     DoCastSelf(SPELL_EJECT_PLAYER);
-                }              
+                }
                 break;
             case 24:
                 if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
