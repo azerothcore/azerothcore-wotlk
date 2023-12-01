@@ -1113,7 +1113,15 @@ public:
         {
             if (apply)
             {
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
+                Movement::PointsArray pathPoints;
+                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry() * 100);
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_RUN, 6.0f);
@@ -1124,7 +1132,7 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type != POINT_MOTION_TYPE)
+            if (type != ESCORT_MOTION_TYPE)
                 return;
 
             switch (id)
