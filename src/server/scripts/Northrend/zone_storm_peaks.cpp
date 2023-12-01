@@ -1115,8 +1115,6 @@ public:
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
-            if (apply)
-            {
                 Movement::PointsArray pathPoints;
                 pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
 
@@ -1132,7 +1130,6 @@ public:
                 me->SetSpeed(MOVE_RUN, 6.0f);
                 me->SetSpeedRate(MOVE_FLIGHT, 8.0f);
                 me->setActive(true);
-            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -1183,8 +1180,6 @@ public:
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
-            if (apply)
-            {
                 Movement::PointsArray pathPoints;
                 pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
 
@@ -1200,7 +1195,6 @@ public:
                 me->SetSpeed(MOVE_RUN, 6.0f);
                 me->SetSpeedRate(MOVE_FLIGHT, 8.0f);
                 me->setActive(true);
-            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
