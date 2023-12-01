@@ -85,7 +85,7 @@ uint32 OPvPCapturePointNA::GetAliveGuardsCount()
     uint32 cnt = 0;
     for (auto itr = _creatures.begin(); itr != _creatures.end(); ++itr)
     {
-        auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
+        auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
         for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
             if (itr2->second->IsAlive() && (itr2->second->GetEntry() == NA_HALAANI_GUARD_A || itr2->second->GetEntry() == NA_HALAANI_GUARD_H))
                 ++cnt;
@@ -103,7 +103,7 @@ void OPvPCapturePointNA::DespawnNPCs(HalaaNPCS teamNPC)
     for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
-        auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
+        auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
         for (auto itr = bounds.first; itr != bounds.second;)
         {
@@ -114,8 +114,8 @@ void OPvPCapturePointNA::DespawnNPCs(HalaaNPCS teamNPC)
                 ++itr;
                 c->AddObjectToRemoveList();
                 sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
-                m_Creatures[i] = 0;
-                m_CreatureTypes[m_Creatures[i]] = 0;
+                _creatures[i] = 0;
+                _creatureTypes[_creatures[i]] = 0;
             }
         }
     }
@@ -128,9 +128,9 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
         ObjectGuid::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
         if (data) {
-            sObjectMgr->UpdateCreatureHalaa(spawnId, m_PvP->GetMap(), data->posX, data->posY);
-            m_Creatures[i] = spawnId;
-            m_CreatureTypes[m_Creatures[i]] = i;
+            sObjectMgr->UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
+            _creatures[i] = spawnId;
+            _creatureTypes[_creatures[i]] = i;
         }
     }
 }
@@ -580,31 +580,31 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
 
 bool OPvPCapturePointNA::Update(uint32 diff)
 {
-    if (!m_capturePoint)
+    if (!_capturePoint)
         return false;
 
-    float radius = ((float)m_capturePoint->GetGOInfo()->capturePoint.radius);
+    float radius = ((float)_capturePoint->GetGOInfo()->capturePoint.radius);
 
-    for (PlayerSet playerSet : m_activePlayers)
+    for (PlayerSet playerSet : _activePlayers)
     {
         for (ObjectGuid playerGuid : playerSet)
         {
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-                if (!m_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
+                if (!_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
                     HandlePlayerLeave(player);
         }
     }
 
     std::list<Player*> players;
-    Acore::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
-    Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
+    Acore::AnyPlayerInObjectRangeCheck checker(_capturePoint, radius);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(_capturePoint, players, checker);
+    Cell::VisitWorldObjects(_capturePoint, searcher, radius);
 
     for (Player* const player : players)
     {
         if (player->IsOutdoorPvPActive())
         {
-            if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+            if (_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
                 HandlePlayerEnter(player);
         }
     }
@@ -635,13 +635,13 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             // if the guards have been killed, then the challenger has one hour to take over halaa.
             // in case they fail to do it, the guards are respawned, and they have to start again.
             if (GetControllingFaction() == TEAM_ALLIANCE) {
-                m_State = OBJECTIVESTATE_ALLIANCE;
-                m_value = m_maxValue;
+                _state = OBJECTIVESTATE_ALLIANCE;
+                _value = _maxValue;
             }
             else
             {
-                m_State = OBJECTIVESTATE_HORDE;
-                m_value = -m_maxValue;
+                _state = OBJECTIVESTATE_HORDE;
+                _value = -_maxValue;
             }
             // we reset again the artkit, map icons, sliders and respawn Halaa for controller team
             SendChangePhase();
@@ -653,16 +653,16 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             m_RespawnTimer -= diff;
 
         // get the difference of numbers
-        float fact_diff = ((float)m_activePlayers[0].size() - (float)m_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+        float fact_diff = ((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
         if (!fact_diff)
             return false;
 
-        float maxDiff = m_maxSpeed * diff;
+        float maxDiff = _maxSpeed * diff;
 
         if (fact_diff < 0)
         {
             // horde is in majority, but it's already horde-controlled -> no change
-            if (m_State == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
+            if (_state == OBJECTIVESTATE_HORDE && _value <= -_maxValue)
                 return false;
 
             if (fact_diff < -maxDiff)
@@ -671,37 +671,37 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         else
         {
             // ally is in majority, but it's already ally-controlled -> no change
-            if (m_State == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
+            if (_state == OBJECTIVESTATE_ALLIANCE && _value >= _maxValue)
                 return false;
 
             if (fact_diff > maxDiff)
                 fact_diff = maxDiff;
         }
 
-        float oldValue = m_value;
-        TeamId oldTeam = m_team;
+        float oldValue = _value;
+        TeamId oldTeam = _team;
 
-        m_OldState = m_State;
+        _oldState = _state;
 
-        m_value += fact_diff;
+        _value += fact_diff;
 
-        if (m_value < -m_minValue) // red
+        if (_value < -_minValue) // red
         {
-            if (m_value < -m_maxValue) //check if the m_value is lower than max, that means horde capped point
+            if (_value < -_maxValue) //check if the m_value is lower than max, that means horde capped point
             {
-                m_value = -m_maxValue;
-                m_State = OBJECTIVESTATE_HORDE;
-                m_team = TEAM_HORDE;
+                _value = -_maxValue;
+                _state = OBJECTIVESTATE_HORDE;
+                _team = TEAM_HORDE;
             }
             else //then point is still in battle between teams
             {
-                if (m_OldState == OBJECTIVESTATE_NEUTRAL || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
+                if (_oldState == OBJECTIVESTATE_NEUTRAL || _oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || _oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
                 {
-                    m_State = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
+                    _state = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
                 }
                 else
                 {
-                    m_State = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
+                    _state = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
                 }
             }
             if (GetControllingFaction() == TEAM_ALLIANCE && !m_canRecap)
@@ -714,21 +714,21 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         }
         else //blue
         {
-            if (m_value > m_maxValue) //check if the m_value is bigger than max, that means alliance capped point
+            if (_value > _maxValue) //check if the m_value is bigger than max, that means alliance capped point
             {
-                m_value = m_maxValue;
-                m_State = OBJECTIVESTATE_ALLIANCE;
-                m_team = TEAM_ALLIANCE;
+                _value = _maxValue;
+                _state = OBJECTIVESTATE_ALLIANCE;
+                _team = TEAM_ALLIANCE;
             }
             else //then point is still in battle between teams
             {
-                if (m_OldState == OBJECTIVESTATE_NEUTRAL || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
+                if (_oldState == OBJECTIVESTATE_NEUTRAL || _oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || _oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
                 {
-                    m_State = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
+                    _state = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
                 }
                 else
                 {
-                    m_State = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+                    _state = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
                 }
             }
             if (GetControllingFaction() == TEAM_HORDE && !m_canRecap)
@@ -740,14 +740,14 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             }
         }
 
-        if (m_value != oldValue)
+        if (_value != oldValue)
         {
             SendChangePhase();
         }
 
-        if (m_OldState != m_State)
+        if (_oldState != _state)
         {
-            if (oldTeam != m_team)
+            if (oldTeam != _team)
             {
                 ChangeTeam(oldTeam);
             }
