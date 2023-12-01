@@ -113,7 +113,7 @@ public:
             { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
             { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
             { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::Yes },
             { "additem set",       HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
             { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
             { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
