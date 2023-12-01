@@ -1097,6 +1097,7 @@ enum WhenAllElseFailsAlliance
 
     // Spell
     SPELL_EJECT_PLAYER = 68576,
+    SPELL_KNOCKBACK_PLAYER = 42895
 };
 
 class npc_vehicle_d16_propelled_delivery : public CreatureScript
@@ -1131,12 +1132,26 @@ public:
                 case 12:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_2)
                     {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                            if (Unit* player = vehicle->GetPassenger(0))
+                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                {
+                                    player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                }
+
                         DoCastSelf(SPELL_EJECT_PLAYER);
                     }
                     break;
                 case 17:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
                     {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                            if (Unit* player = vehicle->GetPassenger(0))
+                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                {
+                                    player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                }
+
                         DoCastSelf(SPELL_EJECT_PLAYER);
                     }
                     else
