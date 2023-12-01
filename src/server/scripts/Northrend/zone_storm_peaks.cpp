@@ -1113,7 +1113,7 @@ public:
 
         uint8 pointId;
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+        void PassengerBoarded(Unit* /*who*/, int8 /*seatId*/, bool apply) override
         {
             if (apply)
             {
@@ -1181,7 +1181,7 @@ public:
 
         uint8 pointId;
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+        void PassengerBoarded(Unit* /*who*/, int8 /*seatId*/, bool apply) override
         {
             if (apply)
             {
