@@ -1740,7 +1740,7 @@ public:
 
         Player* p = handler->GetSession()->GetPlayer();
         // remove binding (let GM give it to another player later)
-        if (p == playerTarget)
+        if (p && p == playerTarget)
         {
             for (auto const& itemPos : dest)
             {
@@ -1751,7 +1751,7 @@ public:
             }
         }
 
-        if (count && item)
+        if (p && count && item)
         {
             p->SendNewItem(item, count, false, true);
 
