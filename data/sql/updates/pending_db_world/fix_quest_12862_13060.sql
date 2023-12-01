@@ -1,7 +1,7 @@
 UPDATE `creature_template` SET `AIName`="", `ScriptName` = 'npc_vehicle_d16_propelled_delivery' WHERE `entry` IN (30477, 30487);
 -- Plane Aliance k3
 SET @PATH := 30477 * 100;
-DELETE FROM `waypoint_data` WHERE `id` IN (30477, 30487);
+DELETE FROM `waypoint_data` WHERE `id` IN (30477*100, 30487*100);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (@PATH, 1, 6165, -1064.51, 422.119, NULL, 0, 0, 0, 100, 0),
 (@PATH, 2, 6204.1, -998.487, 457.563, NULL, 0, 0, 0, 100, 0),
