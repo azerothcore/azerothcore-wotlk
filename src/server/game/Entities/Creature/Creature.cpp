@@ -622,40 +622,7 @@ void Creature::Update(uint32 diff)
             time_t now = GameTime::GetGameTime().count();
             if (m_respawnTime <= now)
             {
-
-                ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_RESPAWN, GetEntry());
-
-                if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
-                {
-                    // Creature should not respawn, reset respawn timer. Conditions will be checked again the next time it tries to respawn.
-                    m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
-                    break;
-                }
-
-                bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
-                if (!allowed)                                               // Will be rechecked on next Update call
-                    break;
-
-                ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
-                time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
-
-                CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
-
-                if (!linkedRespawntime || (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))             // Can respawn
-                    Respawn();
-                else                                // the master is dead
-                {
-                    ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
-                    if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
-                    {
-                        SetRespawnTime(DAY);
-                    }
-                    else
-                    {
-                        m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
-                    }
-                    SaveRespawnTime(); // also save to DB immediately
-                }
+                Respawn();
             }
             break;
         }
@@ -2006,83 +1973,121 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
 void Creature::Respawn(bool force)
 {
-    //DestroyForNearbyPlayers(); // pussywizard: not needed
-
     if (force)
     {
         if (IsAlive())
+        {
             setDeathState(DeathState::JustDied);
+        }
         else if (getDeathState() != DeathState::Corpse)
+        {
             setDeathState(DeathState::Corpse);
+        }
     }
 
-    RemoveCorpse(false, false);
+    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_RESPAWN, GetEntry());
 
-    if (getDeathState() == DeathState::Dead)
+    if (!sConditionMgr->IsObjectMeetToConditions(this, conditions) && !force)
     {
-        if (m_spawnId)
-        {
-            GetMap()->RemoveCreatureRespawnTime(m_spawnId);
-            CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
-            // Respawn check if spawn has 2 entries
-            if (data->id2)
-            {
-                uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
-                UpdateEntry(entry, data, true);  // Select Random Entry
-                m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
-                LoadEquipment(data->equipmentId);                                                     // Reload Equipment
-                AIM_Initialize();                                                                     // Reload AI
-            }
-            else
-            {
-                if (m_originalEntry != GetEntry())
-                    UpdateEntry(m_originalEntry);
-            }
-        }
-
-        LOG_DEBUG("entities.unit", "Respawning creature {} (SpawnId: {}, {})", GetName(), GetSpawnId(), GetGUID().ToString());
-        m_respawnTime = 0;
-        ResetPickPocketLootTime();
-        loot.clear();
-        SelectLevel();
-
-        setDeathState(DeathState::JustRespawned);
-
-        // MDic - Acidmanifesto
-        // Do not override transform auras
-        if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
-        {
-            uint32 displayID = GetNativeDisplayId();
-            if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
-            {
-                SetDisplayId(displayID);
-                SetNativeDisplayId(displayID);
-            }
-        }
-
-        GetMotionMaster()->InitDefault();
-
-        //Call AI respawn virtual function
-        if (IsAIEnabled)
-        {
-            //reset the AI to be sure no dirty or uninitialized values will be used till next tick
-            AI()->Reset();
-            TriggerJustRespawned = true;//delay event to next tick so all creatures are created on the map before processing
-        }
-
-        uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
-        if (poolid)
-            sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
-
-        //Re-initialize reactstate that could be altered by movementgenerators
-        InitializeReactState();
-
-        m_respawnedTime = GameTime::GetGameTime().count();
+        // Creature should not respawn, reset respawn timer. Conditions will be checked again the next time it tries to respawn.
+        m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
+        return;
     }
-    m_respawnedTime = GameTime::GetGameTime().count();
-    // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    UpdateObjectVisibility(false);
+
+    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
+    if (!allowed && !force)                                               // Will be rechecked on next Update call
+        return;
+
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
+    time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
+
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+
+    if (!linkedRespawntime || (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)) || force)          // Should respawn
+    {
+        RemoveCorpse(false, false);
+
+        if (getDeathState() == DeathState::Dead)
+        {
+            if (m_spawnId)
+            {
+                GetMap()->RemoveCreatureRespawnTime(m_spawnId);
+                CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
+                // Respawn check if spawn has 2 entries
+                if (data->id2)
+                {
+                    uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
+                    UpdateEntry(entry, data, true);  // Select Random Entry
+                    m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
+                    LoadEquipment(data->equipmentId);                                                     // Reload Equipment
+                    AIM_Initialize();                                                                     // Reload AI
+                }
+                else
+                {
+                    if (m_originalEntry != GetEntry())
+                        UpdateEntry(m_originalEntry);
+                }
+            }
+
+            LOG_DEBUG("entities.unit", "Respawning creature {} (SpawnId: {}, {})", GetName(), GetSpawnId(), GetGUID().ToString());
+            m_respawnTime = 0;
+            ResetPickPocketLootTime();
+            loot.clear();
+            SelectLevel();
+
+            setDeathState(DeathState::JustRespawned);
+
+            // MDic - Acidmanifesto
+            // Do not override transform auras
+            if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
+            {
+                uint32 displayID = GetNativeDisplayId();
+                if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
+                {
+                    SetDisplayId(displayID);
+                    SetNativeDisplayId(displayID);
+                }
+            }
+
+            GetMotionMaster()->InitDefault();
+
+            //Call AI respawn virtual function
+            if (IsAIEnabled)
+            {
+                //reset the AI to be sure no dirty or uninitialized values will be used till next tick
+                AI()->Reset();
+                TriggerJustRespawned = true;//delay event to next tick so all creatures are created on the map before processing
+            }
+
+            uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
+            if (poolid)
+                sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+
+            //Re-initialize reactstate that could be altered by movementgenerators
+            InitializeReactState();
+
+            m_respawnedTime = GameTime::GetGameTime().count();
+        }
+        m_respawnedTime = GameTime::GetGameTime().count();
+        // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
+        m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+        UpdateObjectVisibility(false);
+
+    }
+    else                                // the master is dead
+    {
+        ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+        if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
+        {
+            SetRespawnTime(DAY);
+        }
+        else
+        {
+            time_t now = GameTime::GetGameTime().count();
+            m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
+        }
+        SaveRespawnTime(); // also save to DB immediately
+    }
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)

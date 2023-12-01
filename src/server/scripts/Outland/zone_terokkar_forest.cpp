@@ -472,7 +472,7 @@ public:
             {
                 case 0:
                     if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 10))
-                        Cage->SetGoState(GO_STATE_ACTIVE);
+                        Cage->UseDoorOrButton();
                     break;
                 case 2:
                     Talk(SAY_PROGRESS_1, player);
@@ -501,9 +501,10 @@ public:
             }
         }
 
-        void Reset() override
+        void JustRespawned() override
         {
-            me->RestoreFaction();
+            me->SetImmuneToAll(true);
+            npc_escortAI::JustRespawned();
         }
 
         void JustDied(Unit* /*killer*/) override

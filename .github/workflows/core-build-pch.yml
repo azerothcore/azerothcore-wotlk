@@ -1,9 +1,10 @@
-name: main
+name: pch-build
 on:
   push:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -15,29 +16,22 @@ jobs:
       fail-fast: false
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
-        os: [ubuntu-20.04]
-        compiler: [clang]
+        include:
+          - os: ubuntu-20.04
+            compiler: clang12
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-pch
     env:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}
       - name: Configure OS
         run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core.sh
+        run: source ./apps/ci/ci-conf-core-pch.sh
       - name: Process pending sql
         run: bash bin/acore-db-pendings
       - name: Build

@@ -285,9 +285,12 @@ public:
 
     static bool HandleLearnAllLangCommand(ChatHandler* handler)
     {
-        // skipping UNIVERSAL language (0)
-        for (uint8 i = 1; i < LANGUAGES_COUNT; ++i)
-            handler->GetSession()->GetPlayer()->learnSpell(lang_description[i].spell_id);
+        for (LanguageDesc const& langDesc : lang_description)
+            if (uint32 langSpellId = langDesc.spell_id)
+            {
+                handler->GetPlayer()->learnSpell(langSpellId);
+                handler->GetPlayer()->SetSkill(langDesc.skill_id, 0, 300, 300);
+            }
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_ALL_LANG);
         return true;

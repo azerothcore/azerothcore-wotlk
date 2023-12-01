@@ -1,4 +1,4 @@
-name: core-modules-build
+name: nopch-module-build
 on:
   push:
     branches:
@@ -56,9 +56,3 @@ jobs:
         run: bash bin/acore-db-pendings
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-      - name: Dry run
-        run: source ./apps/ci/ci-dry-run.sh worldserver
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh

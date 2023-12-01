@@ -27,7 +27,6 @@
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"
-#include "advstd.h"
 #include <cstddef>
 #include <map>
 #include <tuple>
@@ -115,7 +114,7 @@ namespace Acore::Impl::ChatCommands
     }
 
     template <typename T> struct HandlerToTuple { static_assert(Acore::dependant_false_v<T>, "Invalid command handler signature"); };
-    template <typename... Ts> struct HandlerToTuple<bool(ChatHandler*, Ts...)> { using type = std::tuple<ChatHandler*, advstd::remove_cvref_t<Ts>...>; };
+    template <typename... Ts> struct HandlerToTuple<bool(ChatHandler*, Ts...)> { using type = std::tuple<ChatHandler*, std::remove_cvref_t<Ts>...>; };
     template <typename T> using TupleType = typename HandlerToTuple<T>::type;
 
     struct CommandInvoker
