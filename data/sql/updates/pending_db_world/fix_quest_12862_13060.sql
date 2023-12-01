@@ -1,3 +1,12 @@
+-- D16 Horde remove SAI
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30477);
+-- D16 Horde remove Timed Actionlists
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3047700) AND (`source_type` = 9);
+-- D16 Aliance remove SAI
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30487);
+-- D16 Aliance remove Timed Actionlists
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3048700) AND (`source_type` = 9);
+-- Update D16 creature ScriptName
 UPDATE `creature_template` SET `AIName`="", `ScriptName` = 'npc_vehicle_d16_propelled_delivery' WHERE `entry` IN (30477, 30487);
 -- Plane Aliance k3
 SET @PATH := 30477 * 100;
