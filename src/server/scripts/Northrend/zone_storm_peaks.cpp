@@ -1124,7 +1124,7 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type != ESCORT_MOTION_TYPE)
+            if (type != POINT_MOTION_TYPE)
                 return;
 
             switch (id)
