@@ -680,8 +680,7 @@ public:
                     {
                         if (barthilas->IsAlive() && !barthilas->IsInCombat())
                         {
-                            Position barthilasTelPosis = BarthilasPos;
-                            barthilas->NearTeleportTo(barthilasTelPosis);
+                            barthilas->NearTeleportTo(BarthilasPos.GetPositionX(), BarthilasPos.GetPositionY(),BarthilasPos.GetPositionZ(), BarthilasPos.GetOrientation());
                             barthilas->SetHomePosition(BarthilasPos);
                         }
                     }
