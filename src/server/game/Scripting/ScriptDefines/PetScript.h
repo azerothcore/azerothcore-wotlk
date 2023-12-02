@@ -34,7 +34,7 @@ public:
 
     [[nodiscard]] virtual bool CanUnlearnSpellSet(Pet* /*pet*/, uint32 /*level*/, uint32 /*spell*/) { return true; }
 
-    [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellEntry*/) { return true; }
+    [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellInfo*/) { return true; }
 
     [[nodiscard]] virtual bool CanResetTalents(Pet* /*pet*/) { return true; }
 
