@@ -55,6 +55,21 @@ public:
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
+    void SendErrorMessage(uint32 entry);
+
+    template<typename... Args>
+    void SendErrorMessage(char const* fmt, Args&&... args)
+    {
+        PSendSysMessage(fmt, std::forward<Args>(args)...);
+        SetSentErrorMessage(true);
+    }
+
+    template<typename... Args>
+    void SendErrorMessage(uint32 entry, Args&&... args)
+    {
+        PSendSysMessage(entry, std::forward<Args>(args)...);
+        SetSentErrorMessage(true);
+    }
 
     template<typename... Args>
     void PSendSysMessage(char const* fmt, Args&&... args)

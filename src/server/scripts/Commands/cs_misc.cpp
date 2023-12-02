@@ -169,8 +169,7 @@ public:
             {
                 if (arenaTokens.size() > 1)
                 {
-                    handler->PSendSysMessage("Invalid [arena] specified.");
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage("Invalid [arena] specified.");
                     return false;
                 }
 
@@ -202,8 +201,7 @@ public:
             }
             else
             {
-                handler->PSendSysMessage("Invalid [arena] specified.");
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage("Invalid [arena] specified.");
                 return false;
             }
         }
@@ -236,15 +234,13 @@ public:
 
         if (!count)
         {
-            handler->PSendSysMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
             return false;
         }
 
         if (tokens.size() != uint16(count + 2))
         {
-            handler->PSendSysMessage("Invalid number of nicknames for this bracket.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Invalid number of nicknames for this bracket.");
             return false;
         }
 
@@ -409,16 +405,14 @@ public:
         Battleground* bgt = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA);
         if (!bgt)
         {
-            handler->PSendSysMessage("Couldn't create arena map!");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Couldn't create arena map!");
             return false;
         }
 
         Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
         if (!bg)
         {
-            handler->PSendSysMessage("Couldn't create arena map!");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Couldn't create arena map!");
             return false;
         }
 
@@ -492,8 +486,7 @@ public:
             return true;
         }
 
-        handler->SendSysMessage(LANG_USE_BOL);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_USE_BOL);
         return false;
     }
 
@@ -538,8 +531,7 @@ public:
             return true;
         }
 
-        handler->SendSysMessage(LANG_USE_BOL);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_USE_BOL);
         return false;
     }
 
@@ -638,23 +630,20 @@ public:
     {
         if (!spell)
         {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
             return false;
         }
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
 
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -668,8 +657,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -681,8 +669,7 @@ public:
 
         if (!spells.holds_alternative<SpellInfo const*>())
         {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
             return false;
         }
 
@@ -690,8 +677,7 @@ public:
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
 
@@ -715,8 +701,7 @@ public:
         Player* _player = handler->GetSession()->GetPlayer();
         if (target->GetGUID() == _player->GetGUID())
         {
-            handler->SendSysMessage(LANG_CANT_TELEPORT_SELF);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CANT_TELEPORT_SELF);
             return false;
         }
 
@@ -738,8 +723,7 @@ public:
                 // only allow if gm mode is on
                 if (!_player->IsGameMaster())
                 {
-                    handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     return false;
                 }
 
@@ -760,8 +744,7 @@ public:
                     // we are in group, we can go only if we are in the player group
                     if (_player->GetGroup() != targetPlayer->GetGroup())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, nameLink.c_str());
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_CANNOT_GO_TO_INST_PARTY, nameLink.c_str());
                         return false;
                     }
                 }
@@ -770,8 +753,7 @@ public:
                     // we are not in group, let's verify our GM mode
                     if (!_player->IsGameMaster())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, nameLink.c_str());
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_CANNOT_GO_TO_INST_GM, nameLink.c_str());
                         return false;
                     }
                 }
@@ -868,8 +850,7 @@ public:
         Player* _player = handler->GetSession()->GetPlayer();
         if (target->GetGUID() == _player->GetGUID())
         {
-            handler->PSendSysMessage(LANG_CANT_TELEPORT_SELF);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CANT_TELEPORT_SELF);
             return false;
         }
 
@@ -887,8 +868,7 @@ public:
 
             if (targetPlayer->IsBeingTeleported())
             {
-                handler->PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_IS_TELEPORTED, nameLink.c_str());
                 return false;
             }
 
@@ -896,8 +876,7 @@ public:
 
             if (map->IsBattlegroundOrArena())
             {
-                handler->PSendSysMessage("Can't summon to a battleground!");
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage("Can't summon to a battleground!");
                 return false;
             }
             else if (map->IsDungeon())
@@ -908,8 +887,7 @@ public:
                     // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
                     if (!targetPlayer->GetSession()->GetSecurity())
                     {
-                        handler->PSendSysMessage("Only GMs can be summoned to an instance!");
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage("Only GMs can be summoned to an instance!");
                         return false;
                     }
                 }
@@ -927,8 +905,7 @@ public:
                         (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()))
                     // the last check is a bit excessive, but let it be, just in case
                 {
-                    handler->PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST, nameLink.c_str());
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST, nameLink.c_str());
                     return false;
                 }
             }
@@ -1006,8 +983,7 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
             return false;
         }
 
@@ -1020,8 +996,7 @@ public:
                     (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID())))
             // the last check is a bit excessive, but let it be, just in case
         {
-            handler->SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST);
             return false;
         }
 
@@ -1044,8 +1019,7 @@ public:
 
             if (player->IsBeingTeleported())
             {
-                handler->PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
                 return false;
             }
 
@@ -1056,8 +1030,7 @@ public:
                 if (playerMap->Instanceable() && playerMap->GetInstanceId() != gmMap->GetInstanceId())
                 {
                     // cannot summon from instance to instance
-                    handler->PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST, plNameLink.c_str());
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST, plNameLink.c_str());
                     return false;
                 }
             }
@@ -1101,8 +1074,7 @@ public:
 
         if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -1169,15 +1141,13 @@ public:
         // If player is not mounted, so go out :)
         if (!player->IsMounted())
         {
-            handler->SendSysMessage(LANG_CHAR_NON_MOUNTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CHAR_NON_MOUNTED);
             return false;
         }
 
         if (player->IsInFlight())
         {
-            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_YOU_IN_FLIGHT);
             return false;
         }
 
@@ -1194,8 +1164,7 @@ public:
 
         if (!guid)
         {
-            handler->SendSysMessage(LANG_NO_SELECTION);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_SELECTION);
             return false;
         }
 
@@ -1220,8 +1189,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -1236,8 +1204,7 @@ public:
         {
             if (!SpellMgr::IsSpellValid(*spell))
             {
-                handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell.value()->Id);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell.value()->Id);
                 return false;
             }
 
@@ -1297,8 +1264,7 @@ public:
 
         if (targetPlayer->IsBeingTeleported())
         {
-            handler->PSendSysMessage(LANG_IS_TELEPORTED, handler->playerLink(target->GetName()).c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_IS_TELEPORTED, handler->playerLink(target->GetName()).c_str());
             return false;
         }
 
@@ -1368,8 +1334,7 @@ public:
 
         if (handler->GetSession() && target->GetGUID() == handler->GetSession()->GetPlayer()->GetGUID())
         {
-            handler->SendSysMessage(LANG_COMMAND_KICKSELF);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_KICKSELF);
             return false;
         }
 
@@ -1487,8 +1452,7 @@ public:
 
         if (!graveyard)
         {
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNOEXIST, graveyardId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_GRAVEYARDNOEXIST, graveyardId);
             return false;
         }
 
@@ -1498,8 +1462,7 @@ public:
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
         if (!areaEntry || areaEntry->zone != 0)
         {
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
             return false;
         }
 
@@ -1548,8 +1511,7 @@ public:
             GraveyardData const* data = sGraveyard->FindGraveyardData(graveyardId, zone_id);
             if (!data)
             {
-                handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDERROR, graveyardId);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_GRAVEYARDERROR, graveyardId);
                 return false;
             }
 
@@ -1598,24 +1560,21 @@ public:
         Player* playerTarget = handler->getSelectedPlayer();
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
         AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaID);
         if (!area)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
         int32 offset = area->exploreFlag / 32;
         if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -1632,24 +1591,21 @@ public:
         Player* playerTarget = handler->getSelectedPlayer();
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
         AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaID);
         if (!area)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
         int32 offset = area->exploreFlag / 32;
         if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -1665,8 +1621,7 @@ public:
     {
         if (!sObjectMgr->GetItemTemplate(itemTemplate->ItemId))
         {
-            handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemTemplate->ItemId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_ITEMIDINVALID, itemTemplate->ItemId);
             return false;
         }
 
@@ -1700,16 +1655,14 @@ public:
                 if (!playerTarget->HasItemCount(itemId, 0))
                 {
                     // output that player don't have any items to destroy
-                    handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
                     return false;
                 }
 
                 if (!playerTarget->HasItemCount(itemId, -count))
                 {
                     // output that player don't have as many items that you want to destroy
-                    handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
                     return false;
                 }
             }
@@ -1734,8 +1687,7 @@ public:
 
         if (!count || dest.empty()) // can't add any
         {
-            handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
             return false;
         }
 
@@ -1776,8 +1728,7 @@ public:
         // prevent generation all items with itemset field value '0'
         if (!*itemSetId)
         {
-            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
             return false;
         }
 
@@ -1826,8 +1777,7 @@ public:
 
         if (!found)
         {
-            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
             return false;
         }
 
@@ -1839,8 +1789,7 @@ public:
         // Weather is OFF
         if (!sWorld->getBoolConfig(CONFIG_WEATHER))
         {
-            handler->SendSysMessage(LANG_WEATHER_DISABLED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WEATHER_DISABLED);
             return false;
         }
 
@@ -1856,8 +1805,7 @@ public:
 
         if (!weather)
         {
-            handler->SendSysMessage(LANG_NO_WEATHER);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_WEATHER);
             return false;
         }
 
@@ -1871,8 +1819,7 @@ public:
         Player* SelectedPlayer = handler->getSelectedPlayer();
         if (!SelectedPlayer)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -1887,24 +1834,21 @@ public:
 
         if (skillID <= 0)
         {
-            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skillID);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_SKILL_ID, skillID);
             return false;
         }
 
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
         SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skillID);
         if (!skillLine)
         {
-            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, uint32(skillID));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_SKILL_ID, uint32(skillID));
             return false;
         }
 
@@ -2384,8 +2328,7 @@ public:
         {
             if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
             {
-                handler->SendSysMessage(LANG_SELECT_CREATURE);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_SELECT_CREATURE);
                 return false;
             }
 
@@ -2396,8 +2339,7 @@ public:
             return true;
         }
 
-        handler->SendSysMessage(LANG_SELECT_CREATURE);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_SELECT_CREATURE);
         return false;
     }
 
@@ -2428,8 +2370,7 @@ public:
 
         if (Acore::StringTo<int32>(notSpeakTime).value_or(0) < 0)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -2445,8 +2386,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -2475,8 +2415,7 @@ public:
 
         if (muteDuration <= 0)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -2578,8 +2517,7 @@ public:
         {
             if (playerTarget->CanSpeak())
             {
-                handler->SendSysMessage(LANG_CHAT_ALREADY_ENABLED);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_CHAT_ALREADY_ENABLED);
                 return false;
             }
 
@@ -2608,8 +2546,7 @@ public:
     {
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             return false;
         }
 
@@ -2651,8 +2588,7 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -2786,8 +2722,7 @@ public:
         Creature* caster = handler->getSelectedCreature();
         if (!caster)
         {
-            handler->SendSysMessage(LANG_SELECT_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
             return false;
         }
 
@@ -2803,8 +2738,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -2850,8 +2784,7 @@ public:
 
         if (!target || !target->IsConnected())
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -2885,8 +2818,7 @@ public:
 
         if (!target && !creatureTarget)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -2914,8 +2846,7 @@ public:
             return true;
         }
 
-        handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
         return false;
     }
 
@@ -2930,8 +2861,7 @@ public:
 
         if (!target && !creatureTarget)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -2966,8 +2896,7 @@ public:
     {
         if (!sSoundEntriesStore.LookupEntry(soundId))
         {
-            handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, soundId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SOUND_NOT_EXIST, soundId);
             return false;
         }
 
