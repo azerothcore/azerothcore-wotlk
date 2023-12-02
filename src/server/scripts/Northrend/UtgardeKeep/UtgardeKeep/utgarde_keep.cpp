@@ -216,7 +216,7 @@ public:
     {
         PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
         }

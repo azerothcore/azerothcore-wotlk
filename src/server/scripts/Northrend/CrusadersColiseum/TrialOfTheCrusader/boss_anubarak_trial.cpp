@@ -880,7 +880,7 @@ public:
     {
         PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }

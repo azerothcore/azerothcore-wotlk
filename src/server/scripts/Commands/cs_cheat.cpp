@@ -205,8 +205,7 @@ public:
         Player* chr = handler->getSelectedPlayer();
         if (!chr)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
