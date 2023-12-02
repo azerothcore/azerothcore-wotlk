@@ -113,7 +113,7 @@ public:
             { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
             { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
             { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::Yes },
             { "additem set",       HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
             { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
             { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
@@ -1617,7 +1617,7 @@ public:
         return true;
     }
 
-    static bool HandleAddItemCommand(ChatHandler* handler, ItemTemplate const* itemTemplate, Optional<int32> _count)
+    static bool HandleAddItemCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, ItemTemplate const* itemTemplate, Optional<int32> _count)
     {
         if (!sObjectMgr->GetItemTemplate(itemTemplate->ItemId))
         {
@@ -1629,22 +1629,21 @@ public:
         int32 count = 1;
 
         if (_count)
-        {
             count = *_count;
-        }
 
         if (!count)
-        {
             count = 1;
-        }
 
-        Player* player = handler->GetSession()->GetPlayer();
-        Player* playerTarget = handler->getSelectedPlayer();
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
+            return false;
+
+        Player* playerTarget = player->GetConnectedPlayer();
 
         if (!playerTarget)
-        {
-            playerTarget = player;
-        }
+            return false;
 
         // Subtract
         if (count < 0)
@@ -1681,9 +1680,7 @@ public:
         InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
 
         if (msg != EQUIP_ERR_OK) // convert to possible store amount
-        {
             count -= noSpaceForCount;
-        }
 
         if (!count || dest.empty()) // can't add any
         {
@@ -1693,32 +1690,31 @@ public:
 
         Item* item = playerTarget->StoreNewItem(dest, itemId, true);
 
+        Player* p = handler->GetSession()->GetPlayer();
         // remove binding (let GM give it to another player later)
-        if (player == playerTarget)
+        if (p && p == playerTarget)
         {
             for (auto const& itemPos : dest)
             {
-                if (Item* item1 = player->GetItemByPos(itemPos.pos))
+                if (Item* item1 = p->GetItemByPos(itemPos.pos))
                 {
                     item1->SetBinding(false);
                 }
             }
         }
 
-        if (count && item)
+        if (p && count && item)
         {
-            player->SendNewItem(item, count, false, true);
+            p->SendNewItem(item, count, false, true);
 
-            if (player != playerTarget)
+            if (p != playerTarget)
             {
                 playerTarget->SendNewItem(item, count, true, false);
             }
         }
 
         if (noSpaceForCount)
-        {
             handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
-        }
 
         return true;
     }
