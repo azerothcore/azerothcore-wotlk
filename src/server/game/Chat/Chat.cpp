@@ -155,6 +155,12 @@ void ChatHandler::SendErrorMessage(uint32 entry)
     SetSentErrorMessage(true);
 }
 
+void ChatHandler::SendErrorMessage(std::string_view str, bool escapeCharacters)
+{
+    SendSysMessage(str, escapeCharacters);
+    SetSentErrorMessage(true);
+}
+
 bool ChatHandler::_ParseCommands(std::string_view text)
 {
     if (Acore::ChatCommands::TryExecuteCommand(*this, text))
