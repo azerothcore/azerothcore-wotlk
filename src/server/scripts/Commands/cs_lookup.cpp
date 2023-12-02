@@ -1172,8 +1172,7 @@ public:
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
 
@@ -1650,8 +1649,7 @@ public:
     {
         if (!result)
         {
-            handler->PSendSysMessage(LANG_NO_PLAYERS_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
             return false;
         }
 
@@ -1710,8 +1708,7 @@ public:
 
         if (!counter) // empty accounts only
         {
-            handler->PSendSysMessage(LANG_NO_PLAYERS_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
             return false;
         }
 

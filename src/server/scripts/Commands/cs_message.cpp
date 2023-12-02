@@ -175,14 +175,12 @@ public:
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND, playerNameArg->c_str());
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND, playerNameArg->c_str());
                     return false;
                 }
             }
         }
-        handler->SendSysMessage(LANG_USE_BOL);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_USE_BOL);
         return false;
     }
 };

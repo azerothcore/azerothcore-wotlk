@@ -60,8 +60,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -72,8 +71,7 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
             return false;
         }
 
@@ -93,8 +91,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -105,8 +102,7 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
             return false;
         }
 
@@ -124,8 +120,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -136,8 +131,7 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
             return false;
         }
 
@@ -163,8 +157,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 

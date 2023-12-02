@@ -59,8 +59,7 @@ public:
     {
         if (sArenaTeamMgr->GetArenaTeamByName(name))
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_EXISTS, name.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_EXISTS, name.c_str());
             return false;
         }
 
@@ -72,8 +71,7 @@ public:
 
         if (Player::GetArenaTeamIdFromDB(captain->GetGUID(), type) != 0)
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_SIZE, captain->GetName().c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_SIZE, captain->GetName().c_str());
             return false;
         }
 
@@ -82,8 +80,7 @@ public:
         if (!arena->Create(captain->GetGUID(), type, name, 4293102085, 101, 4293253939, 4, 4284049911))
         {
             delete arena;
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -99,15 +96,13 @@ public:
 
         if (!arena)
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
             return false;
         }
 
         if (arena->IsFighting())
         {
-            handler->SendSysMessage(LANG_ARENA_ERROR_COMBAT);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_COMBAT);
             return false;
         }
 
@@ -125,29 +120,25 @@ public:
         ArenaTeam* arena = sArenaTeamMgr->GetArenaTeamByName(oldName);
         if (!arena)
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, oldName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, oldName.c_str());
             return false;
         }
 
         if (sArenaTeamMgr->GetArenaTeamByName(newName))
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_EXISTS, oldName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_EXISTS, oldName.c_str());
             return false;
         }
 
         if (arena->IsFighting())
         {
-            handler->SendSysMessage(LANG_ARENA_ERROR_COMBAT);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_COMBAT);
             return false;
         }
 
         if (!arena->SetName(newName))
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -161,15 +152,13 @@ public:
         ArenaTeam* arena = sArenaTeamMgr->GetArenaTeamById(teamId);
         if (!arena)
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
             return false;
         }
 
         if (arena->IsFighting())
         {
-            handler->SendSysMessage(LANG_ARENA_ERROR_COMBAT);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_COMBAT);
             return false;
         }
 
@@ -181,15 +170,13 @@ public:
 
         if (!arena->IsMember(target->GetGUID()))
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NOT_MEMBER, target->GetName().c_str(), arena->GetName().c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NOT_MEMBER, target->GetName().c_str(), arena->GetName().c_str());
             return false;
         }
 
         if (arena->GetCaptain() == target->GetGUID())
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_CAPTAIN, target->GetName().c_str(), arena->GetName().c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_CAPTAIN, target->GetName().c_str(), arena->GetName().c_str());
             return false;
         }
 
@@ -207,8 +194,7 @@ public:
         ArenaTeam* arena = sArenaTeamMgr->GetArenaTeamById(teamId);
         if (!arena)
         {
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NOT_FOUND, teamId);
             return false;
         }
 
