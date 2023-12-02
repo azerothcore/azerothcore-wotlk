@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CommandScript.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

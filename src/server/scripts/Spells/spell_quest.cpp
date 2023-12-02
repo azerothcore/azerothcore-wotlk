@@ -15,22 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "CreatureTextMgr.h"
+#include "GridNotifiers.h"
+#include "MapMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "Vehicle.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used for quests.
  * Ordered alphabetically using questId and scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_q#questID_".
  */
-
-#include "CellImpl.h"
-#include "CreatureTextMgr.h"
-#include "GridNotifiers.h"
-#include "MapMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "Vehicle.h"
 
 class spell_q11065_wrangle_some_aether_rays : public SpellScript
 {
@@ -2569,3 +2569,4 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
 }
+

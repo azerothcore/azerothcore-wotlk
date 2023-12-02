@@ -23,12 +23,12 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

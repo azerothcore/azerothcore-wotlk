@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 ///////////////////////////////////////
@@ -673,3 +675,4 @@ void AddSC_event_pilgrims_end_scripts()
     new achievement_pb_pilgrims_peril();
     new achievement_pb_terokkar_turkey_time();
 }
+

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -88,3 +89,11 @@ void ScriptMgr::OnPetAddToWorld(Pet* pet)
         script->OnPetAddToWorld(pet);
     });
 }
+
+PetScript::PetScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PetScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<PetScript>;

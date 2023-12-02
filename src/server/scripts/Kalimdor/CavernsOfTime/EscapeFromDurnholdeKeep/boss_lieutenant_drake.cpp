@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
 #include "old_hillsbrad.h"

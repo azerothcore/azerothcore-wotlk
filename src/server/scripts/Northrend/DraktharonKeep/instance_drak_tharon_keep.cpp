@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
 
 DoorData const doorData[] =

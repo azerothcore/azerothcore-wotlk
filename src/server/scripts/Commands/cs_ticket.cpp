@@ -24,11 +24,11 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
 #include "TicketMgr.h"
 
 using namespace Acore::ChatCommands;

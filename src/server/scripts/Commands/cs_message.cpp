@@ -24,12 +24,12 @@ EndScriptData */
 
 #include "Channel.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 

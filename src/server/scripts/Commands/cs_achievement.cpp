@@ -24,9 +24,8 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "Language.h"
+#include "CommandScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

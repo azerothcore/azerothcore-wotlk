@@ -24,13 +24,13 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 

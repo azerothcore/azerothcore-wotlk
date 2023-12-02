@@ -23,11 +23,11 @@
  EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "Timer.h"
 
 using namespace Acore::ChatCommands;

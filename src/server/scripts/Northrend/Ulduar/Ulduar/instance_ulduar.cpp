@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameTime.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -1281,3 +1282,4 @@ void AddSC_instance_ulduar()
 {
     new instance_ulduar();
 }
+

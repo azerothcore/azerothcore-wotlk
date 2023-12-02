@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
 
 enum Talk
@@ -356,3 +357,4 @@ void AddSC_boss_hydross_the_unstable()
     RegisterSpellScript(spell_hydross_cleansing_field_command);
     RegisterSpellScript(spell_hydross_mark_of_hydross);
 }
+

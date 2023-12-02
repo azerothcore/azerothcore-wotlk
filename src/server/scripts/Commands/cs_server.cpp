@@ -23,6 +23,7 @@
  EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Config.h"
 #include "GameTime.h"
 #include "GitRevision.h"
@@ -32,7 +33,6 @@
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Opcodes.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "WorldPacket.h"
 #include "the_eye.h"
 
@@ -1062,3 +1063,4 @@ void AddSC_boss_kaelthas()
     new spell_kaelthas_nether_beam();
     new spell_kaelthas_summon_nether_vapor();
 }
+

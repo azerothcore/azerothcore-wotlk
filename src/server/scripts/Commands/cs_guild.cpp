@@ -23,9 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

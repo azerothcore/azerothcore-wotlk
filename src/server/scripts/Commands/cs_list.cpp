@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -33,7 +34,6 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Random.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;

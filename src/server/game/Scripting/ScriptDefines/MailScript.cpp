@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MailScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -25,3 +26,11 @@ void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver c
         script->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);\
     });
 }
+
+MailScript::MailScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<MailScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<MailScript>;

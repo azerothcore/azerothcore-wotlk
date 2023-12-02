@@ -17,8 +17,9 @@
 
 #include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
 
@@ -194,3 +195,4 @@ void AddSC_instance_obsidian_sanctum()
 {
     new instance_obsidian_sanctum();
 }
+

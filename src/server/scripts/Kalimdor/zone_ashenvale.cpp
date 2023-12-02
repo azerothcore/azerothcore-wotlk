@@ -22,8 +22,8 @@ SDComment: Quest support: 6544, 6482
 SDCategory: Ashenvale Forest
 EndScriptData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 

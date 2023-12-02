@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
 
@@ -271,3 +272,4 @@ void AddSC_instance_nexus()
     new instance_nexus();
     new npc_crystalline_frayer();
 }
+
