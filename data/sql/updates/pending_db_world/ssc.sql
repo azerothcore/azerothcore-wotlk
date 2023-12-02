@@ -121,12 +121,12 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 -- Patrolling Colossi
 (@CGUID+100, 21251, 0, 0, 548, 3607, 3607, 3, 1, 210.447, -502.402, -11.5291, 1.6796, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+101, 21251, 0, 0, 548, 3607, 3607, 3, 1, 192.113, -375.63, 11.0924, 1.77739, 604800, 0, 0, 50791, 1, ''),
--- Naga Patrol 1
+-- Naga Gatekeeper Group 1
 (@CGUID+102, 21299, 0, 0, 548, 3607, 3607, 3, 1, 253.901, -263.248, -0.697787, 3.59963, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+103, 21299, 0, 0, 548, 3607, 3607, 3, 1, 256.296, -269.096, 0.255504, 0.106307, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+104, 21298, 0, 0, 548, 3607, 3607, 3, 1, 257.341, -257.822, -0.414473, 3.50811, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+105, 21298, 0, 0, 548, 3607, 3607, 3, 1, 257.758, -273.48, 1.15305, 3.28122, 604800, 0, 0, 50791, 1, ''),
--- Naga Patrol 2
+-- Naga Gatekeeper Group 2
 (@CGUID+106, 21298, 0, 0, 548, 3607, 3607, 3, 1, 239.163, -672.661, -7.28062, 2.35619, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+107, 21299, 0, 0, 548, 3607, 3607, 3, 1, 242.1, -666.757, -7.36396, 4.25082, 604800, 0, 0, 50791, 1, ''),
 (@CGUID+108, 21299, 0, 0, 548, 3607, 3607, 3, 1, 249.929, -662.809, -7.36396, 0.325823, 604800, 0, 0, 50791, 1, ''),
@@ -710,7 +710,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21220);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21220, 0, 0, 0, 0, 0, 100, 0, 4800, 6900, 3650, 14750, 0, 0, 11, 38582, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Priestess - In Combat - Cast \'Holy Smite\''),
+(21220, 0, 0, 0, 0, 0, 100, 0, 4800, 6900, 3650, 14750, 0, 0, 11, 38582, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Priestess - In Combat - Cast \'Holy Smite\''),
 (21220, 0, 1, 0, 0, 0, 100, 0, 6050, 12850, 6050, 17050, 0, 0, 11, 38585, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Priestess - In Combat - Cast \'Holy Fire\''),
 (21220, 0, 2, 0, 74, 0, 100, 0, 8500, 16100, 8500, 16100, 75, 35, 11, 38580, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Priestess - On Friendly Below 75% Health - Cast \'Greater Heal\''),
 (21220, 0, 3, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 54, 60000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Priestess - On Data Set 1 1 - Stop Waypoint'),
@@ -1189,3 +1189,298 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+110, @CGUID+112, 3, 135, 515),
 (@CGUID+110, @CGUID+113, 6, 225, 515),
 (@CGUID+110, @CGUID+114, 6, 135, 515);
+
+-- Pathing for Tidewalker Depth-Seer Entry: 21224
+SET @NPC := @CGUID+190;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=251.03633,`position_y`=-678.4142,`position_z`=-7.363956 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,251.03633,-678.4142,-7.363956,NULL,0,1,0,100,0),
+(@PATH,2,259.25516,-714.61,-3.1125016,NULL,0,1,0,100,0),
+(@PATH,3,275.394,-727.29,-5.9174,NULL,0,1,0,100,0),
+(@PATH,4,296.90958,-730.5774,-10.859179,NULL,0,1,0,100,0),
+(@PATH,5,275.394,-727.29,-5.9174,NULL,0,1,0,100,0),
+(@PATH,6,259.25516,-714.61,-3.1125016,NULL,0,1,0,100,0),
+(@PATH,7,253.3281,-698.11395,-4.5272155,NULL,0,1,0,100,0);
+-- 0x2030FC448014BA00003774000162A0A0 .go xyz 251.03633 -678.4142 -7.363956
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+190;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+190, @CGUID+190, 0, 0, 3),
+(@CGUID+190, @CGUID+189, 3, 90 , 515),
+(@CGUID+190, @CGUID+191, 3, 135, 515),
+(@CGUID+190, @CGUID+192, 3, 180, 515),
+(@CGUID+190, @CGUID+193, 3, 225, 515),
+(@CGUID+190, @CGUID+194, 3, 270, 515);
+
+-- Pathing for Tidewalker Depth-Seer Entry: 21224
+SET @NPC := @CGUID+170;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=324.86948,`position_y`=-750.54535,`position_z`=-13.158199 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,324.86948,-750.54535,-13.158199,NULL,0,1,0,100,0),
+(@PATH,2,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,3,378.03885,-751.7342,-13.158199,NULL,0,1,0,100,0),
+(@PATH,4,391.25952,-752.86414,-8.177013,NULL,0,1,0,100,0),
+(@PATH,5,324.86948,-750.54535,-13.158199,NULL,0,1,0,100,0),
+(@PATH,6,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,7,378.03885,-751.7342,-13.158199,NULL,0,1,0,100,0),
+(@PATH,8,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,9,339.4434,-759.32965,-13.1582,NULL,0,1,0,100,0),
+(@PATH,10,324.86948,-750.54535,-13.158199,NULL,0,1,0,100,0),
+(@PATH,11,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,12,378.03885,-751.7342,-13.158199,NULL,0,1,0,100,0),
+(@PATH,13,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,14,339.4434,-759.32965,-13.1582,NULL,0,1,0,100,0),
+(@PATH,15,324.86948,-750.54535,-13.158199,NULL,0,1,0,100,0),
+(@PATH,16,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,17,378.03885,-751.7342,-13.158199,NULL,0,1,0,100,0),
+(@PATH,18,391.25952,-752.86414,-8.177013,NULL,0,1,0,100,0),
+(@PATH,19,413.21085,-758.54877,-7.153605,NULL,0,1,0,100,0),
+(@PATH,20,438.24,-760.3828,-7.1443305,NULL,0,1,0,100,0),
+(@PATH,21,355.7988,-756.04895,-13.158199,NULL,0,1,0,100,0),
+(@PATH,22,339.4434,-759.32965,-13.1582,NULL,0,1,0,100,0),
+(@PATH,23,324.86948,-750.54535,-13.158199,NULL,0,1,0,100,0);
+-- 0x2030FC448014BA00003774000062A0A0 .go xyz 324.86948 -750.54535 -13.158199
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+170;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+170, @CGUID+170, 0, 0, 3),
+(@CGUID+170, @CGUID+175, 3, 135, 515),
+(@CGUID+170, @CGUID+176, 3, 225, 515);
+
+-- Pathing for Tidewalker Warrior Entry: 21225
+SET @NPC := @CGUID+188;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=427.18655,`position_y`=-734.0529,`position_z`=-7.144329 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,427.18655,-734.0529,-7.144329,NULL,0,1,0,100,0),
+(@PATH,2,406.05627,-714.9347,-7.145604,NULL,0,1,0,100,0),
+(@PATH,3,390.40665,-711.6302,-10.97888,NULL,0,1,0,100,0),
+(@PATH,4,375.37387,-707.41205,-13.158196,NULL,0,1,0,100,0),
+(@PATH,5,360.63754,-705.92065,-13.158196,NULL,0,1,0,100,0),
+(@PATH,6,351.4438,-713.7607,-13.158196,NULL,0,1,0,100,0),
+(@PATH,7,342.65686,-727.2888,-13.650046,NULL,0,1,0,100,0),
+(@PATH,8,330.53772,-736.4134,-13.158197,NULL,0,1,0,100,0),
+(@PATH,9,325.7357,-743.4034,-13.158198,NULL,0,1,0,100,0),
+(@PATH,10,342.57553,-727.414,-13.64526,NULL,0,1,0,100,0),
+(@PATH,11,351.4438,-713.7607,-13.158196,NULL,0,1,0,100,0),
+(@PATH,12,360.63754,-705.92065,-13.158196,NULL,0,1,0,100,0),
+(@PATH,13,375.37387,-707.41205,-13.158196,NULL,0,1,0,100,0),
+(@PATH,14,390.40665,-711.6302,-10.97888,NULL,0,1,0,100,0),
+(@PATH,15,406.05627,-714.9347,-7.145604,NULL,0,1,0,100,0),
+(@PATH,16,419.44083,-718.8114,-7.1443276,NULL,0,1,0,100,0);
+-- 0x2030FC448014BA400037740000E2A0A0 .go xyz 427.18655 -734.0529 -7.144329
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+188;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+188, @CGUID+188, 0, 0, 3),
+(@CGUID+188, @CGUID+185, 3, 135, 515),
+(@CGUID+188, @CGUID+184, 3, 225, 515),
+(@CGUID+188, @CGUID+186, 6, 135, 515),
+(@CGUID+188, @CGUID+187, 6, 225, 515);
+
+-- Pathing for Tidewalker Warrior Entry: 21225
+SET @NPC := @CGUID+178;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=325.18936,`position_y`=-711.09375,`position_z`=-13.1581955 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,325.18936,-711.09375,-13.1581955,NULL,0,1,0,100,0),
+(@PATH,2,331.09204,-728.1687,-13.955469,NULL,0,1,0,100,0),
+(@PATH,3,347.30734,-734.81976,-13.158197,NULL,0,1,0,100,0),
+(@PATH,4,365.36285,-749.3015,-13.158199,NULL,0,1,0,100,0),
+(@PATH,5,378.29504,-747.2388,-13.158199,NULL,0,1,0,100,0),
+(@PATH,6,389.0487,-741.4439,-8.479857,NULL,0,1,0,100,0),
+(@PATH,7,402.775,-729.8548,-7.6928926,NULL,0,1,0,100,0),
+(@PATH,8,402.66895,-716.2503,-7.718832,NULL,0,1,0,100,0),
+(@PATH,9,390.77545,-705.5174,-8.062674,NULL,0,1,0,100,0),
+(@PATH,10,380.61374,-701.78143,-13.158196,NULL,0,1,0,100,0),
+(@PATH,11,336.66348,-689.71356,-13.158196,NULL,0,1,0,100,0);
+-- 0x2030FC448014BA400037740001E2A0A0 .go xyz 325.18936 -711.09375 -13.1581955
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+178;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+178, @CGUID+178, 0, 0, 3),
+(@CGUID+178, @CGUID+180, 3, 90 , 515),
+(@CGUID+178, @CGUID+181, 3, 126, 515),
+(@CGUID+178, @CGUID+182, 3, 162, 515),
+(@CGUID+178, @CGUID+183, 3, 198, 515),
+(@CGUID+178, @CGUID+177, 3, 234, 515),
+(@CGUID+178, @CGUID+179, 3, 270, 515);
+
+-- Pathing for Tidewalker Warrior Entry: 21225
+SET @NPC := @CGUID+173;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=326.03873,`position_y`=-698.36163,`position_z`=-13.158196 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,326.03873,-698.36163,-13.158196,NULL,0,1,0,100,0),
+(@PATH,2,360.38873,-689.5804,-13.158197,NULL,0,1,0,100,0),
+(@PATH,3,381.1791,-689.51556,-13.158197,NULL,0,1,0,100,0),
+(@PATH,4,391.92984,-691.2345,-7.9605947,NULL,0,1,0,100,0),
+(@PATH,5,403.55884,-691.6163,-7.2252545,NULL,0,1,0,100,0),
+(@PATH,6,415.05093,-686.76697,-7.129974,NULL,0,1,0,100,0),
+(@PATH,7,438.00778,-686.28436,-7.1443276,NULL,0,1,0,100,0),
+(@PATH,8,415.05093,-686.76697,-7.129974,NULL,0,1,0,100,0),
+(@PATH,9,403.55884,-691.6163,-7.2252545,NULL,0,1,0,100,0),
+(@PATH,10,391.9396,-691.2361,-7.9643173,NULL,0,1,0,100,0),
+(@PATH,11,381.1791,-689.51556,-13.158197,NULL,0,1,0,100,0),
+(@PATH,12,360.38873,-689.5804,-13.158197,NULL,0,1,0,100,0),
+(@PATH,13,337.80548,-687.7771,-13.158196,NULL,0,1,0,100,0);
+-- 0x2030FC448014BA400037740002E2A0A0 .go xyz 326.03873 -698.36163 -13.158196
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+173;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
+(@CGUID+173, @CGUID+173, 0, 0, 3),
+(@CGUID+173, @CGUID+171, 3, 90 , 515),
+(@CGUID+173, @CGUID+172, 3, 180, 515),
+(@CGUID+173, @CGUID+174, 3, 270, 515);
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.71428 WHERE (`entry` = 21224);
+UPDATE `creature_template_addon` SET `bytes2` = 1 WHERE (`entry` IN (21224, 21225, 21226, 21227, 21228));
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.71428 WHERE (`entry` IN (21218, 21301));
+
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (@CGUID+1  ,@CGUID+2  ,@CGUID+3  ,@CGUID+4  ,@CGUID+5  ,@CGUID+6  ,@CGUID+7  ,@CGUID+8  ,@CGUID+9  ,@CGUID+10 ,@CGUID+11 ,@CGUID+12 ,@CGUID+13 ,@CGUID+14 ,@CGUID+15 ,@CGUID+22 ,@CGUID+23 ,@CGUID+24 ,@CGUID+25 ,@CGUID+26 ,@CGUID+27 ,@CGUID+28 ,@CGUID+29 ,@CGUID+30 ,@CGUID+31 ,@CGUID+32 ,@CGUID+33 ,@CGUID+34 ,@CGUID+35 ,@CGUID+36 ,@CGUID+37 ,@CGUID+38 ,@CGUID+39 ,@CGUID+40 ,@CGUID+41 ,@CGUID+42 ,@CGUID+43 ,@CGUID+44 ,@CGUID+45 ,@CGUID+46 ,@CGUID+47 ,@CGUID+48 ,@CGUID+49 ,@CGUID+50 ,@CGUID+51 ,@CGUID+52 ,@CGUID+53 ,@CGUID+54 ,@CGUID+55 ,@CGUID+56 ,@CGUID+57 ,@CGUID+58 ,@CGUID+59 ,@CGUID+60 ,@CGUID+61 ,@CGUID+62 ,@CGUID+63 ,@CGUID+64 ,@CGUID+65 ,@CGUID+66 ,@CGUID+67 ,@CGUID+68 ,@CGUID+69 ,@CGUID+70 ,@CGUID+71 ,@CGUID+72 ,@CGUID+73 ,@CGUID+74 ,@CGUID+75 ,@CGUID+76 ,@CGUID+77 ,@CGUID+78 ,@CGUID+79 ,@CGUID+80 ,@CGUID+81 ,@CGUID+82 ,@CGUID+83 ,@CGUID+84 ,@CGUID+85 ,@CGUID+86 ,@CGUID+87 ,@CGUID+88 ,@CGUID+89 ,@CGUID+90 ,@CGUID+91 ,@CGUID+92 ,@CGUID+93 ,@CGUID+94 ,@CGUID+95 ,@CGUID+96 ,@CGUID+97 ,@CGUID+98 ,@CGUID+99 ,@CGUID+102,@CGUID+103,@CGUID+104,@CGUID+105,@CGUID+106,@CGUID+107,@CGUID+108,@CGUID+109,@CGUID+115,@CGUID+116,@CGUID+117,@CGUID+118,@CGUID+119,@CGUID+120,@CGUID+121,@CGUID+122,@CGUID+123,@CGUID+124,@CGUID+125,@CGUID+126,@CGUID+127,@CGUID+128,@CGUID+129,@CGUID+130,@CGUID+131,@CGUID+132,@CGUID+133,@CGUID+134,@CGUID+135,@CGUID+136,@CGUID+137,@CGUID+138);
+INSERT INTO `creature_formations` (`memberGUID`, `leaderGUID`, `groupAI`) VALUES
+(@CGUID+1  , @CGUID+1  , 3),
+(@CGUID+2  , @CGUID+1  , 3),
+(@CGUID+3  , @CGUID+1  , 3),
+(@CGUID+4  , @CGUID+1  , 3),
+(@CGUID+5  , @CGUID+1  , 3),
+(@CGUID+6  , @CGUID+6  , 3),
+(@CGUID+7  , @CGUID+6  , 3),
+(@CGUID+8  , @CGUID+6  , 3),
+(@CGUID+9  , @CGUID+6  , 3),
+(@CGUID+10 , @CGUID+6  , 3),
+(@CGUID+11 , @CGUID+11 , 3),
+(@CGUID+12 , @CGUID+11 , 3),
+(@CGUID+13 , @CGUID+11 , 3),
+(@CGUID+14 , @CGUID+11 , 3),
+(@CGUID+15 , @CGUID+11 , 3),
+(@CGUID+22 , @CGUID+22 , 3),
+(@CGUID+23 , @CGUID+22 , 3),
+(@CGUID+24 , @CGUID+22 , 3),
+(@CGUID+25 , @CGUID+22 , 3),
+(@CGUID+26 , @CGUID+22 , 3),
+(@CGUID+27 , @CGUID+22 , 3),
+(@CGUID+28 , @CGUID+22 , 3),
+(@CGUID+29 , @CGUID+22 , 3),
+(@CGUID+30 , @CGUID+22 , 3),
+(@CGUID+31 , @CGUID+31 , 3),
+(@CGUID+32 , @CGUID+31 , 3),
+(@CGUID+33 , @CGUID+31 , 3),
+(@CGUID+34 , @CGUID+31 , 3),
+(@CGUID+35 , @CGUID+31 , 3),
+(@CGUID+36 , @CGUID+31 , 3),
+(@CGUID+37 , @CGUID+31 , 3),
+(@CGUID+38 , @CGUID+31 , 3),
+(@CGUID+39 , @CGUID+31 , 3),
+(@CGUID+40 , @CGUID+40 , 3),
+(@CGUID+41 , @CGUID+40 , 3),
+(@CGUID+42 , @CGUID+40 , 3),
+(@CGUID+43 , @CGUID+40 , 3),
+(@CGUID+44 , @CGUID+40 , 3),
+(@CGUID+45 , @CGUID+40 , 3),
+(@CGUID+46 , @CGUID+40 , 3),
+(@CGUID+47 , @CGUID+40 , 3),
+(@CGUID+48 , @CGUID+40 , 3),
+(@CGUID+49 , @CGUID+49 , 3),
+(@CGUID+50 , @CGUID+49 , 3),
+(@CGUID+51 , @CGUID+49 , 3),
+(@CGUID+52 , @CGUID+49 , 3),
+(@CGUID+53 , @CGUID+49 , 3),
+(@CGUID+54 , @CGUID+49 , 3),
+(@CGUID+55 , @CGUID+49 , 3),
+(@CGUID+56 , @CGUID+49 , 3),
+(@CGUID+57 , @CGUID+49 , 3),
+(@CGUID+58 , @CGUID+58 , 3),
+(@CGUID+59 , @CGUID+58 , 3),
+(@CGUID+60 , @CGUID+58 , 3),
+(@CGUID+61 , @CGUID+58 , 3),
+(@CGUID+62 , @CGUID+58 , 3),
+(@CGUID+63 , @CGUID+58 , 3),
+(@CGUID+64 , @CGUID+58 , 3),
+(@CGUID+65 , @CGUID+58 , 3),
+(@CGUID+66 , @CGUID+58 , 3),
+(@CGUID+67 , @CGUID+67 , 3),
+(@CGUID+68 , @CGUID+67 , 3),
+(@CGUID+69 , @CGUID+67 , 3),
+(@CGUID+70 , @CGUID+67 , 3),
+(@CGUID+71 , @CGUID+67 , 3),
+(@CGUID+72 , @CGUID+67 , 3),
+(@CGUID+73 , @CGUID+67 , 3),
+(@CGUID+74 , @CGUID+67 , 3),
+(@CGUID+75 , @CGUID+67 , 3),
+(@CGUID+76 , @CGUID+76 , 3),
+(@CGUID+77 , @CGUID+76 , 3),
+(@CGUID+78 , @CGUID+76 , 3),
+(@CGUID+79 , @CGUID+76 , 3),
+(@CGUID+80 , @CGUID+76 , 3),
+(@CGUID+81 , @CGUID+76 , 3),
+(@CGUID+82 , @CGUID+82 , 3),
+(@CGUID+83 , @CGUID+82 , 3),
+(@CGUID+84 , @CGUID+82 , 3),
+(@CGUID+85 , @CGUID+82 , 3),
+(@CGUID+86 , @CGUID+82 , 3),
+(@CGUID+87 , @CGUID+82 , 3),
+(@CGUID+88 , @CGUID+88 , 3),
+(@CGUID+89 , @CGUID+88 , 3),
+(@CGUID+90 , @CGUID+88 , 3),
+(@CGUID+91 , @CGUID+88 , 3),
+(@CGUID+92 , @CGUID+88 , 3),
+(@CGUID+93 , @CGUID+88 , 3),
+(@CGUID+94 , @CGUID+94 , 3),
+(@CGUID+95 , @CGUID+94 , 3),
+(@CGUID+96 , @CGUID+94 , 3),
+(@CGUID+97 , @CGUID+94 , 3),
+(@CGUID+98 , @CGUID+94 , 3),
+(@CGUID+99 , @CGUID+94 , 3),
+(@CGUID+102, @CGUID+102, 3),
+(@CGUID+103, @CGUID+102, 3),
+(@CGUID+104, @CGUID+102, 3),
+(@CGUID+105, @CGUID+102, 3),
+(@CGUID+106, @CGUID+106, 3),
+(@CGUID+107, @CGUID+106, 3),
+(@CGUID+108, @CGUID+106, 3),
+(@CGUID+109, @CGUID+106, 3),
+(@CGUID+115, @CGUID+115, 3),
+(@CGUID+116, @CGUID+115, 3),
+(@CGUID+117, @CGUID+115, 3),
+(@CGUID+118, @CGUID+118, 3),
+(@CGUID+119, @CGUID+118, 3),
+(@CGUID+120, @CGUID+118, 3),
+(@CGUID+121, @CGUID+118, 3),
+(@CGUID+122, @CGUID+122, 3),
+(@CGUID+123, @CGUID+122, 3),
+(@CGUID+124, @CGUID+122, 3),
+(@CGUID+125, @CGUID+122, 3),
+(@CGUID+126, @CGUID+122, 3),
+(@CGUID+127, @CGUID+127, 3),
+(@CGUID+128, @CGUID+127, 3),
+(@CGUID+129, @CGUID+127, 3),
+(@CGUID+130, @CGUID+127, 3),
+(@CGUID+131, @CGUID+127, 3),
+(@CGUID+132, @CGUID+127, 3),
+(@CGUID+133, @CGUID+133, 3),
+(@CGUID+134, @CGUID+133, 3),
+(@CGUID+135, @CGUID+133, 3),
+(@CGUID+136, @CGUID+133, 3),
+(@CGUID+137, @CGUID+133, 3),
+(@CGUID+138, @CGUID+133, 3);
+
+UPDATE `smart_scripts` SET `action_param2`=0 WHERE `entryorguid`=21230 AND `source_type`=0 AND `id`=1 AND `link`=0;
+UPDATE `smart_scripts` SET `action_param2`=0 WHERE `entryorguid`=21230 AND `source_type`=0 AND `id`=5 AND `link`=0;
