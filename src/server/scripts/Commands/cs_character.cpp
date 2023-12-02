@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -32,7 +33,6 @@ EndScriptData */
 #include "Player.h"
 #include "PlayerDump.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "Timer.h"
 #include "World.h"
 #include "WorldSession.h"

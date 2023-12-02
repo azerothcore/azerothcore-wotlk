@@ -15,17 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GridNotifiersImpl.h"
+#include "CreatureScript.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "shadowfang_keep.h"
+#include "GridNotifiersImpl.h"
 
 enum ApothecarySpells
 {
@@ -530,3 +531,4 @@ void AddSC_boss_apothecary_hummel()
     RegisterSpellScript(spell_apothecary_perfume_spill);
     RegisterSpellScript(spell_apothecary_cologne_spill);
 }
+

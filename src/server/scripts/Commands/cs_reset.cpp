@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"

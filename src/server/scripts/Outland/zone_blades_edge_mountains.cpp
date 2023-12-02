@@ -15,6 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Cell.h"
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Blades_Edge_Mountains
 SD%Complete: 90
@@ -27,17 +39,6 @@ npc_nether_drake
 npc_daranelle
 go_legion_obelisk
 EndContentData */
-
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellInfo.h"
-#include "SpellScript.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue

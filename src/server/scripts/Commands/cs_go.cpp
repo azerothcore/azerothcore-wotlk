@@ -23,16 +23,16 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameGraveyard.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "TicketMgr.h"
 
-#include <regex>
 #include "boost/algorithm/string.hpp"
+#include <regex>
 
 using namespace Acore::ChatCommands;
 

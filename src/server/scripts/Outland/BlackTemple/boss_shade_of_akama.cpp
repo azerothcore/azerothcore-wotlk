@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Says
@@ -564,3 +565,4 @@ void AddSC_boss_shade_of_akama()
     RegisterSpellScript(spell_shade_of_akama_shade_soul_channel);
     RegisterSpellScript(spell_shade_of_akama_akama_soul_expel);
 }
+

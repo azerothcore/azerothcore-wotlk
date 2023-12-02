@@ -24,12 +24,12 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DisableMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;

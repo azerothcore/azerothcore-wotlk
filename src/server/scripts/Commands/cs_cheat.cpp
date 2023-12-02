@@ -16,9 +16,9 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;

@@ -16,10 +16,10 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Group.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

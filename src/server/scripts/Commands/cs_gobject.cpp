@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
@@ -32,7 +33,6 @@ EndScriptData */
 #include "Opcodes.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "ScriptMgr.h"
 #include "Transport.h"
 
 using namespace Acore::ChatCommands;

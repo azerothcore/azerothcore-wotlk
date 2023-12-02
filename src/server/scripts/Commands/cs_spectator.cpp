@@ -19,8 +19,8 @@
 #include "ArenaSpectator.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 
 using namespace Acore::ChatCommands;

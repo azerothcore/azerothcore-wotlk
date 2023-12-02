@@ -27,6 +27,7 @@ EndScriptData */
 #include "AutobroadcastMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"

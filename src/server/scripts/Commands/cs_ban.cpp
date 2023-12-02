@@ -26,12 +26,12 @@ EndScriptData */
 #include "BanMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 /// Ban function modes
 enum BanMode

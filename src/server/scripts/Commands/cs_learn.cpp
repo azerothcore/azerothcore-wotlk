@@ -22,12 +22,12 @@ Comment: All learn related commands
 Category: commandscripts
 EndScriptData */
 
+#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 

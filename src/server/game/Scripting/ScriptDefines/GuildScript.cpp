@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GuildScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -121,3 +122,11 @@ bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, 
 
     return true;
 }
+
+GuildScript::GuildScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GuildScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<GuildScript>;

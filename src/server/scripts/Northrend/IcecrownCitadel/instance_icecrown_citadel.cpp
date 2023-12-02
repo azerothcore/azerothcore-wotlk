@@ -16,13 +16,14 @@
  */
 
 #include "AccountMgr.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
