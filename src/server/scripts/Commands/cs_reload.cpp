@@ -280,8 +280,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->PSendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -728,8 +727,7 @@ public:
     {
         if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
         {
-            handler->SendSysMessage("Warden system disabled by config - reloading warden_action skipped.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Warden system disabled by config - reloading warden_action skipped.");
             return false;
         }
 
@@ -961,8 +959,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -979,8 +976,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -1006,8 +1002,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 

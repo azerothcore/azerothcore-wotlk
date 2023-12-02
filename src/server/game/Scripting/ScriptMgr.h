@@ -1914,7 +1914,7 @@ public:
 
     [[nodiscard]] virtual bool CanUnlearnSpellSet(Pet* /*pet*/, uint32 /*level*/, uint32 /*spell*/) { return true; }
 
-    [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellEntry*/) { return true; }
+    [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellInfo*/) { return true; }
 
     [[nodiscard]] virtual bool CanResetTalents(Pet* /*pet*/) { return true; }
 
@@ -2650,7 +2650,7 @@ public: /* PetScript */
     void OnInitStatsForLevel(Guardian* guardian, uint8 petlevel);
     void OnCalculateMaxTalentPointsForLevel(Pet* pet, uint8 level, uint8& points);
     bool CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell);
-    bool CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry);
+    bool CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellInfo);
     bool CanResetTalents(Pet* pet);
 
 public: /* ArenaScript */
