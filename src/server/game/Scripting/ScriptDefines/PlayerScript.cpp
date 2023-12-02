@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -1696,3 +1697,11 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
 
     return true;
 }
+
+PlayerScript::PlayerScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PlayerScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<PlayerScript>;

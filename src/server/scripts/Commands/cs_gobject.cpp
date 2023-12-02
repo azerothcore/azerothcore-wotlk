@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
@@ -32,7 +33,6 @@ EndScriptData */
 #include "Opcodes.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "ScriptMgr.h"
 #include "Transport.h"
 
 using namespace Acore::ChatCommands;
@@ -73,8 +73,7 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
             return false;
         }
 
@@ -98,8 +97,7 @@ public:
         GameObjectTemplate const* objectInfo = sObjectMgr->GetGameObjectTemplate(objectId);
         if (!objectInfo)
         {
-            handler->PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST, uint32(objectId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GAMEOBJECT_NOT_EXIST, uint32(objectId));
             return false;
         }
 
@@ -107,8 +105,7 @@ public:
         {
             // report to DB errors log as in loading case
             LOG_ERROR("sql.sql", "Gameobject (Entry {} GoType: {}) have invalid displayId ({}), not spawned.", *objectId, objectInfo->type, objectInfo->displayId);
-            handler->PSendSysMessage(LANG_GAMEOBJECT_HAVE_INVALID_DATA, uint32(objectId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GAMEOBJECT_HAVE_INVALID_DATA, uint32(objectId));
             return false;
         }
 
@@ -162,8 +159,7 @@ public:
 
         if (!sObjectMgr->GetGameObjectTemplate(objectId))
         {
-            handler->PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST, uint32(objectId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GAMEOBJECT_NOT_EXIST, uint32(objectId));
             return false;
         }
 
@@ -299,8 +295,7 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(spawnId);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(spawnId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(spawnId));
             return false;
         }
 
@@ -310,8 +305,7 @@ public:
             Unit* owner = ObjectAccessor::GetUnit(*handler->GetSession()->GetPlayer(), ownerGuid);
             if (!owner || !ownerGuid.IsPlayer())
             {
-                handler->PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, ownerGuid.GetCounter(), object->GetSpawnId());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_DELOBJREFERCREATURE, ownerGuid.GetCounter(), object->GetSpawnId());
                 return false;
             }
 
@@ -336,8 +330,7 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
             return false;
         }
 
@@ -375,8 +368,7 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
             return false;
         }
 
@@ -386,8 +378,7 @@ public:
             pos = { (*xyz)[0], (*xyz)[1], (*xyz)[2] };
             if (!MapMgr::IsValidMapCoord(object->GetMapId(), pos))
             {
-                handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), object->GetMapId());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), object->GetMapId());
                 return false;
             }
         }
@@ -432,15 +423,13 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
             return false;
         }
 
         if (!phaseMask)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -512,8 +501,7 @@ public:
             GameObjectData const* spawnData = sObjectMgr->GetGameObjectData(spawnId);
             if (!spawnData)
             {
-                handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, spawnId);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, spawnId);
                 return false;
             }
             entry = spawnData->id;
@@ -527,8 +515,7 @@ public:
         GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (!gameObjectInfo)
         {
-            handler->PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST, entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GAMEOBJECT_NOT_EXIST, entry);
             return false;
         }
 
@@ -569,8 +556,7 @@ public:
         GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
-            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
             return false;
         }
 

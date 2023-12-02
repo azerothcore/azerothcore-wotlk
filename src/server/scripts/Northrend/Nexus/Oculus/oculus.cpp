@@ -15,19 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "oculus.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "oculus.h"
 #include <unordered_map>
 
 enum Drakes
@@ -1034,3 +1035,4 @@ void AddSC_oculus()
     new spell_oculus_rider_aura();
     new spell_oculus_drake_flag();
 }
+

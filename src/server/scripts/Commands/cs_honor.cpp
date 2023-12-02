@@ -23,9 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
@@ -61,8 +61,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -79,8 +78,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -98,8 +96,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 

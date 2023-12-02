@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "UnitScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -250,3 +251,12 @@ void ScriptMgr::OnAuraApply(Unit* unit, Aura* aura)
         script->OnAuraApply(unit, aura);
     });
 }
+
+UnitScript::UnitScript(const char* name, bool addToScripts) :
+    ScriptObject(name)
+{
+    if (addToScripts)
+        ScriptRegistry<UnitScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<UnitScript>;

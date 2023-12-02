@@ -15,12 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum Texts

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GroupScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -90,3 +91,11 @@ void ScriptMgr::OnCreate(Group* group, Player* leader)
         script->OnCreate(group, leader);
     });
 }
+
+GroupScript::GroupScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GroupScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<GroupScript>;

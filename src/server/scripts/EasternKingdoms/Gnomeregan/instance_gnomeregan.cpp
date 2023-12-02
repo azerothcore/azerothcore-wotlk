@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
@@ -184,3 +186,4 @@ void AddSC_instance_gnomeregan()
     new npc_kernobee();
     new spell_gnomeregan_radiation_bolt();
 }
+

@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "the_eye.h"
 
 enum Yells
@@ -294,3 +295,4 @@ void AddSC_boss_high_astromancer_solarian()
     new spell_astromancer_wrath_of_the_astromancer();
     new spell_astromancer_solarian_transform();
 }
+

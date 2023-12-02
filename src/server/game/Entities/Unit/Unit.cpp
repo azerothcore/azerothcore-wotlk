@@ -53,6 +53,7 @@
 #include "PetAI.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -19835,10 +19836,10 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         Unit* target = (itr->second.castFlags & NPC_CLICK_CAST_TARGET_CLICKER) ? clicker : this;
         ObjectGuid origCasterGUID = (itr->second.castFlags & NPC_CLICK_CAST_ORIG_CASTER_OWNER) ? GetOwnerGUID() : clicker->GetGUID();
 
-        SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->second.spellId);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->second.spellId);
 
         // xinef: dont allow players to enter vehicles on arena
-        if (spellEntry->HasAura(SPELL_AURA_CONTROL_VEHICLE) && caster->GetTypeId() == TYPEID_PLAYER && caster->FindMap() && caster->FindMap()->IsBattleArena())
+        if (spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) && caster->GetTypeId() == TYPEID_PLAYER && caster->FindMap() && caster->FindMap()->IsBattleArena())
             continue;
 
         if (seatId > -1)
@@ -19847,7 +19848,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             bool valid = false;
             while (i < MAX_SPELL_EFFECTS)
             {
-                if (spellEntry->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
+                if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
                 {
                     valid = true;
                     break;
@@ -19867,18 +19868,18 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             {
                 int32 bp0[MAX_SPELL_EFFECTS];
                 for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-                    bp0[j] = spellEntry->Effects[j].BasePoints;
+                    bp0[j] = spellInfo->Effects[j].BasePoints;
 
                 bp0[i] = seatId;
-                Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, bp0, nullptr, origCasterGUID);
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, this, clicker, bp0, nullptr, origCasterGUID);
             }
         }
         else
         {
             if (IsInMap(caster))
-                caster->CastSpell(target, spellEntry, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, nullptr, nullptr, origCasterGUID);
+                caster->CastSpell(target, spellInfo, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, nullptr, nullptr, origCasterGUID);
             else
-                Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, nullptr, nullptr, origCasterGUID);
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, this, clicker, nullptr, nullptr, origCasterGUID);
         }
 
         result = true;

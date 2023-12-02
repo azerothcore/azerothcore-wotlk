@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Emotes
@@ -184,3 +185,4 @@ void AddSC_boss_huhuran()
     RegisterSpellScript(spell_huhuran_wyvern_sting);
     RegisterSpellScript(spell_huhuran_poison_bolt);
 }
+

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 enum Yells
@@ -282,3 +283,4 @@ void AddSC_boss_moroes()
     RegisterKarazhanCreatureAI(boss_moroes);
     RegisterSpellScript(spell_moroes_vanish);
 }
+

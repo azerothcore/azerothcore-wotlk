@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
