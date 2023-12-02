@@ -5671,7 +5671,7 @@ void ObjectMgr::ValidateSpellScripts()
 
     for (SpellScriptsContainer::iterator itr = _spellScriptsStore.begin(); itr != _spellScriptsStore.end();)
     {
-        SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
         std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> > SpellScriptLoaders;
         sScriptMgr->CreateSpellScriptLoaders(itr->first, SpellScriptLoaders);
         itr = _spellScriptsStore.upper_bound(itr->first);
@@ -5688,17 +5688,17 @@ void ObjectMgr::ValidateSpellScripts()
             }
             if (spellScript)
             {
-                spellScript->_Init(&sitr->first->GetName(), spellEntry->Id);
+                spellScript->_Init(&sitr->first->GetName(), spellInfo->Id);
                 spellScript->_Register();
-                if (!spellScript->_Validate(spellEntry))
+                if (!spellScript->_Validate(spellInfo))
                     valid = false;
                 delete spellScript;
             }
             if (auraScript)
             {
-                auraScript->_Init(&sitr->first->GetName(), spellEntry->Id);
+                auraScript->_Init(&sitr->first->GetName(), spellInfo->Id);
                 auraScript->_Register();
-                if (!auraScript->_Validate(spellEntry))
+                if (!auraScript->_Validate(spellInfo))
                     valid = false;
                 delete auraScript;
             }
