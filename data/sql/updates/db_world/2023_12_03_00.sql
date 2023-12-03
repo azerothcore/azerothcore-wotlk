@@ -1,3 +1,4 @@
+-- DB update 2023_12_02_00 -> 2023_12_03_00
 --
 DELETE FROM `command` WHERE `name`='go creature name';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
