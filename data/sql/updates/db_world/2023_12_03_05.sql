@@ -1,3 +1,4 @@
+-- DB update 2023_12_03_04 -> 2023_12_03_05
 --
 SET @ENTRY := 25040; -- Greater Water Elemental
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
