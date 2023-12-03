@@ -1,3 +1,4 @@
+-- DB update 2023_12_03_05 -> 2023_12_03_06
 -- D16 Horde remove SAI
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30477);
 -- D16 Horde remove Timed Actionlists
