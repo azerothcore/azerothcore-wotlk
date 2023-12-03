@@ -159,7 +159,7 @@ enum AncestralWolf
     EMOTE_WOLF_LIFT_HEAD        = 0,
     EMOTE_WOLF_HOWL             = 1,
     SAY_WOLF_WELCOME            = 0,
-    GUIDED_BY_THE_SPIRITS       = 29938,
+    SPELL_GUIDED_BY_THE_SPIRITS       = 29938,
     NPC_RYGA                    = 17123
 };
 
