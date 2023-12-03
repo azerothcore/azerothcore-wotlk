@@ -72,6 +72,9 @@ public:
 
     // Called when any raid boss has their state updated (e.g. pull, reset, kill)
     virtual void OnBeforeSetBossState(uint32 /*id*/, EncounterState /*newState*/, EncounterState /*oldState*/, Map* /*instance*/) { }
+
+    // Called when a gameobject is created by an instance
+    virtual void AfterInstanceGameObjectCreate(Map* /*instance*/, GameObject* /*go*/) { }
 };
 
 #endif

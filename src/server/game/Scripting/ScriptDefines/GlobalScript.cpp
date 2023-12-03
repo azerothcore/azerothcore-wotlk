@@ -232,6 +232,20 @@ void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, Encount
     });
 }
 
+/**
+ * @brief Called when a game object is created inside an instance
+ *
+ * @param instance A pointer to the [map] object of the instance
+ * @param go The object being added
+ */
+void ScriptMgr::AfterInstanceGameObjectCreate(Map* instance, GameObject* go)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->AfterInstanceGameObjectCreate(instance, go);
+    });
+}
+
 GlobalScript::GlobalScript(const char* name)
     : ScriptObject(name)
 {
