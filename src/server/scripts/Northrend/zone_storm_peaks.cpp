@@ -1141,11 +1141,18 @@ public:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_2)
                     {
                         if (Vehicle* vehicle = me->GetVehicleKit())
+                        {
                             if (Unit* player = vehicle->GetPassenger(0))
+                            {
                                 if (player->GetTypeId() == TYPEID_PLAYER)
                                 {
-                                    player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    player->m_Events.AddEventAtOffset([player]()
+                                    {
+                                        player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    }, 1s);
                                 }
+                            }
+                        }
 
                         DoCastSelf(SPELL_EJECT_PLAYER);
                     }
@@ -1154,11 +1161,18 @@ public:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
                     {
                         if (Vehicle* vehicle = me->GetVehicleKit())
+                        {
                             if (Unit* player = vehicle->GetPassenger(0))
+                            {
                                 if (player->GetTypeId() == TYPEID_PLAYER)
                                 {
-                                    player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    player->m_Events.AddEventAtOffset([player]()
+                                    {
+                                        player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    }, 1s);
                                 }
+                            }
+                        }
 
                         DoCastSelf(SPELL_EJECT_PLAYER);
                     }
