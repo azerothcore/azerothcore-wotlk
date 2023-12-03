@@ -27,11 +27,11 @@
 #include "WaypointMgr.h"
 #include "WorldSession.h"
 
- // Ours
+// Ours
 enum qSniffing
 {
-    SPELL_SUMMON_PURSUERS_PERIODIC = 54993,
-    SPELL_SNIFFING_CREDIT = 55477,
+    SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
+    SPELL_SNIFFING_CREDIT                   = 55477,
 };
 
 class npc_frosthound : public CreatureScript
@@ -84,14 +84,14 @@ public:
 
             switch (waypointId)
             {
-            case 0:
-                me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
-                break;
-            case 19:
-                me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
-                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    summoner->ToPlayer()->KilledMonsterCredit(29677);
-                break;
+                case 0:
+                    me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
+                    break;
+                case 19:
+                    me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                        summoner->ToPlayer()->KilledMonsterCredit(29677);
+                    break;
             }
         }
 
@@ -114,10 +114,10 @@ public:
 
 enum eIronWatcher
 {
-    SPELL_THUNDERING_STOMP = 60925,
-    SPELL_STORM_HAMMER = 56448,
-    SPELL_SHATTERED_EYES = 57290,
-    SPELL_STORM_HAMMER_DUMMY = 60930,
+    SPELL_THUNDERING_STOMP          = 60925,
+    SPELL_STORM_HAMMER              = 56448,
+    SPELL_SHATTERED_EYES            = 57290,
+    SPELL_STORM_HAMMER_DUMMY        = 60930,
 };
 
 class npc_iron_watcher : public CreatureScript
@@ -204,13 +204,13 @@ public:
 
 enum eTimeLost
 {
-    NPC_TIME_LOST_PROTO_DRAKE = 32491,
-    NPC_VYRAGOSA = 32630,
+    NPC_TIME_LOST_PROTO_DRAKE   = 32491,
+    NPC_VYRAGOSA                = 32630,
 
-    SPELL_TIME_SHIFT = 61084,
-    SPELL_TIME_LAPSE = 51020,
-    SPELL_FROST_BREATH = 47425,
-    SPELL_FROST_CLEAVE = 51857,
+    SPELL_TIME_SHIFT            = 61084,
+    SPELL_TIME_LAPSE            = 51020,
+    SPELL_FROST_BREATH          = 47425,
+    SPELL_FROST_CLEAVE          = 51857,
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
@@ -288,22 +288,22 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-            case SPELL_TIME_SHIFT:
-                me->CastSpell(me, SPELL_TIME_SHIFT, false);
-                events.Repeat(18s);
-                break;
-            case SPELL_TIME_LAPSE:
-                me->CastSpell(me->GetVictim(), SPELL_TIME_LAPSE, false);
-                events.Repeat(12s);
-                break;
-            case SPELL_FROST_BREATH:
-                me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
-                events.Repeat(12s);
-                break;
-            case SPELL_FROST_CLEAVE:
-                me->CastSpell(me->GetVictim(), SPELL_FROST_CLEAVE, false);
-                events.Repeat(8s);
-                break;
+                case SPELL_TIME_SHIFT:
+                    me->CastSpell(me, SPELL_TIME_SHIFT, false);
+                    events.Repeat(18s);
+                    break;
+                case SPELL_TIME_LAPSE:
+                    me->CastSpell(me->GetVictim(), SPELL_TIME_LAPSE, false);
+                    events.Repeat(12s);
+                    break;
+                case SPELL_FROST_BREATH:
+                    me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
+                    events.Repeat(12s);
+                    break;
+                case SPELL_FROST_CLEAVE:
+                    me->CastSpell(me->GetVictim(), SPELL_FROST_CLEAVE, false);
+                    events.Repeat(8s);
+                    break;
             }
 
             DoMeleeAttackIfReady();
@@ -318,17 +318,17 @@ public:
 
 enum eWildWyrm
 {
-    SPELL_FIGHT_WYRM_BASE = 56673,
-    SPELL_FIGHT_WYRM_NEXT = 60863,
-    SPELL_SPEAR_OF_HODIR = 56671,
-    SPELL_DODGE_CLAWS = 56704,
-    SPELL_WYRM_GRIP = 56689,
-    SPELL_GRAB_ON = 60533,
-    SPELL_THRUST_SPEAR = 56690,
-    SPELL_MIGHTY_SPEAR_THRUST = 60586,
-    SPELL_FATAL_STRIKE = 60587,
-    SPELL_PRY_JAWS_OPEN = 56706,
-    SPELL_JAWS_OF_DEATH = 56692,
+    SPELL_FIGHT_WYRM_BASE           = 56673,
+    SPELL_FIGHT_WYRM_NEXT           = 60863,
+    SPELL_SPEAR_OF_HODIR            = 56671,
+    SPELL_DODGE_CLAWS               = 56704,
+    SPELL_WYRM_GRIP                 = 56689,
+    SPELL_GRAB_ON                   = 60533,
+    SPELL_THRUST_SPEAR              = 56690,
+    SPELL_MIGHTY_SPEAR_THRUST       = 60586,
+    SPELL_FATAL_STRIKE              = 60587,
+    SPELL_PRY_JAWS_OPEN             = 56706,
+    SPELL_JAWS_OF_DEATH             = 56692,
 };
 
 class npc_wild_wyrm : public CreatureScript
@@ -633,10 +633,10 @@ public:
 
 enum q13007IronColossus
 {
-    SPELL_JORMUNGAR_SUBMERGE = 56504,
-    SPELL_JORMUNGAR_EMERGE = 56508,
+    SPELL_JORMUNGAR_SUBMERGE        = 56504,
+    SPELL_JORMUNGAR_EMERGE          = 56508,
     SPELL_JORMUNGAR_SUBMERGE_VISUAL = 56512,
-    SPELL_COLOSSUS_GROUND_SLAM = 61673
+    SPELL_COLOSSUS_GROUND_SLAM      = 61673
 };
 
 class spell_q13007_iron_colossus : public SpellScriptLoader
@@ -701,8 +701,8 @@ public:
 
 enum RoxiRamrocket
 {
-    SPELL_MECHANO_HOG = 60866,
-    SPELL_MEKGINEERS_CHOPPER = 60867
+    SPELL_MECHANO_HOG               = 60866,
+    SPELL_MEKGINEERS_CHOPPER        = 60867
 };
 
 class npc_roxi_ramrocket : public CreatureScript
@@ -717,11 +717,11 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         //Trainer Menu
-        if (creature->IsTrainer())
+        if ( creature->IsTrainer() )
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         //Vendor Menu
-        if (creature->IsVendor())
+        if ( creature->IsVendor() )
             if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER))
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
@@ -734,12 +734,12 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-        case GOSSIP_ACTION_TRAIN:
-            player->GetSession()->SendTrainerList(creature->GetGUID());
-            break;
-        case GOSSIP_ACTION_TRADE:
-            player->GetSession()->SendListInventory(creature->GetGUID());
-            break;
+            case GOSSIP_ACTION_TRAIN:
+                player->GetSession()->SendTrainerList(creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_TRADE:
+                player->GetSession()->SendListInventory(creature->GetGUID());
+                break;
         }
         return true;
     }
@@ -751,11 +751,11 @@ public:
 
 enum BrunnhildarPrisoner
 {
-    SPELL_ICE_PRISON = 54894,
-    SPELL_ICE_LANCE = 55046,
-    SPELL_FREE_PRISONER = 55048,
-    SPELL_RIDE_DRAKE = 55074,
-    SPELL_SHARD_IMPACT = 55047
+    SPELL_ICE_PRISON           = 54894,
+    SPELL_ICE_LANCE            = 55046,
+    SPELL_FREE_PRISONER        = 55048,
+    SPELL_RIDE_DRAKE           = 55074,
+    SPELL_SHARD_IMPACT         = 55047
 };
 
 class npc_brunnhildar_prisoner : public CreatureScript
@@ -816,18 +816,18 @@ public:
 
 enum FreedProtoDrake
 {
-    NPC_DRAKE = 29709,
+    NPC_DRAKE                           = 29709,
 
-    AREA_VALLEY_OF_ANCIENT_WINTERS = 4437,
+    AREA_VALLEY_OF_ANCIENT_WINTERS      = 4437,
 
-    TEXT_EMOTE = 0,
+    TEXT_EMOTE                          = 0,
 
-    SPELL_KILL_CREDIT_PRISONER = 55144,
-    SPELL_SUMMON_LIBERATED = 55073,
-    SPELL_KILL_CREDIT_DRAKE = 55143,
+    SPELL_KILL_CREDIT_PRISONER          = 55144,
+    SPELL_SUMMON_LIBERATED              = 55073,
+    SPELL_KILL_CREDIT_DRAKE             = 55143,
 
-    EVENT_CHECK_AREA = 1,
-    EVENT_REACHED_HOME = 2,
+    EVENT_CHECK_AREA                    = 1,
+    EVENT_REACHED_HOME                  = 2,
 };
 
 class npc_freed_protodrake : public CreatureScript
@@ -859,49 +859,49 @@ public:
 
             switch (events.ExecuteEvent())
             {
-            case EVENT_CHECK_AREA:
-                if (me->GetAreaId() == AREA_VALLEY_OF_ANCIENT_WINTERS)
-                {
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                        if (Unit* passenger = vehicle->GetPassenger(0))
-                        {
-                            Talk(TEXT_EMOTE, passenger);
-
-                            Movement::PointsArray pathPoints;
-                            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                            WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_DRAKE);
-                            for (uint8 i = 0; i < i_path->size(); ++i)
+                case EVENT_CHECK_AREA:
+                    if (me->GetAreaId() == AREA_VALLEY_OF_ANCIENT_WINTERS)
+                    {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                            if (Unit* passenger = vehicle->GetPassenger(0))
                             {
-                                WaypointData const* node = i_path->at(i);
-                                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                            }
+                                Talk(TEXT_EMOTE, passenger);
 
-                            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-                        }
-                }
-                else
-                    events.ScheduleEvent(EVENT_CHECK_AREA, 5s);
-                break;
-            case EVENT_REACHED_HOME:
-                if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* player = vehicle->GetPassenger(0))
-                        if (player->GetTypeId() == TYPEID_PLAYER)
-                        {
-                            // for each prisoner on drake, give credit
-                            for (uint8 i = 1; i < 4; ++i)
-                                if (Unit* prisoner = me->GetVehicleKit()->GetPassenger(i))
+                                Movement::PointsArray pathPoints;
+                                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_DRAKE);
+                                for (uint8 i = 0; i < i_path->size(); ++i)
                                 {
-                                    if (prisoner->GetTypeId() != TYPEID_UNIT)
-                                        return;
-                                    prisoner->CastSpell(player, SPELL_KILL_CREDIT_PRISONER, true);
-                                    prisoner->CastSpell(prisoner, SPELL_SUMMON_LIBERATED, true);
-                                    prisoner->ExitVehicle();
+                                    WaypointData const* node = i_path->at(i);
+                                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
                                 }
-                            me->CastSpell(me, SPELL_KILL_CREDIT_DRAKE, true);
-                            player->ExitVehicle();
-                        }
-                break;
+
+                                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                            }
+                    }
+                    else
+                        events.ScheduleEvent(EVENT_CHECK_AREA, 5s);
+                    break;
+                case EVENT_REACHED_HOME:
+                    if (Vehicle* vehicle = me->GetVehicleKit())
+                        if (Unit* player = vehicle->GetPassenger(0))
+                            if (player->GetTypeId() == TYPEID_PLAYER)
+                            {
+                                // for each prisoner on drake, give credit
+                                for (uint8 i = 1; i < 4; ++i)
+                                    if (Unit* prisoner = me->GetVehicleKit()->GetPassenger(i))
+                                    {
+                                        if (prisoner->GetTypeId() != TYPEID_UNIT)
+                                            return;
+                                        prisoner->CastSpell(player, SPELL_KILL_CREDIT_PRISONER, true);
+                                        prisoner->CastSpell(prisoner, SPELL_SUMMON_LIBERATED, true);
+                                        prisoner->ExitVehicle();
+                                    }
+                                me->CastSpell(me, SPELL_KILL_CREDIT_DRAKE, true);
+                                player->ExitVehicle();
+                            }
+                    break;
             }
         }
     };
@@ -974,17 +974,17 @@ public:
             {
                 class DelayedTransportPositionOffsets : public BasicEvent
                 {
-                public:
-                    DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
+                    public:
+                        DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
 
-                    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-                    {
-                        _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
-                        return true;
-                    }
+                        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+                        {
+                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
+                            return true;
+                        }
 
-                private:
-                    Unit* _owner;
+                    private:
+                        Unit* _owner;
                 };
 
                 if (who->IsPlayer())
@@ -1023,7 +1023,7 @@ public:
 
 enum CloseRift
 {
-    SPELL_DESPAWN_RIFT = 61665
+    SPELL_DESPAWN_RIFT          = 61665
 };
 
 class spell_close_rift : public SpellScriptLoader
@@ -1092,12 +1092,12 @@ class spell_q12823_remove_collapsing_cave_aura : public SpellScript
 enum WhenAllElseFailsAlliance
 {
     // Creature
-    NPC_PROPELLED_DEVICE_1 = 30477,
-    NPC_PROPELLED_DEVICE_2 = 30487,
+    NPC_PROPELLED_DEVICE_1      = 30477,
+    NPC_PROPELLED_DEVICE_2      = 30487,
 
     // Spell
-    SPELL_EJECT_PLAYER = 68576,
-    SPELL_KNOCKBACK_PLAYER = 42895
+    SPELL_EJECT_PLAYER          = 68576,
+    SPELL_KNOCKBACK_PLAYER      = 42895
 };
 
 class npc_vehicle_d16_propelled_delivery : public CreatureScript
@@ -1198,7 +1198,6 @@ public:
         return new npc_vehicle_d16_propelled_deliveryAI(creature);
     }
 };
-
 void AddSC_storm_peaks()
 {
     new npc_frosthound();
