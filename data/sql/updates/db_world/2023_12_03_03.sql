@@ -1,3 +1,4 @@
+-- DB update 2023_12_03_02 -> 2023_12_03_03
 -- Update Midsummer relevant gameobject spawns for "Striking Back" quest with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (187918, 180443, 180444, 188048, 188050, 188148, 188149, 188150)) AND (`guid` IN (50558, 50559, 50560, 50565, 50566, 50567, 50568, 50572, 49426, 49427, 49383, 49384, 49385, 49386, 49387, 49388, 49453, 49454, 49455));
