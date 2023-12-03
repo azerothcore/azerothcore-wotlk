@@ -195,7 +195,7 @@ public:
         }
 
         void WaypointReached(uint32 waypointId) override
-        {            
+        {
             switch (waypointId)
             {
                 case 0:
