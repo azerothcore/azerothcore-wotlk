@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPNA.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "GameGraveyard.h"
