@@ -29,6 +29,7 @@
 #include "GossipDef.h"
 #include "Group.h"
 #include "GuildMgr.h"
+#include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "LootMgr.h"
@@ -1425,7 +1426,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                     return;
                 }
 
-                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (_player->GetRaidDifficulty() >= 0 && uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
                 {
                     if (!currMap)
                         currMap = groupGuy->GetMap();

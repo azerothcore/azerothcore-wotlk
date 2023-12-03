@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "nexus.h"
@@ -222,3 +223,4 @@ void AddSC_boss_anomalus()
     new boss_anomalus();
     new achievement_chaos_theory();
 }
+

@@ -15,28 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
+#ifndef SCRIPT_OBJECT_ARENA_SCRIPT_H_
+#define SCRIPT_OBJECT_ARENA_SCRIPT_H_
 
-void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
+#include "ObjectGuid.h"
+#include "ScriptObject.h"
+
+class ArenaScript : public ScriptObject
 {
-    ExecuteScript<CommandSC>([&](CommandSC* script)
-    {
-        script->OnHandleDevCommand(player, enable);
-    });
-}
+protected:
 
-bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
-{
-    auto ret = IsValidBoolScript<CommandSC>([&](CommandSC* script)
-    {
-        return !script->CanExecuteCommand(handler, cmdStr);
-    });
+    ArenaScript(const char* name);
 
-    if (ret && *ret)
-    {
-        return false;
-    }
+public:
 
-    return true;
-}
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
+
+    [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
+
+    virtual void OnGetPoints(ArenaTeam* /*team*/, uint32 /*memberRating*/, float& /*points*/) { }
+
+    [[nodiscard]] virtual bool CanSaveToDB(ArenaTeam* /*team*/) { return true; }
+};
+
+#endif

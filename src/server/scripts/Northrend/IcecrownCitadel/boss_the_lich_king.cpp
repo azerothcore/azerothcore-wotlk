@@ -15,21 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "icecrown_citadel.h"
+#include "GridNotifiersImpl.h"
 
 enum Texts
 {

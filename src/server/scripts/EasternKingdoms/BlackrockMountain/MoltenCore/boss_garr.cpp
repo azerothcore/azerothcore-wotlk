@@ -16,12 +16,13 @@
  */
 
 #include "Containers.h"
+#include "CreatureScript.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "molten_core.h"
 
 enum Texts
@@ -253,3 +254,4 @@ void AddSC_boss_garr()
     new spell_garr_separation_nexiety();
     new spell_garr_frenzy();
 }
+

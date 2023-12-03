@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "icecrown_citadel.h"
@@ -133,3 +135,4 @@ void AddSC_icecrown_citadel_teleport()
     new icecrown_citadel_teleport();
     new at_frozen_throne_teleport();
 }
+

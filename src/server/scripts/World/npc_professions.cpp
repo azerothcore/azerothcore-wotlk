@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellInfo.h"
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80
 SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering.
 SDCategory: NPCs
 EndScriptData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellInfo.h"
 
 /*
 A few notes for future developement:
@@ -1375,3 +1375,4 @@ void AddSC_npc_professions()
     new npc_prof_tailor();
     new go_evil_book_for_dummies();
 }
+

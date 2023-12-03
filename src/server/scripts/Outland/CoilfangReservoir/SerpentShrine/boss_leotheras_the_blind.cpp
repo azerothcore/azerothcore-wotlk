@@ -16,9 +16,10 @@
  */
 
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
 
@@ -434,3 +435,4 @@ void AddSC_boss_leotheras_the_blind()
     RegisterSpellScript(spell_leotheras_demon_link);
     RegisterSpellScript(spell_leotheras_clear_consuming_madness);
 }
+

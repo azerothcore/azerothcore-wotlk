@@ -16,12 +16,15 @@
  */
 
 #include "AccountMgr.h"
+#include "AchievementCriteriaScript.h"
 #include "BanMgr.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "ulduar.h"
 

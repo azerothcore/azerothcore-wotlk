@@ -16,8 +16,10 @@
  */
 
 #include "the_slave_pens.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 class at_quagmirran_lair : public AreaTriggerScript
 {
@@ -42,3 +44,4 @@ void AddSC_the_slave_pens()
 {
     new at_quagmirran_lair();
 }
+

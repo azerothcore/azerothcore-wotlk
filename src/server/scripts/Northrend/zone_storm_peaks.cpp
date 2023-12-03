@@ -16,13 +16,14 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 #include "WorldSession.h"
@@ -1104,3 +1105,4 @@ void AddSC_storm_peaks()
     new spell_close_rift();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }
+

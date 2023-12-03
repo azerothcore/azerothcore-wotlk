@@ -16,7 +16,7 @@
  */
 
 #include "BattlegroundAV.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 
 enum Spells

@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include <random>
 
 enum eBonfire
@@ -893,3 +895,4 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
 }
+

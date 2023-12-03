@@ -17,12 +17,13 @@
 
 #include "OutdoorPvPZM.h"
 #include "Creature.h"
+#include "CreatureScript.h"
 #include "GameGraveyard.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -470,3 +471,4 @@ void AddSC_outdoorpvp_zm()
 {
     new OutdoorPvP_zangarmarsh();
 }
+

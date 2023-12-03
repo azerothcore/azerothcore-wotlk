@@ -16,10 +16,11 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Yells
@@ -719,3 +720,4 @@ void AddSC_boss_gothik()
     new npc_boss_gothik_minion();
     new spell_gothik_shadow_bolt_volley();
 }
+

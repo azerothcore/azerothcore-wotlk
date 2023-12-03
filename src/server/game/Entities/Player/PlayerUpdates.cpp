@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementMgr.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -35,6 +36,7 @@
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
 
@@ -795,8 +797,8 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                 GetPureSkillValue(_spell_idx->second->SkillLine);
 
             // Alchemy Discoveries here
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellid);
-            if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+            if (spellInfo && spellInfo->Mechanic == MECHANIC_DISCOVERY)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(
                         _spell_idx->second->SkillLine, spellid, this))

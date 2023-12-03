@@ -22,12 +22,12 @@ Comment: All learn related commands
 Category: commandscripts
 EndScriptData */
 
+#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -78,8 +78,7 @@ public:
 
         if (!targetPlayer)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -212,31 +211,27 @@ public:
         Pet* pet = player->GetPet();
         if (!pet)
         {
-            handler->SendSysMessage(LANG_NO_PET_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_PET_FOUND);
             return false;
         }
 
         CreatureTemplate const* creatureInfo = pet->GetCreatureTemplate();
         if (!creatureInfo)
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
         CreatureFamilyEntry const* petFamily = sCreatureFamilyStore.LookupEntry(creatureInfo->family);
         if (!petFamily)
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
         if (petFamily->petTalentType < 0)                       // not hunter pet
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
@@ -430,8 +425,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 

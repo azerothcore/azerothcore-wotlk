@@ -16,13 +16,14 @@
  */
 
 #include "blackrock_depths.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 enum IronhandData
 {
