@@ -1,3 +1,4 @@
+-- DB update 2023_12_03_06 -> 2023_12_03_07
 -- add a time to script_waypoint
 DELETE FROM `script_waypoint` WHERE `entry`=17077 AND `pointid` IN (50, 51, 52, 53);
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
