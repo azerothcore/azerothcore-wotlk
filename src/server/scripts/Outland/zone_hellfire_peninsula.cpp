@@ -175,7 +175,7 @@ public:
             if (creature->GetOwner() && creature->GetOwner()->GetTypeId() == TYPEID_PLAYER)
                 Start(false, false, creature->GetOwner()->GetGUID());
             creature->SetSpeed(MOVE_WALK, 1.5f);
-            DoCast(GUIDED_BY_THE_SPIRITS);
+            DoCast(SPELL_GUIDED_BY_THE_SPIRITS);
             Reset();
         }
 
