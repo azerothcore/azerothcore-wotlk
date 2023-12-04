@@ -15,9 +15,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 -- 21216
 SET @CGUID = 153000;
 
-DELETE FROM `creature` WHERE `guid` = @CGUID+21;
-DELETE FROM `creature` WHERE `guid` = @CGUID+20;
-DELETE FROM `creature` WHERE `guid` = @CGUID+19;
-INSERT INTO `creature` VALUES (@CGUID+21, 21933, 0, 0, 548, 0, 0, 1, 1, 0, -259.13, -356.28, 15.03, 6.04, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 50791, 1, '');
-INSERT INTO `creature` VALUES (@CGUID+20, 21933, 0, 0, 548, 0, 0, 1, 1, 0, -218.8, -371.34, 14.608, 2.72, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 50791, 1, '');
-INSERT INTO `creature` VALUES (@CGUID+19, 21934, 0, 0, 548, 0, 0, 1, 1, 0, -239.43, -363.48, 12, 1.19093, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 50791, 1, '');
+UPDATE `creature` SET `position_x`= -259.13, `position_y`= -356.28, `position_z`= 15.03, `orientation`=6.04 WHERE `guid` = @CGUID+21;
+UPDATE `creature` SET `position_x`= -218.8, `position_y`= -371.34, `position_z`= 14.608, `orientation`=2.72 WHERE `guid` = @CGUID+20;
+UPDATE `creature` SET `position_x`= -239.43, `position_y`  -363.48, `position_z`= 12, `orientation`=1.19093 WHERE `guid` = @CGUID+19;
