@@ -72,8 +72,13 @@ struct boss_the_lurker_below : public BossAI
         BossAI::Reset();
         me->SetReactState(REACT_PASSIVE);
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-        me->SetVisible(false);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        me->DespawnOrUnsummon(2000);
     }
 
     void DoAction(int32 action) override
@@ -82,8 +87,6 @@ struct boss_the_lurker_below : public BossAI
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
-            me->SetVisible(true);
-            me->UpdateObjectVisibility(true);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
@@ -213,7 +216,7 @@ public:
             if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
             {
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
+                if (Creature* lurker = go->SummonCreature(NPC_THE_LURKER_BELOW, 40.4058f, -417.108f, -21.5911f, 3.03312f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 604800000))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
                 return true;
             }
