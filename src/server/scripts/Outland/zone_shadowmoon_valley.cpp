@@ -15,6 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "Group.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Shadowmoon_Valley
 SD%Complete: 100
@@ -35,13 +43,6 @@ npc_lord_illidan_stormrage
 go_crystal_prison
 npc_enraged_spirit
 EndContentData */
-
-#include "Group.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellScript.h"
 
 // Ours
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader

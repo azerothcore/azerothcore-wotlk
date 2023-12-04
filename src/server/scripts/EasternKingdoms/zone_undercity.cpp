@@ -28,15 +28,16 @@ npc_highborne_lamenter
 npc_parqual_fintallas
 EndContentData */
 
+#include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 /*######
 ## npc_lady_sylvanas_windrunner

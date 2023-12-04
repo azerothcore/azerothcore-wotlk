@@ -16,9 +16,9 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 constexpr std::array<const char*, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
@@ -91,16 +91,14 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
         Player* target = player->GetConnectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 

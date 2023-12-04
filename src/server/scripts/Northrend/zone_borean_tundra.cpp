@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
@@ -25,6 +25,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 
 // Ours
@@ -2083,3 +2084,4 @@ void AddSC_borean_tundra()
     new spell_q11719_bloodspore_ruination_45997();
     new npc_bloodmage_laurith();
 }
+

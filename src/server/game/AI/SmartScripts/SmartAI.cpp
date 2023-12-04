@@ -16,13 +16,13 @@
  */
 
 #include "SmartAI.h"
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"

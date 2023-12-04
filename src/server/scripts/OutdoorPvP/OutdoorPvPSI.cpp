@@ -16,14 +16,15 @@
  */
 
 #include "OutdoorPvPSI.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -263,3 +264,4 @@ void AddSC_outdoorpvp_si()
 {
     new OutdoorPvP_silithus();
 }
+

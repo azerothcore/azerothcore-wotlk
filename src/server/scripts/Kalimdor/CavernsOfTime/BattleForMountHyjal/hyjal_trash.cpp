@@ -16,7 +16,7 @@
  */
 
 #include "hyjal_trash.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
 

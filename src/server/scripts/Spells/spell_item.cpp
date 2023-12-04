@@ -15,23 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
+#include "CreatureScript.h"
+#include "GameTime.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SkillDiscovery.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "WorldSession.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used by items.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_item_".
  */
-
-#include "Battleground.h"
-#include "GameTime.h"
-#include "ObjectMgr.h"
-#include "Pet.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SkillDiscovery.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "WorldSession.h"
 
 enum MassiveSeaforiumCharge
 {
@@ -4061,3 +4061,4 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_venomhide_feed);
     RegisterSpellScript(spell_item_scroll_of_retribution);
 }
+

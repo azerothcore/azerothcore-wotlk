@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "serpent_shrine.h"
 
@@ -33,6 +35,7 @@ ObjectData const creatureData[] =
 {
     { NPC_LEOTHERAS_THE_BLIND,    DATA_LEOTHERAS_THE_BLIND    },
     { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_LADY_VASHJ,             DATA_LADY_VASHJ             },
     { 0,                          0                           }
 };
 
@@ -51,9 +54,7 @@ public:
 
     struct instance_serpentshrine_cavern_InstanceMapScript : public InstanceScript
     {
-        instance_serpentshrine_cavern_InstanceMapScript(Map* map) : InstanceScript(map)
-        {
-        }
+        instance_serpentshrine_cavern_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         void Initialize() override
         {
@@ -83,12 +84,6 @@ public:
         {
             switch (go->GetEntry())
             {
-                case GO_LADY_VASHJ_BRIDGE_CONSOLE:
-                case GO_COILFANG_BRIDGE1:
-                case GO_COILFANG_BRIDGE2:
-                case GO_COILFANG_BRIDGE3:
-                    AddDoor(go);
-                    break;
                 case GO_SHIELD_GENERATOR1:
                 case GO_SHIELD_GENERATOR2:
                 case GO_SHIELD_GENERATOR3:
@@ -96,19 +91,8 @@ public:
                     ShieldGeneratorGUID[go->GetEntry() - GO_SHIELD_GENERATOR1] = go->GetGUID();
                     break;
             }
-        }
 
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_LADY_VASHJ_BRIDGE_CONSOLE:
-                case GO_COILFANG_BRIDGE1:
-                case GO_COILFANG_BRIDGE2:
-                case GO_COILFANG_BRIDGE3:
-                    RemoveDoor(go);
-                    break;
-            }
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -120,44 +104,20 @@ public:
                     if (creature->GetPositionX() > -110.0f && creature->GetPositionX() < 155.0f && creature->GetPositionY() > -610.0f && creature->GetPositionY() < -280.0f)
                         AliveKeepersCount += creature->IsAlive() ? 0 : -1; // SmartAI calls JUST_RESPAWNED in AIInit...
                     break;
-                case NPC_THE_LURKER_BELOW:
-                    LurkerBelowGUID = creature->GetGUID();
-                    break;
-                case NPC_LEOTHERAS_THE_BLIND:
-                    LeotherasTheBlindGUID = creature->GetGUID();
-                    break;
                 case NPC_CYCLONE_KARATHRESS:
                     creature->GetMotionMaster()->MoveRandom(50.0f);
-                    break;
-                case NPC_LADY_VASHJ:
-                    LadyVashjGUID = creature->GetGUID();
                     break;
                 case NPC_ENCHANTED_ELEMENTAL:
                 case NPC_COILFANG_ELITE:
                 case NPC_COILFANG_STRIDER:
                 case NPC_TAINTED_ELEMENTAL:
-                    if (Creature* vashj = instance->GetCreature(LadyVashjGUID))
+                    if (Creature* vashj = GetCreature(DATA_LADY_VASHJ))
                         vashj->AI()->JustSummoned(creature);
                     break;
                 default:
                     break;
             }
             InstanceScript::OnCreatureCreate(creature);
-        }
-
-        ObjectGuid GetGuidData(uint32 identifier) const override
-        {
-            switch (identifier)
-            {
-                case NPC_THE_LURKER_BELOW:
-                    return LurkerBelowGUID;
-                case NPC_LEOTHERAS_THE_BLIND:
-                    return LeotherasTheBlindGUID;
-                case NPC_LADY_VASHJ:
-                    return LadyVashjGUID;
-            }
-
-            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32  /*data*/) override
@@ -175,13 +135,17 @@ public:
                     SetBossState(DATA_BRIDGE_EMERGED, DONE);
                     break;
                 case DATA_ACTIVATE_SHIELD:
-                    if (Creature* vashj = instance->GetCreature(LadyVashjGUID))
-                        for (uint8 i = 0; i < 4; ++i)
-                            if (GameObject* gobject = instance->GetGameObject(ShieldGeneratorGUID[i]))
+                    if (Creature* vashj = GetCreature(DATA_LADY_VASHJ))
+                    {
+                        for (auto const& shieldGuid : ShieldGeneratorGUID)
+                        {
+                            if (GameObject* gobject = instance->GetGameObject(shieldGuid))
                             {
                                 gobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 vashj->SummonTrigger(gobject->GetPositionX(), gobject->GetPositionY(), gobject->GetPositionZ(), 0.0f, 0);
                             }
+                        }
+                    }
                     break;
             }
         }
@@ -195,10 +159,7 @@ public:
         }
 
     private:
-        ObjectGuid LadyVashjGUID;
         ObjectGuid ShieldGeneratorGUID[4];
-        ObjectGuid LurkerBelowGUID;
-        ObjectGuid LeotherasTheBlindGUID;
         int32 AliveKeepersCount;
     };
 
@@ -341,3 +302,4 @@ void AddSC_instance_serpentshrine_cavern()
     RegisterSpellScript(spell_serpentshrine_cavern_infection);
     RegisterSpellScript(spell_serpentshrine_cavern_coilfang_water);
 }
+

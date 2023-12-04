@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "zulgurub.h"
@@ -423,3 +424,4 @@ void AddSC_boss_jeklik()
     RegisterCreatureAI(npc_batrider);
     RegisterSpellScript(spell_batrider_bomb);
 }
+
