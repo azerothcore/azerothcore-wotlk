@@ -101,8 +101,8 @@ public:
             {
                 case NPC_COILFANG_SHATTERER:
                 case NPC_COILFANG_PRIESTESS:
-                    if (creature->GetPositionX() > -110.0f && creature->GetPositionX() < 155.0f && creature->GetPositionY() > -610.0f && creature->GetPositionY() < -280.0f)
-                        AliveKeepersCount += creature->IsAlive() ? 0 : -1; // SmartAI calls JUST_RESPAWNED in AIInit...
+                    if (creature->GetPositionX() > 190.0f)
+                        --AliveKeepersCount;
                     break;
                 case NPC_CYCLONE_KARATHRESS:
                     creature->GetMotionMaster()->MoveRandom(50.0f);
@@ -126,9 +126,13 @@ public:
             {
                 case DATA_PLATFORM_KEEPER_RESPAWNED:
                     ++AliveKeepersCount;
+                    if (AliveKeepersCount > 24)
+                        AliveKeepersCount = 24;
                     break;
                 case DATA_PLATFORM_KEEPER_DIED:
                     --AliveKeepersCount;
+                    if (AliveKeepersCount < 0)
+                        AliveKeepersCount = 0;
                     break;
                 case DATA_BRIDGE_ACTIVATED:
                     SetBossState(DATA_BRIDGE_EMERGED, NOT_STARTED);
