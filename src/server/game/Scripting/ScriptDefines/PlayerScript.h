@@ -526,7 +526,6 @@ public:
     [[nodiscard]] virtual bool OnCanPlayerFlyInZone(Player* /*player*/, uint32 /*mapId*/, uint32 /*zoneId*/, SpellInfo const* /*bySpell*/) { return true; }
 
     // Passive Anticheat System
-    virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetUnderACKmount(Player* /*player*/) { }
     virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
