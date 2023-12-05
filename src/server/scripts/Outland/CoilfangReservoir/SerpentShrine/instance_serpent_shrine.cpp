@@ -127,12 +127,16 @@ public:
                 case DATA_PLATFORM_KEEPER_RESPAWNED:
                     ++AliveKeepersCount;
                     if (AliveKeepersCount > 24)
+                    {
                         AliveKeepersCount = 24;
+                    }
                     break;
                 case DATA_PLATFORM_KEEPER_DIED:
                     --AliveKeepersCount;
                     if (AliveKeepersCount < 0)
+                    {
                         AliveKeepersCount = 0;
+                    }
                     break;
                 case DATA_BRIDGE_ACTIVATED:
                     SetBossState(DATA_BRIDGE_EMERGED, NOT_STARTED);
