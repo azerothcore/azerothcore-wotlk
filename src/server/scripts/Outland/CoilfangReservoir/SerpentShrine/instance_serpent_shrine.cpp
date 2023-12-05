@@ -126,16 +126,16 @@ public:
             {
                 case DATA_PLATFORM_KEEPER_RESPAWNED:
                     ++AliveKeepersCount;
-                    if (AliveKeepersCount > 24)
+                    if (AliveKeepersCount > MAX_KEEPER_COUNT)
                     {
-                        AliveKeepersCount = 24;
+                        AliveKeepersCount = MAX_KEEPER_COUNT;
                     }
                     break;
                 case DATA_PLATFORM_KEEPER_DIED:
                     --AliveKeepersCount;
-                    if (AliveKeepersCount < 0)
+                    if (AliveKeepersCount < MIN_KEEPER_COUNT)
                     {
-                        AliveKeepersCount = 0;
+                        AliveKeepersCount = MIN_KEEPER_COUNT;
                     }
                     break;
                 case DATA_BRIDGE_ACTIVATED:
