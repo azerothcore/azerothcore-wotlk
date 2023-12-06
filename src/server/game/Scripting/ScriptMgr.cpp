@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "AllScriptsObjects.h"
+#include "LFGScripts.h"
 #include "InstanceScript.h"
 #include "ScriptObject.h"
 #include "ScriptSystem.h"
@@ -64,6 +65,9 @@ void ScriptMgr::Initialize()
     LOG_INFO("server.loading", " ");
 
     AddSC_SmartScripts();
+
+    // LFGScripts
+    lfg::AddSC_LFGScripts();
 
     ASSERT(_script_loader_callback,
         "Script loader callback wasn't registered!");
