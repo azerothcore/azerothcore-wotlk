@@ -1,3 +1,4 @@
+-- DB update 2023_12_04_03 -> 2023_12_06_00
 --
 DELETE FROM `pool_template` WHERE `entry` = 137;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (137, 1, 'Tanaris - Inconspicuous Landmark Pool');
