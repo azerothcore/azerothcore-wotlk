@@ -1,3 +1,4 @@
+-- DB update 2023_12_06_00 -> 2023_12_07_00
 SET @CGUID = 153000;
 -- 21215 Leotheras the Blind
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID+139;
