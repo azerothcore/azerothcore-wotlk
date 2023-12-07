@@ -154,7 +154,6 @@ struct boss_leotheras_the_blind : public BossAI
     void ElfTime()
     {
         DoResetThreatList();
-        _demonPhase = false;
         me->InterruptNonMeleeSpells(false);
         scheduler.Schedule(25050ms, 32550ms, GROUP_COMBAT, [this](TaskContext context)
         {
@@ -170,19 +169,15 @@ struct boss_leotheras_the_blind : public BossAI
 
     void MoveToTargetIfOutOfRange(Unit* target)
     {
-        scheduler.Schedule(1s, GROUP_DEMON, [this, target](TaskContext context)
+        if (me->GetDistance2d(target) > 40.0f)
+        {   
+            me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
+            me->AddThreat(target, 0.0f);
+        }
+        else
         {
-            if (me->GetDistance2d(target) > 40.0f)
-            {   
-                me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
-                me->AddThreat(target, 0.0f);
-            }
-            else
-            {
-                me->GetMotionMaster()->Clear();
-            }
-            context.Repeat(1s);
-        });
+            me->GetMotionMaster()->Clear();
+        }
     }
 
     void DemonTime()
@@ -192,11 +187,13 @@ struct boss_leotheras_the_blind : public BossAI
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
-        _demonPhase = true;
-        MoveToTargetIfOutOfRange(me->GetVictim());
-
+        
         scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
+        scheduler.Schedule(1s, GROUP_DEMON, [this](TaskContext context)
+        {
+            MoveToTargetIfOutOfRange(me->GetVictim());
+            context.Repeat(1s);
+        }).Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
         {
             Talk(SAY_INNER_DEMONS);
             me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
@@ -242,7 +239,6 @@ struct boss_leotheras_the_blind : public BossAI
     }
 private:
     bool _recentlySpoken;
-    bool _demonPhase;
 };
 
 struct npc_inner_demon : public ScriptedAI
