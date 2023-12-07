@@ -170,7 +170,7 @@ struct boss_leotheras_the_blind : public BossAI
     void MoveToTargetIfOutOfRange(Unit* target)
     {
         if (me->GetDistance2d(target) > 40.0f)
-        {   
+        {
             me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
             me->AddThreat(target, 0.0f);
         }
@@ -187,7 +187,7 @@ struct boss_leotheras_the_blind : public BossAI
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
-        
+
         scheduler.CancelGroup(GROUP_COMBAT);
         scheduler.Schedule(1s, GROUP_DEMON, [this](TaskContext context)
         {
