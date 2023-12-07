@@ -167,14 +167,27 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
+    void ChaseBehaviour(Unit* who)
+    {
+        if (who && who->isTargetableForAttack())
+        {
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 10.0f, 0);
+                me->AddThreat(who, 0.0f);
+            }
+        }
+    }
+
     void DemonTime()
     {
         DoResetThreatList();
         me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
-        me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
+
+        ChaseBehaviour(me->GetVictim());
 
         scheduler.CancelGroup(GROUP_COMBAT);
         scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
