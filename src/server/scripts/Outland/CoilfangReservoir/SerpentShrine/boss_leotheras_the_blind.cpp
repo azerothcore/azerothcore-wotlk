@@ -173,7 +173,7 @@ struct boss_leotheras_the_blind : public BossAI
         {
             if (me->Attack(who, false))
             {
-                me->GetMotionMaster()->MoveChase(who, 10.0f, 0);
+                me->GetMotionMaster()->MoveChase(who, 40.0f, 0);
                 me->AddThreat(who, 0.0f);
             }
         }
