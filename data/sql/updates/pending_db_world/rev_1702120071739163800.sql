@@ -19,7 +19,8 @@ DELETE FROM `gameobject` WHERE (`id` = 181288);
 DELETE FROM `creature` WHERE (`id1` = 16781) AND (`guid` IN (94531, 94547));
 DELETE FROM `game_event_creature` WHERE (`guid` IN (94531, 94547));
 
--- update orientations  (completes TODO of PR #17549)
+-- 16781, 'Midsummer Celebrant'
+-- update orientations (completes TODO of PR #17549)
 UPDATE `creature` SET `orientation` = 5.19 WHERE (`id1` = 16781) AND (guid = 139128);
 UPDATE `creature` SET `orientation` = 2.86 WHERE (`id1` = 16781) AND (guid = 139129);
 UPDATE `creature` SET `orientation` = 5.94 WHERE (`id1` = 16781) AND (guid = 139130);
