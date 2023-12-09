@@ -29,7 +29,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` = 26520) AND (`guid` BETWEEN 12672 AND 12686);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-(12672, 26520, 1, 1, 1, 0, -2320.02294921875, -617.2916259765625, -9.21654701232910156, 4.012910842895507812, 120, 0, 0, 0, 0, 0, "", 50063, 1, NULL),
+(12672, 26520, 1, 1, 1, 0, -2320.02294921875, -617.2916259765625, -9.21654701232910156, 5.672, 120, 0, 0, 0, 0, 0, "", 50063, 1, "orientation corrected manually (not sniffed)"),
 (12673, 26520, 1, 1, 1, 0, 142.810638427734375, -4719.85205078125, 17.95322990417480468, 5.270894527435302734, 120, 0, 0, 0, 0, 0, "", 50172, 1, NULL),
 (12674, 26520, 530, 1, 1, 0, -3066.60302734375, 2384.980224609375, 62.469970703125, 3.368485450744628906, 120, 0, 0, 0, 0, 0, "", 50063, 1, NULL),
 (12675, 26520, 530, 1, 1, 0, 2283.706787109375, 6137.61767578125, 136.7052001953125, 1.570796370506286621, 120, 0, 0, 0, 0, 0, "", 50063, 1, NULL),
