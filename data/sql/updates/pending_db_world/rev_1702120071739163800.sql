@@ -27,4 +27,4 @@ UPDATE `creature` SET `orientation` = 5.94 WHERE (`id1` = 16781) AND (guid = 139
 UPDATE `creature` SET `orientation` = 0.84 WHERE (`id1` = 16781) AND (guid = 139151);
 UPDATE `creature` SET `orientation` = 0.73 WHERE (`id1` = 16781) AND (guid = 139153);
 UPDATE `creature` SET `orientation` = 0.89 WHERE (`id1` = 16781) AND (guid = 139184);
-UPDATE `creature` SET `Comment` = "orientation corrected manually (not sniffed)" WHERE (guid IN (139128, 139129, 139130, 139151, 139153, 139184));
+UPDATE `creature` SET `Comment` = "orientation corrected manually (not sniffed)" WHERE (`id1` = 16781) AND (guid IN (139128, 139129, 139130, 139151, 139153, 139184));
