@@ -1620,14 +1620,6 @@ void ScriptMgr::OnQuestAbandon(Player* player, uint32 questId)
 }
 
 // Player anti cheat
-void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
-{
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-    {
-        script->AnticheatSetSkipOnePacketForASH(player, apply);
-    });
-}
-
 void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
