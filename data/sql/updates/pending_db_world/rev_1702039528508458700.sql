@@ -96,6 +96,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 
 -- remove duplicate spawns
 DELETE FROM `creature` WHERE (`id1` = 17066) AND (`guid` IN (1886, 204955));
+DELETE FROM `creature_addon` WHERE (`guid` IN (1886, 204955));
 DELETE FROM `game_event_creature` WHERE (`guid` IN (1886, 204955));
 
 -- enable all spawns for eventEntry 1
