@@ -352,7 +352,7 @@ public:
         float x = locationValues[0];
         float y = locationValues[1];
 
-        if (mapId == MAPID_INVALID)
+        if (!sMapStore.LookupEntry(mapId))
         {
             handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
             return false;

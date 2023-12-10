@@ -269,7 +269,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         LocateRibbonPole();
         SpawnFireSpiralBunny();
 
-        _scheduler.Schedule(1s, [this](TaskContext context)
+        scheduler.Schedule(1s, [this](TaskContext context)
             {
                 DoCleanupChecks();
                 context.Repeat();
@@ -326,7 +326,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void LocateRibbonPole()
     {
-        _scheduler.Schedule(420ms, [this](TaskContext context)
+        scheduler.Schedule(420ms, [this](TaskContext context)
             {
                 _ribbonPole = me->FindNearestGameObject(GO_RIBBON_POLE, 10.0f);
 
@@ -380,7 +380,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_3)
         {
-            _scheduler.Schedule(500ms, [this](TaskContext /*context*/)
+            scheduler.Schedule(500ms, [this](TaskContext /*context*/)
             {
                 _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
@@ -391,7 +391,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_5)
         {
-            _scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
+            scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
             {
                 _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
@@ -461,11 +461,10 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
 private:
-    TaskScheduler _scheduler;
     std::vector<Player*> _dancerList;
     GameObject* _ribbonPole;
     Creature* _bunny;

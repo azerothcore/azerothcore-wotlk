@@ -455,7 +455,6 @@ public: /* PlayerScript */
     bool OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
 
     // Anti cheat
-    void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
     void AnticheatSetUnderACKmount(Player* player);
     void AnticheatSetRootACKUpd(Player* player);
