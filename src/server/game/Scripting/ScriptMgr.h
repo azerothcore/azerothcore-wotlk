@@ -297,6 +297,7 @@ public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
+    void OnPlayerJustDied(Player* player);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);

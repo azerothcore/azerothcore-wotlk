@@ -29,6 +29,10 @@ protected:
     PlayerScript(const char* name);
 
 public:
+    // Called when a player dies
+    virtual void OnPlayerJustDied(Player* /*player*/) { }
+
+    // Called when clicking the release button
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
     // Called on Send Initial Packets Before Add To Map
