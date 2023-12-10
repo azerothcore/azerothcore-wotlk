@@ -16,9 +16,10 @@
  */
 
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -35,7 +36,8 @@ ObjectData const creatureData[] =
     { NPC_MASTERS_EYE,  DATA_MASTERS_EYE  },
     { NPC_VEKLOR,       DATA_VEKLOR       },
     { NPC_VEKNILASH,    DATA_VEKNILASH    },
-    { NPC_VISCIDUS,     DATA_VISCIDUS     }
+    { NPC_VISCIDUS,     DATA_VISCIDUS     },
+    { 0,                0                 }
 };
 
 DoorData const doorData[] =
@@ -209,15 +211,9 @@ public:
             return true;
         }
 
-        void Update(uint32 diff) override
-        {
-            scheduler.Update(diff);
-        }
-
     private:
         GuidVector CThunGraspGUIDs;
         uint32 BugTrioDeathCount;
-        TaskScheduler scheduler;
     };
 };
 

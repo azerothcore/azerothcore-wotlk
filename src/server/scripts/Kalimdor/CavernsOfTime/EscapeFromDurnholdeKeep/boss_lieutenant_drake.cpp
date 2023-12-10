@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
 #include "old_hillsbrad.h"
@@ -42,24 +42,13 @@ enum Spells
 
 struct boss_lieutenant_drake : public BossAI
 {
-    boss_lieutenant_drake(Creature* creature) : BossAI(creature, DATA_LIEUTENANT_DRAKE)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_lieutenant_drake(Creature* creature) : BossAI(creature, DATA_LIEUTENANT_DRAKE) { }
 
     void InitializeAI() override
     {
         runSecondPath = false;
         pathId = me->GetEntry() * 10;
         me->GetMotionMaster()->MovePath(pathId, false);
-    }
-
-    void Reset() override
-    {
-        _Reset();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -112,10 +101,6 @@ struct boss_lieutenant_drake : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-        if (InstanceScript* instance = me->GetInstanceScript())
-        {
-            instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
-        }
     }
 
     void MovementInform(uint32 type, uint32 point) override

@@ -23,14 +23,16 @@
 */
 
 #include "Creature.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 ObjectData const creatureData[] =
 {
-    { NPC_QUAGMIRRAN, DATA_QUAGMIRRAN }
+    { NPC_QUAGMIRRAN, DATA_QUAGMIRRAN },
+    { 0,              0               }
 };
 
 class instance_the_slave_pens : public InstanceMapScript

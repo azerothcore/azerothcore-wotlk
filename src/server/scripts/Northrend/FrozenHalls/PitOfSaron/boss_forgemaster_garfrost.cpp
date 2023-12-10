@@ -16,12 +16,13 @@
  */
 
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "pit_of_saron.h"
 
@@ -380,3 +381,4 @@ void AddSC_boss_garfrost()
 
     new spell_garfrost_permafrost();
 }
+

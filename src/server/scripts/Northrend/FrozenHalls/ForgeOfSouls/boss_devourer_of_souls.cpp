@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "forge_of_souls.h"
 
 enum eTexts
@@ -376,3 +377,4 @@ void AddSC_boss_devourer_of_souls()
     new boss_devourer_of_souls();
     new spell_wailing_souls_periodic();
 }
+

@@ -15,17 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "zulgurub.h"
 /* ScriptData
 SDName: Boss_Gahz'ranka
 SD%Complete: 85
 SDComment: Massive Geyser with knockback not working. Spell buggy.
 SDCategory: Zul'Gurub
 EndScriptData */
-
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "zulgurub.h"
 
 enum Spells
 {
@@ -202,3 +202,4 @@ void AddSC_boss_gahzranka()
     RegisterSpellScript(spell_gahzranka_slam);
     RegisterSpellScript(spell_pagles_point_cast);
 }
+

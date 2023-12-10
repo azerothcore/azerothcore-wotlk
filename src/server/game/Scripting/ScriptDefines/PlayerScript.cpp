@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -72,6 +73,21 @@ void ScriptMgr::OnPlayerReleasedGhost(Player* player)
     {
         script->OnPlayerReleasedGhost(player);
     });
+}
+
+bool ScriptMgr::OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([player, mapId, zoneId, bySpell](PlayerScript* script)
+        {
+            return !script->OnCanPlayerFlyInZone(player, mapId, zoneId, bySpell);
+        });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
@@ -135,6 +151,14 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnTalentsReset(player, noCost);
+    });
+}
+
+void ScriptMgr::OnAfterSpecSlotChanged(Player* player, uint8 newSlot)
+{
+    ExecuteScript<PlayerScript>([=](PlayerScript* script)
+    {
+        script->OnAfterSpecSlotChanged(player, newSlot);
     });
 }
 
@@ -1596,14 +1620,6 @@ void ScriptMgr::OnQuestAbandon(Player* player, uint32 questId)
 }
 
 // Player anti cheat
-void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
-{
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-    {
-        script->AnticheatSetSkipOnePacketForASH(player, apply);
-    });
-}
-
 void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -1673,3 +1689,11 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
 
     return true;
 }
+
+PlayerScript::PlayerScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PlayerScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<PlayerScript>;

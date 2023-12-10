@@ -581,7 +581,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
                 {
                     LOG_FATAL("sql.sql", "Could not re-prepare statements!");
                     std::this_thread::sleep_for(10s);
-                    std::abort();
+                    ABORT();
                 }
 
                 LOG_INFO("sql.sql", "Successfully reconnected to {} @{}:{} ({}).",
@@ -600,7 +600,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
 
                 // We could also initiate a shutdown through using std::raise(SIGTERM)
                 std::this_thread::sleep_for(10s);
-                std::abort();
+                ABORT();
             }
             else
             {
@@ -624,12 +624,12 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
         case ER_NO_SUCH_TABLE:
             LOG_ERROR("sql.sql", "Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         case ER_PARSE_ERROR:
             LOG_ERROR("sql.sql", "Error while parsing SQL. Core fix required.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         default:
             LOG_ERROR("sql.sql", "Unhandled MySQL errno {}. Unexpected behaviour possible.", errNo);

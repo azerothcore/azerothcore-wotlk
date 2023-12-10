@@ -16,9 +16,9 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
@@ -741,7 +741,7 @@ public:
                         break;
                     case 11:
                         Talk(EMOTE_DIES);
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->SetHealth(0);
                         return;
                     }

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Says
@@ -1426,3 +1427,4 @@ void AddSC_boss_illidan()
     new spell_illidan_cage_trap();
     new spell_illidan_cage_trap_stun();
 }
+

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AllCreatureScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -48,6 +49,15 @@ void ScriptMgr::OnCreatureSaveToDB(Creature* creature)
     });
 }
 
+void ScriptMgr::OnBeforeCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature, uint8& level)
+{
+    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    {
+        script->OnBeforeCreatureSelectLevel(cinfo, creature, level);
+    });
+
+}
+
 void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature)
 {
     ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
@@ -68,3 +78,11 @@ void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* cr
 //
 //    return true;
 //}
+
+AllCreatureScript::AllCreatureScript(const char* name) :
+    ScriptObject(name)
+{
+    ScriptRegistry<AllCreatureScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<AllCreatureScript>;

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 enum Yells
@@ -114,15 +115,13 @@ struct boss_moroes : public BossAI
 
         scheduler.Schedule(10s, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
-            if(Creature* guest = GetRandomGuest())
+            if (Creature* guest = GetRandomGuest())
             {
                 guest->AI()->Talk(SAY_GUEST);
             }
             context.Repeat(5s);
         }).Schedule(1min, 2min, GROUP_PRECOMBAT_TALK, [this](TaskContext context)
         {
-            //this was not scheduled in the previous commit
-            //does this have to be removed?
             Talk(SAY_OUT_OF_COMBAT);
             context.Repeat(1min, 2min);
         });
@@ -158,7 +157,6 @@ struct boss_moroes : public BossAI
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);
-                DoCastRandomTarget(SPELL_GARROTE, 0, 100.0f, true, true);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
@@ -180,7 +178,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if(!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
+        if (!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
         {
             Talk(SAY_KILL);
             _recentlySpoken = true;
@@ -208,12 +206,39 @@ struct boss_moroes : public BossAI
                 guestList.push_back(summon);
             }
         }
+
         return Acore::Containers::SelectRandomContainerElement(guestList);
+    }
+
+    bool CheckGuestsInRoom()
+    {
+        bool guestsInRoom = true;
+        summons.DoForAllSummons([&guestsInRoom](WorldObject* summon)
+        {
+            if ((summon->ToCreature()->GetPositionX()) < -11028.f || (summon->ToCreature()->GetPositionY()) < -1955.f) //boundaries of the two doors
+            {
+                guestsInRoom = false;
+                return false;
+            }
+            return true;
+        });
+
+        return guestsInRoom;
     }
 
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+
+        if (!CheckGuestsInRoom())
+        {
+            EnterEvadeMode();
+            summons.DoForAllSummons([](WorldObject* summon)
+            {
+                summon->ToCreature()->DespawnOnEvade(5s);
+            });
+            return;
+        }
 
         if (!UpdateVictim())
             return;
@@ -258,3 +283,4 @@ void AddSC_boss_moroes()
     RegisterKarazhanCreatureAI(boss_moroes);
     RegisterSpellScript(spell_moroes_vanish);
 }
+

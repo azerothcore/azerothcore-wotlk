@@ -225,9 +225,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         break;
                 }
             }
-            // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
+            // Overwritten by SPELL_AURA_MOD_LANGUAGE auras (Affects only Say and Yell)
             Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
-            if (!ModLangAuras.empty())
+            if (!ModLangAuras.empty() && (type == CHAT_MSG_SAY || type == CHAT_MSG_YELL))
                 lang = ModLangAuras.front()->GetMiscValue();
         }
 

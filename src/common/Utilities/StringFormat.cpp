@@ -17,7 +17,6 @@
 
 #include "StringFormat.h"
 #include "Define.h"
-#include <locale>
 
 template<class Str>
 AC_COMMON_API Str Acore::String::Trim(const Str& s, const std::locale& loc /*= std::locale()*/)

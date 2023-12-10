@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum ScriptTexts
@@ -646,7 +648,7 @@ public:
                         {
                             deathbringer->CastSpell(me, SPELL_RIDE_VEHICLE, true);
                             deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            deathbringer->setDeathState(ALIVE);
+                            deathbringer->setDeathState(DeathState::Alive);
                         }
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 4000);

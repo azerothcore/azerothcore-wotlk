@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ArenaTeamScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -57,3 +58,11 @@ void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPl
         script->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam);
     });
 }
+
+ArenaTeamScript::ArenaTeamScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ArenaTeamScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<ArenaTeamScript>;

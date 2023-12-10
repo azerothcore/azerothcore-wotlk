@@ -53,7 +53,12 @@ enum SSNPCs
     NPC_THE_LURKER_BELOW                    = 21217,
     NPC_LEOTHERAS_THE_BLIND                 = 21215,
     NPC_CYCLONE_KARATHRESS                  = 22104,
+    NPC_FATHOM_LORD_KARATHRESS              = 21214,
     NPC_LADY_VASHJ                          = 21212,
+
+    NPC_FATHOM_GUARD_SHARKKIS               = 21966,
+    NPC_FATHOM_GUARD_TIDALVESS              = 21965,
+    NPC_FATHOM_GUARD_CARIBDIS               = 21964,
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
@@ -83,10 +88,18 @@ enum SSSpells
     SPELL_FRENZY_WATER                      = 37026
 };
 
+enum KeeperCount
+{
+  MIN_KEEPER_COUNT = 0,
+  MAX_KEEPER_COUNT = 24
+};
+
 template <class AI, class T>
 inline AI* GetSerpentShrineAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SerpentShrineScriptName);
 }
+
+#define RegisterSerpentShrineAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSerpentShrineAI)
 
 #endif

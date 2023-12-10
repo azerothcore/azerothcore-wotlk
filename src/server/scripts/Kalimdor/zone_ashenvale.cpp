@@ -22,8 +22,8 @@ SDComment: Quest support: 6544, 6482
 SDCategory: Ashenvale Forest
 EndScriptData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 
@@ -53,7 +53,9 @@ enum Muglash
     NPC_WRATH_SEAWITCH      = 3715,
 
     NPC_VORSHA              = 12940,
-    NPC_MUGLASH             = 12717
+    NPC_MUGLASH             = 12717,
+
+    ACTION_EXTINGUISH_BLAZIER = 0
 };
 
 Position const FirstNagaCoord[3] =
@@ -86,6 +88,15 @@ public:
             eventTimer = 10000;
             waveId = 0;
             _isBrazierExtinguished = false;
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_EXTINGUISH_BLAZIER)
+            {
+                Talk(SAY_MUG_BRAZIER_WAIT);
+                _isBrazierExtinguished = true;
+            }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -202,7 +213,6 @@ public:
     private:
         uint32 eventTimer;
         uint8  waveId;
-    public:
         bool   _isBrazierExtinguished;
     };
 
@@ -212,30 +222,7 @@ public:
     }
 };
 
-class go_naga_brazier : public GameObjectScript
-{
-public:
-    go_naga_brazier() : GameObjectScript("go_naga_brazier") { }
-
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
-    {
-        if (Creature* creature = GetClosestCreatureWithEntry(go, NPC_MUGLASH, INTERACTION_DISTANCE * 2))
-        {
-            if (npc_muglash::npc_muglashAI* pEscortAI = CAST_AI(npc_muglash::npc_muglashAI, creature->AI()))
-            {
-                creature->AI()->Talk(SAY_MUG_BRAZIER_WAIT);
-
-                pEscortAI->_isBrazierExtinguished = true;
-                return false;
-            }
-        }
-
-        return true;
-    }
-};
-
 void AddSC_ashenvale()
 {
     new npc_muglash();
-    new go_naga_brazier();
 }

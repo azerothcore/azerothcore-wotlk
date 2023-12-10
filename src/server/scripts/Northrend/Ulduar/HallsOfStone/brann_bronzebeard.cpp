@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
@@ -601,7 +602,7 @@ public:
             {
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                 {
-                    brann->setDeathState(JUST_DIED);
+                    brann->setDeathState(DeathState::JustDied);
                     brann->Respawn();
                     brann->AI()->DoAction(5);
                 }
@@ -898,3 +899,4 @@ void AddSC_brann_bronzebeard()
     new iron_golem_custodian();
     new spell_hos_dark_matter();
 }
+

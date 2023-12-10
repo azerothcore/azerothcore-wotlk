@@ -30,13 +30,12 @@ npc_stone_watcher_of_norgannon
 npc_tooga
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_aquementas

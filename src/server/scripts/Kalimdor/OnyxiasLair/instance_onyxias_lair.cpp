@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "onyxias_lair.h"
 
 ObjectData const creatureData[] =
 {
-    { NPC_ONYXIA, DATA_ONYXIA }
+    { NPC_ONYXIA, DATA_ONYXIA },
+    { 0,          0           }
 };
 
 class instance_onyxias_lair : public InstanceMapScript

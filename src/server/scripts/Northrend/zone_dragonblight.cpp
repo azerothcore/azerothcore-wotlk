@@ -15,20 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
-#include "GridNotifiersImpl.h"
+#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "GridNotifiersImpl.h"
 
 // Ours
 /********
@@ -702,7 +705,6 @@ public:
                     }
                 }
 
-            me->RemoveVehicleKit(); // not Crash (;
             events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
             me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
         }

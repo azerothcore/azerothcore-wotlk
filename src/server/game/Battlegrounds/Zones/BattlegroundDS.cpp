@@ -16,15 +16,12 @@
  */
 
 #include "BattlegroundDS.h"
-#include "ArenaScore.h"
 #include "Creature.h"
 #include "GameObject.h"
-#include "Language.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundDS::BattlegroundDS()
 {

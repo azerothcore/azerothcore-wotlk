@@ -17,8 +17,9 @@
 
 #include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
 
@@ -44,17 +45,6 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-            {
-                if (GetBossState(i) == IN_PROGRESS)
-                    return true;
-            }
-
-            return false;
         }
 
         void OnCreatureCreate(Creature* pCreature) override
@@ -150,20 +140,6 @@ public:
             return false;
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (InstanceScript::SetBossState(type, state))
-            {
-                return false;
-            }
-
-            if (state == DONE)
-            {
-                SaveToDB();
-            }
-            return true;
-        }
-
         void DoAction(int32 action) override
         {
             switch (action)
@@ -219,3 +195,4 @@ void AddSC_instance_obsidian_sanctum()
 {
     new instance_obsidian_sanctum();
 }
+

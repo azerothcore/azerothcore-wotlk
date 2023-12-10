@@ -380,8 +380,6 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverCancel(WorldPacket& /*recvData*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_CANCEL");
-
     _player->PlayerTalkClass->SendCloseGossip();
 }
 
@@ -535,7 +533,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_QUEST_AUTOLAUNCH");
 }
 
 void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
@@ -624,8 +621,6 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
     uint8 msg;
     recvPacket >> guid >> questId >> msg;
 
-    LOG_DEBUG("network", "WORLD: Received MSG_QUEST_PUSH_RESULT");
-
     if (_player->GetDivider() && _player->GetDivider() == guid)
     {
         if (Player* player = ObjectAccessor::GetPlayer(*_player, _player->GetDivider()))
@@ -641,9 +636,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 
 void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY");
-
-        _player->SendQuestGiverStatusMultiple();
+    _player->SendQuestGiverStatusMultiple();
 }
 
 void WorldSession::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)

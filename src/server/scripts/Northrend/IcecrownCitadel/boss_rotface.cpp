@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum Texts
@@ -277,13 +278,9 @@ public:
                     {
                         if (Creature* c = me->SummonCreature(NPC_OOZE_SPRAY_STALKER, *target, TEMPSUMMON_TIMED_DESPAWN, 8000))
                         {
-                            me->SetOrientation(me->GetAngle(c));
-                            me->SetControlled(true, UNIT_STATE_ROOT);
-                            me->DisableRotate(true);
-                            me->SetFacingTo(me->GetAngle(c));
-                            me->SendMovementFlagUpdate();
+                            me->SetFacingToObject(c);
                             Talk(EMOTE_SLIME_SPRAY);
-                            me->CastSpell(c, SPELL_SLIME_SPRAY, false);
+                            DoCastSelf(SPELL_SLIME_SPRAY);
                         }
                     }
                     events.DelayEvents(1);
@@ -982,3 +979,4 @@ void AddSC_boss_rotface()
 
     new npc_precious_icc();
 }
+

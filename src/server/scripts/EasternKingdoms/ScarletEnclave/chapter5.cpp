@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum LightOfDawnSays
 {
@@ -1248,3 +1249,4 @@ void AddSC_the_scarlet_enclave_c5()
     new spell_chapter5_light_of_dawn_aura();
     new spell_chapter5_rebuke();
 }
+

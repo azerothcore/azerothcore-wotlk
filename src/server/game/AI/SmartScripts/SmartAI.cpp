@@ -16,14 +16,13 @@
  */
 
 #include "SmartAI.h"
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
@@ -602,7 +601,7 @@ void SmartAI::MovepointReached(uint32 id)
     if (mLastWP)
     {
         me->SetPosition(mLastWP->x, mLastWP->y, mLastWP->z, me->GetOrientation());
-        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+        me->SetHomePosition(me->GetPosition());
     }
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
