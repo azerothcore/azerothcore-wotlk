@@ -272,6 +272,11 @@ struct npc_inner_demon : public ScriptedAI
         }
     }
 
+    bool CanBeSeen(Player const* player) override
+    {
+        return player && player->GetGUID() == me->GetSummonerGUID();
+    }
+
     bool CanReceiveDamage(Unit* attacker)
     {
         return attacker && attacker->GetGUID() == me->GetSummonerGUID();
