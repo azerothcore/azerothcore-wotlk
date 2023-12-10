@@ -1,3 +1,4 @@
+-- DB update 2023_12_09_00 -> 2023_12_10_00
 -- Update creature 26520 'Festival Scorchling' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26520) AND (`guid` IN (86895, 94777, 94778, 94779, 94780, 94781, 94782, 94783, 94784, 94785, 94787, 94788, 94789, 94790, 94791, 94792, 94793, 94794, 94795, 94797, 94798, 94799, 94800));
