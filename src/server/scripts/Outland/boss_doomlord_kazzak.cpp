@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 
 enum Texts
 {
@@ -57,7 +56,7 @@ public:
 
         void Reset() override
         {
-            scheduler.CancelAll();
+            _scheduler.CancelAll();
             _inBerserk = false;
         }
 
@@ -69,7 +68,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            scheduler.Schedule(6s, 10s, [this](TaskContext context)
+            _scheduler.Schedule(6s, 10s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SHADOW_VOLLEY);
                 context.Repeat(4s, 6s);
@@ -133,7 +132,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            scheduler.Update(diff);
+            _scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -141,6 +140,7 @@ public:
         }
 
     private:
+        TaskScheduler _scheduler;
         bool _inBerserk;
     };
 
@@ -200,4 +200,3 @@ void AddSC_boss_doomlordkazzak()
     new boss_doomlord_kazzak();
     new spell_mark_of_kazzak();
 }
-

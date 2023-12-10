@@ -38,10 +38,8 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
-#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
-#include "Tokenize.h"
 #include "Totem.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -51,6 +49,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -65,7 +65,7 @@ constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max
     VISIBILITY_DISTANCE_SMALL,
     VISIBILITY_DISTANCE_LARGE,
     VISIBILITY_DISTANCE_GIGANTIC,
-    VISIBILITY_DISTANCE_INFINITE
+    MAX_VISIBILITY_DISTANCE
 };
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
@@ -1090,6 +1090,11 @@ void WorldObject::setActive(bool on)
     if (GetTypeId() == TYPEID_PLAYER)
         return;
 
+    //npcbot: bots should never be removed from active
+    if (on == false && IsNPCBotOrPet())
+        return;
+    //end npcbot
+
     m_isActive = on;
 
     if (on && !IsInWorld())
@@ -1149,6 +1154,10 @@ void WorldObject::SetPositionDataUpdate()
     // Calls immediately for charmed units
     if (GetTypeId() == TYPEID_UNIT && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
         UpdatePositionData();
+    //npcbot
+    else if (IsNPCBotOrPet() && ToUnit()->IsControlledByPlayer())
+        UpdatePositionData();
+    //end npcbot
 }
 
 void WorldObject::UpdatePositionData()
@@ -1881,6 +1890,9 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
 {
     WorldObject const* seer = this;
 
+    //npcbot: master's invisibility should not affect bots' sight
+    if (!IsNPCBot())
+    //end npcbot
     // Pets don't have detection, they use the detection of their masters
     if (Unit const* thisUnit = ToUnit())
         if (Unit* controller = thisUnit->GetCharmerOrOwner())
@@ -2219,6 +2231,11 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             summon = new Puppet(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_TOTEM:
+            //npcbot: totem emul step 1
+            if (summoner && summoner->IsNPCBot())
+                summon = new Totem(properties, summoner->ToCreature()->GetBotOwner()->GetGUID());
+            else
+            //end npcbot
             summon = new Totem(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_MINION:
@@ -2235,6 +2252,25 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
         return nullptr;
     }
 
+    //npcbot: totem emul step 2
+    if (summoner && summoner->IsNPCBot())
+    {
+        summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
+        if (mask == UNIT_MASK_TOTEM)
+        {
+            summon->SetFaction(summoner->ToCreature()->GetFaction());
+            summon->SetPvP(summoner->ToCreature()->IsPvP());
+            //set key flags if needed
+            if (!summoner->ToCreature()->IsFreeBot())
+            {
+                summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+                summon->SetOwnerGUID(summoner->ToCreature()->GetBotOwner()->GetGUID());
+                summon->SetControlledByPlayer(true);
+            }
+        }
+    }
+    //end npcbot
+
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
 
     summon->SetHomePosition(pos);
@@ -2250,6 +2286,11 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     summon->InitSummon();
+
+    //npcbot: totem emul step 3
+    if (summoner && summoner->IsNPCBot())
+        summoner->ToCreature()->OnBotSummon(summon);
+    //end npcbot
 
     //ObjectAccessor::UpdateObjectVisibility(summon);
 
@@ -2836,14 +2877,14 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     return pos;
 }
 
-Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
 {
     Position pos = GetPosition();
     MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle) const
 {
     angle += GetOrientation();
     float destx, desty, destz;
@@ -2922,7 +2963,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
+void WorldObject::UpdateObjectVisibility(bool /*forced*/)
 {
     //updates object's visibility for nearby players
     Acore::VisibleChangesNotifier notifier(*this);
@@ -2931,28 +2972,7 @@ void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 
 void WorldObject::AddToNotify(uint16 f)
 {
-    if (!(m_notifyflags & f))
-        if (Unit* u = ToUnit())
-        {
-            if (f & NOTIFY_VISIBILITY_CHANGED)
-            {
-                uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
-
-                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
-                if (diff >= EVENT_VISIBILITY_DELAY / 2)
-                    EVENT_VISIBILITY_DELAY /= 2;
-                else
-                    EVENT_VISIBILITY_DELAY -= diff;
-                u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
-                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
-            }
-            else if (f & NOTIFY_AI_RELOCATION)
-            {
-                u->m_delayed_unit_ai_notify_timer = u->FindMap() ? DynamicVisibilityMgr::GetAINotifyDelay(u->FindMap()->GetEntry()->map_type) : 500;
-            }
-
-            m_notifyflags |= f;
-        }
+    m_notifyflags |= f;
 }
 
 struct WorldObjectChangeAccumulator

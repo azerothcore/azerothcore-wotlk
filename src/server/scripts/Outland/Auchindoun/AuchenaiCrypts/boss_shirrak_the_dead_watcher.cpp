@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "auchenai_crypts.h"
 
 enum Spells
@@ -242,4 +241,3 @@ void AddSC_boss_shirrak_the_dead_watcher()
     RegisterAuchenaiCryptsCreatureAI(boss_shirrak_the_dead_watcher);
     RegisterSpellScript(spell_auchenai_possess);
 }
-

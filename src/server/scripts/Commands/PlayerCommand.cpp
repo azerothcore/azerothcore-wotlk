@@ -25,7 +25,8 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
 {
     if (!SpellMgr::IsSpellValid(spell))
     {
-        handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+        handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -33,13 +34,14 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
     {
         if (targetPlayer == handler->GetPlayer())
         {
-            handler->SendErrorMessage(LANG_YOU_KNOWN_SPELL);
+            handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
         }
         else
         {
-            handler->SendErrorMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
         }
 
+        handler->SetSentErrorMessage(true);
         return false;
     }
 

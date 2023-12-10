@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Yells
@@ -261,4 +260,3 @@ void AddSC_boss_skeram()
     RegisterTempleOfAhnQirajCreatureAI(boss_skeram);
     RegisterSpellScript(spell_skeram_arcane_explosion);
 }
-

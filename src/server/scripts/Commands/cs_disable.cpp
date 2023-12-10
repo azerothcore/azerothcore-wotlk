@@ -24,12 +24,12 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "DisableMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -81,7 +81,8 @@ public:
                 {
                     if (!sSpellMgr->GetSpellInfo(entry))
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
+                        handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "spell";
@@ -91,7 +92,8 @@ public:
                 {
                     if (!sObjectMgr->GetQuestTemplate(entry))
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                        handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "quest";
@@ -101,7 +103,8 @@ public:
                 {
                     if (!sMapStore.LookupEntry(entry))
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_NOMAPFOUND);
+                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "map";
@@ -111,7 +114,8 @@ public:
                 {
                     if (!sBattlemasterListStore.LookupEntry(entry))
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
+                        handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "battleground";
@@ -121,7 +125,8 @@ public:
                 {
                     if (entry > MAX_OUTDOORPVP_TYPES)
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
+                        handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "outdoorpvp";
@@ -131,7 +136,8 @@ public:
                 {
                     if (!sMapStore.LookupEntry(entry))
                     {
-                        handler->SendErrorMessage(LANG_COMMAND_NOMAPFOUND);
+                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                        handler->SetSentErrorMessage(true);
                         return false;
                     }
                     disableTypeStr = "vmap";
@@ -148,7 +154,8 @@ public:
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
-            handler->SendErrorMessage("This %s (Id: %u) is already disabled.", disableTypeStr.c_str(), entry);
+            handler->PSendSysMessage("This %s (Id: %u) is already disabled.", disableTypeStr.c_str(), entry);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -235,7 +242,8 @@ public:
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (!result)
         {
-            handler->SendErrorMessage("This %s (Id: %u) is not disabled.", disableTypeStr.c_str(), entry);
+            handler->PSendSysMessage("This %s (Id: %u) is not disabled.", disableTypeStr.c_str(), entry);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

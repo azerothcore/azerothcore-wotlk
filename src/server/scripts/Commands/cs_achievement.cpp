@@ -24,8 +24,9 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
+#include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -53,7 +54,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
         target->CompletedAchievement(achievementEntry);
@@ -70,7 +72,8 @@ public:
 
         if (!player)
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

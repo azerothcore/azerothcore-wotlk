@@ -15,20 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "CreatureTextMgr.h"
-#include "Group.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
 /*
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "npc_pet_gen_".
  */
+
+#include "CreatureTextMgr.h"
+#include "Group.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum soulTrader
 {
@@ -833,4 +833,3 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
 }
-

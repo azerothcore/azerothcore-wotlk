@@ -15,14 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
-#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "icecrown_citadel.h"
 
@@ -1730,4 +1729,3 @@ void AddSC_boss_professor_putricide()
     new spell_putricide_eat_ooze();
     new spell_putricide_regurgitated_ooze();
 }
-

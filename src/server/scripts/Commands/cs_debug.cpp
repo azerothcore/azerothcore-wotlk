@@ -27,14 +27,12 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "GossipDef.h"
 #include "GridNotifiersImpl.h"
-#include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
-#include "M2Stores.h"
 #include "MapMgr.h"
+#include "M2Stores.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
@@ -122,7 +120,8 @@ public:
         CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId);
         if (!cineSeq)
         {
-            handler->SendErrorMessage(LANG_CINEMATIC_NOT_EXIST, cinematicId);
+            handler->PSendSysMessage(LANG_CINEMATIC_NOT_EXIST, cinematicId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -148,7 +147,8 @@ public:
     {
         if (!sMovieStore.LookupEntry(movieId))
         {
-            handler->SendErrorMessage(LANG_MOVIE_NOT_EXIST, movieId);
+            handler->PSendSysMessage(LANG_MOVIE_NOT_EXIST, movieId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -161,7 +161,8 @@ public:
     {
         if (!sSoundEntriesStore.LookupEntry(soundId))
         {
-            handler->SendErrorMessage(LANG_SOUND_NOT_EXIST, soundId);
+            handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, soundId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -170,7 +171,8 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -188,7 +190,8 @@ public:
     {
         if (!sSoundEntriesStore.LookupEntry(musicId))
         {
-            handler->SendErrorMessage(LANG_SOUND_NOT_EXIST, musicId);
+            handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, musicId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -204,7 +207,8 @@ public:
     {
         if (!visualId)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -282,7 +286,8 @@ public:
         std::ifstream ifs("opcode.txt");
         if (!ifs.is_open())
         {
-            handler->SendErrorMessage(LANG_DEBUG_OPCODE_FILE_MISSING);
+            handler->SendSysMessage(LANG_DEBUG_OPCODE_FILE_MISSING);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -393,7 +398,8 @@ public:
                 GameObject* obj = handler->GetNearbyGameObject();
                 if (!obj)
                 {
-                    handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, 0);
+                    handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, 0);
+                    handler->SetSentErrorMessage(true);
                     ifs.close();
                     return false;
                 }
@@ -404,7 +410,8 @@ public:
                 GameObject* obj = handler->GetNearbyGameObject();
                 if (!obj)
                 {
-                    handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, 0);
+                    handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, 0);
+                    handler->SetSentErrorMessage(true);
                     ifs.close();
                     return false;
                 }
@@ -1029,7 +1036,8 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1050,7 +1058,8 @@ public:
         WorldObject* target = handler->getSelectedObject();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1079,7 +1088,8 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1128,7 +1138,8 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1163,7 +1174,8 @@ public:
         WorldObject* target = handler->getSelectedObject();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

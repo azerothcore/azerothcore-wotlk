@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "blood_furnace.h"
 
 enum Say

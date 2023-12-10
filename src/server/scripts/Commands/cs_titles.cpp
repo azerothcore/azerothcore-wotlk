@@ -23,10 +23,10 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "CommandScript.h"
 #include "DBCStores.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -60,7 +60,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -71,7 +72,8 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -91,7 +93,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -102,7 +105,8 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -120,7 +124,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -131,7 +136,8 @@ public:
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
         if (!titleInfo)
         {
-            handler->SendErrorMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->PSendSysMessage(LANG_INVALID_TITLE_ID, uint32(titleId));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -157,7 +163,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

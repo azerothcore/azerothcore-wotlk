@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
 
 enum eAIs
@@ -2496,4 +2495,3 @@ void AddSC_boss_faction_champions()
     new npc_toc_pet_hunter();
     new spell_faction_champion_warl_unstable_affliction();
 }
-

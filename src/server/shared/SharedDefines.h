@@ -18,7 +18,6 @@
 #ifndef ACORE_SHAREDDEFINES_H
 #define ACORE_SHAREDDEFINES_H
 
-#include "DBCEnums.h"
 #include "Define.h"
 #include "EnumFlag.h"
 #include <cassert>
@@ -26,7 +25,7 @@
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 constexpr float Z_OFFSET_FIND_HEIGHT = 2.0f;
 
-enum SpellEffIndex : uint8
+enum SpellEffIndex
 {
     EFFECT_0 = 0,
     EFFECT_1 = 1,
@@ -106,33 +105,6 @@ enum Races
 
 #define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
 
-// DisplayRace values from CreatureDisplayInfoExtra.dbc
-enum class DisplayRace : uint8
-{
-    None              = 0,
-    Human             = 1,
-    Orc               = 2,
-    Dwarf             = 3,
-    NightElf          = 4,
-    Undead            = 5,
-    Tauren            = 6,
-    Gnome             = 7,
-    Troll             = 8,
-    Goblin            = 9,
-    BloodElf          = 10,
-    Draenei           = 11,
-    FelOrc            = 12,
-    Naga              = 13,
-    Broken            = 14,
-    Skeleton          = 15,
-    Vrykul            = 16,
-    Tuskarr           = 17,
-    ForestTroll       = 18,
-    Taunka            = 19,
-    NorthrendSkeleton = 20,
-    IceTroll          = 21
-};
-
 // Class value is index in ChrClasses.dbc
 // EnumUtils: DESCRIBE THIS
 enum Classes
@@ -169,13 +141,20 @@ enum UnitClass
     UNIT_CLASS_MAGE                     = 8,
 };
 
+//npcbot
+/*
+//end npcbot
 #define CLASSMASK_ALL_CREATURES ((1<<(UNIT_CLASS_WARRIOR-1)) | (1<<(UNIT_CLASS_PALADIN-1)) | (1<<(UNIT_CLASS_ROGUE-1)) | (1<<(UNIT_CLASS_MAGE-1)))
+//npcbot
+*/
+#define CLASSMASK_ALL_CREATURES CLASSMASK_ALL_PLAYABLE
+//end npcbot
 
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 2
 
-enum ReputationRank : uint8
+enum ReputationRank
 {
     REP_HATED       = 0,
     REP_HOSTILE     = 1,
@@ -244,7 +223,7 @@ enum FactionTemplates
 #define MIN_REPUTATION_RANK (REP_HATED)
 #define MAX_REPUTATION_RANK 8
 
-#define MAX_SPILLOVER_FACTIONS 6
+#define MAX_SPILLOVER_FACTIONS 4
 
 enum MoneyConstants
 {
@@ -755,7 +734,7 @@ enum Language
 
 #define LANGUAGES_COUNT   19
 
-enum TeamId : uint8
+enum TeamId
 {
     TEAM_ALLIANCE = 0,
     TEAM_HORDE,
@@ -3306,6 +3285,22 @@ enum SummonType
     SUMMON_TYPE_JEEVES      = 12
 };
 
+enum SummonSlot
+{
+    SUMMON_SLOT_PET                 = 0,
+    SUMMON_SLOT_TOTEM_FIRE          = 1,
+    SUMMON_SLOT_TOTEM_EARTH         = 2,
+    SUMMON_SLOT_TOTEM_WATER         = 3,
+    SUMMON_SLOT_TOTEM_AIR           = 4,
+    SUMMON_SLOT_MINIPET             = 5,
+    SUMMON_SLOT_QUEST               = 6,
+
+    MAX_SUMMON_SLOT
+};
+
+#define MAX_TOTEM_SLOT      5
+#define MAX_GAMEOBJECT_SLOT 4
+
 enum EventId
 {
     EVENT_CHARGE            = 1003,
@@ -3573,7 +3568,7 @@ enum TradeStatus
     TRADE_STATUS_NOT_ELIGIBLE   = 23                        // Related to trading soulbound loot items
 };
 
-enum XPColorChar : uint8
+enum XPColorChar
 {
     XP_RED,
     XP_ORANGE,
@@ -3582,7 +3577,7 @@ enum XPColorChar : uint8
     XP_GRAY
 };
 
-enum RemoveMethod : uint8
+enum RemoveMethod
 {
     GROUP_REMOVEMETHOD_DEFAULT  = 0,
     GROUP_REMOVEMETHOD_KICK     = 1,

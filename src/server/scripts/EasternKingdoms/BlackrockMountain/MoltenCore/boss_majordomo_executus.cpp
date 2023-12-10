@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "molten_core.h"
 
 enum Texts
@@ -695,4 +694,3 @@ void AddSC_boss_majordomo()
     new spell_majordomo_separation_nexiety();
     new spell_summon_ragnaros();
 }
-

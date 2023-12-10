@@ -16,7 +16,6 @@
  */
 
 #include "Chat.h"
-#include "CommandScript.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "GameTime.h"
@@ -24,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
@@ -206,6 +206,16 @@ public:
         if (!sObjectMgr->GetCreatureTemplate(id))
             return false;
 
+        //npcbot
+        CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(id);
+        if (cinfo && cinfo->IsNPCBotOrPet())
+        {
+            handler->PSendSysMessage("You tried to spawn creature %u, which is part of NPCBots mod. To spawn bots use '.npcbot spawn' instead.", uint32(id));
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
+
         Player* chr = handler->GetSession()->GetPlayer();
         float x = chr->GetPositionX();
         float y = chr->GetPositionY();
@@ -264,14 +274,16 @@ public:
     {
         if (!item)
         {
-            handler->SendErrorMessage(LANG_COMMAND_NEEDITEMSEND);
+            handler->SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Creature* vendor = handler->getSelectedCreature();
         if (!vendor)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -300,7 +312,8 @@ public:
         CreatureData const* data = sObjectMgr->GetCreatureData(lowGuid);
         if (!data)
         {
-            handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, uint32(lowGuid));
+            handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, uint32(lowGuid));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -338,7 +351,8 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit || unit->GetTypeId() != TYPEID_UNIT)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
         Creature* creature = unit->ToCreature();
@@ -354,14 +368,16 @@ public:
     {
         if (lvl < 1 || lvl > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) + 3)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Creature* creature = handler->getSelectedCreature();
         if (!creature || creature->IsPet())
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -379,9 +395,19 @@ public:
 
         if (!unit || unit->IsPet() || unit->IsTotem())
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
+
+        //npcbot
+        if (unit->IsNPCBotOrPet())
+        {
+            handler->SendSysMessage("Selected creature has botAI assigned, use '.npcbot delete' instead");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
 
         // Delete the creature
         unit->CombatStop();
@@ -399,20 +425,23 @@ public:
         Creature* vendor = handler->getSelectedCreature();
         if (!vendor || !vendor->IsVendor())
         {
-            handler->SendErrorMessage(LANG_COMMAND_VENDORSELECTION);
+            handler->SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!item)
         {
-            handler->SendErrorMessage(LANG_COMMAND_NEEDITEMSEND);
+            handler->SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 itemId = item->ItemId;
         if (!sObjectMgr->RemoveVendorItem(addMulti.value_or(false) ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
-            handler->SendErrorMessage(LANG_ITEM_NOT_IN_LIST, itemId);
+            handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -425,7 +454,8 @@ public:
     {
         if (!sFactionTemplateStore.LookupEntry(factionId))
         {
-            handler->SendErrorMessage(LANG_WRONG_FACTION, factionId);
+            handler->PSendSysMessage(LANG_WRONG_FACTION, factionId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -433,7 +463,8 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -500,7 +531,8 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -525,7 +557,8 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -543,7 +576,8 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->PSendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -560,7 +594,8 @@ public:
 
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -635,7 +670,8 @@ public:
 
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -719,15 +755,28 @@ public:
         CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
         if (!data)
         {
-            handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+            handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (handler->GetSession()->GetPlayer()->GetMapId() != data->mapid)
         {
-            handler->SendErrorMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
+            handler->PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
+            handler->SetSentErrorMessage(true);
             return false;
         }
+
+        //npcbot
+        CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+        ASSERT(ct);
+        if (ct->IsNPCBotOrPet())
+        {
+            handler->PSendSysMessage("creature %u (id %u) is a part of NPCBots mod. Use '.npcbot move' instead", lowguid, creature->GetEntry());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        //end npcbot
 
         float x = handler->GetSession()->GetPlayer()->GetPositionX();
         float y = handler->GetSession()->GetPlayer()->GetPositionY();
@@ -749,7 +798,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(DeathState::JustDied);
+                creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
         }
@@ -773,7 +822,8 @@ public:
         Creature* target = handler->getSelectedCreature();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -789,13 +839,15 @@ public:
 
         if (!creature || creature->IsPet())
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, Acore::ToString(displayId).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, Acore::ToString(displayId).c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -853,7 +905,8 @@ public:
                 CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
                 if (!data)
                 {
-                    handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+                    handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
             }
@@ -897,7 +950,7 @@ public:
 
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
-                creature->setDeathState(DeathState::JustDied);
+                creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
 
@@ -922,14 +975,16 @@ public:
     {
         if (phasemask == 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -969,7 +1024,7 @@ public:
 
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
-            creature->setDeathState(DeathState::JustDied);
+            creature->setDeathState(JUST_DIED);
             creature->Respawn();
         }
 
@@ -995,7 +1050,8 @@ public:
 
         if (Acore::StringTo<int32>(spawnTimeStr).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1011,7 +1067,8 @@ public:
 
         if (spawnTime <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1034,7 +1091,8 @@ public:
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1061,7 +1119,8 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1078,14 +1137,16 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->PSendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (/*creature->GetMotionMaster()->empty() ||*/
             creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
         {
-            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
+            handler->PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1093,7 +1154,8 @@ public:
 
         if (mgen->GetTarget() != player)
         {
-            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
+            handler->PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1113,7 +1175,8 @@ public:
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1134,7 +1197,8 @@ public:
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1174,7 +1238,8 @@ public:
 
         if (player->IsExistPet())
         {
-            handler->SendErrorMessage(LANG_YOU_ALREADY_HAVE_PET);
+            handler->SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1189,7 +1254,8 @@ public:
 
         if (!player->CreatePet(creatureTarget))
         {
-            handler->SendErrorMessage(LANG_CREATURE_NON_TAMEABLE, cInfo->Entry);
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, cInfo->Entry);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1202,7 +1268,8 @@ public:
 
         if (!creature || !creature->GetSpawnId())
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1246,19 +1313,22 @@ public:
 
         if (!creature)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!creature->GetSpawnId())
         {
-            handler->SendErrorMessage("Selected creature %u isn't in creature table", creature->GetGUID().GetCounter());
+            handler->PSendSysMessage("Selected creature %u isn't in creature table", creature->GetGUID().GetCounter());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!sObjectMgr->SetCreatureLinkedRespawn(creature->GetSpawnId(), linkguid))
         {
-            handler->SendErrorMessage("Selected creature can't link with guid '%u'", linkguid);
+            handler->PSendSysMessage("Selected creature can't link with guid '%u'", linkguid);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

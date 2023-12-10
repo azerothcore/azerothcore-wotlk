@@ -16,12 +16,10 @@
  */
 
 #include "CellImpl.h"
-#include "CreatureScript.h"
-#include "GameEventMgr.h"
 #include "GameObjectAI.h"
-#include "GameObjectScript.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
@@ -1938,4 +1936,3 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_bells();
 }
-

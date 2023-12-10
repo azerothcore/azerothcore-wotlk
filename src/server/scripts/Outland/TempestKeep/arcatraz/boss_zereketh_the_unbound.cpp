@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "arcatraz.h"
 
 enum Say
@@ -38,7 +37,13 @@ enum Spells
 
 struct boss_zereketh_the_unbound : public BossAI
 {
-    boss_zereketh_the_unbound(Creature* creature) : BossAI(creature, DATA_ZEREKETH) { }
+    boss_zereketh_the_unbound(Creature* creature) : BossAI(creature, DATA_ZEREKETH)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -112,4 +117,3 @@ void AddSC_boss_zereketh_the_unbound()
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
     RegisterSpellScript(spell_zereketh_seed_of_corruption);
 }
-

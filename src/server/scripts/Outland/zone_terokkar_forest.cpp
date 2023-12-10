@@ -15,16 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
 #include "Group.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 
 // Ours
 enum fumping
@@ -474,7 +472,7 @@ public:
             {
                 case 0:
                     if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 10))
-                        Cage->UseDoorOrButton();
+                        Cage->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case 2:
                     Talk(SAY_PROGRESS_1, player);
@@ -503,10 +501,9 @@ public:
             }
         }
 
-        void JustRespawned() override
+        void Reset() override
         {
-            me->SetImmuneToAll(true);
-            npc_escortAI::JustRespawned();
+            me->RestoreFaction();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -578,25 +575,10 @@ public:
 /*######
 ## go_skull_pile
 ######*/
-
-enum SkullPile : uint32
-{
-    QUEST_ADVERSARIAL_BLOOD                     = 11885,
-
-    GOSSIP_MENU_SKULL_PILE                      = 8660,
-    GOSSIP_MENU_TEXT_SKULL_PILE                 = 10888,
-    GOSSIP_MENU_TEXT_SKULL_PILE_QUEST           = 11057,
-
-    GOSSIP_OPTION_SUMMON_GEZZARAK_THE_HUNTRESS  = 0,
-    GOSSIP_OPTION_SUMMON_DARKSCREECHER_AKKARAI  = 1,
-    GOSSIP_OPTION_SUMMON_KARROG                 = 2,
-    GOSSIP_OPTION_SUMMON_VAKKIZ_THE_WINDRAGER   = 3,
-
-    SPELL_SUMMON_GEZZARAK_THE_HUNTRESS          = 40632,
-    SPELL_SUMMON_DARKSCREECHER_AKKARAI          = 40642,
-    SPELL_SUMMON_KARROG                         = 40640,
-    SPELL_SUMMON_VAKKIZ_THE_WINDRAGER           = 40644,
-};
+#define GOSSIP_S_DARKSCREECHER_AKKARAI         "Summon Darkscreecher Akkarai"
+#define GOSSIP_S_KARROG         "Summon Karrog"
+#define GOSSIP_S_GEZZARAK_THE_HUNTRESS         "Summon Gezzarak the Huntress"
+#define GOSSIP_S_VAKKIZ_THE_WINDRAGER         "Summon Vakkiz the Windrager"
 
 class go_skull_pile : public GameObjectScript
 {
@@ -606,29 +588,26 @@ public:
     bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action) override
     {
         ClearGossipMenuFor(player);
-
-        if (sender == GOSSIP_SENDER_MAIN)
+        switch (sender)
         {
-            SendActionMenu(player, go, action);
-            CloseGossipMenuFor(player);
+            case GOSSIP_SENDER_MAIN:
+                SendActionMenu(player, go, action);
+                break;
         }
         return true;
     }
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if ((player->GetQuestStatus(QUEST_ADVERSARIAL_BLOOD) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(QUEST_ADVERSARIAL_BLOOD))
+        if ((player->GetQuestStatus(11885) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(11885))
         {
-            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_GEZZARAK_THE_HUNTRESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_DARKSCREECHER_AKKARAI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_KARROG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-
-            SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE_QUEST, go->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_DARKSCREECHER_AKKARAI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_KARROG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_GEZZARAK_THE_HUNTRESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
         }
-        else
-            SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE, go->GetGUID());
 
+        SendGossipMenuFor(player, go->GetGOInfo()->questgiver.gossipID, go->GetGUID());
         return true;
     }
 
@@ -637,16 +616,16 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
+                player->CastSpell(player, 40642, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
+                player->CastSpell(player, 40640, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->CastSpell(player, SPELL_SUMMON_KARROG, false);
+                player->CastSpell(player, 40632, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
+                player->CastSpell(player, 40644, false);
                 break;
         }
     }

@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
-#include "InstanceMapScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
@@ -225,7 +224,7 @@ public:
                     if (!arthas->IsAlive())
                     {
                         EnsureGridLoaded();
-                        arthas->setDeathState(DeathState::Dead);
+                        arthas->setDeathState(DEAD);
                         arthas->Respawn();
                     }
                     else

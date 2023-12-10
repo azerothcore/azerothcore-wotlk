@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
 
 enum Yells
@@ -311,4 +310,3 @@ void AddSC_boss_tharon_ja()
     new spell_tharon_ja_dummy();
     new spell_tharon_ja_clear_gift_of_tharon_ja();
 }
-

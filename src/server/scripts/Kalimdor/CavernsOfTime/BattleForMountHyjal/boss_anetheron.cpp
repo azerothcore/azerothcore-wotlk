@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
@@ -238,7 +238,7 @@ public:
                     Creature* boss = ObjectAccessor::GetCreature(*me, AnetheronGUID);
                     if (!boss || boss->isDead())
                     {
-                        me->setDeathState(DeathState::JustDied);
+                        me->setDeathState(JUST_DIED);
                         me->RemoveCorpse();
                         return;
                     }

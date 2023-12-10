@@ -15,21 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cell.h"
-#include "CellImpl.h"
-#include "CreatureScript.h"
-#include "GridNotifiers.h"
-#include "Pet.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
 /*
  * Scripts for spells with SPELLFAMILY_HUNTER, SPELLFAMILY_PET and SPELLFAMILY_GENERIC spells used by hunter players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_hun_".
  */
+
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "Pet.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -759,6 +759,22 @@ class spell_hun_sniper_training : public AuraScript
 
     void HandleUpdatePeriodic(AuraEffect* aurEff)
     {
+        //npcbot: handle creatures, remove dead trigger
+        if (!GetUnitOwner()->IsAlive())
+            return;
+        if (Creature const* bot = GetUnitOwner()->ToCreature())
+        {
+            if (!bot->IsNPCBot())
+                return;
+
+            int32 baseAmount = aurEff->GetBaseAmount();
+            int32 amount = bot->isMoving() || aurEff->GetAmount() <= 0 ?
+                bot->CalculateSpellDamage(bot, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
+                aurEff->GetAmount() - 1;
+            aurEff->SetAmount(amount);
+            return;
+        }
+        //end npcbot
         if (Player* playerTarget = GetUnitOwner()->ToPlayer())
         {
             int32 baseAmount = aurEff->GetBaseAmount();
@@ -1378,4 +1394,3 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_bestial_wrath);
     RegisterSpellScript(spell_hun_target_self_and_pet);
 }
-

@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "molten_core.h"
 
 enum Texts
@@ -178,4 +177,3 @@ void AddSC_boss_magmadar()
     // Spells
     new spell_magmadar_lava_bomb();
 }
-

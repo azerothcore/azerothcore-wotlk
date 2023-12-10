@@ -88,12 +88,6 @@ enum SSSpells
     SPELL_FRENZY_WATER                      = 37026
 };
 
-enum KeeperCount
-{
-  MIN_KEEPER_COUNT = 0,
-  MAX_KEEPER_COUNT = 24
-};
-
 template <class AI, class T>
 inline AI* GetSerpentShrineAI(T* obj)
 {

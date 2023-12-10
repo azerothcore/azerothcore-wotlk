@@ -24,7 +24,7 @@ EndScriptData */
 
 #include "BattlefieldMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -126,7 +126,8 @@ public:
 
         if (Acore::StringTo<int32>(timeStr).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -138,7 +139,8 @@ public:
 
         if (time <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

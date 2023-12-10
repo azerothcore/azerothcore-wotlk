@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "scholomance.h"
 
@@ -213,4 +212,3 @@ void AddSC_boss_kormok()
     RegisterSpellScript(spell_kormok_summon_bone_mages);
     RegisterSpellScript(spell_kormok_summon_bone_minions);
 }
-

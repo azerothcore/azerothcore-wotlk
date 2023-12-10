@@ -62,6 +62,8 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_QUERY");
+
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
 
@@ -74,6 +76,8 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
+
     uint32 arenaTeamId;                                     // arena team id
     recvData >> arenaTeamId;
 

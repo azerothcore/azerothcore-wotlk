@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ArenaScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -56,11 +55,3 @@ bool ScriptMgr::CanSaveToDB(ArenaTeam* team)
 
     return true;
 }
-
-ArenaScript::ArenaScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<ArenaScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<ArenaScript>;

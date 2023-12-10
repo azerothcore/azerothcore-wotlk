@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "vault_of_archavon.h"
 
 enum Events
@@ -263,4 +262,3 @@ void AddSC_boss_koralon()
     new spell_koralon_meteor_fists();
     new spell_flame_warder_meteor_fists();
 }
-

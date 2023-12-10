@@ -259,7 +259,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
 
                     if (m_bCanInstantRespawn)
                     {
-                        me->setDeathState(DeathState::JustDied);
+                        me->setDeathState(JUST_DIED);
                         me->Respawn();
                     }
                     else
@@ -299,7 +299,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
             {
                 if (m_bCanInstantRespawn)
                 {
-                    me->setDeathState(DeathState::JustDied);
+                    me->setDeathState(JUST_DIED);
                     me->Respawn();
                 }
                 else

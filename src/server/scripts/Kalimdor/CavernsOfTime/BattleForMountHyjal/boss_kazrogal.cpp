@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -229,4 +228,3 @@ void AddSC_boss_kazrogal()
     new boss_kazrogal();
     new spell_mark_of_kazrogal();
 }
-

@@ -32,31 +32,14 @@ static bool IsMutualChase(Unit* owner, Unit* target)
     return target->GetVictim() == owner;
 }
 
-inline float GetChaseRange(Unit const* owner, Unit const* target)
-{
-    float hitboxSum = owner->GetCombatReach() + target->GetCombatReach();
-
-    float hoverDelta = owner->GetHoverHeight() - target->GetHoverHeight();
-    if (hoverDelta != 0.0f)
-        return std::sqrt(std::max(hitboxSum * hitboxSum - hoverDelta * hoverDelta, 0.0f));
-
-    return hitboxSum;
-}
-
 template<class T>
 bool ChaseMovementGenerator<T>::PositionOkay(T* owner, Unit* target, Optional<float> maxDistance, Optional<ChaseAngle> angle)
 {
     float const distSq = owner->GetExactDistSq(target);
-
-    // Distance between owner(chaser) and target is greater than the allowed distance.
     if (maxDistance && distSq > G3D::square(*maxDistance))
         return false;
-
-    // owner's relative angle to its target is not within boundaries
     if (angle && !angle->IsAngleOkay(target->GetRelativeAngle(owner)))
         return false;
-
-    // owner cannot see its target
     if (!owner->IsWithinLOSInMap(target))
         return false;
     return true;
@@ -79,7 +62,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (Creature* cOwner2 = owner->ToCreature())
+        {
             cOwner2->SetCannotReachTarget();
+        }
+
         return true;
     }
 
@@ -92,161 +78,165 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Unit* target = i_target.getTarget();
 
     bool const mutualChase = IsMutualChase(owner, target);
-    float const chaseRange = GetChaseRange(owner, target);
-    float const minTarget = (_range ? _range->MinTolerance : 0.0f) + chaseRange;
-    float const maxRange = _range ? _range->MaxRange + chaseRange : owner->GetMeleeRange(target); // melee range already includes hitboxes
-    float const maxTarget = _range ? _range->MaxTolerance + chaseRange : CONTACT_DISTANCE + chaseRange;
-
+    float const hitboxSum = owner->GetCombatReach() + target->GetCombatReach();
+    float const minTarget = (_range ? _range->MinTolerance : 0.0f) + hitboxSum;
+    float const maxRange = _range ? _range->MaxRange + hitboxSum : owner->GetMeleeRange(target); // melee range already includes hitboxes
+    float const maxTarget = _range ? _range->MaxTolerance + hitboxSum : CONTACT_DISTANCE + hitboxSum;
     Optional<ChaseAngle> angle = mutualChase ? Optional<ChaseAngle>() : _angle;
 
-    // periodically check if we're already in the expected range...
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())
     {
-        i_recheckDistance.Reset(400); // Sniffed value
+        i_recheckDistance.Reset(100);
 
         if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
         {
-            if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase)
+            if (Creature* cOwner2 = owner->ToCreature())
             {
-                i_recalculateTravel = false;
-                i_path = nullptr;
-                if (Creature* cOwner2 = owner->ToCreature())
-                    cOwner2->SetCannotReachTarget();
-                owner->StopMoving();
-                owner->SetInFront(target);
-                MovementInform(owner);
-                return true;
+                cOwner2->SetCannotReachTarget();
             }
+
+            i_recalculateTravel = false;
+            i_path = nullptr;
+
+            owner->StopMoving();
+            owner->SetInFront(target);
+            MovementInform(owner);
+            return true;
         }
     }
 
-    // if we're done moving, we want to clean up
     if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && owner->movespline->Finalized())
     {
-        i_recalculateTravel = false;
-        i_path = nullptr;
-        if (Creature* cOwner2 = owner->ToCreature())
-            cOwner2->SetCannotReachTarget();
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
+
+        if (owner->IsWithinMeleeRange(this->i_target.getTarget()))
+        {
+            owner->Attack(this->i_target.getTarget(), true);
+            if (Creature* cOwner2 = owner->ToCreature())
+            {
+                cOwner2->SetCannotReachTarget();
+            }
+        }
+        else if (i_path && i_path->GetPathType() & PATHFIND_INCOMPLETE)
+        {
+            if (Creature* cOwner2 = owner->ToCreature())
+            {
+                cOwner2->SetCannotReachTarget(this->i_target.getTarget()->GetGUID());
+            }
+        }
+
+        i_recalculateTravel = false;
+        i_path = nullptr;
     }
 
-    // if the target moved, we have to consider whether to adjust
-    if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase)
+    if (_lastTargetPosition && i_target->GetPosition() == _lastTargetPosition.value() && mutualChase == _mutualChase)
+        return true;
+
+    _lastTargetPosition = i_target->GetPosition();
+
+    if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
     {
-        _lastTargetPosition = target->GetPosition();
-        _mutualChase = mutualChase;
-        if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || !PositionOkay(owner, target, target->isMoving() ? maxTarget : maxRange, angle))
+        if (Creature* cOwner2 = owner->ToCreature())
         {
-            // can we get to the target?
-            if (cOwner && !target->isInAccessiblePlaceFor(cOwner))
-            {
-                cOwner->SetCannotReachTarget(target->GetGUID());
-                cOwner->StopMoving();
-                i_path = nullptr;
-                return true;
-            }
+            cOwner2->SetCannotReachTarget();
+        }
 
-            // figure out which way we want to move
-            float tarX, tarY, tarZ;
-            target->GetPosition(tarX, tarY, tarZ);
-            bool withinRange = owner->IsInDist(target, maxRange);
-            bool withinLOS = owner->IsWithinLOS(tarX, tarY, tarZ);
-            bool moveToward = !(withinRange && withinLOS);
+        return true;
+    }
 
-            // make a new path if we have to...
-            if (!i_path || moveToward != _movingTowards)
-                i_path = std::make_unique<PathGenerator>(owner);
-            else
-                i_path->Clear();
+    float tarX, tarY, tarZ;
+    target->GetPosition(tarX, tarY, tarZ);
 
-            // Predict chase destination to keep up with chase target
-            float additionalRange = 0;
-            bool predictDestination = !mutualChase && target->isMoving();
-            if (predictDestination)
-            {
-                UnitMoveType moveType = MOVE_RUN;
-                if (target->CanFly())
-                    moveType = target->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD) ? MOVE_FLIGHT_BACK : MOVE_FLIGHT;
-                else
-                {
-                    if (target->IsWalking())
-                        moveType = MOVE_WALK;
-                    else
-                        moveType = target->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN;
-                }
-                float speed = target->GetSpeed(moveType) * 0.5f;
-                additionalRange = owner->GetExactDistSq(target) < G3D::square(speed) ? 0 : speed;
-            }
+    bool withinRange = owner->IsInDist(target, maxRange);
+    bool withinLOS   = owner->IsWithinLOS(tarX, tarY, tarZ);
+    bool moveToward  = !(withinRange && withinLOS);
 
-            float x, y, z;
-            bool shortenPath;
+    _mutualChase = mutualChase;
 
-            // if we want to move toward the target and there's no fixed angle...
-            if (moveToward && !angle)
-            {
-                // ...we'll pathfind to the center, then shorten the path
-                target->GetPosition(x, y, z);
-                shortenPath = true;
-            }
-            else
-            {
-                // otherwise, we fall back to nearpoint finding
-                target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - chaseRange - additionalRange, 0, angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
-                shortenPath = false;
-            }
-
-            if (owner->IsHovering())
-                owner->UpdateAllowedPositionZ(x, y, z);
-
-            bool success = i_path->CalculatePath(x, y, z, forceDest);
-            if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
-            {
-                if (cOwner)
-                {
-                    cOwner->SetCannotReachTarget(target->GetGUID());
-                }
-
-                owner->StopMoving();
-                return true;
-            }
-
-            if (shortenPath)
-                i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);
-
-            if (cOwner)
-            {
-                cOwner->SetCannotReachTarget();
-            }
-
-            bool walk = false;
-            if (cOwner && !cOwner->IsPet())
-            {
-                switch (cOwner->GetMovementTemplate().GetChase())
-                {
-                case CreatureChaseMovementType::CanWalk:
-                    walk = owner->IsWalking();
-                    break;
-                case CreatureChaseMovementType::AlwaysWalk:
-                    walk = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-            i_recalculateTravel = true;
-
-            Movement::MoveSplineInit init(owner);
-            init.MovebyPath(i_path->GetPath());
-            init.SetFacing(target);
-            init.SetWalk(walk);
-            init.Launch();
+    if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
+    {
+        // can we get to the target?
+        if (cOwner && !target->isInAccessiblePlaceFor(cOwner))
+        {
+            cOwner->SetCannotReachTarget(target->GetGUID());
+            cOwner->StopMoving();
+            i_path = nullptr;
+            return true;
         }
     }
+
+    if (!i_path || moveToward != _movingTowards)
+        i_path = std::make_unique<PathGenerator>(owner);
+    else
+        i_path->Clear();
+
+    float x, y, z;
+    bool shortenPath;
+    // if we want to move toward the target and there's no fixed angle...
+    if (moveToward && !angle)
+    {
+        // ...we'll pathfind to the center, then shorten the path
+        target->GetPosition(x, y, z);
+        shortenPath = true;
+    }
+    else
+    {
+        // otherwise, we fall back to nearpoint finding
+        target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0, angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
+        shortenPath = false;
+    }
+
+    if (owner->IsHovering())
+        owner->UpdateAllowedPositionZ(x, y, z);
+
+    i_recalculateTravel = true;
+
+    bool success = i_path->CalculatePath(x, y, z, forceDest);
+    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+    {
+        if (cOwner)
+        {
+            cOwner->SetCannotReachTarget(target->GetGUID());
+        }
+
+        return true;
+    }
+
+    if (shortenPath)
+        i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);
+
+    if (cOwner)
+    {
+        cOwner->SetCannotReachTarget();
+    }
+
+    bool walk = false;
+    if (cOwner && !cOwner->IsPet())
+    {
+        switch (cOwner->GetMovementTemplate().GetChase())
+        {
+            case CreatureChaseMovementType::CanWalk:
+                if (owner->IsWalking())
+                    walk = true;
+                break;
+            case CreatureChaseMovementType::AlwaysWalk:
+                walk = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
+
+    Movement::MoveSplineInit init(owner);
+    init.MovebyPath(i_path->GetPath());
+    init.SetFacing(target);
+    init.SetWalk(walk);
+    init.Launch();
 
     return true;
 }
@@ -266,8 +256,8 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
-    i_recheckDistance.Reset(0);
     owner->SetWalk(false);
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 

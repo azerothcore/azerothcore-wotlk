@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
 
 enum Spells
@@ -258,4 +257,3 @@ void AddSC_boss_murmur()
     RegisterSpellScript(spell_shockwave_knockback);
     RegisterSpellScript(spell_murmur_sonic_boom_effect);
 }
-

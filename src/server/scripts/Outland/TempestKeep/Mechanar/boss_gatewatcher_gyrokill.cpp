@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "mechanar.h"
 
@@ -36,7 +36,13 @@ enum Spells
 
 struct boss_gatewatcher_gyrokill : public BossAI
 {
-    boss_gatewatcher_gyrokill(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL) { }
+    boss_gatewatcher_gyrokill(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_GYROKILL)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void JustDied(Unit* /*killer*/) override
     {

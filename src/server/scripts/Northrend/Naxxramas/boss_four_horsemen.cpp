@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Spells
@@ -355,7 +354,7 @@ public:
 
             if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
             {
-                if (Unit* pTarget = me->SelectNearestPlayer(300.0f))
+                if (Unit* pTarget = me->SelectNearestTarget(300.0f))
                 {
                     if (pTarget && me->IsValidAttackTarget(pTarget))
                     {
@@ -459,4 +458,3 @@ void AddSC_boss_four_horsemen()
     new spell_four_horsemen_mark();
     RegisterSpellScript(spell_four_horsemen_consumption);
 }
-

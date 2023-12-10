@@ -62,8 +62,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "StringConvert.h"
-#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -72,12 +70,18 @@
 #include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+
+//npcbot
+#include "botdatamgr.h"
+//end npcbot
 
 /*********************************************************/
 /***                    STORAGE SYSTEM                 ***/
@@ -5454,7 +5458,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if (HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_deathState = DeathState::Dead;
+        m_deathState = DEAD;
         AddUnitState(UNIT_STATE_ISOLATED);
     }
 
@@ -7138,6 +7142,10 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+
+    //npcbot: save stored items
+    BotDataMgr::SaveNpcBotStoredGear(GetGUID(), trans);
+    //end npcbot
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state

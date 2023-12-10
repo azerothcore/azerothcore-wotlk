@@ -22,7 +22,7 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "zulgurub.h"
 

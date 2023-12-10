@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "forge_of_souls.h"
 
 enum Yells
@@ -406,4 +405,3 @@ void AddSC_boss_bronjahm()
     new spell_bronjahm_soulstorm_visual();
     new spell_bronjahm_soulstorm_targeting();
 }
-

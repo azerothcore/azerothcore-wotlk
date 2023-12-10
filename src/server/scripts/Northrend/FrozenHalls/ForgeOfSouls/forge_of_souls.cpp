@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "forge_of_souls.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
-#include "forge_of_souls.h"
 
 enum Yells
 {
@@ -304,4 +303,3 @@ void AddSC_forge_of_souls()
     new npc_fos_leader_second();
     new spell_shield_of_bones();
 }
-

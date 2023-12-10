@@ -52,7 +52,7 @@ enum EncounterFrameType
     ENCOUNTER_FRAME_REFRESH_FRAMES      = 7,    // Xinef: can be used to refresh frames after unit was destroyed from client and send back (phase changes)
 };
 
-enum EncounterState : uint8
+enum EncounterState
 {
     NOT_STARTED   = 0,
     IN_PROGRESS   = 1,
@@ -185,6 +185,13 @@ public:
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
+    //npcbot: map hooks
+    virtual void OnNPCBotEnter(Creature* /*bot*/) { }
+    virtual void OnNPCBotLeave(Creature* /*bot*/) { }
+    void DoRemoveAurasDueToSpellOnNPCBot(Creature* bot, uint32 spell);
+    void DoCastSpellOnNPCBot(Creature* bot, uint32 spell);
+    //end npcbot
+
     //Handle open / close objects
     //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script
@@ -275,17 +282,12 @@ protected:
     void LoadMinionData(MinionData const* data);
     void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
 
-    void AddObject(Creature* obj, bool add = true);
-    void RemoveObject(Creature* obj);
-    void AddObject(GameObject* obj, bool add = true);
-    void RemoveObject(GameObject* obj);
-    void AddObject(WorldObject* obj, uint32 type, bool add = true);
-    void RemoveObject(WorldObject* obj, uint32 type);
+    void AddObject(Creature* obj, bool add);
+    void AddObject(GameObject* obj, bool add);
+    void AddObject(WorldObject* obj, uint32 type, bool add);
 
-    void AddDoor(GameObject* door, bool add = true);
-    void RemoveDoor(GameObject* door);
-    void AddMinion(Creature* minion, bool add = true);
-    void RemoveMinion(Creature* minion);
+    void AddDoor(GameObject* door, bool add);
+    void AddMinion(Creature* minion, bool add);
 
     void UpdateDoorState(GameObject* door);
     void UpdateMinionState(Creature* minion, EncounterState state);

@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
+#include "TaskScheduler.h"
 
 enum Spells
 {
@@ -37,18 +37,20 @@ enum Spells
 
 struct npc_hivezara_stinger : public ScriptedAI
 {
-    npc_hivezara_stinger(Creature* creature) : ScriptedAI(creature) { }
+    npc_hivezara_stinger(Creature* creature) : ScriptedAI(creature)
+    {
+    }
 
     void Reset() override
     {
-        scheduler.CancelAll();
+        _scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* who) override
     {
         DoCast(who ,who->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
-        scheduler.Schedule(5s, [this](TaskContext context)
+        _scheduler.Schedule(5s, [this](TaskContext context)
         {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
             {
@@ -78,24 +80,29 @@ struct npc_hivezara_stinger : public ScriptedAI
             return;
         }
 
-        scheduler.Update(diff,
+        _scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_destroyer : public ScriptedAI
 {
-    npc_obsidian_destroyer(Creature* creature) : ScriptedAI(creature) { }
+    npc_obsidian_destroyer(Creature* creature) : ScriptedAI(creature)
+    {
+    }
 
     void Reset() override
     {
-        scheduler.CancelAll();
+        _scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        scheduler.Schedule(6s, [this](TaskContext context)
+        _scheduler.Schedule(6s, [this](TaskContext context)
         {
             std::list<Unit*> targets;
             SelectTargetList(targets, 6, SelectTargetMethod::Random, 1, [&](Unit* target)
@@ -129,9 +136,12 @@ struct npc_obsidian_destroyer : public ScriptedAI
             return;
         }
 
-        scheduler.Update(diff,
+        _scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 class spell_drain_mana : public SpellScript
@@ -161,4 +171,3 @@ void AddSC_ruins_of_ahnqiraj()
     RegisterRuinsOfAhnQirajCreatureAI(npc_obsidian_destroyer);
     RegisterSpellScript(spell_drain_mana);
 }
-

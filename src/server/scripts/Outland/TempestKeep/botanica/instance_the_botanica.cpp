@@ -15,11 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GameTime.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "SpellScriptLoader.h"
+#include "ScriptMgr.h"
 #include "the_botanica.h"
 
 class instance_the_botanica : public InstanceMapScript
@@ -174,4 +172,3 @@ void AddSC_instance_the_botanica()
     new spell_botanica_call_of_the_falcon();
     new spell_botanica_shift_form();
 }
-

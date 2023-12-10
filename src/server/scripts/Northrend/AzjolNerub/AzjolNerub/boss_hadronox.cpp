@@ -15,11 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -428,4 +426,3 @@ void AddSC_boss_hadronox()
     new spell_hadronox_leech_poison();
     new achievement_hadronox_denied();
 }
-

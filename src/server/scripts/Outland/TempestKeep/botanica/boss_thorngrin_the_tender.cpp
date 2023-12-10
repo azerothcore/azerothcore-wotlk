@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "the_botanica.h"
 
@@ -45,6 +45,10 @@ struct boss_thorngrin_the_tender : public BossAI
     {
         me->m_SightDistance = 100.0f;
         _intro = false;
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void Reset() override

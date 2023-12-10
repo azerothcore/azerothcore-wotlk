@@ -15,20 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "oculus.h"
 #include "CombatAI.h"
-#include "CreatureScript.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "oculus.h"
 #include <unordered_map>
 
 enum Drakes
@@ -393,6 +392,14 @@ public:
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
         {
+            //npcbot
+            if (passenger->IsNPCBot() && add)
+            {
+                despawnTimer = 0;
+                return;
+            }
+            //end npcbot
+
             if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
 
@@ -432,6 +439,12 @@ public:
             if (JustSummoned)
             {
                 despawnTimer = 1;
+                //npcbot
+                if (Vehicle const* v = me->GetVehicleKit())
+                    if (Unit const* passenger = v->GetPassenger(0))
+                        if (passenger->IsNPCBot())
+                            despawnTimer = 0;
+                //end npcbot
                 JustSummoned = false;
                 if (m_pInstance)
                 {
@@ -1035,4 +1048,3 @@ void AddSC_oculus()
     new spell_oculus_rider_aura();
     new spell_oculus_drake_flag();
 }
-

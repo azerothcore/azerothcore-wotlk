@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "gundrak.h"
 
 enum Spells
@@ -498,4 +497,3 @@ void AddSC_boss_drakkari_colossus()
     new spell_drakkari_colossus_surge();
     new spell_drakkari_colossus_face_me();
 }
-

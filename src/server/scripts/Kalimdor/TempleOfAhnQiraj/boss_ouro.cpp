@@ -17,11 +17,12 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -108,6 +109,7 @@ struct boss_ouro : public BossAI
     {
         SetCombatMovement(false);
         me->SetControlled(true, UNIT_STATE_ROOT);
+        _scheduler.SetValidator([this] { return !me->HasUnitState(UNIT_STATE_CASTING); });
     }
 
     bool CanAIAttack(Unit const* victim) const override
@@ -121,8 +123,8 @@ struct boss_ouro : public BossAI
         {
             DoCastSelf(SPELL_BERSERK, true);
             _enraged = true;
-            scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
-            scheduler.Schedule(1s, [this](TaskContext context)
+            _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+            _scheduler.Schedule(1s, [this](TaskContext context)
                 {
                     if (!IsPlayerWithinMeleeRange())
                         DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
@@ -148,8 +150,8 @@ struct boss_ouro : public BossAI
         _submergeMelee = 0;
         _submerged = true;
         DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-        scheduler.CancelGroup(GROUP_EMERGED);
-        scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+        _scheduler.CancelGroup(GROUP_EMERGED);
+        _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
 
         if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
         {
@@ -204,7 +206,8 @@ struct boss_ouro : public BossAI
         DoCastSelf(SPELL_SUMMON_SANDWORM_BASE, true);
         me->SetReactState(REACT_AGGRESSIVE);
         CastGroundRupture();
-        scheduler.Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
+        _scheduler
+            .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
                     {
@@ -262,7 +265,7 @@ struct boss_ouro : public BossAI
     void Reset() override
     {
         instance->SetBossState(DATA_OURO, NOT_STARTED);
-        scheduler.CancelAll();
+        _scheduler.CancelAll();
         _submergeMelee = 0;
         _submerged = false;
         _enraged = false;
@@ -283,6 +286,7 @@ struct boss_ouro : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         Emerge();
+
         BossAI::JustEngagedWith(who);
     }
 
@@ -290,11 +294,14 @@ struct boss_ouro : public BossAI
     {
         UpdateVictim();
 
-        scheduler.Update(diff,
-            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+        _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
     }
 
 protected:
+    TaskScheduler _scheduler;
     bool _enraged;
     uint8 _submergeMelee;
     bool _submerged;
@@ -331,16 +338,16 @@ struct npc_dirt_mound : ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
-        scheduler.Schedule(30s, [this](TaskContext /*context*/)
-        {
-            DoCastSelf(SPELL_SUMMON_SCARABS, true);
-            me->DespawnOrUnsummon(1000);
-        })
+        _scheduler.Schedule(30s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_SUMMON_SCARABS, true);
+                me->DespawnOrUnsummon(1000);
+            })
             .Schedule(100ms, [this](TaskContext context)
-        {
-            ChaseNewTarget();
-            context.Repeat(5s, 10s);
-        });
+            {
+                ChaseNewTarget();
+                context.Repeat(5s, 10s);
+            });
     }
 
     void ChaseNewTarget()
@@ -358,7 +365,7 @@ struct npc_dirt_mound : ScriptedAI
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
+        _scheduler.Update(diff);
     }
 
     void Reset() override
@@ -382,6 +389,7 @@ struct npc_dirt_mound : ScriptedAI
     }
 
 protected:
+    TaskScheduler _scheduler;
     uint32 _ouroHealth;
     InstanceScript* _instance;
 };

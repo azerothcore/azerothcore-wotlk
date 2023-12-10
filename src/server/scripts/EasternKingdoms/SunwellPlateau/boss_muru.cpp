@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
 enum Spells
@@ -518,4 +517,3 @@ void AddSC_boss_muru()
     new spell_entropius_void_zone_visual();
     new spell_entropius_black_hole_effect();
 }
-

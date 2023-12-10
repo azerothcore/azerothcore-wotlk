@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "mechanar.h"
 
 enum Says
@@ -47,7 +46,13 @@ enum Spells
 
 struct boss_nethermancer_sepethrea : public BossAI
 {
-    boss_nethermancer_sepethrea(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA) { }
+    boss_nethermancer_sepethrea(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     bool CanAIAttack(Unit const* target) const override
     {
@@ -160,7 +165,7 @@ struct npc_raging_flames : public ScriptedAI
 
         FixateRandomTarget();
 
-        scheduler.Schedule(15s, 25s, [this](TaskContext task)
+        _scheduler.Schedule(15s, 25s, [this](TaskContext task)
         {
             DoCastSelf(SPELL_INFERNO);
             FixateRandomTarget();
@@ -171,7 +176,7 @@ struct npc_raging_flames : public ScriptedAI
 
     void Reset() override
     {
-        scheduler.CancelAll();
+        _scheduler.CancelAll();
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -184,10 +189,13 @@ struct npc_raging_flames : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
+        _scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 class spell_ragin_flames_inferno : public AuraScript
@@ -211,4 +219,3 @@ void AddSC_boss_nethermancer_sepethrea()
     RegisterMechanarCreatureAI(npc_raging_flames);
     RegisterSpellScript(spell_ragin_flames_inferno);
 }
-

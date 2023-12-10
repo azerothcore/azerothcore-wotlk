@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundScript.h"
 #include "ScriptMgr.h"
 
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
@@ -24,11 +23,3 @@ Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
     ABORT();
     return nullptr;
 }
-
-BattlegroundScript::BattlegroundScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<BattlegroundScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<BattlegroundScript>;

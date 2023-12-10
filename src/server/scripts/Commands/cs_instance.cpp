@@ -23,7 +23,6 @@
  EndScriptData */
 
 #include "Chat.h"
-#include "CommandScript.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
@@ -32,6 +31,7 @@
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -139,7 +139,9 @@ public:
         arena = 0;
         spectators = 0;
         sMapMgr->GetNumPlayersInInstances(dungeon, battleground, arena, spectators);
-        handler->SendErrorMessage("players in instances: dungeons (%d), battlegrounds (%d), arenas (%d + %d spect)", dungeon, battleground, arena, spectators);
+        handler->PSendSysMessage("players in instances: dungeons (%d), battlegrounds (%d), arenas (%d + %d spect)", dungeon, battleground, arena, spectators);
+
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -149,13 +151,15 @@ public:
         Map* map = player->GetMap();
         if (!map->IsDungeon())
         {
-            handler->SendErrorMessage("Map is not a dungeon.");
+            handler->PSendSysMessage("Map is not a dungeon.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!map->ToInstanceMap()->GetInstanceScript())
         {
-            handler->SendErrorMessage("Map has no instance data.");
+            handler->PSendSysMessage("Map has no instance data.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -169,7 +173,8 @@ public:
         // Character name must be provided when using this from console.
         if (!player && !handler->GetSession())
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->PSendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -178,27 +183,31 @@ public:
 
         if (!player->IsConnected())
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         InstanceMap* map = player->GetConnectedPlayer()->GetMap()->ToInstanceMap();
         if (!map)
         {
-            handler->SendErrorMessage(LANG_NOT_DUNGEON);
+            handler->PSendSysMessage(LANG_NOT_DUNGEON);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!map->GetInstanceScript())
         {
-            handler->SendErrorMessage(LANG_NO_INSTANCE_DATA);
+            handler->PSendSysMessage(LANG_NO_INSTANCE_DATA);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         // Reject improper values.
         if (encounterId > map->GetInstanceScript()->GetEncounterCount())
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->PSendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -213,7 +222,8 @@ public:
         // Character name must be provided when using this from console.
         if (!player && !handler->GetSession())
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->PSendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -222,26 +232,30 @@ public:
 
         if (!player->IsConnected())
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         InstanceMap* map = player->GetConnectedPlayer()->GetMap()->ToInstanceMap();
         if (!map)
         {
-            handler->SendErrorMessage(LANG_NOT_DUNGEON);
+            handler->PSendSysMessage(LANG_NOT_DUNGEON);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!map->GetInstanceScript())
         {
-            handler->SendErrorMessage(LANG_NO_INSTANCE_DATA);
+            handler->PSendSysMessage(LANG_NO_INSTANCE_DATA);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (encounterId > map->GetInstanceScript()->GetEncounterCount())
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->PSendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

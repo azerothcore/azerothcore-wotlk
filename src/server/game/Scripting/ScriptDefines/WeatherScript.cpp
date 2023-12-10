@@ -15,8 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WeatherScript.h"
-#include "ElunaScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -44,11 +42,3 @@ void ScriptMgr::OnWeatherUpdate(Weather* weather, uint32 diff)
         tempScript->OnUpdate(weather, diff);
     }
 }
-
-WeatherScript::WeatherScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<WeatherScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<WeatherScript>;

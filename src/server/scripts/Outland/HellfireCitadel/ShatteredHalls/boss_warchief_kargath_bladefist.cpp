@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "shattered_halls.h"
 
@@ -322,4 +321,3 @@ void AddSC_boss_warchief_kargath_bladefist()
     RegisterShatteredHallsCreatureAI(npc_warchief_portal);
     RegisterSpellScript(spell_blade_dance_targeting);
 }
-

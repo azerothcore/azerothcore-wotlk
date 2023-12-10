@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AccountScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -90,13 +89,10 @@ bool ScriptMgr::CanAccountCreateCharacter(uint32 accountId, uint8 charRace, uint
         return !script->CanAccountCreateCharacter(accountId, charRace, charClass);
     });
 
-    return ReturnValidBool(ret);
-}
+    if (ret && *ret)
+    {
+        return false;
+    }
 
-AccountScript::AccountScript(char const* name) :
-    ScriptObject(name)
-{
-    ScriptRegistry<AccountScript>::AddScript(this);
+    return true;
 }
-
-template class AC_GAME_API ScriptRegistry<AccountScript>;

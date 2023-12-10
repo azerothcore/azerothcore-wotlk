@@ -16,10 +16,9 @@
  */
 
 #include "CreatureGroups.h"
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 

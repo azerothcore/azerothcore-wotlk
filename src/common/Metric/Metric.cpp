@@ -71,7 +71,7 @@ void Metric::LoadFromConfigs()
 {
     bool previousValue = _enabled;
     _enabled = sConfigMgr->GetOption<bool>("Metric.Enable", false);
-    _updateInterval = sConfigMgr->GetOption<int32>("Metric.Interval", 1);
+    _updateInterval = sConfigMgr->GetOption<int32>("Metric.Interval", 10);
 
     if (_updateInterval < 1)
     {

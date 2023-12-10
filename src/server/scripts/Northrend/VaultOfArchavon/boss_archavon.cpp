@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "vault_of_archavon.h"
 
 enum Archavon
@@ -235,4 +234,3 @@ void AddSC_boss_archavon()
     new boss_archavon();
     new spell_archavon_rock_shards();
 }
-

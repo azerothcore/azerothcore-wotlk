@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "arcatraz.h"
 
 DoorData const doorData[] =
@@ -56,7 +55,7 @@ public:
             {
                 case GO_CONTAINMENT_CORE_SECURITY_FIELD_ALPHA:
                 case GO_CONTAINMENT_CORE_SECURITY_FIELD_BETA:
-                    AddDoor(go);
+                    AddDoor(go, true);
                     break;
                 case GO_STASIS_POD_ALPHA:
                     StasisPodGUIDs[0] = go->GetGUID();

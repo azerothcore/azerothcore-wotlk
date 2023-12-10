@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "obsidian_sanctum.h"
 
 enum Says
@@ -875,7 +874,7 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_TENEBRON_DEATH);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
-                    instance->SetBossState(DATA_TENEBRON, DONE);
+                    instance->SetBossState(DATA_SHADRON, DONE);
                 }
                 break;
             }
@@ -1584,4 +1583,3 @@ void AddSC_boss_sartharion()
 
     new spell_sartharion_lava_strike();
 }
-

@@ -15,14 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
-#include "InstanceMapScript.h"
+#include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
-#include "SpellScriptLoader.h"
+#include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "zulfarrak.h"
-#include "GridNotifiersImpl.h"
 
 enum Misc
 {
@@ -539,4 +537,3 @@ void AddSC_instance_zulfarrak()
     new spell_zulfarrak_summon_zulfarrak_zombies();
     new spell_zulfarrak_unlocking();
 }
-

@@ -16,10 +16,10 @@
  */
 
 #include "AutobroadcastMgr.h"
-#include "Chat.h"
 #include "Config.h"
-#include "GridNotifiers.h"
+#include "Chat.h"
 #include "Player.h"
+#include "GridNotifiers.h"
 
 AutobroadcastMgr* AutobroadcastMgr::instance()
 {

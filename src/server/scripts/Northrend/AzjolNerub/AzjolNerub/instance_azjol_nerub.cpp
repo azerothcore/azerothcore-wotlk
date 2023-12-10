@@ -16,10 +16,8 @@
  */
 
 #include "AreaBoundary.h"
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
 
 DoorData const doorData[] =
@@ -89,7 +87,7 @@ public:
                 case GO_ANUBARAK_DOORS1:
                 case GO_ANUBARAK_DOORS2:
                 case GO_ANUBARAK_DOORS3:
-                    AddDoor(go);
+                    AddDoor(go, true);
                     break;
             }
         }
@@ -102,7 +100,7 @@ public:
                 case GO_ANUBARAK_DOORS1:
                 case GO_ANUBARAK_DOORS2:
                 case GO_ANUBARAK_DOORS3:
-                    RemoveDoor(go);
+                    AddDoor(go, false);
                     break;
             }
         }

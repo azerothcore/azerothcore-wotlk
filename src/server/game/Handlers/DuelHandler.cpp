@@ -52,6 +52,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_DUEL_CANCELLED");
     Player* player = GetPlayer();
 
     ObjectGuid guid;

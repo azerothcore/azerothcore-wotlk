@@ -18,8 +18,8 @@
 #ifndef CombatPackets_h__
 #define CombatPackets_h__
 
-#include "ObjectGuid.h"
 #include "Packet.h"
+#include "ObjectGuid.h"
 
 namespace WorldPackets
 {

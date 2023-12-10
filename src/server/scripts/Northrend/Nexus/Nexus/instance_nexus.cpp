@@ -15,8 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
 
@@ -94,17 +93,17 @@ public:
                 case GO_TELESTRA_SPHERE:
                     if (GetBossState(DATA_TELESTRA_ORB) != DONE && GetBossState(DATA_MAGUS_TELESTRA_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject);
+                    AddDoor(gameObject, true);
                     break;
                 case GO_ANOMALUS_SPHERE:
                     if (GetBossState(DATA_ANOMALUS_ORB) != DONE && GetBossState(DATA_ANOMALUS_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject);
+                    AddDoor(gameObject, true);
                     break;
                 case GO_ORMOROK_SPHERE:
                     if (GetBossState(DATA_ORMOROK_ORB) != DONE && GetBossState(DATA_ORMOROK_EVENT) == DONE)
                         gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    AddDoor(gameObject);
+                    AddDoor(gameObject, true);
                     break;
             }
         }
@@ -116,7 +115,7 @@ public:
                 case GO_TELESTRA_SPHERE:
                 case GO_ANOMALUS_SPHERE:
                 case GO_ORMOROK_SPHERE:
-                    RemoveDoor(gameObject);
+                    AddDoor(gameObject, false);
                     break;
             }
         }
@@ -272,4 +271,3 @@ void AddSC_instance_nexus()
     new instance_nexus();
     new npc_crystalline_frayer();
 }
-

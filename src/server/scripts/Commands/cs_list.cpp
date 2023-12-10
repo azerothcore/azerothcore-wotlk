@@ -23,7 +23,6 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "CommandScript.h"
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -34,6 +33,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Random.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;
@@ -71,7 +71,8 @@ public:
         CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(creatureId);
         if (!cInfo)
         {
-            handler->SendErrorMessage(LANG_COMMAND_INVALIDCREATUREID, uint32(creatureId));
+            handler->PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, uint32(creatureId));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -342,7 +343,8 @@ public:
 
         if (inventoryCount + mailCount + auctionCount + guildCount == 0)
         {
-            handler->SendErrorMessage(LANG_COMMAND_NOITEMFOUND);
+            handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -356,7 +358,8 @@ public:
         GameObjectTemplate const* gInfo = sObjectMgr->GetGameObjectTemplate(gameObjectId);
         if (!gInfo)
         {
-            handler->SendErrorMessage(LANG_COMMAND_LISTOBJINVALIDID, uint32(gameObjectId));
+            handler->PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, uint32(gameObjectId));
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -456,7 +459,8 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

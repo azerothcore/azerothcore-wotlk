@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DynamicObjectScript.h"
 #include "ScriptMgr.h"
 
 void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
@@ -27,11 +26,3 @@ void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
         script->OnUpdate(dynobj, diff);
     }
 }
-
-DynamicObjectScript::DynamicObjectScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<DynamicObjectScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<DynamicObjectScript>;

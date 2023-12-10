@@ -15,10 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "steam_vault.h"
 
 enum MainChambersAccessPanelSays
@@ -189,4 +187,3 @@ void AddSC_instance_steam_vault()
     new go_main_chambers_access_panel();
     new instance_steam_vault();
 }
-

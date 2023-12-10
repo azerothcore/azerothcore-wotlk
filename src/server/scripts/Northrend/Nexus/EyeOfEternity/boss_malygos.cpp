@@ -16,8 +16,6 @@
  */
 
 #include "CombatAI.h"
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
@@ -26,7 +24,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "eye_of_eternity.h"
 
@@ -538,6 +535,7 @@ public:
                                             pPlayer->SendMessageToSet(&data, true);
 
                                             sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                            sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                             pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -720,6 +718,7 @@ public:
                                 if (Player* pPlayer = i->GetSource())
                                 {
                                     sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
@@ -906,6 +905,7 @@ public:
 
                 sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
                 sScriptMgr->AnticheatSetUnderACKmount(plr);
+                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
             }
         }
 
@@ -945,6 +945,7 @@ public:
                                 plr->SetDisableGravity(true, true);
 
                                 sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
+                                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
                                 sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 

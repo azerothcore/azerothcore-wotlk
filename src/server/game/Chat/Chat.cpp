@@ -62,7 +62,8 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 
     if (!target_session && !target_account)
     {
-        SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
         return true;
     }
 
@@ -91,7 +92,8 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     AccountTypes target_ac_sec = AccountTypes(target_sec);
     if (m_session->GetSecurity() < target_ac_sec || (strong && m_session->GetSecurity() <= target_ac_sec))
     {
-        SendErrorMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
         return true;
     }
 
@@ -149,18 +151,6 @@ void ChatHandler::SendSysMessage(uint32 entry)
     SendSysMessage(GetAcoreString(entry));
 }
 
-void ChatHandler::SendErrorMessage(uint32 entry)
-{
-    SendSysMessage(entry);
-    SetSentErrorMessage(true);
-}
-
-void ChatHandler::SendErrorMessage(std::string_view str, bool escapeCharacters)
-{
-    SendSysMessage(str, escapeCharacters);
-    SetSentErrorMessage(true);
-}
-
 bool ChatHandler::_ParseCommands(std::string_view text)
 {
     if (Acore::ChatCommands::TryExecuteCommand(*this, text))
@@ -171,7 +161,8 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return false;
 
     // Send error message for GMs
-    SendErrorMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    SetSentErrorMessage(true);
     return true;
 }
 
@@ -691,7 +682,8 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
         std::string name = extractPlayerNameFromLink(args);
         if (name.empty())
         {
-            SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
             return false;
         }
 
@@ -733,7 +725,8 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
     // some from req. data must be provided (note: name is empty if player not exist)
     if ((!player || !*player) && (!player_guid || !*player_guid) && (!player_name || player_name->empty()))
     {
-        SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
         return false;
     }
 
@@ -846,7 +839,8 @@ bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player
         {
             if (!normalizePlayerName(name))
             {
-                SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+                SetSentErrorMessage(true);
                 return false;
             }
 

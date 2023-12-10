@@ -23,16 +23,16 @@
  EndScriptData */
 
 #include "Chat.h"
-#include "CommandScript.h"
 #include "Config.h"
 #include "GameTime.h"
 #include "GitRevision.h"
 #include "Language.h"
 #include "ModuleMgr.h"
-#include "MotdMgr.h"
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
+#include "ScriptMgr.h"
+#include "MotdMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"
@@ -307,7 +307,8 @@ public:
 
         if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -332,7 +333,8 @@ public:
 
         if (delay <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -360,7 +362,8 @@ public:
 
         if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -385,7 +388,8 @@ public:
 
         if (delay <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -413,7 +417,8 @@ public:
 
         if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -438,7 +443,8 @@ public:
 
         if (delay <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -466,7 +472,8 @@ public:
 
         if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -491,7 +498,8 @@ public:
 
         if (delay <= 0)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -569,7 +577,8 @@ public:
             return true;
         }
 
-        handler->SendErrorMessage(LANG_USE_BOL);
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 

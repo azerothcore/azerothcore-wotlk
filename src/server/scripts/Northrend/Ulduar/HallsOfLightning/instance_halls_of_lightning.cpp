@@ -15,8 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
 
@@ -218,4 +217,3 @@ void AddSC_instance_halls_of_lightning()
 {
     new instance_halls_of_lightning();
 }
-

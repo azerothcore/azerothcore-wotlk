@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "vault_of_archavon.h"
 
 enum Spells
@@ -278,4 +277,3 @@ void AddSC_boss_emalon()
     new spell_voa_overcharge();
     new spell_voa_lightning_nova();
 }
-

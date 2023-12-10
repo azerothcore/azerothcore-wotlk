@@ -16,17 +16,16 @@
  */
 
 #include "CombatAI.h"
-#include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SmartScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 // Ours
@@ -2204,4 +2203,3 @@ void AddSC_icecrown()
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
 }
-

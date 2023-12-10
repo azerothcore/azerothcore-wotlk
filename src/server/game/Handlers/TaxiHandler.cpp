@@ -27,6 +27,8 @@
 
 void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
+
     ObjectGuid guid;
 
     recvData >> guid;
@@ -59,6 +61,8 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
 
 void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
+
     ObjectGuid guid;
     recvData >> guid;
 
@@ -120,9 +124,13 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
         GetPlayer()->Mount(mountDisplayId);
 
     if (Creature* critter = ObjectAccessor::GetCreature(*GetPlayer(), GetPlayer()->GetCritterGUID()))
+    {
         critter->DespawnOrUnsummon();
+    }
 
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
+
+    sScriptMgr->AnticheatSetSkipOnePacketForASH(GetPlayer(), true);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
@@ -160,6 +168,8 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
 
 void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
+
     ObjectGuid guid;
     uint32 node_count;
 
@@ -199,6 +209,8 @@ void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_MOVE_SPLINE_DONE");
+
     ObjectGuid guid; // used only for proper packet read
     recvData >> guid.ReadAsPacked();
 
@@ -251,6 +263,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXI");
+
     ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);

@@ -15,16 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include <random>
 
 enum eBonfire
@@ -161,8 +159,6 @@ struct npc_midsummer_torch_target : public ScriptedAI
         int8 num = urand(0, posVec.size() - 1);
         Position pos;
         pos.Relocate(posVec.at(num));
-        me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
 
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
     }
@@ -208,7 +204,7 @@ class spell_gen_crab_disguise : public AuraScript
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_gen_crab_disguise::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -269,7 +265,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         LocateRibbonPole();
         SpawnFireSpiralBunny();
 
-        scheduler.Schedule(1s, [this](TaskContext context)
+        _scheduler.Schedule(1s, [this](TaskContext context)
             {
                 DoCleanupChecks();
                 context.Repeat();
@@ -326,7 +322,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void LocateRibbonPole()
     {
-        scheduler.Schedule(420ms, [this](TaskContext context)
+        _scheduler.Schedule(420ms, [this](TaskContext context)
             {
                 _ribbonPole = me->FindNearestGameObject(GO_RIBBON_POLE, 10.0f);
 
@@ -380,7 +376,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_3)
         {
-            scheduler.Schedule(500ms, [this](TaskContext /*context*/)
+            _scheduler.Schedule(500ms, [this](TaskContext /*context*/)
             {
                 _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
@@ -391,7 +387,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
         if (_dancerList.size() >= THRESHOLD_FIREWORK_5)
         {
-            scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
+            _scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
             {
                 _bunny->CastSpell(nullptr, SPELL_RIBBON_POLE_FIREWORK);
             })
@@ -461,10 +457,11 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        scheduler.Update(diff);
+        _scheduler.Update(diff);
     }
 
 private:
+    TaskScheduler _scheduler;
     std::vector<Player*> _dancerList;
     GameObject* _ribbonPole;
     Creature* _bunny;
@@ -757,9 +754,9 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
-        OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
         if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
+            OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     }
@@ -894,4 +891,3 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
 }
-

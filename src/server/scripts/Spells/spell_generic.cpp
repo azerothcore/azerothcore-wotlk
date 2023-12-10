@@ -15,6 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
+ * of creature using it or can't be bound to any player class.
+ * Ordered alphabetically using scriptname.
+ * Scriptnames of files in this file should be prefixed with "spell_gen_"
+ */
+
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -22,25 +29,18 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
-/*
- * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
- * of creature using it or can't be bound to any player class.
- * Ordered alphabetically using scriptname.
- * Scriptnames of files in this file should be prefixed with "spell_gen_"
- */
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1952,7 +1952,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    bool Validate(SpellInfo const* /*spellEntry*/) override
     {
         return ValidateSpellInfo({
             SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
@@ -2477,6 +2477,10 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
+        //npcbot
+        if (GetCaster() && GetCaster()->IsNPCBot() && GetOwner()->GetTypeId() == TYPEID_UNIT)
+            return true;
+        //end npcbot
         return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT;
     }
 
@@ -2499,7 +2503,19 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
                 break;
         }
 
+        //npcbot
+        /*
+        //end npcbot
         float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+        //npcbot
+        */
+        float avgILvl;
+        if (caster->GetTypeId() == TYPEID_PLAYER)
+            avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+        else
+            avgILvl = caster->ToCreature()->GetBotAverageItemLevel();
+        //end npcbot
+
         if (avgILvl < baseItemLevel)
             return;                     /// @todo Research possibility of scaling down
 
@@ -3606,6 +3622,11 @@ class spell_gen_tournament_pennant : public AuraScript
 
     bool Load() override
     {
+        //npcbot
+        if (GetCaster() && GetCaster()->IsNPCBot())
+            return true;
+        //end npcbot
+
         return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
@@ -5102,40 +5123,6 @@ class spell_gen_yehkinya_bramble : public SpellScript
     }
 };
 
-// 35244 - Choking Vines
-enum ChokingVines
-{
-    SPELL_CHOKING_VINES = 35244,
-    SPELL_CHOKING_WOUND = 35247
-};
-
-class spell_gen_choking_vines : public AuraScript
-{
-    PrepareAuraScript(spell_gen_choking_vines);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CHOKING_VINES, SPELL_CHOKING_WOUND });
-    }
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-        {
-            if (GetStackAmount() == GetSpellInfo()->StackAmount) // 5 stacks
-            {
-                target->RemoveAurasDueToSpell(SPELL_CHOKING_VINES);
-                target->CastSpell(target, SPELL_CHOKING_WOUND, true); // Unknown if it's a self cast or casted by the source on 5th
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_gen_choking_vines::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-    }
-};
-
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5288,6 +5275,4 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_planting_scourge_banner);
     RegisterSpellScript(spell_gen_jubling_cooldown);
     RegisterSpellScript(spell_gen_yehkinya_bramble);
-    RegisterSpellScript(spell_gen_choking_vines);
 }
-

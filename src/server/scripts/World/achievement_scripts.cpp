@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
 #include "BattlegroundAB.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundIC.h"
@@ -23,6 +22,7 @@
 #include "BattlegroundWS.h"
 #include "Creature.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Vehicle.h"
 
 class achievement_resilient_victory : public AchievementCriteriaScript

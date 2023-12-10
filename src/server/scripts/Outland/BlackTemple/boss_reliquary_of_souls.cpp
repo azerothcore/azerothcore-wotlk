@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
-#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Says
@@ -791,4 +790,3 @@ void AddSC_boss_reliquary_of_souls()
     new spell_reliquary_of_souls_aura_of_anger();
     new spell_reliquary_of_souls_spite();
 }
-

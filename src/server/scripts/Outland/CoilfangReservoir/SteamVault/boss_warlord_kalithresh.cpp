@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
+#include "SpellAuras.h"
 #include "steam_vault.h"
 
 enum Texts
@@ -172,4 +171,3 @@ void AddSC_boss_warlord_kalithresh()
     RegisterSteamvaultCreatureAI(boss_warlord_kalithresh);
     RegisterSpellScript(spell_warlords_rage);
 }
-

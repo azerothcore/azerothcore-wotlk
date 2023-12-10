@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MiscScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -183,11 +182,3 @@ void ScriptMgr::GetDialogStatus(Player* player, Object* questgiver)
         script->GetDialogStatus(player, questgiver);
     });
 }
-
-MiscScript::MiscScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<MiscScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<MiscScript>;

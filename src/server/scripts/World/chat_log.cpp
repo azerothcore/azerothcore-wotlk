@@ -16,11 +16,10 @@
  */
 
 #include "Channel.h"
-#include "CreatureScript.h"
 #include "Group.h"
 #include "Guild.h"
+#include "ScriptMgr.h"
 #include "Log.h"
-#include "PlayerScript.h"
 
 class ChatLogScript : public PlayerScript
 {
@@ -143,4 +142,3 @@ void AddSC_chat_log()
 {
     new ChatLogScript();
 }
-

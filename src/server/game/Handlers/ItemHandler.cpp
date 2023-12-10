@@ -29,6 +29,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+// npcbot
+#include "botmgr.h"
+//end npcbot
+
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SPLIT_ITEM");
@@ -727,6 +731,7 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
 
 void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_SELL_ITEM");
     ObjectGuid vendorguid, itemguid;
     uint32 count;
 
@@ -907,6 +912,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_BUYBACK_ITEM");
     ObjectGuid vendorguid;
     uint32 slot;
 
@@ -962,6 +968,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 
 void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_BUY_ITEM_IN_SLOT");
     ObjectGuid vendorguid, bagguid;
     uint32 item, slot, count;
     uint8 bagslot;
@@ -1003,6 +1010,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_BUY_ITEM");
     ObjectGuid vendorguid;
     uint32 item, slot, count;
     uint8 unk1;
@@ -1085,6 +1093,15 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
         {
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
             {
+                // npcbot
+                if (_player->HaveBot())
+                {
+                    if (!(itemTemplate->AllowableClass & (_player->GetClassMask() | _player->GetBotMgr()->GetAllNpcBotsClassMask())) &&
+                        itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
+                        continue;
+                }
+                else
+                // end npcbot
                 if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
                 {
                     continue;

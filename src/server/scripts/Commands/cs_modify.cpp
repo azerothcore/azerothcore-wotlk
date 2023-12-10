@@ -24,12 +24,12 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "StringConvert.h"
 
 using namespace Acore::ChatCommands;
@@ -108,13 +108,15 @@ public:
     {
         if (modifyValue < 1)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -255,7 +257,8 @@ public:
         Creature* target = handler->getSelectedCreature();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -294,7 +297,8 @@ public:
 
         if (!sFactionTemplateStore.LookupEntry(factionid))
         {
-            handler->SendErrorMessage(LANG_WRONG_FACTION, factionid);
+            handler->PSendSysMessage(LANG_WRONG_FACTION, factionid);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -314,7 +318,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -351,7 +356,8 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -381,7 +387,8 @@ public:
             }
         }
 
-        handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+        handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -389,13 +396,15 @@ public:
     {
         if (speed > maximumBound || speed < minimumBound)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -409,7 +418,8 @@ public:
 
             if (player->IsInFlight() && checkInFlight)
             {
-                handler->SendErrorMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
+                handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -495,14 +505,16 @@ public:
     {
         if (scale > 10.0f || scale < 0.1f)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -527,14 +539,16 @@ public:
     {
         if (!sCreatureDisplayInfoStore.LookupEntry(creatureDisplayID))
         {
-            handler->SendErrorMessage(LANG_NO_MOUNT);
+            handler->SendSysMessage(LANG_NO_MOUNT);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -570,7 +584,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -661,7 +676,8 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -673,13 +689,15 @@ public:
 
         if (field < OBJECT_END || field >= target->GetValuesCount())
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (bit < 1 || bit > 32)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -702,7 +720,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -739,7 +758,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -784,7 +804,8 @@ public:
                     {
                         if (*delta < 0 || (*delta > ReputationMgr::PointsInRank[r] - 1))
                         {
-                            handler->SendErrorMessage(LANG_COMMAND_FACTION_DELTA, ReputationMgr::PointsInRank[r] - 1);
+                            handler->PSendSysMessage(LANG_COMMAND_FACTION_DELTA, ReputationMgr::PointsInRank[r] - 1);
+                            handler->SetSentErrorMessage(true);
                             return false;
                         }
 
@@ -799,7 +820,8 @@ public:
 
             if (r >= MAX_REPUTATION_RANK)
             {
-                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr.c_str());
+                handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -817,13 +839,15 @@ public:
 
         if (!factionEntry)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_UNKNOWN, factionId);
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_UNKNOWN, factionId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (factionEntry->reputationListID < 0)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[handler->GetSessionDbcLocale()], factionId);
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[handler->GetSessionDbcLocale()], factionId);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -898,7 +922,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -919,7 +944,8 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -947,7 +973,8 @@ public:
         }
         else
         {
-            handler->SendErrorMessage(LANG_MUST_MALE_OR_FEMALE);
+            handler->SendSysMessage(LANG_MUST_MALE_OR_FEMALE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

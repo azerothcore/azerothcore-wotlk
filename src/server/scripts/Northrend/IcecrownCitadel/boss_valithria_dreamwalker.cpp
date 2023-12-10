@@ -15,17 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
-#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "GridNotifiersImpl.h"
 
 enum Texts
 {
@@ -295,12 +293,16 @@ public:
             _instance(creature->GetInstanceScript()), _portalCount(RAID_MODE<uint32>(3, 8, 3, 8))
         {
             me->SetReactState(REACT_PASSIVE);
+            _spawnHealth = 1; // just in case if not set below
+            if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
+                if (data->curhealth)
+                    _spawnHealth = data->curhealth;
         }
 
         void Reset() override
         {
             _events.Reset();
-            me->SetHealth(me->GetMaxHealth() * 0.5f); // starts at 50% health
+            me->SetHealth(_spawnHealth);
             me->LoadCreaturesAddon(true);
             // immune to percent heals
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_OBS_MOD_HEALTH, true);
@@ -438,9 +440,8 @@ public:
             // does not enter combat
             if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
             {
-                uint32 startingHealth = me->GetMaxHealth() * 0.5f;
-                if (me->GetHealth() != startingHealth) // healing when boss cannot be engaged (lower spire not finished, cheating) doesn't start the fight, prevent winning this way
-                    me->SetHealth(startingHealth);
+                if (me->GetHealth() != _spawnHealth) // healing when boss cannot be engaged (lower spire not finished, cheating) doesn't start the fight, prevent winning this way
+                    me->SetHealth(_spawnHealth);
                 return;
             }
 
@@ -483,6 +484,7 @@ public:
     private:
         EventMap _events;
         InstanceScript* _instance;
+        uint32 _spawnHealth;
         uint32 const _portalCount;
         uint32 _missedPortals;
         bool _under25PercentTalkDone;
@@ -754,7 +756,7 @@ public:
             if (!me->IsInCombat())
                 if (me->GetSpawnId())
                     if (!me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                        me->CastSpell(me, SPELL_CORRUPTION, true);
+                        me->CastSpell(me, SPELL_CORRUPTION, false);
 
             if (!UpdateVictim())
                 return;

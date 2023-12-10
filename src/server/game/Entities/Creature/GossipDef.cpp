@@ -17,12 +17,11 @@
 
 #include "GossipDef.h"
 #include "Formulas.h"
-#include "Object.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "QuestDef.h"
-#include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 

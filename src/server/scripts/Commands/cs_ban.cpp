@@ -26,12 +26,12 @@ EndScriptData */
 #include "BanMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 /// Ban function modes
 enum BanMode
@@ -121,7 +121,8 @@ public:
 
         if (!normalizePlayerName(name))
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -141,7 +142,8 @@ public:
                 break;
             case BAN_NOTFOUND:
                 {
-                    handler->SendErrorMessage(LANG_BAN_NOTFOUND, "character", name.c_str());
+                    handler->PSendSysMessage(LANG_BAN_NOTFOUND, "character", name.c_str());
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
             default:
@@ -185,14 +187,16 @@ public:
             case BAN_ACCOUNT:
                 if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
-                    handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
+                    handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
                 break;
             case BAN_CHARACTER:
                 if (!normalizePlayerName(nameOrIP))
                 {
-                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                    handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
                 break;
@@ -238,15 +242,16 @@ public:
                 switch (mode)
                 {
                     default:
-                        handler->SendErrorMessage(LANG_BAN_NOTFOUND, "account", nameOrIP.c_str());
+                        handler->PSendSysMessage(LANG_BAN_NOTFOUND, "account", nameOrIP.c_str());
                         break;
                     case BAN_CHARACTER:
-                        handler->SendErrorMessage(LANG_BAN_NOTFOUND, "character", nameOrIP.c_str());
+                        handler->PSendSysMessage(LANG_BAN_NOTFOUND, "character", nameOrIP.c_str());
                         break;
                     case BAN_IP:
-                        handler->SendErrorMessage(LANG_BAN_NOTFOUND, "ip", nameOrIP.c_str());
+                        handler->PSendSysMessage(LANG_BAN_NOTFOUND, "ip", nameOrIP.c_str());
                         break;
                 }
+                handler->SetSentErrorMessage(true);
                 return false;
             case BAN_LONGER_EXISTS:
                 handler->PSendSysMessage("Unsuccessful! A longer ban is already present on this account!");
@@ -270,7 +275,8 @@ public:
         std::string accountName = nameStr;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -675,13 +681,15 @@ public:
 
         if (!normalizePlayerName(CharacterName))
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!sBan->RemoveBanCharacter(CharacterName))
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -714,14 +722,16 @@ public:
             case BAN_ACCOUNT:
                 if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
-                    handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
+                    handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
                 break;
             case BAN_CHARACTER:
                 if (!normalizePlayerName(nameOrIP))
                 {
-                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                    handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
                 break;

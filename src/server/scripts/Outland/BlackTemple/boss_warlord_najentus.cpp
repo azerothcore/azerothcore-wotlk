@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Yells
@@ -44,116 +43,165 @@ enum Spells
 enum Events
 {
     EVENT_SPELL_BERSERK             = 1,
-    EVENT_TALK_CHECK                = 2
+    EVENT_YELL                      = 2,
+    EVENT_SPELL_NEEDLE              = 3,
+    EVENT_SPELL_SPINE               = 4,
+    EVENT_SPELL_SHIELD              = 5,
+    EVENT_KILL_SPEAK                = 6
 };
 
-struct boss_najentus : public BossAI
+class boss_najentus : public CreatureScript
 {
-    boss_najentus(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS), _canTalk(true) { }
+public:
+    boss_najentus() : CreatureScript("boss_najentus") { }
 
-    void JustEngagedWith(Unit* who) override
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        _canTalk = true;
+        return GetBlackTempleAI<boss_najentusAI>(creature);
+    }
 
-        BossAI::JustEngagedWith(who);
-        Talk(SAY_AGGRO);
-
-        ScheduleUniqueTimedEvent(8min, [&]
+    struct boss_najentusAI : public BossAI
+    {
+        boss_najentusAI(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS)
         {
-            Talk(SAY_ENRAGE);
-            DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_SPELL_BERSERK);
+        }
 
-        ScheduleTimedEvent(25s, 100s, [&]
+        void Reset() override
         {
-            Talk(SAY_SPECIAL);
-        }, 25s, 100s);
+            BossAI::Reset();
+        }
 
-        ScheduleTimedEvent(10s, [&]
+        void KilledUnit(Unit* victim) override
         {
-            me->CastCustomSpell(SPELL_NEEDLE_SPINE, SPELLVALUE_MAX_TARGETS, 3, me, false);
-        }, 15s, 15s);
-
-        ScheduleTimedEvent(21s, [&]
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_KILL_SPEAK) == 0)
             {
-                DoCast(target, SPELL_IMPALING_SPINE);
-                target->CastSpell(target, SPELL_SUMMON_IMPALING_SPINE, true);
-                Talk(SAY_NEEDLE);
+                Talk(SAY_SLAY);
+                events.ScheduleEvent(EVENT_KILL_SPEAK, 5000);
             }
-        }, 20s, 20s);
+        }
 
-        ScheduleTimedEvent(1min, [&]
+        void JustDied(Unit* killer) override
         {
-            DoCastSelf(SPELL_TIDAL_SHIELD);
-            scheduler.DelayAll(10s);
-        }, 1min, 1min);
-    }
+            BossAI::JustDied(killer);
+            Talk(SAY_DEATH);
+        }
 
-    void KilledUnit(Unit* victim) override
-    {
-        if (victim->GetTypeId() == TYPEID_PLAYER && _canTalk)
+        void JustEngagedWith(Unit* who) override
         {
-            Talk(SAY_SLAY);
-            _canTalk = false;
-            ScheduleUniqueTimedEvent(5s, [&]
+            BossAI::JustEngagedWith(who);
+            Talk(SAY_AGGRO);
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, 480000);
+            events.ScheduleEvent(EVENT_YELL, urand(25000, 100000));
+            events.RescheduleEvent(EVENT_SPELL_NEEDLE, 10000);
+            events.RescheduleEvent(EVENT_SPELL_SPINE, 20001);
+            events.RescheduleEvent(EVENT_SPELL_SHIELD, 60000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
             {
-                _canTalk = true;
-            }, EVENT_TALK_CHECK);
+                case EVENT_SPELL_SHIELD:
+                    me->CastSpell(me, SPELL_TIDAL_SHIELD, false);
+                    events.DelayEvents(10000);
+                    events.ScheduleEvent(EVENT_SPELL_SHIELD, 60000);
+                    break;
+                case EVENT_SPELL_BERSERK:
+                    Talk(SAY_ENRAGE);
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_SPELL_NEEDLE:
+                    me->CastCustomSpell(SPELL_NEEDLE_SPINE, SPELLVALUE_MAX_TARGETS, 3, me, false);
+                    events.ScheduleEvent(EVENT_SPELL_NEEDLE, 15000);
+                    break;
+                case EVENT_SPELL_SPINE:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    {
+                        me->CastSpell(target, SPELL_IMPALING_SPINE, false);
+                        target->CastSpell(target, SPELL_SUMMON_IMPALING_SPINE, true);
+                        Talk(SAY_NEEDLE);
+                    }
+                    events.ScheduleEvent(EVENT_SPELL_SPINE, 20000);
+                    return;
+                case EVENT_YELL:
+                    Talk(SAY_SPECIAL);
+                    events.ScheduleEvent(EVENT_YELL, urand(25000, 100000));
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
         }
-    }
-
-    void JustDied(Unit* killer) override
-    {
-        BossAI::JustDied(killer);
-        Talk(SAY_DEATH);
-    }
-
-private:
-    bool _canTalk;
+    };
 };
 
-class spell_najentus_needle_spine : public SpellScript
+class spell_najentus_needle_spine : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_najentus_needle_spine);
+public:
+    spell_najentus_needle_spine() : SpellScriptLoader("spell_najentus_needle_spine") { }
 
-    void HandleDummy(SpellEffIndex  /*effIndex*/)
+    class spell_najentus_needle_spine_SpellScript : public SpellScript
     {
-        if (Unit* target = GetHitUnit())
-            GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
-    }
+        PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
 
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-class spell_najentus_hurl_spine : public SpellScript
-{
-    PrepareSpellScript(spell_najentus_hurl_spine);
-
-    void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
-    {
-        Unit* target = GetHitUnit();
-        if (target && target->HasAura(SPELL_TIDAL_SHIELD))
+        void HandleDummy(SpellEffIndex  /*effIndex*/)
         {
-            target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
-            target->CastSpell(target, SPELL_TIDAL_BURST, true);
+            if (Unit* target = GetHitUnit())
+                GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
         }
-    }
 
-    void Register() override
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        return new spell_najentus_needle_spine_SpellScript();
+    }
+};
+
+class spell_najentus_hurl_spine : public SpellScriptLoader
+{
+public:
+    spell_najentus_hurl_spine() : SpellScriptLoader("spell_najentus_hurl_spine") { }
+
+    class spell_najentus_hurl_spine_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
+
+        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
+        {
+            Unit* target = GetHitUnit();
+            if (target && target->HasAura(SPELL_TIDAL_SHIELD))
+            {
+                target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
+                target->CastSpell(target, SPELL_TIDAL_BURST, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_najentus_hurl_spine_SpellScript();
     }
 };
 
 void AddSC_boss_najentus()
 {
-    RegisterBlackTempleCreatureAI(boss_najentus);
-    RegisterSpellScript(spell_najentus_needle_spine);
-    RegisterSpellScript(spell_najentus_hurl_spine);
+    new boss_najentus();
+    new spell_najentus_needle_spine();
+    new spell_najentus_hurl_spine();
 }
-

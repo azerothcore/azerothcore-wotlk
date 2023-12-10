@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
 
 enum Talk
@@ -37,8 +36,6 @@ enum Spells
     SPELL_CLEANSING_FIELD       = 37934,
     SPELL_BLUE_BEAM             = 38015,
     SPELL_ELEMENTAL_SPAWNIN     = 25035,
-    SPELL_PURIFY_ELEMENTAL      = 36461,
-    SPELL_SUMMON_ELEMENTAL      = 36459,
 
     SPELL_SUMMON_CORRUPTED1     = 38188,
     SPELL_SUMMON_CORRUPTED2     = 38189,
@@ -71,36 +68,24 @@ enum Spells
 enum Misc
 {
     GROUP_ABILITIES                 = 1,
-    GROUP_OOC_PURIFY_ELEMENTALS     = 2,
-
-    NPC_PURIFIED_WATER_ELEMENTAL    = 21260,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
-    NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253
-};
-
-enum WaterElementalPathIds
-{
-    PATH_CENTER                     = 5,
-    PATH_END                        = 12
 };
 
 struct boss_hydross_the_unstable : public BossAI
 {
-    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE), _recentlySpoken(false) { }
+    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
-        _Reset();
-        _recentlySpoken = false;
-        SummonTaintedElementalOOC();
-    }
+        BossAI::Reset();
 
-    void SummonTaintedElementalOOC()
-    {
-        me->m_Events.AddEventAtOffset([this] {
-            DoCastAOE(SPELL_SUMMON_ELEMENTAL);
-            SummonTaintedElementalOOC();
-        }, 12s, 12s, GROUP_OOC_PURIFY_ELEMENTALS);
+        _recentlySpoken = false;
     }
 
     void JustReachedHome() override
@@ -109,27 +94,6 @@ struct boss_hydross_the_unstable : public BossAI
         if (!me->HasAura(SPELL_BLUE_BEAM))
         {
             me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
-        }
-    }
-
-    void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
-    {
-        if (movementType == WAYPOINT_MOTION_TYPE)
-        {
-            if (pathId == PATH_CENTER)
-            {
-                summon->SetFacingToObject(me);
-                DoCast(summon, SPELL_PURIFY_ELEMENTAL);
-
-                // Happens even if Hydross is dead, so completely detached to the spell, which is nothing but a dummy anyways.
-                summon->m_Events.AddEventAtOffset([summon] {
-                    summon->UpdateEntry(NPC_PURIFIED_WATER_ELEMENTAL);
-                }, 1s);
-            }
-            else if (pathId == PATH_END)
-            {
-                summon->DespawnOrUnsummon();
-            }
         }
     }
 
@@ -229,7 +193,6 @@ struct boss_hydross_the_unstable : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         SetForm(false, true);
-        me->m_Events.CancelEventGroup(GROUP_OOC_PURIFY_ELEMENTALS);
 
         scheduler.Schedule(1s, [this](TaskContext context)
         {
@@ -259,18 +222,13 @@ struct boss_hydross_the_unstable : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        BossAI::JustSummoned(summon);
-
+        summons.Summon(summon);
         summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
+        summon->SetInCombatWithZone();
 
         if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
         {
             summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-        }
-        else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
-        {
-            summon->SetOwnerGUID(me->GetGUID());
-            summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
         }
         else
         {
@@ -292,69 +250,101 @@ private:
     bool _recentlySpoken;
 };
 
-class spell_hydross_cleansing_field_aura : public AuraScript
+class spell_hydross_cleansing_field_aura : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hydross_cleansing_field_aura);
+public:
+    spell_hydross_cleansing_field_aura() : SpellScriptLoader("spell_hydross_cleansing_field_aura") { }
 
-    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_hydross_cleansing_field_aura_AuraScript : public AuraScript
     {
-        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-    }
+        PrepareAuraScript(spell_hydross_cleansing_field_aura_AuraScript)
 
-    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-    }
+        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+                if (Unit* caster = GetCaster())
+                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+        }
 
-    void Register() override
+        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+                if (Unit* caster = GetCaster())
+                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        return new spell_hydross_cleansing_field_aura_AuraScript();
     }
 };
 
-class spell_hydross_cleansing_field_command : public AuraScript
+class spell_hydross_cleansing_field_command : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hydross_cleansing_field_command);
+public:
+    spell_hydross_cleansing_field_command() : SpellScriptLoader("spell_hydross_cleansing_field_command") { }
 
-    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_hydross_cleansing_field_command_AuraScript : public AuraScript
     {
-        if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
-            GetTarget()->InterruptNonMeleeSpells(false);
-        else
-            GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
-    }
+        PrepareAuraScript(spell_hydross_cleansing_field_command_AuraScript)
 
-    void Register() override
+        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
+                GetTarget()->InterruptNonMeleeSpells(false);
+            else
+                GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        return new spell_hydross_cleansing_field_command_AuraScript();
     }
 };
 
-class spell_hydross_mark_of_hydross : public AuraScript
+class spell_hydross_mark_of_hydross : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hydross_mark_of_hydross);
+public:
+    spell_hydross_mark_of_hydross() : SpellScriptLoader("spell_hydross_mark_of_hydross") { }
 
-    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_hydross_mark_of_hydross_AuraScript : public AuraScript
     {
-        GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
-    }
+        PrepareAuraScript(spell_hydross_mark_of_hydross_AuraScript)
 
-    void Register() override
+        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        return new spell_hydross_mark_of_hydross_AuraScript();
     }
 };
 
 void AddSC_boss_hydross_the_unstable()
 {
     RegisterSerpentShrineAI(boss_hydross_the_unstable);
-    RegisterSpellScript(spell_hydross_cleansing_field_aura);
-    RegisterSpellScript(spell_hydross_cleansing_field_command);
-    RegisterSpellScript(spell_hydross_mark_of_hydross);
+    new spell_hydross_cleansing_field_aura();
+    new spell_hydross_cleansing_field_command();
+    new spell_hydross_mark_of_hydross();
 }
-

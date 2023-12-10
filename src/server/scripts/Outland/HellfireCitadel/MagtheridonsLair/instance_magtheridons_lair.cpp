@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "magtheridons_lair.h"
 
 BossBoundaryData const boundaries =
@@ -67,7 +66,7 @@ public:
                     _magtheridonGUID = creature->GetGUID();
                     break;
                 case NPC_HELLFIRE_CHANNELER:
-                    AddMinion(creature);
+                    AddMinion(creature, true);
                     break;
                 case NPC_HELLFIRE_WARDER:
                     _wardersSet.insert(creature->GetGUID());
@@ -80,7 +79,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_HELLFIRE_CHANNELER:
-                    RemoveMinion(creature);
+                    AddMinion(creature, false);
                     break;
             }
         }
@@ -90,7 +89,7 @@ public:
             switch (go->GetEntry())
             {
                 case GO_MAGTHERIDON_DOORS:
-                    AddDoor(go);
+                    AddDoor(go, true);
                     break;
                 case GO_MANTICRON_CUBE:
                     _cubesSet.insert(go->GetGUID());
@@ -112,7 +111,7 @@ public:
             switch (go->GetEntry())
             {
                 case GO_MAGTHERIDON_DOORS:
-                    RemoveDoor(go);
+                    AddDoor(go, false);
                     break;
                 case GO_MANTICRON_CUBE:
                     _cubesSet.erase(go->GetGUID());

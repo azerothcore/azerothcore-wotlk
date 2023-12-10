@@ -17,10 +17,9 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -586,4 +585,3 @@ void AddSC_boss_felmyst()
     new spell_felmyst_fog_of_corruption_charm();
     new spell_felmyst_open_brutallus_back_doors();
 }
-

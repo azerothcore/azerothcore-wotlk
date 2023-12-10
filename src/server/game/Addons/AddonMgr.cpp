@@ -16,8 +16,8 @@
  */
 
 #include "AddonMgr.h"
-#include "CryptoHash.h"
 #include "DatabaseEnv.h"
+#include "CryptoHash.h"
 #include "Log.h"
 #include "Timer.h"
 #include <list>

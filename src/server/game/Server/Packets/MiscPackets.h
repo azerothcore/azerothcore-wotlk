@@ -18,8 +18,8 @@
 #ifndef MiscPackets_h__
 #define MiscPackets_h__
 
-#include "ObjectGuid.h"
 #include "Packet.h"
+#include "ObjectGuid.h"
 #include "Weather.h"
 
 enum WeatherState : uint32;

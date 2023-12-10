@@ -215,6 +215,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     uint32 spellId = 0;
 
     recvData >> guid >> spellId;
+    LOG_DEBUG("network", "WORLD: Received CMSG_TRAINER_BUY_SPELL Npc {}, learn spell id is: {}", guid.ToString(), spellId);
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
@@ -272,6 +273,8 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: Received CMSG_GOSSIP_HELLO");
+
     ObjectGuid guid;
     recvData >> guid;
 

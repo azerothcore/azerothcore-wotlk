@@ -23,8 +23,8 @@
 #include "Common.h"
 #include "CreatureAIImpl.h"
 #include "DBCEnums.h"
-#include <functional>
 #include <unordered_map>
+#include <functional>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::set<uint32> BattlegroundClientIdsContainer;
@@ -183,6 +183,11 @@ private:
     typedef std::map<uint32 /*mapId*/, BattlegroundTemplate*> BattlegroundMapTemplateContainer;
     BattlegroundTemplateMap _battlegroundTemplates;
     BattlegroundMapTemplateContainer _battlegroundMapTemplates;
+
+    //npcbot
+public:
+    BattlegroundDataContainer const& GetBgDataStore() const { return bgDataStore; }
+    //end npcbot
 };
 
 #define sBattlegroundMgr BattlegroundMgr::instance()

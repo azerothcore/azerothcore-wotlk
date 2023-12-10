@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "zulfarrak.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "CreatureScript.h"
-#include "GameObject.h"
-#include "GameObjectAI.h"
-#include "GameObjectScript.h"
-#include "GridNotifiers.h"
-#include "InstanceScript.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
-#include "Player.h"
-#include "ScriptSystem.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 /* ScriptData
 SDName: Zulfarrak
 SD%Complete: 50
@@ -42,7 +27,21 @@ npc_sergeant_bly
 npc_weegli_blastfuse
 EndContentData */
 
+#include "zulfarrak.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "InstanceScript.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptSystem.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 
 /*######
 ## npc_sergeant_bly
@@ -735,4 +734,3 @@ void AddSC_zulfarrak()
     new npc_shadowpriest_sezziz();
     new go_troll_cage();
 }
-

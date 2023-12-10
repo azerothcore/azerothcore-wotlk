@@ -15,16 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cell.h"
-#include "CellImpl.h"
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
-#include "GridNotifiers.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Azuremyst_Isle
 SD%Complete: 75
@@ -41,7 +31,16 @@ go_ravager_cage
 npc_death_ravager
 EndContentData */
 
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 /*######
 ## npc_draenei_survivor
@@ -585,4 +584,3 @@ void AddSC_azuremyst_isle()
     new go_bristlelimb_cage();
     RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
 }
-

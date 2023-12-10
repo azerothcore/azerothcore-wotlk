@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "the_eye.h"
 
 enum Yells
@@ -46,7 +45,17 @@ enum Misc
     DISPLAYID_INVISIBLE                 = 11686,
     NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT  = 18928,
     NPC_SOLARIUM_AGENT                  = 18925,
-    NPC_SOLARIUM_PRIEST                 = 18806
+    NPC_SOLARIUM_PRIEST                 = 18806,
+
+    EVENT_CHECK_HEALTH                  = 1,
+    EVENT_SPELL_ARCANE_MISSILES         = 2,
+    EVENT_SPELL_WRATH_OF_ASTROMANCER    = 3,
+    EVENT_SPELL_BLINDING_LIGHT          = 4,
+    EVENT_SPAWN_PORTALS                 = 5,
+    EVENT_SUMMON_ADDS                   = 6,
+    EVENT_REAPPEAR                      = 7,
+    EVENT_SPELL_PSYCHIC_SCREAM          = 8,
+    EVENT_SPELL_VOID_BOLT               = 9
 };
 
 #define INNER_PORTAL_RADIUS         14.0f
@@ -57,174 +66,179 @@ enum Misc
 #define CENTER_O                    1.06421f
 #define PORTAL_Z                    17.005f
 
-struct boss_high_astromancer_solarian : public BossAI
+class boss_high_astromancer_solarian : public CreatureScript
 {
-    boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
+public:
+    boss_high_astromancer_solarian() : CreatureScript("boss_high_astromancer_solarian") { }
+
+    struct boss_high_astromancer_solarianAI : public BossAI
     {
-        scheduler.SetValidator([this]
+        boss_high_astromancer_solarianAI(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
         {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
-
-    void Reset() override
-    {
-        BossAI::Reset();
-        me->SetModelVisible(true);
-        _visible = true;
-
-        ScheduleHealthCheckEvent(20, [&]{
-            scheduler.CancelAll();
-            scheduler.Schedule(3s, [this](TaskContext context)
-            {
-                DoCastVictim(SPELL_VOID_BOLT);
-                context.Repeat(7s);
-            }).Schedule(7s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_PSYCHIC_SCREAM);
-                context.Repeat(12s);
-            });
-            DoCastSelf(SPELL_SOLARIAN_TRANSFORM, true);
-        });
-    }
-
-    void AttackStart(Unit* who) override
-    {
-        if (who && me->Attack(who, true))
-        {
-            me->GetMotionMaster()->MoveChase(who, 0.0f);
         }
-    }
 
-    void KilledUnit(Unit* victim) override
-    {
-        if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+        void Reset() override
         {
-            Talk(SAY_KILL);
+            BossAI::Reset();
+            me->SetModelVisible(true);
         }
-    }
 
-    void JustDied(Unit* killer) override
-    {
-        me->SetModelVisible(true);
-        Talk(SAY_DEATH);
-        BossAI::JustDied(killer);
-    }
+        void AttackStart(Unit* who) override
+        {
+            if (who && me->Attack(who, true))
+                me->GetMotionMaster()->MoveChase(who, (events.GetNextEventTime(EVENT_SPELL_VOID_BOLT) == 0 ? 30.0f : 0.0f));
+        }
 
-    void JustEngagedWith(Unit* who) override
-    {
-        Talk(SAY_AGGRO);
-        BossAI::JustEngagedWith(who);
-        me->CallForHelp(105.0f);
+        void KilledUnit(Unit* victim) override
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+                Talk(SAY_KILL);
+        }
 
-        scheduler.Schedule(3650ms, [this](TaskContext context)
+        void JustDied(Unit* killer) override
         {
-            DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
-            context.Repeat(800ms, 7300ms);
-        }).Schedule(21800ms, [this](TaskContext context)
+            me->SetModelVisible(true);
+            Talk(SAY_DEATH);
+            BossAI::JustDied(killer);
+        }
+
+        void JustEngagedWith(Unit* who) override
         {
-            DoCastRandomTarget(SPELL_WRATH_OF_THE_ASTROMANCER, 0, 100.0f);
-            context.Repeat(21800ms, 23350ms);
-        }).Schedule(33900ms, [this](TaskContext context)
+            Talk(SAY_AGGRO);
+            BossAI::JustEngagedWith(who);
+            me->CallForHelp(105.0f);
+
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            events.ScheduleEvent(EVENT_SPELL_ARCANE_MISSILES, 3000);
+            events.ScheduleEvent(EVENT_SPELL_WRATH_OF_ASTROMANCER, 1000);
+            events.ScheduleEvent(EVENT_SPELL_BLINDING_LIGHT, 40000);
+            events.ScheduleEvent(EVENT_SPAWN_PORTALS, 50000);
+        }
+
+        void JustSummoned(Creature* summon) override
         {
-            DoCastSelf(SPELL_BLINDING_LIGHT);
-            context.Repeat(33900ms, 48100ms);
-        }).Schedule(52100ms, [this](TaskContext context)
+            summons.Summon(summon);
+            if (!summon->IsTrigger())
+                summon->SetInCombatWithZone();
+        }
+
+        void UpdateAI(uint32 diff) override
         {
-            _visible = false;
-            me->SetReactState(REACT_PASSIVE);
-            me->SetModelVisible(false);
-            scheduler.DelayAll(21s);
-            scheduler.Schedule(6s, [this](TaskContext)
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
             {
-                Talk(SAY_SUMMON1);
-                summons.DoForAllSummons([&](WorldObject* summon)
-                {
-                    if (Creature* light = summon->ToCreature())
+                case EVENT_CHECK_HEALTH:
+                    if (me->HealthBelowPct(21))
                     {
-                        if (light->GetEntry() == NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT)
-                        {
-                            if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
+                        events.Reset();
+                        events.ScheduleEvent(EVENT_SPELL_VOID_BOLT, 3000);
+                        events.ScheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 7000);
+                        me->CastSpell(me, SPELL_SOLARIAN_TRANSFORM, true);
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    break;
+                case EVENT_SPELL_ARCANE_MISSILES:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+                        me->CastSpell(target, SPELL_ARCANE_MISSILES, false);
+                    events.ScheduleEvent(EVENT_SPELL_ARCANE_MISSILES, 3000);
+                    break;
+                case EVENT_SPELL_WRATH_OF_ASTROMANCER:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                        me->CastSpell(target, SPELL_WRATH_OF_THE_ASTROMANCER, false);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH_OF_ASTROMANCER, 22000);
+                    break;
+                case EVENT_SPELL_BLINDING_LIGHT:
+                    me->CastSpell(me, SPELL_BLINDING_LIGHT, false);
+                    events.ScheduleEvent(EVENT_SPELL_BLINDING_LIGHT, 40000);
+                    break;
+                case EVENT_SPAWN_PORTALS:
+                    me->setAttackTimer(BASE_ATTACK, 21000);
+                    me->SetModelVisible(false);
+                    events.ScheduleEvent(EVENT_SPAWN_PORTALS, 50000);
+                    events.DelayEvents(21000);
+                    events.ScheduleEvent(EVENT_SUMMON_ADDS, 6000);
+                    events.ScheduleEvent(EVENT_REAPPEAR, 20000);
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        float o = rand_norm() * 2 * M_PI;
+                        if (i == 0)
+                            me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
+                        else
+                            me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
+                    }
+                    break;
+                case EVENT_SUMMON_ADDS:
+                    Talk(SAY_SUMMON1);
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    {
+                        if (Creature* light = ObjectAccessor::GetCreature(*me, *itr))
+                            if (light->GetEntry() == NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT)
                             {
-                                me->SetPosition(*light);
-                                me->StopMovingOnCurrentPos();
+                                if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
+                                {
+                                    me->SetPosition(*light);
+                                    me->StopMovingOnCurrentPos();
+                                }
+                                for (uint8 j = 0; j < 4; ++j)
+                                    me->SummonCreature(NPC_SOLARIUM_AGENT, light->GetPositionX() + frand(-3.0f, 3.0f), light->GetPositionY() + frand(-3.0f, 3.0f), light->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                             }
-                            for (uint8 j = 0; j < 4; ++j)
+                    }
+                    break;
+                case EVENT_REAPPEAR:
+                    Talk(SAY_SUMMON2);
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    {
+                        if (Creature* light = ObjectAccessor::GetCreature(*me, *itr))
+                        {
+                            if (light->GetEntry() == NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT)
                             {
-                                me->SummonCreature(NPC_SOLARIUM_AGENT, light->GetPositionX() + frand(-3.0f, 3.0f), light->GetPositionY() + frand(-3.0f, 3.0f), light->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                                light->RemoveAllAuras();
+                                if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
+                                    me->SetModelVisible(true);
+                                else
+                                    me->SummonCreature(NPC_SOLARIUM_PRIEST, light->GetPositionX() + frand(-3.0f, 3.0f), light->GetPositionY() + frand(-3.0f, 3.0f), light->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                             }
                         }
                     }
-                });
-            }).Schedule(20s, [this](TaskContext)
-            {
-                _visible = true;
-                me->SetReactState(REACT_AGGRESSIVE);
-                Talk(SAY_SUMMON2);
-                summons.DoForAllSummons([&](WorldObject* summon)
-                {
-                    if (Creature* light = summon->ToCreature())
+                    // protection
+                    if (me->GetDisplayId() != me->GetNativeDisplayId())
                     {
-                        if (light->GetEntry() == NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT)
-                        {
-                            light->RemoveAllAuras();
-                            if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
-                            {
-                                me->SetModelVisible(true);
-                            }
-                            else
-                            {
-                                me->SummonCreature(NPC_SOLARIUM_PRIEST, light->GetPositionX() + frand(-3.0f, 3.0f), light->GetPositionY() + frand(-3.0f, 3.0f), light->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                            }
-                        }
+                        me->SetModelVisible(true);
+                        me->SummonCreature(NPC_SOLARIUM_PRIEST, me->GetPositionX() + frand(-3.0f, 3.0f), me->GetPositionY() + frand(-3.0f, 3.0f), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_SOLARIUM_PRIEST, me->GetPositionX() + frand(-3.0f, 3.0f), me->GetPositionY() + frand(-3.0f, 3.0f), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                     }
-                });
-            });
-
-            for (uint8 i = 0; i < 3; ++i)
-            {
-                float o = rand_norm() * 2 * M_PI;
-                if (i == 0)
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
-                else
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
+                    break;
+                case EVENT_SPELL_VOID_BOLT:
+                    me->CastSpell(me->GetVictim(), SPELL_VOID_BOLT, false);
+                    events.ScheduleEvent(EVENT_SPELL_VOID_BOLT, 7000);
+                    break;
+                case EVENT_SPELL_PSYCHIC_SCREAM:
+                    me->CastSpell(me, SPELL_PSYCHIC_SCREAM, false);
+                    events.ScheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 12000);
+                    break;
             }
-            context.Repeat(67500ms, 71200ms);
-        });
-    }
 
-     void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        if (_visible)
-        {
             DoMeleeAttackIfReady();
         }
-    }
 
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-        if (!summon->IsTrigger())
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
-            summon->SetInCombatWithZone();
+            return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
         }
-    }
+    };
 
-    bool CheckEvadeIfOutOfCombatArea() const override
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
+        return GetTheEyeAI<boss_high_astromancer_solarianAI>(creature);
     }
-private:
-    bool _visible;
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public SpellScriptLoader
@@ -291,8 +305,7 @@ public:
 
 void AddSC_boss_high_astromancer_solarian()
 {
-    RegisterTheEyeAI(boss_high_astromancer_solarian);
+    new boss_high_astromancer_solarian();
     new spell_astromancer_wrath_of_the_astromancer();
     new spell_astromancer_solarian_transform();
 }
-

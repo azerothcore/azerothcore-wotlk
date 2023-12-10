@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
 
 enum AnubTexts
@@ -881,7 +880,7 @@ public:
     {
         PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+        bool Validate(SpellInfo const* /*spellEntry*/) override
         {
             return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
@@ -953,4 +952,3 @@ void AddSC_boss_anubarak_trial()
     new spell_gen_leeching_swarm();
     new spell_gen_leeching_swarm_dmg();
 }
-

@@ -26,9 +26,9 @@ EndScriptData */
 #include "AccountMgr.h"
 #include "Base32.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "CryptoGenerics.h"
 #include "IPLocation.h"
+#include "Language.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
@@ -101,7 +101,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -110,7 +111,8 @@ public:
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
         {
-            handler->SendErrorMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SendSysMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -124,13 +126,15 @@ public:
             if (!result)
             {
                 LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
-                handler->SendErrorMessage(LANG_UNKNOWN_ERROR);
+                handler->SendSysMessage(LANG_UNKNOWN_ERROR);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
 
             if (!result->Fetch()->IsNull())
             {
-                handler->SendErrorMessage(LANG_2FA_ALREADY_SETUP);
+                handler->SendSysMessage(LANG_2FA_ALREADY_SETUP);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -163,7 +167,8 @@ public:
         }
 
         // new suggestion, or no token specified, output TOTP parameters
-        handler->SendErrorMessage(LANG_2FA_SECRET_SUGGESTION, Acore::Encoding::Base32::Encode(pair.first->second).c_str());
+        handler->PSendSysMessage(LANG_2FA_SECRET_SUGGESTION, Acore::Encoding::Base32::Encode(pair.first->second).c_str());
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -171,7 +176,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -180,7 +186,8 @@ public:
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
         {
-            handler->SendErrorMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SendSysMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -194,14 +201,16 @@ public:
             if (!result)
             {
                 LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
-                handler->SendErrorMessage(LANG_UNKNOWN_ERROR);
+                handler->SendSysMessage(LANG_UNKNOWN_ERROR);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
 
             Field* field = result->Fetch();
             if (field->IsNull())
             { // 2FA not enabled
-                handler->SendErrorMessage(LANG_2FA_NOT_SETUP);
+                handler->SendSysMessage(LANG_2FA_NOT_SETUP);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
 
@@ -216,7 +225,8 @@ public:
                 if (!success)
                 {
                     LOG_ERROR("misc", "Account {} has invalid ciphertext in TOTP token.", accountId);
-                    handler->SendErrorMessage(LANG_UNKNOWN_ERROR);
+                    handler->SendSysMessage(LANG_UNKNOWN_ERROR);
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
             }
@@ -234,7 +244,8 @@ public:
                 handler->SendSysMessage(LANG_2FA_INVALID_TOKEN);
         }
 
-        handler->SendErrorMessage(LANG_2FA_REMOVE_NEED_TOKEN);
+        handler->SendSysMessage(LANG_2FA_REMOVE_NEED_TOKEN);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -242,7 +253,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -253,7 +265,8 @@ public:
         auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
         if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
         {
-            handler->SendErrorMessage(LANG_IMPROPER_VALUE);
+            handler->SendSysMessage(LANG_IMPROPER_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -293,19 +306,24 @@ public:
                 }
                 break;
             case AOR_NAME_TOO_LONG:
-                handler->SendErrorMessage(LANG_ACCOUNT_TOO_LONG);
+                handler->SendSysMessage(LANG_ACCOUNT_TOO_LONG);
+                handler->SetSentErrorMessage(true);
                 return false;
             case AOR_PASS_TOO_LONG:
-                handler->SendErrorMessage(LANG_ACCOUNT_PASS_TOO_LONG);
+                handler->SendSysMessage(LANG_ACCOUNT_PASS_TOO_LONG);
+                handler->SetSentErrorMessage(true);
                 return false;
             case AOR_NAME_ALREADY_EXIST:
-                handler->SendErrorMessage(LANG_ACCOUNT_ALREADY_EXIST);
+                handler->SendSysMessage(LANG_ACCOUNT_ALREADY_EXIST);
+                handler->SetSentErrorMessage(true);
                 return false;
             case AOR_DB_INTERNAL_ERROR:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, accountName);
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, accountName);
+                handler->SetSentErrorMessage(true);
                 return false;
             default:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_CREATED, accountName);
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED, accountName);
+                handler->SetSentErrorMessage(true);
                 return false;
         }
 
@@ -327,14 +345,16 @@ public:
         std::string accountName = account;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 accountId = AccountMgr::GetId(accountName);
         if (!accountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -351,13 +371,16 @@ public:
                 handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName.c_str());
                 break;
             case AOR_NAME_NOT_EXIST:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             case AOR_DB_INTERNAL_ERROR:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             default:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
         }
 
@@ -416,7 +439,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -428,14 +452,16 @@ public:
         std::string accountName = _accountName;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 accountId = AccountMgr::GetId(accountName);
         if (!accountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -452,7 +478,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_USE_BOL);
+            handler->SendSysMessage(LANG_USE_BOL);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -472,7 +499,8 @@ public:
                 }
                 else
                 {
-                    handler->SendErrorMessage("No IP2Location information - account not locked");
+                    handler->PSendSysMessage("No IP2Location information - account not locked");
+                    handler->SetSentErrorMessage(true);
                     return false;
                 }
             }
@@ -487,7 +515,8 @@ public:
             return true;
         }
 
-        handler->SendErrorMessage(LANG_USE_BOL);
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -495,7 +524,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_USE_BOL);
+            handler->SendSysMessage(LANG_USE_BOL);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -522,7 +552,8 @@ public:
             return true;
         }
 
-        handler->SendErrorMessage(LANG_USE_BOL);
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -530,7 +561,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -540,21 +572,24 @@ public:
 
         if (!oldPassword || !newPassword || !passwordConfirmation)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!AccountMgr::CheckPassword(handler->GetSession()->GetAccountId(), std::string(oldPassword)))
         {
-            handler->SendErrorMessage(LANG_COMMAND_WRONGOLDPASSWORD);
+            handler->SendSysMessage(LANG_COMMAND_WRONGOLDPASSWORD);
             sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (strcmp(newPassword, passwordConfirmation) != 0)
         {
-            handler->SendErrorMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+            handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
             sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -566,11 +601,13 @@ public:
                 sScriptMgr->OnPasswordChange(handler->GetSession()->GetAccountId());
                 break;
             case AOR_PASS_TOO_LONG:
-                handler->SendErrorMessage(LANG_PASSWORD_TOO_LONG);
+                handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
                 sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
+                handler->SetSentErrorMessage(true);
                 return false;
             default:
-                handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SetSentErrorMessage(true);
                 return false;
         }
 
@@ -581,7 +618,8 @@ public:
     {
         if (!*args)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -590,7 +628,8 @@ public:
 
         if (!_account || !_secret)
         {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -599,14 +638,16 @@ public:
 
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 targetAccountId = AccountMgr::GetId(accountName);
         if (!targetAccountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -626,20 +667,23 @@ public:
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
         {
-            handler->SendErrorMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SendSysMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         Optional<std::vector<uint8>> decoded = Acore::Encoding::Base32::Decode(secret);
         if (!decoded)
         {
-            handler->SendErrorMessage(LANG_2FA_SECRET_INVALID);
+            handler->SendSysMessage(LANG_2FA_SECRET_INVALID);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (128 < (decoded->size() + Acore::Crypto::AES::IV_SIZE_BYTES + Acore::Crypto::AES::TAG_SIZE_BYTES))
         {
-            handler->SendErrorMessage(LANG_2FA_SECRET_TOO_LONG);
+            handler->SendSysMessage(LANG_2FA_SECRET_TOO_LONG);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -691,14 +735,16 @@ public:
             accountName = account;
             if (!Utf8ToUpperOnlyLatin(accountName))
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             }
 
             accountId = AccountMgr::GetId(accountName);
             if (!accountId)
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -755,7 +801,8 @@ public:
             targetAccountName = arg1;
             if (!Utf8ToUpperOnlyLatin(targetAccountName))
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -764,7 +811,8 @@ public:
         gm = (isAccountNameGiven) ? Acore::StringTo<int32>(arg2).value_or(0) : Acore::StringTo<int32>(arg1).value_or(0);
         if (gm > SEC_CONSOLE)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -782,7 +830,8 @@ public:
         targetSecurity = AccountMgr::GetSecurity(targetAccountId, gmRealmID);
         if (targetSecurity >= playerSecurity || gm >= playerSecurity)
         {
-            handler->SendErrorMessage(LANG_YOURS_SECURITY_IS_LOW);
+            handler->SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -798,7 +847,8 @@ public:
 
             if (result)
             {
-                handler->SendErrorMessage(LANG_YOURS_SECURITY_IS_LOW);
+                handler->SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
@@ -806,7 +856,8 @@ public:
         // Check if provided realm.Id.Realm has a negative value other than -1
         if (gmRealmID < -1)
         {
-            handler->SendErrorMessage(LANG_INVALID_REALMID);
+            handler->SendSysMessage(LANG_INVALID_REALMID);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -859,14 +910,16 @@ public:
         std::string accountName = account;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 targetAccountId = AccountMgr::GetId(accountName);
         if (!targetAccountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -877,7 +930,8 @@ public:
 
         if (strcmp(password, passwordConfirmation))
         {
-            handler->SendErrorMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+            handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -889,13 +943,16 @@ public:
                 handler->SendSysMessage(LANG_COMMAND_PASSWORD);
                 break;
             case AOR_NAME_NOT_EXIST:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
                 return false;
             case AOR_PASS_TOO_LONG:
-                handler->SendErrorMessage(LANG_PASSWORD_TOO_LONG);
+                handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+                handler->SetSentErrorMessage(true);
                 return false;
             default:
-                handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SetSentErrorMessage(true);
                 return false;
         }
         return true;

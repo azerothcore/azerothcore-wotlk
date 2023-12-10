@@ -15,65 +15,122 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AllMapScript.h"
-#include "BattlegroundMapScript.h"
-#include "InstanceMapScript.h"
-#include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
-#include "WorldMapScript.h"
 
 namespace
 {
     template<class ScriptName>
-    void ForeachMaps(Map* map, std::function<void(ScriptName*)> const& executeHook)
+    inline void ForeachMaps([[maybe_unused]] Map* map, [[maybe_unused]] std::function<void(ScriptName*)> executeHook)
+    {
+        static_assert(Acore::dependant_false_v<ScriptName>, "Unsupported type used for ForeachMaps");
+    }
+
+    template<>
+    inline void ForeachMaps(Map* map, std::function<void(WorldMapScript*)> executeHook)
     {
         auto mapEntry = map->GetEntry();
+
         if (!mapEntry)
         {
             return;
         }
 
-        if constexpr (std::is_same_v<ScriptName, WorldMapScript>)
-        {
-            if (!mapEntry->IsWorldMap())
-            {
-                return;
-            }
-        }
-        else if constexpr (std::is_same_v<ScriptName, InstanceMapScript>)
-        {
-            if (!mapEntry->IsDungeon())
-            {
-                return;
-            }
-        }
-        else if constexpr (std::is_same_v<ScriptName, BattlegroundMapScript>)
-        {
-            if (!mapEntry->IsBattleground())
-            {
-                return;
-            }
-        }
-        else
-        {
-            static_assert(Acore::dependant_false_v<ScriptName>, "Unsupported type used for ForeachMaps");
-        }
-
-        if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
+        if (!mapEntry->IsWorldMap())
         {
             return;
         }
 
-        for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
+        if (ScriptRegistry<WorldMapScript>::ScriptPointerList.empty())
         {
-            auto const scriptEntry = script->GetEntry();
-            if (!scriptEntry)
+            return;
+        }
+
+        for (auto const& [scriptID, script] : ScriptRegistry<WorldMapScript>::ScriptPointerList)
+        {
+            MapEntry const* mapEntry = script->GetEntry();
+            if (!mapEntry)
             {
                 continue;
             }
 
-            if (scriptEntry->MapID != map->GetId())
+            if (mapEntry->MapID != map->GetId())
+            {
+                continue;
+            }
+
+            executeHook(script);
+            return;
+        }
+    }
+
+    template<>
+    inline void ForeachMaps(Map* map, std::function<void(InstanceMapScript*)> executeHook)
+    {
+        auto mapEntry = map->GetEntry();
+
+        if (!mapEntry)
+        {
+            return;
+        }
+
+        if (!mapEntry->IsDungeon())
+        {
+            return;
+        }
+
+        if (ScriptRegistry<InstanceMapScript>::ScriptPointerList.empty())
+        {
+            return;
+        }
+
+        for (auto const& [scriptID, script] : ScriptRegistry<InstanceMapScript>::ScriptPointerList)
+        {
+            MapEntry const* mapEntry = script->GetEntry();
+            if (!mapEntry)
+            {
+                continue;
+            }
+
+            if (mapEntry->MapID != map->GetId())
+            {
+                continue;
+            }
+
+            executeHook(script);
+            return;
+        }
+    }
+
+    template<>
+    inline void ForeachMaps(Map* map, std::function<void(BattlegroundMapScript*)> executeHook)
+    {
+        auto mapEntry = map->GetEntry();
+
+        if (!mapEntry)
+        {
+            return;
+        }
+
+        if (!mapEntry->IsBattleground())
+        {
+            return;
+        }
+
+        if (ScriptRegistry<BattlegroundMapScript>::ScriptPointerList.empty())
+        {
+            return;
+        }
+
+        for (auto const& [scriptID, script] : ScriptRegistry<BattlegroundMapScript>::ScriptPointerList)
+        {
+            MapEntry const* mapEntry = script->GetEntry();
+            if (!mapEntry)
+            {
+                continue;
+            }
+
+            if (mapEntry->MapID != map->GetId())
             {
                 continue;
             }
@@ -94,22 +151,22 @@ void ScriptMgr::OnCreateMap(Map* map)
     });
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnCreate(map);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnCreate(map);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnCreate((InstanceMap*)map);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnCreate((InstanceMap*)map);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnCreate((BattlegroundMap*)map);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnCreate((BattlegroundMap*)map);
+        });
 }
 
 void ScriptMgr::OnDestroyMap(Map* map)
@@ -122,22 +179,22 @@ void ScriptMgr::OnDestroyMap(Map* map)
     });
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnDestroy(map);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnDestroy(map);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnDestroy((InstanceMap*)map);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnDestroy((InstanceMap*)map);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnDestroy((BattlegroundMap*)map);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnDestroy((BattlegroundMap*)map);
+        });
 }
 
 void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
@@ -146,22 +203,22 @@ void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     ASSERT(gmap);
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnLoadGridMap(map, gmap, gx, gy);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnLoadGridMap(map, gmap, gx, gy);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnLoadGridMap((InstanceMap*)map, gmap, gx, gy);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnLoadGridMap((InstanceMap*)map, gmap, gx, gy);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnLoadGridMap((BattlegroundMap*)map, gmap, gx, gy);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnLoadGridMap((BattlegroundMap*)map, gmap, gx, gy);
+        });
 }
 
 void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
@@ -170,22 +227,22 @@ void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     ASSERT(gmap);
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnUnloadGridMap(map, gmap, gx, gy);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnUnloadGridMap(map, gmap, gx, gy);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnUnloadGridMap((InstanceMap*)map, gmap, gx, gy);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnUnloadGridMap((InstanceMap*)map, gmap, gx, gy);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnUnloadGridMap((BattlegroundMap*)map, gmap, gx, gy);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnUnloadGridMap((BattlegroundMap*)map, gmap, gx, gy);
+        });
 }
 
 void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
@@ -198,28 +255,28 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
         script->OnPlayerEnterAll(map, player);
     });
 
-    ExecuteScript<PlayerScript>([=](PlayerScript* script)
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnMapChanged(player);
     });
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnPlayerEnter(map, player);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnPlayerEnter(map, player);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnPlayerEnter((InstanceMap*)map, player);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnPlayerEnter((InstanceMap*)map, player);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnPlayerEnter((BattlegroundMap*)map, player);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnPlayerEnter((BattlegroundMap*)map, player);
+        });
 }
 
 void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
@@ -233,22 +290,22 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
     });
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnPlayerLeave(map, player);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnPlayerLeave(map, player);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnPlayerLeave((InstanceMap*)map, player);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnPlayerLeave((InstanceMap*)map, player);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnPlayerLeave((BattlegroundMap*)map, player);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnPlayerLeave((BattlegroundMap*)map, player);
+        });
 }
 
 void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
@@ -261,22 +318,22 @@ void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
     });
 
     ForeachMaps<WorldMapScript>(map,
-    [&](WorldMapScript* script)
-    {
-        script->OnUpdate(map, diff);
-    });
+        [&](WorldMapScript* script)
+        {
+            script->OnUpdate(map, diff);
+        });
 
     ForeachMaps<InstanceMapScript>(map,
-    [&](InstanceMapScript* script)
-    {
-        script->OnUpdate((InstanceMap*)map, diff);
-    });
+        [&](InstanceMapScript* script)
+        {
+            script->OnUpdate((InstanceMap*)map, diff);
+        });
 
     ForeachMaps<BattlegroundMapScript>(map,
-    [&](BattlegroundMapScript* script)
-    {
-        script->OnUpdate((BattlegroundMap*)map, diff);
-    });
+        [&](BattlegroundMapScript* script)
+        {
+            script->OnUpdate((BattlegroundMap*)map, diff);
+        });
 }
 
 void ScriptMgr::OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask)
@@ -294,11 +351,3 @@ void ScriptMgr::OnDestroyInstance(MapInstanced* mapInstanced, Map* map)
         script->OnDestroyInstance(mapInstanced, map);
     });
 }
-
-AllMapScript::AllMapScript(const char* name) :
-    ScriptObject(name)
-{
-    ScriptRegistry<AllMapScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<AllMapScript>;

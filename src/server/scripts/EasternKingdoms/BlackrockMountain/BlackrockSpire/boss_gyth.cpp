@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "blackrock_spire.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -245,4 +244,3 @@ void AddSC_boss_gyth()
     new boss_gyth();
     RegisterSpellScript(spell_gyth_chromatic_protection);
 }
-

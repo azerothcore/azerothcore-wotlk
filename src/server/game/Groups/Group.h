@@ -19,7 +19,6 @@
 #define AZEROTHCORE_GROUP_H
 
 #include "DBCEnums.h"
-#include "DataMap.h"
 #include "GroupRefMgr.h"
 #include "LootMgr.h"
 #include "QueryResult.h"
@@ -45,7 +44,7 @@ struct MapEntry;
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
 
-enum RollVote : uint8
+enum RollVote
 {
     PASS              = 0,
     NEED              = 1,
@@ -193,6 +192,16 @@ public:
     bool   Create(Player* leader);
     bool   LoadGroupFromDB(Field* field);
     void   LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    //npcbot
+    bool Create(Creature* leader);
+    bool AddMember(Creature* creature);
+    void LoadCreatureMemberFromDB(uint32 entry, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    void UpdateBotOutOfRange(Creature* creature);
+    void LinkBotMember(GroupBotReference* bRef);
+    void DelinkBotMember(ObjectGuid guid);
+    GroupBotReference* GetFirstBotMember() { return m_botMemberMgr.getFirst(); }
+    GroupBotReference const* GetFirstBotMember() const { return m_botMemberMgr.getFirst(); }
+    //end npcbot
     bool   AddInvite(Player* player);
     void   RemoveInvite(Player* player);
     void   RemoveAllInvites();
@@ -243,7 +252,6 @@ public:
     GroupReference* GetFirstMember() { return m_memberMgr.getFirst(); }
     GroupReference const* GetFirstMember() const { return m_memberMgr.getFirst(); }
     uint32 GetMembersCount() const { return m_memberSlots.size(); }
-    uint32 GetInviteeCount() const { return m_invitees.size(); }
 
     uint8 GetMemberGroup(ObjectGuid guid) const;
 
@@ -320,7 +328,9 @@ public:
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
     void DoForAllMembers(std::function<void(Player*)> const& worker);
 
-    DataMap CustomData;
+    //npcbots
+    ObjectGuid const* GetTargetIcons() const { return m_targetIcons; }
+    //end npcbots
 
 protected:
     void _homebindIfInstance(Player* player);
@@ -335,6 +345,9 @@ protected:
 
     MemberSlotList      m_memberSlots;
     GroupRefMgr     m_memberMgr;
+    //npcbot
+    GroupBotRefManager  m_botMemberMgr;
+    //end npcbot
     InvitesList         m_invitees;
     ObjectGuid          m_leaderGuid;
     std::string         m_leaderName;

@@ -15,13 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
 #include "Containers.h"
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Misc
@@ -395,4 +393,3 @@ void AddSC_boss_elder_nadox()
     // Achievements
     new achievement_respect_your_elders();
 }
-

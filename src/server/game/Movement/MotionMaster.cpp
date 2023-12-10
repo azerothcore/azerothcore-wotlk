@@ -30,7 +30,6 @@
 #include "PointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
-#include "WaypointMgr.h"
 #include "WaypointMovementGenerator.h"
 
 inline MovementGenerator* GetIdleMovementGenerator()
@@ -449,21 +448,6 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     }
 }
 
-void MotionMaster::MoveSplinePath(uint32 path_id)
-{
-    // convert the path id to a Movement::PointsArray*
-    Movement::PointsArray* points = new Movement::PointsArray();
-    WaypointPath const* path = sWaypointMgr->GetPath(path_id);
-    for (uint8 i = 0; i < path->size(); ++i)
-    {
-        WaypointData const* node = path->at(i);
-        points->push_back(G3D::Vector3(node->x, node->y, node->z));
-    }
-
-    // pass the new PointsArray* to the appropriate MoveSplinePath function
-    MoveSplinePath(points);
-}
-
 void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
@@ -570,6 +554,26 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
 
     if (speedXY <= 0.1f)
         return;
+
+    //npcbot: blademaser only (disabled)
+    /*
+    if (_owner->IsNPCBot())
+    {
+        Movement::MoveSplineInit init(_owner);
+        init.MoveTo(x, y, z, false);
+        init.SetParabolic(speedZ, 0);
+        init.SetFacing(o);
+        init.SetOrientationFixed(true);
+        init.SetVelocity(speedXY);
+
+        GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, EVENT_JUMP);
+        movement->Priority = MOTION_PRIORITY_HIGHEST;
+        movement->BaseUnitState = UNIT_STATE_JUMPING;
+        Add(movement);
+        return;
+    }
+    */
+    //end npcbot
 
     float moveTimeHalf = speedZ / Movement::gravity;
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);

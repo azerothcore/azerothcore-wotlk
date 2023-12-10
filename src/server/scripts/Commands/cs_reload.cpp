@@ -27,7 +27,6 @@ EndScriptData */
 #include "AutobroadcastMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
@@ -281,7 +280,8 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
+            handler->PSendSysMessage("DB scripts used currently, please attempt reload later.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -476,7 +476,7 @@ public:
 
             Field* fields = result->Fetch();
 
-            sObjectMgr->LoadCreatureTemplate(fields, true);
+            sObjectMgr->LoadCreatureTemplate(fields);
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }
 
@@ -728,7 +728,8 @@ public:
     {
         if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
         {
-            handler->SendErrorMessage("Warden system disabled by config - reloading warden_action skipped.");
+            handler->SendSysMessage("Warden system disabled by config - reloading warden_action skipped.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -960,7 +961,8 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
+            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -977,7 +979,8 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
+            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1003,7 +1006,8 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
+            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

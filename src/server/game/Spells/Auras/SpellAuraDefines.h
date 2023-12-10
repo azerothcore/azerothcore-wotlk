@@ -386,7 +386,7 @@ enum AuraObjectType
     DYNOBJ_AURA_TYPE,
 };
 
-enum AuraRemoveMode : uint8
+enum AuraRemoveMode
 {
     AURA_REMOVE_NONE                = 0,
     AURA_REMOVE_BY_DEFAULT          = 1,    // scripted remove, remove by stack with aura with different ids and sc aura remove

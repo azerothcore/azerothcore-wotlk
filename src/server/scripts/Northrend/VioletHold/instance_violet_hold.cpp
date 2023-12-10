@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "violet_hold.h"
 
@@ -677,4 +676,3 @@ void AddSC_instance_violet_hold()
 {
     new instance_violet_hold();
 }
-

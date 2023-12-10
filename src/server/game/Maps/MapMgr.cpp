@@ -34,8 +34,14 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+//npcbot
+#include "botdatamgr.h"
+#include "botmgr.h"
+//end npcbot
+
 MapMgr::MapMgr()
 {
+    i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;
@@ -53,11 +59,17 @@ MapMgr* MapMgr::instance()
 
 void MapMgr::Initialize()
 {
+    Map::InitStateMachine();
+
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
 
     // Start mtmaps if needed
     if (num_threads > 0)
         m_updater.activate(num_threads);
+
+    //npcbot: load bots
+    BotMgr::Initialize();
+    //end npcbot
 }
 
 void MapMgr::InitializeVisibilityDistanceInfo()
@@ -81,10 +93,10 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             ASSERT(entry);
 
             if (entry->Instanceable())
-                map = new MapInstanced(id);
+                map = new MapInstanced(id, std::chrono::seconds(i_gridCleanUpDelay));
             else
             {
-                map = new Map(id, 0, REGULAR_DIFFICULTY);
+                map = new Map(id, std::chrono::seconds(i_gridCleanUpDelay), 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
@@ -246,6 +258,10 @@ void MapMgr::Update(uint32 diff)
     for (uint8 i = 0; i < 4; ++i)
         i_timer[i].Update(diff);
 
+    //npcbot
+    BotDataMgr::Update(diff);
+    //end npcbot
+
     // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
     //if (mapUpdateStep == 0)
     {
@@ -271,6 +287,10 @@ void MapMgr::Update(uint32 diff)
 
     if (m_updater.activated())
         m_updater.wait();
+
+    //npcbot
+    BotMgr::HandleDelayedTeleports();
+    //end npcbot
 
     if (mapUpdateStep < 3)
     {
@@ -333,6 +353,8 @@ void MapMgr::UnloadAll()
 
     if (m_updater.activated())
         m_updater.deactivate();
+
+    Map::DeleteStateMachine();
 }
 
 void MapMgr::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)

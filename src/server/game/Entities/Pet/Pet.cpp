@@ -21,7 +21,6 @@
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "PetPackets.h"
@@ -473,7 +472,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         else
         {
             if (!curHealth && getPetType() == HUNTER_PET)
-                setDeathState(DeathState::JustDied);
+                setDeathState(JUST_DIED);
             else
             {
                 SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
@@ -617,7 +616,7 @@ void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
 void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
 {
     Creature::setDeathState(s);
-    if (getDeathState() == DeathState::Corpse)
+    if (getDeathState() == CORPSE)
     {
         if (getPetType() == HUNTER_PET)
         {
@@ -633,7 +632,7 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
             //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
     }
-    else if (getDeathState() == DeathState::Alive)
+    else if (getDeathState() == ALIVE)
     {
         //RemoveUnitFlag(UNIT_FLAG_STUNNED);
         CastPetAuras(true);
@@ -652,7 +651,7 @@ void Pet::Update(uint32 diff)
 
     switch (m_deathState)
     {
-        case DeathState::Corpse:
+        case CORPSE:
             {
                 if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= GameTime::GetGameTime().count())
                 {
@@ -661,7 +660,7 @@ void Pet::Update(uint32 diff)
                 }
                 break;
             }
-        case DeathState::Alive:
+        case ALIVE:
             {
                 // unsummon pet that lost owner
                 Player* owner = GetOwner();
@@ -1942,16 +1941,16 @@ void Pet::InitLevelupSpellsForLevel()
     {
         for (uint32 spellId : defSpells->spellid)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo)
+            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellEntry)
                 continue;
 
             // will called first if level down
-            if (spellInfo->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellInfo))
-                unlearnSpell(spellInfo->Id, true);
+            if (spellEntry->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellEntry))
+                unlearnSpell(spellEntry->Id, true);
             // will called if level up
             else
-                learnSpell(spellInfo->Id);
+                learnSpell(spellEntry->Id);
         }
     }
 }
@@ -2241,7 +2240,7 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 
     sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
 
-    return uint8(points * sWorld->getRate(RATE_TALENT_PET));
+    return points;
 }
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)

@@ -16,7 +16,7 @@
  */
 
 #include "BattlegroundAV.h"
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 enum Yells

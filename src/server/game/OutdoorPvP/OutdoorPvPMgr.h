@@ -21,7 +21,6 @@
 #define OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL 1000
 
 #include "OutdoorPvP.h"
-#include <memory>
 
 class Player;
 class GameObject;
@@ -40,7 +39,7 @@ class OutdoorPvPMgr
 {
 private:
     OutdoorPvPMgr();
-    ~OutdoorPvPMgr() = default;
+    ~OutdoorPvPMgr() {};
 
 public:
     static OutdoorPvPMgr* instance();
@@ -81,20 +80,24 @@ public:
 
     void HandleDropFlag(Player* player, uint32 spellId);
 
-    // pussywizard: lock required because different functions affect _players
+    // pussywizard: lock required because different functions affect m_players
     std::mutex _lock;
 
 private:
+    typedef std::vector<OutdoorPvP*> OutdoorPvPSet;
+    typedef std::map<uint32 /* zoneid */, OutdoorPvP*> OutdoorPvPMap;
+    typedef std::map<OutdoorPvPTypes, OutdoorPvPData*> OutdoorPvPDataMap;
+
     // contains all initiated outdoor pvp events
     // used when initing / cleaning up
-    std::vector<std::unique_ptr<OutdoorPvP>> m_OutdoorPvPSet;
+    OutdoorPvPSet  m_OutdoorPvPSet;
 
     // maps the zone ids to an outdoor pvp event
     // used in player event handling
-    std::map<uint32/*zoneid*/, OutdoorPvP*> m_OutdoorPvPMap;
+    OutdoorPvPMap   m_OutdoorPvPMap;
 
     // Holds the outdoor PvP templates
-    std::map<OutdoorPvPTypes, std::unique_ptr<OutdoorPvPData>> m_OutdoorPvPDatas;
+    OutdoorPvPDataMap m_OutdoorPvPDatas;
 
     // update interval
     uint32 m_UpdateTimer;

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 # Copy all default config files to env/dist/etc if they don't already exist

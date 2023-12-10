@@ -25,12 +25,12 @@ EndScriptData */
 #include "AccountMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -1172,7 +1172,8 @@ public:
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1649,7 +1650,8 @@ public:
     {
         if (!result)
         {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
+            handler->PSendSysMessage(LANG_NO_PLAYERS_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1708,7 +1710,8 @@ public:
 
         if (!counter) // empty accounts only
         {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
+            handler->PSendSysMessage(LANG_NO_PLAYERS_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

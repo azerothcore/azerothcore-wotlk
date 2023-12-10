@@ -132,13 +132,12 @@ RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
     passwd -d "$DOCKER_USER" && \
     chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
 
-COPY --chown=$USER_ID:GROUP_ID \
-     --chmod=755 \
-     apps/docker/entrypoint.sh /azerothcore/entrypoint.sh
+COPY apps/docker/entrypoint.sh /entrypoint.sh
+RUN chmod -v +x /entrypoint.sh
 
 USER $DOCKER_USER
 
-ENTRYPOINT ["/usr/bin/env", "bash", "/azerothcore/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 ###############
 # Auth Server #

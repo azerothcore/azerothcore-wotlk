@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "EventMap.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "old_hillsbrad.h"
 
 static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =
@@ -265,7 +264,7 @@ public:
                                 EnsureGridLoaded();
                                 thrall->SetVisible(false);
                                 Reposition(thrall);
-                                thrall->setDeathState(DeathState::Dead);
+                                thrall->setDeathState(DEAD);
                                 thrall->Respawn();
                                 thrall->SetVisible(true);
                                 SaveToDB();

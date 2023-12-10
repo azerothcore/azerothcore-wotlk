@@ -37,8 +37,8 @@
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellAuras.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -64,6 +64,10 @@ class PlayerMenu;
 class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
+
+// NpcBot mod
+class BotMgr;
+// end NpcBot mod
 
 typedef std::deque<Mail*> PlayerMails;
 typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
@@ -2352,7 +2356,7 @@ public:
     bool IsVisibleGloballyFor(Player const* player) const;
 
     void GetInitialVisiblePackets(Unit* target);
-    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
+    void UpdateObjectVisibility(bool forced = true) override;
     void UpdateVisibilityForPlayer(bool mapChange = false);
     void UpdateVisibilityOf(WorldObject* target);
     void UpdateTriggerVisibility();
@@ -2594,6 +2598,18 @@ public:
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
     std::string GetDebugInfo() const override;
+
+    /*****************************************************************/
+    /***                        NPCBOT SYSTEM                      ***/
+    /*****************************************************************/
+    BotMgr* GetBotMgr() const { return _botMgr; }
+    bool HaveBot() const;
+    uint8 GetNpcBotsCount() const;
+    void RemoveAllBots(uint8 removetype = 0);
+    void UpdatePhaseForBots();
+    /*****************************************************************/
+    /***                      END NPCBOT SYSTEM                    ***/
+    /*****************************************************************/
 
  protected:
     // Gamemaster whisper whitelist
@@ -2872,6 +2888,14 @@ public:
     bool m_needZoneUpdate;
 
 private:
+    /*****************************************************************/
+    /***                        NPCBOT SYSTEM                      ***/
+    /*****************************************************************/
+    BotMgr* _botMgr;
+    /*****************************************************************/
+    /***                      END NPCBOT SYSTEM                    ***/
+    /*****************************************************************/
+
     // internal common parts for CanStore/StoreItem functions
     InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
     InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;

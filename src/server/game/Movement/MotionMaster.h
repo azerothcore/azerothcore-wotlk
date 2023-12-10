@@ -212,7 +212,6 @@ public:
     { MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, generatePath, forceDestination, MOTION_SLOT_ACTIVE, pos.GetOrientation()); }
     void MovePoint(uint32 id, float x, float y, float z, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
     void MoveSplinePath(Movement::PointsArray* path);
-    void MoveSplinePath(uint32 path_id);
 
     // These two movement types should only be used with creatures having landing/takeoff animations
     void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);
@@ -244,6 +243,10 @@ public:
     void ReinitializeMovement();
 
     bool GetDestination(float& x, float& y, float& z);
+
+    //npcbot: add an accessor for Mutate
+    void Add(MovementGenerator* m, MovementSlot slot = MOTION_SLOT_ACTIVE) { Mutate(m, slot); }
+    //end npcbot
 private:
     void Mutate(MovementGenerator* m, MovementSlot slot);                  // use Move* functions instead
 

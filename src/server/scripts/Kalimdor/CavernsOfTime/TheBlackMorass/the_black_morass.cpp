@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "MoveSplineInit.h"
-#include "ScriptedCreature.h"
-#include "SmartAI.h"
-#include "SpellScriptLoader.h"
 #include "the_black_morass.h"
+#include "MoveSplineInit.h"
+#include "SmartAI.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum medivhMisc
 {
@@ -473,4 +472,3 @@ void AddSC_the_black_morass()
 
     RegisterSpellScript(spell_black_morass_corrupt_medivh);
 }
-

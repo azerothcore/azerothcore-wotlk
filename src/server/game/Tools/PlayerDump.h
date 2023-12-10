@@ -18,11 +18,11 @@
 #ifndef _PLAYER_DUMP_H
 #define _PLAYER_DUMP_H
 
-#include "ObjectGuid.h"
+#include <string>
 #include <iosfwd>
 #include <map>
 #include <set>
-#include <string>
+#include "ObjectGuid.h"
 
 enum DumpTableType
 {

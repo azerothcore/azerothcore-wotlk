@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 
 ///////////////////////////////
 // SPELLS
@@ -266,4 +265,3 @@ void AddSC_event_winter_veil_scripts()
     RegisterSpellScript(spell_winter_veil_racer_slam_hit);
     RegisterSpellScript(spell_winter_veil_shoot_air_rifle);
 }
-

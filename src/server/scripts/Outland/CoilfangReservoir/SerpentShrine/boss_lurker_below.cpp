@@ -15,10 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
 
 enum Spells
@@ -65,20 +63,21 @@ const Position positions[MAX_SUMMONS] =
 
 struct boss_the_lurker_below : public BossAI
 {
-    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
+    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
         BossAI::Reset();
         me->SetReactState(REACT_PASSIVE);
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+        me->SetVisible(false);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        me->DespawnOrUnsummon(2000);
     }
 
     void DoAction(int32 action) override
@@ -87,6 +86,8 @@ struct boss_the_lurker_below : public BossAI
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
+            me->SetVisible(true);
+            me->UpdateObjectVisibility(true);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
@@ -216,7 +217,7 @@ public:
             if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
             {
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = go->SummonCreature(NPC_THE_LURKER_BELOW, 40.4058f, -417.108f, -21.5911f, 3.03312f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 604800000))
+                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
                 return true;
             }
@@ -225,38 +226,49 @@ public:
     }
 };
 
-class spell_lurker_below_spout : public AuraScript
+class spell_lurker_below_spout : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_lurker_below_spout);
+public:
+    spell_lurker_below_spout() : SpellScriptLoader("spell_lurker_below_spout") { }
 
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_lurker_below_spout_AuraScript : public AuraScript
     {
-        SetDuration(13000);
-    }
+        PrepareAuraScript(spell_lurker_below_spout_AuraScript);
 
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Creature* creature = GetUnitOwner()->ToCreature())
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            creature->resetAttackTimer();
-            creature->SetReactState(REACT_AGGRESSIVE);
-            if (Unit* target = creature->GetVictim())
-                creature->SetTarget(target->GetGUID());
+            SetDuration(13000);
         }
-    }
 
-    void OnPeriodic(AuraEffect const* aurEff)
-    {
-        PreventDefaultAction();
-        GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
-        GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
-    }
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* creature = GetUnitOwner()->ToCreature())
+            {
+                creature->resetAttackTimer();
+                creature->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = creature->GetVictim())
+                    creature->SetTarget(target->GetGUID());
+            }
+        }
 
-    void Register() override
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            PreventDefaultAction();
+            GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
+            GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        return new spell_lurker_below_spout_AuraScript();
     }
 };
 
@@ -274,18 +286,29 @@ private:
     Unit* _caster;
 };
 
-class spell_lurker_below_spout_cone : public SpellScript
+class spell_lurker_below_spout_cone : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_lurker_below_spout_cone);
+public:
+    spell_lurker_below_spout_cone() : SpellScriptLoader("spell_lurker_below_spout_cone") { }
 
-    void FilterTargets(std::list<WorldObject*>& targets)
+    class spell_lurker_below_spout_cone_SpellScript : public SpellScript
     {
-        targets.remove_if(HasInLineCheck(GetCaster()));
-    }
+        PrepareSpellScript(spell_lurker_below_spout_cone_SpellScript);
 
-    void Register() override
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(HasInLineCheck(GetCaster()));
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lurker_below_spout_cone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lurker_below_spout_cone::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
+        return new spell_lurker_below_spout_cone_SpellScript();
     }
 };
 
@@ -293,6 +316,6 @@ void AddSC_boss_the_lurker_below()
 {
     RegisterSerpentShrineAI(boss_the_lurker_below);
     new go_strange_pool();
-    RegisterSpellScript(spell_lurker_below_spout);
-    RegisterSpellScript(spell_lurker_below_spout_cone);
+    new spell_lurker_below_spout();
+    new spell_lurker_below_spout_cone();
 }

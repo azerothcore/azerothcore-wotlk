@@ -43,13 +43,13 @@ struct Realm;
 
 AC_GAME_API extern Realm realm;
 
-enum ShutdownMask : uint8
+enum ShutdownMask
 {
     SHUTDOWN_MASK_RESTART = 1,
     SHUTDOWN_MASK_IDLE    = 2,
 };
 
-enum ShutdownExitCode : uint8
+enum ShutdownExitCode
 {
     SHUTDOWN_EXIT_CODE = 0,
     ERROR_EXIT_CODE    = 1,
@@ -322,6 +322,10 @@ public:
     static float GetMaxVisibleDistanceInInstances()     { return _maxVisibleDistanceInInstances;  }
     static float GetMaxVisibleDistanceInBGArenas()      { return _maxVisibleDistanceInBGArenas;   }
 
+    static int32 GetVisibilityNotifyPeriodOnContinents() { return m_visibility_notify_periodOnContinents; }
+    static int32 GetVisibilityNotifyPeriodInInstances()  { return m_visibility_notify_periodInInstances;  }
+    static int32 GetVisibilityNotifyPeriodInBGArenas()   { return m_visibility_notify_periodInBGArenas;   }
+
     // our: needed for arena spectator subscriptions
     uint32 GetNextWhoListUpdateDelaySecs() override;
 
@@ -408,6 +412,10 @@ private:
     static float _maxVisibleDistanceOnContinents;
     static float _maxVisibleDistanceInInstances;
     static float _maxVisibleDistanceInBGArenas;
+
+    static int32 m_visibility_notify_periodOnContinents;
+    static int32 m_visibility_notify_periodInInstances;
+    static int32 m_visibility_notify_periodInBGArenas;
 
     std::string _realmName;
 

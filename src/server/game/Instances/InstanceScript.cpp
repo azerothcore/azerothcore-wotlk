@@ -31,6 +31,10 @@
 #include "Spell.h"
 #include "WorldSession.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 BossBoundaryData::~BossBoundaryData()
 {
     for (const_iterator it = begin(); it != end(); ++it)
@@ -56,27 +60,26 @@ void InstanceScript::SaveToDB()
 
 void InstanceScript::OnCreatureCreate(Creature* creature)
 {
-    AddObject(creature);
-    AddMinion(creature);
+    AddObject(creature, true);
+    AddMinion(creature, true);
 }
 
 void InstanceScript::OnCreatureRemove(Creature* creature)
 {
-    RemoveObject(creature);
-    RemoveMinion(creature);
+    AddObject(creature, false);
+    AddMinion(creature, false);
 }
 
 void InstanceScript::OnGameObjectCreate(GameObject* go)
 {
-    AddObject(go);
-    AddDoor(go);
-    sScriptMgr->AfterInstanceGameObjectCreate(instance, go);
+    AddObject(go, true);
+    AddDoor(go, true);
 }
 
 void InstanceScript::OnGameObjectRemove(GameObject* go)
 {
-    RemoveObject(go);
-    RemoveDoor(go);
+    AddObject(go, false);
+    AddDoor(go, false);
 }
 
 ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
@@ -263,11 +266,6 @@ void InstanceScript::AddObject(Creature* obj, bool add)
     }
 }
 
-void InstanceScript::RemoveObject(Creature* obj)
-{
-    AddObject(obj, false);
-}
-
 void InstanceScript::AddObject(GameObject* obj, bool add)
 {
     ObjectInfoMap::const_iterator j = _gameObjectInfo.find(obj->GetEntry());
@@ -275,11 +273,6 @@ void InstanceScript::AddObject(GameObject* obj, bool add)
     {
         AddObject(obj, j->second, add);
     }
-}
-
-void InstanceScript::RemoveObject(GameObject* obj)
-{
-    AddObject(obj, false);
 }
 
 void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
@@ -296,11 +289,6 @@ void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
             _objectGuids.erase(i);
         }
     }
-}
-
-void InstanceScript::RemoveObject(WorldObject* obj, uint32 type)
-{
-    AddObject(obj, type, false);
 }
 
 void InstanceScript::AddDoor(GameObject* door, bool add)
@@ -325,11 +313,6 @@ void InstanceScript::AddDoor(GameObject* door, bool add)
         UpdateDoorState(door);
 }
 
-void InstanceScript::RemoveDoor(GameObject* door)
-{
-    AddDoor(door, false);
-}
-
 void InstanceScript::AddMinion(Creature* minion, bool add)
 {
     MinionInfoMap::iterator itr = minions.find(minion->GetEntry());
@@ -340,11 +323,6 @@ void InstanceScript::AddMinion(Creature* minion, bool add)
         itr->second.bossInfo->minion.insert(minion);
     else
         itr->second.bossInfo->minion.erase(minion);
-}
-
-void InstanceScript::RemoveMinion(Creature* minion)
-{
-    AddMinion(minion, false);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)
@@ -592,67 +570,118 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 // Send Notify to all players in instance
 void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
-    if (!instance->GetPlayers().IsEmpty())
+    InstanceMap::PlayerList const& players = instance->GetPlayers();
+
+    if (!players.IsEmpty())
     {
         va_list ap;
         va_start(ap, format);
         char buff[1024];
         vsnprintf(buff, 1024, format, ap);
         va_end(ap);
-
-        instance->DoForAllPlayers([&, buff](Player* player)
-        {
-            player->GetSession()->SendNotification("%s", buff);
-        });
+        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+            if (Player* player = i->GetSource())
+                player->GetSession()->SendNotification("%s", buff);
     }
 }
 
 // Update Achievement Criteria for all players in instance
 void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
-    instance->DoForAllPlayers([&](Player* player)
-    {
-        player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
-    });
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.IsEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->GetSource())
+                player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
 }
 
 // Start timed achievement for all players in instance
 void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    instance->DoForAllPlayers([&](Player* player)
-    {
-        player->StartTimedAchievement(type, entry);
-    });
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.IsEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->GetSource())
+                player->StartTimedAchievement(type, entry);
 }
 
 // Stop timed achievement for all players in instance
 void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    instance->DoForAllPlayers([&](Player* player)
-    {
-        player->RemoveTimedAchievement(type, entry);
-    });
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.IsEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->GetSource())
+                player->RemoveTimedAchievement(type, entry);
 }
 
 // Remove Auras due to Spell on all players in instance
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
-    instance->DoForAllPlayers([&](Player* player)
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+    if (!PlayerList.IsEmpty())
     {
-        player->RemoveAurasDueToSpell(spell);
-        if (Pet* pet = player->GetPet())
-            pet->RemoveAurasDueToSpell(spell);
-    });
+        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        {
+            if (Player* player = itr->GetSource())
+            {
+                player->RemoveAurasDueToSpell(spell);
+                if (Pet* pet = player->GetPet())
+                    pet->RemoveAurasDueToSpell(spell);
+                //npcbot: include bots
+                if (player->HaveBot())
+                {
+                    for (auto const& bitr : *player->GetBotMgr()->GetBotMap())
+                        if (bitr.second && bitr.second->IsInWorld())
+                            DoRemoveAurasDueToSpellOnNPCBot(bitr.second, spell);
+                }
+                //end npcbot
+            }
+        }
+    }
 }
 
 // Cast spell on all players in instance
 void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
-    instance->DoForAllPlayers([&](Player* player)
-    {
-        player->CastSpell(player, spell, true);
-    });
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.IsEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->GetSource())
+            {
+                player->CastSpell(player, spell, true);
+                //npcbot: include bots
+                if (player->HaveBot())
+                {
+                    for (auto const& bitr : *player->GetBotMgr()->GetBotMap())
+                        if (bitr.second && bitr.second->IsInWorld())
+                            DoCastSpellOnNPCBot(bitr.second, spell);
+                }
+                //end npcbot
+            }
 }
+
+//npcbot: hooks
+void InstanceScript::DoRemoveAurasDueToSpellOnNPCBot(Creature* bot, uint32 spell)
+{
+    ASSERT(bot && bot->IsNPCBot() && bot->IsInWorld() && !bot->IsFreeBot());
+    bot->RemoveAurasDueToSpell(spell);
+    if (Unit* botpet = bot->GetBotsPet())
+        botpet->RemoveAurasDueToSpell(spell);
+}
+
+void InstanceScript::DoCastSpellOnNPCBot(Creature* bot, uint32 spell)
+{
+    ASSERT(bot && bot->IsNPCBot() && bot->IsInWorld() && !bot->IsFreeBot());
+    bot->CastSpell(bot, spell, true);
+    if (Unit* botpet = bot->GetBotsPet())
+        botpet->CastSpell(botpet, spell, true);
+}
+//end npcbot
 
 void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
 {

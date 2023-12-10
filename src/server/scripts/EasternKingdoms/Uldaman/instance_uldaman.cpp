@@ -16,10 +16,9 @@
  */
 
 #include "CreatureAI.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "uldaman.h"
 
 enum Spells
@@ -253,4 +252,3 @@ void AddSC_instance_uldaman()
     new spell_uldaman_stoned();
     new spell_uldaman_boss_agro_archaedas();
 }
-

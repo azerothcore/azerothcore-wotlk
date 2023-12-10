@@ -39,10 +39,10 @@ public:
     {
         ASSERT(threadCount > 0);
 
-        std::unique_ptr<AsyncAcceptor> acceptor;
+        AsyncAcceptor* acceptor = nullptr;
         try
         {
-            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port);
+            acceptor = new AsyncAcceptor(ioContext, bindIp, port);
         }
         catch (boost::system::system_error const& err)
         {
@@ -53,12 +53,13 @@ public:
         if (!acceptor->Bind())
         {
             LOG_ERROR("network", "StartNetwork failed to bind socket acceptor");
+            delete acceptor;
             return false;
         }
 
-        _acceptor = std::move(acceptor);
+        _acceptor = acceptor;
         _threadCount = threadCount;
-        _threads = std::unique_ptr<NetworkThread<SocketType>[]>(CreateThreads());
+        _threads = CreateThreads();
 
         ASSERT(_threads);
 
@@ -66,6 +67,7 @@ public:
             _threads[i].Start();
 
         _acceptor->SetSocketFactory([this]() { return GetSocketForAccept(); });
+
         return true;
     }
 
@@ -73,20 +75,24 @@ public:
     {
         _acceptor->Close();
 
-        for (int32 i = 0; i < _threadCount; ++i)
-            _threads[i].Stop();
+        if (_threadCount != 0)
+            for (int32 i = 0; i < _threadCount; ++i)
+                _threads[i].Stop();
 
         Wait();
 
-        _acceptor.reset();
-        _threads.reset();
+        delete _acceptor;
+        _acceptor = nullptr;
+        delete[] _threads;
+        _threads = nullptr;
         _threadCount = 0;
     }
 
     void Wait()
     {
-        for (int32 i = 0; i < _threadCount; ++i)
-            _threads[i].Wait();
+        if (_threadCount != 0)
+            for (int32 i = 0; i < _threadCount; ++i)
+                _threads[i].Wait();
     }
 
     virtual void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
@@ -120,17 +126,18 @@ public:
     std::pair<tcp::socket*, uint32> GetSocketForAccept()
     {
         uint32 threadIndex = SelectThreadWithMinConnections();
-        return { _threads[threadIndex].GetSocketForAccept(), threadIndex };
+        return std::make_pair(_threads[threadIndex].GetSocketForAccept(), threadIndex);
     }
 
 protected:
-    SocketMgr() = default;
+    SocketMgr() :
+        _acceptor(nullptr), _threads(nullptr), _threadCount(0) { }
 
     virtual NetworkThread<SocketType>* CreateThreads() const = 0;
 
-    std::unique_ptr<AsyncAcceptor> _acceptor;
-    std::unique_ptr<NetworkThread<SocketType>[]> _threads;
-    int32 _threadCount{};
+    AsyncAcceptor* _acceptor;
+    NetworkThread<SocketType>* _threads;
+    int32 _threadCount;
 };
 
 #endif // SocketMgr_h__

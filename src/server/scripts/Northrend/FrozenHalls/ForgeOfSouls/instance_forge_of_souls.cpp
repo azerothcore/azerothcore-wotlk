@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "InstanceMapScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 
@@ -219,4 +218,3 @@ void AddSC_instance_forge_of_souls()
 {
     new instance_forge_of_souls();
 }
-

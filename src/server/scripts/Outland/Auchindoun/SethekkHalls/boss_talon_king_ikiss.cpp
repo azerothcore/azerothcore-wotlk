@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "sethekk_halls.h"
 
 enum Text
@@ -180,4 +179,3 @@ void AddSC_boss_talon_king_ikiss()
     RegisterSethekkHallsCreatureAI(boss_talon_king_ikiss);
     RegisterSpellScript(spell_talon_king_ikiss_blink);
 }
-

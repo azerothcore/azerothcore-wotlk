@@ -15,17 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "karazhan.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "World.h"
-#include "karazhan.h"
+
 #include <array>
 
 enum EchoOfMedivhGossipOptions
@@ -503,7 +506,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
                 piece->CombatStop();
                 piece->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                piece->setDeathState(DeathState::JustRespawned);
+                piece->setDeathState(JUST_RESPAWNED);
                 piece->SetHealth(piece->GetMaxHealth());
                 break;
             }
@@ -525,7 +528,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
                 piece->CombatStop();
                 piece->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                piece->setDeathState(DeathState::JustRespawned);
+                piece->setDeathState(JUST_RESPAWNED);
                 piece->SetHealth(piece->GetMaxHealth());
                 break;
             }
@@ -2087,4 +2090,3 @@ void AddSC_boss_chess_event()
 
     RegisterSpellScript(spell_control_piece);
 }
-

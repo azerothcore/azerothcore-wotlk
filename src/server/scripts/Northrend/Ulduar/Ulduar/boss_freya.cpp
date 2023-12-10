@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
-#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "ulduar.h"
@@ -1110,7 +1109,7 @@ public:
         {
             if (_isTrio && param == ACTION_RESPAWN_TRIO)
             {
-                me->setDeathState(DeathState::JustRespawned);
+                me->setDeathState(JUST_RESPAWNED);
                 Reset();
             }
         }
@@ -1299,4 +1298,3 @@ void AddSC_boss_freya()
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_on_wood", 2);
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_knock_on_wood", 3);
 }
-

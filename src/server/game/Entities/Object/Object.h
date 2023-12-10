@@ -191,6 +191,12 @@ public:
     // FG: some hacky helpers
     void ForceValuesUpdateAtIndex(uint32);
 
+    //npcbot
+    virtual bool IsNPCBot() const { return false; }
+    virtual bool IsNPCBotPet() const { return false; }
+    virtual bool IsNPCBotOrPet() const { return false; }
+    //end npcbot
+
     [[nodiscard]] inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
     Player* ToPlayer() { if (GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player*>(this); else return nullptr; }
     [[nodiscard]] Player const* ToPlayer() const { if (GetTypeId() == TYPEID_PLAYER) return (Player const*)((Player*)this); else return nullptr; }
@@ -379,14 +385,23 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject()  = default;
+    MovableMapObject() : _moveState(MAP_OBJECT_CELL_MOVE_NONE)
+    {
+        _newPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+    }
 
 private:
+    Cell _currentCell;
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
-    Cell _currentCell;
-    MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
+    MapObjectCellMoveState _moveState;
+    Position _newPosition;
+    void SetNewCellPosition(float x, float y, float z, float o)
+    {
+        _moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+        _newPosition.Relocate(x, y, z, o);
+    }
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -410,10 +425,10 @@ public:
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, WorldObject const* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
     Position GetNearPosition(float dist, float angle);
-    void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    void MovePositionToFirstCollision(Position& pos, float dist, float angle) const;
     Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
     Position GetFirstCollisionPosition(float destX, float destY, float destZ);
-    Position GetFirstCollisionPosition(float dist, float angle);
+    Position GetFirstCollisionPosition(float dist, float angle) const;
     Position GetRandomNearPosition(float radius);
 
     void GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
@@ -538,7 +553,7 @@ public:
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
-    virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
+    virtual void UpdateObjectVisibility(bool forced = true);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
@@ -587,6 +602,9 @@ public:
     [[nodiscard]] float GetTransOffsetY() const { return m_movementInfo.transport.pos.GetPositionY(); }
     [[nodiscard]] float GetTransOffsetZ() const { return m_movementInfo.transport.pos.GetPositionZ(); }
     [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
+    //npcbot: TC method transfer
+    [[nodiscard]] Position const& GetTransOffset() const { return m_movementInfo.transport.pos; }
+    //end npcbot
     [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
     [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;

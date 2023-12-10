@@ -17,7 +17,6 @@
 
 #include "CreatureAI.h"
 #include "DisableMgr.h"
-#include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GitRevision.h"

@@ -24,7 +24,6 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -230,7 +229,8 @@ public:
         }
         else
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -282,7 +282,8 @@ public:
         }
         else
         {
-            handler->SendErrorMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);
+            handler->PSendSysMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

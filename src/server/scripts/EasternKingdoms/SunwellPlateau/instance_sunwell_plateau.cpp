@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "SpellScriptLoader.h"
+#include "ScriptMgr.h"
 #include "sunwell_plateau.h"
 
 DoorData const doorData[] =
@@ -155,7 +154,7 @@ public:
                 case GO_FIRE_BARRIER:
                 case GO_MURUS_GATE_1:
                 case GO_MURUS_GATE_2:
-                    AddDoor(go);
+                    AddDoor(go, true);
                     break;
                 case GO_ICE_BARRIER:
                     IceBarrierGUID = go->GetGUID();
@@ -188,7 +187,7 @@ public:
                 case GO_BOSS_COLLISION_1:
                 case GO_BOSS_COLLISION_2:
                 case GO_FORCE_FIELD:
-                    RemoveDoor(go);
+                    AddDoor(go, false);
                     break;
                 default:
                     break;
@@ -304,4 +303,3 @@ void AddSC_instance_sunwell_plateau()
     new instance_sunwell_plateau();
     new spell_cataclysm_breath();
 }
-

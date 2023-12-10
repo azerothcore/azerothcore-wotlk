@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "arcatraz.h"
 
@@ -50,7 +50,13 @@ enum Misc
 
 struct boss_harbinger_skyriss : public BossAI
 {
-    boss_harbinger_skyriss(Creature* creature) : BossAI(creature, DATA_WARDEN_MELLICHAR) { }
+    boss_harbinger_skyriss(Creature* creature) : BossAI(creature, DATA_WARDEN_MELLICHAR)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "mechanar.h"
 
@@ -37,7 +37,13 @@ enum Spells
 
 struct boss_gatewatcher_iron_hand : public BossAI
 {
-    boss_gatewatcher_iron_hand(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_IRON_HAND) { }
+    boss_gatewatcher_iron_hand(Creature* creature) : BossAI(creature, DATA_GATEWATCHER_IRON_HAND)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void JustEngagedWith(Unit* /*who*/) override
     {

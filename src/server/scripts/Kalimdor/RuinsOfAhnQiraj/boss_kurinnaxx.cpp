@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectAI.h"
-#include "GameObjectScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
@@ -33,6 +32,14 @@ enum Spells
     SPELL_THRASH            = 3391
 };
 
+enum Events
+{
+    EVENT_MORTAL_WOUND      = 1,
+    EVENT_SAND_TRAP         = 2,
+    EVENT_WIDE_SLASH        = 3,
+    EVENT_THRASH            = 4
+};
+
 enum Texts
 {
     SAY_KURINNAXX_DEATH     = 5 // Yell by 'Ossirian the Unscarred'
@@ -45,37 +52,26 @@ struct boss_kurinnaxx : public BossAI
     void InitializeAI() override
     {
         me->m_CombatDistance = 50.0f;
+        Reset();
     }
 
-    void JustEngagedWith(Unit* who) override
+    void Reset() override
     {
-        BossAI::JustEngagedWith(who);
+        BossAI::Reset();
+        _enraged = false;
+        events.ScheduleEvent(EVENT_MORTAL_WOUND, 8s, 10s);
+        events.ScheduleEvent(EVENT_SAND_TRAP, 5s, 15s);
+        events.ScheduleEvent(EVENT_WIDE_SLASH, 10s, 15s);
+        events.ScheduleEvent(EVENT_THRASH, 16s);
+    }
 
-        scheduler.Schedule(8s, 10s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_MORTAL_WOUND);
-            context.Repeat(8s, 10s);
-        }).Schedule(5s, 15s, [this](TaskContext context)
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.f, true))
-            {
-                target->CastSpell(target, SPELL_SAND_TRAP, true, nullptr, nullptr, me->GetGUID());
-            }
-            context.Repeat(5s, 15s);
-        }).Schedule(10s, 15s, [this](TaskContext context)
-        {
-            DoCastSelf(SPELL_WIDE_SLASH);
-            context.Repeat(12s, 15s);
-        }).Schedule(16s, [this](TaskContext context)
-        {
-            DoCastSelf(SPELL_THRASH);
-            context.Repeat(16s);
-        });
-
-        ScheduleHealthCheckEvent(30, [&]
+    void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!_enraged && HealthBelowPct(30))
         {
             DoCastSelf(SPELL_ENRAGE);
-        });
+            _enraged = true;
+        }
     }
 
     void JustDied(Unit* killer) override
@@ -83,14 +79,10 @@ struct boss_kurinnaxx : public BossAI
         if (killer)
         {
             killer->GetMap()->LoadGrid(-9502.80f, 2042.65f); // Ossirian grid
-            killer->GetMap()->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
 
             if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                if (Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                {
-                    creature->setActive(true);
-                }
+                player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
             }
         }
 
@@ -102,6 +94,49 @@ struct boss_kurinnaxx : public BossAI
         }
         BossAI::JustDied(killer);
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_MORTAL_WOUND:
+                    DoCastVictim(SPELL_MORTAL_WOUND);
+                    events.ScheduleEvent(EVENT_MORTAL_WOUND, 8s, 10s);
+                    break;
+                case EVENT_SAND_TRAP:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.f, true))
+                    {
+                        target->CastSpell(target, SPELL_SAND_TRAP, true, nullptr, nullptr, me->GetGUID());
+                    }
+                    events.ScheduleEvent(EVENT_SAND_TRAP, 5s, 15s);
+                    break;
+                case EVENT_WIDE_SLASH:
+                    DoCastSelf(SPELL_WIDE_SLASH);
+                    events.ScheduleEvent(EVENT_WIDE_SLASH, 12s, 15s);
+                    break;
+                case EVENT_THRASH:
+                    DoCastSelf(SPELL_THRASH);
+                    events.ScheduleEvent(EVENT_THRASH, 16s);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    bool _enraged;
 };
 
 struct go_sand_trap : public GameObjectAI

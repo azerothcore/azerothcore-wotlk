@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellInfo.h"
 #include "DBCStores.h"
 #include "DBCStructure.h"
 #include "GameGraveyard.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 
 inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellInfo*))
@@ -40,6 +40,68 @@ void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
+    //npcbot: corrections for Life Tap (see Trinity-Bots issue #239)
+    ApplySpellFix({1454}, [](SpellInfo* spellInfo) // Life Tap (Rank 1)
+    {
+        spellInfo->SpellLevel = 6;
+        spellInfo->BaseLevel = 6;
+        spellInfo->MaxLevel = 16;
+    });
+    ApplySpellFix({1455}, [](SpellInfo* spellInfo) // Life Tap (Rank 2)
+    {
+        spellInfo->SpellLevel = 16;
+        spellInfo->BaseLevel = 16;
+        spellInfo->MaxLevel = 26;
+    });
+    ApplySpellFix({1456}, [](SpellInfo* spellInfo) // Life Tap (Rank 3)
+    {
+        spellInfo->SpellLevel = 26;
+        spellInfo->BaseLevel = 26;
+        spellInfo->MaxLevel = 36;
+    });
+    ApplySpellFix({11687}, [](SpellInfo* spellInfo) // Life Tap (Rank 4)
+    {
+        spellInfo->SpellLevel = 36;
+        spellInfo->BaseLevel = 36;
+        spellInfo->MaxLevel = 46;
+    });
+    ApplySpellFix({11688}, [](SpellInfo* spellInfo) // Life Tap (Rank 5)
+    {
+        spellInfo->SpellLevel = 46;
+        spellInfo->BaseLevel = 46;
+        spellInfo->MaxLevel = 56;
+    });
+    ApplySpellFix({11689}, [](SpellInfo* spellInfo) // Life Tap (Rank 6)
+    {
+        spellInfo->SpellLevel = 56;
+        spellInfo->BaseLevel = 56;
+        spellInfo->MaxLevel = 68;
+    });
+    ApplySpellFix({27222}, [](SpellInfo* spellInfo) // Life Tap (Rank 7)
+    {
+        spellInfo->SpellLevel = 68;
+        spellInfo->BaseLevel = 68;
+        spellInfo->MaxLevel = 78;
+    });
+    ApplySpellFix({57946}, [](SpellInfo* spellInfo) // Life Tap (Rank 8)
+    {
+        spellInfo->SpellLevel = 80;
+        spellInfo->BaseLevel = 80;
+        spellInfo->MaxLevel = 90;
+    });
+    //npcbot: corrections for Gunship Battle Shoot: should be able to target creatures (Hurl Axe can)
+    ApplySpellFix({
+        70162,  // Shoot 10N
+        72566,  // Shoot 25N
+        72567,  // Shoot 10H
+        72568   // Shoot 25H
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_ON_PLAYER;
+        spellInfo->TargetAuraSpell = 0;
+    });
+    //end npcbot
+
     ApplySpellFix({
         467,    // Thorns (Rank 1)
         782,    // Thorns (Rank 2)
@@ -55,12 +117,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
-    });
-
-    // Scarlet Raven Priest Image
-    ApplySpellFix({ 48763, 48761 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_SPELL_ATTACK;
     });
 
     // Has Brewfest Mug
@@ -4588,54 +4644,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
-    });
-
-    // Improved Mind Flay and Smite
-    ApplySpellFix({ 37571 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].SpellClassMask[0] = 8388736;
-    });
-
-    // Improved Corruption and Immolate (Updated)
-    ApplySpellFix({ 61992 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
-        spellInfo->Effects[EFFECT_1].BasePoints = 4;
-        spellInfo->Effects[EFFECT_1].DieSides = 1;
-        spellInfo->Effects[EFFECT_1].MiscValue = 22;
-        spellInfo->Effects[EFFECT_1].SpellClassMask[0] = 6;
-    });
-
-    // 46747 Fling torch
-    ApplySpellFix({ 46747 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
-    });
-
-    // Chains of Naberius
-    ApplySpellFix({ 36146 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-    });
-
-    // Force of Neltharaku
-    ApplySpellFix({ 38762 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-    });
-
-    // Spotlight
-    ApplySpellFix({ 29683, 32214 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
-    });
-
-    // Haunted
-    ApplySpellFix({ 53768 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

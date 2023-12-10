@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MovementHandlerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -26,11 +25,3 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
         script->OnPlayerMove(player, movementInfo, opcode);
     });
 }
-
-MovementHandlerScript::MovementHandlerScript(const char* name) :
-    ScriptObject(name)
-{
-    ScriptRegistry<MovementHandlerScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<MovementHandlerScript>;

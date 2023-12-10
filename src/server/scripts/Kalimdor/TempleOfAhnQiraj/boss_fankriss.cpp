@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -57,7 +58,9 @@ struct boss_fankriss : public BossAI
 
     void Reset() override
     {
+        _scheduler.CancelAll();
         summonWormSpells = { SPELL_SUMMON_WORM_1, SPELL_SUMMON_WORM_2, SPELL_SUMMON_WORM_3};
+
         BossAI::Reset();
     }
 
@@ -84,9 +87,11 @@ struct boss_fankriss : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
+        _scheduler.CancelAll();
         BossAI::JustEngagedWith(who);
 
-        scheduler.Schedule(7s, 14s, [this](TaskContext context)
+        _scheduler
+            .Schedule(7s, 14s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_MORTAL_WOUND);
                 context.Repeat();
@@ -109,7 +114,18 @@ struct boss_fankriss : public BossAI
             });
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
 private:
+    TaskScheduler _scheduler;
     std::vector<uint32> summonWormSpells;
 };
 

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 enum Texts
@@ -50,7 +50,7 @@ public:
         void Reset() override
         {
             _inEnrage = false;
-            scheduler.CancelAll();
+            _scheduler.CancelAll();
         }
 
         void KilledUnit(Unit* victim) override
@@ -73,7 +73,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            scheduler.Schedule(1ms, [this](TaskContext context)
+            _scheduler.Schedule(1ms, [this](TaskContext context)
             {
                 if (!HealthAbovePct(20))
                 {
@@ -129,7 +129,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            scheduler.Update(diff);
+            _scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -137,6 +137,7 @@ public:
         }
 
     private:
+        TaskScheduler _scheduler;
         bool _inEnrage;
     };
 

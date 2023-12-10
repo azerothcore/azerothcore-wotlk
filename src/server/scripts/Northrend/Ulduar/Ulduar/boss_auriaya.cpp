@@ -15,13 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum AuriayaSpells
@@ -386,7 +384,7 @@ public:
         {
             if (param == ACTION_FERAL_RESPAWN)
             {
-                me->setDeathState(DeathState::JustRespawned);
+                me->setDeathState(JUST_RESPAWNED);
 
                 if (Player* target = SelectTargetFromPlayerList(200))
                     AttackStart(target);

@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 enum Texts
@@ -511,4 +510,3 @@ void AddSC_durotar()
     new spell_voljin_war_drums();
     new spell_voodoo();
 }
-

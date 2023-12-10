@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
-#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum Texts
@@ -979,4 +978,3 @@ void AddSC_boss_rotface()
 
     new npc_precious_icc();
 }
-

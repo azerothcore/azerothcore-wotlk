@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ServerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -96,11 +95,3 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
 
     return true;
 }
-
-ServerScript::ServerScript(const char* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<ServerScript>::AddScript(this);
-}
-
-template class AC_GAME_API ScriptRegistry<ServerScript>;

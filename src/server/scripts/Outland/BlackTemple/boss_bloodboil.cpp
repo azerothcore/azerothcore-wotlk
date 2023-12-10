@@ -15,9 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Says
@@ -267,4 +266,3 @@ void AddSC_boss_gurtogg_bloodboil()
     new spell_gurtogg_bloodboil();
     new spell_gurtogg_eject();
 }
-

@@ -15,22 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "icecrown_citadel.h"
 #include "AccountMgr.h"
-#include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
-#include "SpellScriptLoader.h"
-#include "icecrown_citadel.h"
-#include "GridNotifiersImpl.h"
 
 enum Texts
 {
@@ -1259,7 +1257,7 @@ public:
     {
         if (spell->Id == SPELL_REVIVE_CHAMPION && !IsUndead)
         {
-            me->setDeathState(DeathState::JustRespawned);
+            me->setDeathState(JUST_RESPAWNED);
             uint32 newEntry = 0;
             switch (me->GetEntry())
             {

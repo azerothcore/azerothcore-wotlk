@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "molten_core.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
-#include "molten_core.h"
 
 enum Texts
 {
@@ -274,4 +273,3 @@ void AddSC_molten_core()
     // Spells
     new spell_mc_play_dead();
 }
-
