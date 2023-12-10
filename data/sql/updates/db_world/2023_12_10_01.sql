@@ -1,3 +1,4 @@
+-- DB update 2023_12_10_00 -> 2023_12_10_01
 -- Update creature 26355 '[DND] Midsummer Bonfire Faction Bunny - H' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26355) AND (`guid` IN (94938, 94939, 94940, 94941, 94942, 94943, 94944, 94945, 94946, 94947, 94948, 94949, 94951, 94952, 94953, 94954, 94955, 94957, 94958, 94959, 94960, 94961, 94962, 94963, 94964));
