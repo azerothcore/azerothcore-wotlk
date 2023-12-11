@@ -138,6 +138,7 @@ struct boss_leotheras_the_blind : public BossAI
                     me->LoadEquipment();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetInCombatWithZone();
                     Talk(SAY_AGGRO);
 
                     scheduler.Schedule(10min, [this](TaskContext)
@@ -270,6 +271,11 @@ struct npc_inner_demon : public ScriptedAI
         {
             affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
+    }
+
+    bool CanBeSeen(Player const* player) override
+    {
+        return player && player->GetGUID() == me->GetSummonerGUID();
     }
 
     bool CanReceiveDamage(Unit* attacker)

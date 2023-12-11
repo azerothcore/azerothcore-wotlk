@@ -269,7 +269,7 @@ struct boss_hydross_the_unstable : public BossAI
         }
         else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
         {
-            summon->SetOwnerGUID(me->GetGUID());
+            summon->setActive(true);
             summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
         }
         else
