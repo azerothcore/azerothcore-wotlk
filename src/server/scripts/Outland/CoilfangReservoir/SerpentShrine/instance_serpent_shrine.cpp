@@ -47,6 +47,12 @@ MinionData const minionData[] =
     { 0,                          0,                          }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_MOROGRIM_TIDEWALKER, new RectangleBoundary(304.32f, 457.59f, -786.5f, -661.3f) },
+    { DATA_LADY_VASHJ,          new CircleBoundary(Position(29.99f, -922.409f), 83.65f) }
+};
+
 class instance_serpent_shrine : public InstanceMapScript
 {
 public:
@@ -63,6 +69,7 @@ public:
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
             LoadMinionData(minionData);
+            LoadBossBoundaries(boundaries);
 
             _aliveKeepersCount = 0;
         }
