@@ -138,6 +138,7 @@ struct boss_leotheras_the_blind : public BossAI
                     me->LoadEquipment();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetInCombatWithZone();
                     Talk(SAY_AGGRO);
 
                     scheduler.Schedule(10min, [this](TaskContext)
