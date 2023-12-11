@@ -254,7 +254,7 @@ class spell_lurker_below_spout : public AuraScript
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
     {
-        amplitude = 1000;
+        amplitude = 200;
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
