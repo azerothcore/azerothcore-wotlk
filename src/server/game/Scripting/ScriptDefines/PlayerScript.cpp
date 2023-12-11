@@ -67,6 +67,14 @@ void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionTyp
     });
 }
 
+void ScriptMgr::OnPlayerJustDied(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnPlayerJustDied(player);
+    });
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
