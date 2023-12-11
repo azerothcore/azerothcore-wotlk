@@ -84,13 +84,13 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
     SendTrainerList(guid);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid)
+void WorldSession::SendTrainerList(ObjectGuid guid, uint32 trainerEntry)
 {
     std::string str = GetAcoreString(LANG_NPC_TAINER_HELLO);
-    SendTrainerList(guid, str);
+    SendTrainerList(guid, str, trainerEntry);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
+void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle, uint32 trainerEntry)
 {
     LOG_DEBUG("network", "WORLD: SendTrainerList");
 
@@ -113,7 +113,8 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         return;
     }
 
-    TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+    SetCurrentTrainer(trainerEntry);
+    TrainerSpellData const* trainer_spells = trainerEntry ? sObjectMgr->GetNpcTrainerSpells(trainerEntry) : unit->GetTrainerSpells();
     if (!trainer_spells)
     {
         LOG_DEBUG("network", "WORLD: SendTrainerList - Training spells not found for creature ({})", guid.ToString());
@@ -228,7 +229,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     // check present spell in trainer spell list
-    TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+    TrainerSpellData const* trainer_spells = GetCurrentTrainer() ? sObjectMgr->GetNpcTrainerSpells(GetCurrentTrainer()) : unit->GetTrainerSpells();
     if (!trainer_spells)
         return;
 
