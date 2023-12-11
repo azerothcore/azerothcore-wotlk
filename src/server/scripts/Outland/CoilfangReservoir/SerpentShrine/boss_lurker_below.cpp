@@ -120,6 +120,14 @@ struct boss_the_lurker_below : public BossAI
         SchedulerPhaseOne(38800ms, 91000ms);
     }
 
+    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
+    {
+        if (!summons.IsAnyCreatureAlive())
+        {
+            SchedulerPhaseTwo(1s);
+        }
+    }
+
     void SchedulerPhaseOne(std::chrono::milliseconds spoutTimer, std::chrono::milliseconds p2Timer)
     {
         scheduler.Schedule(10900ms, GROUP_GEYSER, [this](TaskContext context)
@@ -158,13 +166,13 @@ struct boss_the_lurker_below : public BossAI
                 //needs sniffed spell probably
                 me->SummonCreature(i < 6 ? NPC_COILFANG_AMBUSHER : NPC_COILFANG_GUARDIAN, positions[i].GetPositionX(), positions[i].GetPositionY(), positions[i].GetPositionZ(), positions[i].GetAngle(me), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
             }
-            SchedulerPhaseTwo();
+            SchedulerPhaseTwo(60s);
         });
     }
 
-    void SchedulerPhaseTwo()
+    void SchedulerPhaseTwo(Milliseconds timer)
     {
-        scheduler.Schedule(60s, [this](TaskContext)
+        scheduler.Schedule(timer, [this](TaskContext)
         {
             me->setAttackTimer(BASE_ATTACK, 6000);
             me->SetStandState(UNIT_STAND_STATE_STAND);
