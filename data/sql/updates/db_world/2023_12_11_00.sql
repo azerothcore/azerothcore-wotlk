@@ -1,3 +1,4 @@
+-- DB update 2023_12_10_03 -> 2023_12_11_00
 --
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceGroup` = 1 AND `SourceEntry` IN (38017, 38140, 38241, 38248) AND `ConditionTypeOrReference` = 31 AND `ConditionValue2` = 22057;
 
