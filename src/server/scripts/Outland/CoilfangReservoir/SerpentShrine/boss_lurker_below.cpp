@@ -289,27 +289,29 @@ class spell_lurker_below_spout : public AuraScript
     }
 };
 
-class HasInLineCheck
-{
-public:
-    HasInLineCheck(Unit* caster) : _caster(caster) { }
-
-    bool operator()(WorldObject* unit)
-    {
-        return !_caster->HasInLine(unit, 5.0f) || (unit->GetTypeId() == TYPEID_UNIT && unit->ToUnit()->IsUnderWater());
-    }
-
-private:
-    Unit* _caster;
-};
-
 class spell_lurker_below_spout_cone : public SpellScript
 {
     PrepareSpellScript(spell_lurker_below_spout_cone);
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        targets.remove_if(HasInLineCheck(GetCaster()));
+        Unit* caster = GetCaster();
+        targets.remove_if([caster](WorldObject const* target) -> bool
+        {
+            if (!caster->HasInLine(target, 5.0f) || !target->IsPlayer())
+            {
+                return true;
+            }
+
+            LiquidData const& liquidData = target->GetLiquidData();
+
+            if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
+            {
+                return true;
+            }
+
+            return false;
+        });
     }
 
     void Register() override
