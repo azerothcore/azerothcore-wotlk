@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_00 -> 2023_12_12_01
 --
 -- Lady Vashj
 UPDATE `creature_template` SET `speed_run` = 2.14286 WHERE `entry` = 21212;
