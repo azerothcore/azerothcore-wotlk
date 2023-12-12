@@ -25,7 +25,6 @@ EndScriptData */
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DBCStores.h"
-#include "Language.h"
 #include "Player.h"
 
 using namespace Acore::ChatCommands;

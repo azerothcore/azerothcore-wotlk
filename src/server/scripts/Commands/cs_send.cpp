@@ -19,7 +19,6 @@
 #include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
-#include "Language.h"
 #include "Mail.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
