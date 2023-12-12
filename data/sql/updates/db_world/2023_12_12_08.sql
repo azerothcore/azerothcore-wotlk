@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_07 -> 2023_12_12_08
 -- Update creature 26401 'Summer Scorchling' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26401) AND (`guid` IN (86242, 86243, 86244, 86245, 86246, 86247, 86248, 86250, 86251, 86252, 86253, 86254, 86255, 86256, 86259, 86260, 86261, 86262, 86266, 86267, 86268));
