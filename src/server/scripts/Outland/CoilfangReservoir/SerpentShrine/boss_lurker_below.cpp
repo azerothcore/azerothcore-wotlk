@@ -212,9 +212,6 @@ struct boss_the_lurker_below : public BossAI
         }
         me->resetAttackTimer();
     }
-
-    private:
-        bool _clockWise;
 };
 
 class go_strange_pool : public GameObjectScript
