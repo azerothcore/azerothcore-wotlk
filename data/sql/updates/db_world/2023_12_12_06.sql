@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_05 -> 2023_12_12_06
 -- Tor'gan After completing mission ID 640
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2706;
