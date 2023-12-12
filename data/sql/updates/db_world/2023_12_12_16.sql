@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_15 -> 2023_12_12_16
 --
 UPDATE `creature_template` SET `scale` = 0.5, `unit_flags` = `unit_flags`|2048|524288, `mechanic_immune_mask` = 1073741823, `AIName` = '', `ScriptName` = 'npc_rancid_mushroom' WHERE `entry` = 22250;
 
