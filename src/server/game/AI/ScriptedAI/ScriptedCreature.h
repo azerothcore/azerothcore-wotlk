@@ -21,8 +21,8 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "InstanceScript.h"
 #include "EventMap.h"
+#include "InstanceScript.h"
 #include "TaskScheduler.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
@@ -353,6 +353,18 @@ struct ScriptedAI : public CreatureAI
     //Spawns a creature relative to me
     Creature* DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, uint32 despawntime);
 
+    bool IsUniqueTimedEventDone(uint32 id) const { return _uniqueTimedEvents.find(id) != _uniqueTimedEvents.end(); }
+    void SetUniqueTimedEventDone(uint32 id) { _uniqueTimedEvents.insert(id); }
+    void ResetUniqueTimedEvent(uint32 id) { _uniqueTimedEvents.erase(id); }
+    void ClearUniqueTimedEventsDone() { _uniqueTimedEvents.clear(); }
+
+    // Schedules a timed event using task scheduler.
+    void ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0);
+    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0) { ScheduleTimedEvent(0s, timerMax, exec, repeatMin, repeatMax, uniqueId); };
+
+    // Schedules a timed event using task scheduler that never repeats. Requires an unique non-zero ID.
+    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(0s, timer, exec, 0s, 0s, uniqueId); };
+
     bool HealthBelowPct(uint32 pct) const { return me->HealthBelowPct(pct); }
     bool HealthAbovePct(uint32 pct) const { return me->HealthAbovePct(pct); }
 
@@ -442,6 +454,7 @@ private:
     Difficulty _difficulty;
     bool _isCombatMovementAllowed;
     bool _isHeroic;
+    std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
 struct HealthCheckEventData
@@ -494,9 +507,7 @@ protected:
 
     void TeleportCheaters();
 
-    EventMap events;
     SummonList summons;
-    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;

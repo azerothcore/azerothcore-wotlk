@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "the_eye.h"
 
 class instance_the_eye : public InstanceMapScript
@@ -150,3 +152,4 @@ void AddSC_instance_the_eye()
     new instance_the_eye();
     new spell_the_eye_countercharge();
 }
+

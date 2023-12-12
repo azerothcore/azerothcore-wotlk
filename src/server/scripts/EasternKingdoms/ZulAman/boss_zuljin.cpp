@@ -21,7 +21,7 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulaman.h"
@@ -285,7 +285,7 @@ public:
                     if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
                     {
                         temp->SetVisible(false);
-                        temp->setDeathState(DEAD);
+                        temp->setDeathState(DeathState::Dead);
                     }
                 }
                 SpiritGUID[i].Clear();

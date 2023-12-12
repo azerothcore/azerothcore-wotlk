@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
@@ -30,7 +31,6 @@ EndScriptData */
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -75,8 +75,7 @@ public:
 
         if (sObjectMgr->GetGameTele(name))
         {
-            handler->SendSysMessage(LANG_COMMAND_TP_ALREADYEXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_TP_ALREADYEXIST);
             return false;
         }
 
@@ -94,8 +93,7 @@ public:
         }
         else
         {
-            handler->SendSysMessage(LANG_COMMAND_TP_ADDEDERR);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_TP_ADDEDERR);
             return false;
         }
 
@@ -106,8 +104,7 @@ public:
     {
         if (!tele)
         {
-            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_TELE_NOTFOUND);
             return false;
         }
         std::string name = tele->name;
@@ -120,8 +117,7 @@ public:
     {
         if (!MapMgr::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
         {
-            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             return false;
         }
 
@@ -135,8 +131,7 @@ public:
 
             if (target->IsBeingTeleported())
             {
-                handler->PSendSysMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
                 return false;
             }
 
@@ -212,16 +207,14 @@ public:
     {
         if (!tele)
         {
-            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_TELE_NOTFOUND);
             return false;
         }
 
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -232,8 +225,7 @@ public:
         MapEntry const* map = sMapStore.LookupEntry(tele->mapId);
         if (!map || map->IsBattlegroundOrArena())
         {
-            handler->SendSysMessage(LANG_CANNOT_TELE_TO_BG);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CANNOT_TELE_TO_BG);
             return false;
         }
 
@@ -242,8 +234,7 @@ public:
         Group* grp = target->GetGroup();
         if (!grp)
         {
-            handler->PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
             return false;
         }
 
@@ -289,24 +280,21 @@ public:
     {
         if (!tele)
         {
-            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_TELE_NOTFOUND);
             return false;
         }
 
         Player* player = handler->GetSession()->GetPlayer();
         if (player->IsInCombat())
         {
-            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_YOU_IN_COMBAT);
             return false;
         }
 
         MapEntry const* map = sMapStore.LookupEntry(tele->mapId);
         if (!map || (map->IsBattlegroundOrArena() && (player->GetMapId() != tele->mapId || !player->IsGameMaster())))
         {
-            handler->SendSysMessage(LANG_CANNOT_TELE_TO_BG);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CANNOT_TELE_TO_BG);
             return false;
         }
 
@@ -342,8 +330,7 @@ public:
 
         if (!spawnpoint)
         {
-            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
             return false;
         }
 
@@ -357,8 +344,7 @@ public:
         CreatureData const* spawnpoint = sObjectMgr->GetCreatureData(spawnId);
         if (!spawnpoint)
         {
-            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
             return false;
         }
 
@@ -376,8 +362,7 @@ public:
         QueryResult result = WorldDatabase.Query("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id1 = ct.entry WHERE ct.name LIKE '{}'", normalizedName);
         if (!result)
         {
-            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
             return false;
         }
 

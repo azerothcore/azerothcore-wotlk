@@ -352,6 +352,8 @@ public:
         uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, bool isBot = false);
     ~WorldSession();
 
+    bool IsGMAccount() const;
+
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }

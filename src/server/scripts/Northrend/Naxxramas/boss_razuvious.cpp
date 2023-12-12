@@ -16,6 +16,10 @@
  */
 
 #include "boss_razuvious.h"
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "naxxramas.h"
+
 
 void AddSC_boss_razuvious()
 {

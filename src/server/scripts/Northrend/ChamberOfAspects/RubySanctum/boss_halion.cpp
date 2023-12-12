@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MapMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
 #include "ruby_sanctum.h"
@@ -1501,3 +1502,4 @@ void AddSC_boss_halion()
     new spell_halion_twilight_division();
     new spell_halion_twilight_mending();
 }
+

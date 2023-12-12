@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 //
@@ -193,9 +194,9 @@ public:
 
         void ScheduleEvents()
         {
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
 
-            _scheduler.Schedule(1s, [this](TaskContext context)
+            scheduler.Schedule(1s, [this](TaskContext context)
             {
                 // Chase target, but don't attack - otherwise just roam around
                 if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
@@ -251,13 +252,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
         }
 
     private:
         ObjectGuid _targetGUID;
         ObjectGuid _dragonGUID;
-        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -882,3 +882,4 @@ void AddSC_emerald_dragons()
     new spell_mark_of_nature();
     RegisterSpellScript(spell_shadow_bolt_whirl);
 };
+

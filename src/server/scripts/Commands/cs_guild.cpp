@@ -23,9 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -53,7 +53,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildCreateCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -62,8 +62,12 @@ public:
 
         if (!target || !target->IsConnected())
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        if (guildName.empty())
+        {
             return false;
         }
 
@@ -71,22 +75,19 @@ public:
 
         if (playerTarget->GetGuildId())
         {
-            handler->SendSysMessage(LANG_PLAYER_IN_GUILD);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_IN_GUILD);
             return false;
         }
 
         if (sGuildMgr->GetGuildByName(guildName))
         {
-            handler->SendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
             return false;
         }
 
         if (sObjectMgr->IsReservedName(guildName) || sObjectMgr->IsProfanityName(guildName) || !sObjectMgr->IsValidCharterName(guildName))
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -94,8 +95,7 @@ public:
         if (!guild->Create(playerTarget, guildName))
         {
             delete guild;
-            handler->SendSysMessage(LANG_GUILD_NOT_CREATED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_NOT_CREATED);
             return false;
         }
 
@@ -104,7 +104,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildDeleteCommand(ChatHandler*, std::string_view guildName)
+    static bool HandleGuildDeleteCommand(ChatHandler*, QuotedString guildName)
     {
         if (guildName.empty())
         {
@@ -121,7 +121,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, std::string_view guildName)
+    static bool HandleGuildInviteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString guildName)
     {
         if (!target)
         {
@@ -129,6 +129,11 @@ public:
         }
 
         if (!target)
+        {
+            return false;
+        }
+
+        if (guildName.empty())
         {
             return false;
         }
@@ -186,14 +191,9 @@ public:
         return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
-    static bool HandleGuildRenameCommand(ChatHandler* handler, std::string_view oldGuildStr, std::string_view newGuildStr)
+    static bool HandleGuildRenameCommand(ChatHandler* handler, QuotedString oldGuildStr, QuotedString newGuildStr)
     {
-        if (!oldGuildStr.empty())
-        {
-            return false;
-        }
-
-        if (newGuildStr.empty())
+        if (oldGuildStr.empty() || newGuildStr.empty())
         {
             return false;
         }
@@ -201,22 +201,19 @@ public:
         Guild* guild = sGuildMgr->GetGuildByName(oldGuildStr);
         if (!guild)
         {
-            handler->PSendSysMessage(LANG_COMMAND_COULDNOTFIND, oldGuildStr);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_COULDNOTFIND, oldGuildStr);
             return false;
         }
 
         if (sGuildMgr->GetGuildByName(newGuildStr))
         {
-            handler->PSendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, newGuildStr);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, newGuildStr);
             return false;
         }
 
         if (!guild->SetName(newGuildStr))
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -224,7 +221,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, std::string_view>> const& guildIdentifier)
+    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, QuotedString>> const& guildIdentifier)
     {
         Guild* guild = nullptr;
 
@@ -233,7 +230,7 @@ public:
             if (ObjectGuid::LowType const* guid = std::get_if<ObjectGuid::LowType>(&*guildIdentifier))
                 guild = sGuildMgr->GetGuildById(*guid);
             else
-                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<std::string_view>());
+                guild = sGuildMgr->GetGuildByName(guildIdentifier->get<QuotedString>());
         }
         else if (Optional<PlayerIdentifier> target = PlayerIdentifier::FromTargetOrSelf(handler); target && target->IsConnected())
             guild = target->GetConnectedPlayer()->GetGuild();

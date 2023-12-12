@@ -448,8 +448,8 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
-        SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
-        if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
+        SpellEntry const* spellEntry = sSpellStore.LookupEntry(skillLine->Spell);
+        if (spellEntry && spellEntry->Attributes & SPELL_ATTR0_PASSIVE)
         {
             for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
             {
@@ -458,7 +458,7 @@ void LoadDBCStores(const std::string& dataPath)
                     continue;
                 }
 
-                if (spellInfo->SpellLevel)
+                if (spellEntry->SpellLevel)
                 {
                     continue;
                 }
@@ -468,7 +468,7 @@ void LoadDBCStores(const std::string& dataPath)
                     continue;
                 }
 
-                sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->Id);
+                sPetFamilySpellsStore[cFamily->ID].insert(spellEntry->Id);
             }
         }
     }

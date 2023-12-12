@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SpellAuraEffects.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "Transport.h"
 #include "UpdateMask.h"
 #include "World.h"
@@ -47,6 +47,14 @@ DynamicObject::~DynamicObject()
 
 void DynamicObject::CleanupsBeforeDelete(bool finalCleanup /* = true */)
 {
+    if (Transport* transport = GetTransport())
+    {
+        transport->RemovePassenger(this);
+        SetTransport(nullptr);
+        m_movementInfo.transport.Reset();
+        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
+
     WorldObject::CleanupsBeforeDelete(finalCleanup);
 }
 
@@ -79,6 +87,9 @@ void DynamicObject::RemoveFromWorld()
             return;
 
         UnbindFromCaster();
+
+        if (Transport* transport = GetTransport())
+            transport->RemovePassenger(this, true);
 
         WorldObject::RemoveFromWorld();
 
@@ -114,13 +125,15 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS().count());
 
-    if (IsWorldObject())
-        setActive(true);    //must before add to map to be put in world container
-
     if (!GetMap()->AddToMap(this, true))
     {
         // Returning false will cause the object to be deleted - remove from transport
         return false;
+    }
+
+    if (IsWorldObject())
+    {
+        setActive(true);
     }
 
     return true;

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "WaypointMgr.h"
 #include "the_eye.h"
 
@@ -443,6 +444,8 @@ public:
 
             GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
+            GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+            GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -499,3 +502,4 @@ void AddSC_boss_alar()
     new spell_alar_ember_blast_death();
     new spell_alar_dive_bomb();
 }
+

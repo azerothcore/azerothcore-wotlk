@@ -21,6 +21,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Creature.h"
+#include "DynamicVisibility.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -37,8 +38,10 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Totem.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -48,8 +51,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -64,7 +65,7 @@ constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max
     VISIBILITY_DISTANCE_SMALL,
     VISIBILITY_DISTANCE_LARGE,
     VISIBILITY_DISTANCE_GIGANTIC,
-    MAX_VISIBILITY_DISTANCE
+    VISIBILITY_DISTANCE_INFINITE
 };
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
@@ -248,10 +249,7 @@ void Object::SendUpdateToPlayer(Player* player)
     UpdateData upd;
     WorldPacket packet;
 
-    if (player->HaveAtClient(this))
-        BuildValuesUpdateBlockForPlayer(&upd, player);
-    else
-        BuildCreateUpdateBlockForPlayer(&upd, player);
+    BuildCreateUpdateBlockForPlayer(&upd, player);
     upd.BuildPacket(&packet);
     player->GetSession()->SendPacket(&packet);
 }
@@ -1050,7 +1048,7 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
-    LastUsedScriptID(0), m_name(""), m_isActive(false), m_isFarVisible(false), m_visibilityDistanceOverride(), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
+    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
@@ -1107,6 +1105,8 @@ void WorldObject::setActive(bool on)
             map->AddToActive(this->ToCreature());
         else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
             map->AddToActive((DynamicObject*)this);
+        else if (GetTypeId() == TYPEID_GAMEOBJECT)
+            map->AddToActive((GameObject*)this);
     }
     else
     {
@@ -1114,15 +1114,9 @@ void WorldObject::setActive(bool on)
             map->RemoveFromActive(this->ToCreature());
         else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
             map->RemoveFromActive((DynamicObject*)this);
+        else if (GetTypeId() == TYPEID_GAMEOBJECT)
+            map->RemoveFromActive((GameObject*)this);
     }
-}
-
-void WorldObject::SetFarVisible(bool on)
-{
-    if (GetTypeId() == TYPEID_PLAYER)
-        return;
-
-    m_isFarVisible = on;
 }
 
 void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
@@ -1140,9 +1134,6 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
     if (IsInWorld())
         RemoveFromWorld();
-
-    if (Transport* transport = GetTransport())
-        transport->RemovePassenger(this, true);
 }
 
 void WorldObject::_Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask)
@@ -1635,9 +1626,9 @@ float WorldObject::GetGridActivationRange() const
     {
         if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
         {
-            return std::max(DEFAULT_VISIBILITY_INSTANCE, GetMap()->GetVisibilityRange());
+            return DEFAULT_VISIBILITY_INSTANCE;
         }
-        return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
+        return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
     }
     else if (ToCreature())
     {
@@ -1653,12 +1644,29 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 {
-    if (IsVisibilityOverridden() && !ToPlayer())
+    if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+    {
         return *m_visibilityDistanceOverride;
-    else if (IsFarVisible() && !ToPlayer())
-        return MAX_VISIBILITY_DISTANCE;
+    }
+    else if (GetTypeId() == TYPEID_GAMEOBJECT)
+    {
+        {
+            if (IsInWintergrasp())
+            {
+                return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+            else if (IsVisibilityOverridden())
+            {
+                return *m_visibilityDistanceOverride;
+            }
+            else
+            {
+                return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+        }
+    }
     else
-        return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
+        return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
 }
 
 float WorldObject::GetSightRange(WorldObject const* target) const
@@ -1667,19 +1675,44 @@ float WorldObject::GetSightRange(WorldObject const* target) const
     {
         if (ToPlayer())
         {
-            if (target && target->IsVisibilityOverridden() && !target->ToPlayer())
-                return *target->m_visibilityDistanceOverride;
-            else if (target && target->IsFarVisible() && !target->ToPlayer())
-                return MAX_VISIBILITY_DISTANCE;
-            else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
-                return DEFAULT_VISIBILITY_INSTANCE;
-            else
-                return IsInWintergrasp() ? VISIBILITY_DISTANCE_LARGE : GetMap()->GetVisibilityRange();
+            if (target)
+            {
+                if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
+                {
+                    return *target->m_visibilityDistanceOverride;
+                }
+                else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
+                {
+                    if (IsInWintergrasp() && target->IsInWintergrasp())
+                    {
+                        return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
+                    }
+                    else if (target->IsVisibilityOverridden())
+                    {
+                        return *target->m_visibilityDistanceOverride;
+                    }
+                    else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
+                    {
+                        return DEFAULT_VISIBILITY_INSTANCE;
+                    }
+                    else
+                    {
+                        return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+                    }
+                }
+
+                return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+            }
+            return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
         }
         else if (ToCreature())
+        {
             return ToCreature()->m_SightDistance;
+        }
         else
+        {
             return SIGHT_RANGE_UNIT;
+        }
     }
 
     if (ToDynObject() && isActiveObject())
@@ -2044,8 +2077,11 @@ void Unit::BuildHeartBeatMsg(WorldPacket* data) const
     BuildMovementPacket(data);
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, Player const* skipped_rcvr) const
+void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
+    dist += GetObjectSize();
+    if (includeMargin)
+        dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
     Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
     Cell::VisitWorldObjects(this, notifier, dist);
 }
@@ -2192,8 +2228,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             return nullptr;
     }
 
-    if (!IsGridLoaded(pos.GetPositionX(), pos.GetPositionY()))
-        EnsureGridLoaded(Cell(pos.GetPositionX(), pos.GetPositionY()));
+    EnsureGridLoaded(Cell(pos.GetPositionX(), pos.GetPositionY()));
     if (!summon->Create(GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
     {
         delete summon;
@@ -2866,8 +2901,8 @@ void WorldObject::DestroyForNearbyPlayers()
         return;
 
     std::list<Player*> targets;
-    Acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(), false);
-    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange() + VISIBILITY_COMPENSATION, false);
+    Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
@@ -2887,7 +2922,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-void WorldObject::UpdateObjectVisibility(bool /*forced*/)
+void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 {
     //updates object's visibility for nearby players
     Acore::VisibleChangesNotifier notifier(*this);
@@ -2896,7 +2931,28 @@ void WorldObject::UpdateObjectVisibility(bool /*forced*/)
 
 void WorldObject::AddToNotify(uint16 f)
 {
-    m_notifyflags |= f;
+    if (!(m_notifyflags & f))
+        if (Unit* u = ToUnit())
+        {
+            if (f & NOTIFY_VISIBILITY_CHANGED)
+            {
+                uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
+
+                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
+                if (diff >= EVENT_VISIBILITY_DELAY / 2)
+                    EVENT_VISIBILITY_DELAY /= 2;
+                else
+                    EVENT_VISIBILITY_DELAY -= diff;
+                u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
+                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
+            }
+            else if (f & NOTIFY_AI_RELOCATION)
+            {
+                u->m_delayed_unit_ai_notify_timer = u->FindMap() ? DynamicVisibilityMgr::GetAINotifyDelay(u->FindMap()->GetEntry()->map_type) : 500;
+            }
+
+            m_notifyflags |= f;
+        }
 }
 
 struct WorldObjectChangeAccumulator
@@ -2949,7 +3005,7 @@ struct WorldObjectChangeAccumulator
             source = iter->GetSource();
             ObjectGuid guid = source->GetCasterGUID();
 
-            if (guid.IsPlayer())
+            if (guid)
             {
                 //Caster may be nullptr if DynObj is in removelist
                 if (Player* caster = ObjectAccessor::FindPlayer(guid))

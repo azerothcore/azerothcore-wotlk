@@ -32,10 +32,10 @@ EndContentData */
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -387,7 +387,7 @@ public:
 
             if (!PlayerGUID)
             {
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 return;
             }
 
@@ -408,7 +408,7 @@ public:
                 Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!player || player->GetQuestStatus(10965) == QUEST_STATUS_NONE)
                 {
-                    me->setDeathState(JUST_DIED);
+                    me->setDeathState(DeathState::JustDied);
                     return;
                 }
 
@@ -532,7 +532,7 @@ public:
                                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
                                 PlayerGUID.Clear();
                                 Reset();
-                                me->setDeathState(JUST_DIED);
+                                me->setDeathState(DeathState::JustDied);
                                 break;
                         }
                         break;

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
@@ -245,7 +245,7 @@ public:
                     Creature* boss = ObjectAccessor::GetCreature(*me, AzgalorGUID);
                     if (!boss || boss->isDead())
                     {
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->RemoveCorpse();
                         return;
                     }

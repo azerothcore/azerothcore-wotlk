@@ -16,6 +16,7 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Language.h"
@@ -23,7 +24,6 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
@@ -89,15 +89,13 @@ public:
             ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemID);
             if (!itemTemplate)
             {
-                handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemID);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_ITEMIDINVALID, itemID);
                 return false;
             }
 
             if (!itemCount || (itemTemplate->MaxCount > 0 && itemCount > uint32(itemTemplate->MaxCount)))
             {
-                handler->PSendSysMessage(LANG_COMMAND_INVALID_ITEM_COUNT, itemCount, itemID);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_INVALID_ITEM_COUNT, itemCount, itemID);
                 return false;
             }
 
@@ -111,8 +109,7 @@ public:
 
             if (itemList.size() > MAX_MAIL_ITEMS)
             {
-                handler->PSendSysMessage(LANG_COMMAND_MAIL_ITEMS_LIMIT, MAX_MAIL_ITEMS);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_MAIL_ITEMS_LIMIT, MAX_MAIL_ITEMS);
                 return false;
             }
         }

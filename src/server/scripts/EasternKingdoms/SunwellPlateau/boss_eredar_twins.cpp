@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -524,3 +526,4 @@ void AddSC_boss_eredar_twins()
     new spell_eredar_twins_blaze();
     new AreaTrigger_at_sunwell_eredar_twins();
 }
+

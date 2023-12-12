@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "scholomance.h"
 
 Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
@@ -462,3 +464,4 @@ void AddSC_instance_scholomance()
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
+

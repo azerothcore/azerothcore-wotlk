@@ -16,6 +16,11 @@
  */
 
 #include "boss_faerlina.h"
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "SpellInfo.h"
+#include "naxxramas.h"
+
 
 void AddSC_boss_faerlina()
 {

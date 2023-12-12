@@ -24,12 +24,12 @@ EndScriptData */
 
 #include "Channel.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 
@@ -175,14 +175,12 @@ public:
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND, playerNameArg->c_str());
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND, playerNameArg->c_str());
                     return false;
                 }
             }
         }
-        handler->SendSysMessage(LANG_USE_BOL);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_USE_BOL);
         return false;
     }
 };

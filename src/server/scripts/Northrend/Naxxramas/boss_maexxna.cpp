@@ -16,6 +16,11 @@
  */
 
 #include "boss_maexxna.h"
+#include "CreatureScript.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "naxxramas.h"
+
 
 void AddSC_boss_maexxna()
 {

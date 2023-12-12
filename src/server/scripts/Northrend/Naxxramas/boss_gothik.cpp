@@ -16,6 +16,13 @@
  */
 
 #include "boss_gothik.h"
+#include "CombatAI.h"
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "naxxramas.h"
 
 void AddSC_boss_gothik()
 {
@@ -23,3 +30,4 @@ void AddSC_boss_gothik()
     new npc_boss_gothik_minion();
     new spell_gothik_shadow_bolt_volley();
 }
+

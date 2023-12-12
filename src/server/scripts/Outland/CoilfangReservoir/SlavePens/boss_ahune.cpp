@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "the_slave_pens.h"
@@ -403,3 +404,4 @@ void AddSC_boss_ahune()
     new go_ahune_ice_stone();
     RegisterTheSlavePensCreatureAI(boss_ahune);
 }
+

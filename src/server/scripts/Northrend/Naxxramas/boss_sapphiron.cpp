@@ -16,9 +16,16 @@
  */
 
 #include "boss_sapphiron.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "naxxramas.h"
 
 void AddSC_boss_sapphiron()
 {
     new boss_sapphiron();
     new spell_sapphiron_frost_explosion();
 }
+

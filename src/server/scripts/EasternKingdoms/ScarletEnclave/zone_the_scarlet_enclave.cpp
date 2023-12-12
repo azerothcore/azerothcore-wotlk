@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 /*####
@@ -55,7 +55,6 @@ public:
         void Reset() override
         {
             me->setActive(true);
-            me->SetFarVisible(true);
             me->SetVisible(false);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetCanFly(true);

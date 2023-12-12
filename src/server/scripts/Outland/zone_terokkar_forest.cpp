@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 // Ours
 enum fumping
@@ -472,7 +474,7 @@ public:
             {
                 case 0:
                     if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 10))
-                        Cage->SetGoState(GO_STATE_ACTIVE);
+                        Cage->UseDoorOrButton();
                     break;
                 case 2:
                     Talk(SAY_PROGRESS_1, player);
@@ -501,9 +503,10 @@ public:
             }
         }
 
-        void Reset() override
+        void JustRespawned() override
         {
-            me->RestoreFaction();
+            me->SetImmuneToAll(true);
+            npc_escortAI::JustRespawned();
         }
 
         void JustDied(Unit* /*killer*/) override

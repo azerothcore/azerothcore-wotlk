@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "zulgurub.h"
 /*
 Name: Boss_Hakkar
 %Complete: 95
 Comment: Blood siphon spell buggy cause of Core Issue.
 Category: Zul'Gurub
 */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "zulgurub.h"
 
 enum Says
 {
@@ -412,3 +413,4 @@ void AddSC_boss_hakkar()
     RegisterSpellScript(spell_blood_siphon);
     RegisterSpellScript(spell_hakkar_power_down);
 }
+

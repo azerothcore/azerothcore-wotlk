@@ -16,12 +16,12 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -56,8 +56,7 @@ public:
 
         if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
         {
-            handler->PSendSysMessage(LANG_SELECT_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
             return false;
         }
 
@@ -65,22 +64,19 @@ public:
         // Creatures with family 0 crashes the server
         if (!creatrueTemplate->family)
         {
-            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
             return false;
         }
 
         if (player->IsExistPet())
         {
-            handler->SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_YOU_ALREADY_HAVE_PET);
             return false;
         }
 
         if (!player->CreatePet(creatureTarget))
         {
-            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
             return false;
         }
 
@@ -91,23 +87,20 @@ public:
     {
         if (!spell)
         {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
             return false;
         }
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
 
         Pet* pet = handler->GetSession()->GetPlayer()->GetPet();
         if (!pet)
         {
-            handler->PSendSysMessage("You have no pet");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("You have no pet");
             return false;
         }
 
@@ -115,16 +108,14 @@ public:
         uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spell->Id);
         if (bounds.first != bounds.second || spellDifficultyId)
         {
-            handler->PSendSysMessage("Spell %u cannot be learnt using a command!", spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Spell %u cannot be learnt using a command!", spell->Id);
             return false;
         }
 
         // Check if pet already has it
         if (pet->HasSpell(spell->Id))
         {
-            handler->PSendSysMessage("Pet already has spell: %u", spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Pet already has spell: %u", spell->Id);
             return false;
         }
 
@@ -138,23 +129,20 @@ public:
     {
         if (!spell)
         {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
             return false;
         }
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
 
         Pet* pet = handler->GetSession()->GetPlayer()->GetPet();
         if (!pet)
         {
-            handler->PSendSysMessage("You have no pet");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("You have no pet");
             return false;
         }
 

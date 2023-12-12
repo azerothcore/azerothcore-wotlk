@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
-#include "ScriptMgr.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 enum Say
@@ -54,15 +55,15 @@ public:
     {
         boss_azuregosAI(Creature* creature) : ScriptedAI(creature)
         {
-            _scheduler.SetValidator([this]
-                {
-                    return !me->HasUnitState(UNIT_STATE_CASTING);
-                });
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         void Reset() override
         {
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->RestoreFaction();
             me->GetMap()->DoForAllPlayers([&](Player* p)
@@ -89,7 +90,7 @@ public:
             DoCastSelf(SPELL_MARK_OF_FROST_AURA);
             Talk(SAY_AGGRO);
 
-            _scheduler
+            scheduler
                 .Schedule(7s, [this](TaskContext context)
                 {
                     DoCastVictim(SPELL_CLEAVE);
@@ -149,14 +150,11 @@ public:
                 return;
             }
 
-            _scheduler.Update(diff, [this]
-                {
-                    DoMeleeAttackIfReady();
-                });
+            scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
         }
-
-        protected:
-            TaskScheduler _scheduler;
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
@@ -232,3 +230,4 @@ void AddSC_boss_azuregos()
     RegisterSpellScript(spell_arcane_vacuum);
     RegisterSpellScript(spell_mark_of_frost_freeze);
 }
+

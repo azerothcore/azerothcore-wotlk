@@ -26,8 +26,8 @@ EndScriptData */
 npc_professor_phizzlethorpe
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 

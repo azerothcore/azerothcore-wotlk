@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Group.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Feralas
 SD%Complete: 100
 SDComment: Quest support: 3520 Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
-
-#include "Group.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellScript.h"
 
 enum GordunniTrap
 {
@@ -69,3 +69,4 @@ void AddSC_feralas()
 {
     new spell_gordunni_trap();
 }
+

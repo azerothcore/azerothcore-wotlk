@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "utgarde_keep.h"
 
 enum eTexts
@@ -378,3 +379,4 @@ void AddSC_boss_keleseth()
     new npc_vrykul_skeleton();
     new spell_frost_tomb();
 }
+

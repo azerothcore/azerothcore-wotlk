@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -56,7 +57,7 @@ bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, Achievem
     return true;
 }
 
-void ScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList)
+void ScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, std::list<AchievementCriteriaEntry const*> const* achievementCriteriaList)
 {
     ExecuteScript<AchievementScript>([&](AchievementScript* script)
     {
@@ -78,3 +79,11 @@ bool ScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry c
 
     return true;
 }
+
+AchievementScript::AchievementScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AchievementScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<AchievementScript>;

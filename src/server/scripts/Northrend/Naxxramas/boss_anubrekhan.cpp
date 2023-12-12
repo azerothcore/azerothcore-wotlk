@@ -16,6 +16,9 @@
  */
 
 #include "boss_anubrekhan.h"
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "naxxramas.h"
 
 
 void AddSC_boss_anubrekhan()

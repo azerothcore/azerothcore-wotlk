@@ -16,6 +16,10 @@
  */
 
 #include "boss_noth.h"
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "naxxramas.h"
+
 
 void AddSC_boss_noth()
 {
