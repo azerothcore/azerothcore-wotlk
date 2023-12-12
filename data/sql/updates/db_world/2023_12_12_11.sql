@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_10 -> 2023_12_12_11
 -- miscellaneous cleanups of midsummer spawns
 -- 10177, 'Spire Scarab'
 -- unlink spawns from midsummer (they're unrelated, all located in Blackrock Spire)

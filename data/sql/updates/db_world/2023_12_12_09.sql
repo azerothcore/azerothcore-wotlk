@@ -1,3 +1,4 @@
+-- DB update 2023_12_12_08 -> 2023_12_12_09
 -- Update creature 16592 'Midsummer Bonfire' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 16592) AND (`guid` BETWEEN 245516 AND 245593);
