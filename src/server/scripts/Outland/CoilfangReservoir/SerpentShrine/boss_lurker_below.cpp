@@ -86,11 +86,12 @@ struct boss_the_lurker_below : public BossAI
     {
         if (action == ACTION_START_EVENT)
         {
+            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
+            me->SetStandState(UNIT_STAND_STATE_STAND);
         }
     }
 
@@ -135,7 +136,7 @@ struct boss_the_lurker_below : public BossAI
             me->SetFacingToObject(me->GetVictim());
             me->SetTarget();
             scheduler.RescheduleGroup(GROUP_GEYSER, 25s);
-            scheduler.RescheduleGroup(GROUP_WHIRL, 18s);
+            scheduler.RescheduleGroup(GROUP_WHIRL, 20s);
             scheduler.Schedule(3s, [this](TaskContext)
             {
                 me->InterruptNonMeleeSpells(false);
@@ -243,6 +244,11 @@ class spell_lurker_below_spout : public AuraScript
         SetDuration(16000);
     }
 
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+    {
+        amplitude = 250;
+    }
+
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Creature* creature = GetUnitOwner()->ToCreature())
@@ -265,6 +271,7 @@ class spell_lurker_below_spout : public AuraScript
 
     void Register() override
     {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_lurker_below_spout::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
