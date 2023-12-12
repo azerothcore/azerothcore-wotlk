@@ -1,11 +1,12 @@
 #ifndef BOSS_FOURHORSEMEN_H_
 #define BOSS_FOURHORSEMEN_H_
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum FourHorsemenSpells
