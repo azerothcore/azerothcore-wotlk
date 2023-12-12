@@ -23,12 +23,13 @@
 
 enum Spells
 {
-    SPELL_WATER_BOLT            = 37138,
-    SPELL_WHIRL                 = 37660,
-    SPELL_GEYSER                = 37478,
-    SPELL_SPOUT_VISUAL          = 37431,
-    SPELL_SPOUT_PERIODIC        = 37430,
-    SPELL_LURKER_SPAWN_TRIGGER  = 54587, // Needed for achievement
+    SPELL_WATER_BOLT              = 37138,
+    SPELL_WHIRL                   = 37660,
+    SPELL_GEYSER                  = 37478,
+    SPELL_SPOUT_VISUAL            = 37431,
+    SPELL_SPOUT_PERIODIC_1        = 37429,
+    SPELL_SPOUT_PERIODIC_2        = 37430,
+    SPELL_LURKER_SPAWN_TRIGGER    = 54587, // Needed for achievement
 
     SPELL_CLEAR_ALL_DEBUFFS     = 34098,
     SPELL_SUBMERGE_VISUAL       = 28819,
@@ -38,8 +39,6 @@ enum Misc
 {
     EMOTE_TAKE_BREATH           = 0,
     ACTION_START_EVENT          = 1,
-    ACTION_ROTATE               = 2,
-    ACTION_SHUFFLE_ROTATION     = 3,
     MAX_SUMMONS                 = 9,
 
     NPC_COILFANG_GUARDIAN       = 21873,
@@ -67,7 +66,7 @@ const Position positions[MAX_SUMMONS] =
 
 struct boss_the_lurker_below : public BossAI
 {
-    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW), _clockWise(false) { }
+    boss_the_lurker_below(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
 
     void Reset() override
     {
@@ -75,7 +74,6 @@ struct boss_the_lurker_below : public BossAI
         me->SetReactState(REACT_PASSIVE);
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        _clockWise = RAND(false, true);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -93,15 +91,6 @@ struct boss_the_lurker_below : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
-        }
-        else if (action == ACTION_ROTATE)
-        {
-            float orientation = _clockWise ? Position::NormalizeOrientation(me->GetOrientation() + 0.1f) : Position::NormalizeOrientation(me->GetOrientation() - 0.1f);
-            me->SetFacingTo(orientation);
-        }
-        else if (action == ACTION_SHUFFLE_ROTATION)
-        {
-            _clockWise = RAND(false, true);
         }
     }
 
@@ -150,7 +139,7 @@ struct boss_the_lurker_below : public BossAI
             scheduler.Schedule(3s, [this](TaskContext)
             {
                 me->InterruptNonMeleeSpells(false);
-                DoCastSelf(SPELL_SPOUT_PERIODIC, true);
+                DoCastSelf(RAND(SPELL_SPOUT_PERIODIC_1, SPELL_SPOUT_PERIODIC_2), true);
             });
             context.Repeat(60s);
         }).Schedule(p2Timer, [this](TaskContext)
@@ -223,9 +212,6 @@ struct boss_the_lurker_below : public BossAI
         }
         me->resetAttackTimer();
     }
-
-    private:
-        bool _clockWise;
 };
 
 class go_strange_pool : public GameObjectScript
@@ -252,11 +238,6 @@ class spell_lurker_below_spout : public AuraScript
 {
     PrepareAuraScript(spell_lurker_below_spout);
 
-    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
-    {
-        amplitude = 200;
-    }
-
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         SetDuration(16000);
@@ -270,27 +251,20 @@ class spell_lurker_below_spout : public AuraScript
             creature->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = creature->GetVictim())
                 creature->SetTarget(target->GetGUID());
-
-            if (GetUnitOwner()->GetAI())
-            {
-                GetUnitOwner()->GetAI()->DoAction(ACTION_SHUFFLE_ROTATION);
-            }
         }
     }
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        if (GetUnitOwner()->GetAI())
-        {
-            GetUnitOwner()->GetAI()->DoAction(ACTION_ROTATE);
-        }
+        Unit* caster = GetUnitOwner();
+        float orientation = GetSpellInfo()->Id == SPELL_SPOUT_PERIODIC_1 ? Position::NormalizeOrientation(caster->GetOrientation() + 0.1f) : Position::NormalizeOrientation(caster->GetOrientation() - 0.1f);
+        caster->SetFacingTo(orientation);
         GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
     }
 
     void Register() override
     {
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_lurker_below_spout::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
