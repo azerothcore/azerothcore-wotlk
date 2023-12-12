@@ -165,7 +165,7 @@ struct boss_hydross_the_unstable : public BossAI
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
             }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
             {
-                DoCastRandomTarget(SPELL_VILE_SLUDGE, true);
+                DoCastRandomTarget(SPELL_VILE_SLUDGE, 0, 0.0f, true, true);
                 context.Repeat(9700ms, 32800ms);
             });
         }
@@ -196,7 +196,7 @@ struct boss_hydross_the_unstable : public BossAI
                 DoCastSelf(SPELL_MARK_OF_HYDROSS6);
             }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
             {
-                DoCastRandomTarget(SPELL_WATER_TOMB, true);
+                DoCastRandomTarget(SPELL_WATER_TOMB, 0, 0.0f, true, true);
                 context.Repeat(9700ms, 32800ms);
             });
         }
