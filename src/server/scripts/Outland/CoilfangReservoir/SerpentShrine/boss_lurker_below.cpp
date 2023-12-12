@@ -122,7 +122,7 @@ struct boss_the_lurker_below : public BossAI
 
     void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
     {
-        if (!summons.IsAnyCreatureAlive())
+        if (!summons.IsAnyCreatureAlive() && me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
         {
             SchedulerPhaseTwo(1s);
         }
@@ -254,7 +254,7 @@ class spell_lurker_below_spout : public AuraScript
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
     {
-        amplitude = 1000;
+        amplitude = 200;
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
