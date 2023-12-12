@@ -326,7 +326,7 @@ struct npc_rancid_mushroom : public ScriptedAI
             DoCastSelf(SPELL_GROW);
             context.Repeat(1200ms, 3400ms);
         })
-        .Schedule(22950ms, [this](TaskContext context)
+        .Schedule(22950ms, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SPORE_CLOUD);
             me->KillSelf();
