@@ -412,7 +412,7 @@ public:
 
                 if (applyAura)
                 {
-                    me->AddAura(ARTORIUS_SPELL_STINGING_TRAUMA, me);
+                    me->AddAura(ARTORIUS_SPELL_STINGING_TRAUMA);
                     me->TextEmote(ARTORIUS_WEAKNESS_EMOTE);
                 }
             }
@@ -791,7 +791,7 @@ public:
             {
                 if (Spell->Id == SIMONE_SPELL_WEAKNESS_VIPER_STING)
                 {
-                    me->AddAura(SIMONE_SPELL_SILENCE, me);
+                    me->AddAura(SIMONE_SPELL_SILENCE);
                     me->TextEmote(SIMONE_WEAKNESS_EMOTE);
                 }
             }
@@ -1010,7 +1010,7 @@ public:
 
             if (!me->HasAura(NELSON_SPELL_CRIPPLING_CLIP) && Spell->Id == NELSON_WEAKNESS_WING_CLIP)
             {
-                me->AddAura(NELSON_SPELL_CRIPPLING_CLIP, me);
+                me->AddAura(NELSON_SPELL_CRIPPLING_CLIP);
                 me->TextEmote(NELSON_WEAKNESS_EMOTE);
             }
         }

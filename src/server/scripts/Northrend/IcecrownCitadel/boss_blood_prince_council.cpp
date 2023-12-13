@@ -275,7 +275,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 10min);
             events.ScheduleEvent(EVENT_SHADOW_RESONANCE, 10s, 15s);
             if (IsHeroic())
-                me->AddAura(SPELL_SHADOW_PRISON, me);
+                me->AddAura(SPELL_SHADOW_PRISON);
         }
 
         void AttackStart(Unit* who) override
@@ -535,7 +535,7 @@ public:
             events.ScheduleEvent(EVENT_GLITTERING_SPARKS, 12s, 15s);
             events.ScheduleEvent(EVENT_CONJURE_FLAME, 20s);
             if (IsHeroic())
-                me->AddAura(SPELL_SHADOW_PRISON, me);
+                me->AddAura(SPELL_SHADOW_PRISON);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -828,7 +828,7 @@ public:
             events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 45s);
             if (IsHeroic())
             {
-                me->AddAura(SPELL_SHADOW_PRISON, me);
+                me->AddAura(SPELL_SHADOW_PRISON);
                 me->CastSpell(me, SPELL_SHADOW_PRISON_DUMMY, true);
             }
         }

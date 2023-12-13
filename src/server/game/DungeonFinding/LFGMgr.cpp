@@ -1740,7 +1740,7 @@ namespace lfg
                     // if player is debugging, don't add dungeon cooldown
                     if (!m_Testing)
                     {
-                        player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
+                        player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN);
                     }
                 }
 
@@ -1922,7 +1922,7 @@ namespace lfg
         for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
             if (it->second.accept == LFG_ANSWER_DENY)
                 if (Player* plr = ObjectAccessor::FindPlayer(it->first))
-                    if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr))
+                    if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN))
                         aura->SetDuration(150 * IN_MILLISECONDS);
 
         // Mark players/groups to be removed

@@ -427,7 +427,7 @@ class spell_item_shifting_naaru_silver : public AuraScript
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTarget() == GetCaster())
-            if (Aura* aur = GetTarget()->AddAura(45044 /*Limitless Power*/, GetTarget()))
+            if (Aura* aur = GetTarget()->AddAura(45044 /*Limitless Power*/))
                 aur->SetDuration(GetDuration());
     }
 
@@ -3806,7 +3806,7 @@ class spell_item_elixir_of_shadows : public SpellScript
     {
         if (Player* player = GetCaster()->ToPlayer())
             if (Pet* pet = player->GetPet())
-                pet->AddAura(37678 /*Elixir of Shadows*/, pet);
+                pet->AddAura(37678 /*Elixir of Shadows*/);
     }
 
     void Register() override

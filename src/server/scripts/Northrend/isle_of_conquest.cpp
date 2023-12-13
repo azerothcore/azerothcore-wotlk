@@ -468,7 +468,7 @@ public:
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
             if (Player* player = GetHitPlayer())
-                player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE, player); // prevents falling damage
+                player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE); // prevents falling damage
         }
 
         void Launch()

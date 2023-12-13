@@ -219,7 +219,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
 
         if (duration && aura)
         {
-            if (Aura* aur = me->AddAura(aura, me))
+            if (Aura* aur = me->AddAura(aura))
                 aur->SetDuration(duration);
         }
     }
@@ -641,7 +641,7 @@ struct npc_pet_gen_plump_turkey : public PassiveAI
         if (type == EFFECT_MOTION_TYPE && id == 1)
         {
             me->KillSelf();
-            me->AddAura(SPELL_TURKEY_STARTS_TO_BURN, me);
+            me->AddAura(SPELL_TURKEY_STARTS_TO_BURN);
         }
     }
 
@@ -711,7 +711,7 @@ struct npc_pet_gen_toxic_wasteling : public PassiveAI
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
                 }
-                me->AddAura(71854, me); // Growth
+                me->AddAura(71854); // Growth
                 checkTimer = 0;
             }
         }

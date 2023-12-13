@@ -480,7 +480,7 @@ public:
             me->setActive(true);
             me->SetInCombatWithZone();
             me->CastSpell(me, SPELL_TOUCH_OF_EONAR, true);
-            if (Aura* aur = me->AddAura(SPELL_ATTUNED_TO_NATURE, me))
+            if (Aura* aur = me->AddAura(SPELL_ATTUNED_TO_NATURE))
                 aur->SetStackAmount(150);
 
             events.ScheduleEvent(EVENT_FREYA_ADDS_SPAM, 10s, 0, EVENT_PHASE_ADDS);
@@ -817,7 +817,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_BRIGHTLEAF_FLUX:
-                    if (Aura* aur = me->AddAura(SPELL_BRIGHTLEAF_FLUX, me))
+                    if (Aura* aur = me->AddAura(SPELL_BRIGHTLEAF_FLUX))
                         aur->SetStackAmount(urand(1, 10));
                     events.Repeat(10s);
                     break;

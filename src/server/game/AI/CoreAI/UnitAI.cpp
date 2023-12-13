@@ -142,7 +142,7 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
             {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                 {
-                    me->AddAura(spellid, unit);
+                    unit->AddAura(spellid);
                     return SPELL_CAST_OK;
                 }
             }

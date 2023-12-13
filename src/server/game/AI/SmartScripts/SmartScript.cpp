@@ -751,7 +751,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsUnit(target))
                 {
-                    target->ToUnit()->AddAura(e.action.cast.spell, target->ToUnit());
+                    target->ToUnit()->AddAura(e.action.cast.spell);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_ADD_AURA: Adding aura {} to unit {}",
                               e.action.cast.spell, target->GetGUID().ToString());
                 }

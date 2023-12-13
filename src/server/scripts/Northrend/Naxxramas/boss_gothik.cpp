@@ -669,7 +669,7 @@ public:
                     events.Repeat(8s, 12s);
                     break;
                 case EVENT_UNHOLY_FRENZY:
-                    me->AddAura(SPELL_UNHOLY_FRENZY, me);
+                    me->AddAura(SPELL_UNHOLY_FRENZY);
                     events.Repeat(15s, 17s);
                     break;
                 case EVENT_STOMP:

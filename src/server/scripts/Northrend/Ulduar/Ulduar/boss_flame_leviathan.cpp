@@ -521,19 +521,19 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ActivateTowers()
             switch (i)
             {
                 case EVENT_TOWER_OF_LIFE_DESTROYED:
-                    me->AddAura(SPELL_TOWER_OF_LIFE, me);
+                    me->AddAura(SPELL_TOWER_OF_LIFE);
                     events.RescheduleEvent(EVENT_FREYA, 30s);
                     break;
                 case EVENT_TOWER_OF_STORM_DESTROYED:
-                    me->AddAura(SPELL_TOWER_OF_STORMS, me);
+                    me->AddAura(SPELL_TOWER_OF_STORMS);
                     events.RescheduleEvent(EVENT_THORIMS_HAMMER, 1min);
                     break;
                 case EVENT_TOWER_OF_FROST_DESTROYED:
-                    me->AddAura(SPELL_TOWER_OF_FROST, me);
+                    me->AddAura(SPELL_TOWER_OF_FROST);
                     events.RescheduleEvent(EVENT_HODIRS_FURY, 20s);
                     break;
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
-                    me->AddAura(SPELL_TOWER_OF_FLAMES, me);
+                    me->AddAura(SPELL_TOWER_OF_FLAMES);
                     events.RescheduleEvent(EVENT_MIMIRONS_INFERNO, 42s);
                     break;
             }
@@ -915,7 +915,7 @@ public:
             _castTimer = 25000;
             summons.DespawnAll();
             if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
-                if (Aura* aur = cr->AddAura(SPELL_FREYA_DUMMY_GREEN, cr))
+                if (Aura* aur = cr->AddAura(SPELL_FREYA_DUMMY_GREEN))
                 {
                     aur->SetMaxDuration(-1);
                     aur->SetDuration(-1);
@@ -994,7 +994,7 @@ public:
             _switchTargetTimer = 30000;
             me->SetWalk(true);
 
-            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_BLUE, me))
+            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_BLUE))
             {
                 aur->SetMaxDuration(-1);
                 aur->SetDuration(-1);
@@ -1084,7 +1084,7 @@ public:
             summons.DespawnAll();
             _spellTimer = 0;
             Start(false, false, ObjectGuid::Empty, nullptr, false, true);
-            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
+            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW))
             {
                 aur->SetMaxDuration(-1);
                 aur->SetDuration(-1);
@@ -1933,7 +1933,7 @@ public:
             switch (aurEff->GetEffIndex())
             {
             case EFFECT_0:
-                caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
+                target->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT);
                 break;
             }
         }

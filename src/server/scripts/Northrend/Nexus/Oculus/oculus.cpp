@@ -931,7 +931,7 @@ public:
             {
                 case EFFECT_1:
                     _drakeGUID = drake->GetGUID();
-                    caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
+                    caster->AddAura(SPELL_DRAKE_FLAG_VISUAL);
                     caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                     drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
@@ -939,7 +939,7 @@ public:
                         drake->CastSpell(drake, SPELL_RUBY_EVASIVE_AURA);
                     break;
                 case EFFECT_2:
-                    caster->AddAura(SPELL_SCALE_STATS, drake);
+                    drake->AddAura(SPELL_SCALE_STATS);
                     PreventDefaultAction();
                     break;
             }

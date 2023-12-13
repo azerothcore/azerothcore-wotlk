@@ -1290,7 +1290,7 @@ public:
                 {
                     if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                     {
-                        if (Aura* newPlague = professor->AddAura(plagueId, GetHitUnit()))
+                        if (Aura* newPlague = GetHitUnit()->AddAura(plagueId))
                         {
                             newPlague->SetMaxDuration(oldPlague->GetMaxDuration());
                             newPlague->SetDuration(oldPlague->GetDuration());

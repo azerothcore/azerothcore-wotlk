@@ -606,7 +606,7 @@ class spell_pilgrims_bounty_food : public SpellScript
     {
         if (Unit* target = GetHitUnit())
         {
-            target->AddAura(sSpellMgr->GetSpellInfo(65422), 1, target);
+            target->AddAura(65422);
             target->CastSpell(target, 66041, true);
             target->CastSpell(target, 66622, true);
         }

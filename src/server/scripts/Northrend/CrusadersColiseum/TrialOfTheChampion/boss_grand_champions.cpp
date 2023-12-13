@@ -477,7 +477,7 @@ public:
                     if (me->HasAura(AdditionalSpellInfo->Id))
                         continue;
 
-                    me->AddAura(AdditionalSpellInfo->Id, me);
+                    me->AddAura(AdditionalSpellInfo->Id);
                 }
             }
         }

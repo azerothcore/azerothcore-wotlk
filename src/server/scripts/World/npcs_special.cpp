@@ -2421,9 +2421,9 @@ public:
                         if (rabbit == me || rabbit->HasAura(SPELL_SPRING_RABBIT_IN_LOVE))
                             return;
 
-                        me->AddAura(SPELL_SPRING_RABBIT_IN_LOVE, me);
+                        me->AddAura(SPELL_SPRING_RABBIT_IN_LOVE);
                         DoAction(1);
-                        rabbit->AddAura(SPELL_SPRING_RABBIT_IN_LOVE, rabbit);
+                        rabbit->AddAura(SPELL_SPRING_RABBIT_IN_LOVE);
                         rabbit->AI()->DoAction(1);
                         rabbit->CastSpell(rabbit, SPELL_SPRING_RABBIT_JUMP, true);
                         rabbitGUID = rabbit->GetGUID();

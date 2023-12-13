@@ -125,7 +125,7 @@ struct npc_pet_mage_mirror_image : CasterAI
                 std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(visAura->GetId() + SPELL_LINK_AURA);
                 if (!spellTriggered || !spellTriggered->empty())
                     continue;
-                if (Aura* newAura = me->AddAura(visAura->GetId(), me))
+                if (Aura* newAura = me->AddAura(visAura->GetId()))
                     newAura->SetDuration(visAura->GetDuration());
             }
 

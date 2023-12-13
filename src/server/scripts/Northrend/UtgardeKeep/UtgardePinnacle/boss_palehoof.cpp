@@ -194,7 +194,7 @@ public:
                 if (Creature* cr = me->SummonCreature(NPC_ORB_TRIGGER, 238.608f, -460.71f, 109.567f))
                 {
                     OrbGUID = cr->GetGUID();
-                    cr->AddAura(SPELL_ORB_VISUAL, cr);
+                    cr->AddAura(SPELL_ORB_VISUAL);
                     summons.Summon(cr);
                     cr->SetDisableGravity(true);
                     cr->GetMotionMaster()->MovePoint(0, 275.4f, -453, 110); // ROOM CENTER

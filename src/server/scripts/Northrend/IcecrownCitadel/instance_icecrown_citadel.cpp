@@ -307,7 +307,7 @@ public:
                             if ((itr->second->raceMask & plr->getRaceMask()) && !creature->HasAura(itr->second->spellId))
                                 if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                                     if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
-                                        creature->AddAura(itr->second->spellId, creature);
+                                        creature->AddAura(itr->second->spellId);
                     }
 
             // fighting npcs in Rampart of Skulls

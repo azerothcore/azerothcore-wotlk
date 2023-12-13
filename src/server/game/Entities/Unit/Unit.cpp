@@ -19113,50 +19113,43 @@ void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
     }
 }
 
-Aura* Unit::AddAura(uint32 spellId, Unit* target)
+Aura* Unit::AddAura(uint32 aura)
 {
-    if (!target)
-        return nullptr;
-
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(aura);
     if (!spellInfo)
         return nullptr;
 
-    if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
+    if (!IsAlive() &&
+        !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) &&
+        !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         return nullptr;
 
-    return AddAura(spellInfo, MAX_EFFECT_MASK, target);
-}
-
-Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
-{
-    if (!spellInfo)
+    if (IsImmunedToSpell(spellInfo))
         return nullptr;
 
-    if (target->IsImmunedToSpell(spellInfo))
-        return nullptr;
-
+    uint8 effectMask = MAX_EFFECT_MASK;
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (!(effMask & (1 << i)))
+        if (!(effectMask & (1 << i)))
             continue;
-        if (target->IsImmunedToSpellEffect(spellInfo, i))
-            effMask &= ~(1 << i);
+
+        if (IsImmunedToSpellEffect(spellInfo, i))
+            effectMask &= ~(1 << i);
     }
 
-    if (Aura* aura = Aura::TryRefreshStackOrCreate(spellInfo, effMask, target, this))
-    {
-        aura->ApplyForTargets();
-        return aura;
-    }
-    return nullptr;
+    Aura* auraObject = Aura::TryRefreshStackOrCreate(spellInfo, effectMask, this, this);
+    if (!auraObject)
+        return nullptr;
+
+    auraObject->ApplyForTargets();
+    return auraObject;
 }
 
 void Unit::SetAuraStack(uint32 spellId, Unit* target, uint32 stack)
 {
     Aura* aura = target->GetAura(spellId, GetGUID());
     if (!aura)
-        aura = AddAura(spellId, target);
+        aura = target->AddAura(spellId);
     if (aura && stack)
         aura->SetStackAmount(stack);
 }

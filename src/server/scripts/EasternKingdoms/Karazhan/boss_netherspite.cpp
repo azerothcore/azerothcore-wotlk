@@ -117,7 +117,7 @@ struct boss_netherspite : public BossAI
             if (Creature* portal = me->SummonCreature(PortalID[i], PortalCoord[pos[i]][0], PortalCoord[pos[i]][1], PortalCoord[pos[i]][2], 0, TEMPSUMMON_TIMED_DESPAWN, 60000))
             {
                 PortalGUID[i] = portal->GetGUID();
-                portal->AddAura(PortalVisual[i], portal);
+                portal->AddAura(PortalVisual[i]);
             }
         }
     }
@@ -153,11 +153,11 @@ struct boss_netherspite : public BossAI
                 // buff the target
                 if (target->GetTypeId() == TYPEID_PLAYER)
                 {
-                    target->AddAura(PlayerBuff[j], target);
+                    target->AddAura(PlayerBuff[j]);
                 }
                 else
                 {
-                    target->AddAura(NetherBuff[j], target);
+                    target->AddAura(NetherBuff[j]);
                 }
                 // cast visual beam on the chosen target if switched
                 // simple target switching isn't working -> using BeamerGUID to cast (workaround)
@@ -212,7 +212,7 @@ struct boss_netherspite : public BossAI
         }).Schedule(10s, PORTAL_PHASE, [this](TaskContext context)
         {
             DoCastSelf(SPELL_EMPOWERMENT);
-            me->AddAura(SPELL_NETHERBURN_AURA, me);
+            me->AddAura(SPELL_NETHERBURN_AURA);
             context.Repeat(90s);
         }).Schedule(15s, PORTAL_PHASE, [this](TaskContext context)
         {

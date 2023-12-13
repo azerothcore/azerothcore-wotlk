@@ -302,7 +302,7 @@ public:
                         creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
-                        creature->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, creature);
+                        creature->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
                     else
                         creature->SetVisible(false);
 
@@ -562,7 +562,7 @@ public:
                         c->UpdatePosition(c->GetHomePosition(), true);
                         c->StopMovingOnCurrentPos();
                         c->RemoveAllAuras();
-                        c->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, c);
+                        c->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
                         c->AI()->Reset();
                         c->setActive(false);
                         c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -996,7 +996,7 @@ public:
                                 if (pFalric->IsAlive())
                                 {
                                     pFalric->GetMotionMaster()->MovePoint(0, FalricMovePos);
-                                    if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL, pFalric))
+                                    if (Aura* a = pFalric->AddAura(SPELL_SHADOWMOURNE_VISUAL))
                                         a->SetDuration(8000);
                                 }
                             }
@@ -1008,7 +1008,7 @@ public:
                                 if (pMarwyn->IsAlive())
                                 {
                                     pMarwyn->GetMotionMaster()->MovePoint(0, MarwynMovePos);
-                                    if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL, pMarwyn))
+                                    if (Aura* a = pMarwyn->AddAura(SPELL_SHADOWMOURNE_VISUAL))
                                         a->SetDuration(8000);
                                 }
                                 pMarwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);

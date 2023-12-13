@@ -1857,7 +1857,7 @@ public:
         {
             me->CastSpell(me, SPELL_RECENTLY_SPAWNED, true);
             //me->CastSpell(me, SPELL_EMPOWERED_PASSIVE, true);
-            if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE, me))
+            if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE))
                 aur->SetStackAmount(9);
 
             _spellTimer = 0;
@@ -2607,7 +2607,7 @@ public:
                 target->RemoveAura(SPELL_EMPOWERED);
                 target->CastSpell(target, SPELL_WEAKENED, true);
             }
-            else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
+            else if (Aura* aur = target->AddAura(SPELL_EMPOWERED))
             {
                 aur->SetStackAmount(stack);
                 target->RemoveAurasDueToSpell(SPELL_WEAKENED);

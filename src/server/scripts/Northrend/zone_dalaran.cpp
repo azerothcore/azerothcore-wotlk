@@ -645,7 +645,7 @@ public:
         void Reset() override
         {
             Initialize();
-            me->AddAura(1908, me);
+            me->AddAura(1908);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -750,7 +750,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            me->AddAura(1908, me);
+            me->AddAura(1908);
             Battleshout_timer = 1000;
         }
         void UpdateAI(uint32 diff) override

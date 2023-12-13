@@ -438,9 +438,9 @@ public:
             if (!halion)
                 return;
 
-            halion->AddAura(SPELL_COPY_DAMAGE, me);
-            me->AddAura(SPELL_COPY_DAMAGE, halion);
-            me->AddAura(SPELL_DUSK_SHROUD, me);
+            halion->AddAura(SPELL_COPY_DAMAGE);
+            me->AddAura(SPELL_COPY_DAMAGE);
+            me->AddAura(SPELL_DUSK_SHROUD);
 
             me->SetHealth(halion->GetHealth());
             me->setActive(true);

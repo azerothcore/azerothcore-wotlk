@@ -101,7 +101,7 @@ public:
             achievement = true;
 
             if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
-                me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
+                me->AddAura(SPELL_WEAR_CHRISTMAS_HAT);
         }
 
         uint32 GetData(uint32 data) const override

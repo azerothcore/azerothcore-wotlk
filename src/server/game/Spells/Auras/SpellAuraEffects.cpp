@@ -5529,7 +5529,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     break;
                 case 71563:
                     {
-                        if (Aura* newAura = target->AddAura(71564, target))
+                        if (Aura* newAura = target->AddAura(71564))
                             newAura->SetStackAmount(newAura->GetSpellInfo()->StackAmount);
                         return;
                     }

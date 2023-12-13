@@ -230,7 +230,7 @@ public:
                             if (BoatNum) // different than 0
                                 if (Creature* cr = me->SummonTrigger(BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, 0, 1800000))
                                 {
-                                    cr->AddAura(SPELL_FLAMES, cr);
+                                    cr->AddAura(SPELL_FLAMES);
                                     summons2.Summon(cr);
                                 }
 
@@ -296,7 +296,7 @@ public:
                         {
                             summons.Summon(sf);
                             sf->SetSpeed(MOVE_RUN, 0.4f);
-                            sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
+                            sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N);
                             sf->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2);
                         }

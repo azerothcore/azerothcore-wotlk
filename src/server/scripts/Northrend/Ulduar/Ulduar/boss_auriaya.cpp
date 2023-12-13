@@ -362,7 +362,7 @@ public:
             _feralPounceTimer = 0;
             _feralEssenceStack = 8;
 
-            if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
+            if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE))
                 aur->SetStackAmount(_feralEssenceStack);
         }
 
@@ -397,7 +397,7 @@ public:
                 }
 
                 if (_feralEssenceStack)
-                    if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
+                    if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE))
                         aur->SetStackAmount(_feralEssenceStack);
             }
             else if (param == ACTION_DESPAWN_ADDS)

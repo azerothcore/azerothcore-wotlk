@@ -94,7 +94,7 @@ struct boss_kelidan_the_breaker : public BossAI
         {
             Talk(SAY_NOVA);
             ApplyImmunities(false);
-            me->AddAura(SPELL_BURNING_NOVA, me);
+            me->AddAura(SPELL_BURNING_NOVA);
             ApplyImmunities(true);
             if (IsHeroic())
             {

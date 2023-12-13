@@ -470,7 +470,7 @@ public:
         }
 
         player->SummonCreature(NPC_SPOTLIGHT, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000);
-        player->AddAura(SPELL_A52_NEURALYZER, player);
+        player->AddAura(SPELL_A52_NEURALYZER);
         _triggerTimes[trigger->entry] = GameTime::GetGameTime().count();
         return false;
     }

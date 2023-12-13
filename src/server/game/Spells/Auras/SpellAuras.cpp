@@ -1314,7 +1314,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (*itr < 0)
                         target->ApplySpellImmune(GetId(), IMMUNITY_ID, -(*itr), true);
                     else if (caster)
-                        caster->AddAura(*itr, target);
+                        target->AddAura(*itr);
                 }
             }
         }
@@ -1448,7 +1448,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 aur->RefreshDuration();
                             }
                             else
-                                target->AddAura(74396, target);
+                                target->AddAura(74396);
                         }
                         break;
                     case 12494: // Frostbite, synchronise with Fingers of Frost

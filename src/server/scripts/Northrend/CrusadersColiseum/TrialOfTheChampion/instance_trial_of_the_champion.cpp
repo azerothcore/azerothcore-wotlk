@@ -1189,7 +1189,7 @@ public:
                                 bk->SetFacingToObject(announcer);
                                 announcer->SetFacingToObject(bk);
                                 announcer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                                bk->AddAura(68306, announcer); // spell has attribute player only
+                                announcer->AddAura(68306); // spell has attribute player only
                                 if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                                     tirion->AI()->Talk(TEXT_BK_MEANING);
                             }

@@ -340,7 +340,7 @@ public:
             for (auto iter = spellEffectTargets.begin(); iter != spellEffectTargets.end(); ++iter)
                 if (Unit* target = *iter)
                 {
-                    target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
+                    target->AddAura(SPELL_PROTECTION_OF_ELUNE);
 
                     // Immunity against Hand of death
                     target->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);

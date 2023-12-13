@@ -130,7 +130,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SUMMONED_1:
-                            me->AddAura(SPELL_REND_MOUNTS, me);
+                            me->AddAura(SPELL_REND_MOUNTS);
                             if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 40.0f))
                                 portcullis->UseDoorOrButton();
                             events.ScheduleEvent(EVENT_SUMMONED_2, 2s);

@@ -385,7 +385,7 @@ public:
         void AttackStart(Unit* pWho) override
         {
             if (me->GetMap()->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
-                me->AddAura(SPELL_SHADOWS_IN_THE_DARK, me);
+                me->AddAura(SPELL_SHADOWS_IN_THE_DARK);
 
             if (pWho)
             {

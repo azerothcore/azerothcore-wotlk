@@ -473,7 +473,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 {
                     player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
-                    player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
+                    player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
                 }
             }
         }
@@ -899,7 +899,7 @@ void BattlefieldWG::OnPlayerEnterZone(Player* player)
     if (!m_isActive)
         RemoveAurasFromPlayer(player);
 
-    player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
+    player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
     // Send worldstate to player
     SendInitWorldStatesTo(player);
 

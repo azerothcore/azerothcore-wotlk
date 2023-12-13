@@ -1338,7 +1338,7 @@ struct npc_brew_bubble : public NullCreatureAI
                     if (Aura* aura = me->GetAura(SPELL_BUBBLE_BUILD_UP))
                         aura->ModStackAmount(stacksTarget + 1);
                     else
-                        me->AddAura(SPELL_BUBBLE_BUILD_UP, me);
+                        me->AddAura(SPELL_BUBBLE_BUILD_UP);
 
                     target->ToCreature()->DespawnOrUnsummon();
                     DoAction(0);

@@ -6100,11 +6100,11 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         {
             // Inferno, Warlock summon spell
             case 1122:
-                caster->AddAura(61191, summon);
+                summon->AddAura(61191);
                 break;
             // Ritual of Doom, Warlock summon spell
             case 60478:
-                caster->AddAura(SPELL_RITUAL_ENSLAVEMENT, summon);
+                summon->AddAura(SPELL_RITUAL_ENSLAVEMENT);
                 break;
         }
     }

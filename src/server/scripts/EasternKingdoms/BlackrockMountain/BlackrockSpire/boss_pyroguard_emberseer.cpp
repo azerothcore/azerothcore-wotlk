@@ -220,7 +220,7 @@ public:
 
                                         creature->AI()->SetData(1, 2);
                                     }
-                                me->AddAura(SPELL_ENCAGED_EMBERSEER, me);
+                                me->AddAura(SPELL_ENCAGED_EMBERSEER);
                                 instance->SetBossState(DATA_PYROGAURD_EMBERSEER, NOT_STARTED);
                                 break;
                             }

@@ -636,7 +636,7 @@ public:
     {
         boss_the_lich_kingAI(Creature* creature) : BossAI(creature, DATA_THE_LICH_KING)
         {
-            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
+            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH);
             me->SetImmuneToPC(true);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -674,7 +674,7 @@ public:
             Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
             Cell::VisitGridObjects(me, worker, 333.0f);
 
-            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
+            me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH);
             me->SetImmuneToPC(true);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);

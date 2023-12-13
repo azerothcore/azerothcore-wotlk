@@ -2446,7 +2446,7 @@ public:
                     summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                    summoned->AddAura(SPELL_CYCLONE_FALL, summoned);
+                    summoned->AddAura(SPELL_CYCLONE_FALL);
                     break;
                 case NPC_TREACHEROUS_GUARDIAN_H:
                 case NPC_DOCTOR_H:

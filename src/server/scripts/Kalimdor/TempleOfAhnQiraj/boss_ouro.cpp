@@ -165,7 +165,7 @@ struct boss_ouro : public BossAI
         {
             if (Creature* mound = Acore::Containers::SelectRandomContainerElement(ouroMounds))
             {
-                mound->AddAura(SPELL_SUMMON_OURO_AURA, mound);
+                mound->AddAura(SPELL_SUMMON_OURO_AURA);
                 mound->AI()->SetData(DATA_OURO_HEALTH, me->GetHealth());
             }
         }

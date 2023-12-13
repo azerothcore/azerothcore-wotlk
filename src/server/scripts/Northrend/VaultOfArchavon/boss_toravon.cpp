@@ -75,7 +75,7 @@ public:
             {
                 if (pInstance->GetData(DATA_STONED))
                 {
-                    if (Aura* aur = me->AddAura(SPELL_STONED_AURA, me))
+                    if (Aura* aur = me->AddAura(SPELL_STONED_AURA))
                     {
                         aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
                         aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);

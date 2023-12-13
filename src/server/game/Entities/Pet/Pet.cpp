@@ -89,7 +89,7 @@ void Pet::AddToWorld()
                     if ((itr->second->raceMask & plr->getRaceMask()) && !HasAura(itr->second->spellId))
                         if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                             if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
-                                AddAura(itr->second->spellId, this);
+                                AddAura(itr->second->spellId);
             }
 
     // Prevent stuck pets when zoning. Pets default to "follow" when added to world
@@ -1188,12 +1188,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_WATER_ELEMENTAL_PERM:
                         {
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_MAGE_PET_SCALING_01);
+                            AddAura(SPELL_MAGE_PET_SCALING_02);
+                            AddAura(SPELL_MAGE_PET_SCALING_03);
+                            AddAura(SPELL_MAGE_PET_SCALING_04);
                             break;
                         }
                 }
@@ -1207,24 +1207,24 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 3.5f - petlevel));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 3.5f + petlevel));
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_01, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_02, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_03, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_01);
+                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_02);
+                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_03);
+                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_04);
                             break;
                         }
                     case NPC_EARTH_ELEMENTAL:
                         {
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.0f - petlevel));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.0f + petlevel));
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_01, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_02, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_03, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_01);
+                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_02);
+                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_03);
+                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_04);
                             break;
                         }
                     case NPC_INFERNAL:
@@ -1234,12 +1234,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
                                 SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
                             }
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
-                            AddAura(SPELL_INFERNAL_SCALING_01, this);
-                            AddAura(SPELL_INFERNAL_SCALING_02, this);
-                            AddAura(SPELL_INFERNAL_SCALING_03, this);
-                            AddAura(SPELL_INFERNAL_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_05);
+                            AddAura(SPELL_INFERNAL_SCALING_01);
+                            AddAura(SPELL_INFERNAL_SCALING_02);
+                            AddAura(SPELL_INFERNAL_SCALING_03);
+                            AddAura(SPELL_INFERNAL_SCALING_04);
                             break;
                         }
                     case NPC_DOOMGUARD:
@@ -1249,22 +1249,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
 
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_01, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_02, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_03, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_04, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_01);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_02);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_03);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_04);
+                            AddAura(SPELL_WARLOCK_PET_SCALING_05);
                             break;
                         }
                     case NPC_WATER_ELEMENTAL_TEMP:
                         {
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_MAGE_PET_SCALING_01);
+                            AddAura(SPELL_MAGE_PET_SCALING_02);
+                            AddAura(SPELL_MAGE_PET_SCALING_03);
+                            AddAura(SPELL_MAGE_PET_SCALING_04);
                             break;
                         }
                     case NPC_TREANT: //force of nature
@@ -1275,12 +1275,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
 
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_TREANT_SCALING_01, this);
-                            AddAura(SPELL_TREANT_SCALING_02, this);
-                            AddAura(SPELL_TREANT_SCALING_03, this);
-                            AddAura(SPELL_TREANT_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_TREANT_SCALING_01);
+                            AddAura(SPELL_TREANT_SCALING_02);
+                            AddAura(SPELL_TREANT_SCALING_03);
+                            AddAura(SPELL_TREANT_SCALING_04);
                             break;
                         }
                     case NPC_SHADOWFIEND:
@@ -1288,12 +1288,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
 
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_01, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_02, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_03, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_SHADOWFIEND_SCALING_01);
+                            AddAura(SPELL_SHADOWFIEND_SCALING_02);
+                            AddAura(SPELL_SHADOWFIEND_SCALING_03);
+                            AddAura(SPELL_SHADOWFIEND_SCALING_04);
                             break;
                         }
                     case NPC_FERAL_SPIRIT:
@@ -1301,12 +1301,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 4.0f - petlevel));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 4.0f + petlevel));
 
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SPIRIT_HUNT, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_FERAL_SPIRIT_SPIRIT_HUNT);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_FERAL_SPIRIT_SCALING_01);
+                            AddAura(SPELL_FERAL_SPIRIT_SCALING_02);
+                            AddAura(SPELL_FERAL_SPIRIT_SCALING_03);
 
                             if (owner->getRace() == RACE_ORC)
                             {
@@ -1324,12 +1324,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 SetCreateHealth(28 + 10 * petlevel);
                             }
 
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                            AddAura(SPELL_PET_AVOIDANCE);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_MAGE_PET_SCALING_01);
+                            AddAura(SPELL_MAGE_PET_SCALING_02);
+                            AddAura(SPELL_MAGE_PET_SCALING_03);
+                            AddAura(SPELL_MAGE_PET_SCALING_04);
                             break;
                         }
                     case NPC_EBON_GARGOYLE: // Ebon Gargoyle
@@ -1340,17 +1340,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 SetCreateHealth(28 + 30 * petlevel);
                             }
 
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_DK_PET_SCALING_01, this);
-                            AddAura(SPELL_DK_PET_SCALING_02, this);
-                            AddAura(SPELL_DK_PET_SCALING_03, this);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_DK_PET_SCALING_01);
+                            AddAura(SPELL_DK_PET_SCALING_02);
+                            AddAura(SPELL_DK_PET_SCALING_03);
                             break;
                         }
                     case NPC_BLOODWORM:
                         {
                             // Xinef: Hit / Expertise scaling
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_PET_AVOIDANCE, this);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_PET_AVOIDANCE);
                             SetCreateHealth(4 * petlevel);
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
@@ -1359,11 +1359,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_ARMY_OF_THE_DEAD:
                         {
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_DK_PET_SCALING_01, this);
-                            AddAura(SPELL_DK_PET_SCALING_02, this);
-                            AddAura(SPELL_DK_PET_SCALING_03, this);
-                            AddAura(SPELL_PET_AVOIDANCE, this);
+                            AddAura(SPELL_HUNTER_PET_SCALING_04);
+                            AddAura(SPELL_DK_PET_SCALING_01);
+                            AddAura(SPELL_DK_PET_SCALING_02);
+                            AddAura(SPELL_DK_PET_SCALING_03);
+                            AddAura(SPELL_PET_AVOIDANCE);
 
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
@@ -1400,17 +1400,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
-        if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
+        if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE))
             if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
                 if (aur->GetEffect(0))
                     aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-        AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+        AddAura(SPELL_HUNTER_PET_SCALING_04);
         // Added to perm ghoul by default
         if (!IsPet())
         {
-            AddAura(SPELL_DK_PET_SCALING_01, this);
-            AddAura(SPELL_DK_PET_SCALING_02, this);
+            AddAura(SPELL_DK_PET_SCALING_01);
+            AddAura(SPELL_DK_PET_SCALING_02);
         }
     }
 

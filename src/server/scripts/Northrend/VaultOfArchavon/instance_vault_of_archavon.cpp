@@ -93,7 +93,7 @@ public:
                                     if (!cr->IsInCombat())
                                     {
                                         cr->RemoveAllAuras();
-                                        if (Aura* aur = cr->AddAura(SPELL_STONED_AURA, cr))
+                                        if (Aura* aur = cr->AddAura(SPELL_STONED_AURA))
                                         {
                                             aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
                                             aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);

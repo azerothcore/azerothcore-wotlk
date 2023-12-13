@@ -180,13 +180,13 @@ class spell_dk_raise_ally : public SpellScript
                 ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->GetLevel() + (ghoul->GetLevel() / 4)));
 
                 // Avoidance, Night of the Dead
-                if (Aura* aur = ghoul->AddAura(62137, ghoul))
+                if (Aura* aur = ghoul->AddAura(62137))
                     if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
                         if (aur->GetEffect(0))
                             aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
                 // Hit / Expertise scalling, warlock / hunter pets have this by default
-                ghoul->AddAura(SPELL_HUNTER_PET_SCALING_04, ghoul);
+                ghoul->AddAura(SPELL_HUNTER_PET_SCALING_04);
 
                 // DK Ghoul haste refresh
                 float val = (GetCaster()->m_modAttackSpeedPct[BASE_ATTACK] - 1.0f) * 100.0f;

@@ -922,7 +922,7 @@ public:
         void Reset() override
         {
             me->setAttackTimer(BASE_ATTACK, 2000);
-            me->AddAura(SPELL_VENGEFUL_BLAST_PASSIVE, me);
+            me->AddAura(SPELL_VENGEFUL_BLAST_PASSIVE);
         }
 
         void AttackStart(Unit* who) override

@@ -412,7 +412,7 @@ public:
         void HideNozdormu()
         {
             if (Creature* cr = me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true))
-                cr->AddAura(SPELL_NOZDORMU_INVIS, cr);
+                cr->AddAura(SPELL_NOZDORMU_INVIS);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1289,7 +1289,7 @@ public:
                                 l->EnterVehicle(x, 1);
                                 //l->ClearUnitState(UNIT_STATE_ONVEHICLE);
                                 l->CastSpell(l, SPELL_SAC_HOLY_BOMB_VISUAL, false);
-                                l->AddAura(SPELL_SAC_HOLY_BOMB_VISUAL, l);
+                                l->AddAura(SPELL_SAC_HOLY_BOMB_VISUAL);
                                 events.ScheduleEvent(16, 5s);
                             }
                         }

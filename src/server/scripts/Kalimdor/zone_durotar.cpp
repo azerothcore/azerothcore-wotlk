@@ -122,8 +122,8 @@ public:
                             if (!summoner->HasAura(SPELL_NO_SUMMON_AURA) && !summoner->HasAura(SPELL_SUMMON_ZENTABRA_TRIGGER)
                                     && !summoner->IsInCombat())
                             {
-                                me->AddAura(SPELL_NO_SUMMON_AURA, summoner);
-                                me->AddAura(SPELL_DETECT_INVIS, summoner);
+                                summoner->AddAura(SPELL_NO_SUMMON_AURA);
+                                summoner->AddAura(SPELL_DETECT_INVIS);
                                 summoner->CastSpell(summoner, SPELL_SUMMON_MATRIARCH, true);
                                 Talk(SAY_MATRIARCH_AGGRO, summoner);
                             }
@@ -204,7 +204,7 @@ public:
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 if (Unit* vehSummoner = attacker->ToTempSummon()->GetSummonerUnit())
                 {
-                    vehSummoner->AddAura(SPELL_SUMMON_ZENTABRA_TRIGGER, vehSummoner);
+                    vehSummoner->AddAura(SPELL_SUMMON_ZENTABRA_TRIGGER);
                     vehSummoner->CastSpell(vehSummoner, SPELL_SUMMON_ZENTABRA, true);
                     attacker->CastSpell(attacker, SPELL_EJECT_PASSENGERS, true);
                     vehSummoner->RemoveAurasDueToSpell(SPELL_NO_SUMMON_AURA);
@@ -240,7 +240,7 @@ public:
                         {
                             if (tiger->IsSummon())
                                 if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummonerUnit())
-                                    me->AddAura(SPELL_NO_SUMMON_AURA, vehSummoner);
+                                    vehSummoner->AddAura(SPELL_NO_SUMMON_AURA);
                         }
                         _events.ScheduleEvent(EVENT_NOSUMMON, 50s);
                         break;
@@ -313,8 +313,8 @@ public:
         void Reset() override
         {
             _complete = false;
-            me->AddAura(SPELL_VOLUNTEER_AURA, me);
-            me->AddAura(SPELL_MOUNTING_CHECK, me);
+            me->AddAura(SPELL_VOLUNTEER_AURA);
+            me->AddAura(SPELL_MOUNTING_CHECK);
             DoCast(me, SPELL_PETACT_AURA);
             me->SetReactState(REACT_PASSIVE);
             Talk(SAY_VOLUNTEER_START);

@@ -166,7 +166,7 @@ public:
                 return true;
             }
 
-            aura = target->AddAura(deserterSpell, target);
+            aura = target->AddAura(deserterSpell);
             if (!aura)
             {
                 handler->SendErrorMessage(LANG_BAD_VALUE);

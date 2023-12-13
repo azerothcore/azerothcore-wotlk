@@ -1636,7 +1636,7 @@ void Player::ProcessDelayedOperations()
             {
                 RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             }
-            AddAura(m_entryPointData.mountSpell, this);
+            AddAura(m_entryPointData.mountSpell);
             m_entryPointData.mountSpell = 0;
         }
     }
@@ -2265,7 +2265,7 @@ void Player::SetGMVisible(bool on)
     }
     else
     {
-        AddAura(VISUAL_AURA, this);
+        AddAura(VISUAL_AURA);
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
@@ -11571,7 +11571,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     {
         if (!isBeingLoaded() && GetMountBlockId() && !HasAuraType(SPELL_AURA_MOUNTED))
         {
-            AddAura(GetMountBlockId(), this);
+            AddAura(GetMountBlockId());
             SetMountBlockId(0);
         }
     }
@@ -15270,7 +15270,7 @@ void Player::SetIsSpectator(bool on)
 {
     if (on)
     {
-        AddAura(SPECTATOR_SPELL_SPEED, this);
+        AddAura(SPECTATOR_SPELL_SPEED);
         m_ExtraFlags |= PLAYER_EXTRA_SPECTATOR_ON;
         AddUnitState(UNIT_STATE_ISOLATED);
         //SetFaction(1100);

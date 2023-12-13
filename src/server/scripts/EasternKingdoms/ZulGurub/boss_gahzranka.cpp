@@ -75,7 +75,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            me->AddAura(SPELL_THRASH, me);
+            me->AddAura(SPELL_THRASH);
             events.ScheduleEvent(EVENT_FROSTBREATH, 8s);
             events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25s);
             events.ScheduleEvent(EVENT_SLAM, 15s);

@@ -689,7 +689,7 @@ public:
                             if( Creature* dreadscale = c->SummonCreature(NPC_DREADSCALE, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN) )
                                 dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY() - 25.0f, Locs[LOC_BEHIND_GATE].GetPositionZ());
                             if( Creature* acidmaw = c->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW].GetPositionX(), Locs[LOC_ACIDMAW].GetPositionY(), Locs[LOC_ACIDMAW].GetPositionZ(), Locs[LOC_ACIDMAW].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN) )
-                                acidmaw->AddAura(53421, acidmaw);
+                                acidmaw->AddAura(53421);
                         }
 
                         events.RescheduleEvent(EVENT_SCENE_005_2, 4000);

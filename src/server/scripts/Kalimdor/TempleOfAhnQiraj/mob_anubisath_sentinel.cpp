@@ -249,7 +249,7 @@ public:
 
         void GainSentinelAbility(uint32 id)
         {
-            me->AddAura(id, me);
+            me->AddAura(id);
         }
 
         void JustEngagedWith(Unit* who) override

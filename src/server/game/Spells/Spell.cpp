@@ -3274,7 +3274,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
             m_caster->CastSpell(unit, m_preCastSpell, true);
         else if (sSpellMgr->GetSpellInfo(m_preCastSpell))
             // Blizz seems to just apply aura without bothering to cast
-            m_caster->AddAura(m_preCastSpell, unit);
+            unit->AddAura(m_preCastSpell);
     }
 
     // handle SPELL_AURA_ADD_TARGET_TRIGGER auras

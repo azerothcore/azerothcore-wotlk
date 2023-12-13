@@ -1319,14 +1319,14 @@ public:
                 if (init && !passenger->HasAura(SPELL_BURNING))
                 {
                     me->TextEmote("Your Vehicle is burning!", GetSummoner(), true);
-                    passenger->AddAura(SPELL_BURNING, passenger);
+                    passenger->AddAura(SPELL_BURNING);
                 }
 
             for (uint8 seat = 3; seat <= 5; ++seat)
                 if (Unit* banner = kit->GetPassenger(seat))
                     if (!banner->HasAura(SPELL_COSMETIC_FIRE))
                     {
-                        banner->AddAura(SPELL_COSMETIC_FIRE, banner);
+                        banner->AddAura(SPELL_COSMETIC_FIRE);
                         break;
                     }
         }

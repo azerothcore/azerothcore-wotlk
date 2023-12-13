@@ -126,7 +126,7 @@ public:
         {
             RemoveTargetAura();
             _targetGUID = who->GetGUID();
-            me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
+            who->AddAura(SPELL_DK_SUMMON_GARGOYLE_1);
             ScriptedAI::AttackStart(who);
         }
 
@@ -328,7 +328,7 @@ public:
         void InitializeAI() override
         {
             // Xinef: Hit / Expertise scaling
-            me->AddAura(61017, me);
+            me->AddAura(61017);
             if (Unit* owner = me->GetOwner())
                 me->GetMotionMaster()->MoveFollow(owner, 0.01f, me->GetFollowAngle(), MOTION_SLOT_CONTROLLED);
 

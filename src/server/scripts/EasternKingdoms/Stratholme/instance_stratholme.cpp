@@ -84,7 +84,7 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             if (_baronRunTime > 0)
-                if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
+                if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
         }
 
