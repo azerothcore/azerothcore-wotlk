@@ -2688,9 +2688,28 @@ bool Creature::LoadCreaturesAddon(bool reload)
     //Load Path
     if (cainfo->path_id != 0)
     {
-        if (sWorld->getBoolConfig(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE))
-            setActive(true);
         m_path_id = cainfo->path_id;
+        if (sWorld->getBoolConfig(CONFIG_SET_CREATURES_WITH_LONG_PATH_ACTIVE) && !isActiveObject())
+        {
+            if (WaypointPath const* path = sWaypointMgr->GetPath(m_path_id))
+            {
+                for (size_t i = 0; i < path->size() && !isActiveObject(); i++)
+                {
+                    WaypointData const* firstNode = path->at(i);
+                    const G3D::Vector3 firstPosition(firstNode->x, firstNode->y, firstNode->z);
+                    for (size_t j = 1; j < path->size() && !isActiveObject(); j++)
+                    {
+                        WaypointData const* secondNode = path->at(j);
+                        const G3D::Vector3 secondPosition(secondNode->x, secondNode->y, secondNode->z);
+                        float distance = (firstPosition - secondPosition).length();
+                        if (distance >= 100)
+                        {
+                            setActive(true);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     if (!cainfo->auras.empty())
