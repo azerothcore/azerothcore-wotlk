@@ -1420,7 +1420,8 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetOption<int32>("ICC.Buff.Horde", 73822);
     _int_configs[CONFIG_ICC_BUFF_ALLIANCE] = sConfigMgr->GetOption<int32>("ICC.Buff.Alliance", 73828);
 
-    _bool_configs[CONFIG_SET_CREATURES_WITH_LONG_PATH_ACTIVE] = sConfigMgr->GetOption<bool>("SetCreaturesWithLongPathActive", false);
+    _bool_configs[CONFIG_SET_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE] = sConfigMgr->GetOption<bool>("SetCreaturesWithWaypointMovementActive", false);
+    _int_configs[CONFIG_CREATURE_PATH_DISTANCE_CHECK] = sConfigMgr->GetOption<int32>("CreaturePathDistanceCheck", 100);
 
     // packet spoof punishment
     _int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetOption<int32>("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::POLICY_KICK);

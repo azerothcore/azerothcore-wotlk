@@ -1380,8 +1380,8 @@ CheckGameObjectLoS = 1
 PreloadAllNonInstancedMapGrids = 0
 
 #
-#    SetCreaturesWithLongPathActive
-#        Description: Set creatures with long path to active. This means that they will start
+#    SetCreaturesWithWaypointMovementActive
+#        Description: Set creatures with waypoint movement to active. This means that they will start
 #                     movement once they are loaded (which happens on grid load) and keep moving even
 #                     when no player is near. This will increase CPU usage significantly and can be
 #                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
@@ -1389,7 +1389,18 @@ PreloadAllNonInstancedMapGrids = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-SetCreaturesWithLongPathActive = 0
+SetCreaturesWithWaypointMovementActive = 0
+
+#
+#    CreaturePathDistanceCheck
+#        Description: Minimum distance (in yards) two nodes in a creatures path must be apart, in order
+#                     for the creature to be set to active when having
+#                     "SetCreaturesWithWaypointMovementActive" enabled. Setting this to a low value will
+#                     lead to higher CPU usage as more creatures will be set to active.
+#        Default:     100
+#                     0 - (This will skip the distance check entirely and set all creatures with waypoint movement active)
+
+CreaturePathDistanceCheck = 100
 
 #
 #     DontCacheRandomMovementPaths
