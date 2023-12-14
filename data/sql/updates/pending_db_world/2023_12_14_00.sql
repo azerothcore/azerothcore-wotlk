@@ -5,6 +5,7 @@ UPDATE `smart_scripts` SET `id`=7 WHERE `entryorguid`=3669 AND `source_type`=0 A
 
 # Druid of the Fang
 DELETE FROM `smart_scripts` WHERE `entryorguid`=3840 AND `source_type`=0 AND `id`=4 AND `link`=0;
+UPDATE `smart_scripts` SET `link`=0 WHERE `entryorguid`=3840 AND `source_type`=0 AND `id`=3 AND `link`=4;
 UPDATE `smart_scripts` SET `id`=4, `link`=5 WHERE `entryorguid`=3840 AND `source_type`=0 AND `id`=5 AND `link`=6;
 UPDATE `smart_scripts` SET `id`=5 WHERE `entryorguid`=3840 AND `source_type`=0 AND `id`=6 AND `link`=0;
 UPDATE `smart_scripts` SET `id`=6 WHERE `entryorguid`=3840 AND `source_type`=0 AND `id`=7 AND `link`=0;

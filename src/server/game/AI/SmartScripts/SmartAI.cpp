@@ -1015,15 +1015,6 @@ void SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
     GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt);
 }
 
-void SmartAI::SetForcedCombatMove(float dist)
-{
-    if (!me->GetVictim())
-        return;
-
-    SetRun(mRun);
-    me->GetMotionMaster()->MoveChase(me->GetVictim(), dist);
-}
-
 void SmartAI::SetCombatMove(bool on)
 {
     if (mCanCombatMove == on)
