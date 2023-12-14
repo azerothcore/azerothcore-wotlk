@@ -500,6 +500,7 @@ void SmartAI::CheckConditions(const uint32 diff)
 
 void SmartAI::UpdateAI(uint32 diff)
 {
+    bool hasVictim = UpdateVictim();
     CheckConditions(diff);
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
@@ -535,7 +536,7 @@ void SmartAI::UpdateAI(uint32 diff)
         return;
     }
 
-    if (!UpdateVictim())
+    if (!hasVictim)
         return;
 
     if (mCanAutoAttack)
@@ -822,14 +823,14 @@ void SmartAI::AttackStart(Unit* who)
     // xinef: dont allow charmed npcs to act on their own
     if (me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
-        if (who && mCanAutoAttack)
-            me->Attack(who, true);
+        if (who)
+            me->Attack(who, mCanAutoAttack);
         return;
     }
 
     if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
     {
-        if (mCanCombatMove || GetScript()->GetMaxCombatDist())
+        if (mCanCombatMove)
         {
             SetRun(mRun);
             MovementGeneratorType type = me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE);
@@ -838,8 +839,8 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
             }
-            float range = GetScript()->GetCasterActualDist() > 0.f ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist();
-            me->GetMotionMaster()->MoveChase(who, range > 0.f ? ChaseRange(range) : std::optional<ChaseRange>());
+
+            me->GetMotionMaster()->MoveChase(who);
         }
     }
 }
@@ -1025,10 +1026,6 @@ void SmartAI::SetForcedCombatMove(float dist)
 
 void SmartAI::SetCombatMove(bool on)
 {
-    // Xinef: Fix Combat Movement
-    if (GetScript()->GetMaxCombatDist()/* || GetScript()->GetCasterMaxDist()*/) // Xinef: we only need this hack for old caster movement system
-        return;
-
     if (mCanCombatMove == on)
         return;
 

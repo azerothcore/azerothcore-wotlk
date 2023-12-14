@@ -685,7 +685,7 @@ enum SMART_ACTION
     SMART_ACTION_EXIT_VEHICLE                       = 203,    // none
     SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 204,    // flags
     SMART_ACTION_SET_COMBAT_DISTANCE                = 205,    // combatDistance
-    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 206,    // followDistance, resetToMax
+    // UNUSED                                       = 206,
     SMART_ACTION_SET_HOVER                          = 207,    // 0/1
     SMART_ACTION_ADD_IMMUNITY                       = 208,    // type, id, value
     SMART_ACTION_REMOVE_IMMUNITY                    = 209,    // type, id, value

@@ -57,14 +57,6 @@ SmartScript::SmartScript()
     mScriptType = SMART_SCRIPT_TYPE_CREATURE;
     isProcessingTimedActionList = false;
 
-    // Xinef: Fix Combat Movement
-    mActualCombatDist = 0;
-    mMaxCombatDist = 0;
-
-    smartCasterActualDist = 0.0f;
-    smartCasterMaxDist = 0.0f;
-    smartCasterPowerType = POWER_MANA;
-
     _allowPhaseReset = true;
 }
 
@@ -91,10 +83,6 @@ void SmartScript::OnReset()
     ProcessEventsFor(SMART_EVENT_RESET);
     mLastInvoker.Clear();
     mCounterList.clear();
-
-    // Xinef: Fix Combat Movement
-    RestoreMaxCombatDist();
-    RestoreCasterMaxDist();
 }
 
 void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
@@ -621,25 +609,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
-                    // Flag usable only if caster has max dist set.
-                    if ((e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
-                    {
-                        // Check mana case only and operate movement accordingly, LoS and range is checked in targetet movement generator.
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
-                        int32 currentPower = me->GetPower(GetCasterPowerType());
-
-                        if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-                        {
-                            SetCasterActualDist(0);
-                            CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);
-                        }
-                        else if (GetCasterActualDist() == 0.0f && me->GetPowerPct(GetCasterPowerType()) > 30.0f)
-                        {
-                            RestoreCasterMaxDist();
-                            CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(GetCasterActualDist());
-                        }
-                    }
-
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
                     {
@@ -649,7 +618,18 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             triggerFlags = TRIGGERED_FULL_MASK;
                     }
 
-                    me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
+                    SpellCastResult result = me->CastSpell(target->ToUnit(), e.action.cast.spell, triggerFlags);
+                    bool spellCastFailed = (result != SPELL_CAST_OK && result != SPELL_FAILED_SPELL_IN_PROGRESS);
+
+                    if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                    {
+                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                        CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
+                    }
+
+                    if (spellCastFailed)
+                        RecalcTimer(e, 500, 500);
+
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
                               me->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
@@ -864,15 +844,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            // Xinef: Fix Combat Movement
             bool move = e.action.combatMove.move;
-            if (move && GetMaxCombatDist() && e.GetEventType() == SMART_EVENT_MANA_PCT)
-            {
-                SetActualCombatDist(0);
-                CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);
-            }
-            else
-                CAST_AI(SmartAI, me->AI())->SetCombatMove(move);
+            CAST_AI(SmartAI, me->AI())->SetCombatMove(move);
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ALLOW_COMBAT_MOVEMENT: Creature {} bool on = {}",
                            me->GetGUID().ToString(), e.action.combatMove.move);
             break;
@@ -2423,17 +2396,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsCreature(target))
                     target->ToCreature()->m_CombatDistance = e.action.combatDistance.dist;
 
-            break;
-        }
-        case SMART_ACTION_SET_CASTER_COMBAT_DIST:
-        {
-            if (e.action.casterDistance.reset)
-                RestoreCasterMaxDist();
-            else
-                SetCasterActualDist(e.action.casterDistance.dist);
-
-            if (me->GetVictim() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                me->GetMotionMaster()->MoveChase(me->GetVictim(), GetCasterActualDist());
             break;
         }
         case SMART_ACTION_SET_SIGHT_DIST:
@@ -4821,37 +4783,8 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
 
     GetScript();//load copy of script
 
-    uint32 maxDisableDist = 0;
-    uint32 minEnableDist = 0;
-    for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)
-    {
-        InitTimer((*i));//calculate timers for first time use
-        if (i->GetEventType() == SMART_EVENT_RANGE && i->GetActionType() == SMART_ACTION_ALLOW_COMBAT_MOVEMENT)
-        {
-            if (i->action.combatMove.move == 1 && i->event.minMaxRepeat.rangeMin > minEnableDist)
-                minEnableDist = i->event.minMaxRepeat.rangeMin;
-            else if (i->action.combatMove.move == 0 && (i->event.minMaxRepeat.rangeMax < maxDisableDist || maxDisableDist == 0))
-                maxDisableDist = i->event.minMaxRepeat.rangeMax;
-        }
-
-        // Xinef: if smartcast combat move flag is present
-        if (i->GetActionType() == SMART_ACTION_CAST && (i->action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
-        {
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i->action.cast.spell))
-            {
-                float maxRange = spellInfo->GetMaxRange(spellInfo->IsPositive());
-                float minRange = spellInfo->GetMinRange(spellInfo->IsPositive());
-
-                if (maxRange > 0 && minRange <= maxRange)
-                {
-                    smartCasterMaxDist = minRange + ((maxRange - minRange) * 0.65f);
-                    smartCasterPowerType = (Powers)spellInfo->PowerType;
-                }
-            }
-        }
-    }
-    if (maxDisableDist > 0 && minEnableDist >= maxDisableDist)
-        mMaxCombatDist = uint32(maxDisableDist + ((minEnableDist - maxDisableDist) / 2));
+    for (SmartScriptHolder& event : mEvents)
+        InitTimer(event);//calculate timers for first time use
 
     ProcessEventsFor(SMART_EVENT_AI_INIT);
     InstallEvents();
