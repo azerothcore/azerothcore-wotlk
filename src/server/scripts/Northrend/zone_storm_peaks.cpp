@@ -373,7 +373,7 @@ public:
         void PassengerBoarded(Unit*, int8, bool apply) override
         {
             if (!apply && me->IsAlive() && me->HasAura(SPELL_WYRM_GRIP))
-                me->RemoveAurasDueToSpell(SPELL_WYRM_GRIP);
+                me->RemoveAura(SPELL_WYRM_GRIP);
         }
 
         void MovementInform(uint32 type, uint32 pointId) override
@@ -443,7 +443,7 @@ public:
                     if (Player* player = GetValidPlayer())
                     {
                         player->KilledMonsterCredit(30415);
-                        player->RemoveAurasDueToSpell(SPELL_JAWS_OF_DEATH);
+                        player->RemoveAura(SPELL_JAWS_OF_DEATH);
                     }
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
                     me->GetMotionMaster()->MoveFall(me->GetEntry());
@@ -669,7 +669,7 @@ public:
             }
             else
             {
-                caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
+                caster->RemoveAura(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
                 caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(true, UNIT_STATE_ROOT);
@@ -1080,7 +1080,7 @@ class spell_q12823_remove_collapsing_cave_aura : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        GetHitUnit()->RemoveAurasDueToSpell(SPELL_COLLAPSING_CAVE);
+        GetHitUnit()->RemoveAura(SPELL_COLLAPSING_CAVE);
     }
 
     void Register() override

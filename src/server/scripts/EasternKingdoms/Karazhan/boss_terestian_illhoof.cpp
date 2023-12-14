@@ -136,7 +136,7 @@ struct npc_demon_chain : public ScriptedAI
             Unit* Sacrifice = ObjectAccessor::GetUnit(*me, sacrificeGUID);
             if (Sacrifice)
             {
-                Sacrifice->RemoveAurasDueToSpell(SPELL_SACRIFICE);
+                Sacrifice->RemoveAura(SPELL_SACRIFICE);
             }
         }
     }
@@ -163,7 +163,7 @@ struct boss_terestian_illhoof : public BossAI
 
     void SummonKilrek()
     {
-        me->RemoveAurasDueToSpell(SPELL_BROKEN_PACT);
+        me->RemoveAura(SPELL_BROKEN_PACT);
         DoCastSelf(SPELL_SUMMON_IMP);
     }
 

@@ -102,13 +102,13 @@ class spell_mage_burning_determination : public AuraScript
         // Xinef: immuned effect should just eat charge
         if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
         {
-            eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
+            eventInfo.GetActionTarget()->RemoveAura(54748);
             return false;
         }
         if (Aura* aura = eventInfo.GetActionTarget()->GetAura(54748))
         {
             if (aura->GetDuration() < aura->GetMaxDuration())
-                eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
+                eventInfo.GetActionTarget()->RemoveAura(54748);
             return false;
         }
 
@@ -393,7 +393,7 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION);
+            GetTarget()->RemoveAura(SPELL_MAGE_COMBUSTION);
         }
 
         void Register() override

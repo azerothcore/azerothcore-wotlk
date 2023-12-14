@@ -493,7 +493,7 @@ public:
                     me->CastSpell(me, 30972, true);
                     return 10000;
                 case 10:
-                    me->RemoveAurasDueToSpell(30972);
+                    me->RemoveAura(30972);
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
                         me->CastSpell(arca, SPELL_CONFLAGRATION_BLAST, false);
                     return 1000;

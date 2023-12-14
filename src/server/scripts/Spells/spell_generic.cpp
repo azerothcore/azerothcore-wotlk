@@ -855,7 +855,7 @@ class spell_gen_fixate_aura : public AuraScript
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
-            caster->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_2].CalcValue(), GetTarget()->GetGUID());
+            caster->RemoveAura(GetSpellInfo()->Effects[EFFECT_2].CalcValue(), GetTarget()->GetGUID());
     }
 
     void Register() override
@@ -1647,7 +1647,7 @@ class spell_gen_parachute : public AuraScript
         if (Player* target = GetTarget()->ToPlayer())
             if (target->IsFalling())
             {
-                target->RemoveAurasDueToSpell(SPELL_PARACHUTE);
+                target->RemoveAura(SPELL_PARACHUTE);
                 target->CastSpell(target, SPELL_PARACHUTE_BUFF, true);
             }
     }
@@ -2592,7 +2592,7 @@ class spell_gen_damage_reduction_aura : public AuraScript
                 target->HasAura(SPELL_RENEWED_HOPE) ||
                 target->HasAura(SPELL_VIGILANCE)))
         {
-            target->RemoveAurasDueToSpell(SPELL_DAMAGE_REDUCTION_AURA);
+            target->RemoveAura(SPELL_DAMAGE_REDUCTION_AURA);
         }
     }
 
@@ -3128,18 +3128,18 @@ class spell_gen_defend : public AuraScript
             Unit* target = GetTarget();
 
             for (uint8 i = 0; i < GetSpellInfo()->StackAmount; ++i)
-                target->RemoveAurasDueToSpell(SPELL_VISUAL_SHIELD_1 + i);
+                target->RemoveAura(SPELL_VISUAL_SHIELD_1 + i);
 
             target->CastSpell(target, SPELL_VISUAL_SHIELD_1 + GetAura()->GetStackAmount() - 1, true, nullptr, aurEff);
         }
         else
-            GetTarget()->RemoveAurasDueToSpell(GetId());
+            GetTarget()->RemoveAura(GetId());
     }
 
     void RemoveVisualShields(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         for (uint8 i = 0; i < GetSpellInfo()->StackAmount; ++i)
-            GetTarget()->RemoveAurasDueToSpell(SPELL_VISUAL_SHIELD_1 + i);
+            GetTarget()->RemoveAura(SPELL_VISUAL_SHIELD_1 + i);
     }
 
     void RemoveDummyFromDriver(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -3147,7 +3147,7 @@ class spell_gen_defend : public AuraScript
         if (Unit* caster = GetCaster())
             if (TempSummon* vehicle = caster->ToTempSummon())
                 if (Unit* rider = vehicle->GetSummonerUnit())
-                    rider->RemoveAurasDueToSpell(GetId());
+                    rider->RemoveAura(GetId());
     }
 
     void Register() override
@@ -3443,7 +3443,7 @@ class spell_gen_on_tournament_mount : public AuraScript
     void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
-            caster->RemoveAurasDueToSpell(_pennantSpellId);
+            caster->RemoveAura(_pennantSpellId);
     }
 
     uint32 GetPennatSpellId(Player* player, Unit* mount)
@@ -3612,7 +3612,7 @@ class spell_gen_tournament_pennant : public AuraScript
     {
         if (Unit* caster = GetCaster())
             if (!caster->GetVehicleBase())
-                caster->RemoveAurasDueToSpell(GetId());
+                caster->RemoveAura(GetId());
     }
 
     void Register() override
@@ -4179,7 +4179,7 @@ class spell_gen_bonked : public SpellScript
             }
 
             target->CastSpell(target, SPELL_FOAM_SWORD_DEFEAT, true);
-            target->RemoveAurasDueToSpell(SPELL_BONKED);
+            target->RemoveAura(SPELL_BONKED);
 
             if (Aura const* onGuardAura = target->GetAura(SPELL_ON_GUARD))
             {
@@ -4415,7 +4415,7 @@ class spell_gen_eject_all_passengers : public SpellScript
             vehicle->RemoveAllPassengers();
         }
         if (u)
-            u->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+            u->RemoveAura(VEHICLE_SPELL_PARACHUTE);
     }
 
     void Register() override
@@ -4644,7 +4644,7 @@ public:
         {
             if (!caster->IsAlive())
             {
-                GetUnitOwner()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+                GetUnitOwner()->RemoveAura(GetSpellInfo()->Id);
                 return;
             }
 
@@ -4904,7 +4904,7 @@ class spell_gen_curse_of_pain : public AuraScript
         {
             if (target->GetHealthPct() < 50.f)
             {
-                target->RemoveAurasDueToSpell(SPELL_CURSE_OF_PAIN);
+                target->RemoveAura(SPELL_CURSE_OF_PAIN);
             }
         }
     }
@@ -5123,7 +5123,7 @@ class spell_gen_choking_vines : public AuraScript
         {
             if (GetStackAmount() == GetSpellInfo()->StackAmount) // 5 stacks
             {
-                target->RemoveAurasDueToSpell(SPELL_CHOKING_VINES);
+                target->RemoveAura(SPELL_CHOKING_VINES);
                 target->CastSpell(target, SPELL_CHOKING_WOUND, true); // Unknown if it's a self cast or casted by the source on 5th
             }
         }

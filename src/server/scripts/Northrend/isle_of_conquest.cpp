@@ -254,7 +254,7 @@ public:
                 if (me->GetDistance(me->GetHomePosition()) < 40.0f && std::abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
                 {
                     rage = false;
-                    me->RemoveAurasDueToSpell(SPELL_IOCBOSS_RAGE);
+                    me->RemoveAura(SPELL_IOCBOSS_RAGE);
                 }
             }
         }

@@ -108,11 +108,11 @@ void OutdoorPvPHP::HandlePlayerLeaveZone(Player* player, uint32 zone)
     // remove buffs
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
-        player->RemoveAurasDueToSpell(AllianceBuff);
+        player->RemoveAura(AllianceBuff);
     }
     else
     {
-        player->RemoveAurasDueToSpell(HordeBuff);
+        player->RemoveAura(HordeBuff);
     }
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }

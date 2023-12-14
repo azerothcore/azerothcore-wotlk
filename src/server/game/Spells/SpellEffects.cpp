@@ -430,7 +430,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             apply_direct_bonus = false;
                             // Glyph of Conflagrate
                             if (!m_caster->HasAura(56235))
-                                unitTarget->RemoveAurasDueToSpell(aura->GetId(), m_caster->GetGUID());
+                                unitTarget->RemoveAura(aura->GetId(), m_caster->GetGUID());
 
                             break;
                         }
@@ -1501,7 +1501,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
             if (AuraEffect const* aurEff = m_caster->GetAuraEffect(45062, 0))
             {
                 damageAmount += aurEff->GetAmount();
-                m_caster->RemoveAurasDueToSpell(45062);
+                m_caster->RemoveAura(45062);
             }
 
             addhealth += damageAmount;
@@ -4393,7 +4393,7 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             if (uint32 oldGlyph = player->GetGlyph(m_glyphIndex))
                 if (GlyphPropertiesEntry const* oldGlyphEntry = sGlyphPropertiesStore.LookupEntry(oldGlyph))
                 {
-                    player->RemoveAurasDueToSpell(oldGlyphEntry->SpellId);
+                    player->RemoveAura(oldGlyphEntry->SpellId);
 
                     // Removed any triggered auras
                     Unit::AuraMap& ownedAuras = player->GetOwnedAuras();
@@ -6218,7 +6218,7 @@ void Spell::EffectRemoveAura(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
     // there may be need of specifying casterguid of removed auras
-    unitTarget->RemoveAurasDueToSpell(m_spellInfo->Effects[effIndex].TriggerSpell);
+    unitTarget->RemoveAura(m_spellInfo->Effects[effIndex].TriggerSpell);
 }
 
 void Spell::EffectCastButtons(SpellEffIndex effIndex)

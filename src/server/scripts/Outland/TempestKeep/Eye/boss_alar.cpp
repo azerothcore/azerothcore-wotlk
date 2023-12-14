@@ -246,7 +246,7 @@ public:
                     me->SetPosition(alarPoints[POINT_MIDDLE]);
                     break;
                 case EVENT_MOVE_TO_PHASE_2:
-                    me->RemoveAurasDueToSpell(SPELL_EMBER_BLAST);
+                    me->RemoveAura(SPELL_EMBER_BLAST);
                     me->CastSpell(me, SPELL_REBIRTH_PHASE2, false);
                     break;
                 case EVENT_REBIRTH:
@@ -293,7 +293,7 @@ public:
                         me->StopMovingOnCurrentPos();
                     }
 
-                    me->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
+                    me->RemoveAura(SPELL_DIVE_BOMB_VISUAL);
                     break;
                 case EVENT_SUMMON_DIVE_PHOENIX:
                     {

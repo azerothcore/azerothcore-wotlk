@@ -74,7 +74,7 @@ public:
             // If boss is below 2% hp - cast Armageddon
             if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
             {
-                me->RemoveAurasDueToSpell(SPELL_INFERNO);
+                me->RemoveAura(SPELL_INFERNO);
                 me->StopMoving();
                 if (me->CastSpell(me, SPELL_ARMAGEDDON, TRIGGERED_FULL_MASK) == SPELL_CAST_OK)
                 {

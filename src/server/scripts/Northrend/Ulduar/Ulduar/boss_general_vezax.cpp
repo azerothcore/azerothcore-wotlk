@@ -501,9 +501,9 @@ public:
         {
             if (Unit* target = GetTarget())
             {
-                target->RemoveAurasDueToSpell(SPELL_AURA_OF_DESPAIR_2);
-                target->RemoveAurasDueToSpell(SPELL_CORRUPTED_RAGE);
-                target->RemoveAurasDueToSpell(SPELL_CORRUPTED_WISDOM);
+                target->RemoveAura(SPELL_AURA_OF_DESPAIR_2);
+                target->RemoveAura(SPELL_CORRUPTED_RAGE);
+                target->RemoveAura(SPELL_CORRUPTED_WISDOM);
             }
         }
 

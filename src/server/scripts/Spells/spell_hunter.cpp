@@ -335,7 +335,7 @@ class spell_hun_aspect_of_the_beast : public AuraScript
         if (GetCaster())
             if (Player* caster = GetCaster()->ToPlayer())
                 if (Pet* pet = caster->GetPet())
-                    pet->RemoveAurasDueToSpell(SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET);
+                    pet->RemoveAura(SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET);
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -417,7 +417,7 @@ class spell_hun_ascpect_of_the_viper : public AuraScript
     {
         // Hunter T7 4P Bonus
         if (GetTarget()->HasAura(SPELL_HUNTER_VIPER_ATTACK_SPEED))
-            GetTarget()->RemoveAurasDueToSpell(SPELL_HUNTER_VICIOUS_VIPER);
+            GetTarget()->RemoveAura(SPELL_HUNTER_VICIOUS_VIPER);
     }
 
     void Register() override
@@ -1040,7 +1040,7 @@ class spell_hun_viper_attack_speed : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         // possible exploit
-        GetTarget()->RemoveAurasDueToSpell(SPELL_HUNTER_VICIOUS_VIPER);
+        GetTarget()->RemoveAura(SPELL_HUNTER_VICIOUS_VIPER);
     }
 
     void Register() override

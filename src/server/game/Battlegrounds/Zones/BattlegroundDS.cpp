@@ -122,7 +122,7 @@ void BattlegroundDS::StartingEventOpenDoors()
     // Remove effects of Demonic Circle Summon
     for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         if (itr->second->HasAura(48018))
-            itr->second->RemoveAurasDueToSpell(48018);
+            itr->second->RemoveAura(48018);
 }
 
 void BattlegroundDS::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -136,7 +136,7 @@ void BattlegroundDS::HandleAreaTrigger(Player* player, uint32 trigger)
         case 5348:
             // Remove effects of Demonic Circle Summon
             if (player->HasAura(SPELL_WARL_DEMONIC_CIRCLE))
-                player->RemoveAurasDueToSpell(SPELL_WARL_DEMONIC_CIRCLE);
+                player->RemoveAura(SPELL_WARL_DEMONIC_CIRCLE);
 
             // Someone has get back into the pipes and the knockback has already been performed,
             // so we reset the knockback count for kicking the player again into the arena.

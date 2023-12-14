@@ -88,7 +88,7 @@ struct boss_buru : public BossAI
         _phase = PHASE_EGG;
         instance->SetData(DATA_BURU_PHASE, _phase);
         ManipulateEggs(true);
-        me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
+        me->RemoveAura(SPELL_FULL_SPEED);
         events.ScheduleEvent(EVENT_DISMEMBER, 5s);
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
     }
@@ -116,7 +116,7 @@ struct boss_buru : public BossAI
         if (_phase != PHASE_EGG)
             return;
 
-        me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        me->RemoveAura(SPELL_GATHERING_SPEED);
         events.CancelEvent(EVENT_GATHERING_SPEED);
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
@@ -139,8 +139,8 @@ struct boss_buru : public BossAI
         {
             DoCastSelf(SPELL_FULL_SPEED, true);
             ManipulateEggs(false);
-            me->RemoveAurasDueToSpell(SPELL_THORNS);
-            me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+            me->RemoveAura(SPELL_THORNS);
+            me->RemoveAura(SPELL_GATHERING_SPEED);
             events.Reset();
             _phase = PHASE_TRANSFORM;
             instance->SetData(DATA_BURU_PHASE, _phase);

@@ -559,7 +559,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                     sBattlegroundMgr->BuildBattlegroundStatusPacket(&status, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, 0, GetStartTime(), GetArenaType(), player->GetBgTeamId());
                     player->GetSession()->SendPacket(&status);
 
-                    player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+                    player->RemoveAura(SPELL_ARENA_PREPARATION);
                     player->ResetAllPowers();
                     // remove auras with duration lower than 30s
                     Unit::AuraApplicationMap& auraMap = player->GetAppliedAuras();
@@ -612,7 +612,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             {
-                itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
+                itr->second->RemoveAura(SPELL_PREPARATION);
                 itr->second->ResetAllPowers();
             }
 
@@ -1377,7 +1377,7 @@ void Battleground::RemovePlayerFromResurrectQueue(Player* player)
             if (*itr2 == player->GetGUID())
             {
                 itr->second.erase(itr2);
-                player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
+                player->RemoveAura(SPELL_WAITING_FOR_RESURRECT);
                 return;
             }
 }

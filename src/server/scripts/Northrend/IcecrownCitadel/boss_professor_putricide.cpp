@@ -608,7 +608,7 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     AttackStart(me->GetVictim());
                     // remove Tear Gas
-                    me->RemoveAurasDueToSpell(SPELL_TEAR_GAS_PERIODIC_TRIGGER);
+                    me->RemoveAura(SPELL_TEAR_GAS_PERIODIC_TRIGGER);
                     DoCastAOE(SPELL_TEAR_GAS_CANCEL);
                     if (_phase == 3)
                         summons.DespawnIf(AbominationDespawner(me));
@@ -1176,7 +1176,7 @@ public:
             uint32 adhesiveId = sSpellMgr->GetSpellIdForDifficulty(SPELL_VOLATILE_OOZE_ADHESIVE, GetCaster());
             if (GetHitUnit()->HasAura(adhesiveId))
             {
-                GetHitUnit()->RemoveAurasDueToSpell(adhesiveId, GetCaster()->GetGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
+                GetHitUnit()->RemoveAura(adhesiveId, GetCaster()->GetGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_OOZE_ERUPTION, true);
             }
         }
@@ -1295,7 +1295,7 @@ public:
                             newPlague->SetMaxDuration(oldPlague->GetMaxDuration());
                             newPlague->SetDuration(oldPlague->GetDuration());
                             oldPlague->Remove();
-                            GetCaster()->RemoveAurasDueToSpell(SPELL_UNBOUND_PLAGUE_SEARCHER);
+                            GetCaster()->RemoveAura(SPELL_UNBOUND_PLAGUE_SEARCHER);
                             GetCaster()->CastSpell(GetCaster(), SPELL_PLAGUE_SICKNESS, true);
                             GetCaster()->CastSpell(GetCaster(), SPELL_UNBOUND_PLAGUE_PROTECTION, true);
                             professor->CastSpell(GetHitUnit(), SPELL_UNBOUND_PLAGUE_SEARCHER, true);
@@ -1396,7 +1396,7 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
             uint32 auraId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster());
-            GetHitUnit()->RemoveAurasDueToSpell(auraId);
+            GetHitUnit()->RemoveAura(auraId);
         }
 
         void Register() override
@@ -1655,7 +1655,7 @@ public:
             {
                 if (grow->GetStackAmount() <= 4)
                 {
-                    target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
+                    target->RemoveAura(SPELL_GROW_STACKER);
                     target->RemoveAura(grow);
                     target->DespawnOrUnsummon(1);
                 }

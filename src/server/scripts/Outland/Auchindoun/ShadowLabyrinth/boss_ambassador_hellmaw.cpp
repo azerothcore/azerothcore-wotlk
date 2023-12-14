@@ -83,7 +83,7 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             return;
         }
-        me->RemoveAurasDueToSpell(SPELL_BANISH);
+        me->RemoveAura(SPELL_BANISH);
         Talk(SAY_INTRO);
         DoPlaySoundToSet(me, SOUND_INTRO);
         isBanished = false;

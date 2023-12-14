@@ -344,7 +344,7 @@ public:
                     if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
                         owner->CastSpell(owner, _spellEntry, true);
                     else if (!instance->IsEncounterInProgress())
-                        owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
+                        owner->RemoveAura(SPELL_WEB_FRONT_DOORS);
                 }
         }
 

@@ -162,7 +162,7 @@ public:
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
-                me->RemoveAurasDueToSpell(SPELL_FORGE_BLADE);
+                me->RemoveAura(SPELL_FORGE_BLADE);
                 me->CastSpell(me, SPELL_FORGE_MACE, false);
                 Talk(SAY_HP_33);
             }

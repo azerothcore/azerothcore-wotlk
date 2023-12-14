@@ -949,7 +949,7 @@ public:
                 case EVENT_HEALTH_CHECK:
                     if (HealthAbovePct(25))
                     {
-                        me->RemoveAurasDueToSpell(SPELL_ICEBOUND_ARMOR);
+                        me->RemoveAura(SPELL_ICEBOUND_ARMOR);
                         _didUnderTenPercentText = false;
                     }
                     else
@@ -1101,7 +1101,7 @@ public:
         {
             if (spell->Id == SPELL_HURL_SPEAR && me->HasAura(SPELL_AETHER_SHIELD))
             {
-                me->RemoveAurasDueToSpell(SPELL_AETHER_SHIELD);
+                me->RemoveAura(SPELL_AETHER_SHIELD);
                 Talk(EMOTE_SVALNA_BROKEN_SHIELD, caster);
             }
         }
@@ -1979,7 +1979,7 @@ public:
                 if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
                 {
                     (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
-                    (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
+                    (*itr)->RemoveAura(SPELL_STONEFORM);
                     (*itr)->AI()->SetData(1, 1);
                     break;
                 }
@@ -2119,12 +2119,12 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+            GetHitUnit()->RemoveAura(uint32(GetEffectValue()));
         }
 
         void HandleQuestComplete(SpellEffIndex /*effIndex*/)
         {
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+            GetHitUnit()->RemoveAura(uint32(GetEffectValue()));
         }
 
         void Register() override
@@ -2207,7 +2207,7 @@ public:
             if (Creature* target = GetHitCreature())
             {
                 if (Unit* vehicle = target->GetVehicleBase())
-                    vehicle->RemoveAurasDueToSpell(SPELL_IMPALING_SPEAR);
+                    vehicle->RemoveAura(SPELL_IMPALING_SPEAR);
                 target->DespawnOrUnsummon(1);
             }
         }

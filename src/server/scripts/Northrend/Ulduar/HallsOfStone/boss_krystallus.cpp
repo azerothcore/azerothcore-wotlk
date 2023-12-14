@@ -193,7 +193,7 @@ public:
         {
             if (Unit* target = GetHitUnit())
             {
-                target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
+                target->RemoveAura(GROUND_SLAM_STONED_EFFECT);
                 target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
             }
         }

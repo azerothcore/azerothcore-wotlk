@@ -1198,7 +1198,7 @@ public:
             float horizontalSpeed = 3.0f;
             float verticalSpeed = 40.0f;
             player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
-            player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
+            player->RemoveAura(SPELL_WARHEAD_FUSE);
 
             std::list<Creature*> explosionBunnys;
             caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
@@ -1314,7 +1314,7 @@ class spell_frog_kiss : public SpellScript
     {
         if (Player* target = GetHitPlayer())
         {
-            target->RemoveAurasDueToSpell(SPELL_WARTSBGONE_LIP_BALM);
+            target->RemoveAura(SPELL_WARTSBGONE_LIP_BALM);
         }
     }
 

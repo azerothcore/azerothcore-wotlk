@@ -156,7 +156,7 @@ public:
                             DoCast(target, SPELL_AMBUSH, true);
                         }
                         me->SetDynamicFlag(_dynamicFlags);
-                        me->RemoveAurasDueToSpell(SPELL_VANISH);
+                        me->RemoveAura(SPELL_VANISH);
                         me->SetReactState(REACT_AGGRESSIVE);
                         break;
                     case EVENT_GOUGE:

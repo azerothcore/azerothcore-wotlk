@@ -93,7 +93,7 @@ class spell_zereketh_seed_of_corruption: public AuraScript
     {
         PreventDefaultAction();
         uint32 val = GetSpellInfo()->GetEffect(EFFECT_1).BasePoints;
-        GetTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+        GetTarget()->RemoveAura(GetSpellInfo()->Id);
 
         if (GetCaster())
         {

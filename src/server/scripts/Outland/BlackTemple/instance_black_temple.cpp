@@ -322,12 +322,12 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CHARM);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_STUN);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_DECREASE_SPEED);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_ROOT);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CONFUSE);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_FEAR);
+            target->RemoveAura(SPELL_AURA_MOD_CHARM);
+            target->RemoveAura(SPELL_AURA_MOD_STUN);
+            target->RemoveAura(SPELL_AURA_MOD_DECREASE_SPEED);
+            target->RemoveAura(SPELL_AURA_MOD_ROOT);
+            target->RemoveAura(SPELL_AURA_MOD_CONFUSE);
+            target->RemoveAura(SPELL_AURA_MOD_FEAR);
         }
 
         void Register() override
@@ -515,7 +515,7 @@ public:
                 return;
 
             GetUnitOwner()->CastCustomSpell(GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, SPELLVALUE_BASE_POINT0, effect->GetAmount()*count, GetUnitOwner(), TRIGGERED_FULL_MASK);
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
+            GetUnitOwner()->RemoveAura(SPELL_CHAOTIC_CHARGE);
         }
 
         void Register() override

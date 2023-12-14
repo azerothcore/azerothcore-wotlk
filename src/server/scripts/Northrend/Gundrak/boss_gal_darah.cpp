@@ -119,7 +119,7 @@ public:
             BossAI::JustEngagedWith(who);
 
             ScheduleEvents(true);
-            me->RemoveAurasDueToSpell(SPELL_START_VISUAL);
+            me->RemoveAura(SPELL_START_VISUAL);
             me->InterruptNonMeleeSpells(true);
         }
 
@@ -258,7 +258,7 @@ public:
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
-                target->RemoveAurasDueToSpell(SPELL_TRANSFORM_TO_RHINO);
+                target->RemoveAura(SPELL_TRANSFORM_TO_RHINO);
         }
 
         void Register() override

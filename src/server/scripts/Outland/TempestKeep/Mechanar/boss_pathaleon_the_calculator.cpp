@@ -109,7 +109,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             context.Repeat(18s);
         }).Schedule(16s, [this](TaskContext context)
         {
-            me->RemoveAurasDueToSpell(SPELL_MANA_TAP);
+            me->RemoveAura(SPELL_MANA_TAP);
             me->ModifyPower(POWER_MANA, 5000);
             DoCastSelf(SPELL_ARCANE_TORRENT);
             context.Repeat(15s);

@@ -70,8 +70,8 @@ public:
                 {
                     if (p->GetZoneId() == me->GetZoneId())
                     {
-                        p->RemoveAurasDueToSpell(SPELL_CHILL);
-                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
+                        p->RemoveAura(SPELL_CHILL);
+                        p->RemoveAura(SPELL_FROST_BREATH);
                     }
                 });
         }
@@ -126,16 +126,16 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
+            me->RemoveAura(SPELL_MARK_OF_FROST);
             me->GetMap()->DoForAllPlayers([&](Player* p)
                 {
                     if (p->GetZoneId() == me->GetZoneId())
                     {
 
-                        p->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
-                        p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
-                        p->RemoveAurasDueToSpell(SPELL_CHILL);
-                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
+                        p->RemoveAura(SPELL_MARK_OF_FROST);
+                        p->RemoveAura(SPELL_AURA_OF_FROST);
+                        p->RemoveAura(SPELL_CHILL);
+                        p->RemoveAura(SPELL_FROST_BREATH);
                     }
                 });
 

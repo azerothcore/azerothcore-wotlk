@@ -237,7 +237,7 @@ public:
 
                 if (!summons.HasEntry(NPC_HAND_OF_THE_DECEIVER))
                 {
-                    me->RemoveAurasDueToSpell(SPELL_ANVEENA_ENERGY_DRAIN);
+                    me->RemoveAura(SPELL_ANVEENA_ENERGY_DRAIN);
                     me->SummonCreature(NPC_KILJAEDEN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 1.5f, 4.3f, TEMPSUMMON_MANUAL_DESPAWN);
                     me->SummonCreature(NPC_KALECGOS_KJ, 1726.80f, 661.43f, 138.65f, 3.95f, TEMPSUMMON_MANUAL_DESPAWN);
                 }
@@ -486,7 +486,7 @@ public:
                     Talk(SAY_KJ_PHASE5);
                     break;
                 case EVENT_RESTORE_MELEE:
-                    me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
+                    me->RemoveAura(SPELL_CUSTOM_08_STATE);
                     me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     break;
             }
@@ -1229,7 +1229,7 @@ public:
 
         void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
+            GetUnitOwner()->RemoveAura(SPELL_POSSESS_DRAKE_IMMUNITY);
         }
 
         void Register() override

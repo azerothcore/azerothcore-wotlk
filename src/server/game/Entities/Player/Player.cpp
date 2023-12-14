@@ -2256,7 +2256,7 @@ void Player::SetGMVisible(bool on)
 
     if (on)
     {
-        RemoveAurasDueToSpell(VISUAL_AURA);
+        RemoveAura(VISUAL_AURA);
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
 
@@ -2953,7 +2953,7 @@ void Player::_removeTalentAurasAndSpells(uint32 spellId)
 
         // pussywizard: remove all triggered auras
         if (spellInfo->Effects[i].TriggerSpell > 0)
-            RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
+            RemoveAura(spellInfo->Effects[i].TriggerSpell);
 
         // xinef: remove temporary spells added by talent
         // xinef: recursively remove all learnt spells
@@ -3341,7 +3341,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
 
         // pussywizard: remove all triggered auras
         if (spellInfo->Effects[i].TriggerSpell > 0)
-            RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
+            RemoveAura(spellInfo->Effects[i].TriggerSpell);
     }
 
     // pussywizard: update free primary prof points
@@ -4392,8 +4392,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // remove death flag + set aura
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    RemoveAurasDueToSpell(20584);                           // speed bonuses
-    RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
+    RemoveAura(20584);  // speed bonuses
+    RemoveAura(8326);   // SPELL_AURA_GHOST
 
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
@@ -7088,14 +7088,14 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
         if (item)
             RemoveAurasDueToItemSpell(spellInfo->Id, item->GetGUID());  // un-apply all spells, not only at-equipped
         else
-            RemoveAurasDueToSpell(spellInfo->Id);           // un-apply spell (item set case)
+            RemoveAura(spellInfo->Id);           // un-apply spell (item set case)
 
         // Xinef: Remove Proc Spells and Summons
         for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
         {
             // Xinef: Remove procs
             if (spellInfo->Effects[i].TriggerSpell)
-                RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
+                RemoveAura(spellInfo->Effects[i].TriggerSpell);
 
             // Xinef: remove minions summoned by item
             if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SUMMON)
@@ -8848,7 +8848,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         {
             if ((*itr)->GetMiscValue() == 2228)
             {
-                RemoveAurasDueToSpell((*itr)->GetId());
+                RemoveAura((*itr)->GetId());
                 itr = auraClassScripts.begin();
             }
             else
@@ -8942,7 +8942,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         {
             if ((*itr)->GetMiscValue() == 2228)
             {
-                RemoveAurasDueToSpell((*itr)->GetId());
+                RemoveAura((*itr)->GetId());
                 itr = auraClassScripts.begin();
             }
             else
@@ -10343,7 +10343,7 @@ void Player::CleanupAfterTaxiFlight()
     // For spells that trigger flying paths remove them at arrival
     if (m_flightSpellActivated)
     {
-        this->RemoveAurasDueToSpell(m_flightSpellActivated);
+        this->RemoveAura(m_flightSpellActivated);
         m_flightSpellActivated = 0;
     }
     m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
@@ -15037,7 +15037,7 @@ void Player::ActivateSpec(uint8 spec)
         if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
             if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
             {
-                RemoveAurasDueToSpell(glyphEntry->SpellId);
+                RemoveAura(glyphEntry->SpellId);
                 removedSpecAuras.insert(glyphEntry->SpellId);
             }
 
@@ -15165,7 +15165,7 @@ void Player::ActivateSpec(uint8 spec)
 
     // Xinef: Patch 3.2.0: Switching spec removes paladins spell Righteous Fury (25780)
     if (getClass() == CLASS_PALADIN)
-        RemoveAurasDueToSpell(25780);
+        RemoveAura(25780);
 
     // Xinef: Remove talented single target auras at other targets
     AuraList& scAuras = GetSingleCastAuras();
@@ -15285,7 +15285,7 @@ void Player::SetIsSpectator(bool on)
     }
     else
     {
-        RemoveAurasDueToSpell(SPECTATOR_SPELL_SPEED);
+        RemoveAura(SPECTATOR_SPELL_SPEED);
         if (IsSpectator())
             ClearUnitState(UNIT_STATE_ISOLATED);
         m_ExtraFlags &= ~PLAYER_EXTRA_SPECTATOR_ON;

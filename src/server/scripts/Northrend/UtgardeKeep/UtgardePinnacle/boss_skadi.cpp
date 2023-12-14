@@ -359,7 +359,7 @@ public:
             {
                 case 0:
                 case 1:
-                    me->RemoveAurasDueToSpell(SPELL_FREEZING_CLOUD_VISUAL);
+                    me->RemoveAura(SPELL_FREEZING_CLOUD_VISUAL);
                     me->SetFacingTo(M_PI * 2);
                     break;
                 case 2:

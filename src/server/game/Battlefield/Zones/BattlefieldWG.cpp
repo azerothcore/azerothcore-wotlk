@@ -472,7 +472,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             {
                 if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 {
-                    player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
+                    player->RemoveAura(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
                     player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
                 }
             }
@@ -830,14 +830,14 @@ void BattlefieldWG::PromotePlayer(Player* killer)
 
 void BattlefieldWG::RemoveAurasFromPlayer(Player* player)
 {
-    player->RemoveAurasDueToSpell(SPELL_RECRUIT);
-    player->RemoveAurasDueToSpell(SPELL_CORPORAL);
-    player->RemoveAurasDueToSpell(SPELL_LIEUTENANT);
-    player->RemoveAurasDueToSpell(SPELL_TOWER_CONTROL);
-    player->RemoveAurasDueToSpell(SPELL_SPIRITUAL_IMMUNITY);
-    player->RemoveAurasDueToSpell(SPELL_TENACITY);
-    player->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_WINTERGRASP);
-    player->RemoveAurasDueToSpell(SPELL_WINTERGRASP_RESTRICTED_FLIGHT_AREA);
+    player->RemoveAura(SPELL_RECRUIT);
+    player->RemoveAura(SPELL_CORPORAL);
+    player->RemoveAura(SPELL_LIEUTENANT);
+    player->RemoveAura(SPELL_TOWER_CONTROL);
+    player->RemoveAura(SPELL_SPIRITUAL_IMMUNITY);
+    player->RemoveAura(SPELL_TENACITY);
+    player->RemoveAura(SPELL_ESSENCE_OF_WINTERGRASP);
+    player->RemoveAura(SPELL_WINTERGRASP_RESTRICTED_FLIGHT_AREA);
 }
 
 void BattlefieldWG::OnPlayerJoinWar(Player* player)
@@ -888,10 +888,10 @@ void BattlefieldWG::OnPlayerLeaveZone(Player* player)
     if (!m_isActive)
         RemoveAurasFromPlayer(player);
 
-    player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT);
-    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT);
-    player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
-    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
+    player->RemoveAura(SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT);
+    player->RemoveAura(SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT);
+    player->RemoveAura(SPELL_HORDE_CONTROL_PHASE_SHIFT);
+    player->RemoveAura(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
 }
 
 void BattlefieldWG::OnPlayerEnterZone(Player* player)
@@ -1164,11 +1164,11 @@ void BattlefieldWG::UpdateTenacity()
     {
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->RemoveAurasDueToSpell(SPELL_TENACITY);
+                player->RemoveAura(SPELL_TENACITY);
 
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
             if (Creature* creature = GetCreature(*itr))
-                creature->RemoveAurasDueToSpell(SPELL_TENACITY_VEHICLE);
+                creature->RemoveAura(SPELL_TENACITY_VEHICLE);
     }
 
     // Apply new buff

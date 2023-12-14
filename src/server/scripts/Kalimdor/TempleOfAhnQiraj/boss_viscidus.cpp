@@ -119,16 +119,16 @@ struct boss_viscidus : public BossAI
     {
         BossAI::Reset();
         SoftReset();
-        me->RemoveAurasDueToSpell(SPELL_VISCIDUS_SHRINKS);
+        me->RemoveAura(SPELL_VISCIDUS_SHRINKS);
     }
 
     void SoftReset()
     {
         _hitcounter = 0;
-        me->RemoveAurasDueToSpell(SPELL_STUN_SELF);
+        me->RemoveAura(SPELL_STUN_SELF);
         me->SetReactState(REACT_AGGRESSIVE);
         _phase = PHASE_FROST;
-        me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+        me->RemoveAura(SPELL_INVIS_SELF);
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask spellSchoolMask) override
@@ -247,7 +247,7 @@ struct boss_viscidus : public BossAI
             if (_phase == PHASE_GLOB)
             {
                 _phase = PHASE_FROST;
-                me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+                me->RemoveAura(SPELL_INVIS_SELF);
             }
 
             int32 heal = me->GetMaxHealth() * 0.05f;

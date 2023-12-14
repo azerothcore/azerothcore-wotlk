@@ -91,7 +91,7 @@ struct boss_anzu : public BossAI
             summons.RemoveNotExisting();
             if (!summons.HasEntry(NPC_BROOD_OF_ANZU))
             {
-                me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
+                me->RemoveAura(SPELL_BANISH_SELF);
             }
         }
     }
@@ -164,7 +164,7 @@ struct boss_anzu : public BossAI
             else if (talkTimer >= 16000)
             {
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
+                me->RemoveAura(SPELL_SHADOWFORM);
                 Talk(SAY_ANZU_INTRO2);
                 talkTimer = 0;
                 me->SetInCombatWithZone();
@@ -193,8 +193,8 @@ struct npc_anzu_spirit : public ScriptedAI
                 // Check for Druid HoTs every 2400ms
                 if (me->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 64, 0))
                 {
-                    me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-                    me->RemoveAurasDueToSpell(SPELL_STONEFORM);
+                    me->RemoveAura(SPELL_FREEZE_ANIM);
+                    me->RemoveAura(SPELL_STONEFORM);
 
                     switch (me->GetEntry())
                     {

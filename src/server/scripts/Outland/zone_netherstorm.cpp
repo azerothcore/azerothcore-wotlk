@@ -233,7 +233,7 @@ public:
                 case EVENT_START_FIGHT2:
                     if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
                     {
-                        dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
+                        dimensius->RemoveAura(SPELL_DIMENSIUS_TRANSFORM);
                         dimensius->ReplaceAllUnitFlags(UNIT_FLAG_DISABLE_MOVE);
                         AttackStart(dimensius);
                         fight = true;

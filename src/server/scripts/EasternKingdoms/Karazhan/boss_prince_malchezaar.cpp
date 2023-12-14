@@ -118,7 +118,7 @@ struct boss_malchezaar : public BossAI
         });
 
         ScheduleHealthCheckEvent(30, [&] {
-            me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
+            me->RemoveAura(SPELL_THRASH_AURA);
             Talk(SAY_AXE_TOSS2);
             _phase = PHASE_THREE;
             clearweapons();

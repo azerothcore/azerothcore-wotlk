@@ -189,7 +189,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
                     summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, false);
-                    summon->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
+                    summon->RemoveAura(SPELL_WHITE_SPHERE);
                     summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     summon->SetStandState(UNIT_STAND_STATE_KNEEL);
                     oocSummons.push_back(summon->GetGUID());
@@ -365,9 +365,9 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->SetImmuneToAll(false);
                 me->SetReactState(REACT_AGGRESSIVE);
 
-                me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
-                me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
-                me->RemoveAurasDueToSpell(SPELL_HOVER_FALL);
+                me->RemoveAura(SPELL_SPHERE_VISUAL);
+                me->RemoveAura(SPELL_LIGHTNING_BOLTS);
+                me->RemoveAura(SPELL_HOVER_FALL);
                 SetCombatMovement(true);
 
                 me->SetDisableGravity(false);
@@ -596,7 +596,7 @@ struct npc_twilight_volunteer : public ScriptedAI
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             DoCastSelf(SPELL_ACTIVATE_INITIATE, true);
-            me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
+            me->RemoveAura(SPELL_WHITE_SPHERE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetImmuneToAll(false);

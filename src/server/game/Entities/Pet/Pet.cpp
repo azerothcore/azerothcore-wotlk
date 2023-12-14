@@ -1987,7 +1987,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     else
         itr->second.state = PETSPELL_REMOVED;
 
-    RemoveAurasDueToSpell(spell_id);
+    RemoveAura(spell_id);
 
     uint32 talentCost = GetTalentSpellCost(spell_id);
     if (talentCost > 0)

@@ -259,7 +259,7 @@ public:
             if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
                 return;
 
-            GetCaster()->RemoveAurasDueToSpell(SPELL_RALLY);
+            GetCaster()->RemoveAura(SPELL_RALLY);
             if (count > 0)
                 GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
         }

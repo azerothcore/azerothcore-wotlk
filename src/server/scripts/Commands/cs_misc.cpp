@@ -683,7 +683,7 @@ public:
             return false;
         }
 
-        target->RemoveAurasDueToSpell(spell->Id);
+        target->RemoveAura(spell->Id);
 
         return true;
     }
@@ -2868,13 +2868,13 @@ public:
         if (!creatureTarget && playerTarget && playerTarget->HasAura(SPELL_FREEZE))
         {
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());
-            playerTarget->RemoveAurasDueToSpell(SPELL_FREEZE);
+            playerTarget->RemoveAura(SPELL_FREEZE);
             return true;
         }
         else if (creatureTarget && creatureTarget->HasAura(SPELL_FREEZE))
         {
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, GetLocalizeCreatureName(creatureTarget, handler->GetSessionDbcLocale()).c_str());
-            creatureTarget->RemoveAurasDueToSpell(SPELL_FREEZE);
+            creatureTarget->RemoveAura(SPELL_FREEZE);
             return true;
         }
         else if (!creatureTarget && target && !target->IsConnected())

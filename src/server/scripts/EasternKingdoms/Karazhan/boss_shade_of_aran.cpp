@@ -190,7 +190,7 @@ struct boss_shade_of_aran : public BossAI
 
         if ((damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE) && _drinking && me->GetReactState() == REACT_PASSIVE)
         {
-            me->RemoveAurasDueToSpell(SPELL_DRINK);
+            me->RemoveAura(SPELL_DRINK);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
@@ -215,7 +215,7 @@ struct boss_shade_of_aran : public BossAI
             _drinkScheduler.Schedule(0s, GROUP_DRINKING, [this](TaskContext)
             {
                 me->InterruptNonMeleeSpells(true);
-                me->RemoveAurasDueToSpell(SPELL_ARCANE_MISSILE);
+                me->RemoveAura(SPELL_ARCANE_MISSILE);
                 Talk(SAY_DRINK);
                 DoCastAOE(SPELL_MASS_POLY);
                 // If we set drinking earlier it will break when someone attacks aran while casting poly
@@ -450,7 +450,7 @@ class spell_flamewreath_aura : public AuraScript
                     target->CastSpell(target, SPELL_FLAME_WREATH_RAN_THRU, true);
 
                     target->m_Events.AddEventAtOffset([target] {
-                        target->RemoveAurasDueToSpell(SPELL_FLAME_WREATH_RAN_THRU);
+                        target->RemoveAura(SPELL_FLAME_WREATH_RAN_THRU);
                         target->CastSpell(target, SPELL_FLAME_WREATH_EXPLOSION, true);
                     }, 1s);
                 }

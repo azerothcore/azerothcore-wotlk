@@ -830,7 +830,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
+                caster->RemoveAura(SPELL_RUBY_EVASIVE_MANEUVERS);
                 caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
             }
         }
@@ -867,7 +867,7 @@ public:
             if (!caster->getAttackers().empty())
             {
                 if (caster->HasAura(SPELL_SOAR_BUFF))
-                    caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
+                    caster->RemoveAura(SPELL_SOAR_BUFF);
 
                 PreventDefaultAction();
                 return;
@@ -957,12 +957,12 @@ public:
             if (drake)
             {
                 drake->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
-                drake->RemoveAurasDueToSpell(GetId());
-                drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
-                drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
+                drake->RemoveAura(GetId());
+                drake->RemoveAura(SPELL_SOAR_TRIGGER);
+                drake->RemoveAura(SPELL_RUBY_EVASIVE_AURA);
             }
             caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+            caster->RemoveAura(SPELL_DRAKE_FLAG_VISUAL);
         }
 
         void Register() override
@@ -1000,7 +1000,7 @@ public:
             if (!drake)
             {
                 caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+                caster->RemoveAura(SPELL_DRAKE_FLAG_VISUAL);
             }
         }
 

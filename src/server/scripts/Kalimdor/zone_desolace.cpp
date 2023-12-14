@@ -497,7 +497,7 @@ public:
         if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
             player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
-            player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
+            player->RemoveAura(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
         SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());

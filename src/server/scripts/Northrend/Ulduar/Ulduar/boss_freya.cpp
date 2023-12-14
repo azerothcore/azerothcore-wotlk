@@ -1008,7 +1008,7 @@ public:
             _healTimer += diff;
             if (_healTimer >= 12000)
             {
-                me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
+                me->RemoveAura(SPELL_AUTO_GROW);
                 me->CastSpell(me, me->GetMap()->Is25ManRaid() ? SPELL_LIFEBINDER_HEAL_25 : SPELL_LIFEBINDER_HEAL_10, true);
                 me->DespawnOrUnsummon(2000);
                 _healTimer = 0;
@@ -1048,7 +1048,7 @@ public:
             _despawnTimer += diff;
             if (_despawnTimer >= 22000)
             {
-                me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
+                me->RemoveAura(SPELL_AUTO_GROW);
                 me->DespawnOrUnsummon(2200);
                 _despawnTimer = 0;
             }

@@ -643,7 +643,7 @@ public:
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
                                     c->SetImmuneToAll(false);
-                                    c->RemoveAurasDueToSpell(70300);
+                                    c->RemoveAura(70300);
                                 }
                                 break;
                             case 8:

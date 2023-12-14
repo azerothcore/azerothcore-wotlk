@@ -861,13 +861,13 @@ struct npc_corrupted_totem : public ScriptedAI
                     {
                         if (curr->HasAura(spellId))
                         {
-                            curr->RemoveAurasDueToSpell(spellId);
+                            curr->RemoveAura(spellId);
                         }
                     }
                 }
                 else
                 {
-                    curr->RemoveAurasDueToSpell(spellId);
+                    curr->RemoveAura(spellId);
                 }
             }
         }
@@ -939,7 +939,7 @@ struct npc_drakonid_spawner : public ScriptedAI
     {
         if (action == ACTION_SPAWNER_STOP)
         {
-            me->RemoveAurasDueToSpell(SPELL_SPAWN_DRAKONID_GEN);
+            me->RemoveAura(SPELL_SPAWN_DRAKONID_GEN);
             _scheduler.CancelAll();
         }
     }

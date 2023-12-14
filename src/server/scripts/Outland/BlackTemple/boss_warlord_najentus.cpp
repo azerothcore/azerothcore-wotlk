@@ -139,7 +139,7 @@ class spell_najentus_hurl_spine : public SpellScript
         Unit* target = GetHitUnit();
         if (target && target->HasAura(SPELL_TIDAL_SHIELD))
         {
-            target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
+            target->RemoveAura(SPELL_TIDAL_SHIELD);
             target->CastSpell(target, SPELL_TIDAL_BURST, true);
         }
     }

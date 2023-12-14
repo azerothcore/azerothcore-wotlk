@@ -253,7 +253,7 @@ public:
                 return;
             }
 
-            me->RemoveAurasDueToSpell(SPELL_FEIGN_DEATH); // just in case
+            me->RemoveAura(SPELL_FEIGN_DEATH); // just in case
             me->setActive(true);
             DoZoneInCombat();
             if (!me->hasLootRecipient())
@@ -386,8 +386,8 @@ public:
                     break;
                 case ACTION_REMOVE_INVOCATION:
                     _isEmpowered = false;
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_VISUAL_ACTIVE);
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_OF_BLOOD_KELESETH);
+                    me->RemoveAura(SPELL_INVOCATION_VISUAL_ACTIVE);
+                    me->RemoveAura(SPELL_INVOCATION_OF_BLOOD_KELESETH);
                     break;
                 default:
                     break;
@@ -513,7 +513,7 @@ public:
                 return;
             }
 
-            me->RemoveAurasDueToSpell(SPELL_FEIGN_DEATH); // just in case
+            me->RemoveAura(SPELL_FEIGN_DEATH); // just in case
             me->setActive(true);
             DoZoneInCombat();
             if (!me->hasLootRecipient())
@@ -656,8 +656,8 @@ public:
                     break;
                 case ACTION_REMOVE_INVOCATION:
                     _isEmpowered = false;
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_VISUAL_ACTIVE);
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_OF_BLOOD_TALDARAM);
+                    me->RemoveAura(SPELL_INVOCATION_VISUAL_ACTIVE);
+                    me->RemoveAura(SPELL_INVOCATION_OF_BLOOD_TALDARAM);
                     break;
                 case ACTION_FLAME_BALL_CHASE:
                     summons.DoAction(ACTION_FLAME_BALL_CHASE);
@@ -800,7 +800,7 @@ public:
 
             instance->SetBossState(DATA_BLOOD_PRINCE_COUNCIL, IN_PROGRESS);
             instance->SetData(DATA_ORB_WHISPERER_ACHIEVEMENT, 1);
-            me->RemoveAurasDueToSpell(SPELL_FEIGN_DEATH); // just in case
+            me->RemoveAura(SPELL_FEIGN_DEATH); // just in case
             me->setActive(true);
             DoZoneInCombat();
             if (!me->hasLootRecipient())
@@ -951,8 +951,8 @@ public:
                     break;
                 case ACTION_REMOVE_INVOCATION:
                     _isEmpowered = false;
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_VISUAL_ACTIVE);
-                    me->RemoveAurasDueToSpell(SPELL_INVOCATION_OF_BLOOD_VALANAR);
+                    me->RemoveAura(SPELL_INVOCATION_VISUAL_ACTIVE);
+                    me->RemoveAura(SPELL_INVOCATION_OF_BLOOD_VALANAR);
                     break;
                 default:
                     break;
@@ -1281,7 +1281,7 @@ public:
         {
             if (type == CHASE_MOTION_TYPE && !_exploded)
             {
-                me->RemoveAurasDueToSpell(SPELL_BALL_OF_FLAMES_PERIODIC);
+                me->RemoveAura(SPELL_BALL_OF_FLAMES_PERIODIC);
                 me->SetReactState(REACT_PASSIVE);
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->StopMoving();
@@ -1629,7 +1629,7 @@ public:
             if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))
             {
                 bomb->CastSpell(bomb, SPELL_KINETIC_BOMB_EXPLOSION, true);
-                bomb->RemoveAurasDueToSpell(SPELL_KINETIC_BOMB_VISUAL);
+                bomb->RemoveAura(SPELL_KINETIC_BOMB_VISUAL);
                 target->RemoveAura(GetAura());
                 bomb->AI()->DoAction(SPELL_KINETIC_BOMB_EXPLOSION);
             }

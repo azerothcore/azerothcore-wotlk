@@ -269,7 +269,7 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
+        GetUnitOwner()->RemoveAura(SPELL_SCALDING_WATER);
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)

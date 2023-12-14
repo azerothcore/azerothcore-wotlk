@@ -4232,7 +4232,7 @@ void Unit::ProcessTerrainStatusUpdate()
     if (curLiquid != _lastLiquid)
     {
         if (_lastLiquid && _lastLiquid->SpellId)
-            RemoveAurasDueToSpell(_lastLiquid->SpellId);
+            RemoveAura(_lastLiquid->SpellId);
 
         // Set _lastLiquid before casting liquid spell to avoid infinite loops
         _lastLiquid = curLiquid;
@@ -4851,22 +4851,6 @@ void Unit::RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication
     }
 }
 
-void Unit::RemoveAurasDueToSpell(uint32 spellId, ObjectGuid casterGUID, uint8 reqEffMask, AuraRemoveMode removeMode)
-{
-    for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
-    {
-        Aura const* aura = iter->second->GetBase();
-        if (((aura->GetEffectMask() & reqEffMask) == reqEffMask)
-                && (!casterGUID || aura->GetCasterGUID() == casterGUID))
-        {
-            RemoveAura(iter, removeMode);
-            iter = m_appliedAuras.lower_bound(spellId);
-        }
-        else
-            ++iter;
-    }
-}
-
 void Unit::RemoveAuraFromStack(uint32 spellId, ObjectGuid casterGUID, AuraRemoveMode removeMode)
 {
     AuraMapBoundsNonConst range = m_ownedAuras.equal_range(spellId);
@@ -4922,7 +4906,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId
                                         if (aura->GetUnitOwner() )
                                             if (const std::vector<int32>* spell_triggered = sSpellMgr->GetSpellLinked(-int32(aura->GetId())))
                                                 for (std::vector<int32>::const_iterator itr = spell_triggered->begin(); itr != spell_triggered->end(); ++itr)
-                                                    aura->GetUnitOwner()->RemoveAurasDueToSpell(*itr);
+                                                    aura->GetUnitOwner()->RemoveAura(*itr);
                                     }
                                 }
                             }
@@ -4935,7 +4919,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId
                         if (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x4000000)
                         {
                             if (AuraEffect* aureff = GetAuraEffect(SPELL_AURA_MOD_DECREASE_SPEED, SPELLFAMILY_DEATHKNIGHT, 0, 0x40000, 0, casterGUID))
-                                RemoveAurasDueToSpell(aureff->GetId());
+                                RemoveAura(aureff->GetId());
                         }
                     }
                 default:
@@ -6150,7 +6134,7 @@ void Unit::RemoveGameObject(GameObject* gameObj, bool del)
     // GO created by some spell
     if (uint32 spellid = gameObj->GetSpellId())
     {
-        RemoveAurasDueToSpell(spellid);
+        RemoveAura(spellid);
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
@@ -7132,7 +7116,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         ObjectGuid casterGuid = triggeredByAura->GetCasterGUID();
 
                         // Remove aura (before cast for prevent infinite loop handlers)
-                        RemoveAurasDueToSpell(triggeredByAura->GetId());
+                        RemoveAura(triggeredByAura->GetId());
 
                         uint32 spell = sSpellMgr->GetSpellWithRank(27285, dummySpell->GetRank());
 
@@ -7160,7 +7144,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         ObjectGuid casterGuid = triggeredByAura->GetCasterGUID();
 
                         // Remove aura (before cast for prevent infinite loop handlers)
-                        RemoveAurasDueToSpell(triggeredByAura->GetId());
+                        RemoveAura(triggeredByAura->GetId());
 
                         // Cast finish spell (triggeredByAura already not exist!)
                         if (Unit* caster = ObjectAccessor::GetUnit(*this, casterGuid))
@@ -7962,7 +7946,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (!dummy || dummy->GetStackAmount() < (dummySpell->Id == 71406 ? 8 : 7))
                                 return false;
 
-                            RemoveAurasDueToSpell(71432);
+                            RemoveAura(71432);
                             triggered_spell_id = 71433;  // default main hand attack
                             // roll if offhand
                             if (Player const* player = ToPlayer())
@@ -9264,7 +9248,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                                 if (!dummy || dummy->GetStackAmount() < triggerAmount)
                                     return false;
 
-                                RemoveAurasDueToSpell(stack_spell_id);
+                                RemoveAura(stack_spell_id);
                                 CastSpell(victim, trigger_spell_id, true, nullptr, triggeredByAura);
                                 return true;
                             }
@@ -9669,7 +9653,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             {
                 if (HasAura(70718))
                     CastSpell(this, 70721, true);
-                RemoveAurasDueToSpell(trigger_spell_id);
+                RemoveAura(trigger_spell_id);
                 break;
             }
         // Shamanistic Rage triggered spell
@@ -9721,14 +9705,14 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         if (GetAura((trigger_spell_id == 46916) ? 71072 : 71069))
                             return false;
                         // Xinef: just to be sure
-                        RemoveAurasDueToSpell(70849);
+                        RemoveAura(70849);
                         break;
                     }
 
                     // Xinef: fully remove all auras and reapply once more
-                    RemoveAurasDueToSpell(70849);
-                    RemoveAurasDueToSpell(71072);
-                    RemoveAurasDueToSpell(71069);
+                    RemoveAura(70849);
+                    RemoveAura(71072);
+                    RemoveAura(71069);
 
                     CastSpell(this, 70849, true, castItem, triggeredByAura); // Extra Charge!
                     if (trigger_spell_id == 46916)
@@ -14229,7 +14213,7 @@ void Unit::SetVisible(bool x)
 void Unit::SetModelVisible(bool on)
 {
     if (on)
-        RemoveAurasDueToSpell(24401);
+        RemoveAura(24401);
     else
         CastSpell(this, 24401, true);
 }
@@ -17566,9 +17550,9 @@ void Unit::RemovePetAura(PetAura const* petSpell)
 
     m_petAuras.erase(petSpell);
     if (Pet* pet = ToPlayer()->GetPet())
-        pet->RemoveAurasDueToSpell(petSpell->GetAura(pet->GetEntry()));
+        pet->RemoveAura(petSpell->GetAura(pet->GetEntry()));
     if (Unit* charm = GetCharm())
-        charm->RemoveAurasDueToSpell(petSpell->GetAura(charm->GetEntry()));
+        charm->RemoveAura(petSpell->GetAura(charm->GetEntry()));
 }
 
 void Unit::CastPetAura(PetAura const* aura)

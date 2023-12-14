@@ -404,7 +404,7 @@ void BattlegroundEY::EventPlayerDroppedFlag(Player* player)
         return;
 
     SetFlagPicker(ObjectGuid::Empty);
-    player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
+    player->RemoveAura(BG_EY_NETHERSTORM_FLAG_SPELL);
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
@@ -526,7 +526,7 @@ void BattlegroundEY::EventPlayerCapturedFlag(Player* player, uint32 BgObjectType
 {
     SetFlagPicker(ObjectGuid::Empty);
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
-    player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
+    player->RemoveAura(BG_EY_NETHERSTORM_FLAG_SPELL);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     SpawnBGObject(BgObjectType, RESPAWN_IMMEDIATELY);

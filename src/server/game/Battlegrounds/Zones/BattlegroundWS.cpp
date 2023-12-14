@@ -91,12 +91,12 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
             case BG_WS_EVENT_BOTH_FLAGS_KEPT15:
                 if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_ALLIANCE)))
                 {
-                    player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
+                    player->RemoveAura(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
                 if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_HORDE)))
                 {
-                    player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
+                    player->RemoveAura(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
                 break;
@@ -200,14 +200,14 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
 
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_WARSONG_FLAG);
+        player->RemoveAura(BG_WS_SPELL_WARSONG_FLAG);
         PlaySoundToAll(BG_WS_SOUND_FLAG_CAPTURED_ALLIANCE);
         SendBroadcastText(BG_WS_TEXT_CAPTURED_HORDE_FLAG, CHAT_MSG_BG_SYSTEM_ALLIANCE, player);
         RewardReputationToTeam(890, _reputationCapture, TEAM_ALLIANCE);
     }
     else
     {
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_SILVERWING_FLAG);
+        player->RemoveAura(BG_WS_SPELL_SILVERWING_FLAG);
         PlaySoundToAll(BG_WS_SOUND_FLAG_CAPTURED_HORDE);
         SendBroadcastText(BG_WS_TEXT_CAPTURED_ALLIANCE_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, player);
         RewardReputationToTeam(889, _reputationCapture, TEAM_HORDE);
@@ -240,9 +240,9 @@ void BattlegroundWS::EventPlayerDroppedFlag(Player* player)
         return;
 
     SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(player->GetTeamId()));
-    player->RemoveAurasDueToSpell(BG_WS_SPELL_WARSONG_FLAG);
-    player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
-    player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
+    player->RemoveAura(BG_WS_SPELL_WARSONG_FLAG);
+    player->RemoveAura(BG_WS_SPELL_FOCUSED_ASSAULT);
+    player->RemoveAura(BG_WS_SPELL_BRUTAL_ASSAULT);
 
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -581,12 +581,12 @@ void BattlegroundWS::RemoveAssaultAuras()
 {
     if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_ALLIANCE)))
     {
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
+        player->RemoveAura(BG_WS_SPELL_FOCUSED_ASSAULT);
+        player->RemoveAura(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
     if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_HORDE)))
     {
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
-        player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
+        player->RemoveAura(BG_WS_SPELL_FOCUSED_ASSAULT);
+        player->RemoveAura(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
 }

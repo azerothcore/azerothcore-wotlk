@@ -199,7 +199,7 @@ class spell_winter_veil_racer_slam_hit : public SpellScript
         if (Player* targetSummoner = target->GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             //targetSummoner->RemoveCriteriaProgress(sAchievementCriteriaStore.LookupEntry(RACER_ACHI_CRITERIA)); !ZOMG, ADD ACCESSOR
-            targetSummoner->RemoveAurasDueToSpell(SPELL_RACER_KILL_COUNTER);
+            targetSummoner->RemoveAura(SPELL_RACER_KILL_COUNTER);
         }
     }
 

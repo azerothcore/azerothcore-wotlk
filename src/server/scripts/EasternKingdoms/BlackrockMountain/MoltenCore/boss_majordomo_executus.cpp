@@ -484,7 +484,7 @@ public:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
-                                    ragnaros->RemoveAurasDueToSpell(SPELL_RAGNAROS_FADE);
+                                    ragnaros->RemoveAura(SPELL_RAGNAROS_FADE);
                                     ragnaros->CastSpell(ragnaros, SPELL_RAGNA_EMERGE);
                                 }
                             }break;

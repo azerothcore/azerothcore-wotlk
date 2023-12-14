@@ -125,7 +125,7 @@ public:
             if (remove)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->RemoveAurasDueToSpell(SPELL_FROZEN_PRISON);
+                me->RemoveAura(SPELL_FROZEN_PRISON);
             }
             else
             {

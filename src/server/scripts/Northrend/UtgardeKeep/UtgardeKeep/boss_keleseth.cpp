@@ -95,7 +95,7 @@ public:
 
             if (PrisonerGUID)
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
-                    p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
+                    p->RemoveAura(SPELL_FROST_TOMB_AURA);
             me->DespawnOrUnsummon(5000);
         }
 

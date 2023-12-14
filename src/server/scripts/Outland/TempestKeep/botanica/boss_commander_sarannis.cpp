@@ -122,7 +122,7 @@ class spell_commander_sarannis_arcane_devastation : public AuraScript
 
     void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_ARCANE_RESONANCE);
+        GetTarget()->RemoveAura(SPELL_ARCANE_RESONANCE);
     }
 
     void Register() override

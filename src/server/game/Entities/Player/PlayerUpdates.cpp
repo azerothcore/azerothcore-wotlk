@@ -1799,7 +1799,7 @@ void Player::UpdateTitansGrip()
 {
     // 10% damage reduce if 2x2h weapons are used
     if (!CanTitanGrip())
-        RemoveAurasDueToSpell(49152);
+        RemoveAura(49152);
     else if (Aura* aur = GetAura(49152))
         aur->RecalculateAmountOfEffects();
 }

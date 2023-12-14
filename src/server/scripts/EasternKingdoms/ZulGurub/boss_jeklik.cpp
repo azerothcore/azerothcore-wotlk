@@ -137,7 +137,7 @@ struct boss_jeklik : public BossAI
         Talk(SAY_AGGRO);
         DoZoneInCombat();
 
-        me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
+        me->RemoveAura(SPELL_GREEN_CHANNELING);
         me->SetDisableGravity(true);
         DoCastSelf(SPELL_BAT_FORM, true);
 
@@ -200,7 +200,7 @@ struct boss_jeklik : public BossAI
         //
         ScheduleHealthCheckEvent(50, [&]
         {
-            me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
+            me->RemoveAura(SPELL_BAT_FORM);
             DoResetThreatList();
 
             scheduler.CancelGroup(PHASE_ONE);

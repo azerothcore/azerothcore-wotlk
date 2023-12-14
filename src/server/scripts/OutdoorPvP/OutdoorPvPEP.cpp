@@ -673,12 +673,12 @@ void OutdoorPvPEP::HandlePlayerLeaveZone(Player* player, uint32 zone)
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
         for (int i = 0; i < 4; ++i)
-            player->RemoveAurasDueToSpell(EP_AllianceBuffs[i]);
+            player->RemoveAura(EP_AllianceBuffs[i]);
     }
     else
     {
         for (int i = 0; i < 4; ++i)
-            player->RemoveAurasDueToSpell(EP_HordeBuffs[i]);
+            player->RemoveAura(EP_HordeBuffs[i]);
     }
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
@@ -690,7 +690,7 @@ void OutdoorPvPEP::BuffTeams()
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
         {
             for (int i = 0; i < 4; ++i)
-                player->RemoveAurasDueToSpell(EP_AllianceBuffs[i]);
+                player->RemoveAura(EP_AllianceBuffs[i]);
             if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
                 player->CastSpell(player, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
@@ -700,7 +700,7 @@ void OutdoorPvPEP::BuffTeams()
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
         {
             for (int i = 0; i < 4; ++i)
-                player->RemoveAurasDueToSpell(EP_HordeBuffs[i]);
+                player->RemoveAura(EP_HordeBuffs[i]);
             if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
                 player->CastSpell(player, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
         }

@@ -303,7 +303,7 @@ public:
                     me->KillSelf();
                     break;
                 case EVENT_START_BLACK_HOLE:
-                    me->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_SUMMON_VISUAL2);
+                    me->RemoveAura(SPELL_BLACK_HOLE_SUMMON_VISUAL2);
                     me->CastSpell(me, SPELL_BLACK_HOLE_VISUAL2, true);
                     me->CastSpell(me, SPELL_BLACK_HOLE_PASSIVE, true);
                     break;

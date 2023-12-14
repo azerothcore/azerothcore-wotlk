@@ -379,7 +379,7 @@ public:
                             }
                         case 5:
                             Talk(SAY_BREAKOUT9);
-                            me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
+                            me->RemoveAura(SPELL_ANTI_MAGIC_ZONE);
                             // i do not know why the armor will also be removed
                             m_uiWave_Timer = 2500;
                             break;

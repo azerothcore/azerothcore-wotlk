@@ -185,10 +185,10 @@ public:
 
             if (Unit* vehSummoner = victim->ToTempSummon()->GetSummonerUnit())
             {
-                vehSummoner->RemoveAurasDueToSpell(SPELL_NO_SUMMON_AURA);
-                vehSummoner->RemoveAurasDueToSpell(SPELL_DETECT_INVIS);
-                vehSummoner->RemoveAurasDueToSpell(SPELL_SPIRIT_OF_THE_TIGER_RIDER);
-                vehSummoner->RemoveAurasDueToSpell(SPELL_SUMMON_ZENTABRA_TRIGGER);
+                vehSummoner->RemoveAura(SPELL_NO_SUMMON_AURA);
+                vehSummoner->RemoveAura(SPELL_DETECT_INVIS);
+                vehSummoner->RemoveAura(SPELL_SPIRIT_OF_THE_TIGER_RIDER);
+                vehSummoner->RemoveAura(SPELL_SUMMON_ZENTABRA_TRIGGER);
             }
             me->DespawnOrUnsummon();
         }
@@ -207,10 +207,10 @@ public:
                     vehSummoner->AddAura(SPELL_SUMMON_ZENTABRA_TRIGGER);
                     vehSummoner->CastSpell(vehSummoner, SPELL_SUMMON_ZENTABRA, true);
                     attacker->CastSpell(attacker, SPELL_EJECT_PASSENGERS, true);
-                    vehSummoner->RemoveAurasDueToSpell(SPELL_NO_SUMMON_AURA);
-                    vehSummoner->RemoveAurasDueToSpell(SPELL_DETECT_INVIS);
-                    vehSummoner->RemoveAurasDueToSpell(SPELL_SPIRIT_OF_THE_TIGER_RIDER);
-                    vehSummoner->RemoveAurasDueToSpell(SPELL_SUMMON_ZENTABRA_TRIGGER);
+                    vehSummoner->RemoveAura(SPELL_NO_SUMMON_AURA);
+                    vehSummoner->RemoveAura(SPELL_DETECT_INVIS);
+                    vehSummoner->RemoveAura(SPELL_SPIRIT_OF_THE_TIGER_RIDER);
+                    vehSummoner->RemoveAura(SPELL_SUMMON_ZENTABRA_TRIGGER);
                 }
 
                 me->DespawnOrUnsummon();
@@ -341,7 +341,7 @@ public:
                 _complete = true;    // Preventing from giving credit twice
                 DoCast(me, SPELL_TURNIN);
                 DoCast(me, SPELL_QUEST_CREDIT);
-                me->RemoveAurasDueToSpell(SPELL_MOUNTING_CHECK);
+                me->RemoveAura(SPELL_MOUNTING_CHECK);
                 me->Dismount();
                 Talk(SAY_VOLUNTEER_END);
                 me->GetMotionMaster()->MovePoint(POINT_URUZIN, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());

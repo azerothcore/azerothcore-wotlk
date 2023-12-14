@@ -1466,7 +1466,7 @@ public:
             if (!owner)
                 return;
 
-            owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
+            owner->RemoveAura(SPELL_PASSENGER_LOADED);
         }
 
         void Register() override
@@ -1557,7 +1557,7 @@ public:
                 return;
 
             owner->SetControlled(true, UNIT_STATE_STUNNED);
-            owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+            owner->RemoveAura(SPELL_GATHERING_SPEED);
             if (Vehicle* veh = owner->GetVehicleKit())
                 if (Unit* cannon = veh->GetPassenger(SEAT_CANNON))
                     cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
@@ -1824,7 +1824,7 @@ public:
                 if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
                 {
                     target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
-                    target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
+                    target->RemoveAura(SPELL_OVERLOAD_CIRCUIT);
                 }
         }
 
@@ -1951,7 +1951,7 @@ public:
 
             if (target)
             {
-                target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
+                target->RemoveAura(SPELL_TRANSITUS_SHIELD_IMPACT);
             }
         }
 

@@ -50,7 +50,7 @@ public:
 
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSSESS);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSSESSED);
-            me->RemoveAurasDueToSpell(SPELL_POSSESS_INV);
+            me->RemoveAura(SPELL_POSSESS_INV);
 
             _scheduler.CancelAll();
 
@@ -100,9 +100,9 @@ public:
                         {
                             if (!possessedTarget->HasAura(SPELL_POSSESSED) || possessedTarget->HealthBelowPct(50))
                             {
-                                possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESS);
-                                possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESSED);
-                                me->RemoveAurasDueToSpell(SPELL_POSSESS_INV);
+                                possessedTarget->RemoveAura(SPELL_POSSESS);
+                                possessedTarget->RemoveAura(SPELL_POSSESSED);
+                                me->RemoveAura(SPELL_POSSESS_INV);
                                 _possessedTargetGuid.Clear();
                                 SchedulePossession();
                             }

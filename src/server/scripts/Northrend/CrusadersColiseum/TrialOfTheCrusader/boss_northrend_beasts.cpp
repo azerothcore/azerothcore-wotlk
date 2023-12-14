@@ -213,7 +213,7 @@ public:
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 if( t->IsAlive() )
-                    t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
+                    t->RemoveAura(SPELL_SNOBOLLED);
             }
         }
 
@@ -615,7 +615,7 @@ struct boss_jormungarAI : public ScriptedAI
                         me->SetNativeDisplayId(_MODEL_STATIONARY);
                         SetCombatMovement(false);
                     }
-                    me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
+                    me->RemoveAura(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     Talk(EMOTE_EMERGE);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);

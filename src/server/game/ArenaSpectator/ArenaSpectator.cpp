@@ -195,7 +195,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::stri
         if (Unit* u = o->ToUnit())
         {
             u->RemoveAurasByType(SPELL_AURA_BIND_SIGHT, player->GetGUID());
-            player->RemoveAurasDueToSpell(SPECTATOR_SPELL_BINDSIGHT, player->GetGUID(), (1 << EFFECT_1));
+            player->RemoveAura(SPECTATOR_SPELL_BINDSIGHT, player->GetGUID(), (1 << EFFECT_1));
 
             if (u->GetGUID() == spectate->GetGUID())
                 return true;

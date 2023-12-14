@@ -1233,7 +1233,7 @@ public:
 
                 if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
                 {
-                    sartharion->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                    sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
                 }
             }
             else

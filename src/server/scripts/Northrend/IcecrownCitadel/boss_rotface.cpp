@@ -603,8 +603,8 @@ public:
             if (!GetHitCreature() || !GetHitCreature()->IsAlive())
                 return;
 
-            GetCaster()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
+            GetCaster()->RemoveAura(SPELL_LITTLE_OOZE_COMBINE);
+            GetHitCreature()->RemoveAura(SPELL_LITTLE_OOZE_COMBINE);
             GetHitCreature()->CastSpell(GetCaster(), SPELL_OOZE_MERGE, true);
             GetHitCreature()->DespawnOrUnsummon();
             if (GetCaster()->ToCreature())
@@ -666,8 +666,8 @@ public:
             // explode!
             if (newStack >= 5)
             {
-                GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
-                GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
+                GetCaster()->RemoveAura(SPELL_LARGE_OOZE_BUFF_COMBINE);
+                GetCaster()->RemoveAura(SPELL_LARGE_OOZE_COMBINE);
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                     if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
                         if (rotface->IsAlive())
@@ -684,8 +684,8 @@ public:
                     instance->SetData(DATA_OOZE_DANCE_ACHIEVEMENT, uint32(false));
             }
 
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
+            GetHitCreature()->RemoveAura(SPELL_LARGE_OOZE_BUFF_COMBINE);
+            GetHitCreature()->RemoveAura(SPELL_LARGE_OOZE_COMBINE);
             GetHitCreature()->DespawnOrUnsummon();
         }
 
@@ -729,8 +729,8 @@ public:
                 // explode!
                 if (newStack >= 5)
                 {
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
+                    GetCaster()->RemoveAura(SPELL_LARGE_OOZE_BUFF_COMBINE);
+                    GetCaster()->RemoveAura(SPELL_LARGE_OOZE_COMBINE);
                     if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                         if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
                             if (rotface->IsAlive())
@@ -748,7 +748,7 @@ public:
                 }
             }
 
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
+            GetHitCreature()->RemoveAura(SPELL_LITTLE_OOZE_COMBINE);
             GetHitCreature()->DespawnOrUnsummon();
         }
 

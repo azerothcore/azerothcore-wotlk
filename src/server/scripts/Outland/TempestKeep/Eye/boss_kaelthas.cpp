@@ -356,7 +356,7 @@ public:
             {
                 me->SetDisableGravity(false);
                 me->SetWalk(false);
-                me->RemoveAurasDueToSpell(SPELL_KAEL_FULL_POWER);
+                me->RemoveAura(SPELL_KAEL_FULL_POWER);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 events.SetTimer(60000);
@@ -546,9 +546,9 @@ public:
                     break;
                 case EVENT_SCENE_8:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA1);
-                    me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
-                    me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA3);
+                    me->RemoveAura(SPELL_NETHERBEAM_AURA1);
+                    me->RemoveAura(SPELL_NETHERBEAM_AURA2);
+                    me->RemoveAura(SPELL_NETHERBEAM_AURA3);
                     me->CastSpell(me, SPELL_KAEL_EXPLODES5, true);
                     me->CastSpell(me, SPELL_FLOATING_DROWNED, false);
                     //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
@@ -587,8 +587,8 @@ public:
                     //  trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
                     break;
                 case EVENT_SCENE_15:
-                    me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
-                    me->RemoveAurasDueToSpell(SPELL_KEAL_STUNNED);
+                    me->RemoveAura(SPELL_FLOATING_DROWNED);
+                    me->RemoveAura(SPELL_KEAL_STUNNED);
                     me->CastSpell(me, SPELL_KAEL_FULL_POWER, false);
                     me->CastSpell(me, 36709, true);
                     me->CastSpell(me, 36201, true);
@@ -599,7 +599,7 @@ public:
                     break;
                 case EVENT_SCENE_16:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL
+                    me->RemoveAura(52241); // WRONG VISUAL
                     me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
                     break;
             }

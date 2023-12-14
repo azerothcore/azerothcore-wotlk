@@ -88,7 +88,7 @@ struct boss_thekal : public BossAI
 
         me->SetStandState(UNIT_STAND_STATE_STAND);
         me->SetReactState(REACT_AGGRESSIVE);
-        me->RemoveAurasDueToSpell(SPELL_FRENZY);
+        me->RemoveAura(SPELL_FRENZY);
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         me->LoadEquipment(1, true);
 

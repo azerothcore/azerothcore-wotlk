@@ -209,7 +209,7 @@ public:
                     // A tank with more than 490 defense skills should receive no critical hit
                     //DoCast(me, 41296, true);
                     DoCastVictim(SPELL_SABER_LASH, true);
-                    //me->RemoveAurasDueToSpell(41296);
+                    //me->RemoveAura(41296);
                     SaberlashTimer = 30000;
                 }
                 else SaberlashTimer -= diff;

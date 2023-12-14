@@ -372,12 +372,12 @@ public:
                                 if (_tankGUID)
                                     if (Player* prevTank = ObjectAccessor::GetPlayer(*me, _tankGUID))
                                     {
-                                        prevTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_DAMAGE);
-                                        prevTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_VISUAL);
+                                        prevTank->RemoveAura(SPELL_BLOOD_MIRROR_DAMAGE);
+                                        prevTank->RemoveAura(SPELL_BLOOD_MIRROR_VISUAL);
                                     }
                                 if (_offtankGUID)
                                     if (Player* prevOfftank = ObjectAccessor::GetPlayer(*me, _offtankGUID))
-                                        prevOfftank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_DUMMY);
+                                        prevOfftank->RemoveAura(SPELL_BLOOD_MIRROR_DUMMY);
 
                                 if (target->GetDistance(me->GetVictim()) > 39.0f || me->GetDistance(me->GetVictim()) > 39.0f)
                                 {

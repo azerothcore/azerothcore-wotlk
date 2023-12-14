@@ -125,7 +125,7 @@ public:
             {
                 if (SayThanksTimer <= diff)
                 {
-                    me->RemoveAurasDueToSpell(SPELL_IRRIDATION);
+                    me->RemoveAura(SPELL_IRRIDATION);
 
                     if (Player* player = ObjectAccessor::GetPlayer(*me, pCaster))
                     {

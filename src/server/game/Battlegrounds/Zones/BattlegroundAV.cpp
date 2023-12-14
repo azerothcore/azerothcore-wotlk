@@ -533,9 +533,9 @@ void BattlegroundAV::EndBattleground(TeamId winnerTeamId)
 void BattlegroundAV::RemovePlayer(Player* player)
 {
     //TODO search more buffs
-    player->RemoveAurasDueToSpell(AV_BUFF_ARMOR);
-    player->RemoveAurasDueToSpell(AV_BUFF_A_CAPTAIN);
-    player->RemoveAurasDueToSpell(AV_BUFF_H_CAPTAIN);
+    player->RemoveAura(AV_BUFF_ARMOR);
+    player->RemoveAura(AV_BUFF_A_CAPTAIN);
+    player->RemoveAura(AV_BUFF_H_CAPTAIN);
 }
 
 void BattlegroundAV::HandleAreaTrigger(Player* player, uint32 trigger)

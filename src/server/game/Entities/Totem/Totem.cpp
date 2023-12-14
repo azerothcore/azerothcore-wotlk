@@ -128,7 +128,7 @@ void Totem::UnSummon(uint32 msTime)
     }
 
     CombatStop();
-    RemoveAurasDueToSpell(GetSpell(), GetGUID());
+    RemoveAura(GetSpell(), GetGUID());
 
     if (Unit* owner = GetOwner())
     {
@@ -142,11 +142,11 @@ void Totem::UnSummon(uint32 msTime)
             }
         }
 
-        owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+        owner->RemoveAura(GetSpell(), GetGUID());
 
         // Remove Sentry Totem Aura
         if (GetEntry() == SENTRY_TOTEM_ENTRY)
-            owner->RemoveAurasDueToSpell(static_cast<uint32>(TotemSpellIds::SentryTotemSpell));
+            owner->RemoveAura(static_cast<uint32>(TotemSpellIds::SentryTotemSpell));
 
         //remove aura all party members too
         if (Player* player = owner->ToPlayer())
@@ -162,7 +162,7 @@ void Totem::UnSummon(uint32 msTime)
                 {
                     Player* target = itr->GetSource();
                     if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
-                        target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+                        target->RemoveAura(GetSpell(), GetGUID());
                 }
             }
         }

@@ -255,7 +255,7 @@ public:
             {
                 if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
                 {
-                    victim->RemoveAurasDueToSpell(me->m_spells[0], me->GetGUID());
+                    victim->RemoveAura(me->m_spells[0], me->GetGUID());
                 }
             }
         }

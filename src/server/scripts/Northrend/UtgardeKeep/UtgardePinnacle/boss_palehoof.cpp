@@ -261,7 +261,7 @@ public:
                             if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter - 1])))
                             {
                                 miniBoss->AI()->DoAction(ACTION_UNFREEZE2);
-                                orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
+                                orb->RemoveAura(SPELL_AWAKEN_SUBBOSS);
                             }
                             else
                                 EnterEvadeMode();
@@ -281,9 +281,9 @@ public:
                     {
                         Talk(SAY_AGGRO);
                         if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
-                            orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
+                            orb->RemoveAura(SPELL_AWAKEN_SUBBOSS);
 
-                        me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                        me->RemoveAura(SPELL_FREEZE);
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         me->SetControlled(false, UNIT_STATE_STUNNED);
                         // SETINCOMBATWITHZONE
@@ -378,7 +378,7 @@ public:
             }
             else if (param == ACTION_UNFREEZE2)
             {
-                me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                me->RemoveAura(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
@@ -504,7 +504,7 @@ public:
             }
             else if (param == ACTION_UNFREEZE2)
             {
-                me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                me->RemoveAura(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
@@ -614,7 +614,7 @@ public:
             }
             else if (param == ACTION_UNFREEZE2)
             {
-                me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                me->RemoveAura(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
@@ -722,7 +722,7 @@ public:
             }
             else if (param == ACTION_UNFREEZE2)
             {
-                me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                me->RemoveAura(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 

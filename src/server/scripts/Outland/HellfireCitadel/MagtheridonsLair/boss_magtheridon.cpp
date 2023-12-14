@@ -158,7 +158,7 @@ struct boss_magtheridon : public BossAI
         me->SetImmuneToPC(false);
         me->SetReactState(REACT_AGGRESSIVE);
         instance->SetData(DATA_ACTIVATE_CUBES, 1);
-        me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
+        me->RemoveAura(SPELL_SHADOW_CAGE);
 
         scheduler.Schedule(9s, [this](TaskContext context)
         {

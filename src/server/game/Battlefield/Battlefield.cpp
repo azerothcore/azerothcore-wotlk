@@ -710,7 +710,7 @@ void BfGraveyard::RemovePlayer(ObjectGuid playerGuid)
     m_ResurrectQueue.erase(m_ResurrectQueue.find(playerGuid));
 
     if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-        player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
+        player->RemoveAura(SPELL_WAITING_FOR_RESURRECT);
 }
 
 void BfGraveyard::Resurrect()

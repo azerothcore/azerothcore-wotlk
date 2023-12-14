@@ -2263,7 +2263,7 @@ namespace lfg
             // Remove Dungeon Finder Cooldown if still exists
             if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
             {
-                player->RemoveAurasDueToSpell(LFG_SPELL_DUNGEON_COOLDOWN);
+                player->RemoveAura(LFG_SPELL_DUNGEON_COOLDOWN);
             }
 
             // Xinef: Update achievements, set correct amount of randomly grouped players

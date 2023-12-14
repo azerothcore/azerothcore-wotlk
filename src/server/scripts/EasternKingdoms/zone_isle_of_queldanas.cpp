@@ -181,7 +181,7 @@ public:
             {
                 if (summon->GetEntry() == NPC_MORLEN_COLDGRIP)
                 {
-                    me->RemoveAurasDueToSpell(67541);
+                    me->RemoveAura(67541);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     me->GetMotionMaster()->MoveCharge(11779.30f, -7065.43f, 24.92f, me->GetSpeed(MOVE_RUN), EVENT_CHARGE);
                     events.ScheduleEvent(EVENT_OUTRO_0, 0);
@@ -191,7 +191,7 @@ public:
                 }
                 else if (summons.size() == 1)
                 {
-                    me->RemoveAurasDueToSpell(67541);
+                    me->RemoveAura(67541);
                     me->GetMotionMaster()->MoveCharge(11779.30f, -7065.43f, 24.92f, me->GetSpeed(MOVE_RUN), EVENT_CHARGE);
                     switch(summon->GetEntry())
                     {

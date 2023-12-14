@@ -299,7 +299,7 @@ void OutdoorPvPTF::HandlePlayerEnterZone(Player* player, uint32 zone)
 void OutdoorPvPTF::HandlePlayerLeaveZone(Player* player, uint32 zone)
 {
     // remove buffs
-    player->RemoveAurasDueToSpell(TF_CAPTURE_BUFF);
+    player->RemoveAura(TF_CAPTURE_BUFF);
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
 

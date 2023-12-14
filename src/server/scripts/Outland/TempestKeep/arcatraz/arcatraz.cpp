@@ -603,7 +603,7 @@ public:
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Unit* caster = GetCaster())
-                caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
+                caster->RemoveAura(SPELL_SOUL_STEAL);
         }
 
         void Register() override

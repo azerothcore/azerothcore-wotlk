@@ -1212,7 +1212,7 @@ public:
                             extinguished = true;
                             if (urand(0, 2))
                             {
-                                banner->RemoveAurasDueToSpell(SPELL_COSMETIC_FIRE);
+                                banner->RemoveAura(SPELL_COSMETIC_FIRE);
                                 continue;
                             }
                         }
@@ -1220,7 +1220,7 @@ public:
                     }
 
             if (fireCount == 0)
-                GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
+                GetCaster()->RemoveAura(SPELL_BURNING);
         }
 
         void Register() override
@@ -1343,7 +1343,7 @@ public:
                             if (Unit* turret = kit->GetPassenger(SEAT_TURRET))
                             {
                                 me->SetSpeed(MOVE_FLIGHT, 1.2f);
-                                owner->RemoveAurasDueToSpell(SPELL_WAITING_FOR_A_BOMBER);
+                                owner->RemoveAura(SPELL_WAITING_FOR_A_BOMBER);
                                 turret->HandleSpellClick(owner, 0);
                                 return;
                             }
@@ -1415,7 +1415,7 @@ public:
                                 if (stackAmount)
                                     station->SetAuraStack(SPELL_INFRA_GREEN_SHIELD, station, stackAmount);
                                 else
-                                    station->RemoveAurasDueToSpell(SPELL_INFRA_GREEN_SHIELD);
+                                    station->RemoveAura(SPELL_INFRA_GREEN_SHIELD);
                             }
                         if (!playerPresent)
                             me->DespawnOrUnsummon(1);
@@ -1495,8 +1495,8 @@ class spell_deliver_gryphon : public SpellScript
                 if (Unit* player = gryphon->GetPassenger(SEAT_PLAYER))
                 {
                     player->ExitVehicle();
-                    player->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
-                    player->RemoveAurasDueToSpell(SPELL_ONSLAUGHT_GRYPHON);
+                    player->RemoveAura(VEHICLE_SPELL_PARACHUTE);
+                    player->RemoveAura(SPELL_ONSLAUGHT_GRYPHON);
                     player->SummonCreature(NPC_CAPTURED_ONSLAUGHT_GRYPHON, 7434.7f, 4213.3f, 316.52f, 3.88f, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
                 }
             }

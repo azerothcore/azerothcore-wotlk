@@ -196,7 +196,7 @@ public:
                     if (!_isDead)
                     {
                         _isDead = true;
-                        me->RemoveAurasDueToSpell(SPELL_ALLURING_PERFUME);
+                        me->RemoveAura(SPELL_ALLURING_PERFUME);
                         DoCastSelf(SPELL_PERMANENT_FEIGN_DEATH, true);
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         Talk(SAY_HUMMEL_DEATH);

@@ -214,7 +214,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_END1)
             {
-                me->RemoveAurasDueToSpell(SPELL_FELMYST_SPEED_BURST);
+                me->RemoveAura(SPELL_FELMYST_SPEED_BURST);
                 me->SetFacingTo(1.57f);
                 if (events.GetNextEventTime(EVENT_FLIGHT_BREATH1) != 0)
                     events.ScheduleEvent(EVENT_FLIGHT_BREATH2, 2000);
@@ -229,7 +229,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_END2)
             {
-                me->RemoveAurasDueToSpell(SPELL_FELMYST_SPEED_BURST);
+                me->RemoveAura(SPELL_FELMYST_SPEED_BURST);
                 me->SetFacingTo(4.71f);
             }
         }
@@ -520,8 +520,8 @@ public:
 
         void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
+            GetTarget()->RemoveAura(SPELL_FOG_OF_CORRUPTION_CHARM);
+            GetTarget()->RemoveAura(SPELL_FOG_OF_CORRUPTION_CHARM2);
             Unit::Kill(GetCaster(), GetTarget(), false);
         }
 

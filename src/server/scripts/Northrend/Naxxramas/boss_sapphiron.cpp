@@ -379,7 +379,7 @@ public:
                         {
                             if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
                             {
-                                block->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
+                                block->RemoveAura(SPELL_ICEBOLT_TRIGGER);
                             }
                         }
                     }

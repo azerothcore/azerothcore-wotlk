@@ -98,7 +98,7 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
         _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, urand(5000, 20000));
         //_events.ScheduleEvent(EVENT_SHAMAN_FIRESHIELD, 0);
 
-        me->RemoveAurasDueToSpell(SPELL_SHAMAN_FIRESHIELD);
+        me->RemoveAura(SPELL_SHAMAN_FIRESHIELD);
         me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
     }
 

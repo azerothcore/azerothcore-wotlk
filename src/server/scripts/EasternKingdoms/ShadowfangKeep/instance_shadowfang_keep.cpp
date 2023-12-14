@@ -206,7 +206,7 @@ public:
         void HandleDummyTick(AuraEffect const*  /*aurEff*/)
         {
             PreventDefaultAction();
-            GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
+            GetUnitOwner()->RemoveAura(_forsakenSpell);
             _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
             if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
                 ++_forsakenSpell;

@@ -621,7 +621,7 @@ public:
             if (spell->Id == SPELL_ELUNE_CANDLE)
             {
                 if (me->HasAura(SPELL_OMEN_STARFALL))
-                    me->RemoveAurasDueToSpell(SPELL_OMEN_STARFALL);
+                    me->RemoveAura(SPELL_OMEN_STARFALL);
 
                 events.RescheduleEvent(EVENT_CAST_STARFALL, 14s, 16s);
             }

@@ -83,7 +83,7 @@ void OutdoorPvPSI::HandlePlayerEnterZone(Player* player, uint32 zone)
 void OutdoorPvPSI::HandlePlayerLeaveZone(Player* player, uint32 zone)
 {
     // remove buffs
-    player->RemoveAurasDueToSpell(SI_CENARION_FAVOR);
+    player->RemoveAura(SI_CENARION_FAVOR);
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
 
@@ -97,7 +97,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
             if (player->GetTeamId() == TEAM_ALLIANCE && player->HasAura(SI_SILITHYST_FLAG))
             {
                 // remove aura
-                player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
+                player->RemoveAura(SI_SILITHYST_FLAG);
                 ++ m_Gathered_A;
                 if (m_Gathered_A >= SI_MAX_RESOURCES)
                 {
@@ -123,7 +123,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
             if (player->GetTeamId() == TEAM_HORDE && player->HasAura(SI_SILITHYST_FLAG))
             {
                 // remove aura
-                player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
+                player->RemoveAura(SI_SILITHYST_FLAG);
                 ++ m_Gathered_H;
                 if (m_Gathered_H >= SI_MAX_RESOURCES)
                 {

@@ -229,7 +229,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                 {
                     if (Creature* piece = ObjectAccessor::GetCreature(*me, guid))
                     {
-                        piece->RemoveAurasDueToSpell(SPELL_HAND_OF_MEDIVH);
+                        piece->RemoveAura(SPELL_HAND_OF_MEDIVH);
                     }
                 }
             }
@@ -1521,7 +1521,7 @@ struct npc_chesspiece : public ScriptedAI
             _charmerGUID = charmer->GetGUID();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetWalk(true);
-            charmer->RemoveAurasDueToSpell(SPELL_GAME_IN_SESSION);
+            charmer->RemoveAura(SPELL_GAME_IN_SESSION);
 
             // Build new action bar
             if (Player* playerCharmer = charmer->ToPlayer())
@@ -1562,7 +1562,7 @@ struct npc_chesspiece : public ScriptedAI
 
             if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
             {
-                charmer->RemoveAurasDueToSpell(SPELL_CONTROL_PIECE);
+                charmer->RemoveAura(SPELL_CONTROL_PIECE);
                 charmer->CastSpell(charmer, SPELL_GAME_IN_SESSION, true);
                 charmer->CastSpell(charmer, SPELL_RECENTLY_INGAME, true);
                 charmer->NearTeleportTo(-11106.92f, -1843.32f, 229.626f, 4.2331f);

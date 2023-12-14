@@ -226,7 +226,7 @@ struct boss_volazj : public BossAI
             insanityPhase = false;
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            me->RemoveAurasDueToSpell(INSANITY_VISUAL);
+            me->RemoveAura(INSANITY_VISUAL);
         }
 
         events.Update(diff);
@@ -304,7 +304,7 @@ private:
             {
                 if (uint32 const insanityAura = GetPlrInsanityAuraId(pPlayer->GetPhaseMask()))
                 {
-                    pPlayer->RemoveAurasDueToSpell(insanityAura);
+                    pPlayer->RemoveAura(insanityAura);
                 }
             }
         }
@@ -334,7 +334,7 @@ private:
             Player* pPlayer = i.GetSource();
             if (pPlayer && !(pPlayer->GetPhaseMask() & phase))
             {
-                pPlayer->RemoveAurasDueToSpell(GetPlrInsanityAuraId(pPlayer->GetPhaseMask()));
+                pPlayer->RemoveAura(GetPlrInsanityAuraId(pPlayer->GetPhaseMask()));
             }
         }
 

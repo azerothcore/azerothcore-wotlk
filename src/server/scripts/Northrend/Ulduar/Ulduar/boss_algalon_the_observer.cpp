@@ -649,7 +649,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_INTRO_1:
-                    me->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
+                    me->RemoveAura(SPELL_RIDE_THE_LIGHTNING);
                     Talk(SAY_ALGALON_INTRO_1);
                     break;
                 case EVENT_INTRO_2:
@@ -1206,7 +1206,7 @@ public:
         {
             PreventDefaultAction();
             if (GetStackAmount() != 1)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 2]);
+                GetTarget()->RemoveAura(PhasePunchAlphaId[GetStackAmount() - 2]);
             GetTarget()->CastSpell(GetTarget(), PhasePunchAlphaId[GetStackAmount() - 1], TRIGGERED_FULL_MASK);
             if (GetStackAmount() == 5)
                 Remove(AURA_REMOVE_BY_DEFAULT);
@@ -1215,7 +1215,7 @@ public:
         void OnRemove(AuraEffect const*, AuraEffectHandleModes)
         {
             if (GetStackAmount() != 5)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 1]);
+                GetTarget()->RemoveAura(PhasePunchAlphaId[GetStackAmount() - 1]);
         }
 
         void Register() override
@@ -1392,7 +1392,7 @@ public:
         {
             PreventDefaultAction();
             GetTarget()->RemoveAurasByType(SPELL_AURA_PHASE);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_DAMAGE);
+            GetTarget()->RemoveAura(SPELL_BLACK_HOLE_DAMAGE);
         }
 
         void Register() override

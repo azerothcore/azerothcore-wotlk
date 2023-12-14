@@ -103,7 +103,7 @@ struct boss_moam : public BossAI
         {
             if (me->HasAura(SPELL_ENERGIZE))
             {
-                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                me->RemoveAura(SPELL_ENERGIZE);
                 events.RescheduleEvent(EVENT_STONE_PHASE_END, 1s);
             }
 
@@ -123,7 +123,7 @@ struct boss_moam : public BossAI
                     events.ScheduleEvent(EVENT_STONE_PHASE_END, 90s);
                     break;
                 case EVENT_STONE_PHASE_END:
-                    me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                    me->RemoveAura(SPELL_ENERGIZE);
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 2s, 6s);
                     events.ScheduleEvent(EVENT_STONE_PHASE, 90s);
                     break;

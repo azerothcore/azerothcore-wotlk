@@ -1545,11 +1545,11 @@ class spell_dk_ghoul_thrash : public SpellScript
 
             if (Unit* caster = GetCaster())
             {
-                caster->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+                caster->RemoveAura(SPELL_GHOUL_FRENZY);
 
                 if (Unit* charmer = caster->GetCharmer())
                 {
-                    charmer->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY);
+                    charmer->RemoveAura(SPELL_GHOUL_FRENZY);
                 }
             }
         }

@@ -562,7 +562,7 @@ public:
                             {
                                 if (argelmachAdd->GetEntry() == NPC_WRATH_HAMMER_CONSTRUCT)
                                 {
-                                    argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                    argelmachAdd->RemoveAura(SPELL_STONED);
                                     argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
                                     itr = adds.erase(itr);
                                 }
@@ -570,7 +570,7 @@ public:
                                 {
                                     if (argelmachAdd->IsWithinDist2d(argelmach, 10.f))
                                     {
-                                        argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                        argelmachAdd->RemoveAura(SPELL_STONED);
                                         argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
                                         itr = adds.erase(itr);
                                     }
@@ -614,7 +614,7 @@ public:
                             {
                                 if (!argelmachAdd->IsInCombat())
                                 {
-                                    argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                    argelmachAdd->RemoveAura(SPELL_STONED);
                                     argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
                                 }
                             }

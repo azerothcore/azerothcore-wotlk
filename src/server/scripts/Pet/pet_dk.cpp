@@ -275,8 +275,8 @@ public:
                 {
                     if (Player* player = owner->ToPlayer())
                     {
-                        player->RemoveAurasDueToSpell(SPELL_DK_RAISE_ALLY); // Remove Raise Ally aura
-                        player->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY); // Remove Frenzy aura
+                        player->RemoveAura(SPELL_DK_RAISE_ALLY); // Remove Raise Ally aura
+                        player->RemoveAura(SPELL_GHOUL_FRENZY); // Remove Frenzy aura
                         //player->ClearResurrectRequestData();
                     }
                 }

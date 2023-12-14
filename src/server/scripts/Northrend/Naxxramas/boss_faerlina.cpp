@@ -233,7 +233,7 @@ public:
                 Talk(EMOTE_WIDOWS_EMBRACE);
                 if (me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
                 {
-                    me->RemoveAurasDueToSpell(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25));
+                    me->RemoveAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25));
                     events.RescheduleEvent(EVENT_FRENZY, 1min);
                 }
                 pInstance->SetData(DATA_FRENZY_REMOVED, 0);

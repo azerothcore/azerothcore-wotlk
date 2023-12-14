@@ -195,7 +195,7 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner->CastSpell((Unit*)nullptr, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
-        _owner->RemoveAurasDueToSpell(SPELL_FROST_BOMB_VISUAL);
+        _owner->RemoveAura(SPELL_FROST_BOMB_VISUAL);
         return true;
     }
 
@@ -717,9 +717,9 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
             {
                 _trappedPlayerGUID.Clear();
-                player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
-                player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
-                player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+                player->RemoveAura(SPELL_ICE_TOMB_DAMAGE);
+                player->RemoveAura(SPELL_ASPHYXIATION);
+                player->RemoveAura(SPELL_ICE_TOMB_UNTARGETABLE);
                 me->DespawnOrUnsummon(5000);
             }
         }
@@ -751,7 +751,7 @@ public:
                     _asphyxiationTimer = 0;
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
                     {
-                        player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+                        player->RemoveAura(SPELL_ICE_TOMB_UNTARGETABLE);
                         player->CastSpell(player, SPELL_ASPHYXIATION, true);
                     }
                 }
@@ -1215,8 +1215,8 @@ public:
 
         void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+            GetTarget()->RemoveAura(SPELL_ASPHYXIATION);
+            GetTarget()->RemoveAura(SPELL_ICE_TOMB_UNTARGETABLE);
         }
 
         void Register() override
@@ -1306,7 +1306,7 @@ public:
                 if (GetStackAmount() >= (s->GetMap()->Is25ManRaid() ? 75 : 30))
                 {
                     s->CastSpell(s, 72466, true);
-                    s->RemoveAurasDueToSpell(72424);
+                    s->RemoveAura(72424);
                     if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
                     SetDuration(1);
                 }

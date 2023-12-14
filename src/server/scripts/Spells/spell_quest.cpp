@@ -396,9 +396,9 @@ class spell_q10769_dissension_amongst_the_ranks_aura : public AuraScript
         if (ar)
         {
             if (ar->getGender() == GENDER_MALE)
-                ar->RemoveAurasDueToSpell(38225);
+                ar->RemoveAura(38225);
             else
-                ar->RemoveAurasDueToSpell(38227);
+                ar->RemoveAura(38227);
         }
     }
 
@@ -610,7 +610,7 @@ class spell_quest_test_flight_charging : public AuraScript
                     break;
             }
 
-            player->RemoveAurasDueToSpell(SPELL_CANNON_CHARGING_PORT);
+            player->RemoveAura(SPELL_CANNON_CHARGING_PORT);
             shooter->CastSpell(player, spellId, true);
         }
     }
@@ -1060,7 +1060,7 @@ class spell_q11396_11399_scourging_crystal_controller_dummy : public SpellScript
     {
         if (Unit* target = GetHitUnit())
             if (target->GetTypeId() == TYPEID_UNIT)
-                target->RemoveAurasDueToSpell(SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3);
+                target->RemoveAura(SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3);
     }
 
     void Register() override
@@ -1469,7 +1469,7 @@ class spell_symbol_of_life_dummy : public SpellScript
         {
             if (target->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
             {
-                target->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                target->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
                 target->ReplaceAllDynamicFlags(0);
                 target->ReplaceAllUnitFlags2(UNIT_FLAG2_NONE);
                 target->SetHealth(target->GetMaxHealth() / 2);
@@ -1984,7 +1984,7 @@ enum QuenchingMist
 
         void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_FLICKERING_FLAMES);
+            GetTarget()->RemoveAura(SPELL_FLICKERING_FLAMES);
         }
 
         void Register() override
@@ -2463,7 +2463,7 @@ class spell_q10651_q10692_book_of_fel_names : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (GetHitUnit()->HasAura(SPELL_METAMORPHOSIS))
-            GetHitUnit()->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+            GetHitUnit()->RemoveAura(SPELL_METAMORPHOSIS);
     }
 
     void Register() override

@@ -91,7 +91,7 @@ struct boss_doomwalker : public ScriptedAI
             Talk(SAY_EARTHQUAKE);
             if (_inEnrage) // avoid enrage + earthquake
             {
-                me->RemoveAurasDueToSpell(SPELL_ENRAGE);
+                me->RemoveAura(SPELL_ENRAGE);
             }
             DoCastAOE(SPELL_EARTHQUAKE);
             context.Repeat(30s, 55s);

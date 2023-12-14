@@ -237,7 +237,7 @@ void OutdoorPvPNA::HandlePlayerEnterZone(Player* player, uint32 zone)
 void OutdoorPvPNA::HandlePlayerLeaveZone(Player* player, uint32 zone)
 {
     // remove buffs
-    player->RemoveAurasDueToSpell(NA_CAPTURE_BUFF);
+    player->RemoveAura(NA_CAPTURE_BUFF);
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
 

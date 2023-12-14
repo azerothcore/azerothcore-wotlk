@@ -290,7 +290,7 @@ public:
                 Boom();
                 isBombing = false;
                 BombTimer = urand(20000, 40000);
-                me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+                me->RemoveAura(SPELL_FIRE_BOMB_CHANNEL);
                 if (EnrageTimer <= 10000)
                     EnrageTimer = 0;
                 else

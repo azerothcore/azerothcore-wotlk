@@ -113,7 +113,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
                                 if (Unit* passenger = vehicle->GetPassenger(0))
                                 {
                                     passenger->NearTeleportTo(x, y, z - (transportEntry == TRANSPORT_ORGRIMS_HAMMER ? 19.0f : 4.0f), M_PI);
-                                    passenger->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE); // maybe vehicle / seat flag should be responsible for parachute gain?
+                                    passenger->RemoveAura(VEHICLE_SPELL_PARACHUTE); // maybe vehicle / seat flag should be responsible for parachute gain?
                                 }
                         }
                         else

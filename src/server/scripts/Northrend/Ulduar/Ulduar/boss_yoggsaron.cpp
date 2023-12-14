@@ -2610,7 +2610,7 @@ public:
             else if (Aura* aur = target->AddAura(SPELL_EMPOWERED))
             {
                 aur->SetStackAmount(stack);
-                target->RemoveAurasDueToSpell(SPELL_WEAKENED);
+                target->RemoveAura(SPELL_WEAKENED);
             }
         }
 

@@ -581,7 +581,7 @@ public:
                             {
                                 overload = true;
                                 cr->AI()->Talk(EMOTE_TESLA_LINK_BREAKS);
-                                me->RemoveAurasDueToSpell(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
+                                me->RemoveAura(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
                                 cr->InterruptNonMeleeSpells(true);
                             }
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 1000.f, true))
@@ -690,8 +690,8 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
-                target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
-                target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
+                target->RemoveAura(SPELL_POSITIVE_CHARGE_STACK);
+                target->RemoveAura(SPELL_NEGATIVE_CHARGE_STACK);
                 target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, caster->GetGUID());
             }
         }

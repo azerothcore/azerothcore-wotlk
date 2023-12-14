@@ -583,7 +583,7 @@ public:
                 if( permafrostTimer <= diff )
                 {
                     permafrostTimer = 0;
-                    me->RemoveAurasDueToSpell(SPELL_FROST_SPHERE);
+                    me->RemoveAura(SPELL_FROST_SPHERE);
                     me->SetDisplayId(11686);
                     me->SetObjectScale(2.0f);
                     me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 142.7f, me->GetOrientation(), false);

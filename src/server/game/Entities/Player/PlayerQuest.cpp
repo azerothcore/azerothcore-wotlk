@@ -1554,13 +1554,13 @@ void Player::SendQuestUpdate(uint32 questId)
             // xinef: spells are sorted, if no condition is fulfilled remove aura
             if (oldSpellId && oldSpellId != itr->second->spellId)
             {
-                RemoveAurasDueToSpell(oldSpellId);
+                RemoveAura(oldSpellId);
                 oldSpellId = 0;
             }
 
             if (!itr->second->IsFitToRequirements(this, zone, area))
             {
-                //RemoveAurasDueToSpell(itr->second->spellId);
+                //RemoveAura(itr->second->spellId);
                 oldSpellId = itr->second->spellId;
             }
             else
@@ -1572,7 +1572,7 @@ void Player::SendQuestUpdate(uint32 questId)
 
         // xinef: check if we have something to remove yet
         if (oldSpellId)
-            RemoveAurasDueToSpell(oldSpellId);
+            RemoveAura(oldSpellId);
     }
 
     UpdateForQuestWorldObjects();

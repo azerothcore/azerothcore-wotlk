@@ -125,7 +125,7 @@ public:
         {
             target->m_clientGUIDs.insert(_owner.GetGUID());
             _owner.CastSpell(target, SPELL_ENVENOM, true);
-            target->RemoveAurasDueToSpell(SPELL_DEADLY_POISON);
+            target->RemoveAura(SPELL_DEADLY_POISON);
             target->m_clientGUIDs.erase(_owner.GetGUID());
         }
         return true;

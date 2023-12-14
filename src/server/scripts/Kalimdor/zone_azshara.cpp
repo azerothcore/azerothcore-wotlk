@@ -267,7 +267,7 @@ public:
                     me->ReplaceAllNpcFlags(NPCFlags(1));
                     me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->MoveIdle();
-                    me->RemoveAurasDueToSpell(SPELL_PERIODIC_DEPTH_CHARGE);
+                    me->RemoveAura(SPELL_PERIODIC_DEPTH_CHARGE);
                     Reached = true;
                 }
 

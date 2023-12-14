@@ -344,7 +344,7 @@ public:
             //Incase wipe during phase that mograine fake death
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+            me->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
             SayAshbringer = false;
             timer = 0;
             step = 1;
@@ -447,7 +447,7 @@ public:
                     //Incase wipe during phase that mograine fake death
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                    me->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
                     events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);

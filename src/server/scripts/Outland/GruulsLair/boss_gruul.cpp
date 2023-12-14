@@ -111,7 +111,7 @@ struct boss_gruul : public BossAI
             scheduler.Schedule(9700ms, [this](TaskContext)
             {
                 Talk(SAY_SHATTER);
-                me->RemoveAurasDueToSpell(SPELL_LOOK_AROUND);
+                me->RemoveAura(SPELL_LOOK_AROUND);
                 DoCastSelf(SPELL_SHATTER);
             });
             context.Repeat(60s);
@@ -258,7 +258,7 @@ class spell_gruul_shatter : public SpellScript
     {
         if (Unit* target = GetHitUnit())
         {
-            target->RemoveAurasDueToSpell(SPELL_STONED);
+            target->RemoveAura(SPELL_STONED);
 
             if (target->IsPlayer())
             {

@@ -940,7 +940,7 @@ class spell_pri_t4_4p_bonus : public AuraScript
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->RemoveAurasDueToSpell(SPELL_PRIEST_T4_4P_FLEXIBILITY);
+        GetTarget()->RemoveAura(SPELL_PRIEST_T4_4P_FLEXIBILITY);
     }
 
     void Register() override

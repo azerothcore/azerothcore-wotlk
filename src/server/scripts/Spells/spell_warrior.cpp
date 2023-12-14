@@ -184,7 +184,7 @@ class spell_warr_improved_spell_reflection_trigger : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
+        GetCaster()->RemoveAura(SPELL_WARRIOR_SPELL_REFLECTION);
         unitList.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
         while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
             unitList.pop_back();
@@ -749,7 +749,7 @@ class spell_warr_vigilance : public AuraScript
                     target->HasAura(SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY) ||
                     target->HasAura(SPELL_PRIEST_RENEWED_HOPE)))
         {
-            target->RemoveAurasDueToSpell(SPELL_GEN_DAMAGE_REDUCTION_AURA);
+            target->RemoveAura(SPELL_GEN_DAMAGE_REDUCTION_AURA);
         }
 
         target->ResetRedirectThreat();

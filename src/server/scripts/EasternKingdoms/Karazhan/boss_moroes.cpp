@@ -267,7 +267,7 @@ class spell_moroes_vanish : public SpellScript
         {
             Position pos = target->GetFirstCollisionPosition(5.0f, M_PI);
             GetCaster()->CastSpell(target, SPELL_GARROTE_DUMMY, true);
-            GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
+            GetCaster()->RemoveAura(SPELL_VANISH);
             GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());
         }
     }

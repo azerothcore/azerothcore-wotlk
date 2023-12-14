@@ -70,7 +70,7 @@ struct boss_supremus : public BossAI
             events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 5000, EVENT_GROUP_ABILITIES);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
-            me->RemoveAurasDueToSpell(SPELL_SNARE_SELF);
+            me->RemoveAura(SPELL_SNARE_SELF);
         }
         else
         {

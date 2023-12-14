@@ -176,8 +176,8 @@ class spell_dru_feral_swiftness : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1);
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2);
+        GetTarget()->RemoveAura(SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1);
+        GetTarget()->RemoveAura(SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2);
     }
 
     void Register() override
@@ -293,7 +293,7 @@ class spell_dru_barkskin : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
+        GetUnitOwner()->RemoveAura(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
     }
 
     void Register() override
@@ -473,8 +473,8 @@ class spell_dru_enrage : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE);
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGED_DEFENSE);
+        GetTarget()->RemoveAura(SPELL_DRUID_ENRAGE_MOD_DAMAGE);
+        GetTarget()->RemoveAura(SPELL_DRUID_ENRAGED_DEFENSE);
 
         RecalculateBaseArmor();
     }
@@ -889,7 +889,7 @@ class spell_dru_savage_roar_aura : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_SAVAGE_ROAR);
+        GetTarget()->RemoveAura(SPELL_DRUID_SAVAGE_ROAR);
     }
 
     void Register() override
@@ -932,7 +932,7 @@ class spell_dru_starfall_dummy : public SpellScript
         if (caster->GetCreatureType() == CREATURE_TYPE_BEAST || caster->IsMounted())
         {
             if (SpellInfo const* spellInfo = GetTriggeringSpell())
-                caster->RemoveAurasDueToSpell(spellInfo->Id);
+                caster->RemoveAura(spellInfo->Id);
             return;
         }
 
@@ -988,7 +988,7 @@ class spell_dru_survival_instincts_aura : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_SURVIVAL_INSTINCTS);
+        GetTarget()->RemoveAura(SPELL_DRUID_SURVIVAL_INSTINCTS);
     }
 
     void Register() override
@@ -1159,7 +1159,7 @@ class spell_dru_berserk : public SpellScript
 
             // remove aura
             for (auto& i : TigerFury)
-                caster->RemoveAurasDueToSpell(i);
+                caster->RemoveAura(i);
 
             // reset dire bear maul cd
             for (auto& i : DireMaul)

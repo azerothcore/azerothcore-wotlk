@@ -176,7 +176,7 @@ public:
         void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             SummonsAction(ACTION_MAKE_FRIENDLY);
-            me->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
+            me->RemoveAura(SPELL_ARTRUIS_BINDING);
             summon->DespawnOrUnsummon(60000);
             me->SetControlled(false, UNIT_STATE_STUNNED);
         }
@@ -195,14 +195,14 @@ public:
                     {
                         if (action == ACTION_BIND_MINIONS)
                         {
-                            minion->RemoveAurasDueToSpell(SPELL_TOMB_OF_THE_HEARTLESS);
+                            minion->RemoveAura(SPELL_TOMB_OF_THE_HEARTLESS);
                             if (me->GetVictim())
                                 minion->AI()->AttackStart(me->GetVictim());
                         }
                         else if (action == ACTION_MAKE_FRIENDLY && me->GetVictim())
                         {
                             minion->AI()->Talk(SAY_TURNED_FRIENDLY);
-                            minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
+                            minion->RemoveAura(SPELL_ARTRUIS_BINDING);
                             minion->SetFaction(me->GetVictim()->GetFaction());
                             minion->AddThreat(me, 100000.0f);
                             minion->AI()->AttackStart(me);

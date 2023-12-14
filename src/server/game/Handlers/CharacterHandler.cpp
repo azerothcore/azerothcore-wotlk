@@ -1575,7 +1575,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
     {
         if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
         {
-            _player->RemoveAurasDueToSpell(glyphEntry->SpellId);
+            _player->RemoveAura(glyphEntry->SpellId);
 
             // Removed any triggered auras
             Unit::AuraMap& ownedAuras = _player->GetOwnedAuras();

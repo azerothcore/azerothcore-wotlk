@@ -387,7 +387,7 @@ public:
 
         void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
+            GetTarget()->RemoveAura(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
         }
 
         void Register() override
@@ -532,7 +532,7 @@ class spell_rog_prey_on_the_weak : public AuraScript
             }
         }
         else
-            target->RemoveAurasDueToSpell(SPELL_ROGUE_PREY_ON_THE_WEAK);
+            target->RemoveAura(SPELL_ROGUE_PREY_ON_THE_WEAK);
     }
 
     void Register() override

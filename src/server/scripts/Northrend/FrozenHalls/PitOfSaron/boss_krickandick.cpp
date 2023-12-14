@@ -510,9 +510,9 @@ public:
                 {
                     PreventDefaultAction();
                     target->CastSpell(target, SPELL_EXPLOSIVE_BARRAGE_DAMAGE, false);
-                    target->RemoveAurasDueToSpell(SPELL_HASTY_GROW);
-                    target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-                    target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
+                    target->RemoveAura(SPELL_HASTY_GROW);
+                    target->RemoveAura(SPELL_AUTO_GROW);
+                    target->RemoveAura(SPELL_EXPLODING_ORB_VISUAL);
                     if (target->GetTypeId() == TYPEID_UNIT)
                         target->ToCreature()->DespawnOrUnsummon(2000);
                 }

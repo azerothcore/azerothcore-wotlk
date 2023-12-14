@@ -92,7 +92,7 @@ struct boss_laj : public BossAI
         }, 25s);
 
         ScheduleTimedEvent(30s, [&] {
-            me->RemoveAurasDueToSpell(_lastTransform.spellId);
+            me->RemoveAura(_lastTransform.spellId);
             _lastTransform = Acore::Containers::SelectRandomContainerElementIf(_transformContainer, [&](LajTransformData data) -> bool
             {
                 return data.spellId != _lastTransform.spellId;

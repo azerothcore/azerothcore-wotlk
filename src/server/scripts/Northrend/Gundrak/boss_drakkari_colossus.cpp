@@ -180,7 +180,7 @@ public:
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                me->RemoveAura(SPELL_FREEZE_ANIM);
                 if (me->GetVictim())
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
             }
@@ -204,7 +204,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_COLOSSUS_START_FIGHT:
-                    me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                    me->RemoveAura(SPELL_FREEZE_ANIM);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_COLOSSUS_MIGHTY_BLOW:

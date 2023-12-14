@@ -99,7 +99,7 @@ public:
         {
             if (spellInfo->Id == SPELL_TRANSFORMATION)
             {
-                me->RemoveAurasDueToSpell(SPELL_MOJO_FRENZY);
+                me->RemoveAura(SPELL_MOJO_FRENZY);
                 events.CancelEvent(EVENT_TRANSFORMATION);
                 Talk(EMOTE_TRANSFORMED);
             }

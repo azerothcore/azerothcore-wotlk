@@ -505,7 +505,7 @@ public:
                 case EVENT_CYANIGOSSA_TRANSFORM:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
                     {
-                        c->RemoveAurasDueToSpell(SPELL_CYANIGOSA_BLUE_AURA);
+                        c->RemoveAura(SPELL_CYANIGOSA_BLUE_AURA);
                         c->CastSpell(c, SPELL_CYANIGOSA_TRANSFORM, 0);
                         events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500ms);
                     }

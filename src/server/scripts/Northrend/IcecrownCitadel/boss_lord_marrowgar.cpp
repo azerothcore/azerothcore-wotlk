@@ -390,7 +390,7 @@ public:
                     if (Unit* vehBase = trapped->GetVehicleBase())
                         vehBase->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, trapped->GetGUID());
                     trapped->_ExitVehicle(&exitPos);
-                    trapped->RemoveAurasDueToSpell(SPELL_IMPALED);
+                    trapped->RemoveAura(SPELL_IMPALED);
                     trapped->GetMotionMaster()->Clear();
                     trapped->UpdatePosition(exitPos, true);
                     trapped->StopMovingOnCurrentPos();

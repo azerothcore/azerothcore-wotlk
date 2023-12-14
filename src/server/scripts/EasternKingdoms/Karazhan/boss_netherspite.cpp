@@ -195,8 +195,8 @@ struct boss_netherspite : public BossAI
         }
 
         scheduler.CancelGroup(BANISH_PHASE);
-        me->RemoveAurasDueToSpell(SPELL_BANISH_ROOT);
-        me->RemoveAurasDueToSpell(SPELL_BANISH_VISUAL);
+        me->RemoveAura(SPELL_BANISH_ROOT);
+        me->RemoveAura(SPELL_BANISH_VISUAL);
         SummonPortals();
         scheduler.Schedule(60s, [this](TaskContext /*context*/)
         {
@@ -243,8 +243,8 @@ struct boss_netherspite : public BossAI
     {
         Talk(EMOTE_PHASE_BANISH);
         scheduler.CancelGroup(PORTAL_PHASE);
-        me->RemoveAurasDueToSpell(SPELL_EMPOWERMENT);
-        me->RemoveAurasDueToSpell(SPELL_NETHERBURN_AURA);
+        me->RemoveAura(SPELL_EMPOWERMENT);
+        me->RemoveAura(SPELL_NETHERBURN_AURA);
         DoCastSelf(SPELL_BANISH_VISUAL, true);
         DoCastSelf(SPELL_BANISH_ROOT, true);
 
@@ -263,7 +263,7 @@ struct boss_netherspite : public BossAI
 
         for (uint8 i = 0; i < 3; ++i)
         {
-            me->RemoveAurasDueToSpell(NetherBuff[i]);
+            me->RemoveAura(NetherBuff[i]);
         }
     }
 

@@ -436,7 +436,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         sScriptMgr->OnAddPassenger(this, unit, seatId);
 
     // Remove parachute on vehicle switch
-    unit->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+    unit->RemoveAura(VEHICLE_SPELL_PARACHUTE);
     return true;
 }
 

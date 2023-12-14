@@ -297,7 +297,7 @@ struct npc_amanitar_mushrooms : public ScriptedAI
                 {
                     if (Player* plr = me->SelectNearestPlayer(2.0f))
                     {
-                        plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+                        plr->RemoveAura(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
                         DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
                         DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
                         DoCastSelf(SPELL_SHRINK);
@@ -332,7 +332,7 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
     {
         if (Unit* target = GetTarget())
         {
-            target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+            target->RemoveAura(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
         }
     }
 

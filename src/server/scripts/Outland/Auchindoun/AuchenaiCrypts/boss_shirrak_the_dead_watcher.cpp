@@ -97,7 +97,7 @@ struct boss_shirrak_the_dead_watcher : public BossAI
                     }
                     else
                     {
-                        player->RemoveAurasDueToSpell(SPELL_INHIBIT_MAGIC);
+                        player->RemoveAura(SPELL_INHIBIT_MAGIC);
                     }
                 }
             }

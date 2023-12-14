@@ -199,8 +199,8 @@ class spell_hallows_end_candy_pirate_costume : public AuraScript
     {
         if (Unit* target = GetTarget())
         {
-            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_MALE);
-            target->RemoveAurasDueToSpell(SPELL_HALLOWS_END_CANDY_3_FEMALE);
+            target->RemoveAura(SPELL_HALLOWS_END_CANDY_3_MALE);
+            target->RemoveAura(SPELL_HALLOWS_END_CANDY_3_FEMALE);
         }
     }
 

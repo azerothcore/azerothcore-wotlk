@@ -468,7 +468,7 @@ public:
                 break;
 
             case EVENT_INTRO_H2_3_2:
-                me->RemoveAurasDueToSpell(SPELL_SUMMON_SOULS);
+                me->RemoveAura(SPELL_SUMMON_SOULS);
                 events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
                 break;
             case EVENT_INTRO_H2_4:

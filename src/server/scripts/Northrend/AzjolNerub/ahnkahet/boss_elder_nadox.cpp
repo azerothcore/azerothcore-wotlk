@@ -358,7 +358,7 @@ class spell_ahn_kahet_swarmer_aura : public SpellScript
         }
         else
         {
-            caster->RemoveAurasDueToSpell(SPELL_SWARM);
+            caster->RemoveAura(SPELL_SWARM);
         }
     }
 

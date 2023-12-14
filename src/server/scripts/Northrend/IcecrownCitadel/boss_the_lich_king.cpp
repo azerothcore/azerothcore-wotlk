@@ -703,7 +703,7 @@ public:
             instance->SetBossState(DATA_THE_LICH_KING, IN_PROGRESS);
             me->setActive(true);
             me->SetInCombatWithZone();
-            me->RemoveAurasDueToSpell(SPELL_EMOTE_SIT_NO_SHEATH); // just to be sure
+            me->RemoveAura(SPELL_EMOTE_SIT_NO_SHEATH); // just to be sure
 
             events.ScheduleEvent(EVENT_BERSERK, 15min, EVENT_GROUP_BERSERK);
             events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 15s, EVENT_GROUP_ABILITIES);
@@ -1313,7 +1313,7 @@ public:
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                         theLichKing->SetStandState(UNIT_STAND_STATE_STAND);
                         theLichKing->SetSheath(SHEATH_STATE_MELEE);
-                        theLichKing->RemoveAurasDueToSpell(SPELL_EMOTE_SIT_NO_SHEATH);
+                        theLichKing->RemoveAura(SPELL_EMOTE_SIT_NO_SHEATH);
                         theLichKing->AI()->Talk(SAY_LK_INTRO_1);
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FROZEN_THRONE);
                         _events.ScheduleEvent(EVENT_INTRO_LK_MOVE, 3s);
@@ -1622,7 +1622,7 @@ public:
                     me->CastSpell(me, SPELL_LIGHTS_BLESSING, false);
                     break;
                 case EVENT_OUTRO_FORDRING_REMOVE_ICE:
-                    me->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
+                    me->RemoveAura(SPELL_ICE_LOCK);
                     SetEquipmentSlots(false, EQUIP_ASHBRINGER_GLOWING);
                     if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
@@ -1727,7 +1727,7 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
+            GetHitUnit()->RemoveAura(SPELL_RAISE_DEAD);
             GetHitUnit()->InterruptNonMeleeSpells(true);
             GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
             if (Creature* creature = GetHitCreature())
@@ -1758,7 +1758,7 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+            GetHitUnit()->RemoveAura(uint32(GetEffectValue()));
         }
 
         void Register() override
@@ -2564,7 +2564,7 @@ public:
                 //pass->ClearUnitState(UNIT_STATE_ONVEHICLE);
                 return;
             }
-            pass->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+            pass->RemoveAura(VEHICLE_SPELL_PARACHUTE);
             if (didbelow50pct || dropped)
                 return;
             if (IsHeroic())
@@ -3064,7 +3064,7 @@ public:
 
             if (Creature* c = GetCaster()->ToCreature())
             {
-                c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
+                c->RemoveAura(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
                 c->GetMotionMaster()->Clear(true);
                 c->StopMoving();
                 c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
@@ -3165,7 +3165,7 @@ public:
         void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
         {
             if (!apply)
-                pass->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+                pass->RemoveAura(VEHICLE_SPELL_PARACHUTE);
         }
 
         void DoAction(int32 action) override
@@ -3188,7 +3188,7 @@ public:
                     else if (buff)
                         me->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
 
-                    summoner->RemoveAurasDueToSpell(IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
+                    summoner->RemoveAura(IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
                 }
                 else
                     me->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
@@ -3446,7 +3446,7 @@ public:
         {
             for (std::list<WorldObject*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                 if (Unit* target = (*itr)->ToUnit())
-                    target->RemoveAurasDueToSpell(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
+                    target->RemoveAura(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
             if (Creature* lichKing = ObjectAccessor::GetCreature(*GetCaster(), _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
             if (Creature* spawner = GetCaster()->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 50.0f, true))

@@ -266,8 +266,8 @@ public:
             DoCast(me, SPELL_BLOOD_POWER, true);
             DoCast(me, SPELL_MARK_OF_THE_FALLEN_CHAMPION_S, true);
             DoCast(me, SPELL_RUNE_OF_BLOOD_S, true);
-            me->RemoveAurasDueToSpell(SPELL_BERSERK);
-            me->RemoveAurasDueToSpell(SPELL_FRENZY);
+            me->RemoveAura(SPELL_BERSERK);
+            me->RemoveAura(SPELL_FRENZY);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MARK_OF_THE_FALLEN_CHAMPION);
         }
 
@@ -280,7 +280,7 @@ public:
             }
 
             // pussywizard: without this, the aura is not recalculated the first time
-            me->RemoveAurasDueToSpell(SPELL_BLOOD_POWER);
+            me->RemoveAura(SPELL_BLOOD_POWER);
             DoCast(me, SPELL_BLOOD_POWER, true);
 
             if (!instance->CheckRequiredBosses(DATA_DEATHBRINGER_SAURFANG, who->ToPlayer()))
@@ -580,7 +580,7 @@ public:
                     break;
                 case ACTION_START_OUTRO:
                     {
-                        me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
+                        me->RemoveAura(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -842,7 +842,7 @@ public:
                     break;
                 case ACTION_START_OUTRO:
                     {
-                        me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
+                        me->RemoveAura(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)

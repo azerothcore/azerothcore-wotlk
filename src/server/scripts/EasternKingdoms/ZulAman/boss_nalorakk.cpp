@@ -381,7 +381,7 @@ public:
                 {
                     // me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 5122);
                     Talk(SAY_SHIFTEDTOTROLL);
-                    me->RemoveAurasDueToSpell(SPELL_BEARFORM);
+                    me->RemoveAura(SPELL_BEARFORM);
                     Surge_Timer = urand(15000, 20000);
                     BrutalSwipe_Timer = urand(7000, 12000);
                     Mangle_Timer = urand(10000, 15000);

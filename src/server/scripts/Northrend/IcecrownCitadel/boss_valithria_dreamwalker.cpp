@@ -204,7 +204,7 @@ public:
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        _trigger->RemoveAurasDueToSpell(_spellId);
+        _trigger->RemoveAura(_spellId);
         return true;
     }
 
@@ -344,7 +344,7 @@ public:
                 Talk(SAY_VALITHRIA_SUCCESS);
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                 _instance->DoRemoveAurasDueToSpellOnPlayers(70766);
-                me->RemoveAurasDueToSpell(SPELL_CORRUPTION_VALITHRIA);
+                me->RemoveAura(SPELL_CORRUPTION_VALITHRIA);
                 me->CastSpell(me, SPELL_ACHIEVEMENT_CHECK, true);
                 me->CastSpell((Unit*)nullptr, SPELL_DREAMWALKERS_RAGE, false);
                 _events.Reset();

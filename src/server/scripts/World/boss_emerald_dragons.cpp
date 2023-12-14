@@ -409,7 +409,7 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
+            me->RemoveAura(SPELL_SHADOW_BOLT_WHIRL);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -618,7 +618,7 @@ public:
 
         void Reset() override
         {
-            me->RemoveAurasDueToSpell(SPELL_SHADE);
+            me->RemoveAura(SPELL_SHADE);
             _stage = 1;
 
             _shades = 0;
@@ -698,7 +698,7 @@ public:
                     _banished = false;
 
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveAurasDueToSpell(SPELL_SHADE);
+                    me->RemoveAura(SPELL_SHADE);
                     me->SetReactState(REACT_AGGRESSIVE);
                 }
                 // _banishtimer has not expired, and we still have active shades:

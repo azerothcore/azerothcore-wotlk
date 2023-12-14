@@ -317,8 +317,8 @@ struct boss_eye_of_cthun : public BossAI
                         {
                             scheduler.CancelAll();
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-                            me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                            me->RemoveAura(SPELL_RED_COLORATION);
+                            me->RemoveAura(SPELL_FREEZE_ANIM);
                             me->InterruptNonMeleeSpells(false);
                             ScheduleTask();
                         }
@@ -339,7 +339,7 @@ struct boss_eye_of_cthun : public BossAI
         me->InterruptNonMeleeSpells(false);
 
         //Remove Red coloration from c'thun
-        me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
+        me->RemoveAura(SPELL_RED_COLORATION);
 
         //Reset to normal emote state and prevent select and attack
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -388,7 +388,7 @@ struct boss_cthun : public BossAI
         _fleshTentaclesKilled = 0;
 
         //Reset flags
-        me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+        me->RemoveAura(SPELL_TRANSFORM);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
         BossAI::Reset();
@@ -435,7 +435,7 @@ struct boss_cthun : public BossAI
                 target->m_Events.AddEventAtOffset([target, this]()
                 {
                     DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
-                    target->RemoveAurasDueToSpell(SPELL_MIND_FLAY);
+                    target->RemoveAura(SPELL_MIND_FLAY);
 
                     target->m_Events.AddEventAtOffset([target, this]()
                     {
@@ -550,13 +550,13 @@ struct boss_cthun : public BossAI
                 Talk(EMOTE_WEAKENED);
 
                 DoCast(me, SPELL_PURPLE_COLORATION, true);
-                me->RemoveAurasDueToSpell(SPELL_CARAPACE_CTHUN);
+                me->RemoveAura(SPELL_CARAPACE_CTHUN);
 
                 scheduler.Schedule(45s, [this](TaskContext /*context*/)
                 {
                     ScheduleTasks();
                     //Remove purple coloration
-                    me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+                    me->RemoveAura(SPELL_PURPLE_COLORATION);
                     DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
@@ -838,7 +838,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
                 _portalGUID = portal->GetGUID();
             }
 
-            me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+            me->RemoveAura(SPELL_SUBMERGE_VISUAL);
             DoCastSelf(SPELL_BIRTH);
             DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE, true);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -1004,7 +1004,7 @@ public:
                                 player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
                             }
 
-                            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                            player->RemoveAura(SPELL_DIGESTIVE_ACID);
                         }, 1s);
                     }
                     else

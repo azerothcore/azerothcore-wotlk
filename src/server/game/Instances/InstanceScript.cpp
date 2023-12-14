@@ -639,9 +639,9 @@ void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
     instance->DoForAllPlayers([&](Player* player)
     {
-        player->RemoveAurasDueToSpell(spell);
+        player->RemoveAura(spell);
         if (Pet* pet = player->GetPet())
-            pet->RemoveAurasDueToSpell(spell);
+            pet->RemoveAura(spell);
     });
 }
 

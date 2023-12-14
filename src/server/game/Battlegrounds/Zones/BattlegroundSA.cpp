@@ -367,7 +367,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             // status was set to STATUS_WAIT_JOIN manually for Preparation, set it back now
             SetStatus(STATUS_IN_PROGRESS);
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
+                itr->second->RemoveAura(SPELL_PREPARATION);
         }
         if (TotalTime >= 30s)
         {

@@ -90,7 +90,7 @@ public:
 
                     // if we are here, all is ok (aura and item present)
                     player->DestroyItemCount(itemEntry, 1, true);
-                    player->RemoveAurasDueToSpell(auraId);
+                    player->RemoveAura(auraId);
 
                     if (counter < 6)
                     {
@@ -733,9 +733,9 @@ public:
         {
             if (spell->Id == SPELL_FREE_RAGECLAW)
             {
-                me->RemoveAurasDueToSpell(SPELL_LEFT_CHAIN);
-                me->RemoveAurasDueToSpell(SPELL_RIGHT_CHAIN);
-                me->RemoveAurasDueToSpell(SPELL_KNEEL);
+                me->RemoveAura(SPELL_LEFT_CHAIN);
+                me->RemoveAura(SPELL_RIGHT_CHAIN);
+                me->RemoveAura(SPELL_KNEEL);
                 me->SetFaction(me->GetCreatureTemplate()->faction);
                 DoCast(me, SPELL_UNSHACKLED, true);
                 Talk(SAY_RAGECLAW);

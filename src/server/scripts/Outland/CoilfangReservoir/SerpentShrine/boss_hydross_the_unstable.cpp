@@ -108,7 +108,7 @@ struct boss_hydross_the_unstable : public BossAI
         BossAI::JustReachedHome();
         if (!me->HasAura(SPELL_BLUE_BEAM))
         {
-            me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
+            me->RemoveAura(SPELL_CLEANSING_FIELD_AURA);
         }
     }
 
@@ -174,7 +174,7 @@ struct boss_hydross_the_unstable : public BossAI
             me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
-            me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
+            me->RemoveAura(SPELL_CORRUPTION);
 
             scheduler.Schedule(0s, GROUP_ABILITIES, [this](TaskContext)
             {

@@ -122,7 +122,7 @@ struct npc_underbog_mushroom : public ScriptedAI
 
                     context.Schedule(4s, [this](TaskContext /*context*/)
                         {
-                            me->RemoveAurasDueToSpell(SPELL_GROW);
+                            me->RemoveAura(SPELL_GROW);
                             me->DespawnOrUnsummon(2000);
                         });
                 }

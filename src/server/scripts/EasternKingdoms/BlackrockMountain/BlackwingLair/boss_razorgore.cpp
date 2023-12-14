@@ -189,7 +189,7 @@ public:
             {
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
-                    charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
+                    charmer->RemoveAura(SPELL_MINDCONTROL_VISUAL);
                     me->TauntApply(charmer);
                 }
             }

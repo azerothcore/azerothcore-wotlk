@@ -378,7 +378,7 @@ public:
         if (!_creature->IsAlive())
             return true;
 
-        _creature->RemoveAurasDueToSpell(ExperiencedSpells[_level]);
+        _creature->RemoveAura(ExperiencedSpells[_level]);
         ++_level;
 
         _creature->CastSpell(_creature, ExperiencedSpells[_level], true);

@@ -241,7 +241,7 @@ public:
 
         void ClearSleeping()
         {
-            me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL);
+            me->RemoveAura(SPELL_SLEEP_VISUAL);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             Talk(EMOTE_KER_AWAKEN);

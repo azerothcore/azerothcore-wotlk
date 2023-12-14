@@ -142,7 +142,7 @@ public:
                 {
                     _swapTime = GameTime::GetGameTime().count() + 6;
                     _lastSchool = spellInfo->GetSchoolMask();
-                    GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
+                    GetUnitOwner()->RemoveAura(_lastForm);
                     _lastForm = form;
                     GetUnitOwner()->CastSpell(GetUnitOwner(), _lastForm, true);
                 }

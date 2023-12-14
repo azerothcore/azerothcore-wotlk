@@ -184,7 +184,7 @@ class boss_anub_arak : public CreatureScript
                         events.ScheduleEvent(EVENT_POUND, 18s);
                         break;
                     case EVENT_ENABLE_ROTATE:
-                        me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
+                        me->RemoveAura(SPELL_SELF_ROOT);
                         me->DisableRotate(false);
                         break;
                     case EVENT_CHECK_HEALTH_25:

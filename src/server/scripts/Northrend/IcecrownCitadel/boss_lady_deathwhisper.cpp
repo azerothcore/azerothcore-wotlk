@@ -290,7 +290,7 @@ public:
             events.ScheduleEvent(EVENT_EMPOWER_CULTIST, 20s, 30s, 0, PHASE_ONE);
 
             Talk(SAY_AGGRO);
-            me->RemoveAurasDueToSpell(SPELL_SHADOW_CHANNELING);
+            me->RemoveAura(SPELL_SHADOW_CHANNELING);
             me->CastSpell(me, SPELL_MANA_BARRIER, true);
 
             instance->SetBossState(DATA_LADY_DEATHWHISPER, IN_PROGRESS);
@@ -315,7 +315,7 @@ public:
                 DoStartMovement(me->GetVictim());
                 damage -= me->GetPower(POWER_MANA);
                 me->SetPower(POWER_MANA, 0);
-                me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
+                me->RemoveAura(SPELL_MANA_BARRIER);
                 events.SetPhase(PHASE_TWO);
                 events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 10s, 12s, 0, PHASE_TWO);
                 events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, 19s, 21s, 0, PHASE_TWO);
@@ -745,7 +745,7 @@ public:
                     events.Repeat(20s, 27s);
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
-                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                    me->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_FANATIC);
@@ -866,7 +866,7 @@ public:
                     events.Repeat(27s, 32s);
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
-                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                    me->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_ADHERENT);

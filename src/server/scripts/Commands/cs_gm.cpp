@@ -202,7 +202,7 @@ public:
         if (*visibleArg)
         {
             if (_player->HasAura(VISUAL_AURA))
-                _player->RemoveAurasDueToSpell(VISUAL_AURA);
+                _player->RemoveAura(VISUAL_AURA);
 
             _player->SetGMVisible(true);
             _player->UpdateObjectVisibility();

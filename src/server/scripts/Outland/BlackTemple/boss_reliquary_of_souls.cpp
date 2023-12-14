@@ -311,7 +311,7 @@ public:
                 damage = 0;
                 if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
-                    me->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_SUFFERING_PASSIVE); // prevent fixate from triggering
+                    me->RemoveAura(SPELL_ESSENCE_OF_SUFFERING_PASSIVE); // prevent fixate from triggering
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     Talk(SUFF_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
@@ -598,7 +598,7 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_AURA_OF_SUFFERING_TRIGGER);
+            GetTarget()->RemoveAura(SPELL_AURA_OF_SUFFERING_TRIGGER);
         }
 
         void Register() override
@@ -652,7 +652,7 @@ public:
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Unit* caster = GetCaster())
-                caster->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, GetTarget()->GetGUID());
+                caster->RemoveAura(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, GetTarget()->GetGUID());
         }
 
         void Register() override

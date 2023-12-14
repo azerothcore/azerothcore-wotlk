@@ -315,7 +315,7 @@ public:
                     me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, me->GetOrientation());
                     DoResetThreatList();
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-                    me->RemoveAurasDueToSpell(Transform[Phase].unaura);
+                    me->RemoveAura(Transform[Phase].unaura);
                     DoCast(me, Transform[Phase].spell);
                     Talk(Transform[Phase].text);
                     if (Phase > 0)
@@ -347,7 +347,7 @@ public:
                         AttackStart(me->GetVictim());
                     if (NextPhase == 3)
                     {
-                        me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
+                        me->RemoveAura(SPELL_ENERGY_STORM);
                         Summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     }

@@ -93,7 +93,7 @@ public:
 
         void ApplyHakkarPowerStacks()
         {
-            me->RemoveAurasDueToSpell(SPELL_HAKKAR_POWER);
+            me->RemoveAura(SPELL_HAKKAR_POWER);
             for (int i = DATA_JEKLIK; i < DATA_HAKKAR; i++)
                 if (instance->GetBossState(i) != DONE)
                     DoCastSelf(SPELL_HAKKAR_POWER, true);

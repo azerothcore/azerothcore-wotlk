@@ -1291,7 +1291,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         {
             // some auras remove at aura remove
             if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area))
-                target->RemoveAurasDueToSpell(itr->second->spellId);
+                target->RemoveAura(itr->second->spellId);
             // some auras applied at aura apply
             else if (itr->second->autocast)
             {
@@ -1326,7 +1326,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 for (std::vector<int32>::const_iterator itr = spellTriggered->begin(); itr != spellTriggered->end(); ++itr)
                 {
                     if (*itr < 0)
-                        target->RemoveAurasDueToSpell(-(*itr));
+                        target->RemoveAura(-(*itr));
                     else if (removeMode != AURA_REMOVE_BY_DEATH)
                         target->CastSpell(target, *itr, true, nullptr, nullptr, GetCasterGUID());
                 }
@@ -1665,7 +1665,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     case 74396: // Fingers of Frost
                         // Remove the IGNORE_AURASTATE aura
-                        target->RemoveAurasDueToSpell(44544);
+                        target->RemoveAura(44544);
                         break;
                     case 44401: // Missile Barrage
                     case 48108: // Hot Streak
@@ -1848,7 +1848,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (GetId() == 1784)
                     {
                         target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
-                        target->RemoveAurasDueToSpell(18461);
+                        target->RemoveAura(18461);
                     }
                     break;
                 }
@@ -1857,12 +1857,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Ghost Wolf Speed (PvP 58 lvl set)
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000800)
                 {
-                    target->RemoveAurasDueToSpell(47017);
+                    target->RemoveAura(47017);
                 }
                 // Lightning Shield vs The Earthshatterer 8/9 set bonus
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000400)
                 {
-                    target->RemoveAurasDueToSpell(28820);
+                    target->RemoveAura(28820);
                 }
                 break;
             }
@@ -1914,7 +1914,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             if (apply)
                                 owner->CastSpell(owner, 34471, true, 0, GetEffect(0));
                             else
-                                owner->RemoveAurasDueToSpell(34471);
+                                owner->RemoveAura(34471);
                         }
                     }
                     break;
@@ -1948,7 +1948,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 64364, true);
                     }
                     else
-                        target->RemoveAurasDueToSpell(64364, GetCasterGUID());
+                        target->RemoveAura(64364, GetCasterGUID());
                     break;
                 case 31842:
                     if (caster && caster->HasAura(70755))
@@ -1956,7 +1956,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (apply)
                             target->CastSpell(target, 71166, true);
                         else
-                            target->RemoveAurasDueToSpell(71166);
+                            target->RemoveAura(71166);
                     }
                     break;
             }

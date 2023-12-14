@@ -78,8 +78,8 @@ struct npc_eye_of_acherus : public ScriptedAI
     {
         if (!apply)
         {
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
+            me->GetCharmerOrOwner()->RemoveAura(SPELL_THE_EYE_OF_ACHERUS);
+            me->GetCharmerOrOwner()->RemoveAura(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
         }
     }
 
@@ -99,7 +99,7 @@ struct npc_eye_of_acherus : public ScriptedAI
                 _events.ScheduleEvent(EVENT_UNROOT, 400ms);
                 break;
             case EVENT_UNROOT:
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
+                me->RemoveAura(SPELL_ROOT_SELF);
                 DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
                 _events.ScheduleEvent(EVENT_LAUNCH_TOWARDS_DESTINATION, 1s + 200ms);
                 break;
@@ -129,9 +129,9 @@ struct npc_eye_of_acherus : public ScriptedAI
                 {
                     Talk(SAY_EYE_UNDER_CONTROL, owner);
                 }
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
+                me->RemoveAura(SPELL_ROOT_SELF);
                 DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
-                me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
+                me->RemoveAura(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
                 break;
             default:
                 break;
@@ -782,7 +782,7 @@ public:
             phase = PHASE_TO_EQUIP;
 
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            me->RemoveAurasDueToSpell(SPELL_SOUL_PRISON_CHAIN);
+            me->RemoveAura(SPELL_SOUL_PRISON_CHAIN);
 
             float z;
             anchor->GetContactPoint(me, anchorX, anchorY, z, 1.0f);

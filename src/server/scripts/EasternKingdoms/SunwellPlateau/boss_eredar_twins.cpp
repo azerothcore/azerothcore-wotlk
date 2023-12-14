@@ -438,7 +438,7 @@ public:
             {
                 if (GetCaster()->HasAura(SPELL_FLAME_TOUCHED))
                 {
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_FLAME_TOUCHED);
+                    GetCaster()->RemoveAura(SPELL_FLAME_TOUCHED);
                     GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
                     return SPELL_FAILED_DONT_REPORT;
                 }
@@ -447,7 +447,7 @@ public:
             {
                 if (GetCaster()->HasAura(SPELL_DARK_TOUCHED))
                 {
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_DARK_TOUCHED);
+                    GetCaster()->RemoveAura(SPELL_DARK_TOUCHED);
                     GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
                     return SPELL_FAILED_DONT_REPORT;
                 }

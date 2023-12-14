@@ -304,7 +304,7 @@ public:
                             if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
-                                razor->RemoveAurasDueToSpell(19832); // MindControl
+                                razor->RemoveAura(19832); // MindControl
                                 DoRemoveAurasDueToSpellOnPlayers(19832);
                             }
                             _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1s);

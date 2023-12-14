@@ -52,7 +52,7 @@ struct boss_twilight_corrupter : public ScriptedAI
     void Reset() override
     {
         _scheduler.CancelAll();
-        me->RemoveAurasDueToSpell(SPELL_SWELL_OF_SOULS);
+        me->RemoveAura(SPELL_SWELL_OF_SOULS);
     }
 
     void InitializeAI() override

@@ -90,7 +90,7 @@ struct boss_high_botanist_freywinn : public BossAI
     void ResumeEncounter()
     {
         me->GetMotionMaster()->MoveChase(me->GetVictim());
-        me->RemoveAurasDueToSpell(SPELL_TREE_FORM);
+        me->RemoveAura(SPELL_TREE_FORM);
         me->InterruptNonMeleeSpells(false);
     }
 

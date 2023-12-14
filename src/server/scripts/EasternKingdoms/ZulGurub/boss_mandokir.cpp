@@ -165,7 +165,7 @@ public:
                     }
                 }
             }
-            me->RemoveAurasDueToSpell(SPELL_FRENZY);
+            me->RemoveAura(SPELL_FRENZY);
             me->SetImmuneToAll(false);
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
@@ -258,7 +258,7 @@ public:
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*me, _chargeTarget.first))
                     {
-                        me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+                        me->RemoveAura(SPELL_WHIRLWIND);
                         DoCast(target, SPELL_WATCH_CHARGE, true);
                     }
                 }

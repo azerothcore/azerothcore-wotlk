@@ -250,7 +250,7 @@ public:
         {
             if (param == ACTION_ILLIDAN_CAGED)
             {
-                me->RemoveAurasDueToSpell(SPELL_FRENZY);
+                me->RemoveAura(SPELL_FRENZY);
                 events.Reset();
                 events.ScheduleEvent(EVENT_PHASE_4_START, 16000);
             }
@@ -1253,7 +1253,7 @@ public:
                 if (GetUnitOwner()->GetDisplayId() == GetUnitOwner()->GetNativeDisplayId())
                     GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_FORM, true);
                 else
-                    GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
+                    GetUnitOwner()->RemoveAura(SPELL_DEMON_FORM);
             }
             else if (aurEff->GetTickNumber() == 2)
             {

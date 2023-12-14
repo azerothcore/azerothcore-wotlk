@@ -158,7 +158,7 @@ public:
                 return;
             }
 
-            creatureTarget->RemoveAurasDueToSpell(SPELL_PLAY_DEAD_PACIFY);
+            creatureTarget->RemoveAura(SPELL_PLAY_DEAD_PACIFY);
             creatureTarget->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             creatureTarget->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             //creatureTarget->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);

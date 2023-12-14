@@ -106,7 +106,7 @@ public:
             {
                 _gasDummyGUID = gasDummy->GetGUID();
                 for (uint8 i = 0; i < 3; ++i)
-                    gasDummy->RemoveAurasDueToSpell(gaseousBlightVisual[i]);
+                    gasDummy->RemoveAura(gaseousBlightVisual[i]);
             }
         }
 
@@ -169,7 +169,7 @@ public:
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == PUNGENT_BLIGHT_HELPER)
-                target->RemoveAurasDueToSpell(INOCULATED_HELPER);
+                target->RemoveAura(INOCULATED_HELPER);
             else if (Player* p = target->ToPlayer())
             {
                 // Gaseous Blight damage
@@ -184,8 +184,8 @@ public:
             if (Creature* gasDummy = ObjectAccessor::GetCreature(*me, _gasDummyGUID))
                 for (uint8 i = 0; i < 3; ++i)
                 {
-                    me->RemoveAurasDueToSpell(gaseousBlight[i]);
-                    gasDummy->RemoveAurasDueToSpell(gaseousBlightVisual[i]);
+                    me->RemoveAura(gaseousBlight[i]);
+                    gasDummy->RemoveAura(gaseousBlightVisual[i]);
                 }
         }
 
@@ -308,7 +308,7 @@ public:
             uint32 blightId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), caster);
 
             // ...and remove it
-            caster->RemoveAurasDueToSpell(blightId);
+            caster->RemoveAura(blightId);
             caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
 
             if (InstanceScript* inst = caster->GetInstanceScript())
@@ -393,7 +393,7 @@ public:
             if (!(aura && aura->GetStackAmount() == 10))
                 return;
 
-            GetHitUnit()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+            GetHitUnit()->RemoveAura(GetSpellInfo()->Id);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GASTRIC_EXPLOSION, true);
         }
 

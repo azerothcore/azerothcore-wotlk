@@ -576,7 +576,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 2)
             {
-                me->RemoveAurasDueToSpell(SPELL_THE_LIGHT_OF_DAWN);
+                me->RemoveAura(SPELL_THE_LIGHT_OF_DAWN);
                 Talk(EMOTE_LIGHT_OF_DAWN05);
                 events.Reset();
 

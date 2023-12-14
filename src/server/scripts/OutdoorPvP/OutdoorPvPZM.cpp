@@ -164,10 +164,10 @@ void OutdoorPvPZM::HandlePlayerEnterZone(Player* player, uint32 zone)
 void OutdoorPvPZM::HandlePlayerLeaveZone(Player* player, uint32 zone)
 {
     // remove buffs
-    player->RemoveAurasDueToSpell(ZM_CAPTURE_BUFF);
+    player->RemoveAura(ZM_CAPTURE_BUFF);
     // remove flag
-    player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_A);
-    player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_H);
+    player->RemoveAura(ZM_BATTLE_STANDARD_A);
+    player->RemoveAura(ZM_BATTLE_STANDARD_H);
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
 
@@ -231,7 +231,7 @@ int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, GameObject* go)
             sGraveyard->RemoveGraveyardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, TEAM_HORDE);          // rem gy
             sGraveyard->AddGraveyardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, TEAM_ALLIANCE, false);   // add gy
             _pvp->TeamApplyBuff(TEAM_ALLIANCE, ZM_CAPTURE_BUFF, 0, player);
-            player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_A);
+            player->RemoveAura(ZM_BATTLE_STANDARD_A);
             sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_ZM_CAPTURE_GY_A));
         }
         else if (player->HasAura(ZM_BATTLE_STANDARD_H) && m_GraveYardState != ZM_GRAVEYARD_H)
@@ -244,7 +244,7 @@ int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, GameObject* go)
             sGraveyard->RemoveGraveyardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, TEAM_ALLIANCE);          // rem gy
             sGraveyard->AddGraveyardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, TEAM_HORDE, false);   // add gy
             _pvp->TeamApplyBuff(TEAM_HORDE, ZM_CAPTURE_BUFF, 0, player);
-            player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_H);
+            player->RemoveAura(ZM_BATTLE_STANDARD_H);
             sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_ZM_CAPTURE_GY_H));
         }
         UpdateTowerState();
@@ -322,8 +322,8 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(TeamId controlling_factionId)
                     Player* p = ObjectAccessor::FindPlayer(m_FlagCarrierGUID);
                     if (p)
                     {
-                        p->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_A);
-                        p->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_H);
+                        p->RemoveAura(ZM_BATTLE_STANDARD_A);
+                        p->RemoveAura(ZM_BATTLE_STANDARD_H);
                     }
                     m_FlagCarrierGUID.Clear();
                 }

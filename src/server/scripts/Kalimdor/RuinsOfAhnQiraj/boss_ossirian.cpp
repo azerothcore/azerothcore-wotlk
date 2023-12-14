@@ -150,7 +150,7 @@ struct boss_ossirian : public BossAI
         {
             if (spell->Id == weakness)
             {
-                me->RemoveAurasDueToSpell(SPELL_STRENGTH_OF_OSSIRIAN);
+                me->RemoveAura(SPELL_STRENGTH_OF_OSSIRIAN);
             }
         }
     }

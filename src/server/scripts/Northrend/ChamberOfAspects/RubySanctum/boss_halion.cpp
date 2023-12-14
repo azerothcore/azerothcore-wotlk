@@ -191,7 +191,7 @@ public:
 
         if (instance->GetBossState(DATA_HALION) != IN_PROGRESS)
         {
-            _owner->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
+            _owner->RemoveAura(SPELL_TWILIGHT_REALM);
             return true;
         }
 
@@ -220,7 +220,7 @@ public:
         {
             _livingEmberCount = 0;
             BossAI::Reset();
-            me->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
+            me->RemoveAura(SPELL_TWILIGHT_PHASING);
             me->CastSpell(me, SPELL_CLEAR_DEBUFFS, false);
 
             me->SetVisible(false);
@@ -720,14 +720,14 @@ public:
 
             if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_TWILIGHT_HALION)))
             {
-                twilightHalion->RemoveAurasDueToSpell(_corporealityReference[MAX_CORPOREALITY_STATE - 1 - oldValue]);
+                twilightHalion->RemoveAura(_corporealityReference[MAX_CORPOREALITY_STATE - 1 - oldValue]);
                 twilightHalion->CastSpell(twilightHalion, _corporealityReference[MAX_CORPOREALITY_STATE - 1 - _corporeality], true);
                 twilightHalion->AI()->Talk(oldValue < _corporeality ? EMOTE_CORPOREALITY_TOT : EMOTE_CORPOREALITY_TIT);
             }
 
             if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION)))
             {
-                halion->RemoveAurasDueToSpell(_corporealityReference[oldValue]);
+                halion->RemoveAura(_corporealityReference[oldValue]);
                 halion->CastSpell(halion, _corporealityReference[_corporeality], true);
                 halion->AI()->Talk(oldValue > _corporeality ? EMOTE_CORPOREALITY_POT : EMOTE_CORPOREALITY_PIP);
             }
@@ -938,7 +938,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
+            GetTarget()->RemoveAura(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -988,7 +988,7 @@ public:
 
             if (Unit* dispelledUnit = GetUnitOwner())
                 if (dispelledUnit->HasAura(_removeSpellId))
-                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
+                    dispelledUnit->RemoveAura(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1095,9 +1095,9 @@ public:
         {
             if (GetHitUnit())
             {
-                GetHitUnit()->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
-                GetHitUnit()->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-                GetHitUnit()->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION);
+                GetHitUnit()->RemoveAura(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+                GetHitUnit()->RemoveAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+                GetHitUnit()->RemoveAura(SPELL_FIERY_COMBUSTION);
             }
         }
 
@@ -1197,7 +1197,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAura(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                 return;
             GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
@@ -1230,12 +1230,12 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAura(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
+            GetTarget()->RemoveAura(SPELL_TWILIGHT_REALM);
 
             if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -1395,7 +1395,7 @@ public:
             controller->CastSpell(controller, SPELL_SUMMON_EXIT_PORTALS, true);
             controller->AI()->DoAction(ACTION_CHECK_CORPOREALITY);
 
-            halion->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
+            halion->RemoveAura(SPELL_TWILIGHT_PHASING);
             if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
                 gobject->Delete();
 

@@ -744,7 +744,7 @@ public:
         void OnRemoveStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (Player* owner = GetOwner()->ToPlayer())
-                owner->RemoveAurasDueToSpell(aurEff->GetAmount());
+                owner->RemoveAura(aurEff->GetAmount());
         }
 
         void Register() override

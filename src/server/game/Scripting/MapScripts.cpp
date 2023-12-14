@@ -657,7 +657,7 @@ void Map::ScriptsProcess()
                     // Source (datalong2 != 0) or target (datalong2 == 0) must be Unit.
                     bool bReverse = step.script->RemoveAura.Flags & SF_REMOVEAURA_REVERSE;
                     if (Unit* unit = _GetScriptUnit(bReverse ? source : target, bReverse, step.script))
-                        unit->RemoveAurasDueToSpell(step.script->RemoveAura.SpellID);
+                        unit->RemoveAura(step.script->RemoveAura.SpellID);
                     break;
                 }
 

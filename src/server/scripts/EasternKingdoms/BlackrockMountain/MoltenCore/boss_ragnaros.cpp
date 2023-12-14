@@ -278,7 +278,7 @@ public:
                         {
                             _isIntroDone = true;
                             extraEvents.SetPhase(PHASE_EMERGED);
-                            me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
+                            me->RemoveAura(SPELL_RAGNAROS_SUBMERGE_EFFECT);
                             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetImmuneToAll(false);
                             me->SetReactState(REACT_AGGRESSIVE);
@@ -468,7 +468,7 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
 
-            me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
+            me->RemoveAura(SPELL_RAGNA_SUBMERGE_VISUAL);
 
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {

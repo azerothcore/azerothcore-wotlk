@@ -83,13 +83,13 @@ struct boss_leotheras_the_blind : public BossAI
         _recentlySpoken = false;
 
         ScheduleHealthCheckEvent(15, [&]{
-            me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+            me->RemoveAura(SPELL_WHIRLWIND);
 
             if (me->GetDisplayId() != me->GetNativeDisplayId())
             {
                 //is currently in metamorphosis
                 me->LoadEquipment();
-                me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+                me->RemoveAura(SPELL_METAMORPHOSIS);
                 scheduler.RescheduleGroup(GROUP_COMBAT, 10s);
             }
 
@@ -184,7 +184,7 @@ struct boss_leotheras_the_blind : public BossAI
     void DemonTime()
     {
         DoResetThreatList();
-        me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+        me->RemoveAura(SPELL_WHIRLWIND);
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
@@ -203,7 +203,7 @@ struct boss_leotheras_the_blind : public BossAI
             DoResetThreatList();
             me->LoadEquipment();
             me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
-            me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+            me->RemoveAura(SPELL_METAMORPHOSIS);
             scheduler.CancelGroup(GROUP_DEMON);
             ElfTime();
         });
@@ -269,7 +269,7 @@ struct npc_inner_demon : public ScriptedAI
     {
         if (Unit* affectedPlayer = ObjectAccessor::GetUnit(*me, me->GetSummonerGUID()))
         {
-            affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
+            affectedPlayer->RemoveAura(SPELL_INSIDIOUS_WHISPER);
         }
     }
 

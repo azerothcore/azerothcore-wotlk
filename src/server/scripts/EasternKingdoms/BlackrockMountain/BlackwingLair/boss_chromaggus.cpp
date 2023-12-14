@@ -311,7 +311,7 @@ class spell_gen_elemental_shield : public SpellScript
         {
             for (uint32 spell = SPELL_FIRE_ELEMENTAL_SHIELD; spell <= SPELL_ARCANE_ELEMENTAL_SHIELD; ++spell)
             {
-                caster->RemoveAurasDueToSpell(spell);
+                caster->RemoveAura(spell);
             }
 
             caster->CastSpell(caster, SPELL_FIRE_ELEMENTAL_SHIELD + urand(0, 4), true);
@@ -346,7 +346,7 @@ class spell_gen_brood_power : public SpellScript
         {
             for (uint32 spell = SPELL_RED_BROOD_POWER; spell <= SPELL_GREEN_BROOD_POWER; ++spell)
             {
-                caster->RemoveAurasDueToSpell(spell);
+                caster->RemoveAura(spell);
             }
 
             caster->CastSpell(caster, RAND(SPELL_RED_BROOD_POWER, SPELL_BLUE_BROOD_POWER, SPELL_BRONZE_BROOD_POWER, SPELL_BLACK_BROOD_POWER, SPELL_GREEN_BROOD_POWER), true);
