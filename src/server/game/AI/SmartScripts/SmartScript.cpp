@@ -4077,6 +4077,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_SUMMONED_UNIT:
         case SMART_EVENT_SUMMONED_UNIT_DIES:
+        case SMART_EVENT_SUMMONED_UNIT_EVADE:
             {
                 if (!IsCreature(unit))
                     return;
