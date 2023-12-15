@@ -97,6 +97,9 @@ public:
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
+    // Called when a summoned unit evades
+    void SummonedCreatureEvade(Creature* summon) override;
+
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
 
@@ -282,6 +285,9 @@ public:
 
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
+    // Called when a summoned unit evades
+    void SummonedCreatureEvade(Creature* summon) override;
 
 protected:
     SmartScript mScript;
