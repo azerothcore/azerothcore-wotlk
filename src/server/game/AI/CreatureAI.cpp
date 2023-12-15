@@ -295,6 +295,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     {
         return false;
     }
+
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle
     // don't remove clone caster on evade (to be verified)
     me->RemoveEvadeAuras();
