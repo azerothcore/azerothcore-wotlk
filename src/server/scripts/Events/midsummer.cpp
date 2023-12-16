@@ -207,7 +207,6 @@ struct npc_midsummer_bonfire : public ScriptedAI
             {
                 if (!InitBonfire())
                     context.Repeat();
-
             });
     }
 
