@@ -170,12 +170,12 @@ public:
     {
     }
 
-    void OnUpdateZone(Player* player, uint32 newZone, uint32 newArea) override
+    void OnUpdateZone(Player* player, uint32 newZone, uint32 /*newArea*/) override
     {
         if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
             return;
 
-        auto itr = BonfireStateStore.find(std::make_tuple(player->GetMapId(), player->GetZoneId(), player->GetTeamId()));
+        auto itr = BonfireStateStore.find(std::make_tuple(player->GetMapId(), newZone, player->GetTeamId()));
         if (itr != BonfireStateStore.end())
         {
             if (itr->second)
