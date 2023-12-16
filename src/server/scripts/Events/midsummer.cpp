@@ -176,17 +176,14 @@ public:
             return;
 
         auto itr = BonfireStateStore.find(std::make_tuple(player->GetMapId(), newZone, player->GetTeamId()));
-        if (itr != BonfireStateStore.end())
+        if ((itr != BonfireStateStore.end()) && (itr->second))
         {
-            if (itr->second)
+            if (!(*(itr->second)))
             {
-                if (!(*(itr->second)))
-                {
-                    if (!player->HasAura(SPELL_BONFIRES_BLESSING))
-                        player->CastSpell(player, SPELL_BONFIRES_BLESSING, true);
+                if (!player->HasAura(SPELL_BONFIRES_BLESSING))
+                    player->CastSpell(player, SPELL_BONFIRES_BLESSING, true);
 
-                    return;
-                }
+                return;
             }
         }
 
@@ -336,10 +333,9 @@ struct npc_midsummer_bonfire : public ScriptedAI
             return false;
 
         auto itr = BonfireStateStore.find(std::make_tuple(me->GetMapId(), me->GetZoneId(), _teamId));
-        if (itr != BonfireStateStore.end())
+        if ((itr != BonfireStateStore.end()) && (itr->second))
         {
-            if (itr->second)
-                _isStampedOut = itr->second;
+            _isStampedOut = itr->second;
         }
         else
         {
