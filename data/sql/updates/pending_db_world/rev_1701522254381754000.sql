@@ -175,7 +175,8 @@ UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_midsummer_bonf
 
 -- Spell 45444 Bonfire's Blessing
 DELETE FROM `spell_script_names` WHERE `spell_id` = 45444 AND `ScriptName` = 'spell_bonfires_blessing';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (45444, 'spell_bonfires_blessing');
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(45444, 'spell_bonfires_blessing');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 24) AND (`SourceEntry` = 45444);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
