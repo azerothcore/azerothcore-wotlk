@@ -220,9 +220,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
             me->CastSpell(me, SPELL_MIDSUMMER_BONFIRE_BUNNIES_2, true);
 
             if (_spellFocus = me->FindNearestGameObject(GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS, 10.0f))
-            {
                 me->AddGameObject(_spellFocus);
-            }
         }
 
         switch (_type)
@@ -234,9 +232,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                 break;
             case BONFIRE_TYPE_AHUNE:
                 if (_bonfire)
-                {
                     _bonfire->SetGoState(GO_STATE_ACTIVE);
-                }
                 break;
             default:
                 break;
@@ -338,7 +334,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
         }
         else
         {
-            LOG_ERROR("scripts.midsummer", "NPC {} (GUID{}) in zone {} can't locate its entry within BonfireStateStore", me->GetGUID().GetEntry(), me->GetSpawnId(), me->GetZoneId());
+            LOG_ERROR("scripts.midsummer", "NPC {} (GUID{}) in map {}, zone {} with teamId {} can't locate its entry within BonfireStateStore", me->GetGUID().GetEntry(), me->GetSpawnId(), me->GetMapId(), me->GetZoneId(), _teamId);
         }
 
         if (_type != BONFIRE_TYPE_AHUNE)
