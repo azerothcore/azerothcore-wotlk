@@ -239,7 +239,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
         }
     }
 
-    void Extinguish()
+    void StampOut()
     {
         switch (_type)
         {
@@ -357,7 +357,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
             }
             case SPELL_STAMP_OUT_BONFIRE:
             {
-                Extinguish();
+                StampOut();
 
                 // desecrating other faction's bonfire flags player for PVP
                 caster->SetPvP(true);
