@@ -220,7 +220,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
         {
             me->CastSpell(me, SPELL_MIDSUMMER_BONFIRE_BUNNIES_2, true);
 
-            if (_spellFocus = me->FindNearestGameObject(GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS, 10.0f))
+            if ((_spellFocus = me->FindNearestGameObject(GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS, 10.0f)))
                 me->AddGameObject(_spellFocus);
         }
 
