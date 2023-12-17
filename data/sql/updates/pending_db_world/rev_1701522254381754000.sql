@@ -182,6 +182,11 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 24) AND (`SourceEntr
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (24, 0, 45444, 0, 0, 12, 0, 1, 0, 0, 0, 0, 0, '', 'Spell \'Bonfire\'s Blessing\' PROC requires Midsummer Fire Festival');
 
+-- proc cooldown 45 seconds
+DELETE FROM `spell_proc_event` WHERE (`entry` = 45444);
+INSERT INTO `spell_proc_event` (`entry`, `Cooldown`) VALUES
+(45444, 45000);
+
 -- remove all spawns of 181376, 'Midsummer Bonfire Campfire Damage Trap' 
 -- it's the linked trap of 181377
 -- which is beeing spawned by spell 29114 'Midsummer Bonfire Bunnies 2' by NPC 16592 if the fire is burning
