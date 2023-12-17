@@ -86,11 +86,12 @@ struct boss_the_lurker_below : public BossAI
     {
         if (action == ACTION_START_EVENT)
         {
+            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetInCombatWithZone();
+            me->SetStandState(UNIT_STAND_STATE_STAND);
         }
     }
 
@@ -135,7 +136,7 @@ struct boss_the_lurker_below : public BossAI
             me->SetFacingToObject(me->GetVictim());
             me->SetTarget();
             scheduler.RescheduleGroup(GROUP_GEYSER, 25s);
-            scheduler.RescheduleGroup(GROUP_WHIRL, 18s);
+            scheduler.RescheduleGroup(GROUP_WHIRL, 20s);
             scheduler.Schedule(3s, [this](TaskContext)
             {
                 me->InterruptNonMeleeSpells(false);
@@ -146,7 +147,7 @@ struct boss_the_lurker_below : public BossAI
         {
             //phase2
             scheduler.CancelAll();
-            DoCastSelf(SPELL_SUBMERGE_VISUAL, true);
+            DoCastSelf(SPELL_SUBMERGE_VISUAL);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -225,7 +226,7 @@ public:
             if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
             {
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = go->SummonCreature(NPC_THE_LURKER_BELOW, 40.4058f, -417.108f, -21.5911f, 3.03312f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 604800000))
+                if (Creature* lurker = go->SummonCreature(NPC_THE_LURKER_BELOW, 38.4567f, -417.324f, -18.916666f, 2.94960f, TEMPSUMMON_MANUAL_DESPAWN))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
                 return true;
             }
@@ -241,6 +242,11 @@ class spell_lurker_below_spout : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         SetDuration(16000);
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+    {
+        amplitude = 250;
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -265,6 +271,7 @@ class spell_lurker_below_spout : public AuraScript
 
     void Register() override
     {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_lurker_below_spout::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_lurker_below_spout::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
@@ -277,22 +284,9 @@ class spell_lurker_below_spout_cone : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Unit* caster = GetCaster();
-        targets.remove_if([caster](WorldObject const* target) -> bool
+        targets.remove_if([this](WorldObject const* target) -> bool
         {
-            if (!caster->HasInLine(target, 5.0f) || !target->IsPlayer())
-            {
-                return true;
-            }
-
-            LiquidData const& liquidData = target->GetLiquidData();
-
-            if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
-            {
-                return true;
-            }
-
-            return false;
+            return !GetCaster()->HasInLine(target, 5.0f) || !target->IsPlayer() || target->ToUnit()->IsInWater();
         });
     }
 

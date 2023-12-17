@@ -817,6 +817,11 @@ void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
 }
 
+void SmartAI::SummonedCreatureEvade(Creature* summon)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_EVADE, summon);
+}
+
 void SmartAI::AttackStart(Unit* who)
 {
     // xinef: dont allow charmed npcs to act on their own
@@ -1134,6 +1139,11 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
+}
+
+void SmartGameObjectAI::SummonedCreatureEvade(Creature* summon)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_EVADE, summon);
 }
 
 void SmartGameObjectAI::UpdateAI(uint32 diff)
