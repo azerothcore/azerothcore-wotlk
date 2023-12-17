@@ -2759,6 +2759,7 @@ void World::_UpdateGameTime()
 void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
 {
     // ignore if server shutdown at next tick
+
     if (IsStopped())
         return;
 
@@ -2779,6 +2780,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
     {
         playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
         {
+#ifdef MOD_PLAYERBOTS
+            sScriptMgr->OnPlayerbotLogoutBots();
+#endif
             if (!GetActiveSessionCount())
             {
                 LOG_INFO("server", "> No players online. Skip save before shutdown");
@@ -2806,8 +2810,6 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
         _shutdownTimer = time;
         ShutdownMsg(true, nullptr, reason);
     }
-
-    sScriptMgr->OnPlayerbotLogoutBots();
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
