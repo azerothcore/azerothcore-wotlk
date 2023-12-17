@@ -295,7 +295,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
         for (uint32 i = 0; (i < COUNT_GO_BONFIRE_ALLIANCE) && (_type == BONFIRE_TYPE_NONE); i++)
         {
-            if (_bonfire = me->FindNearestGameObject(GoBonfireAlliance[i], 10.0f))
+            if ((_bonfire = me->FindNearestGameObject(GoBonfireAlliance[i], 10.0f)))
             {
                 _type = BONFIRE_TYPE_ALLIANCE;
                 _teamId = TEAM_ALLIANCE;
@@ -304,7 +304,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
         for (uint32 i = 0; (i < COUNT_GO_BONFIRE_HORDE) && (_type == BONFIRE_TYPE_NONE); i++)
         {
-            if (_bonfire = me->FindNearestGameObject(GoBonfireHorde[i], 10.0f))
+            if ((_bonfire = me->FindNearestGameObject(GoBonfireHorde[i], 10.0f)))
             {
                 _type = BONFIRE_TYPE_HORDE;
                 _teamId = TEAM_HORDE;
@@ -313,7 +313,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
         for (uint32 i = 0; (i < COUNT_GO_BONFIRE_CITY) && (_type == BONFIRE_TYPE_NONE); i++)
         {
-            if (_bonfire = me->FindNearestGameObject(GoBonfireCity[i], 10.0f))
+            if ((_bonfire = me->FindNearestGameObject(GoBonfireCity[i], 10.0f)))
             {
                 _type = BONFIRE_TYPE_CITY;
                 return true;
