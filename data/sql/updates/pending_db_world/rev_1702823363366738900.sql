@@ -24,4 +24,4 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 
 -- enable all spawns for eventEntry 1
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (16817, 16818, 25697, 25710, 25754)));
-INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE (`id1` IN (16817, 16818, 25697, 25710, 25754)));
+INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (16817, 16818, 25697, 25710, 25754));
