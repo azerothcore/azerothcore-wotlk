@@ -218,7 +218,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
         if (!_spellFocus)
         {
-            me->CastSpell(me, SPELL_MIDSUMMER_BONFIRE_BUNNIES_2, true);
+            DoCastSelf(SPELL_MIDSUMMER_BONFIRE_BUNNIES_2, true);
 
             if ((_spellFocus = me->FindNearestGameObject(GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS, 10.0f)))
                 me->AddGameObject(_spellFocus);
@@ -228,7 +228,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
         {
             case BONFIRE_TYPE_ALLIANCE:
             case BONFIRE_TYPE_HORDE:
-                me->CastSpell(me, SPELL_LIGHT_BONFIRE_ART_KIT, true);
+                DoCastSelf(SPELL_LIGHT_BONFIRE_ART_KIT, true);
                 UpdateBonfireBlessingBuffs();
                 break;
             case BONFIRE_TYPE_AHUNE:
@@ -255,7 +255,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                     _spellFocus = nullptr;
                 }
 
-                me->CastSpell(me, SPELL_STAMP_OUT_BONFIRE_ART_KIT, true);
+                DoCastSelf(SPELL_STAMP_OUT_BONFIRE_ART_KIT, true);
                 UpdateBonfireBlessingBuffs();
                 break;
             default:
@@ -275,9 +275,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                     if (_isStampedOut)
                     {
                         if (*_isStampedOut)
-                        {
                             p->RemoveAurasDueToSpell(SPELL_BONFIRES_BLESSING);
-                        }
                         else
                         {
                             if (!p->HasAura(SPELL_BONFIRES_BLESSING))
@@ -321,22 +319,16 @@ struct npc_midsummer_bonfire : public ScriptedAI
         }
 
         if ((_type == BONFIRE_TYPE_NONE) && (_bonfire = me->FindNearestGameObject(GO_AHUNE_BONFIRE, 10.0f)))
-        {
             _type = BONFIRE_TYPE_AHUNE;
-        }
 
         if (_type == BONFIRE_TYPE_NONE)
             return false;
 
         auto itr = BonfireStateStore.find(std::make_tuple(me->GetMapId(), me->GetZoneId(), _teamId));
         if ((itr != BonfireStateStore.end()) && (itr->second))
-        {
             _isStampedOut = itr->second;
-        }
         else
-        {
             LOG_ERROR("scripts.midsummer", "NPC {} (GUID{}) in map {}, zone {} with teamId {} can't locate its entry within BonfireStateStore", me->GetGUID().GetEntry(), me->GetSpawnId(), me->GetMapId(), me->GetZoneId(), _teamId);
-        }
 
         if (_type != BONFIRE_TYPE_AHUNE)
             Ignite();
