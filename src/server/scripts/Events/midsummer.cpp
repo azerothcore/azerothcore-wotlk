@@ -319,7 +319,10 @@ struct npc_midsummer_bonfire : public ScriptedAI
         }
 
         if ((_type == BONFIRE_TYPE_NONE) && (_bonfire = me->FindNearestGameObject(GO_AHUNE_BONFIRE, 10.0f)))
+        {
             _type = BONFIRE_TYPE_AHUNE;
+            return true;
+        }
 
         if (_type == BONFIRE_TYPE_NONE)
             return false;
@@ -330,8 +333,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
         else
             LOG_ERROR("scripts.midsummer", "NPC {} (GUID{}) in map {}, zone {} with teamId {} can't locate its entry within BonfireStateStore", me->GetGUID().GetEntry(), me->GetSpawnId(), me->GetMapId(), me->GetZoneId(), _teamId);
 
-        if (_type != BONFIRE_TYPE_AHUNE)
-            Ignite();
+        Ignite();
 
         return true;
     }
