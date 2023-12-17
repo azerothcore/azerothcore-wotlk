@@ -56,7 +56,8 @@ SmartScript::SmartScript()
     mTemplate = SMARTAI_TEMPLATE_BASIC;
     mScriptType = SMART_SCRIPT_TYPE_CREATURE;
     isProcessingTimedActionList = false;
-
+    mCurrentPriority = 0;
+    mEventSortingRequired = false;
     _allowPhaseReset = true;
 }
 
@@ -78,6 +79,12 @@ void SmartScript::OnReset()
         {
             InitTimer((*i));
             (*i).runOnce = false;
+        }
+
+        if ((*i).priority != SmartScriptHolder::DEFAULT_PRIORITY)
+        {
+            (*i).priority = SmartScriptHolder::DEFAULT_PRIORITY;
+            mEventSortingRequired = true;
         }
     }
     ProcessEventsFor(SMART_EVENT_RESET);
@@ -106,14 +113,18 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 
 void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
+    e.runOnce = true;//used for repeat check
+
     //calc random
-    if (e.event.event_chance < 100 && e.event.event_chance)
+    if (e.event.event_chance < 100 && e.event.event_chance && !(e.event.event_flags & SMART_EVENT_FLAG_TEMP_IGNORE_CHANCE_ROLL))
     {
         uint32 rnd = urand(1, 100);
         if (e.event.event_chance <= rnd)
             return;
     }
-    e.runOnce = true;//used for repeat check
+
+    // Remove SMART_EVENT_FLAG_TEMP_IGNORE_CHANCE_ROLL flag after processing roll chances as it's not needed anymore
+    e.event.event_flags &= ~SMART_EVENT_FLAG_TEMP_IGNORE_CHANCE_ROLL;
 
     if (unit)
         mLastInvoker = unit->GetGUID();
@@ -577,6 +588,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.action.cast.targetsLimit)
                 Acore::Containers::RandomResize(targets, e.action.cast.targetsLimit);
 
+            bool failedSpellCast = false, successfulSpellCast = false;
+
             for (WorldObject* target : targets)
             {
                 // may be nullptr
@@ -609,6 +622,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
+                    float distanceToTarget = me->GetDistance(target->ToUnit());
+                    float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
+                    float spellMinRange = me->GetSpellMinRangeForTarget(target->ToUnit(), spellInfo);
+
+                    // Let us not try to cast spell if we know it is going to fail anyway. Stick to chasing and continue.
+                    if (distanceToTarget > spellMaxRange) {
+                        failedSpellCast = true;
+                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true, spellMaxRange - 0.1f); // -0.1f to fix rounding
+                        continue;
+                    }
+                    else if (distanceToTarget < spellMinRange) {
+                        failedSpellCast = true;
+                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
+                        continue;
+                    }
+
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
                     {
@@ -624,16 +654,32 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
                         // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
+                        if (result == SPELL_FAILED_OUT_OF_RANGE)
+                            // if we are just out of range, we only chase until we are back in spell range.
+                            CAST_AI(SmartAI, me->AI())->SetCombatMove(true, spellMaxRange - 0.1f); // -0.1f to fix rounding
+                        else
+                            // if spell fail for any other reason, we chase to melee range.
+                            CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
                     }
 
                     if (spellCastFailed)
-                        RecalcTimer(e, 500, 500);
+                        failedSpellCast = true;
+                    else
+                        successfulSpellCast = true;
 
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_CAST: Unit {} casts spell {} on target {} with castflags {}",
                               me->GetGUID().ToString(), e.action.cast.spell, target->GetGUID().ToString(), e.action.cast.castFlags);
                 }
             }
+
+            // If there is at least 1 failed cast and no successful casts at all, retry again on next loop
+            if (failedSpellCast && !successfulSpellCast)
+            {
+                RetryLater(e, true);
+                // Don't execute linked events
+                return;
+            }
+
             break;
         }
         case SMART_ACTION_SELF_CAST:
@@ -4538,7 +4584,8 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             {
                 if (me && me->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    e.timer = 1200;
+                    //e.timer = 1200;
+                    RaisePriority(e);
                     return;
                 }
             }
@@ -4596,6 +4643,18 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
                     break;
                 }
         }
+
+        if (e.priority != SmartScriptHolder::DEFAULT_PRIORITY)
+        {
+            // Reset priority to default one only if the event hasn't been rescheduled again to next loop
+            if (e.timer > 1)
+            {
+                // Re-sort events if this was moved to the top of the queue
+                mEventSortingRequired = true;
+                // Reset priority to default one
+                e.priority = SmartScriptHolder::DEFAULT_PRIORITY;
+            }
+        }
     }
     else
         e.timer -= diff;
@@ -4623,6 +4682,12 @@ void SmartScript::OnUpdate(uint32 const diff)
         return;
 
     InstallEvents();//before UpdateTimers
+
+    if (mEventSortingRequired)
+    {
+        SortEvents(mEvents);
+        mEventSortingRequired = false;
+    }
 
     for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)
         UpdateTimer(*i, diff);
@@ -4677,6 +4742,33 @@ void SmartScript::OnUpdate(uint32 const diff)
         }
         else mTextTimer -= diff;
     }
+}
+
+void SmartScript::SortEvents(SmartAIEventList& events)
+{
+    std::sort(events.begin(), events.end());
+}
+
+void SmartScript::RaisePriority(SmartScriptHolder& e)
+{
+    e.timer = 1;
+    // Change priority only if it's set to default, otherwise keep the current order of events
+    if (e.priority == SmartScriptHolder::DEFAULT_PRIORITY)
+    {
+        e.priority = mCurrentPriority++;
+        mEventSortingRequired = true;
+    }
+}
+
+void SmartScript::RetryLater(SmartScriptHolder& e, bool ignoreChanceRoll)
+{
+    RaisePriority(e);
+
+    // This allows to retry the action later without rolling again the chance roll (which might fail and end up not executing the action)
+    if (ignoreChanceRoll)
+        e.event.event_flags |= SMART_EVENT_FLAG_TEMP_IGNORE_CHANCE_ROLL;
+
+    e.runOnce = false;
 }
 
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)

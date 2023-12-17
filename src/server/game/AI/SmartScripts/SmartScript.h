@@ -228,6 +228,10 @@ private:
     void SetPhase(uint32 p);
     bool IsInPhase(uint32 p) const;
 
+    void SortEvents(SmartAIEventList& events);
+    void RaisePriority(SmartScriptHolder& e);
+    void RetryLater(SmartScriptHolder& e, bool ignoreChanceRoll = false);
+
     SmartAIEventList mEvents;
     SmartAIEventList mInstallEvents;
     SmartAIEventList mTimedActionList;
@@ -249,6 +253,8 @@ private:
     uint32 mLastTextID;
     uint32 mTalkerEntry;
     bool mUseTextTimer;
+    uint32 mCurrentPriority;
+    bool mEventSortingRequired;
 
     // Xinef: misc
     bool _allowPhaseReset;

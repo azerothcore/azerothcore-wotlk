@@ -1015,7 +1015,7 @@ void SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
     GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt);
 }
 
-void SmartAI::SetCombatMove(bool on)
+void SmartAI::SetCombatMove(bool on, float chaseRange)
 {
     if (mCanCombatMove == on)
         return;
@@ -1032,7 +1032,7 @@ void SmartAI::SetCombatMove(bool on)
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
             {
                 SetRun(mRun);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), chaseRange);
                 me->CastStop();
             }
         }
