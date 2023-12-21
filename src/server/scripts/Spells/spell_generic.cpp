@@ -653,7 +653,6 @@ class spell_gen_area_aura_select_players : public AuraScript
    54847 - Mojo Volley       (spell_gen_select_target_count_15_2)
    59452 - Mojo Volley       (spell_gen_select_target_count_15_2)
    46008 - Negative Energy   (spell_gen_select_target_count_15_5)
-   38017 - Wave A - 1                 (spell_gen_select_target_count_7_1)
    40851 - Disgruntled                (spell_gen_select_target_count_7_1)
    45680 - Shadow Bolt                (spell_gen_select_target_count_7_1)
    45976 - Open Portal                (spell_gen_select_target_count_7_1)

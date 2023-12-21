@@ -1245,11 +1245,21 @@ public:
         return true;
     }
 
-    static bool HandleWPGPSCommand(ChatHandler* handler)
+    static bool HandleWPGPSCommand(ChatHandler* handler, Optional<std::string> type)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        LOG_INFO("sql.dev", "(@PATH, XX, {0:.3f}, {0:.3f}, {0:.5f}, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        if (!type)
+        {
+            // waypoint_data - id, point, X, Y, Z, O, delay, move_type, action, action_chance, wpguid
+            LOG_INFO("sql.dev", "(@PATH, XX, {:.3f}, {:.3f}, {:.5f}, {:.5f}, 0, 0, 0, 100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+        }
+
+        if (type == "sai")
+        {
+            // waypoint (SAI) - entry, pointid, X, Y, Z, O, delay
+            LOG_INFO("sql.dev", "(@PATH, XX, {:.3f}, {:.3f}, {:.5f}, {:.5f}, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+        }
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
