@@ -145,7 +145,13 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
         Title = ci->SubName;
 
         LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        //npcbot: pointless check, see AccountInfo()
+        /*
+        //end npcbot
         if (loc_idx >= 0)
+        //npcbot
+        */
+        //end npcbot
         {
             if (CreatureLocale const* cl = sObjectMgr->GetCreatureLocale(entry))
             {
