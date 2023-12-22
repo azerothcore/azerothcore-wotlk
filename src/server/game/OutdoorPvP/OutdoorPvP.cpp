@@ -361,14 +361,14 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         botsCount[team] = 0;
 
-        for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
+        for (GuidSet::iterator itr = _activePlayers[team].begin(); itr != _activePlayers[team].end(); ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 botsCount[team] += player->GetNpcBotsCount();
         }
     }
 
-    fact_diff += 0.5f * ((float)botsCount[0] - (float)botsCount[1]) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+    factDiff += 0.5f * ((float)botsCount[0] - (float)botsCount[1]) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
     //end npcbot
 
     TeamId ChallengerId = TEAM_NEUTRAL;

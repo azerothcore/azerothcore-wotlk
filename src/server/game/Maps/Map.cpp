@@ -2788,10 +2788,6 @@ template <>
 void Map::AddToActive(Creature* c)
 {
     AddToActiveHelper(c);
-        //npcbot
-        else if (c->IsNPCBot())
-            EnsureGridLoadedForActiveObject(Cell(Acore::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())), c);
-        //end npcbot
 }
 
 template<>
@@ -2816,15 +2812,6 @@ template <>
 void Map::RemoveFromActive(Creature* c)
 {
     RemoveFromActiveHelper(c);
-        //npcbot: prevent crash from accessing deleted creatureData
-        if (c->IsNPCBot())
-            c->GetHomePosition().GetPosition(x, y, z);
-        else
-        //end npcbot
-        //npcbot
-        else if (c->IsNPCBot())
-            EnsureGridLoaded(Cell(Acore::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())));
-        //end npcbot
 }
 
 template<>
