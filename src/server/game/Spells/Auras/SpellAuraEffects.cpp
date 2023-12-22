@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -528,8 +529,14 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 Item* item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
                 Item* item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
 
-                if (item1 && item2 && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                if (!item2)
+                    item2 = caster->ToPlayer()->GetShield();
+
+                if (item1 && item2
+                    && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                {
                     amount = -10;
+                }
                 else
                     amount = 0;
             }
@@ -1617,8 +1624,8 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    if (target->IsInWorld())
-        target->UpdateObjectVisibility();
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
+    target->bRequestForcedVisibilityUpdate = false;
 }
 
 void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1694,8 +1701,8 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    if (target->IsInWorld())
-        target->UpdateObjectVisibility();
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
+    target->bRequestForcedVisibilityUpdate = false;
 }
 
 void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1773,7 +1780,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
     // die at aura end
     else if (target->IsAlive())
         // call functions which may have additional effects after chainging state of unit
-        target->setDeathState(JUST_DIED);
+        target->setDeathState(DeathState::JustDied);
 
     // xinef: damage immunity spell, not needed because of 93 aura (adds non_attackable state)
     // xinef: probably blizzard added it just in case in wotlk (id > 46000)
@@ -1859,6 +1866,7 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         if (!target->GetMap()->Instanceable())
         {
             target->UpdateObjectVisibility(false);
+            target->m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f);
         }
         else
             target->UpdateObjectVisibility();
@@ -2318,6 +2326,392 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     // Honor the Dead
                     case 65386:
                     case 65495:
+                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 29203 : 29204);
+                        break;
+                    // Gossip NPC Appearance - Brewfest
+                    case 65511:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21839 : 21838);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21841 : 21840);
+                                    break;
+                                case DisplayRace::Orc:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21867 : 21866);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21869 : 21868);
+                                    break;
+                                case DisplayRace::Troll:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21875 : 21874);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21877 : 21876);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21869 : 21871);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21872 : 21873);
+                                    break;
+                                case DisplayRace::Undead:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21879 : 21878);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21881 : 21880);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21844 : 21842);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21845 : 21843);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21846 : 21848);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21847 : 21849);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21851 : 21850);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21853 : 21852);
+                                    break;
+                                case DisplayRace::Human:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21859 : 21858);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21861 : 21860);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21863 : 21862);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21865 : 21864);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21854 : 21856);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21855 : 21857);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            // equip random brewfest mug
+                            uint32 itemIds[5] = {
+                                2703,  // Monster - Item, Tankard Wooden
+                                2704,  // Monster - Item, Tankard Dirty
+                                2705,  // Monster - Item, Tankard Metal
+                                13861, // Monster - Item, Tankard Gold
+                                33963  // NPC Equip 33963
+                            };
+                            if (target->ToCreature())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, itemIds[urand(0, 4)]);
+
+                            break;
+                        }
+                    // Gossip NPC Appearance - Winter Veil
+                    case 65522:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18793 : 18785);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18805 : 18804);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18809 : 18808);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18807 : 18806);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18811 : 18810);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18795 : 18794);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18797 : 18796);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18799 : 18798);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18801 : 18800);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18803 : 18802);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19342 : 19339);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Default
+                    case 65523:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19170 : 19169);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19182 : 19181);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19186 : 19185);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19184 : 19183);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19188 : 19187);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19172 : 19171);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19174 : 19173);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19176 : 19175);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19178 : 19177);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19180 : 19179);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19343 : 19340);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Lunar Festival
+                    case 65524:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18841 : 18840);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18870 : 18869);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18874 : 18873);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18872 : 18871);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18876 : 18875);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18843 : 18842);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18845 : 18844);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18847 : 18846);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18860 : 18858);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18868 : 18867);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21067 : 19341);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Hallow's End
+                    case 65525:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22361 : 22360);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22375 : 22374);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22379 : 22378);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22377 : 22376);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22381 : 22380);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22363 : 22362);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22365 : 22364);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22367 : 22366);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22371 : 22370);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22373 : 22372);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22369 : 22368);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Midsummer
+                    case 65526:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21086 : 21085);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16438 : 16436);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16446 : 16445);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16432 : 16442);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16444 : 16443);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21083 : 21084);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16413 : 16434);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16448 : 16447);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16433 : 16412);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16435 : 16414);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 29243 : 16431);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Spirit of Competition
+                    case 65527:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24508 : 24519);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24515 : 24526);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24517 : 24528);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24516 : 24527);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24518 : 24529);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24509 : 24520);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24510 : 24521);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24511 : 24522);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24513 : 24524);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24514 : 24525);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24512 : 24523);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Pirates' Day
+                    case 65528:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25032 : 25043);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25039 : 25050);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25041 : 25052);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25040 : 25051);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25042 : 25053);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25033 : 25044);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25034 : 25045);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25035 : 25046);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25037 : 25048);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25038 : 25049);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25036 : 25047);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Day of the Dead(DotD)
+                    case 65529:
                         target->SetDisplayId(target->getGender() == GENDER_MALE ? 29203 : 29204);
                         break;
                     // Darkspear Pride
@@ -3794,6 +4188,7 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
             break;
         case 34471: // The Beast Within
         case 19574: // Bestial Wrath
+        case 38484: // Bestial Wrath
             mechanic = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, apply);
@@ -6369,6 +6764,11 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
 
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(damage, caster);
+    }
+
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
         //npcbot: Black Arrow damage on targets below 20%
@@ -6486,6 +6886,11 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
 
     // Script Hook For HandlePeriodicHealthLeechAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
+
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(damage, caster);
+    }
 
     if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
         damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), 0.0f, GetBase()->GetStackAmount());
@@ -6695,6 +7100,11 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal, GetSpellInfo());
     sScriptMgr->ModifyHealReceived(target, caster, heal, GetSpellInfo());
+
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(heal, caster);
+    }
 
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
     Unit::CalcHealAbsorb(healInfo);

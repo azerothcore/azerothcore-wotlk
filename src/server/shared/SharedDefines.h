@@ -18,6 +18,7 @@
 #ifndef ACORE_SHAREDDEFINES_H
 #define ACORE_SHAREDDEFINES_H
 
+#include "DBCEnums.h"
 #include "Define.h"
 #include "EnumFlag.h"
 #include <cassert>
@@ -25,7 +26,7 @@
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 constexpr float Z_OFFSET_FIND_HEIGHT = 2.0f;
 
-enum SpellEffIndex
+enum SpellEffIndex : uint8
 {
     EFFECT_0 = 0,
     EFFECT_1 = 1,
@@ -105,6 +106,33 @@ enum Races
 
 #define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
 
+// DisplayRace values from CreatureDisplayInfoExtra.dbc
+enum class DisplayRace : uint8
+{
+    None              = 0,
+    Human             = 1,
+    Orc               = 2,
+    Dwarf             = 3,
+    NightElf          = 4,
+    Undead            = 5,
+    Tauren            = 6,
+    Gnome             = 7,
+    Troll             = 8,
+    Goblin            = 9,
+    BloodElf          = 10,
+    Draenei           = 11,
+    FelOrc            = 12,
+    Naga              = 13,
+    Broken            = 14,
+    Skeleton          = 15,
+    Vrykul            = 16,
+    Tuskarr           = 17,
+    ForestTroll       = 18,
+    Taunka            = 19,
+    NorthrendSkeleton = 20,
+    IceTroll          = 21
+};
+
 // Class value is index in ChrClasses.dbc
 // EnumUtils: DESCRIBE THIS
 enum Classes
@@ -154,7 +182,7 @@ enum UnitClass
 
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 2
 
-enum ReputationRank
+enum ReputationRank : uint8
 {
     REP_HATED       = 0,
     REP_HOSTILE     = 1,
@@ -223,7 +251,7 @@ enum FactionTemplates
 #define MIN_REPUTATION_RANK (REP_HATED)
 #define MAX_REPUTATION_RANK 8
 
-#define MAX_SPILLOVER_FACTIONS 4
+#define MAX_SPILLOVER_FACTIONS 6
 
 enum MoneyConstants
 {
@@ -734,7 +762,7 @@ enum Language
 
 #define LANGUAGES_COUNT   19
 
-enum TeamId
+enum TeamId : uint8
 {
     TEAM_ALLIANCE = 0,
     TEAM_HORDE,
@@ -3568,7 +3596,7 @@ enum TradeStatus
     TRADE_STATUS_NOT_ELIGIBLE   = 23                        // Related to trading soulbound loot items
 };
 
-enum XPColorChar
+enum XPColorChar : uint8
 {
     XP_RED,
     XP_ORANGE,
@@ -3577,7 +3605,7 @@ enum XPColorChar
     XP_GRAY
 };
 
-enum RemoveMethod
+enum RemoveMethod : uint8
 {
     GROUP_REMOVEMETHOD_DEFAULT  = 0,
     GROUP_REMOVEMETHOD_KICK     = 1,

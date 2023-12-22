@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
 
 DoorData const doorData[] =
@@ -50,7 +52,7 @@ public:
                 case GO_NOVOS_CRYSTAL_2:
                 case GO_NOVOS_CRYSTAL_3:
                 case GO_NOVOS_CRYSTAL_4:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
             }
         }
@@ -63,7 +65,7 @@ public:
                 case GO_NOVOS_CRYSTAL_2:
                 case GO_NOVOS_CRYSTAL_3:
                 case GO_NOVOS_CRYSTAL_4:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }

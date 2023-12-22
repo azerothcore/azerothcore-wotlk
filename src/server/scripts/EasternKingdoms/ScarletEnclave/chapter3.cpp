@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "Unit.h"
 
 class spell_q12779_an_end_to_all_things : public SpellScript
 {
@@ -40,3 +40,4 @@ void AddSC_the_scarlet_enclave_c3()
 {
     RegisterSpellScript(spell_q12779_an_end_to_all_things);
 }
+

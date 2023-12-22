@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "Duration.h"
 #include "Random.h"
-#include "advstd.h"
 #include <map>
 #include <type_traits>
 
@@ -91,7 +90,7 @@ class LambdaBasicEvent : public BasicEvent
 };
 
 template<typename T>
-using is_lambda_event = std::enable_if_t<!std::is_base_of_v<BasicEvent, std::remove_pointer_t<advstd::remove_cvref_t<T>>>>;
+using is_lambda_event = std::enable_if_t<!std::is_base_of_v<BasicEvent, std::remove_pointer_t<std::remove_cvref_t<T>>>>;
 
 typedef std::multimap<uint64, BasicEvent*> EventList;
 

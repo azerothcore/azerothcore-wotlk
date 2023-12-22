@@ -22,9 +22,9 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "zulaman.h"
 

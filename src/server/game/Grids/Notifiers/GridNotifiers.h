@@ -44,14 +44,16 @@ namespace Acore
         GuidUnorderedSet vis_guids;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
+        bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly) :
-            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
+        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
 
+        void Visit(GameObjectMapType&);
         template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
@@ -69,10 +71,9 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player) : VisibleNotifier(player, false) { }
+        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
 
         template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
-        void Visit(CreatureMapType&);
         void Visit(PlayerMapType&);
     };
 
@@ -81,20 +82,6 @@ namespace Acore
         Creature& i_creature;
         CreatureRelocationNotifier(Creature& c) : i_creature(c) {}
         template<class T> void Visit(GridRefMgr<T>&) {}
-        void Visit(CreatureMapType&);
-        void Visit(PlayerMapType&);
-    };
-
-    struct DelayedUnitRelocation
-    {
-        Map& i_map;
-        Cell& cell;
-        CellCoord& p;
-        const float i_radius;
-        DelayedUnitRelocation(Cell& c, CellCoord& pair, Map& map, float radius) :
-            i_map(map), cell(c), p(pair), i_radius(radius) { }
-        template<class T> void Visit(GridRefMgr<T>&) { }
-        void Visit(CreatureMapType&);
         void Visit(PlayerMapType&);
     };
 
@@ -105,25 +92,6 @@ namespace Acore
         explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.GetTypeId() == TYPEID_UNIT)  {}
         template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(CreatureMapType&);
-    };
-
-    struct GridUpdater
-    {
-        GridType& i_grid;
-        uint32 i_timeDiff;
-        GridUpdater(GridType& grid, uint32 diff) : i_grid(grid), i_timeDiff(diff) { }
-
-        template<class T> void updateObjects(GridRefMgr<T>& m)
-        {
-            for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
-                iter->GetSource()->Update(i_timeDiff);
-        }
-
-        void Visit(PlayerMapType& m) { updateObjects<Player>(m); }
-        void Visit(CreatureMapType& m) { updateObjects<Creature>(m); }
-        void Visit(GameObjectMapType& m) { updateObjects<GameObject>(m); }
-        void Visit(DynamicObjectMapType& m) { updateObjects<DynamicObject>(m); }
-        void Visit(CorpseMapType& m) { updateObjects<Corpse>(m); }
     };
 
     struct MessageDistDeliverer
@@ -186,7 +154,8 @@ namespace Acore
     struct ObjectUpdater
     {
         uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        bool i_largeOnly;
+        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
         template<class T> void Visit(GridRefMgr<T>& m);
         void Visit(PlayerMapType&) {}
         void Visit(CorpseMapType&) {}

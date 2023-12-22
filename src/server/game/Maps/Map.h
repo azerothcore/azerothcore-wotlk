@@ -32,6 +32,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "TaskScheduler.h"
 #include "Timer.h"
 #include <bitset>
 #include <list>
@@ -71,6 +72,7 @@ namespace VMAP
 namespace Acore
 {
     struct ObjectUpdater;
+    struct LargeObjectUpdater;
 }
 
 struct ScriptAction
@@ -301,7 +303,7 @@ typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHol
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
 
-enum EncounterCreditType
+enum EncounterCreditType : uint8
 {
     ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
@@ -311,7 +313,7 @@ class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
 public:
-    Map(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
+    Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
 
     [[nodiscard]] MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -336,7 +338,13 @@ public:
     template<class T> void RemoveFromMap(T*, bool);
 
     void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-        TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor);
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -355,7 +363,7 @@ public:
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
         GridCoord p = Acore::ComputeGridCoord(x, y);
-        return !getNGrid(p.x_coord, p.y_coord) || getNGrid(p.x_coord, p.y_coord)->GetGridState() == GRID_STATE_REMOVAL;
+        return !getNGrid(p.x_coord, p.y_coord);
     }
 
     [[nodiscard]] bool IsGridLoaded(float x, float y) const
@@ -363,25 +371,12 @@ public:
         return IsGridLoaded(Acore::ComputeGridCoord(x, y));
     }
 
-    bool GetUnloadLock(GridCoord const& p) const { return getNGrid(p.x_coord, p.y_coord)->getUnloadLock(); }
-    void SetUnloadLock(GridCoord const& p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadExplicitLock(on); }
     void LoadGrid(float x, float y);
     void LoadAllCells();
-    bool UnloadGrid(NGridType& ngrid, bool pForce);
-    void GridMarkNoUnload(uint32 x, uint32 y);
-    void GridUnmarkNoUnload(uint32 x, uint32 y);
+    bool UnloadGrid(NGridType& ngrid);
     virtual void UnloadAll();
 
-    void ResetGridExpiry(NGridType& grid, float factor = 1) const
-    {
-        grid.ResetTimeTracker(std::chrono::duration_cast<std::chrono::seconds>(i_gridExpiry * factor));
-    }
-
-    [[nodiscard]] std::chrono::seconds GetGridExpiry(void) const { return i_gridExpiry; }
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
-
-    static void InitStateMachine();
-    static void DeleteStateMachine();
 
     static bool ExistMap(uint32 mapid, int gx, int gy);
     static bool ExistVMap(uint32 mapid, int gx, int gy);
@@ -420,10 +415,6 @@ public:
     void MoveAllDynamicObjectsInMoveList();
     void RemoveAllObjectsInRemoveList();
     virtual void RemoveAllPlayers();
-
-    // used only in MoveAllCreaturesInMoveList and ObjectGridUnloader
-    bool CreatureRespawnRelocation(Creature* c, bool diffGridOnly);
-    bool GameObjectRespawnRelocation(GameObject* go, bool diffGridOnly);
 
     [[nodiscard]] uint32 GetInstanceId() const { return i_InstanceId; }
     [[nodiscard]] uint8 GetSpawnMode() const { return (i_spawnMode); }
@@ -478,10 +469,12 @@ public:
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
+    void resetMarkedCellsLarge() { marked_cells_large.reset(); }
+    bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
+    void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
-    [[nodiscard]] bool ActiveObjectsNearGrid(NGridType const& ngrid) const;
 
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
     void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
@@ -602,6 +595,10 @@ public:
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
+    TaskScheduler _creatureRespawnScheduler;
+
+    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
+
     void LoadCorpseData();
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
@@ -668,30 +665,20 @@ private:
     // Load MMap Data
     void LoadMMap(int gx, int gy);
 
-    bool CreatureCellRelocation(Creature* creature, Cell new_cell);
-    bool GameObjectCellRelocation(GameObject* go, Cell new_cell);
-    bool DynamicObjectCellRelocation(DynamicObject* go, Cell new_cell);
-
     template<class T> void InitializeObject(T* obj);
-    void AddCreatureToMoveList(Creature* c, float x, float y, float z, float ang);
+    void AddCreatureToMoveList(Creature* c);
     void RemoveCreatureFromMoveList(Creature* c);
-    void AddGameObjectToMoveList(GameObject* go, float x, float y, float z, float ang);
+    void AddGameObjectToMoveList(GameObject* go);
     void RemoveGameObjectFromMoveList(GameObject* go);
-    void AddDynamicObjectToMoveList(DynamicObject* go, float x, float y, float z, float ang);
+    void AddDynamicObjectToMoveList(DynamicObject* go);
     void RemoveDynamicObjectFromMoveList(DynamicObject* go);
 
-    bool _creatureToMoveLock;
     std::vector<Creature*> _creaturesToMove;
-
-    bool _gameObjectsToMoveLock;
     std::vector<GameObject*> _gameObjectsToMove;
-
-    bool _dynamicObjectsToMoveLock;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
 
     [[nodiscard]] bool IsGridLoaded(const GridCoord&) const;
     void EnsureGridCreated_i(const GridCoord&);
-    void EnsureGridLoadedForActiveObject(Cell const&, WorldObject* object);
 
     void buildNGridLinkage(NGridType* pNGridType) { pNGridType->link(this); }
 
@@ -713,8 +700,6 @@ private:
     void SendObjectUpdates();
 
 protected:
-    void SetUnloadReferenceLock(GridCoord const& p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadReferenceLock(on); }
-
     std::mutex Lock;
     std::mutex GridLock;
     std::shared_mutex MMapLock;
@@ -729,8 +714,6 @@ protected:
 
     MapRefMgr m_mapRefMgr;
     MapRefMgr::iterator m_mapRefIter;
-
-    int32 m_VisibilityNotifyPeriod;
 
     typedef std::set<WorldObject*> ActiveNonPlayers;
     ActiveNonPlayers m_activeNonPlayers;
@@ -750,8 +733,6 @@ private:
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
     GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
 
-    std::chrono::seconds i_gridExpiry;
-
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
     Map* m_parentMap;
@@ -759,10 +740,7 @@ private:
     NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
     GridMap* GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
-
-    //these functions used to process player/mob aggro reactions and
-    //visibility calculations. Highly optimized for massive calculations
-    void ProcessRelocationNotifies(uint32 diff);
+    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
@@ -839,7 +817,7 @@ enum InstanceResetMethod
 class InstanceMap : public Map
 {
 public:
-    InstanceMap(uint32 id, std::chrono::seconds, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
+    InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
     ~InstanceMap() override;
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
@@ -873,7 +851,7 @@ private:
 class BattlegroundMap : public Map
 {
 public:
-    BattlegroundMap(uint32 id, std::chrono::seconds, uint32 InstanceId, Map* _parent, uint8 spawnMode);
+    BattlegroundMap(uint32 id, uint32 InstanceId, Map* _parent, uint8 spawnMode);
     ~BattlegroundMap() override;
 
     bool AddPlayerToMap(Player*) override;

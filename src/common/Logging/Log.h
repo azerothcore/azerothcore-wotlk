@@ -68,13 +68,13 @@ public:
     bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
 
     template<typename... Args>
-    inline void outMessage(std::string const& filter, LogLevel const level, std::string_view fmt, Args&&... args)
+    inline void outMessage(std::string const& filter, LogLevel const level, Acore::FormatString<Args...> fmt, Args&&... args)
     {
         _outMessage(filter, level, Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void outCommand(uint32 account, std::string_view fmt, Args&&... args)
+    void outCommand(uint32 account, Acore::FormatString<Args...> fmt, Args&&... args)
     {
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
         {

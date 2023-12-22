@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CommandScript.h"
 #include "Chat.h"
 #include "ScriptMgr.h"
 
@@ -30,3 +31,11 @@ Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()
 
     return table;
 }
+
+CommandScript::CommandScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<CommandScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<CommandScript>;

@@ -38,8 +38,10 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Totem.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -49,8 +51,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -65,7 +65,7 @@ constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max
     VISIBILITY_DISTANCE_SMALL,
     VISIBILITY_DISTANCE_LARGE,
     VISIBILITY_DISTANCE_GIGANTIC,
-    MAX_VISIBILITY_DISTANCE
+    VISIBILITY_DISTANCE_INFINITE
 };
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
@@ -2924,6 +2924,22 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
         SendMessageToSet(WorldPackets::Misc::Playsound(sound_id).Write(), true);
 }
 
+void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
+        }
+    }
+}
+
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     if (target)
@@ -2933,6 +2949,22 @@ void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
     else
     {
         SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
+    }
+}
+
+void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
+        }
     }
 }
 
@@ -2963,7 +2995,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-void WorldObject::UpdateObjectVisibility(bool /*forced*/)
+void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 {
     //updates object's visibility for nearby players
     Acore::VisibleChangesNotifier notifier(*this);
@@ -2972,7 +3004,28 @@ void WorldObject::UpdateObjectVisibility(bool /*forced*/)
 
 void WorldObject::AddToNotify(uint16 f)
 {
-    m_notifyflags |= f;
+    if (!(m_notifyflags & f))
+        if (Unit* u = ToUnit())
+        {
+            if (f & NOTIFY_VISIBILITY_CHANGED)
+            {
+                uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
+
+                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
+                if (diff >= EVENT_VISIBILITY_DELAY / 2)
+                    EVENT_VISIBILITY_DELAY /= 2;
+                else
+                    EVENT_VISIBILITY_DELAY -= diff;
+                u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
+                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
+            }
+            else if (f & NOTIFY_AI_RELOCATION)
+            {
+                u->m_delayed_unit_ai_notify_timer = u->FindMap() ? DynamicVisibilityMgr::GetAINotifyDelay(u->FindMap()->GetEntry()->map_type) : 500;
+            }
+
+            m_notifyflags |= f;
+        }
 }
 
 struct WorldObjectChangeAccumulator

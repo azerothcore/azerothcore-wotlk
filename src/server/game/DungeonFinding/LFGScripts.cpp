@@ -306,4 +306,9 @@ namespace lfg
         }
     }
 
+    void AddSC_LFGScripts()
+    {
+        new LFGPlayerScript();
+        new LFGGroupScript();
+    }
 } // namespace lfg

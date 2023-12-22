@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
@@ -25,7 +26,6 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -1006,7 +1006,7 @@ public:
                             {
                                 if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
                                     if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
-                                        patient->setDeathState(JUST_DIED);
+                                        patient->setDeathState(DeathState::JustDied);
                             }
                         }
 
@@ -1155,7 +1155,7 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 me->SetDynamicFlag(32);
 
                 if (DoctorGUID)

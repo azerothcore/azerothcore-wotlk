@@ -15,6 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "GameTime.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellMgr.h"
 /* ScriptData
 SDName: Areatrigger_Scripts
 SD%Complete: 100
@@ -33,12 +39,6 @@ at_bring_your_orphan_to         q910 q910 q1800 q1479 q1687 q1558 q10951 q10952
 at_brewfest
 at_area_52_entrance
 EndContentData */
-
-#include "GameTime.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellMgr.h"
 
 // Ours
 class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
@@ -496,3 +496,4 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_brewfest();
     new AreaTrigger_at_area_52_entrance();
 }
+

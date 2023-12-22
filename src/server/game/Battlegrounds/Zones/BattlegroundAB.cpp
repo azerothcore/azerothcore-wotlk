@@ -774,6 +774,6 @@ void BattlegroundAB::ApplyPhaseMask()
     for (auto const& itr : bgPlayerMap)
     {
         itr.second->SetPhaseMask(phaseMask, false);
-        itr.second->UpdateObjectVisibility(true);
+        itr.second->UpdateObjectVisibility(true, false);
     }
 }

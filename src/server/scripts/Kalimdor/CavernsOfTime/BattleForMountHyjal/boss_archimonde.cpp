@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "hyjal.h"
 /* ScriptData
 SDName: Boss_Archimonde
 SD%Complete: 85
 SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "hyjal.h"
 
 enum Texts
 {
@@ -789,3 +789,4 @@ void AddSC_boss_archimonde()
     new npc_doomfire_targetting();
     new npc_ancient_wisp();
 }
+

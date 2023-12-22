@@ -420,6 +420,12 @@ public:
      * */
     bool CanCastSpell(uint32 spellID) const;
 
+    /**
+    * @brief Helper to get the creature's summoner GUID, if it is a summon
+    *
+    * */
+    [[nodiscard]] ObjectGuid GetSummonerGUID() const;
+
     std::string GetDebugInfo() const override;
 
     //NPCBots

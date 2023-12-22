@@ -16,13 +16,14 @@
  */
 
 #include "AccountMgr.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
@@ -727,7 +728,7 @@ public:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
                 case GO_SINDRAGOSA_ENTRANCE_DOOR:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_SCIENTIST_ENTRANCE:
                     PutricideEnteranceDoorGUID = go->GetGUID();
@@ -737,7 +738,7 @@ public:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_01:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04:
                     if (instance->Is25ManRaid())
-                        AddDoor(go, true);
+                        AddDoor(go);
                     break;
                 case GO_LADY_DEATHWHISPER_ELEVATOR:
                     LadyDeathwisperElevatorGUID = go->GetGUID();
@@ -758,7 +759,7 @@ public:
                     break;
                 case GO_SAURFANG_S_DOOR:
                     DeathbringerSaurfangDoorGUID = go->GetGUID();
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_DEATHBRINGER_S_CACHE_10N:
                 case GO_DEATHBRINGER_S_CACHE_25N:
@@ -873,7 +874,7 @@ public:
                         go->SetRespawnTime(7 * DAY);
                     break;
                 case GO_SCOURGE_TRANSPORTER_FIRST:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     ScourgeTransporterFirstGUID = go->GetGUID();
                     if (GetBossState(DATA_LORD_MARROWGAR) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
@@ -911,7 +912,7 @@ public:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
                 case GO_SCOURGE_TRANSPORTER_FIRST:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
                 case GO_THE_SKYBREAKER_A:
                 case GO_ORGRIMS_HAMMER_H:

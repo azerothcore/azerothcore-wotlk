@@ -20,10 +20,10 @@
 #include "MapDefines.h"
 #include "MapTree.h"
 #include "VMapDefinitions.h"
+#include <boost/filesystem.hpp>
 #include <iomanip>
 #include <set>
 #include <sstream>
-#include <boost/filesystem.hpp>
 
 using G3D::Vector3;
 using G3D::AABox;

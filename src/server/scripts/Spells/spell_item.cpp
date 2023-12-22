@@ -15,23 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
+#include "CreatureScript.h"
+#include "GameTime.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SkillDiscovery.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "WorldSession.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used by items.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_item_".
  */
-
-#include "Battleground.h"
-#include "GameTime.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "Pet.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SkillDiscovery.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "WorldSession.h"
 
 enum MassiveSeaforiumCharge
 {
@@ -1536,7 +1536,8 @@ private:
 
 enum DesperateDefense
 {
-    SPELL_DESPERATE_RAGE    = 33898
+    SPELL_DESPERATE_RAGE    = 33898,
+    SPELL_SERVERSIDE_DESPERAT_DEFENSE = 33897 // Root and Pacify
 };
 
 // 33896 - Desperate Defense
@@ -1555,9 +1556,15 @@ class spell_item_desperate_defense : public AuraScript
         GetTarget()->CastSpell(GetTarget(), SPELL_DESPERATE_RAGE, true, nullptr, aurEff);
     }
 
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_SERVERSIDE_DESPERAT_DEFENSE);
+    }
+
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_item_desperate_defense::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_desperate_defense::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2805,7 +2812,7 @@ class spell_item_shimmering_vessel : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         if (Creature* target = GetHitCreature())
-            target->setDeathState(JUST_RESPAWNED);
+            target->setDeathState(DeathState::JustRespawned);
     }
 
     void Register() override
@@ -2843,40 +2850,6 @@ class spell_item_purify_helboar_meat : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_purify_helboar_meat::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-enum CrystalPrison
-{
-    OBJECT_IMPRISONED_DOOMGUARD     = 179644,
-};
-
-class spell_item_crystal_prison_dummy_dnd : public SpellScript
-{
-    PrepareSpellScript(spell_item_crystal_prison_dummy_dnd);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        if (!sObjectMgr->GetGameObjectTemplate(OBJECT_IMPRISONED_DOOMGUARD))
-            return false;
-        return true;
-    }
-
-    void HandleDummy(SpellEffIndex /* effIndex */)
-    {
-        if (Creature* target = GetHitCreature())
-        {
-            if (target->isDead() && !target->IsPet())
-            {
-                GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - GameTime::GetGameTime().count()));
-                target->DespawnOrUnsummon();
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_crystal_prison_dummy_dnd::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -3941,6 +3914,31 @@ class spell_item_venomhide_feed : public SpellScript
     }
 };
 
+// 30077 - Carinda's Scroll of Retribution
+enum ScrollOfRetribution
+{
+    NPC_VIERA_SUNWHISPER    = 17226
+};
+
+class spell_item_scroll_of_retribution : public SpellScript
+{
+    PrepareSpellScript(spell_item_scroll_of_retribution)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_VIERA_SUNWHISPER)
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_scroll_of_retribution::CheckCast);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4031,7 +4029,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_refocus);
     RegisterSpellScript(spell_item_shimmering_vessel);
     RegisterSpellScript(spell_item_purify_helboar_meat);
-    RegisterSpellScript(spell_item_crystal_prison_dummy_dnd);
     RegisterSpellScript(spell_item_reindeer_transformation);
     RegisterSpellScript(spell_item_nigh_invulnerability);
     RegisterSpellScript(spell_item_poultryizer);
@@ -4062,4 +4059,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_elixir_of_shadows);
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
+    RegisterSpellScript(spell_item_scroll_of_retribution);
 }
+

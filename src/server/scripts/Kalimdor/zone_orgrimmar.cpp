@@ -27,8 +27,8 @@ npc_shenthul
 npc_thrall_warchief
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
@@ -157,7 +157,6 @@ enum ThrallWarchief : uint32
     QUEST_WHAT_THE_WIND_CARRIES     = 6566,
     GOSSIP_MENU_THRALL              = 3664,
     GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
-    GOSSIP_OPTION_DEFAULT           = 0
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
@@ -179,7 +178,7 @@ public:
             uint32 NextAction = GOSSIP_ACTION_INFO_DEF + DiscussionOrder + 1;
             uint32 GossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + DiscussionOrder - 1;
 
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, NextAction);
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, 0, GOSSIP_SENDER_MAIN, NextAction);
             SendGossipMenuFor(player, GossipResponse, creature->GetGUID());
         }
         else if (DiscussionOrder == 7)
@@ -200,7 +199,7 @@ public:
 
         if (player->GetQuestStatus(QUEST_WHAT_THE_WIND_CARRIES) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());

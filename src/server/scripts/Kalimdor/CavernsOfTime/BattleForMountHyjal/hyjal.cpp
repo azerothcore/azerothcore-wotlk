@@ -28,8 +28,8 @@ npc_thrall
 npc_tyrande_whisperwind
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "hyjalAI.h"

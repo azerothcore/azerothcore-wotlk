@@ -52,7 +52,7 @@ enum EncounterFrameType
     ENCOUNTER_FRAME_REFRESH_FRAMES      = 7,    // Xinef: can be used to refresh frames after unit was destroyed from client and send back (phase changes)
 };
 
-enum EncounterState
+enum EncounterState : uint8
 {
     NOT_STARTED   = 0,
     IN_PROGRESS   = 1,
@@ -282,12 +282,17 @@ protected:
     void LoadMinionData(MinionData const* data);
     void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
 
-    void AddObject(Creature* obj, bool add);
-    void AddObject(GameObject* obj, bool add);
-    void AddObject(WorldObject* obj, uint32 type, bool add);
+    void AddObject(Creature* obj, bool add = true);
+    void RemoveObject(Creature* obj);
+    void AddObject(GameObject* obj, bool add = true);
+    void RemoveObject(GameObject* obj);
+    void AddObject(WorldObject* obj, uint32 type, bool add = true);
+    void RemoveObject(WorldObject* obj, uint32 type);
 
-    void AddDoor(GameObject* door, bool add);
-    void AddMinion(Creature* minion, bool add);
+    void AddDoor(GameObject* door, bool add = true);
+    void RemoveDoor(GameObject* door);
+    void AddMinion(Creature* minion, bool add = true);
+    void RemoveMinion(Creature* minion);
 
     void UpdateDoorState(GameObject* door);
     void UpdateMinionState(Creature* minion, EncounterState state);
