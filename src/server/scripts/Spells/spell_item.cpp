@@ -17,7 +17,6 @@
 
 #include "Battleground.h"
 #include "CreatureScript.h"
-#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
