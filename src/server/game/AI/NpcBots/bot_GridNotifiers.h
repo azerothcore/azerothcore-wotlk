@@ -1203,7 +1203,7 @@ public:
         }
         else if (Creature const* cre = ob->ToCreature())
         {
-            if (cre->IsVisible() && cre->getDeathState() == CORPSE && cre->HasUnitFlag(UNIT_FLAG_SKINNABLE) && cre->loot.isLooted() &&
+            if (cre->IsVisible() && cre->getDeathState() == DeathState::Corpse && cre->HasUnitFlag(UNIT_FLAG_SKINNABLE) && cre->loot.isLooted() &&
                 cre->isTappedBy(_checker->ToPlayer()) && CheckSkill(cre->GetCreatureTemplate()->GetRequiredLootSkill()))
             {
                 if (int32(cre->GetLevel() < 20 ? (cre->GetLevel() - 10) * 10 : cre->GetLevel() * 5) <= int32(MaxSkillForLevel(_checker->ToUnit()->GetLevel())))
@@ -1259,7 +1259,7 @@ public:
     {
         if (Creature const* cre = unit->ToCreature())
             if (_checker->IsWithinDistInMap(cre, _range))
-                return cre->IsVisible() && cre->getDeathState() == CORPSE &&
+                return cre->IsVisible() && cre->getDeathState() == DeathState::Corpse &&
                     cre->HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE) &&
                     _checker->ToPlayer()->isAllowedToLoot(cre);
         return false;

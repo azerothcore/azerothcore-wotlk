@@ -62,7 +62,7 @@ public:
             if ((liveTimer += diff) >= INFERNAL_DURATION)
             {
                 canUpdate = false;
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 return;
             }
 

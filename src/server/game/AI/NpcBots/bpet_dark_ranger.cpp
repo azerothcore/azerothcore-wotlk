@@ -72,7 +72,7 @@ public:
             if ((liveTimer += diff) >= MINION_DURATION)
             {
                 canUpdate = false;
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 return;
             }
 
