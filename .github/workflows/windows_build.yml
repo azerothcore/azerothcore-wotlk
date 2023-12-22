@@ -21,10 +21,7 @@ jobs:
     name: ${{ matrix.os }}
     env:
       BOOST_ROOT: C:\local\boost_1_82_0
-    if: |
-      github.repository == 'trickerer/AzerothCore-wotlk-with-NPCBots'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+    if: github.repository == 'trickerer/AzerothCore-wotlk-with-NPCBots' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - name: ccache
