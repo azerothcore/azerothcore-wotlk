@@ -6,7 +6,7 @@
 3.3.5
 :------------:
 [![nopch-build](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/actions/workflows/core-build-nopch.yml/badge.svg?branch=npcbots_3.3.5)](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/actions/workflows/core-build-nopch.yml)
-[![windows-build](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/workflows/windows-build/badge.svg?branch=npcbots_3.3.5&event=push)](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/actions?query=workflow%3Awindows-build+branch%3Amaster+event%3Apush)
+[![windows-build](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/actions/workflows/windows_build.yml/badge.svg)](https://github.com/trickerer/AzerothCore-wotlk-with-NPCBots/actions/workflows/windows_build.yml)
 
 ## Introduction
 

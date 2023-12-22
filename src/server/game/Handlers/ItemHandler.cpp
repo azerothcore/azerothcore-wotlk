@@ -1265,7 +1265,13 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
     {
         std::string Name = pName->name;
         LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        //npcbot: pointless check, see AccountInfo()
+        /*
+        //end npcbot
         if (loc_idx >= 0)
+        //npcbot
+        */
+        //end npcbot
             if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
                 ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
 
