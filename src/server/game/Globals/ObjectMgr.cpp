@@ -16,7 +16,6 @@
  */
 
 #include "ObjectMgr.h"
-#include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
