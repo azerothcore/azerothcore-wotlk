@@ -73,6 +73,11 @@ void VisibleNotifier::SendToSelf()
 
     for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
+        //npcbot:
+        if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
+            continue;
+        //end npcbot
+
         if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
         {
             if (i_largeOnly != obj->IsVisibilityOverridden())
