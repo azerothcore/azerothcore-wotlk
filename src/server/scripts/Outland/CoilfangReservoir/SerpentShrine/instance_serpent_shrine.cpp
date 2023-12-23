@@ -40,6 +40,12 @@ ObjectData const creatureData[] =
     { 0,                          0                           }
 };
 
+ObjectData const gameObjectData[] =
+{
+    { GO_STRANGE_POOL, DATA_STRANGE_POOL },
+    { 0,               0                 }
+};
+
 MinionData const minionData[] =
 {
     { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_LORD_KARATHRESS },
@@ -69,7 +75,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
             LoadMinionData(minionData);
             LoadBossBoundaries(boundaries);
 
