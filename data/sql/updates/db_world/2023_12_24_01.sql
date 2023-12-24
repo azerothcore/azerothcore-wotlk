@@ -1,3 +1,4 @@
+-- DB update 2023_12_24_00 -> 2023_12_24_01
 -- update various midsummer NPC spawns with sniffed values
 DELETE FROM `creature` WHERE (`id1` IN (16817, 16818, 25697, 25710, 25754)) AND (`guid` IN (202768, 202862, 94855, 94856, 94857, 202750, 94858, 94859, 94860, 94861, 202734, 245704, 202735, 202736, 202737));
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
