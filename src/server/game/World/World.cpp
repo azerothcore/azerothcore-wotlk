@@ -3259,9 +3259,7 @@ void World::RemoveOldCorpses()
 void World::DoForAllPlayers(std::function<void(Player*)> exec)
 {
     std::shared_lock lock(*HashMapHolder<Player>::GetLock());
-    const HashMapHolder<Player>::MapType& playerMap = ObjectAccessor::GetPlayers();
-
-    for (auto const& it : playerMap)
+    for (auto const& it : ObjectAccessor::GetPlayers())
     {
         if (Player* player = it.second)
         {
