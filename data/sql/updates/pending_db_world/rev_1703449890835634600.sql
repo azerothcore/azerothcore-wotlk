@@ -22,7 +22,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 1, 5047, 2, 0, 36, 0, 0, 0, 0, 0, 0, 0, '', 'Player must be alive'),
-(22, 1, 5047, 2, 0, 14, 0, 13956, 0, 0, 1, 0, 0, '', 'Cast Teleport to Un\'goro if Meeting a Great One (13956) status is not none.'),
+(22, 1, 5047, 2, 0, 14, 0, 13956, 0, 0, 1, 0, 0, '', 'Cast Teleport to Sholazar if Meeting a Great One (13956) status is not none.'),
 (22, 1, 5047, 2, 1, 36, 0, 0, 0, 0, 0, 0, 0, '', 'Player must be alive'),
-(22, 1, 5047, 2, 1, 8, 0, 12613, 0, 0, 0, 0, 0, '', 'Cast Teleport to Un\'goro if The Makers Overlook (12613) has been rewarded.'),
-(22, 1, 5047, 2, 1, 8, 0, 12559, 0, 0, 0, 0, 0, '', 'Cast Teleport to Un\'goro if The Makers Perch (12559) has been rewarded.');
+(22, 1, 5047, 2, 1, 8, 0, 12613, 0, 0, 0, 0, 0, '', 'Cast Teleport to Sholazar if The Makers Overlook (12613) has been rewarded.'),
+(22, 1, 5047, 2, 1, 8, 0, 12559, 0, 0, 0, 0, 0, '', 'Cast Teleport to Sholazar if The Makers Perch (12559) has been rewarded.');
