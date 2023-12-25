@@ -3256,6 +3256,25 @@ void World::RemoveOldCorpses()
     _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
 }
 
+void World::DoForAllPlayers(std::function<void(Player*)> exec)
+{
+    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+    const HashMapHolder<Player>::MapType& playerMap = ObjectAccessor::GetPlayers();
+
+    for (auto const& it : playerMap)
+    {
+        if (Player* player = it.second)
+        {
+            if (!player->IsInWorld())
+            {
+                continue;
+            }
+
+            exec(player);
+        }
+    }
+}
+
 bool World::IsPvPRealm() const
 {
     return getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP;
