@@ -69,7 +69,7 @@ public:
     }
 };
 
-static bool BonfireStampedOutState[77];
+static bool BonfireStampedOutState[COUNT_GO_BONFIRE_ALLIANCE + COUNT_GO_BONFIRE_HORDE];
 
 // <mapId, zoneId, teamId>, <state>
 const std::map<std::tuple<uint32, uint32, TeamId>, bool*> BonfireStateStore = {
