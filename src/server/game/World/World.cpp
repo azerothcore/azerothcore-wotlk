@@ -3256,7 +3256,7 @@ void World::RemoveOldCorpses()
     _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
 }
 
-void World::DoForAllPlayers(std::function<void(Player*)> exec)
+void World::DoForAllOnlinePlayers(std::function<void(Player*)> exec)
 {
     std::shared_lock lock(*HashMapHolder<Player>::GetLock());
     for (auto const& it : ObjectAccessor::GetPlayers())

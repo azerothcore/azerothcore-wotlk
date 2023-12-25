@@ -349,7 +349,7 @@ public:
 
     void RemoveOldCorpses() override;
 
-    void DoForAllPlayers(std::function<void(Player*)> exec) override;
+    void DoForAllOnlinePlayers(std::function<void(Player*)> exec) override;
 
 protected:
     void _UpdateGameTime();

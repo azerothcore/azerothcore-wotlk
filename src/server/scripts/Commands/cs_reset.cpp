@@ -290,7 +290,7 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        sWorld->DoForAllPlayers([&] (Player* player){
+        sWorld->DoForAllOnlinePlayers([&] (Player* player){
             player->SetAtLoginFlag(atLogin);
         });
 
