@@ -1,3 +1,4 @@
+-- DB update 2023_12_25_00 -> 2023_12_25_01
 --
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 37546;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
