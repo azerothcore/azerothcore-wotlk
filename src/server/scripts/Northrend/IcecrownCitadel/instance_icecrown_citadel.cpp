@@ -16,7 +16,6 @@
  */
 
 #include "AccountMgr.h"
-#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
 #include "InstanceMapScript.h"

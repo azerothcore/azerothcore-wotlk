@@ -23,7 +23,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
 #include "pit_of_saron.h"
 
 enum Yells
