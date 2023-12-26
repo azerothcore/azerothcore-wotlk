@@ -626,14 +626,33 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     float distanceToTarget = me->GetDistance(target->ToUnit());
                     float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
                     float spellMinRange = me->GetSpellMinRangeForTarget(target->ToUnit(), spellInfo);
+                    float meleeRange = me->GetMeleeRange(target->ToUnit());
 
-                    // Let us not try to cast spell if we know it is going to fail anyway. Stick to chasing and continue.
-                    if (distanceToTarget > spellMaxRange) {
-                        failedSpellCast = true;
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true, spellMaxRange - 0.1f); // -0.1f to fix rounding
+                    bool isWithinLOSInMap = me->IsWithinLOSInMap(target->ToUnit());
+                    bool isWithinMeleeRange = distanceToTarget <= meleeRange;
+                    bool isRangedAttack = spellMaxRange > NOMINAL_MELEE_RANGE;
+                    bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
+                    // To prevent running back and forth when OOM, we must have more than 10% mana.
+                    bool canCastSpell = me->GetPowerPct(POWER_MANA) > 10.0f && spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) < me->GetPower(POWER_MANA) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+
+                    // If target is rooted we move out of melee range before casting, but not further than spell max range.
+                    if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell)
+                    {
+                        failedSpellCast = true; // Mark spellcast as failed so we can retry it later
+                        float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
+                        CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
                         continue;
                     }
-                    else if (distanceToTarget < spellMinRange) {
+
+                    // Let us not try to cast spell if we know it is going to fail anyway. Stick to chasing and continue.
+                    if (distanceToTarget > spellMaxRange && isWithinLOSInMap)
+                    {
+                        failedSpellCast = true;
+                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        continue;
+                    }
+                    else if (distanceToTarget < spellMinRange || !isWithinLOSInMap)
+                    {
                         failedSpellCast = true;
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
                         continue;
@@ -656,9 +675,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
                         if (result == SPELL_FAILED_OUT_OF_RANGE)
                             // if we are just out of range, we only chase until we are back in spell range.
-                            CAST_AI(SmartAI, me->AI())->SetCombatMove(true, spellMaxRange - 0.1f); // -0.1f to fix rounding
+                            CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         else
-                            // if spell fail for any other reason, we chase to melee range.
+                            // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
                             CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
                     }
 
@@ -4584,7 +4603,6 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             {
                 if (me && me->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    //e.timer = 1200;
                     RaisePriority(e);
                     return;
                 }
@@ -4751,7 +4769,7 @@ void SmartScript::SortEvents(SmartAIEventList& events)
 
 void SmartScript::RaisePriority(SmartScriptHolder& e)
 {
-    e.timer = 1;
+    e.timer = 1200;
     // Change priority only if it's set to default, otherwise keep the current order of events
     if (e.priority == SmartScriptHolder::DEFAULT_PRIORITY)
     {

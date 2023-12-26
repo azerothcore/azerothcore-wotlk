@@ -1098,6 +1098,32 @@ void SmartAI::StopFollow(bool complete)
     GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
+void SmartAI::MoveAway(float distance)
+{
+    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
+        return;
+
+    mCanCombatMove = false;
+
+    if (!IsAIControlled())
+        return;
+
+    if (!HasEscortState(SMART_ESCORT_ESCORTING))
+    {
+        if (me->GetVictim())
+        {
+            me->StopMoving();
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                me->GetMotionMaster()->Clear(false);
+
+            float x, y, z;
+            me->GetClosePoint(x, y, z, me->GetObjectSize(), distance, M_PI);
+            if (me->GetVictim()->IsWithinLOS(x, y, z))
+                me->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
+        }
+    }
+}
+
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker)
 {
     if (invoker)
