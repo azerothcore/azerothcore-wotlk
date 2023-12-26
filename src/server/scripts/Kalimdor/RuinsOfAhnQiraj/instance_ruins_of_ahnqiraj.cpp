@@ -16,7 +16,6 @@
  */
 
 #include "CreatureGroups.h"
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"

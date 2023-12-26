@@ -23,7 +23,6 @@ SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
 #include "Chat.h"
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
