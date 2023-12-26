@@ -19,7 +19,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Emotes

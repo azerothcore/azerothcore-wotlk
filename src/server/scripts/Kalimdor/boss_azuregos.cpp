@@ -16,7 +16,6 @@
  */
 
 #include "CreatureScript.h"
-#include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
