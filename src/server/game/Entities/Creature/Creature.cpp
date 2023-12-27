@@ -243,6 +243,8 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
+
+    _pauseRandomMovement = true;
 }
 
 Creature::~Creature()

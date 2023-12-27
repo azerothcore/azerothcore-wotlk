@@ -343,6 +343,9 @@ public:
     [[nodiscard]] uint32 GetCurrentWaypointID() const { return m_waypointID; }
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
 
+    [[nodiscard]] bool IsRandomMovementPaused() const { return _pauseRandomMovement; }
+    void PauseRandomMovement(bool state) { _pauseRandomMovement = state; }
+
     void SearchFormation();
     [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
     [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
@@ -501,6 +504,8 @@ private:
 
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
+
+    bool _pauseRandomMovement;
 };
 
 class AssistDelayEvent : public BasicEvent

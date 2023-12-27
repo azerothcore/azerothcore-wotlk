@@ -16,11 +16,8 @@
  */
 
 #include "RandomMovementGenerator.h"
-#include "Cell.h"
-#include "CellImpl.h"
 #include "Creature.h"
 #include "CreatureGroups.h"
-#include "GridNotifiers.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "MoveSpline.h"
@@ -44,14 +41,10 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     if (creature->_moveState != MAP_OBJECT_CELL_MOVE_NONE)
         return;
 
-    std::list<Player*> nearbyPlayers;
-    float radius = creature->GetVisibilityRange();
-    Acore::AnyPlayerInObjectRangeCheck check(creature, radius, false);
-    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(creature, nearbyPlayers, check);
-    Cell::VisitWorldObjects(creature, searcher, radius);
-
-    if (nearbyPlayers.empty())
+    if (creature->IsRandomMovementPaused())
         return;
+
+    creature->PauseRandomMovement(true);
 
     if (_validPointsVector[_currentPoint].empty())
     {

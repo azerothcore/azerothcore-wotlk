@@ -741,6 +741,9 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     if (t_diff)
         _dynamicTree.update(t_diff);
 
+    GuidVector seen;
+    seen.reserve(10); //maybe reserve m_mapRefMgr.getSize() * 10 ??
+
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
@@ -751,6 +754,14 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             WorldSession* session = player->GetSession();
             MapSessionFilter updater(session);
             session->Update(s_diff, updater);
+            for (auto obj : player->m_clientGUIDs)
+                if (std::find(seen.begin(), seen.end(), obj) == seen.end())
+                {
+                    seen.push_back(obj);
+                    if (obj.IsCreature())
+                        if (Creature* creature = player->GetMap()->GetCreature(obj))
+                            creature->PauseRandomMovement(false);
+                }
         }
     }
 
