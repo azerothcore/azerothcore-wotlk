@@ -740,6 +740,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.scripts.ai.sai=4,Console Server
 #Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts.midsummer=4,Console Server
 #Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server

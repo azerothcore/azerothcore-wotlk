@@ -24,10 +24,8 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
-#include "Config.h"
 #include "GameTime.h"
 #include "GitRevision.h"
-#include "Language.h"
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"

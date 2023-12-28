@@ -18,7 +18,6 @@
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
-#include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"

@@ -24,7 +24,6 @@ EndScriptData */
 
 #include "Chat.h"
 #include "CommandScript.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "WaypointMgr.h"

@@ -26,7 +26,6 @@ EndScriptData */
 #include "Chat.h"
 #include "CommandScript.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
 #include "TicketMgr.h"

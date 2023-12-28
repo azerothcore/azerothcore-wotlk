@@ -16,7 +16,6 @@
  */
 
 #include "CreatureAI.h"
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "blood_furnace.h"

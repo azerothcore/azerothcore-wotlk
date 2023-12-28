@@ -24,7 +24,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "WorldSession.h"
 #include "pit_of_saron.h"
 
 enum Yells
