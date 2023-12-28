@@ -31,7 +31,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9453, 0, 13, 14, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 11, 13910, 0, 0, 0, 0, 0, 17, 0, 50, 5, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Cast spell \'Force Create Elemental Totem\''),
 (9453, 0, 14, 15, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Emote 3'),
 (9453, 0, 15, 16, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Set react aggressive'),
-(9453, 0, 16, 17, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Set in combat with zone'),
+(9453, 0, 16, 17, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 123, 1000, 0, 0, 0, 0, 0, 17, 0, 50, 5, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Add threat to nearby players'),
 (9453, 0, 17, 18, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 56, 11522, 1, 0, 0, 0, 0, 17, 0, 50, 5, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Add item'),
 (9453, 0, 18, 19, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 57, 11172, 11, 0, 0, 0, 0, 17, 0, 50, 5, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Remove item'),
 (9453, 0, 19, 20, 61, 0, 100, 513, 0, 0, 0, 0, 0, 0, 57, 11173, 1, 0, 0, 0, 0, 17, 0, 50, 5, 0, 0, 0, 0, 0, 'Aquementas - On timed event triggered - Remove item'),
@@ -40,5 +40,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 9453 AND `SourceId` = 0 AND `SourceGroup` = 18;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 18, 9453, 0, 0, 2, 0, 11172, 11, 1, 0, 0, 0, '', 'Has 11 of item Silvery Claws'),
-(22, 18, 9453, 0, 0, 2, 0, 11173, 1, 1, 0, 0, 0, '', 'Has 1 of item Irontree Heart');
+(22, 18, 9453, 0, 0, 2, 1, 11172, 11, 1, 0, 0, 0, '', 'Has 11 of item Silvery Claws'),
+(22, 18, 9453, 0, 0, 2, 1, 11173, 1, 1, 0, 0, 0, '', 'Has 1 of item Irontree Heart');
