@@ -20,7 +20,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## npc_ranger_lilatha
