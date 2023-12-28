@@ -16,7 +16,6 @@
  */
 
 #include "CharacterDatabaseCleaner.h"
-#include "Common.h"
 #include "DBCStores.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"

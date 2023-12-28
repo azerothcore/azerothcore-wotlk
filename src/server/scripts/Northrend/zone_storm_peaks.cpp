@@ -26,7 +26,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WaypointMgr.h"
-#include "WorldSession.h"
 
 // Ours
 enum qSniffing
