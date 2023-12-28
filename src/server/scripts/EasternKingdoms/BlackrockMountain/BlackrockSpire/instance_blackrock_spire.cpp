@@ -23,13 +23,11 @@
 #include "GridNotifiers.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "blackrock_spire.h"
-#include "GridNotifiersImpl.h"
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 

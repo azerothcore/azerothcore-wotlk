@@ -23,7 +23,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
-#include "WaypointMgr.h"
 #include "zulgurub.h"
 
 enum Says

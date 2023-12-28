@@ -20,7 +20,6 @@ Blasted_Lands
 Quest support: 3628. Teleporter to Rise of the Defiler.
 */
 
-#include "CreatureScript.h"
 #include "Group.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

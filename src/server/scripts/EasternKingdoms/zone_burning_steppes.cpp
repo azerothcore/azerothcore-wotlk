@@ -18,7 +18,6 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## NPC 9836: Maredis Firestar
