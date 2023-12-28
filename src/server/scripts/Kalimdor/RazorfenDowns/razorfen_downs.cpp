@@ -23,7 +23,6 @@
 #include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## npc_belnistrasz for Quest 3525 "Extinguishing the Idol"

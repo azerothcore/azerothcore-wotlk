@@ -21,7 +21,6 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
-#include "World.h"
 
 using namespace Acore::ChatCommands;
 

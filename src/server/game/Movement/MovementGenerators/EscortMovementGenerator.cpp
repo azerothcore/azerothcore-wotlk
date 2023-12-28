@@ -22,7 +22,6 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
-#include "World.h"
 
 template<class T>
 void EscortMovementGenerator<T>::DoInitialize(T* unit)
