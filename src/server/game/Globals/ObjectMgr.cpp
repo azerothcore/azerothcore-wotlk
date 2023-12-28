@@ -2478,25 +2478,6 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     return spawnId;
 }
 
-void ObjectMgr::UpdateCreatureHalaa(ObjectGuid::LowType spawnId, Map* map, float x, float y)
-{
-    CreatureData& data = NewOrExistCreatureData(spawnId);
-
-    AddCreatureToGrid(spawnId, &data);
-
-    // Spawn if necessary (loaded grids only)
-    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
-    {
-        Creature* creature = new Creature();
-        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
-        {
-            LOG_ERROR("sql.sql", "AddCreature: Cannot add creature spawnId {} to map", spawnId);
-            delete creature;
-            return;
-        }
-    }
-}
-
 void ObjectMgr::LoadGameobjects()
 {
     uint32 oldMSTime = getMSTime();

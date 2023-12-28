@@ -81,6 +81,25 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
     }
 }
 
+void UpdateCreatureHalaa(ObjectGuid::LowType spawnId, Map* map, float x, float y)
+{
+    CreatureData& data = sObjectMgr->NewOrExistCreatureData(spawnId);
+
+    sObjectMgr->AddCreatureToGrid(spawnId, &data);
+
+    // Spawn if necessary (loaded grids only)
+    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
+    {
+        Creature* creature = new Creature();
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
+        {
+            LOG_ERROR("sql.sql", "AddCreature: Cannot add creature spawnId {} to map", spawnId);
+            delete creature;
+            return;
+        }
+    }
+}
+
 uint32 OPvPCapturePointNA::GetAliveGuardsCount()
 {
     uint32 cnt = 0;
@@ -129,7 +148,7 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
         ObjectGuid::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
         if (data) {
-            sObjectMgr->UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
+            UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
             _creatures[i] = spawnId;
             _creatureTypes[_creatures[i]] = i;
         }
