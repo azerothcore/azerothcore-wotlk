@@ -566,7 +566,7 @@ void Group::AddMemberWithGuid(ObjectGuid guid)
         }
         // We are raid group and no one slot is free
         if (!groupFound)
-            return false;
+            return;
     }
 
     MemberSlot member;
