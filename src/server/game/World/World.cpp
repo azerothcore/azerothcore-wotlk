@@ -2487,6 +2487,11 @@ void World::Update(uint32 diff)
     if (sToCloud9Sidecar->ClusterModeEnabled())
     {
         {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 async tasks"));
+            sToCloud9Sidecar->ProcessAsyncTasks();
+        }
+
+        {
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 hooks"));
             sToCloud9Sidecar->ProcessHooks();
         }

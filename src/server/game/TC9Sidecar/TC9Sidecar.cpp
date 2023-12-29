@@ -18,9 +18,11 @@
 #include "TC9Sidecar.h"
 #include "libsidecar.h"
 #include "TC9GuildHooks.h"
+#include "TC9GroupHooks.h"
 #include "TC9GrpcHandler.h"
 #include "Config.h"
 #include "Log.h"
+#include "InstanceSaveMgr.h"
 
 #define AVAILABLE_MAPS_ALL_MAPS ""
 
@@ -40,8 +42,19 @@ void ToCloud9Sidecar::Init(uint16 port, int realmId)
 
     if (_clusterModeEnabled)
     {
+        uint32 *assignedMaps;
+        int assignedMapsSize = 0;
+
         std::string availableMaps = sConfigMgr->GetOption<std::string>("Cluster.AvailableMaps", AVAILABLE_MAPS_ALL_MAPS);
-        TC9InitLib(port, realmId, availableMaps.data());
+        TC9InitLib(port, realmId, availableMaps.data(), &assignedMaps, &assignedMapsSize);
+
+        for (int i = 0; i < MAX_MAP_ID; i++)
+            _assignedMapsByID[i] = false;
+
+        for (int i = 0; i < assignedMapsSize; i++)
+            _assignedMapsByID[assignedMaps[i]] = true;
+
+        free(assignedMaps);
 
         SetupHooks();
         SetupGrpcHandlers();
@@ -56,9 +69,20 @@ void ToCloud9Sidecar::Deinit()
 
 void ToCloud9Sidecar::SetupHooks()
 {
-    TC9SetOnGuildMemberAddedHook(&ToCloud9GuildHooks::OnGuildMemberAdded);
+    TC9SetOnMapsReassignedHook(&ToCloud9Sidecar::OnMapsReassigned);
+
     TC9SetOnGuildMemberLeftHook(&ToCloud9GuildHooks::OnGuildMemberLeft);
+    TC9SetOnGuildMemberAddedHook(&ToCloud9GuildHooks::OnGuildMemberAdded);
     TC9SetOnGuildMemberRemovedHook(&ToCloud9GuildHooks::OnGuildMemberRemoved);
+
+    TC9SetOnGroupCreatedHook(&ToCloud9GroupHooks::OnGroupCreated);
+    TC9SetOnGroupDisbandedHook(&ToCloud9GroupHooks::OnGroupDisbanded);
+    TC9SetOnGroupMemberAddedHook(&ToCloud9GroupHooks::OnGroupMemberAdded);
+    TC9SetOnGroupMemberRemovedHook(&ToCloud9GroupHooks::OnGroupMemberRemoved);
+    TC9SetOnGroupLootTypeChangedHook(&ToCloud9GroupHooks::OnGroupLootTypeChanged);
+    TC9SetOnGroupConvertedToRaidHook(&ToCloud9GroupHooks::OnGroupConvertedToRaid);
+    TC9SetOnGroupRaidDifficultyChangedHook(&ToCloud9GroupHooks::OnGroupRaidDifficultyChanged);
+    TC9SetOnGroupDungeonDifficultyChangedHook(&ToCloud9GroupHooks::OnGroupDungeonDifficultyChanged);
 }
 
 void ToCloud9Sidecar::SetupGrpcHandlers()
@@ -84,6 +108,16 @@ void ToCloud9Sidecar::ProcessGrpcRequests()
     TC9ProcessGRPCRequests();
 }
 
+void ToCloud9Sidecar::ProcessAsyncTasks()
+{
+    _asyncTasksProcessor.ProcessReadyCallbacks();
+}
+
+bool ToCloud9Sidecar::IsMapAssigned(uint32 mapId)
+{
+    return _assignedMapsByID[mapId];
+}
+
 uint32 ToCloud9Sidecar::GenerateCharacterGuid()
 {
     return uint32(TC9GetNextAvailableCharacterGuid());
@@ -92,4 +126,44 @@ uint32 ToCloud9Sidecar::GenerateCharacterGuid()
 uint32 ToCloud9Sidecar::GenerateItemGuid()
 {
     return uint32(TC9GetNextAvailableItemGuid());
+}
+
+uint32 ToCloud9Sidecar::GenerateInstanceGuid()
+{
+    return uint32(TC9GetNextAvailableInstanceGuid());
+}
+
+void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize)
+{
+    for (int i = 0; i < addedMapsSize; i++)
+        sToCloud9Sidecar->_assignedMapsByID[addedMaps[i]] = true;
+
+    for (int i = 0; i < removedMapsSize; i++)
+        sToCloud9Sidecar->_assignedMapsByID[removedMaps[i]] = false;
+
+    if (addedMapsSize > 0)
+    {
+        std::vector<uint32_t> newMapIDs(addedMaps, addedMaps + addedMapsSize);
+
+        auto instanceSaveStoragePtr = std::make_shared<InstanceSaveMgr::InstanceSaveHashMap>();
+        auto playerBindStoragePtr = std::make_shared<PlayerBindStorage>();
+
+        AsyncTask<bool> task(
+           [instanceSaveStoragePtr, playerBindStoragePtr, newMapIDs]() -> bool {
+               LOG_INFO("server", "Starting to load data for newly assigned maps...");
+
+               sInstanceSaveMgr->LoadInstanceSavesAndBindsForMapIDs(newMapIDs, *instanceSaveStoragePtr, *playerBindStoragePtr);
+               return true;
+           },
+           [instanceSaveStoragePtr, playerBindStoragePtr, newMapIDs](bool) {
+               sInstanceSaveMgr->MergeWithNewInstanceSaves(*instanceSaveStoragePtr, *playerBindStoragePtr);
+               TC9ReadyToAcceptPlayersFromMaps((uint32_t*)newMapIDs.data(), newMapIDs.size());
+
+               LOG_INFO("server", "Finished loading data for newly assigned maps.");
+           }
+        );
+
+        task.ExecuteAsync();
+        sToCloud9Sidecar->_asyncTasksProcessor.AddCallback(std::move(task));
+    }
 }

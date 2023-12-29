@@ -19,6 +19,10 @@
 #define _TC9_SIDECAR_H
 
 #include "Common.h"
+#include "AsyncTask.h"
+#include "AsyncCallbackProcessor.h"
+
+#define MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
 
 class ToCloud9Sidecar
 {
@@ -34,17 +38,27 @@ public:
 
     bool ClusterModeEnabled() { return _clusterModeEnabled; }
 
+    bool IsMapAssigned(uint32 mapId);
+
     void SetupHooks();
     void SetupGrpcHandlers();
 
     void ProcessHooks();
     void ProcessGrpcRequests();
+    void ProcessAsyncTasks();
 
     uint32 GenerateCharacterGuid();
     uint32 GenerateItemGuid();
+    uint32 GenerateInstanceGuid();
 
 private:
+    static void OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize);
+
     bool _clusterModeEnabled;
+
+    bool _assignedMapsByID[MAX_MAP_ID];
+    
+    AsyncCallbackProcessor<AsyncTask<bool>> _asyncTasksProcessor;
 };
 
 #define sToCloud9Sidecar ToCloud9Sidecar::instance()

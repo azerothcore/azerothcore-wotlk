@@ -7,6 +7,36 @@ void panicWithTC9Unavailable(const char* message) {
     exit(EXIT_FAILURE);
 }
 
+void TC9SetOnGroupCreatedHook(OnGroupCreatedHook h) { panicWithTC9Unavailable("TC9SetOnGroupCreatedHook"); }
+
+// TC9SetOnGroupMemberAddedHook sets hook for member added event.
+//
+void TC9SetOnGroupMemberAddedHook(OnGroupMemberAddedHook h)  { panicWithTC9Unavailable("TC9SetOnGroupMemberAddedHook"); }
+
+// TC9SetOnGroupMemberRemovedHook sets hook for member left/kicked event.
+//
+void TC9SetOnGroupMemberRemovedHook(OnGroupMemberRemovedHook h) { panicWithTC9Unavailable("TC9SetOnGroupMemberRemovedHook"); }
+
+// TC9SetOnGroupDisbandedHook sets hook for group disbanded event.
+//
+void TC9SetOnGroupDisbandedHook(OnGroupDisbandedHook h) { panicWithTC9Unavailable("TC9SetOnGroupDisbandedHook"); }
+
+// TC9SetOnGroupLootTypeChangedHook sets hook for group loot type changed event.
+//
+void TC9SetOnGroupLootTypeChangedHook(OnGroupLootTypeChangedHook h) { panicWithTC9Unavailable("TC9SetOnGroupLootTypeChangedHook"); }
+
+// TC9SetOnGroupDungeonDifficultyChangedHook sets hook for group dungeon difficulty changed event.
+//
+void TC9SetOnGroupDungeonDifficultyChangedHook(OnGroupDungeonDifficultyChangedHook h) { panicWithTC9Unavailable("TC9SetOnGroupDungeonDifficultyChangedHook"); }
+
+// TC9SetOnGroupRaidDifficultyChangedHook sets hook for group raid difficulty changed event.
+//
+void TC9SetOnGroupRaidDifficultyChangedHook(OnGroupRaidDifficultyChangedHook h) { panicWithTC9Unavailable("TC9SetOnGroupRaidDifficultyChangedHook"); }
+
+// TC9SetOnGroupConvertedToRaidHook sets hook for group converted to raid event.
+//
+void TC9SetOnGroupConvertedToRaidHook(OnGroupConvertedToRaidHook h) { panicWithTC9Unavailable("TC9SetOnGroupConvertedToRaidHook"); }
+
 void TC9SetOnGuildMemberAddedHook(OnGuildMemberAddedHook h) { panicWithTC9Unavailable("TC9SetOnGuildMemberAddedHook"); }
 
 // TC9SetOnGuildMemberRemovedHook sets hook for guild member removed (kicked) event.
@@ -28,14 +58,22 @@ GoUint64 TC9GetNextAvailableCharacterGuid() { panicWithTC9Unavailable("TC9GetNex
 // TC9GetNextAvailableItemGuid returns next available item GUID. Thread unsafe.
 GoUint64 TC9GetNextAvailableItemGuid() { panicWithTC9Unavailable("TC9GetNextAvailableItemGuid"); return 0; }
 
+// TC9GetNextAvailableInstanceGuid returns next available dungeon/raid instance GUID. Thread unsafe.
+GoUint64 TC9GetNextAvailableInstanceGuid() { panicWithTC9Unavailable("TC9GetNextAvailableInstanceGuid"); return 0; }
+
 // TC9InitLib inits lib by starting services like grpc and healthcheck.
 // Adds game server to the servers registry that will make this server visible for game load balancer.
 //
-void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps) { panicWithTC9Unavailable("TC9InitLib"); }
+void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize) { panicWithTC9Unavailable("TC9InitLib"); }
 
 // TC9GracefulShutdown gracefully stops all running services.
 //
 void TC9GracefulShutdown() { panicWithTC9Unavailable("TC9GracefulShutdown"); }
+
+// TC9ReadyToAcceptPlayersFromMaps notifies servers registry that this server
+// loaded maps related data and ready to accept players from those maps.
+//
+void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen) { panicWithTC9Unavailable("TC9GracefulShutdown"); }
 
 // TC9SetCanPlayerInteractWithNPCAndFlagsHandler sets handler for can player interact with NPC and with given NPC flags request.
 //

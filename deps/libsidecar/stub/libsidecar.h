@@ -1,6 +1,8 @@
 #include <stddef.h>
 
+#include "events-group.h"
 #include "events-guild.h"
+#include "events-servers-registry.h"
 #include "player-interactions-api.h"
 #include "player-items-api.h"
 #include "player-money-api.h"
@@ -41,6 +43,38 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
+// TC9SetOnGroupCreatedHook sets hook for group created event.
+//
+void TC9SetOnGroupCreatedHook(OnGroupCreatedHook h);
+
+// TC9SetOnGroupMemberAddedHook sets hook for member added event.
+//
+void TC9SetOnGroupMemberAddedHook(OnGroupMemberAddedHook h);
+
+// TC9SetOnGroupMemberRemovedHook sets hook for member left/kicked event.
+//
+void TC9SetOnGroupMemberRemovedHook(OnGroupMemberRemovedHook h);
+
+// TC9SetOnGroupDisbandedHook sets hook for group disbanded event.
+//
+void TC9SetOnGroupDisbandedHook(OnGroupDisbandedHook h);
+
+// TC9SetOnGroupLootTypeChangedHook sets hook for group loot type changed event.
+//
+void TC9SetOnGroupLootTypeChangedHook(OnGroupLootTypeChangedHook h);
+
+// TC9SetOnGroupDungeonDifficultyChangedHook sets hook for group dungeon difficulty changed event.
+//
+void TC9SetOnGroupDungeonDifficultyChangedHook(OnGroupDungeonDifficultyChangedHook h);
+
+// TC9SetOnGroupRaidDifficultyChangedHook sets hook for group raid difficulty changed event.
+//
+void TC9SetOnGroupRaidDifficultyChangedHook(OnGroupRaidDifficultyChangedHook h);
+
+// TC9SetOnGroupConvertedToRaidHook sets hook for group converted to raid event.
+//
+void TC9SetOnGroupConvertedToRaidHook(OnGroupConvertedToRaidHook h);
+
 // TC9SetOnGuildMemberAddedHook sets hook for guild member added event.
 void TC9SetOnGuildMemberAddedHook(OnGuildMemberAddedHook h);
 
@@ -49,6 +83,10 @@ void TC9SetOnGuildMemberRemovedHook(OnGuildMemberRemovedHook h);
 
 // TC9SetOnGuildMemberLeftHook sets hook for guild member left event.
 void TC9SetOnGuildMemberLeftHook(OnGuildMemberLeftHook h);
+
+// TC9SetOnMapsReassignedHook sets hook for maps reassigning by servers registry event.
+//
+extern void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h);
 
 // TC9ProcessEventsHooks calls all events hooks.
 void TC9ProcessEventsHooks();
@@ -63,14 +101,25 @@ GoUint64 TC9GetNextAvailableCharacterGuid();
 // TC9GetNextAvailableItemGuid returns next available item GUID. Thread unsafe.
 GoUint64 TC9GetNextAvailableItemGuid();
 
+// TC9GetNextAvailableInstanceGuid returns next available dungeon/raid instance GUID. Thread unsafe.
+//
+GoUint64 TC9GetNextAvailableInstanceGuid();
+
+
 // TC9InitLib inits lib by starting services like grpc and healthcheck.
 // Adds game server to the servers registry that will make this server visible for game load balancer.
 //
-void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps);
+void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize);
 
 // TC9GracefulShutdown gracefully stops all running services.
 //
 void TC9GracefulShutdown();
+
+// TC9ReadyToAcceptPlayersFromMaps notifies servers registry that this server
+// loaded maps related data and ready to accept players from those maps.
+//
+void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen);
+
 
 // TC9SetCanPlayerInteractWithNPCAndFlagsHandler sets handler for can player interact with NPC and with given NPC flags request.
 //
