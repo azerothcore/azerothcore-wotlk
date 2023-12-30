@@ -129,9 +129,9 @@ enum HalaaGuardsNA
 
 enum HalaaCreaturesSpawn
 {
-    NA_HALAA_CREATURES = 12,
-    NA_HALAA_CREATURE_TEAM_SPAWN = 20,
-    NA_HALAA_MAX_CREATURE_SPAWN = 40
+    NA_HALAA_CREATURES = 12, //Quantity of creatures_templates contains HALAA
+    NA_HALAA_CREATURE_TEAM_SPAWN = 20, //Number of creatures by team
+    NA_HALAA_MAX_CREATURE_SPAWN = 40 //Number of creatures by both teams
 };
 
 // spawned when the alliance is attacking, horde is in control
@@ -177,7 +177,7 @@ struct HalaaIds
     uint32 idPatrol;
 };
 
-const HalaaIds PatrolCreatureEntry[12] =
+const HalaaIds PatrolCreatureEntry[NA_HALAA_CREATURES] =
 {
     // Horde
     {18192},
