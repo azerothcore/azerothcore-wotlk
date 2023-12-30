@@ -362,7 +362,7 @@ public:
     /* Enable or Disable the ability to save on the database this gameobject's state
      * whenever it changes
      */
-    void AllowSaveToDB(bool enable);
+    void AllowSaveToDB(bool enable) { m_saveStateOnDb = enable; };
 
     void SaveStateToDB();
 
