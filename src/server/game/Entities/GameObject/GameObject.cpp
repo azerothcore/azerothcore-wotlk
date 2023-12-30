@@ -335,19 +335,17 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        if (InstanceScript* script = GetInstanceScript())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            switch (script->GetStoredGameObjectState(guidlow))
+            switch (uint8 state = instance->GetStoredGameObjectState(GetSpawnId()))
             {
                 case 0:
                     SetGoState(GO_STATE_READY);
                     SwitchDoorOrButton(true);
                     break;
                 case 1:
-                    SetGoState(GO_STATE_READY);
-                    break;
                 case 2:
-                    SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    SetGoState((GOState)state);
                     break;
                 default:
                     SetGoState(go_state);

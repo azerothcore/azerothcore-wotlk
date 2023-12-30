@@ -742,6 +742,8 @@ void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= nullptr*/, ui
 
 void InstanceScript::LoadInstanceSavedGameobjectStateData()
 {
+    _objectStateMap.clear();
+
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     stmt->SetData(0, instance->GetInstanceId());
 
