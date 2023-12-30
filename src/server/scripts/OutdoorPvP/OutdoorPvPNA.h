@@ -40,7 +40,7 @@ const uint32 NA_HALAA_GRAVEYARD = 993;
 
 const uint32 NA_HALAA_GRAVEYARD_ZONE = 3518; // need to add zone id, not area id
 
-const uint32 NA_HALAA_ZONE_ID = 3628; // halaa zone id
+uint32 const NA_HALAA_ZONE_ID = 3628; // halaa zone id
 
 const uint32 NA_RESPAWN_TIME = 3600000; // one hour to capture after defeating all guards
 
@@ -246,8 +246,8 @@ protected:
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
-    void DeSpawnGOs();
-    void DespawnNPCs(HalaaNPCS teamNPC);
+    void DespawnGOs();
+    void DespawnCreatures(HalaaNPCS teamNPC);
 
     void SpawnNPCsForTeam(HalaaNPCS teamNPC);
     void SpawnGOsForTeam(TeamId teamId);
