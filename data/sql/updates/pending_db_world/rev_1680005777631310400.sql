@@ -4,7 +4,7 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (31961, 2048);
 
 -- NPC CREATURE
-SET @NPC := (SELECT MAX(`guid`) FROM `creature`);
+SET @NPC := 12608;
 DELETE FROM `creature` WHERE `guid` IN (@NPC+1, @NPC+2, @NPC+3, @NPC+4, @NPC+5, @NPC+6, @NPC+7, @NPC+8, @NPC+9, @NPC+10, @NPC+11, @NPC+12, @NPC+13, @NPC+14, @NPC+15, @NPC+16, @NPC+17, @NPC+18, @NPC+19, @NPC+20, @NPC+21, @NPC+22, @NPC+23, @NPC+24, @NPC+25, @NPC+26, @NPC+27, @NPC+28, @NPC+29, @NPC+30, @NPC+31, @NPC+32, @NPC+33, @NPC+34, @NPC+35, @NPC+36, @NPC+37, @NPC+38, @NPC+39, @NPC+40);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 -- HORDE
