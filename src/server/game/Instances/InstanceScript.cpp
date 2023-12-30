@@ -744,7 +744,6 @@ void InstanceScript::LoadInstanceSavedGameobjectStateData()
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     stmt->SetData(0, instance->GetInstanceId());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
     {
