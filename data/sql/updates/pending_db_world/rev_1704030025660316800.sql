@@ -22,5 +22,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14566, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Equine Spirit - Talk - Say 0');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11489;
-// Delete the wrong event This event should have been said by Creature 14566
+-- Delete the wrong event This event should have been said by Creature 14566
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 11489) AND (`source_type` = 0) AND (`id` IN (4));
