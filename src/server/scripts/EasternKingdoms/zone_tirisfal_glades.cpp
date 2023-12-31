@@ -15,26 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* ScriptData
- SDName: Tirisfal_Glades
- SD%Complete: 100
- SDComment: Quest support: 590, 1819
- SDCategory: Tirisfal Glades
- EndScriptData */
+/* ScriptData
+SDName: Tirisfal_Glades
+SD%Complete: 100
+SDComment: Quest support: 590
+SDCategory: Tirisfal Glades
+EndScriptData */
 
- /* ContentData
- npc_calvin_montague
- go_mausoleum_door
- go_mausoleum_trigger
- EndContentData */
+/* ContentData
+npc_calvin_montague
+*/
 
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 
- /*######
- ## npc_calvin_montague
- ######*/
+/*######
+## npc_calvin_montague
+######*/
 
 enum Calvin
 {
@@ -57,18 +55,15 @@ class npc_calvin_montague : public CreatureScript
 public:
     npc_calvin_montague() : CreatureScript("npc_calvin_montague") {}
 
-    /*[0] Flags: 33536
-[0] Flags2: 2048
-[0] Flags3: 0
-    [1] AuraState: 4194304*/
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_590)
         {
             creature->SetFaction(FACTION_MONSTER);
-            creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);            
+            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);//This is reset when out of combat
             creature->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
+            creature->SetReactState(REACT_AGGRESSIVE);
             creature->AI()->AttackStart(player);
         }
         return true;
@@ -80,9 +75,9 @@ public:
 
         void Reset() override
         {
-            //557584
             if (m_uiPhase != 1)
             {
+                me->SetReactState(REACT_DEFENSIVE);
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             }
         }
@@ -91,8 +86,7 @@ public:
         {
             if (m_uiPhase == 1)
             {
-                events.ScheduleEvent(EVENT_EMOTE, 0s);
-                return;
+                events.ScheduleEvent(EVENT_EMOTE, 2500ms);
             }
             else
             {
@@ -105,7 +99,7 @@ public:
         {
             m_uiPhase = 0;
             events.Reset();
-        }
+        }        
 
         void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
@@ -138,7 +132,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
 
-            if (m_uiPhase == 0 && me->HealthBelowPct(50))
+            if (m_uiPhase == 0 && me->HealthBelowPct(30))
             {
                 m_uiPhase = 1;
                 me->RestoreFaction();
@@ -152,8 +146,7 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_EMOTE:
-                        //12/03/2023 09:15:25.073                       
+                    case EVENT_EMOTE:                   
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID))
                             me->SetFacingToObject(player);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
