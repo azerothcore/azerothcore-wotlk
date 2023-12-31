@@ -80,7 +80,6 @@ public:
                         //A creature is summoned without being summoned
                         if (!me->FindNearestCreature(11075, 30.0f))
                         {
-
                             me->SummonCreature(11075, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
