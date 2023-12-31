@@ -96,7 +96,7 @@ public:
             }
             else
             {
-                events.ScheduleEvent(EVENT_END, 25s);
+                events.ScheduleEvent(EVENT_END, 3min);
             }
 
         }
