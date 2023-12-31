@@ -193,7 +193,6 @@ public:
     }
 };
 
-
 void AddSC_tirisfal_glades()
 {
     new npc_calvin_montague();
