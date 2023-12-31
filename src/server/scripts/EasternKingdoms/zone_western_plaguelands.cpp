@@ -76,7 +76,7 @@ public:
             {
                 case 199:                                   //felstone
                     if (player->GetQuestStatus(5216) == QUEST_STATUS_INCOMPLETE ||
-                            player->GetQuestStatus(5229) == QUEST_STATUS_INCOMPLETE)
+                        player->GetQuestStatus(5229) == QUEST_STATUS_INCOMPLETE)
                     {
                         me->SummonCreature(11075, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                         DoDie();
@@ -84,15 +84,15 @@ public:
                     break;
                 case 200:                                   //dalson
                     if (player->GetQuestStatus(5219) == QUEST_STATUS_INCOMPLETE ||
-                            player->GetQuestStatus(5231) == QUEST_STATUS_INCOMPLETE)
+                        player->GetQuestStatus(5231) == QUEST_STATUS_INCOMPLETE)
                     {
-                        me->SummonCreature(11077, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                        me->SummonCreature(11077, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                         DoDie();
                     }
                     break;
                 case 201:                                   //gahrron
                     if (player->GetQuestStatus(5225) == QUEST_STATUS_INCOMPLETE ||
-                            player->GetQuestStatus(5235) == QUEST_STATUS_INCOMPLETE)
+                        player->GetQuestStatus(5235) == QUEST_STATUS_INCOMPLETE)
                     {
                         me->SummonCreature(11078, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                         DoDie();
@@ -100,9 +100,9 @@ public:
                     break;
                 case 202:                                   //writhing
                     if (player->GetQuestStatus(5222) == QUEST_STATUS_INCOMPLETE ||
-                            player->GetQuestStatus(5233) == QUEST_STATUS_INCOMPLETE)
+                        player->GetQuestStatus(5233) == QUEST_STATUS_INCOMPLETE)
                     {
-                        me->SummonCreature(11076, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                        me->SummonCreature(11076, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                         DoDie();
                     }
                     break;
