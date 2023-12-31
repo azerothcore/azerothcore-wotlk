@@ -49,7 +49,6 @@ enum event
     EVENT_END = 4,
 };
 
-
 class npc_calvin_montague : public CreatureScript
 {
 public:
@@ -60,7 +59,7 @@ public:
         if (quest->GetQuestId() == QUEST_590)
         {
             creature->SetFaction(FACTION_MONSTER);
-            creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);            
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);//This is reset when out of combat
             creature->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
             creature->SetReactState(REACT_AGGRESSIVE);
@@ -92,14 +91,13 @@ public:
             {
                 events.ScheduleEvent(EVENT_END, 3min);
             }
-
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             m_uiPhase = 0;
             events.Reset();
-        }        
+        }
 
         void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
@@ -131,7 +129,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
             if (m_uiPhase == 0 && me->HealthBelowPct(30))
             {
                 m_uiPhase = 1;
@@ -146,7 +143,7 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_EMOTE:                   
+                    case EVENT_EMOTE:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID))
                             me->SetFacingToObject(player);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
@@ -162,7 +159,7 @@ public:
                         //It seems that Blizzard forgot to take this move into EVENT_END events
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID))
-                            player->AreaExploredOrEventHappens(QUEST_590);                        
+                            player->AreaExploredOrEventHappens(QUEST_590);
                         events.ScheduleEvent(EVENT_END, 12900ms);
                         break;
                     case EVENT_END:
@@ -170,7 +167,7 @@ public:
                         me->RestoreFaction();
                         me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->SetSheath(SHEATH_STATE_MELEE);                        
+                        me->SetSheath(SHEATH_STATE_MELEE);
                         m_uiPlayerGUID.Clear();
                         m_uiPhase = 0;
                         me->GetMotionMaster()->Initialize();
@@ -178,7 +175,7 @@ public:
                         break;
                     default:
                         break;
-                }               
+                }
             }
 
             if (!UpdateVictim())
