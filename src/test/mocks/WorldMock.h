@@ -120,6 +120,7 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
+    MOCK_METHOD(void, DoForAllOnlinePlayers, (std::function<void(Player*)> exec));
 };
 #pragma GCC diagnostic pop
 
