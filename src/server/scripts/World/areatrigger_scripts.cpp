@@ -246,49 +246,6 @@ public:
 };
 
 /*######
-## at_sholazar_waygate
-######*/
-
-enum Waygate
-{
-    SPELL_SHOLAZAR_TO_UNGORO_TELEPORT           = 52056,
-    SPELL_UNGORO_TO_SHOLAZAR_TELEPORT           = 52057,
-
-    AT_SHOLAZAR                                 = 5046,
-    AT_UNGORO                                   = 5047,
-
-    QUEST_THE_MAKERS_OVERLOOK                   = 12613,
-    QUEST_THE_MAKERS_PERCH                      = 12559,
-    QUEST_MEETING_A_GREAT_ONE                   = 13956,
-};
-
-class AreaTrigger_at_sholazar_waygate : public AreaTriggerScript
-{
-public:
-    AreaTrigger_at_sholazar_waygate() : AreaTriggerScript("at_sholazar_waygate") { }
-
-    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
-    {
-        if (!player->isDead() && (player->GetQuestStatus(QUEST_MEETING_A_GREAT_ONE) != QUEST_STATUS_NONE ||
-                                  (player->GetQuestStatus(QUEST_THE_MAKERS_OVERLOOK) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_THE_MAKERS_PERCH) == QUEST_STATUS_REWARDED)))
-        {
-            switch (trigger->entry)
-            {
-                case AT_SHOLAZAR:
-                    player->CastSpell(player, SPELL_SHOLAZAR_TO_UNGORO_TELEPORT, true);
-                    break;
-
-                case AT_UNGORO:
-                    player->CastSpell(player, SPELL_UNGORO_TO_SHOLAZAR_TELEPORT, true);
-                    break;
-            }
-        }
-
-        return false;
-    }
-};
-
-/*######
 ## at_nats_landing
 ######*/
 
@@ -490,7 +447,6 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_stormwright_shelf();
     new AreaTrigger_at_scent_larkorwi();
     new AreaTrigger_at_last_rites();
-    new AreaTrigger_at_sholazar_waygate();
     new AreaTrigger_at_nats_landing();
     new AreaTrigger_at_sentry_point();
     new AreaTrigger_at_brewfest();
