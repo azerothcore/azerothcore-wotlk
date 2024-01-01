@@ -1,3 +1,4 @@
+-- DB update 2024_01_01_03 -> 2024_01_01_04
 -- Update creature 26188 '[PH] Torch Catching Target Bunny' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26188) AND (`guid` IN (245595, 245600, 245604, 245606, 245610, 245614, 245635, 245640));
