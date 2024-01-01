@@ -218,7 +218,7 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
         _pvp->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_CAPTURE_A));
     }
-    else if(teamId == TEAM_HORDE)
+    else
     {
         m_WyvernStateSouth = WYVERN_NEU_ALLIANCE;
         m_WyvernStateNorth = WYVERN_NEU_ALLIANCE;
@@ -620,7 +620,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(_capturePoint, players, checker);
     Cell::VisitWorldObjects(_capturePoint, searcher, radius);
 
-    for (Player* const player : players)
+    for (Player* player : players)
     {
         if (player->IsOutdoorPvPActive())
         {
