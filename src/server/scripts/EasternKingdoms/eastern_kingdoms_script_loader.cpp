@@ -309,7 +309,6 @@ void AddEasternKingdomsScripts()
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
-    AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
     AddSC_westfall();
