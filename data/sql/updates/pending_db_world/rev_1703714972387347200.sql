@@ -100,7 +100,8 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (25982, 25994, 571, 1, 1, 0, 5532.052734375, -725.14739990234375, 149.1902008056640625, 2.164208173751831054, 120, 0, 0, 0, 0, 0, "", 50172, 1, NULL),
 (25983, 25994, 571, 1, 1, 0, 6156.80322265625, -1029.747802734375, 409.1746826171875, 0.03490658476948738, 120, 0, 0, 0, 0, 0, "", 50172, 1, NULL);
 
--- remaining spawns (no sniffed values available)
+-- remaining spawn (no sniffed values available)
+-- only update equipment_id
 UPDATE `creature` SET `equipment_id` = 0 WHERE `guid` = 94523;
 
 -- clear equipment_template entries
@@ -111,4 +112,63 @@ DELETE FROM `creature_equip_template` WHERE (`CreatureID` IN (25962, 25994));
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25962, 25994)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25962, 25994));
 
--- TODO: add SAI
+-- add missing condition
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45407) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 16781) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 45407, 0, 0, 31, 0, 3, 16781, 0, 0, 0, 0, '', '\'Reveler - Applause/Cheer\' targets \'Midsummer Celebrant\'');
+
+-- SAI 25962
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25962;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25962);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25962, 0, 0, 0, 60, 0, 100, 0, 0, 0, 100000, 120000, 0, 0, 88, 2596200, 2596201, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - On Update - Run Random Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2596200, 2596201));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2596200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 2200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment'),
+(2596200, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Play Emote 92'),
+(2596200, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2596200, 9, 3, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2596200, 9, 4, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2596200, 9, 5, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2596200, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2596200, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Play Emote 2'),
+(2596200, 9, 8, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Home Position'),
+(2596200, 9, 10, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment'),
+--
+(2596201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 1906, 2081, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment'),
+(2596201, 9, 1, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 11, 46322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'NPC Juggle Torch (Juggling)\''),
+(2596201, 9, 5, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2596201, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2596201, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Play Emote 2'),
+(2596201, 9, 8, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Home Position'),
+(2596201, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment');
+
+-- SAI 25994
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25994;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25994);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25994, 0, 0, 0, 60, 0, 100, 0, 0, 0, 100000, 120000, 0, 0, 88, 2599400, 2599401, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - On Update - Run Random Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2599400, 2599401));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2599400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 2200, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment'),
+(2599400, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Play Emote 92'),
+(2599400, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2599400, 9, 3, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2599400, 9, 4, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 46332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Midsummer Flame Breath\''),
+(2599400, 9, 5, 0, 0, 0, 100, 0, 6500, 6500, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2599400, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2599400, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Play Emote 2'),
+(2599400, 9, 8, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Home Position'),
+(2599400, 9, 10, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment'),
+--
+(2599401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 1906, 2081, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment'),
+(2599401, 9, 1, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 11, 46322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'NPC Juggle Torch (Juggling)\''),
+(2599401, 9, 5, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2599401, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2599401, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Play Emote 2'),
+(2599401, 9, 8, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Home Position'),
+(2599401, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment');
