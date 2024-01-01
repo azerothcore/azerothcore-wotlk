@@ -1,3 +1,4 @@
+-- DB update 2023_12_30_00 -> 2024_01_01_00
 -- Update all 'Mailbox' gameobjects with sniffed values
 -- updated spawns
 DELETE FROM `gameobject`
