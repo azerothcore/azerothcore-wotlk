@@ -1,10 +1,10 @@
+-- update BroadcastTextId
 UPDATE `creature_text` SET `BroadcastTextId`=9463 WHERE `CreatureID`=14383 AND `GroupID`=0 AND `ID`=0;
 UPDATE `creature_text` SET `BroadcastTextId`=9464 WHERE `CreatureID`=14383 AND `GroupID`=1 AND `ID`=0;
 UPDATE `creature_text` SET `BroadcastTextId`=9465 WHERE `CreatureID`=14383 AND `GroupID`=2 AND `ID`=0;
 UPDATE `creature_text` SET `BroadcastTextId`=9475 WHERE `CreatureID`=14383 AND `GroupID`=3 AND `ID`=0;
 
 -- Remove GroupID 1 add  GroupID 0 BroadcastTextId
-
 DELETE FROM `creature_text` WHERE `CreatureID`=11489;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (11489, 0, 0, 'You do not belong here! Ancients, rise up against these intruders!', 14, 0, 100, 0, 0, 0, 11727, 0, 'Tendris Warpwood');
