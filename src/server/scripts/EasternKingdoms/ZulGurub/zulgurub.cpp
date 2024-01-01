@@ -16,8 +16,8 @@
  */
 
 #include "GridNotifiers.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum Spells
 {
@@ -56,3 +56,4 @@ void AddSC_zulgurub()
 {
     RegisterSpellScript(spell_axe_flurry);
 }
+

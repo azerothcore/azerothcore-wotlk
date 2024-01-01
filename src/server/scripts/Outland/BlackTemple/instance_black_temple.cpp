@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 DoorData const doorData[] =
@@ -156,7 +158,7 @@ public:
                 case GO_ILLIDAN_GATE:
                 case GO_ILLIDAN_DOOR_R:
                 case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
             }
         }
@@ -178,7 +180,7 @@ public:
                 case GO_ILLIDAN_GATE:
                 case GO_ILLIDAN_DOOR_R:
                 case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }
@@ -657,3 +659,4 @@ void AddSC_instance_black_temple()
     new spell_black_temple_curse_of_vitality();
     new spell_black_temple_dementia();
 }
+

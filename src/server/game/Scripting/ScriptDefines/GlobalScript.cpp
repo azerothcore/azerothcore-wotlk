@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GlobalScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -86,11 +87,11 @@ bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* lootStoreI
     return true;
 }
 
-bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store)
+bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList equalChanced, Loot& loot, LootStore const& store)
 {
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
-        return !script->OnBeforeLootEqualChanced(player, EqualChanced, loot, store);
+        return !script->OnBeforeLootEqualChanced(player, equalChanced, loot, store);
     });
 
     if (ret && *ret)
@@ -230,3 +231,25 @@ void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, Encount
         script->OnBeforeSetBossState(id, newState, oldState, instance);
     });
 }
+
+/**
+ * @brief Called when a game object is created inside an instance
+ *
+ * @param instance A pointer to the [map] object of the instance
+ * @param go The object being added
+ */
+void ScriptMgr::AfterInstanceGameObjectCreate(Map* instance, GameObject* go)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->AfterInstanceGameObjectCreate(instance, go);
+    });
+}
+
+GlobalScript::GlobalScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GlobalScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<GlobalScript>;

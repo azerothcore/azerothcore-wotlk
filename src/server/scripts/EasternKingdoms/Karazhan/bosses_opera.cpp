@@ -22,12 +22,12 @@ SDComment: Oz, Hood, and RAJ event implemented. RAJ event requires more testing.
 SDCategory: Karazhan
 EndScriptData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
-#include "TaskScheduler.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "TaskScheduler.h"
 #include "karazhan.h"
 
 /***********************************/

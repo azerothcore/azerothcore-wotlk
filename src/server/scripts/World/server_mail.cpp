@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ObjectMgr.h"
+#include "Player.h"
+#include "PlayerScript.h"
 #include "QueryResult.h"
 
 class ServerMailReward : public PlayerScript
@@ -49,3 +50,4 @@ void AddSC_server_mail()
 {
     new ServerMailReward();
 }
+

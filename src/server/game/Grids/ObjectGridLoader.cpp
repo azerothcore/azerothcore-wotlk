@@ -18,42 +18,13 @@
 #include "ObjectGridLoader.h"
 #include "CellImpl.h"
 #include "Corpse.h"
-#include "GridNotifiers.h"
 #include "Creature.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-
-void ObjectGridEvacuator::Visit(CreatureMapType& m)
-{
-    // creature in unloading grid can have respawn point in another grid
-    // if it will be unloaded then it will not respawn in original grid until unload/load original grid
-    // move to respawn point to prevent this case. For player view in respawn grid this will be normal respawn.
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end();)
-    {
-        Creature* c = iter->GetSource();
-        ++iter;
-
-        ASSERT(!c->IsPet() && "ObjectGridRespawnMover must not be called for pets");
-        c->GetMap()->CreatureRespawnRelocation(c, true);
-    }
-}
-
-void ObjectGridEvacuator::Visit(GameObjectMapType& m)
-{
-    // gameobject in unloading grid can have respawn point in another grid
-    // if it will be unloaded then it will not respawn in original grid until unload/load original grid
-    // move to respawn point to prevent this case. For player view in respawn grid this will be normal respawn.
-    for (GameObjectMapType::iterator iter = m.begin(); iter != m.end();)
-    {
-        GameObject* go = iter->GetSource();
-        ++iter;
-
-        go->GetMap()->GameObjectRespawnRelocation(go, true);
-    }
-}
 
 // for loading world object at grid loading (Corpses)
 //TODO: to implement npc on transport, also need to load npcs at grid loading
@@ -255,17 +226,6 @@ void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
         obj->CleanupsBeforeDelete();
         ///- object will get delinked from the manager when deleted
         delete obj;
-    }
-}
-
-void ObjectGridStoper::Visit(CreatureMapType& m)
-{
-    // stop any fights at grid de-activation and remove dynobjects created at cast by creatures
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        iter->GetSource()->RemoveAllDynObjects();
-        if (iter->GetSource()->IsInCombat())
-            iter->GetSource()->CombatStop();
     }
 }
 

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AuctionHouseScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -117,3 +118,11 @@ void ScriptMgr::OnBeforeAuctionHouseMgrUpdate()
         script->OnBeforeAuctionHouseMgrUpdate();
     });
 }
+
+AuctionHouseScript::AuctionHouseScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AuctionHouseScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<AuctionHouseScript>;

@@ -18,6 +18,8 @@
 #ifndef DBCENUMS_H
 #define DBCENUMS_H
 
+#include "Define.h"
+
 #pragma pack(push, 1)
 
 struct DBCPosition2D
@@ -48,7 +50,7 @@ struct DBCPosition3D
 // also see MAX_LEVEL and GT_MAX_LEVEL define
 #define STRONG_MAX_LEVEL 255
 
-enum BattlegroundBracketId                                  // bracketId for level ranges
+enum BattlegroundBracketId : uint8                                  // bracketId for level ranges
 {
     BG_BRACKET_ID_FIRST          = 0,
     BG_BRACKET_ID_LAST           = 15
@@ -268,7 +270,7 @@ enum AreaFlags
     AREA_FLAG_NO_FLY_ZONE        = 0x20000000                 // Marks zones where you cannot fly
 };
 
-enum Difficulty
+enum Difficulty : uint8
 {
     REGULAR_DIFFICULTY           = 0,
 

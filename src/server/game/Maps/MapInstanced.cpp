@@ -19,17 +19,16 @@
 #include "Battleground.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "MMapFactory.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "VMapFactory.h"
 
-MapInstanced::MapInstanced(uint32 id, std::chrono::seconds expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
+MapInstanced::MapInstanced(uint32 id) : Map(id, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
-    // fill with zero
-    memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS * sizeof(uint16));
+    // initialize instanced maps list
+    m_InstancedMaps.clear();
 }
 
 void MapInstanced::InitVisibilityDistance()
@@ -203,7 +202,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 
     LOG_DEBUG("maps", "MapInstanced::CreateInstance: {} map instance {} for {} created with difficulty {}", save ? "" : "new ", InstanceId, GetId(), difficulty ? "heroic" : "normal");
 
-    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this);
+    InstanceMap* map = new InstanceMap(GetId(), InstanceId, difficulty, this);
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();
@@ -237,7 +236,7 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     else
         spawnMode = REGULAR_DIFFICULTY;
 
-    BattlegroundMap* map = new BattlegroundMap(GetId(), GetGridExpiry(), InstanceId, this, spawnMode);
+    BattlegroundMap* map = new BattlegroundMap(GetId(), InstanceId, this, spawnMode);
     ASSERT(map->IsBattlegroundOrArena());
     map->SetBG(bg);
     bg->SetBgMap(map);

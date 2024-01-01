@@ -16,7 +16,7 @@
  */
 
 #include "hyjal_trash.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
 
@@ -584,7 +584,7 @@ public:
             {
                 if ((faction == 0 && LastOverronPos == 17) || (faction == 1 && LastOverronPos == 21))
                 {
-                    me->setDeathState(DEAD);
+                    me->setDeathState(DeathState::Dead);
                     me->RemoveCorpse();
                 }
             }
@@ -685,7 +685,7 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK_UNARMED);
                 if ((faction == 0 && LastOverronPos == 17) || (faction == 1 && LastOverronPos == 21))
                 {
-                    me->setDeathState(DEAD);
+                    me->setDeathState(DeathState::Dead);
                     me->RemoveCorpse();
                 }
             }

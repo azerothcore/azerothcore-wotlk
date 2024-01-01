@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "InstanceMapScript.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
@@ -1211,3 +1213,4 @@ void AddSC_instance_naxxramas()
     new boss_naxxramas_misc();
     new at_naxxramas_hub_portal();
 }
+

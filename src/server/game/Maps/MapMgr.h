@@ -24,7 +24,6 @@
 #include "MapInstanced.h"
 #include "MapUpdater.h"
 #include "Object.h"
-#include "GridStates.h"
 
 #include <mutex>
 
@@ -73,14 +72,6 @@ public:
 
     void Initialize(void);
     void Update(uint32);
-
-    void SetGridCleanUpDelay(uint32 t)
-    {
-        if (t < MIN_GRID_DELAY)
-            i_gridCleanUpDelay = MIN_GRID_DELAY;
-        else
-            i_gridCleanUpDelay = t;
-    }
 
     void SetMapUpdateInterval(uint32 t)
     {
@@ -179,7 +170,6 @@ private:
     MapMgr& operator=(const MapMgr&);
 
     std::mutex Lock;
-    uint32 i_gridCleanUpDelay;
     MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;

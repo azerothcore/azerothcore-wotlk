@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /*
  * Scripts for spells with SPELLFAMILY_ROGUE and SPELLFAMILY_GENERIC spells used by rogue players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_rog_".
  */
-
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
 
 enum RogueSpells
 {
@@ -710,3 +710,4 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_tricks_of_the_trade_proc);
     RegisterSpellScript(spell_rog_pickpocket);
 }
+

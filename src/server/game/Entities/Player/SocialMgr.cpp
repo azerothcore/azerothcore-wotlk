@@ -220,7 +220,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo&
     friendInfo.Class = 0;
 
     Player* pFriend = ObjectAccessor::FindConnectedPlayer(friendGUID);
-    if (!pFriend || AccountMgr::IsGMAccount(pFriend->GetSession()->GetSecurity()))
+    if (!pFriend || pFriend->GetSession()->IsGMAccount())
         return;
 
     TeamId teamId = player->GetTeamId();

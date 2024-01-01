@@ -16,16 +16,19 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WaypointMgr.h"
+
 // Ours
 enum songOfWindandWater
 {
@@ -1410,8 +1413,7 @@ public:
                             break;
                         case 25:
                             Talk(PLANE_EMOTE);
-                            DoCast(AURA_ENGINE);
-                            me->SetUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
+                            DoCastSelf(AURA_ENGINE);
                             break;
                     }
             pointId++;
@@ -1543,3 +1545,4 @@ void AddSC_sholazar_basin()
 
     RegisterSpellScript(spell_q12611_deathbolt);
 }
+

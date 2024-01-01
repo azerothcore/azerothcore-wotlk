@@ -23,11 +23,11 @@
  EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "Timer.h"
 
 using namespace Acore::ChatCommands;
@@ -96,16 +96,14 @@ public:
 
         if (std::size_t(eventId) >= events.size())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
         GameEventData const& eventData = events[eventId];
         if (!eventData.isValid())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
@@ -136,24 +134,21 @@ public:
 
         if (*eventId < 1 || *eventId >= events.size())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
         GameEventData const& eventData = events[eventId];
         if (!eventData.isValid())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
         if (activeEvents.find(eventId) != activeEvents.end())
         {
-            handler->PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId), eventData.description.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId), eventData.description.c_str());
             return false;
         }
 
@@ -168,16 +163,14 @@ public:
 
         if (*eventId < 1 || *eventId >= events.size())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
         GameEventData const& eventData = events[eventId];
         if (!eventData.isValid())
         {
-            handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_EXIST);
             return false;
         }
 
@@ -185,8 +178,7 @@ public:
 
         if (activeEvents.find(eventId) == activeEvents.end())
         {
-            handler->PSendSysMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId), eventData.description.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId), eventData.description.c_str());
             return false;
         }
 

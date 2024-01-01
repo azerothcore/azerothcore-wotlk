@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "Containers.h"
+#include "CreatureScript.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "ahnkahet.h"
 
@@ -733,3 +735,4 @@ void AddSC_boss_jedoga_shadowseeker()
     // Achievements
     new achievement_volunteer_work();
 }
+

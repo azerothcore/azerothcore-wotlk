@@ -3243,7 +3243,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         case SMART_TARGET_FARTHEST:
             if (me)
             {
-                if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, e.target.farthest.maxDist, e.target.farthest.playerOnly, e.target.farthest.isInLos)))
+                if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, e.target.farthest.maxDist, e.target.farthest.playerOnly, e.target.farthest.isInLos, e.target.farthest.minDist)))
                     targets.push_back(u);
             }
             break;
@@ -4077,6 +4077,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_SUMMONED_UNIT:
         case SMART_EVENT_SUMMONED_UNIT_DIES:
+        case SMART_EVENT_SUMMONED_UNIT_EVADE:
             {
                 if (!IsCreature(unit))
                     return;

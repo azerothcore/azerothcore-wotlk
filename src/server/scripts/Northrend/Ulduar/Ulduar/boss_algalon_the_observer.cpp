@@ -15,15 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum Spells
@@ -387,6 +390,11 @@ public:
 
             _phaseTwo = false;
             _heraldOfTheTitans = true;
+
+            if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+            }
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
@@ -1151,6 +1159,14 @@ public:
 
                 if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
+
+                if (Map* map = player->GetMap())
+                {
+                    if (InstanceMap* instanceMap = map->ToInstanceMap())
+                    {
+                        instanceMap->PermBindAllPlayers();
+                    }
+                }
             }
 
             return false;

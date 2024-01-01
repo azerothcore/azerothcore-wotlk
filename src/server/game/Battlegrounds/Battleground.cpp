@@ -29,6 +29,7 @@
 #include "Creature.h"
 #include "CreatureTextMgr.h"
 #include "Formulas.h"
+#include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
@@ -861,7 +862,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
 
                 // Xinef: check player level and not bracket level if (CanAwardArenaPoints())
-                if (player->GetLevel() >= BG_AWARD_ARENA_POINTS_MIN_LEVEL)
+                if (player->GetLevel() >= sWorld->getIntConfig(CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD))
                     player->ModifyArenaPoints(winner_arena);
 
                 if (!player->GetRandomWinner())
@@ -1635,7 +1636,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
 
     if (Creature* creature = AddCreature(entry, type, x, y, z, o))
     {
-        creature->setDeathState(DEAD);
+        creature->setDeathState(DeathState::Dead);
         creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
         /// @todo: Fix display here
