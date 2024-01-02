@@ -139,11 +139,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 --
 (2596201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 1906, 2081, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment'),
 (2596201, 9, 1, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 11, 46322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'NPC Juggle Torch (Juggling)\''),
-(2596201, 9, 5, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
-(2596201, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
-(2596201, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Play Emote 2'),
-(2596201, 9, 8, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Home Position'),
-(2596201, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment');
+(2596201, 9, 2, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2596201, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2596201, 9, 4, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Play Emote 2'),
+(2596201, 9, 5, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Set Orientation Home Position'),
+(2596201, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Fire Eater - Actionlist - Change Equipment');
 
 -- SAI 25994
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25994;
@@ -167,8 +167,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 --
 (2599401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 1906, 2081, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment'),
 (2599401, 9, 1, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 11, 46322, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'NPC Juggle Torch (Juggling)\''),
-(2599401, 9, 5, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
-(2599401, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
-(2599401, 9, 7, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Play Emote 2'),
-(2599401, 9, 8, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Home Position'),
-(2599401, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment');
+(2599401, 9, 2, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 0, 11, 45407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Cast \'Reveler - Applause/Cheer\''),
+(2599401, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 19, 16781, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Closest Creature \'Midsummer Celebrant\''),
+(2599401, 9, 4, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Play Emote 2'),
+(2599401, 9, 5, 0, 0, 0, 100, 0, 4200, 4200, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Set Orientation Home Position'),
+(2599401, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Eater - Actionlist - Change Equipment');
