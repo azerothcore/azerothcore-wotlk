@@ -24,42 +24,38 @@
 
 enum AshbringerEventMisc
 {
-    AB_Effect_000 = 28441,
-    AURA_OF_ASHBRINGER = 28282,
+    AB_Effect_000                  = 28441,
+    AURA_OF_ASHBRINGER             = 28282,
+    NPC_SCARLET_MYRIDON            = 4295,
+    NPC_SCARLET_DEFENDER           = 4298,
+    NPC_SCARLET_CENTURION          = 4301,
+    NPC_SCARLET_SORCERER           = 4294,
+    NPC_SCARLET_WIZARD             = 4300,
+    NPC_SCARLET_ABBOT              = 4303,
+    NPC_SCARLET_MONK               = 4540,
+    NPC_SCARLET_CHAMPION           = 4302,
+    NPC_SCARLET_CHAPLAIN           = 4299,
+    NPC_FAIRBANKS                  = 4542,
 
-    NPC_SCARLET_MYRIDON = 4295,
-    NPC_SCARLET_DEFENDER = 4298,
-    NPC_SCARLET_CENTURION = 4301,
-    NPC_SCARLET_SORCERER = 4294,
-    NPC_SCARLET_WIZARD = 4300,
-    NPC_SCARLET_ABBOT = 4303,
-    NPC_SCARLET_MONK = 4540,
-    NPC_SCARLET_CHAMPION = 4302,
-    NPC_SCARLET_CHAPLAIN = 4299,
-    NPC_FAIRBANKS = 4542,
-
-    NPC_COMMANDER_MOGRAINE = 3976,
-    NPC_INQUISITOR_WHITEMANE = 3977,
-    DOOR_CHAPEL = 104591,
-    DOOR_HIGH_INQUISITOR_ID = 104600,
+    NPC_COMMANDER_MOGRAINE         = 3976,
+    NPC_INQUISITOR_WHITEMANE       = 3977,
+    DOOR_CHAPEL                    = 104591,
+    DOOR_HIGH_INQUISITOR_ID        = 104600,
     SAY_MOGRAINE_ASHBRBINGER_INTRO = 6,
 };
 
 enum DataTypes
 {
     TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
-
-    DATA_MOGRAINE = 2,
-    DATA_WHITEMANE = 3,
-    DATA_DOOR_WHITEMANE = 4,
-
-    DATA_HORSEMAN_EVENT = 5,
-    GAMEOBJECT_PUMPKIN_SHRINE = 6,
-
-    DATA_VORREL = 7,
-    DATA_ARCANIST_DOAN = 8,
-    TYPE_ASHBRINGER_EVENT = 9,
-    DATA_DOOR_CHAPEL = 10,
+    TYPE_ASHBRINGER_EVENT         = 2,
+    DATA_MOGRAINE                 = 3,
+    DATA_WHITEMANE                = 4,
+    DATA_DOOR_WHITEMANE           = 5,
+    DATA_HORSEMAN_EVENT           = 6,
+    DATA_VORREL                   = 7,
+    DATA_ARCANIST_DOAN            = 8,    
+    DATA_DOOR_CHAPEL              = 9,
+    GAMEOBJECT_PUMPKIN_SHRINE     = 10,   
 };
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -273,106 +269,108 @@ public:
 
 enum ScarletMonasteryTrashMisc
 {
-    SAY_WELCOME = 0,
-    AURA_ASHBRINGER = 28282,
-    NPC_HIGHLORD_MOGRAINE = 16062,
-    MODEL_HIGHLORD_MOGRAINE = 16180,
-    MODEL_FAIRBANKS = 16179,
-    SPELL_COSMETIC_CHAIN = 45537,
-    SPELL_COSMETIC_EXPLODE = 45935,
-    SPELL_FORGIVENESS = 28697
+    SAY_WELCOME                 = 0,
+    DEAD_SOUND                  = 1326,
+    AURA_ASHBRINGER             = 28282,
+    NPC_HIGHLORD_MOGRAINE       = 16062,
+    MODEL_HIGHLORD_MOGRAINE     = 16180,
+    MODEL_FAIRBANKS             = 16179,
+    SPELL_COSMETIC_CHAIN        = 45537,
+    SPELL_COSMETIC_EXPLODE      = 45935
 };
 
 enum AshbringerEvent
 {
-    EVENT_MOGRAINE_FACING_PLAYER = 1,
-    EVENT_MOGRAINE_KNEEL = 2,
-    EVENT_MOGRAINE_EMOTE_TALK3 = 3,
-    EVENT_SUMMONED_HIGHLORD_MOGRAINE = 4,
-    EVENT_HIGHLORD_MOGRAINE_MOVE_STOP = 5,
-    EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE = 6,
-    EVENT_MOGRAINE_UNIT_STAND_STATE_STAND = 7,
-    EVENT_MOGRAINE_EMOTE_TALK4 = 8,
-    EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK = 9,
-    EVENT_HIGHLORD_MOGRAINE_EMOTE1 = 10,
-    EVENT_HIGHLORD_MOGRAINE_EMOTE2 = 11,
-    EVENT_HIGHLORD_MOGRAINE_EMOTE3 = 12,
+    EVENT_MOGRAINE_FACING_PLAYER             = 1,
+    EVENT_MOGRAINE_KNEEL                     = 2,
+    EVENT_MOGRAINE_EMOTE_TALK3               = 3,
+    EVENT_SUMMONED_HIGHLORD_MOGRAINE         = 4,
+    EVENT_HIGHLORD_MOGRAINE_MOVE_STOP        = 5,
+    EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE  = 6,
+    EVENT_MOGRAINE_UNIT_STAND_STATE_STAND    = 7,
+    EVENT_MOGRAINE_EMOTE_TALK4               = 8,
+    EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK       = 9,
+    EVENT_HIGHLORD_MOGRAINE_EMOTE1           = 10,
+    EVENT_HIGHLORD_MOGRAINE_EMOTE2           = 11,
+    EVENT_HIGHLORD_MOGRAINE_EMOTE3           = 12,
     EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2 = 13,
-    EVENT_MOGRAINE_EMOTE_TALK5 = 14,
-    EVENT_HIGHLORD_MOGRAINE_CASTSPELL = 15,
-    EVENT_MOGRAINE_CASTSPELL = 16,
-    EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE = 17,
-    EVENT_ASHBRINGER_OVER = 18
+    EVENT_MOGRAINE_EMOTE_TALK5               = 14,
+    EVENT_HIGHLORD_MOGRAINE_CASTSPELL        = 15,
+    EVENT_MOGRAINE_CASTSPELL                 = 16,
+    EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE    = 17,
+    EVENT_ASHBRINGER_OVER                    = 18
 };
 
 enum MograineEvents
 {
-    EVENT_RESURRECTED = 1,
+    EVENT_RESURRECTED        = 1,
     EVENT_SPELL_LAY_ON_HANDS = 2,
-    EVENT_MOGRAINE_EMOTE = 3,
-    EVENT_MOVE = 4
+    EVENT_MOGRAINE_EMOTE     = 3,
+    EVENT_MOVE               = 4
 };
 
 enum WhitemaneEvents
 {
-    EVENT_SPELL_HOLY_SMITE = 1,
+    EVENT_SPELL_HOLY_SMITE         = 1,
     EVENT_SPELL_POWER_WORLD_SHIELD = 2,
-    EVENT_SPELL_HEAL = 3,
-    EVENT_SPELL_DOMINATE_MIND = 4,
-    EVENT_SLEEP = 5,
-    EVENT_RESURRECT = 6,
-    EVENT_SAY = 7,
-    EVENT_WHITEMANE_EMOTE = 8,
-    EVENT_DEALY_ATTACK = 9
+    EVENT_SPELL_HEAL               = 3,
+    EVENT_SPELL_DOMINATE_MIND      = 4,
+    EVENT_SLEEP                    = 5,
+    EVENT_RESURRECT                = 6,
+    EVENT_SAY                      = 7,
+    EVENT_WHITEMANE_EMOTE          = 8,
+    EVENT_DEALY_ATTACK             = 9
 };
 
 enum Spells
 {
     //Mograine Spells
-    SPELL_CRUSADER_STRIKE = 14518,
-    SPELL_HAMMER_OF_JUSTICE = 5589,
-    SPELL_LAY_ON_HANDS = 9257,
-    SPELL_RETRIBUTION_AURA = 8990,
+    SPELL_CRUSADER_STRIKE           = 14518,
+    SPELL_HAMMER_OF_JUSTICE         = 5589,
+    SPELL_LAY_ON_HANDS              = 9257,
+    SPELL_RETRIBUTION_AURA          = 8990,
 
     //Whitemanes Spells
-    SPELL_SCARLET_RESURRECTION = 9232,
-    SPELL_DEEP_SLEEP = 9256,
-    SPELL_DOMINATE_MIND = 14515,
-    SPELL_HOLY_SMITE = 9481,
-    SPELL_HEAL = 12039,
-    SPELL_POWER_WORD_SHIELD = 22187,
+    SPELL_SCARLET_RESURRECTION      = 9232,
+    SPELL_DEEP_SLEEP                = 9256,
+    SPELL_DOMINATE_MIND             = 14515,
+    SPELL_HOLY_SMITE                = 9481,
+    SPELL_HEAL                      = 12039,
+    SPELL_POWER_WORD_SHIELD         = 22187,
 
     //Highlord Mograine Spells
-    SPELL_MOGRAINE_COMETH_DND = 28688,
+    SPELL_MOGRAINE_COMETH_DND       = 28688,
+    SPELL_FORGIVENESS               = 28697,
 
-    //SPELL_TRANSFORM_GHOST
-    SPELL_TRANSFORM_GHOST = 28443
+    //SPELL_TRANSFORM_GHOST 
+    SPELL_TRANSFORM_GHOST           = 28443
 };
 
 enum Says
 {
     //Mograine says
-    SAY_MO_AGGRO = 0,
-    SAY_MO_KILL = 1,
-    SAY_MO_RESURRECTED = 2,
+    SAY_MO_AGGRO                    = 0,
+    SAY_MO_KILL                     = 1,
+    SAY_MO_RESURRECTED              = 2,
 
     //Mograine Ashbringer Event says
-    SAY_MO_AB_TALK3 = 3,
-    SAY_MO_AB_TALK4 = 4,
-    SAY_MO_AB_TALK5 = 5,
+    SAY_MO_AB_TALK3                 = 3,
+    SAY_MO_AB_TALK4                 = 4,
+    SAY_MO_AB_TALK5                 = 5,
 
     //Highlord Mograine Ashbringer Event Says
-    SAY_HM_AB_TALK0 = 0,
-    SAY_HM_AB_TALK1 = 1,
-    SAY_HM_AB_TALK2 = 2,
+    SAY_HM_AB_TALK0                 = 0,
+    SAY_HM_AB_TALK1                 = 1,
+    SAY_HM_AB_TALK2                 = 2,
 
     //Whitemane says
-    SAY_WH_INTRO = 0,
-    SAY_WH_KILL = 1,
-    SAY_WH_RESURRECT = 2,
+    SAY_WH_INTRO                    = 0,
+    SAY_WH_KILL                     = 1,
+    SAY_WH_RESURRECT                = 2
 };
 
 float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
+Position const summonedMograinePos = { 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f };
 
 class npc_mograine : public CreatureScript
 {
@@ -405,7 +403,7 @@ public:
                     me->AI()->Talk(SAY_MO_AB_TALK3, _playerWhoStartedAshbringer);
                     break;
                 case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
-                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 120000))
+                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, summonedMograinePos, TEMPSUMMON_TIMED_DESPAWN, 120000))
                     {
                         summonedMograine->SetFaction(FACTION_FRIENDLY);
                         summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
@@ -504,7 +502,6 @@ public:
 
         void Reset() override
         {
-            // Incase wipe during phase that mograine fake death
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
@@ -559,70 +556,32 @@ public:
                 damage = 0;
 
             //On first death, fake death and open door, as well as initiate whitemane if exist
-          if (damage > me->GetHealth() && !_fakeDeath)
+            if (damage > me->GetHealth() && !_fakeDeath)
             {
                 // On first death, fake death and open door, as well as initiate whitemane if exist
                 if (Creature* Whitemane = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
                     Whitemane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    //ServerToClient: SMSG_CHAT (0x2BAD) Length: 187 ConnIdx: 0 Time: 06/24/2023 06:02:03.366 Number: 9026
                     Whitemane->AI()->Talk(SAY_WH_INTRO, me);
                     float fx, fy, fz;
                     me->GetContactPoint(Whitemane, fx, fy, fz, 5.0f);
                     Whitemane->GetMotionMaster()->MovePoint(1, fx, fy, fz);
                     Whitemane->SetReactState(REACT_AGGRESSIVE);
-                    // Whitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
                 }
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->MoveIdle();
                 me->SetHealth(0);
-                /*ServerToClient: SMSG_PLAY_OBJECT_SOUND(0x276E) Length : 48 ConnIdx : 1 Time : 11 / 25 / 2023 11 : 17 : 10.928 Number : 1490
-                    SoundId : 1326 (1326)
-                    SourceObjectGUID : Full : 0x204CB017A003E2000001BA00006163B7 Creature / 0 R4908 / S442 Map : 189 Entry : 3976 Low : 6382519
-                    TargetObjectGUID : Full : 0x204CB017A003E2000001BA00006163B7 Creature / 0 R4908 / S442 Map : 189 Entry : 3976 Low : 6382519
-                    Position : X : 1138.4968 Y : 1400.8589 Z : 30.745066
-                    BroadcastTextID : 0*/
-                me->PlayDirectSound(1326);
-                /* ServerToClient: SMSG_AURA_UPDATE(0x2C1F) Length : 18 ConnIdx : 1 Time : 11 / 25 / 2023 11 : 17 : 10.928 Number : 1491
-                     UpdateAll : False
-                     AurasCount : 1
-                     [0] Slot : 0
-                     [0] HasAura : False
-                     UnitGUID : Full: 0x204CB017A003E2000001BA00006163B7 Creature / 0 R4908 / S442 Map : 189 Entry : 3976 Low : 6382519*/
+                me->PlayDirectSound(DEAD_SOUND);
+                //Remove all beneficial auras
                 me->RemoveAura(SPELL_RETRIBUTION_AURA);
-                /* ServerToClient: SMSG_ATTACK_STOP(0x293E) Length : 23 ConnIdx : 1 Time : 11 / 25 / 2023 11 : 17 : 10.928 Number : 1492
-                     Attacker Guid : Full: 0x204CB017A003E2000001BA00006163B7 Creature / 0 R4908 / S442 Map : 189 Entry : 3976 Low : 6382519
-                     Victim Guid : Full: 0x084CA000000000000000000000ABA68A Player / 0 R4904 / S0 Map : 0 Low : 11249290
-                     NowDead : False*/
                 me->AttackStop();
-                /*ServerToClient: SMSG_UPDATE_OBJECT(0x27CB) Length : 132 ConnIdx : 1 Time : 11 / 25 / 2023 11 : 17 : 10.928 Number : 1494
-                    NumObjUpdates : 2
-                    MapID : 189 (189)
-                    HasRemovedObjects : True
-                    DestroyedObjCount : 0
-                    RemovedObjCount : 3
-                    (OutOfRange)[0] ObjectGUID : Full : 0x204CB017A00433000001BA0000E163B8 Creature / 0 R4908 / S442 Map : 189 Entry : 4300 Low : 14771128
-                    (OutOfRange)[1] ObjectGUID : Full : 0x204CB017A00432800001BA00016163B8 Creature / 0 R4908 / S442 Map : 189 Entry : 4298 Low : 23159736
-                    (OutOfRange)[2] ObjectGUID : Full : 0x204CB017A00433400001BA0005E163B8 Creature / 0 R4908 / S442 Map : 189 Entry : 4301 Low : 98657208
-                    Data size : 69
-                    [0] UpdateType : Values
-                    [0] Object Guid : Full: 0x084CA000000000000000000000ABA68A Player / 0 R4904 / S0 Map : 0 Low : 11249290
-                    [0] Flags : 524296
-                    [1] UpdateType : Values
-                    [1] Object Guid : Full: 0x204CB017A003E2000001BA00006163B7 Creature / 0 R4908 / S442 Map : 189 Entry : 3976 Low : 6382519
-                    [1] Target : Full : 0x0
-                    [1] Flags : 34081344
-                    [1] StandState : 7*/
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                /*ClientToServer: CMSG_SET_SELECTION(0x3528) Length : 2 ConnIdx : 1 Time : 11 / 25 / 2023 11 : 17 : 10.932 Number : 1496
-                    Guid : Full : 0x0*/
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->ClearAllReactives();
                 me->SetReactState(REACT_PASSIVE);
                 _scheduler.CancelAll();
                 _fakeDeath = true;
-                /*  ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE))->AI()->DoZoneInCombat(nullptr, 15.0f);*/
             }
         }
 
@@ -636,7 +595,6 @@ public:
         {
             if (instance)
             {
-                //ServerToClient: SMSG_SPELL_GO (0x2C36) Length: 125 ConnIdx: 1 Time: 11/25/2023 11:17:38.916 Number: 1884
                 //When hit with resurrection say text
                 if (spell->Id == SPELL_SCARLET_RESURRECTION)
                 {
@@ -670,18 +628,16 @@ public:
 
             if (!UpdateVictim() || SayAshbringer)
                 return;
-             _scheduler.Update(diff);
-             events.Update(diff);
-             if (me->HasUnitState(UNIT_STATE_CASTING))
+            _scheduler.Update(diff);
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-          while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_RESURRECTED:
-                        //me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                         me->SetReactState(REACT_PASSIVE);
-                        //Removed the debuff that took a long time
                         me->AttackStop();
                         me->InterruptNonMeleeSpells(false);
                         //How do I get rid of the animation from UNIT_STAND_STATE_DEAD to UNIT_STAND_STATE_STAND?
@@ -689,9 +645,6 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_LAY_ON_HANDS, 0s);
                         break;
                     case EVENT_SPELL_LAY_ON_HANDS:
-                        //ServerToClient: SMSG_PLAY_OBJECT_SOUND (0x276E) Length: 48 ConnIdx: 1 Time: 11/25/2023 11:17:43.409 Number: 1928
-                    //SoundId: 5837 (5837)
-                        //ServerToClient: SMSG_SPELL_START (0x2C37) Length: 108 ConnIdx: 1 Time: 11/25/2023 11:17:43.409 Number: 1929
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             if (Whitemane->IsAlive())
@@ -700,13 +653,10 @@ public:
                             events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
                         }
                         break;
-                        //ServerToClient: SMSG_CHAT (0x2BAD) Length: 159 ConnIdx: 0 Time: 11/25/2023 11:17:43.597 Number: 1936
                     case EVENT_MOGRAINE_EMOTE:
-                        //ServerToClient: SMSG_CHAT (0x2BAD) Length: 159 ConnIdx: 0 Time: 11/25/2023 11:17:43.597 Number: 1936
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                         events.ScheduleEvent(EVENT_MOVE, 3044ms);
                         break;
-                        //ServerToClient: SMSG_ON_MONSTER_MOVE (0x2DD4) Length: 80 ConnIdx: 1 Time: 11/25/2023 11:17:46.641 Number: 1956
                     case EVENT_MOVE:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                         {
@@ -717,12 +667,11 @@ public:
                             me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
                         }
                         break;
-                        //SMSG_ATTACKER_STATE_UPDATE (0x2952) Length: 80 ConnIdx: 1 Time: 11/25/2023 11:17:49.891 Number: 1990
-                        //8990 
                     default:
                         break;
                 }
             }
+
             DoMeleeAttackIfReady();
         }
 
@@ -755,7 +704,6 @@ public:
 
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);//this heck fix
             me->SetReactState(REACT_AGGRESSIVE);
             _victimbuff = nullptr;
             events.Reset();
@@ -876,8 +824,6 @@ public:
                         {
                             if (target->HealthBelowPct(75))
                             {
-                                if (me->IsNonMeleeSpellCast(true))
-                                    me->InterruptNonMeleeSpells(false);
                                 DoCast(target, SPELL_HEAL);
                                 events.Repeat(17500ms, 20s);
                                 break;
@@ -885,10 +831,11 @@ public:
                         }
                         events.Repeat(1s);
                         break;
+
                    /* case EVENT_SPELL_DOMINATE_MIND:
                         if (me->GetThreatMgr().GetThreatList().size() > 1)
                         {
-                            if (urand(0, 50))
+                            if (urand(0, 2))
                             {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                                 {
@@ -904,7 +851,7 @@ public:
                         //This saves the target's "SLEEP" buff after the move is complete
                         _victimbuff = me->GetVictim();
                         me->SetReactState(REACT_PASSIVE);
-                        DoCast(me,SPELL_DEEP_SLEEP);
+                        DoCast(SPELL_DEEP_SLEEP);
 
                         me->AttackStop();
                         if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
@@ -922,32 +869,26 @@ public:
                     case EVENT_RESURRECT:
                         if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                         {
-                            //ServerToClient: SMSG_SPELL_START (0x2C37) Length: 110 ConnIdx: 1 Time: 06/24/2023 06:03:22.400 Number: 13497
                             DoCast(mograine, SPELL_SCARLET_RESURRECTION);
                             me->SetSheath(SHEATH_STATE_UNARMED);
-                            //ServerToClient: SMSG_SPELL_GO (0x2C36) Length: 125 ConnIdx: 1 Time: 06/24/2023 06:03:24.397 Number: 13596
                             events.ScheduleEvent(EVENT_SAY, 3429ms);
                         }
                         break;
-                    case  EVENT_SAY://3429ms
-                        //ServerToClient: SMSG_CHAT (0x2BAD) Length: 107 ConnIdx: 0 Time: 06/24/2023 06:03:25.829 Number: 13659
+                    case  EVENT_SAY:                       
                         Talk(SAY_WH_RESURRECT);
                         events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1413ms);
                         break;
-                    case EVENT_WHITEMANE_EMOTE://1230ms
-                        //ServerToClient: SMSG_EMOTE (0x27CF) Length: 27 ConnIdx: 1 Time: 06/24/2023 06:03:27.242 Number: 13726
+                    case EVENT_WHITEMANE_EMOTE:                        
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                         _Phase = 2;
                         events.ScheduleEvent(EVENT_DEALY_ATTACK, 3227ms);
                         break;
-                    case EVENT_DEALY_ATTACK://3227ms
+                    case EVENT_DEALY_ATTACK:
                         _Phase = 2;
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        //ServerToClient: SMSG_SPELL_START (0x2C37) Length: 123 ConnIdx: 1 Time: 06/24/2023 06:03:30.469 Number: 13916
+                        me->SetReactState(REACT_AGGRESSIVE);                        
                         events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 0ms);
                         events.ScheduleEvent(EVENT_SPELL_HEAL, 15s);
                         events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 10s);
-                        //events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND, 10s);
                         break;
                     default:
                         break;
@@ -992,7 +933,7 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
                 //There is a delay in sniffing 1615ms
-                //The sniffer uses this spell, but without the visual effect of the spell, using spell 57767 as a visual effect instead
+                //The sniffer uses this spell, but without the visual effect of the spell.
                 me->CastSpell(me, SPELL_TRANSFORM_GHOST);
                 //delay 10ms
                 me->SetDisplayId(MODEL_FAIRBANKS);
