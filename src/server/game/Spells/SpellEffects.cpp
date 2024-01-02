@@ -385,10 +385,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 damage += damage / 4;
                         }
                     }
-                    // Immolate - hidden delay for conflagrate
-                    else if (m_spellInfo->SpellFamilyFlags[0] & 0x4)
-                    {
-                    }
                     // Conflagrate - consumes Immolate or Shadowflame
                     else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                     {

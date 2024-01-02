@@ -608,6 +608,7 @@ public:
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
+    virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H
