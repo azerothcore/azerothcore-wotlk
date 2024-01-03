@@ -53,9 +53,9 @@ enum DataTypes
     DATA_DOOR_WHITEMANE           = 5,
     DATA_HORSEMAN_EVENT           = 6,
     DATA_VORREL                   = 7,
-    DATA_ARCANIST_DOAN            = 8,    
+    DATA_ARCANIST_DOAN            = 8,
     DATA_DOOR_CHAPEL              = 9,
-    GAMEOBJECT_PUMPKIN_SHRINE     = 10,   
+    GAMEOBJECT_PUMPKIN_SHRINE     = 10
 };
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -342,7 +342,7 @@ enum Spells
     SPELL_MOGRAINE_COMETH_DND       = 28688,
     SPELL_FORGIVENESS               = 28697,
 
-    //SPELL_TRANSFORM_GHOST 
+    //SPELL_TRANSFORM_GHOST
     SPELL_TRANSFORM_GHOST           = 28443
 };
 
