@@ -517,7 +517,7 @@ public:
             SayAshbringer = false;
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (instance)
             {
@@ -718,7 +718,7 @@ public:
             ScriptedAI::JustRespawned();
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (instance)
             {
