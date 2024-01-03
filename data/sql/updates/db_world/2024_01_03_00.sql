@@ -1,3 +1,4 @@
+-- DB update 2024_01_02_00 -> 2024_01_03_00
 # Lord Cobrahn
 DELETE FROM `smart_scripts` WHERE `entryorguid`=3669 AND `source_type`=0 AND `id`=6 AND `link`=7;
 UPDATE `smart_scripts` SET `id`=6 WHERE `entryorguid`=3669 AND `source_type`=0 AND `id`=7 AND `link`=0;
