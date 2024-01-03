@@ -1,3 +1,4 @@
+-- DB update 2024_01_03_02 -> 2024_01_03_03
 SET @CGUID := 158000;
 
 DELETE FROM `creature` WHERE `map` = 550;
