@@ -845,7 +845,7 @@ public:
                                 }
                             }
                         }
-                        events.Repeat(5s);
+                        events.Repeat(10s);
                         break;*/
                     case EVENT_SLEEP:
                         //This saves the target's "SLEEP" buff after the move is complete
@@ -874,18 +874,18 @@ public:
                             events.ScheduleEvent(EVENT_SAY, 3429ms);
                         }
                         break;
-                    case  EVENT_SAY:                       
+                    case  EVENT_SAY:
                         Talk(SAY_WH_RESURRECT);
                         events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1413ms);
                         break;
-                    case EVENT_WHITEMANE_EMOTE:                        
+                    case EVENT_WHITEMANE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                         _Phase = 2;
                         events.ScheduleEvent(EVENT_DEALY_ATTACK, 3227ms);
                         break;
                     case EVENT_DEALY_ATTACK:
                         _Phase = 2;
-                        me->SetReactState(REACT_AGGRESSIVE);                        
+                        me->SetReactState(REACT_AGGRESSIVE);
                         events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 0ms);
                         events.ScheduleEvent(EVENT_SPELL_HEAL, 15s);
                         events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 10s);
