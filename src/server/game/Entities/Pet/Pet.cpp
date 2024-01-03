@@ -105,6 +105,14 @@ void Pet::AddToWorld()
 
     if (GetOwnerGUID().IsPlayer())
     {
+        if (Player* owner = GetOwner())
+        {
+            if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
+            {
+                owner->SetLastPetSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            }
+        }
+
         sScriptMgr->OnPetAddToWorld(this);
     }
 }

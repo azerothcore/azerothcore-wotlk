@@ -16,7 +16,6 @@
  */
 
 #include "AreaTriggerScript.h"
-#include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "InstanceScript.h"
 #include "Player.h"

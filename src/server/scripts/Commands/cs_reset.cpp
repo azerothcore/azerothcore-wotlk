@@ -290,10 +290,9 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-        HashMapHolder<Player>::MapType const& plist = ObjectAccessor::GetPlayers();
-        for (auto itr = plist.begin(); itr != plist.end(); ++itr)
-            itr->second->SetAtLoginFlag(atLogin);
+        sWorld->DoForAllOnlinePlayers([&] (Player* player){
+            player->SetAtLoginFlag(atLogin);
+        });
 
         return true;
     }

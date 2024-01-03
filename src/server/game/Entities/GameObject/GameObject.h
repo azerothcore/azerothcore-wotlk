@@ -350,25 +350,21 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
-    void SaveInstanceData(uint8 state);
-    void UpdateInstanceData(uint8 state);
-    bool FindStateSavedOnInstance();
-    bool ValidateGameobjectType();
-    uint8 GetStateSavedOnInstance();
-    bool IsInstanceGameobject();
-    uint8 GameobjectStateToInt(GOState* state);
+    [[nodiscard]] bool ValidateGameobjectType() const;
+    [[nodiscard]] bool IsInstanceGameobject() const;
+    [[nodiscard]] uint8 GameobjectStateToInt(GOState* state) const;
 
     /* A check to verify if this object is available to be saved on the DB when
      * a state change occurs
      */
-    bool IsAbleToSaveOnDb();
+    [[nodiscard]] bool IsAllowedToSaveToDB() const { return m_saveStateOnDb; };
 
     /* Enable or Disable the ability to save on the database this gameobject's state
      * whenever it changes
      */
-    void UpdateSaveToDb(bool enable);
+    void AllowSaveToDB(bool enable) { m_saveStateOnDb = enable; };
 
-    void SavingStateOnDB();
+    void SaveStateToDB();
 
     std::string GetDebugInfo() const override;
 protected:

@@ -45,6 +45,7 @@ enum DataTypes
     DATA_ALIVE_KEEPERS                      = 22,
     DATA_BRIDGE_ACTIVATED                   = 23,
     DATA_ACTIVATE_SHIELD                    = 24,
+    DATA_STRANGE_POOL                       = 25
 };
 
 enum SSNPCs
@@ -77,7 +78,9 @@ enum SSNPCs
     GO_SHIELD_GENERATOR1                    = 185051,
     GO_SHIELD_GENERATOR2                    = 185052,
     GO_SHIELD_GENERATOR3                    = 185053,
-    GO_SHIELD_GENERATOR4                    = 185054
+    GO_SHIELD_GENERATOR4                    = 185054,
+
+    GO_STRANGE_POOL                         = 184956
 };
 
 enum SSSpells

@@ -17,7 +17,6 @@
 
 #include "OutdoorPvPZM.h"
 #include "Creature.h"
-#include "CreatureScript.h"
 #include "GameGraveyard.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"

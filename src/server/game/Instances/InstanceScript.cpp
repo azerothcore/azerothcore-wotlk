@@ -740,6 +740,26 @@ void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= nullptr*/, ui
     instance->SendToPlayers(&data);
 }
 
+void InstanceScript::LoadInstanceSavedGameobjectStateData()
+{
+    _objectStateMap.clear();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, instance->GetInstanceId());
+
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        Field* fields;
+
+        do
+        {
+            fields = result->Fetch();
+            StoreGameObjectState(fields[0].Get<uint32>(), fields[1].Get<uint8>());
+
+        } while (result->NextRow());
+    }
+}
+
 std::string InstanceScript::GetBossStateName(uint8 state)
 {
     // See enum EncounterState in InstanceScript.h
@@ -760,6 +780,18 @@ std::string InstanceScript::GetBossStateName(uint8 state)
         default:
             return "INVALID";
     }
+}
+
+uint8 InstanceScript::GetStoredGameObjectState(ObjectGuid::LowType spawnId) const
+{
+    auto i = _objectStateMap.find(spawnId);
+
+    if (i != _objectStateMap.end())
+    {
+        return i->second;
+    }
+
+    return 3; // Any state higher than 2 to get the default state for the object we are loading.
 }
 
 bool InstanceHasScript(WorldObject const* obj, char const* scriptName)

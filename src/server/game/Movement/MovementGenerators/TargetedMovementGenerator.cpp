@@ -107,7 +107,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
         {
-            if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase)
+            if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
             {
                 i_recalculateTravel = false;
                 i_path = nullptr;
@@ -134,11 +134,11 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     // if the target moved, we have to consider whether to adjust
-    if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase)
+    if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))
     {
         _lastTargetPosition = target->GetPosition();
         _mutualChase = mutualChase;
-        if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || !PositionOkay(owner, target, target->isMoving() ? maxTarget : maxRange, angle))
+        if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || !PositionOkay(owner, target, maxTarget, angle))
         {
             // can we get to the target?
             if (cOwner && !target->isInAccessiblePlaceFor(cOwner))
@@ -150,10 +150,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             }
 
             // figure out which way we want to move
-            float tarX, tarY, tarZ;
-            target->GetPosition(tarX, tarY, tarZ);
+            float x, y, z;
+            target->GetPosition(x, y, z);
             bool withinRange = owner->IsInDist(target, maxRange);
-            bool withinLOS = owner->IsWithinLOS(tarX, tarY, tarZ);
+            bool withinLOS = owner->IsWithinLOS(x, y, z);
             bool moveToward = !(withinRange && withinLOS);
 
             // make a new path if we have to...
@@ -181,14 +181,12 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
                 additionalRange = owner->GetExactDistSq(target) < G3D::square(speed) ? 0 : speed;
             }
 
-            float x, y, z;
             bool shortenPath;
 
             // if we want to move toward the target and there's no fixed angle...
             if (moveToward && !angle)
             {
                 // ...we'll pathfind to the center, then shorten the path
-                target->GetPosition(x, y, z);
                 shortenPath = true;
             }
             else
@@ -214,7 +212,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             }
 
             if (shortenPath)
-                i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);
+                i_path->ShortenPathUntilDist(G3D::Vector3(x, y, z), maxTarget);
 
             if (cOwner)
             {
