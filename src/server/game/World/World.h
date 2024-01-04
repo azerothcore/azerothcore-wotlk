@@ -352,6 +352,8 @@ public:
 
     void RemoveOldCorpses() override;
 
+    void DoForAllOnlinePlayers(std::function<void(Player*)> exec) override;
+
 protected:
     void _UpdateGameTime();
     // callback for UpdateRealmCharacters

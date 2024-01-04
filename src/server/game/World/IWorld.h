@@ -612,6 +612,7 @@ public:
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
     virtual SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) = 0;
+    virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

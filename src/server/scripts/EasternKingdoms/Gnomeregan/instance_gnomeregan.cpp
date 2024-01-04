@@ -62,7 +62,7 @@ public:
                 case GO_CAVE_IN_2:
                 case GO_WORKSHOP_DOOR:
                 case GO_FINAL_CHAMBER_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
             }
         }

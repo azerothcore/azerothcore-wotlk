@@ -371,10 +371,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
                     item2->SetState(ITEM_CHANGED, _player);
                     _player->ItemRemovedQuestCheck(item2->GetEntry(), count[j]);
                     item2->SendUpdateToPlayer(_player);
-
-                    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-                    item2->SaveToDB(trans);
-                    CharacterDatabase.CommitTransaction(trans);
                 }
             }
 

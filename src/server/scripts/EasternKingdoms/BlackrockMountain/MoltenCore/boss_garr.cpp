@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Containers.h"
 #include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
