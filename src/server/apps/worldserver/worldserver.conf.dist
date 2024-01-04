@@ -2744,7 +2744,6 @@ Quests.IgnoreAutoComplete = 0
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
 #                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
-#                     NOTE: the final amount will also affected by Rate.Drop.Money
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
