@@ -1,3 +1,4 @@
+-- DB update 2024_01_05_01 -> 2024_01_05_02
 -- Update creatures '(Master) Fire Eater' / '(Master) Flame Eater' with sniffed values
 
 SET @CID1 := 25962; -- Fire Eater
