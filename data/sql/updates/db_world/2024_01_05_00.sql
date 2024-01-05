@@ -1,3 +1,4 @@
+-- DB update 2024_01_03_03 -> 2024_01_05_00
 -- Update 'Commoner' spawns with sniffed values
 
 SET @GEVENT1  := 1;  -- Midsummer
