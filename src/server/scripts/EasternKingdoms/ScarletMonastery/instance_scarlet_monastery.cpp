@@ -39,7 +39,7 @@ enum AshbringerEventMisc
     NPC_SCARLET_CHAMPION           = 4302,
     NPC_SCARLET_ABBOT              = 4303,
     NPC_SCARLET_MONK               = 4540,
-    NPC_FAIRBANKS                  = 4542,   
+    NPC_FAIRBANKS                  = 4542,
     NPC_HIGHLORD_MOGRAINE          = 16062,
 
     DOOR_CHAPEL                    = 104591,
@@ -672,7 +672,7 @@ public:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            float fx{}, fy{}, fz{};                            
+                            float fx, fy, fz;
                             Whitemane->GetContactPoint(me, fx, fy, fz, 0.0f);
                             me->GetMotionMaster()->MovePoint(POINT_MOGRAINE_TO_WHITEMANE, fx, fy, fz);
                         }
@@ -799,8 +799,7 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SPELL_HOLY_SMITE:
-                      
+                    case EVENT_SPELL_HOLY_SMITE:                      
                         if (Unit* target = me->GetVictim())
                         {
                             me->GetMotionMaster()->MoveChase(target, 30.0f);
