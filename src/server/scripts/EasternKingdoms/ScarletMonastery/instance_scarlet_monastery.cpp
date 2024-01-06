@@ -314,23 +314,23 @@ enum AshbringerEvent
 
 enum MograineEvents
 {
-    EVENT_RESURRECTED        = 1,
-    EVENT_SPELL_LAY_ON_HANDS = 2,
-    EVENT_MOGRAINE_EMOTE     = 3,
-    EVENT_MOVE               = 4
+    EVENT_RESURRECTED                       = 1,
+    EVENT_SPELL_LAY_ON_HANDS                = 2,
+    EVENT_MOGRAINE_EMOTE                    = 3,
+    EVENT_MOVE                              = 4
 };
 
 enum WhitemaneEvents
 {
-    EVENT_SPELL_HOLY_SMITE         = 1,
-    EVENT_SPELL_POWER_WORLD_SHIELD = 2,
-    EVENT_SPELL_HEAL               = 3,
-    EVENT_SPELL_DOMINATE_MIND      = 4,
-    EVENT_SLEEP                    = 5,
-    EVENT_RESURRECT                = 6,
-    EVENT_SAY                      = 7,
-    EVENT_WHITEMANE_EMOTE          = 8,
-    EVENT_DEALY_ATTACK             = 9
+    EVENT_SPELL_HOLY_SMITE                  = 1,
+    EVENT_SPELL_POWER_WORLD_SHIELD          = 2,
+    EVENT_SPELL_HEAL                        = 3,
+    EVENT_SPELL_DOMINATE_MIND               = 4,
+    EVENT_SLEEP                             = 5,
+    EVENT_RESURRECT                         = 6,
+    EVENT_SAY                               = 7,
+    EVENT_WHITEMANE_EMOTE                   = 8,
+    EVENT_DEALY_ATTACK                      = 9
 };
 
 enum Spells
@@ -663,14 +663,13 @@ public:
                         {
                             if (Whitemane->IsAlive())
                                 me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);
-
                             Talk(SAY_MO_RESURRECTED, Whitemane);
-                            events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
                         }
+                        events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
                         break;
                     case EVENT_MOGRAINE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                        events.ScheduleEvent(EVENT_MOVE, 3044ms);
+                        events.ScheduleEvent(EVENT_MOVE, 3000ms);
                         break;
                     case EVENT_MOVE:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
@@ -751,7 +750,7 @@ public:
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            //Until Mowglini is resurrected, players cannot kill her
+            //The player cannot kill her until she is releashed. Retain at least 1 life
             if (_Phase != 2 && damage >= me->GetHealth())
             {
                 damage = 0;
@@ -894,17 +893,17 @@ public:
                         {
                             DoCast(mograine, SPELL_SCARLET_RESURRECTION);
                             me->SetSheath(SHEATH_STATE_UNARMED);
-                            events.ScheduleEvent(EVENT_SAY, 3429ms);
+                            events.ScheduleEvent(EVENT_SAY, 3400ms);
                         }
                         break;
                     case  EVENT_SAY:
                         Talk(SAY_WH_RESURRECT);
-                        events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1413ms);
+                        events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1400ms);
                         break;
                     case EVENT_WHITEMANE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                         _Phase = 2;
-                        events.ScheduleEvent(EVENT_DEALY_ATTACK, 3227ms);
+                        events.ScheduleEvent(EVENT_DEALY_ATTACK, 3200ms);
                         break;
                     case EVENT_DEALY_ATTACK:
                         me->SetReactState(REACT_AGGRESSIVE);
