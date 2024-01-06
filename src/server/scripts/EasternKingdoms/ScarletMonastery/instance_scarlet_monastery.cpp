@@ -799,7 +799,7 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SPELL_HOLY_SMITE:                      
+                    case EVENT_SPELL_HOLY_SMITE:
                         if (Unit* target = me->GetVictim())
                         {
                             me->GetMotionMaster()->MoveChase(target, 30.0f);
