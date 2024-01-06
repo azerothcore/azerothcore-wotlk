@@ -88,7 +88,7 @@ public:
         {
             switch (go->GetEntry())
             {
-                //case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
+                // case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
                 case DOOR_HIGH_INQUISITOR_ID:
                     DoorHighInquisitorGUID = go->GetGUID();
                     break;
@@ -147,7 +147,7 @@ public:
 
                         if (Whitemane->IsAlive() && Mograine->IsAlive())
                         {
-                            //When Whitemane emerges from the main gate, Whitemane will stand next to Mograine's corpse and will not reset Whitemane
+                            // When Whitemane emerges from the main gate, Whitemane will stand next to Mograine's corpse and will not reset Whitemane
                             if (Whitemane->IsInCombat())
                                 Whitemane->DespawnOnEvade(30s);
 
@@ -156,7 +156,7 @@ public:
                             return;
                         }
 
-                        //Whitemane will not be able to fight Mograine again when he dies
+                        // Whitemane will not be able to fight Mograine again when he dies
                         if (!Whitemane->IsAlive())
                         {
                             Mograine->DespawnOrUnsummon();
@@ -420,7 +420,8 @@ public:
                         summonedMograine->SetFaction(FACTION_FRIENDLY);
                         summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
                         summonedMograine->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
-                        summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND);//Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
+                        // Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
+                        summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND);
                     }
                     events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48500ms);
                     break;
@@ -468,7 +469,7 @@ public:
                     events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3000ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
-                    //In Blizzard's servers, after "HIGHLORD_MOGRAINE" uses this spell, "MOGRAINE" will have a visual effect of lightning hits, and the visual effect after the hit is missing here and needs to be fixed
+                    // In Blizzard's servers, after "HIGHLORD_MOGRAINE" uses this spell, "MOGRAINE" will have a visual effect of lightning hits, and the visual effect after the hit is missing here and needs to be fixed
                     summonedMograine->CastSpell(me, SPELL_FORGIVENESS);
                     events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1000ms);
                     break;
@@ -566,7 +567,7 @@ public:
             if (damage > me->GetHealth() && instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) != SPECIAL && _fakeDeath)
                 damage = 0;
 
-            //On first death, fake death and open door, as well as initiate whitemane if exist
+            // On first death, fake death and open door, as well as initiate whitemane if exist
             if (damage > me->GetHealth() && !_fakeDeath)
             {
                 // On first death, fake death and open door, as well as initiate whitemane if exist
@@ -583,7 +584,7 @@ public:
                 me->GetMotionMaster()->MoveIdle();
                 me->SetHealth(0);
                 me->PlayDirectSound(SOUND_DEAD);
-                //Remove all beneficial auras
+                // Remove all beneficial auras
                 me->RemoveAura(SPELL_RETRIBUTION_AURA);
                 me->AttackStop();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -605,13 +606,14 @@ public:
         {
             if (instance)
             {
-                //When hit with resurrection say text
+                // When hit with resurrection say text
                 if (spell->Id == SPELL_SCARLET_RESURRECTION)
                 {
                     instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
                     events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
                 }
 
+                // Ashbringer Event
                 if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
                 {
                     me->SetFaction(FACTION_FRIENDLY);
@@ -654,7 +656,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
                         me->InterruptNonMeleeSpells(false);
-                        //How do I get rid of the animation from UNIT_STAND_STATE_DEAD to UNIT_STAND_STATE_STAND?
+                        // How do I get rid of the animation from UNIT_STAND_STATE_DEAD to UNIT_STAND_STATE_STAND?
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         events.ScheduleEvent(EVENT_SPELL_LAY_ON_HANDS, 0s);
                         break;
@@ -743,14 +745,14 @@ public:
         {
             events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
             events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 22s, 45s);
-            //This spell was not used during the single-player test on the Blizzard server,
+            // This spell was not used during the single-player test on the Blizzard server,
             // it should take 2 people, and the chance of using it should be low
             events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND, 5s, 10s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            //The player cannot kill her until she is releashed. Retain at least 1 life
+            // The player cannot kill her until she is releashed. Retain at least 1 life
             if (_Phase != 2 && damage >= me->GetHealth())
             {
                 damage = 0;
@@ -765,10 +767,10 @@ public:
 
             if (id == POINT_WHITEMANE_RESURRECTED)
             {
-                //This determines whether the target buff exists
-                //Use don't know why use me->GetVictim() Unable to get the target
+                // This determines whether the target buff exists
+                // Use don't know why use me->GetVictim() Unable to get the target
                 if (_victimbuff && _victimbuff->HasAura(SPELL_DEEP_SLEEP))
-                    //Wait 5 seconds to revive while the debuff is still present on the player
+                    // Wait 5 seconds to revive while the debuff is still present on the player
                     events.ScheduleEvent(EVENT_RESURRECT, 5s);
                 else
                     events.ScheduleEvent(EVENT_RESURRECT, 1s);
@@ -823,7 +825,7 @@ public:
                         events.Repeat(2600ms, 3000ms);
                         break;
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
-                        //Since mograine has 0 HP, the DoSelectLowestHpFriendly function will always try to use it on him, not on himself
+                        // Since mograine has 0 HP, the DoSelectLowestHpFriendly function will always try to use it on him, not on himself
                         if (_Phase != 2)
                         {
                             DoCast(me, SPELL_POWER_WORD_SHIELD);
@@ -870,7 +872,7 @@ public:
                         events.Repeat(10s);
                         break;
                     case EVENT_SLEEP:
-                        //This saves the target's "SLEEP" buff after the move is complete
+                        // This saves the target's "SLEEP" buff after the move is complete
                         _victimbuff = me->GetVictim();
                         me->SetReactState(REACT_PASSIVE);
                         DoCast(SPELL_DEEP_SLEEP);
@@ -946,17 +948,17 @@ public:
             SayAshbringer = false;
         }
 
-        //Ready to move to SmartAI
+        // Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
             if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
             {
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
-                //There is a delay in sniffing 1615ms
-                //The sniffer uses this spell, but without the visual effect of the spell.
+                // There is a delay in sniffing 1615ms
+                // The sniffer uses this spell, but without the visual effect of the spell.
                 me->CastSpell(me, SPELL_TRANSFORM_GHOST);
-                //delay 10ms
+                // delay 10ms
                 me->SetDisplayId(MODEL_FAIRBANKS);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 SayAshbringer = true;
