@@ -500,6 +500,7 @@ void SmartAI::CheckConditions(const uint32 diff)
 
 void SmartAI::UpdateAI(uint32 diff)
 {
+    bool hasVictim = UpdateVictim();
     CheckConditions(diff);
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
@@ -535,7 +536,7 @@ void SmartAI::UpdateAI(uint32 diff)
         return;
     }
 
-    if (!UpdateVictim())
+    if (!hasVictim)
         return;
 
     if (mCanAutoAttack)
@@ -827,14 +828,14 @@ void SmartAI::AttackStart(Unit* who)
     // xinef: dont allow charmed npcs to act on their own
     if (me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
-        if (who && mCanAutoAttack)
-            me->Attack(who, true);
+        if (who)
+            me->Attack(who, mCanAutoAttack);
         return;
     }
 
     if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
     {
-        if (mCanCombatMove || GetScript()->GetMaxCombatDist())
+        if (mCanCombatMove)
         {
             SetRun(mRun);
             MovementGeneratorType type = me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE);
@@ -843,8 +844,8 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
             }
-            float range = GetScript()->GetCasterActualDist() > 0.f ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist();
-            me->GetMotionMaster()->MoveChase(who, range > 0.f ? ChaseRange(range) : std::optional<ChaseRange>());
+
+            me->GetMotionMaster()->MoveChase(who);
         }
     }
 }
@@ -1019,21 +1020,8 @@ void SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
     GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt);
 }
 
-void SmartAI::SetForcedCombatMove(float dist)
+void SmartAI::SetCombatMove(bool on, float chaseRange)
 {
-    if (!me->GetVictim())
-        return;
-
-    SetRun(mRun);
-    me->GetMotionMaster()->MoveChase(me->GetVictim(), dist);
-}
-
-void SmartAI::SetCombatMove(bool on)
-{
-    // Xinef: Fix Combat Movement
-    if (GetScript()->GetMaxCombatDist()/* || GetScript()->GetCasterMaxDist()*/) // Xinef: we only need this hack for old caster movement system
-        return;
-
     if (mCanCombatMove == on)
         return;
 
@@ -1049,7 +1037,7 @@ void SmartAI::SetCombatMove(bool on)
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
             {
                 SetRun(mRun);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), chaseRange);
                 me->CastStop();
             }
         }
@@ -1113,6 +1101,32 @@ void SmartAI::StopFollow(bool complete)
     StartDespawn();
 
     GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
+}
+
+void SmartAI::MoveAway(float distance)
+{
+    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
+        return;
+
+    mCanCombatMove = false;
+
+    if (!IsAIControlled())
+        return;
+
+    if (!HasEscortState(SMART_ESCORT_ESCORTING))
+    {
+        if (me->GetVictim())
+        {
+            me->StopMoving();
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                me->GetMotionMaster()->Clear(false);
+
+            float x, y, z;
+            me->GetClosePoint(x, y, z, me->GetObjectSize(), distance, M_PI);
+            if (me->GetVictim()->IsWithinLOS(x, y, z))
+                me->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
+        }
+    }
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker)

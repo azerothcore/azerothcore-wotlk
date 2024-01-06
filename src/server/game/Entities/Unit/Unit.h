@@ -2668,17 +2668,6 @@ namespace Acore
     };
 }
 
-class ConflagrateAuraStateDelayEvent : public BasicEvent
-{
-public:
-    ConflagrateAuraStateDelayEvent(Unit* owner, ObjectGuid casterGUID) : BasicEvent(), m_owner(owner), m_casterGUID(casterGUID) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-private:
-    Unit* m_owner;
-    ObjectGuid m_casterGUID;
-};
-
 class RedirectSpellEvent : public BasicEvent
 {
 public:

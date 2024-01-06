@@ -1014,44 +1014,29 @@ class spell_midsummer_fling_torch : public SpellScript
     bool handled;
     bool Load() override { handled = false; return true; }
 
-    SpellCastResult CheckCast()
-    {
-        GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
-        if (_crList.empty())
-        {
-            return SPELL_FAILED_NOT_HERE;
-        }
-
-        return SPELL_CAST_OK;
-    }
-
     void ThrowNextTorch(Unit* caster)
     {
-        uint8 rand = urand(0, _crList.size() - 1);
-        Position pos;
-        pos.Relocate(0.0f, 0.0f, 0.0f);
-        for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
-        {
-            if (caster->GetDistance(*itr) < 5)
-            {
-                if (!rand)
-                    rand++;
-                continue;
-            }
+        Creature* bunny = caster->FindNearestCreature(NPC_TORCH_TARGET, 100.0f);
 
-            if (!rand)
-            {
-                pos.Relocate(*itr);
-                break;
-            }
-        }
+        if (!bunny)
+            return;
 
-        // we have any pos
-        if (pos.GetPositionX())
-        {
-            caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
-            caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_TORCH_SHADOW, true);
-        }
+        // targets are located on a circle with fixed radius around the target bunny
+        // first target is chosen randomly anywhere on the circle
+        // next target is chosen on the opposite half of the circle
+        // so a minimum flight duration of the torch is guaranteed
+        float angle = 0.0f;
+        if (GetSpellInfo()->Id == SPELL_FLING_TORCH_DUMMY)
+            angle = frand(-1.0f * M_PI, 1.0f * M_PI); // full circle
+        else
+            angle = frand(-0.5f * M_PI, 0.5f * M_PI); // half circle
+
+        Position pos = bunny->GetPosition();
+        pos.SetOrientation(caster->GetPosition().GetAbsoluteAngle(pos));
+        pos.RelocatePolarOffset(angle, 8.0f); // radius is sniffed value
+
+        caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
+        caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_TORCH_SHADOW, true);
     }
 
     void HandleFinish()
@@ -1108,15 +1093,11 @@ class spell_midsummer_fling_torch : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
-        OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
         if (m_scriptSpellId == SPELL_JUGGLE_TORCH)
         {
             OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     }
-
-private:
-    std::list<Creature*> _crList;
 };
 
 enum eJuggle
