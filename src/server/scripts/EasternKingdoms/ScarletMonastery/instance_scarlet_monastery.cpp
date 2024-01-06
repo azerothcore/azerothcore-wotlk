@@ -45,8 +45,8 @@ enum AshbringerEventMisc
     DOOR_CHAPEL                    = 104591,
     DOOR_HIGH_INQUISITOR_ID        = 104600,
 
-    MODEL_HIGHLORD_MOGRAINE     = 16180,
-    MODEL_FAIRBANKS             = 16179,
+    MODEL_HIGHLORD_MOGRAINE        = 16180,
+    MODEL_FAIRBANKS                = 16179,
 
     SAY_MOGRAINE_ASHBRBINGER_INTRO = 6
 };
@@ -266,9 +266,13 @@ public:
             {
                 if (instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
                 {
-                    Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
-                    if (commanderMograine && commanderMograine->IsAlive())
-                        commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
+                    if (Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE)))
+                    {
+                        if (commanderMograine->IsAlive())
+                        {
+                            commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
+                        }
+                    }
 
                     instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
                     return true;
