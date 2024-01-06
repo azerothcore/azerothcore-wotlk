@@ -1,3 +1,4 @@
+-- DB update 2024_01_05_03 -> 2024_01_06_00
 -- Update gameobject Caribou Trap' spawns with sniffed values
 SET @GO1  := 187982;
 SET @GO2  := 187995;
