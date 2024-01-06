@@ -25,30 +25,37 @@
 
 enum AshbringerEventMisc
 {
-    AB_Effect_000                  = 28441,
+    AB_EFFECT_000                  = 28441,
     AURA_OF_ASHBRINGER             = 28282,
-    NPC_SCARLET_MYRIDON            = 4295,
-    NPC_SCARLET_DEFENDER           = 4298,
-    NPC_SCARLET_CENTURION          = 4301,
-    NPC_SCARLET_SORCERER           = 4294,
-    NPC_SCARLET_WIZARD             = 4300,
-    NPC_SCARLET_ABBOT              = 4303,
-    NPC_SCARLET_MONK               = 4540,
-    NPC_SCARLET_CHAMPION           = 4302,
-    NPC_SCARLET_CHAPLAIN           = 4299,
-    NPC_FAIRBANKS                  = 4542,
 
     NPC_COMMANDER_MOGRAINE         = 3976,
     NPC_INQUISITOR_WHITEMANE       = 3977,
+    NPC_SCARLET_MYRIDON            = 4295,
+    NPC_SCARLET_SORCERER           = 4294,
+    NPC_SCARLET_DEFENDER           = 4298,
+    NPC_SCARLET_CHAPLAIN           = 4299,
+    NPC_SCARLET_WIZARD             = 4300,
+    NPC_SCARLET_CENTURION          = 4301,
+    NPC_SCARLET_CHAMPION           = 4302,
+    NPC_SCARLET_ABBOT              = 4303,
+    NPC_SCARLET_MONK               = 4540,
+    NPC_FAIRBANKS                  = 4542,   
+    NPC_HIGHLORD_MOGRAINE          = 16062,
+
     DOOR_CHAPEL                    = 104591,
     DOOR_HIGH_INQUISITOR_ID        = 104600,
-    SAY_MOGRAINE_ASHBRBINGER_INTRO = 6,
+
+    MODEL_HIGHLORD_MOGRAINE     = 16180,
+    MODEL_FAIRBANKS             = 16179,
+
+    SAY_MOGRAINE_ASHBRBINGER_INTRO = 6
 };
 
 enum DataTypes
 {
     TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
     TYPE_ASHBRINGER_EVENT         = 2,
+
     DATA_MOGRAINE                 = 3,
     DATA_WHITEMANE                = 4,
     DATA_DOOR_WHITEMANE           = 5,
@@ -56,6 +63,7 @@ enum DataTypes
     DATA_VORREL                   = 7,
     DATA_ARCANIST_DOAN            = 8,
     DATA_DOOR_CHAPEL              = 9,
+
     GAMEOBJECT_PUMPKIN_SHRINE     = 10
 };
 
@@ -147,6 +155,7 @@ public:
                             encounter = NOT_STARTED;
                             return;
                         }
+
                         //Whitemane will not be able to fight Mograine again when he dies
                         if (!Whitemane->IsAlive())
                         {
@@ -161,6 +170,7 @@ public:
                             encounter = data;
                             return;
                         }
+
                         encounter = data;
                     }
                     if (data == SPECIAL)
@@ -177,9 +187,9 @@ public:
                         }
 
                         // the ashbringer incident did not sniff out any data from whitemane
-                        Creature* whitemane = instance->GetCreature(WhitemaneGUID);
-                        if (whitemane && whitemane->IsAlive() && !whitemane->IsInCombat())
-                            whitemane->DespawnOrUnsummon();
+                        if (Creature* whitemane = instance->GetCreature(WhitemaneGUID))
+                            if (whitemane->IsAlive() && !whitemane->IsInCombat())
+                                whitemane->DespawnOrUnsummon();
 
                         for (auto const& scarletCathedralNpcGuid : AshbringerNpcGUID)
                             if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
@@ -259,6 +269,7 @@ public:
                     Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
                     if (commanderMograine && commanderMograine->IsAlive())
                         commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
+
                     instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
                     return true;
                 }
@@ -268,16 +279,11 @@ public:
     }
 };
 
-enum ScarletMonasteryTrashMisc
+enum Misc
 {
-    SAY_WELCOME                 = 0,
-    DEAD_SOUND                  = 1326,
-    AURA_ASHBRINGER             = 28282,
-    NPC_HIGHLORD_MOGRAINE       = 16062,
-    MODEL_HIGHLORD_MOGRAINE     = 16180,
-    MODEL_FAIRBANKS             = 16179,
-    SPELL_COSMETIC_CHAIN        = 45537,
-    SPELL_COSMETIC_EXPLODE      = 45935
+    POINT_MOGRAINE_TO_WHITEMANE = 0,
+    POINT_WHITEMANE_TO_MOGRAINE = 0,
+    POINT_WHITEMANE_RESURRECTED = 1
 };
 
 enum AshbringerEvent
@@ -353,6 +359,7 @@ enum Says
     SAY_MO_AGGRO                    = 0,
     SAY_MO_KILL                     = 1,
     SAY_MO_RESURRECTED              = 2,
+    SOUND_DEAD                      = 1326,
 
     //Mograine Ashbringer Event says
     SAY_MO_AB_TALK3                 = 3,
@@ -505,7 +512,6 @@ public:
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
             _fakeDeath = false;
@@ -530,7 +536,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            if (id == 1)
+            if (id == POINT_MOGRAINE_TO_WHITEMANE)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(SPELL_RETRIBUTION_AURA);
@@ -542,7 +548,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-             Talk(SAY_MO_AGGRO);
+            Talk(SAY_MO_AGGRO);
             DoCastSelf(SPELL_RETRIBUTION_AURA);
             _scheduler.Schedule(1s, [this](TaskContext)
                 {
@@ -563,17 +569,16 @@ public:
                 if (Creature* Whitemane = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
-                    Whitemane->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Whitemane->AI()->Talk(SAY_WH_INTRO, me);
                     float fx, fy, fz;
                     me->GetContactPoint(Whitemane, fx, fy, fz, 5.0f);
-                    Whitemane->GetMotionMaster()->MovePoint(1, fx, fy, fz);
+                    Whitemane->GetMotionMaster()->MovePoint(POINT_WHITEMANE_TO_MOGRAINE, fx, fy,fz);
                     Whitemane->SetReactState(REACT_AGGRESSIVE);
                 }
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->MoveIdle();
                 me->SetHealth(0);
-                me->PlayDirectSound(DEAD_SOUND);
+                me->PlayDirectSound(SOUND_DEAD);
                 //Remove all beneficial auras
                 me->RemoveAura(SPELL_RETRIBUTION_AURA);
                 me->AttackStop();
@@ -603,7 +608,7 @@ public:
                     events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
                 }
 
-                if (who && spell->Id == AB_Effect_000 && !SayAshbringer)
+                if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
                 {
                     me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->MoveIdle();
@@ -629,10 +634,14 @@ public:
 
             if (!UpdateVictim() || SayAshbringer)
                 return;
+
             _scheduler.Update(diff);
+
             events.Update(diff);
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
+
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -650,6 +659,7 @@ public:
                         {
                             if (Whitemane->IsAlive())
                                 me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);
+
                             Talk(SAY_MO_RESURRECTED, Whitemane);
                             events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
                         }
@@ -661,11 +671,10 @@ public:
                     case EVENT_MOVE:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                         {
-
-                            float fx, fy, fz;
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            float fx{}, fy{}, fz{};                            
                             Whitemane->GetContactPoint(me, fx, fy, fz, 0.0f);
-                            me->GetMotionMaster()->MovePoint(1, fx, fy, fz);
+                            me->GetMotionMaster()->MovePoint(POINT_MOGRAINE_TO_WHITEMANE, fx, fy, fz);
                         }
                         break;
                     default:
@@ -715,6 +724,7 @@ public:
         {
             if (instance)
                 instance->DoUseDoorOrButton(instance->GetGuidData(DATA_DOOR_WHITEMANE));
+
             ScriptedAI::JustRespawned();
         }
 
@@ -730,6 +740,8 @@ public:
         {
             events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
             events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 22s, 45s);
+            //This spell was not used during the single-player test on the Blizzard server,
+            // it should take 2 people, and the chance of using it should be low
             events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND, 5s, 10s);
         }
 
@@ -748,7 +760,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            if (id == 2)
+            if (id == POINT_WHITEMANE_RESURRECTED)
             {
                 //This determines whether the target buff exists
                 //Use don't know why use me->GetVictim() Unable to get the target
@@ -788,22 +800,29 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SPELL_HOLY_SMITE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, false))
+                      
+                        if (Unit* target = me->GetVictim())
                         {
                             me->GetMotionMaster()->MoveChase(target, 30.0f);
 
                             if (DoCast(target, SPELL_HOLY_SMITE) != SPELL_CAST_OK)
                             {
-                                me->GetMotionMaster()->MoveChase(target, 0);
-                                events.Repeat(1200ms,1500ms);
+                                me->GetMotionMaster()->MoveChase(target);
+                                events.Repeat(1200ms);
+                                break;
+                            }
+
+                            if (me->GetExactDist2d(target) < 5.0f)
+                            {
+                                events.Repeat(4500ms, 5s);
                                 break;
                             }
                         }
-                        events.Repeat(4000ms,7s);
+                        events.Repeat(2600ms, 3000ms);
                         break;
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
                         //Since mograine has 0 HP, the DoSelectLowestHpFriendly function will always try to use it on him, not on himself
-                        if (_Phase!=2)
+                        if (_Phase != 2)
                         {
                             DoCast(me, SPELL_POWER_WORD_SHIELD);
                             events.Repeat(22s, 35s);
@@ -830,13 +849,13 @@ public:
                                 break;
                             }
                         }
-                        events.Repeat(1s);
+                        events.Repeat(5s);
                         break;
-
-                   /* case EVENT_SPELL_DOMINATE_MIND:
+                    case EVENT_SPELL_DOMINATE_MIND:
+                        // The list of hates is greater than 1
                         if (me->GetThreatMgr().GetThreatList().size() > 1)
                         {
-                            if (urand(0, 2))
+                            if (urand(0, 20))//Used for testing !urand(0, 20)
                             {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                                 {
@@ -847,21 +866,21 @@ public:
                             }
                         }
                         events.Repeat(10s);
-                        break;*/
+                        break;
                     case EVENT_SLEEP:
                         //This saves the target's "SLEEP" buff after the move is complete
                         _victimbuff = me->GetVictim();
                         me->SetReactState(REACT_PASSIVE);
                         DoCast(SPELL_DEEP_SLEEP);
-
                         me->AttackStop();
+
                         if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                         {
                             if (me->GetDistance(mograine) > 0.5f)
                             {
                                 float fx, fy, fz;
                                 mograine->GetContactPoint(me, fx, fy, fz, 0.5f);
-                                me->GetMotionMaster()->MovePoint(2, fx, fy, fz);
+                                me->GetMotionMaster()->MovePoint(POINT_WHITEMANE_RESURRECTED, fx, fy, fz);
                                 break;
                             }
                         }
@@ -885,9 +904,8 @@ public:
                         events.ScheduleEvent(EVENT_DEALY_ATTACK, 3227ms);
                         break;
                     case EVENT_DEALY_ATTACK:
-                        _Phase = 2;
                         me->SetReactState(REACT_AGGRESSIVE);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 0ms);
+                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
                         events.ScheduleEvent(EVENT_SPELL_HEAL, 15s);
                         events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 10s);
                         break;
@@ -903,7 +921,7 @@ public:
         InstanceScript* instance;
         Unit* _victimbuff = nullptr;
         EventMap events;
-        int _Phase{};
+        uint8 _Phase{};
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -919,7 +937,7 @@ public:
 
     struct npc_fairbanksAI : public SmartAI
     {
-        npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
+        npc_fairbanksAI(Creature* creature) : SmartAI(creature) {}
 
         void Reset() override
         {
@@ -929,7 +947,7 @@ public:
         //Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (who && spell->Id == AB_Effect_000 && !SayAshbringer)
+            if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
             {
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
