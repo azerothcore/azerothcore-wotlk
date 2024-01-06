@@ -145,7 +145,7 @@ struct boss_hydross_the_unstable : public BossAI
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
             DoCastSelf(SPELL_CORRUPTION, true);
 
-            scheduler.Schedule(0s, GROUP_ABILITIES, [this](TaskContext)
+            scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION1);
             }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
@@ -163,6 +163,7 @@ struct boss_hydross_the_unstable : public BossAI
             }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
+                context.Repeat(15s);
             }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_VILE_SLUDGE, 0, 0.0f, true, true);
@@ -176,7 +177,7 @@ struct boss_hydross_the_unstable : public BossAI
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
             me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
 
-            scheduler.Schedule(0s, GROUP_ABILITIES, [this](TaskContext)
+            scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS1);
             }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
@@ -194,6 +195,7 @@ struct boss_hydross_the_unstable : public BossAI
             }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS6);
+                context.Repeat(15s);
             }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_WATER_TOMB, 0, 0.0f, true, true);
@@ -357,4 +359,3 @@ void AddSC_boss_hydross_the_unstable()
     RegisterSpellScript(spell_hydross_cleansing_field_command);
     RegisterSpellScript(spell_hydross_mark_of_hydross);
 }
-
