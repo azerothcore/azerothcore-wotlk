@@ -892,9 +892,9 @@ public:
                         if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                         {
                             DoCast(mograine, SPELL_SCARLET_RESURRECTION);
-                            me->SetSheath(SHEATH_STATE_UNARMED);
-                            events.ScheduleEvent(EVENT_SAY, 3400ms);
                         }
+                        me->SetSheath(SHEATH_STATE_UNARMED);
+                        events.ScheduleEvent(EVENT_SAY, 3400ms);
                         break;
                     case  EVENT_SAY:
                         Talk(SAY_WH_RESURRECT);
