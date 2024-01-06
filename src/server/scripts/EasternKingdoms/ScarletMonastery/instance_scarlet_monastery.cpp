@@ -857,7 +857,7 @@ public:
                         // The list of hates is greater than 1
                         if (me->GetThreatMgr().GetThreatList().size() > 1)
                         {
-                            if (urand(0, 20))//Used for testing !urand(0, 20)
+                            if (!urand(0, 20))// 1/20 Used for testing urand(0, 20)
                             {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                                 {
