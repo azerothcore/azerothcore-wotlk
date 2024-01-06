@@ -148,19 +148,19 @@ struct boss_hydross_the_unstable : public BossAI
             scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION1);
-            }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
-            {
-                DoCastSelf(SPELL_MARK_OF_CORRUPTION2);
             }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
             {
-                DoCastSelf(SPELL_MARK_OF_CORRUPTION3);
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION2);
             }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
             {
-                DoCastSelf(SPELL_MARK_OF_CORRUPTION4);
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION3);
             }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
             {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION4);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION5);
-            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext context)
+            }).Schedule(90s, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
                 context.Repeat(15s);
@@ -180,19 +180,19 @@ struct boss_hydross_the_unstable : public BossAI
             scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS1);
-            }).Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
-            {
-                DoCastSelf(SPELL_MARK_OF_HYDROSS2);
             }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
             {
-                DoCastSelf(SPELL_MARK_OF_HYDROSS3);
+                DoCastSelf(SPELL_MARK_OF_HYDROSS2);
             }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
             {
-                DoCastSelf(SPELL_MARK_OF_HYDROSS4);
+                DoCastSelf(SPELL_MARK_OF_HYDROSS3);
             }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
             {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS4);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS5);
-            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext context)
+            }).Schedule(90s, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS6);
                 context.Repeat(15s);
@@ -359,4 +359,3 @@ void AddSC_boss_hydross_the_unstable()
     RegisterSpellScript(spell_hydross_cleansing_field_command);
     RegisterSpellScript(spell_hydross_mark_of_hydross);
 }
-
