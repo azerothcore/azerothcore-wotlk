@@ -160,7 +160,7 @@ struct boss_hydross_the_unstable : public BossAI
             }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION5);
-            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
                 context.Repeat(15s);
@@ -192,7 +192,7 @@ struct boss_hydross_the_unstable : public BossAI
             }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS5);
-            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_MARK_OF_HYDROSS6);
                 context.Repeat(15s);
