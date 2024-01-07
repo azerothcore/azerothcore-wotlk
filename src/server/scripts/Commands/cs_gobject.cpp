@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: gobject_commandscript
-%Complete: 100
-Comment: All gobject related commands
-Category: commandscripts
-EndScriptData */
-
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GameEventMgr.h"
@@ -59,7 +52,8 @@ public:
             { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
             { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
             { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
-            { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No }
+            { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
+            { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -579,6 +573,20 @@ public:
             object->SendCustomAnim(*objectState);
         }
         handler->PSendSysMessage("Set gobject type %d state %u", objectType, *objectState);
+        return true;
+    }
+
+    static bool HandleGameObjectRespawn(ChatHandler* handler, GameObjectSpawnId guidLow)
+    {
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
+        if (!object)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
+            return false;
+        }
+
+        object->Respawn();
+        handler->PSendSysMessage(LANG_CMD_GO_RESPAWN, object->GetNameForLocaleIdx(handler->GetSessionDbcLocale()), object->GetEntry(), object->GetSpawnId());
         return true;
     }
 };
