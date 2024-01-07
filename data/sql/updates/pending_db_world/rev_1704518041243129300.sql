@@ -1,7 +1,7 @@
 -- SOULS_LICH_KING_RAND_WHISPER
 -- quest "A Feast of Souls" quest id 24547
 
-DELETE FROM `creature_text` WHERE `GroupID` BETWEEN 20 AND 35;
+DELETE FROM `creature_text` WHERE `CreatureID`=37181 AND `GroupID` BETWEEN 20 AND 35;
 
 DELETE
 FROM `creature_text`
@@ -39,7 +39,7 @@ WHERE `MenuID`=10996 AND `OptionID`=6;
 -- You must not approach the Frost Queen. Quickly, stop them!
 UPDATE `creature_text` SET `BroadcastTextId`=37105
 WHERE `CreatureID`=37503 AND `GroupID`=0 AND `ID`=0;
--- It won't.
+-- 
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID`=38229 WHERE `MenuID`=10995 AND `OptionID`=0;
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID`=38229 WHERE `MenuID`=10995 AND `OptionID`=1;
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID`=38229 WHERE `MenuID`=10995 AND `OptionID`=2;
