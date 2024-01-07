@@ -725,6 +725,7 @@ class spell_rog_vanish_purge : public SpellScript
 
     void Register() override
     {
+        // Blizzard handles EFFECT_0 as the unroot and EFFECT_1 as unsnare. Hence why they are not done in the same place.
         OnEffectHitTarget += SpellEffectFn(spell_rog_vanish_purge::HandleRootRemove, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         OnEffectHitTarget += SpellEffectFn(spell_rog_vanish_purge::HandleSnareRemove, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
     }
