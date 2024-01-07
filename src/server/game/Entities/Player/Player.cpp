@@ -9313,12 +9313,9 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     }
 }
 
-void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool isBossEmote = false)
+void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
 {
-    if (isBossEmote)
-        Talk(textId, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
-    else
-        Talk(textId, CHAT_MSG_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+    Talk(textId, CHAT_MSG_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 }
 
 void Player::Whisper(std::string_view text, Language language, Player* target, bool /*= false*/)
@@ -9367,12 +9364,10 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     }
 }
 
-void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false*/)
+void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper = false)
 {
     if (!target)
-    {
         return;
-    }
 
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
     if (!bct)
@@ -9383,7 +9378,10 @@ void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false
 
     LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
+    if (isBossWhisper)
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
+    else
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
 }
 
