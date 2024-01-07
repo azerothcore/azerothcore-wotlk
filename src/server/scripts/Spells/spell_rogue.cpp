@@ -705,7 +705,7 @@ class spell_rog_vanish_purge : public SpellScript
 {
     PrepareSpellScript(spell_rog_vanish_purge);
 
-    bool Validate(SpellInfo const* /*spellInfo*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_PARALYZE });
     }
@@ -736,7 +736,7 @@ class spell_rog_vanish : public SpellScript
 {
     PrepareSpellScript(spell_rog_vanish);
 
-    bool Validate(SpellInfo const* /*spellInfo*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_CLEAN_ESCAPE_AURA, SPELL_CLEAN_ESCAPE_HEAL });
     }
