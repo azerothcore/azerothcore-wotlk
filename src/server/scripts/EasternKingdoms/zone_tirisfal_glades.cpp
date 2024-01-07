@@ -118,7 +118,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!m_uiPhase&& me->HealthBelowPct(30))
+            if (!m_uiPhase && me->HealthBelowPct(30))
             {
                 m_uiPhase = 1;
                 me->RestoreFaction();
