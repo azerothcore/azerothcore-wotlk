@@ -179,17 +179,21 @@ public:
                 case TYPE_ASHBRINGER_EVENT:
                     if (data == IN_PROGRESS)
                     {
+                        if (Creature* Mograine = instance->GetCreature(WhitemaneGUID))
+                            if (Mograine->IsAlive() && !Mograine->IsInCombat())
+                                Mograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
+
+                        // the ashbringer incident did not sniff out any data from whitemane
+                        if (Creature* whitemane = instance->GetCreature(WhitemaneGUID))
+                            if (whitemane->IsAlive() && !whitemane->IsInCombat())
+                                whitemane->DespawnOrUnsummon();
+
                         if (GameObject* go = instance->GetGameObject(DoorChapelGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                             go->SetLootState(GO_ACTIVATED);
                             go->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
-
-                        // the ashbringer incident did not sniff out any data from whitemane
-                        if (Creature* whitemane = instance->GetCreature(WhitemaneGUID))
-                            if (whitemane->IsAlive() && !whitemane->IsInCombat())
-                                whitemane->DespawnOrUnsummon();
 
                         for (auto const& scarletCathedralNpcGuid : AshbringerNpcGUID)
                             if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
@@ -260,17 +264,16 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (player->HasAura(AURA_OF_ASHBRINGER))
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
-                {
-                    Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
-                    if (commanderMograine && commanderMograine->IsAlive())
-                        commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
+        if (!player->HasAura(AURA_OF_ASHBRINGER))
+            return false;
 
-                    instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
-                    return true;
-                }
+        InstanceScript* instance = player->GetInstanceScript();
+        if (instance && instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
+        {
+            instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
+            return true;
+        }
+
         return false;
     }
 };
@@ -604,18 +607,17 @@ public:
                     instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
                     events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
                 }
-
-                // Ashbringer Event
-                if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
-                {
-                    me->SetFaction(FACTION_FRIENDLY);
-                    me->GetMotionMaster()->MoveIdle();
-                    _playerWhoStartedAshbringer = who->ToPlayer();
-                    // Standing delay inside the cathedral
-                    SayAshbringer = true;
-                    events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
-                    events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
-                }
+                else
+                    if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)// Ashbringer Event
+                    {
+                        me->SetFaction(FACTION_FRIENDLY);
+                        me->GetMotionMaster()->MoveIdle();
+                        _playerWhoStartedAshbringer = who->ToPlayer();
+                        // Standing delay inside the cathedral
+                        SayAshbringer = true;
+                        events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
+                        events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
+                    }
             }
         }
 
@@ -807,12 +809,12 @@ public:
                                 events.Repeat(1200ms);
                                 break;
                             }
-
-                            if (me->GetExactDist2d(target) < 5.0f)
-                            {
-                                events.Repeat(4500ms, 5s);
-                                break;
-                            }
+                            else
+                                if (me->GetExactDist2d(target) < 5.0f)
+                                {
+                                    events.Repeat(4500ms, 5s);
+                                    break;
+                                }
                         }
                         events.Repeat(2600ms, 3000ms);
                         break;
@@ -824,15 +826,15 @@ public:
                             events.Repeat(22s, 35s);
                             break;
                         }
-
-                        if (Unit* target = DoSelectLowestHpFriendly(40.0f))
-                        {
-                            if (DoCast(target, SPELL_POWER_WORD_SHIELD) == SPELL_CAST_OK)
+                        else
+                            if (Unit* target = DoSelectLowestHpFriendly(40.0f))
                             {
-                                events.Repeat(22s, 35s);
-                                break;
+                                if (DoCast(target, SPELL_POWER_WORD_SHIELD) == SPELL_CAST_OK)
+                                {
+                                    events.Repeat(22s, 35s);
+                                    break;
+                                }
                             }
-                        }
                         events.Repeat(1s);
                         break;
                     case EVENT_SPELL_HEAL:
