@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -229,8 +230,7 @@ public:
         }
         else
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -282,8 +282,7 @@ public:
         }
         else
         {
-            handler->PSendSysMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);
             return false;
         }
 
@@ -291,10 +290,9 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-        HashMapHolder<Player>::MapType const& plist = ObjectAccessor::GetPlayers();
-        for (auto itr = plist.begin(); itr != plist.end(); ++itr)
-            itr->second->SetAtLoginFlag(atLogin);
+        sWorld->DoForAllOnlinePlayers([&] (Player* player){
+            player->SetAtLoginFlag(atLogin);
+        });
 
         return true;
     }

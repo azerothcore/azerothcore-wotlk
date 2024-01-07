@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Pet.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "TemporarySummon.h"
 /*
  * Scripts for spells with SPELLFAMILY_MAGE and SPELLFAMILY_GENERIC spells used by mage players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_mage_".
  */
-
-#include "Pet.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "TemporarySummon.h"
 
 enum MageSpells
 {
@@ -908,7 +908,7 @@ const uint32 spell_mage_polymorph_cast_visual::spell_mage_polymorph_cast_visual:
 class spell_mage_summon_water_elemental : public SpellScript
 {
     PrepareSpellScript(spell_mage_summon_water_elemental)
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -936,9 +936,9 @@ class spell_mage_summon_water_elemental : public SpellScript
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
                 pet->m_CreatureSpellCooldowns.clear();
-                SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(31707);
-                pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
-                pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(31707);
+                pet->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
+                pet->GetCharmInfo()->SetSpellAutocast(spellInfo, true);
                 caster->ToPlayer()->CharmSpellInitialize();
             }
     }
@@ -1083,3 +1083,4 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_fingers_of_frost_proc_aura);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc);
 }
+

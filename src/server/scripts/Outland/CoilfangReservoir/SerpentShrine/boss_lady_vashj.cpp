@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "serpent_shrine.h"
 
@@ -64,6 +65,8 @@ enum Misc
     ITEM_TAINTED_CORE               = 31088,
 
     POINT_HOME                      = 1,
+
+    NPC_TRIGGER                     = 15384
 };
 
 struct boss_lady_vashj : public BossAI
@@ -330,6 +333,73 @@ class spell_lady_vashj_spore_drop_effect : public SpellScript
     }
 };
 
+class spell_lady_vashj_summons : public SpellScript
+{
+    PrepareSpellScript(spell_lady_vashj_summons);
+
+    enum SpellIds : uint32
+    {
+        SPELL_SUMMON_WAVE_A_MOB = 38019,
+        SPELL_SUMMON_WAVE_B_MOB = 38247,
+        SPELL_SUMMON_WAVE_C_MOB = 38242,
+        SPELL_SUMMON_WAVE_D_MOB = 38244
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_WAVE_A_MOB, SPELL_SUMMON_WAVE_B_MOB, SPELL_SUMMON_WAVE_C_MOB, SPELL_SUMMON_WAVE_D_MOB });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // Filter targets by distance depending on the spell
+        // Coilfang Elites/Striders spawns on top of the stairs. The others at the foot of the stairs.
+        bool top = GetSpellInfo()->Id == SPELL_SUMMON_COILFANG_ELITE || GetSpellInfo()->Id == SPELL_SUMMON_COILFANG_STRIDER;
+        float minDist = top ? 25.f : 60.f;
+        float maxDist = top ? 60.f : 100.f;
+
+        Unit* caster = GetCaster();
+        targets.remove(caster);
+        targets.remove_if([caster, minDist, maxDist](WorldObject const* target) -> bool
+        {
+            float dist = caster->GetExactDist2d(target);
+            return target->GetEntry() != NPC_TRIGGER || (dist < minDist || dist > maxDist);
+        });
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleHit()
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            switch (GetSpellInfo()->Id)
+            {
+                case SPELL_SUMMON_ENCHANTED_ELEMENTAL:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_A_MOB, true);
+                    break;
+                case SPELL_SUMMON_COILFANG_ELITE:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_B_MOB, true);
+                    break;
+                case SPELL_SUMMON_COILFANG_STRIDER:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_C_MOB, true);
+                    break;
+                case SPELL_SUMMON_TAINTED_ELEMENTAL:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_D_MOB, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lady_vashj_summons::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnHit += SpellHitFn(spell_lady_vashj_summons::HandleHit);
+    }
+};
+
 void AddSC_boss_lady_vashj()
 {
     RegisterSerpentShrineAI(boss_lady_vashj);
@@ -337,4 +407,6 @@ void AddSC_boss_lady_vashj()
     RegisterSpellScript(spell_lady_vashj_remove_tainted_cores);
     RegisterSpellScript(spell_lady_vashj_summon_sporebat);
     RegisterSpellScript(spell_lady_vashj_spore_drop_effect);
+    RegisterSpellScript(spell_lady_vashj_summons);
 }
+

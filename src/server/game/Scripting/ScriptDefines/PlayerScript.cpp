@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -63,6 +64,14 @@ void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionTyp
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnBattlegroundDesertion(player, desertionType);
+    });
+}
+
+void ScriptMgr::OnPlayerJustDied(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnPlayerJustDied(player);
     });
 }
 
@@ -1619,14 +1628,6 @@ void ScriptMgr::OnQuestAbandon(Player* player, uint32 questId)
 }
 
 // Player anti cheat
-void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
-{
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-    {
-        script->AnticheatSetSkipOnePacketForASH(player, apply);
-    });
-}
-
 void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -1696,3 +1697,11 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
 
     return true;
 }
+
+PlayerScript::PlayerScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PlayerScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<PlayerScript>;

@@ -15,20 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Alterac_Mountains
-SD%Complete: 0
-SDComment: Placeholder
-SDCategory: Alterac Mountains
-EndScriptData */
+#ifndef SCRIPT_OBJECT_ARENA_SCRIPT_H_
+#define SCRIPT_OBJECT_ARENA_SCRIPT_H_
 
-/* ContentData
-EndContentData */
+#include "ObjectGuid.h"
+#include "ScriptObject.h"
 
-//#include "ScriptMgr.h"
-//#include "ScriptedCreature.h"
-
-/*void AddSC_alterac_mountains()
+class ArenaScript : public ScriptObject
 {
-    Script* newscript;
-}*/
+protected:
+
+    ArenaScript(const char* name);
+
+public:
+
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
+
+    [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
+
+    virtual void OnGetPoints(ArenaTeam* /*team*/, uint32 /*memberRating*/, float& /*points*/) { }
+
+    [[nodiscard]] virtual bool CanSaveToDB(ArenaTeam* /*team*/) { return true; }
+};
+
+#endif

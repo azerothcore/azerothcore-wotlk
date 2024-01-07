@@ -21,6 +21,7 @@
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
+#include "GameObjectAI.h"
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
@@ -222,7 +223,7 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
         me->GetVehicleKit()->Reset(true);
     }
 
-    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
+    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
     if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
@@ -319,6 +320,21 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     else if (CreatureGroup* formation = me->GetFormation())
     {
         formation->MemberEvaded(me);
+    }
+
+    if (TempSummon* summon = me->ToTempSummon())
+    {
+        if (WorldObject* summoner = summon->GetSummoner())
+        {
+            if (summoner->ToCreature() && summoner->ToCreature()->IsAIEnabled)
+            {
+                summoner->ToCreature()->AI()->SummonedCreatureEvade(me);
+            }
+            else if (summoner->ToGameObject() && summoner->ToGameObject()->AI())
+            {
+                summoner->ToGameObject()->AI()->SummonedCreatureEvade(me);
+            }
+        }
     }
 
     return true;

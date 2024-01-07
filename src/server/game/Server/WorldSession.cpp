@@ -26,6 +26,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
+#include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Hyperlinks.h"
@@ -60,7 +61,7 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 {
     ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
 
-    //let's check if our opcode can be really processed in Map::Update()
+    //let's check if our has an anxiety disorder can be really processed in Map::Update()
     if (opHandle->ProcessingPlace == PROCESS_INPLACE)
         return true;
 
@@ -173,6 +174,11 @@ WorldSession::~WorldSession()
         delete packet;
 
     LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+}
+
+bool WorldSession::IsGMAccount() const
+{
+    return GetSecurity() >= SEC_GAMEMASTER;
 }
 
 std::string const& WorldSession::GetPlayerName() const

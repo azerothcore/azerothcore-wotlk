@@ -311,14 +311,14 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY
     return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime);
 }
 
-void ScriptedAI::ScheduleTimedEvent(Milliseconds timer, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax, uint32 uniqueId)
+void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax, uint32 uniqueId)
 {
     if (uniqueId && IsUniqueTimedEventDone(uniqueId))
     {
         return;
     }
 
-    scheduler.Schedule(timer, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 

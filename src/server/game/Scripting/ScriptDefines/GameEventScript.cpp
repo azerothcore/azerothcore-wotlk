@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameEventScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -41,3 +42,11 @@ void ScriptMgr::OnGameEventCheck(uint16 EventID)
         script->OnEventCheck(EventID);
     });
 }
+
+GameEventScript::GameEventScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GameEventScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<GameEventScript>;

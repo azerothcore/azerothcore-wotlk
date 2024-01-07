@@ -391,7 +391,7 @@ enum UnitMoveType
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
-enum WeaponAttackType
+enum WeaponAttackType : uint8
 {
     BASE_ATTACK   = 0,
     OFF_ATTACK    = 1,
@@ -430,7 +430,7 @@ enum CombatRating
 
 #define MAX_COMBAT_RATING         25
 
-enum DamageEffectType
+enum DamageEffectType : uint8
 {
     DIRECT_DAMAGE           = 0,                            // used for normal weapon damage (not for class abilities or spells)
     SPELL_DIRECT_DAMAGE     = 1,                            // spell/class abilities damage
@@ -2667,17 +2667,6 @@ namespace Acore
         bool const _ascending;
     };
 }
-
-class ConflagrateAuraStateDelayEvent : public BasicEvent
-{
-public:
-    ConflagrateAuraStateDelayEvent(Unit* owner, ObjectGuid casterGUID) : BasicEvent(), m_owner(owner), m_casterGUID(casterGUID) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-private:
-    Unit* m_owner;
-    ObjectGuid m_casterGUID;
-};
 
 class RedirectSpellEvent : public BasicEvent
 {

@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "PetPackets.h"
@@ -104,6 +105,14 @@ void Pet::AddToWorld()
 
     if (GetOwnerGUID().IsPlayer())
     {
+        if (Player* owner = GetOwner())
+        {
+            if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
+            {
+                owner->SetLastPetSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            }
+        }
+
         sScriptMgr->OnPetAddToWorld(this);
     }
 }
@@ -1941,16 +1950,16 @@ void Pet::InitLevelupSpellsForLevel()
     {
         for (uint32 spellId : defSpells->spellid)
         {
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellEntry)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
             // will called first if level down
-            if (spellEntry->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellEntry))
-                unlearnSpell(spellEntry->Id, true);
+            if (spellInfo->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellInfo))
+                unlearnSpell(spellInfo->Id, true);
             // will called if level up
             else
-                learnSpell(spellEntry->Id);
+                learnSpell(spellInfo->Id);
         }
     }
 }

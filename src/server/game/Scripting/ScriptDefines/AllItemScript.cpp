@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AllItemScript.h"
+#include "ItemScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 #include "ScriptedGossip.h"
@@ -139,3 +141,18 @@ void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, ui
         tempScript->OnGossipSelectCode(player, item, sender, action, code);
     }
 }
+
+AllItemScript::AllItemScript(const char* name) :
+    ScriptObject(name)
+{
+    ScriptRegistry<AllItemScript>::AddScript(this);
+}
+
+ItemScript::ItemScript(const char* name) :
+    ScriptObject(name)
+{
+    ScriptRegistry<ItemScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<AllItemScript>;
+template class AC_GAME_API ScriptRegistry<ItemScript>;

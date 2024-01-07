@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "temple_of_ahnqiraj.h"
 /* ScriptData
 SDName: Boss_Cthun
 SD%Complete: 95
 SDComment: Darkglare tracking issue
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -1053,3 +1054,4 @@ void AddSC_boss_cthun()
     new at_cthun_stomach_exit();
     new at_cthun_center();
 }
+

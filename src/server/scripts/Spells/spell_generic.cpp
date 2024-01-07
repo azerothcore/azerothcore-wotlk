@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
- * of creature using it or can't be bound to any player class.
- * Ordered alphabetically using scriptname.
- * Scriptnames of files in this file should be prefixed with "spell_gen_"
- */
-
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -29,18 +22,25 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
+/*
+ * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
+ * of creature using it or can't be bound to any player class.
+ * Ordered alphabetically using scriptname.
+ * Scriptnames of files in this file should be prefixed with "spell_gen_"
+ */
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -653,7 +653,6 @@ class spell_gen_area_aura_select_players : public AuraScript
    54847 - Mojo Volley       (spell_gen_select_target_count_15_2)
    59452 - Mojo Volley       (spell_gen_select_target_count_15_2)
    46008 - Negative Energy   (spell_gen_select_target_count_15_5)
-   38017 - Wave A - 1                 (spell_gen_select_target_count_7_1)
    40851 - Disgruntled                (spell_gen_select_target_count_7_1)
    45680 - Shadow Bolt                (spell_gen_select_target_count_7_1)
    45976 - Open Portal                (spell_gen_select_target_count_7_1)
@@ -1952,7 +1951,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({
             SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
@@ -5290,3 +5289,4 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
 }
+

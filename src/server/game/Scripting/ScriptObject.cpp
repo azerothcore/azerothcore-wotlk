@@ -15,28 +15,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
+#include "DBCStores.h"
+#include "Log.h"
 
-void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
+//ScriptObject::ScriptObject(char const* name) : _name(name)
+//{
+//    sScriptMgr->IncreaseScriptCount();
+//}
+//
+//ScriptObject::~ScriptObject()
+//{
+//    sScriptMgr->DecreaseScriptCount();
+//}
+
+template<class TMap>
+void MapScript<TMap>::checkMap()
 {
-    ExecuteScript<CommandSC>([&](CommandSC* script)
-    {
-        script->OnHandleDevCommand(player, enable);
-    });
+    _mapEntry = sMapStore.LookupEntry(_mapId);
+
+    if (!_mapEntry)
+        LOG_ERROR("maps.script", "Invalid MapScript for {}; no such map ID.", _mapId);
 }
 
-bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
-{
-    auto ret = IsValidBoolScript<CommandSC>([&](CommandSC* script)
-    {
-        return !script->CanExecuteCommand(handler, cmdStr);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
-}
+template class AC_GAME_API MapScript<Map>;
+template class AC_GAME_API MapScript<InstanceMap>;
+template class AC_GAME_API MapScript<BattlegroundMap>;

@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "utgarde_keep.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "utgarde_keep.h"
 
 class npc_dragonflayer_forge_master : public CreatureScript
 {
@@ -216,7 +217,7 @@ public:
     {
         PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
         }
@@ -248,3 +249,4 @@ void AddSC_utgarde_keep()
 
     new spell_ticking_time_bomb();
 }
+

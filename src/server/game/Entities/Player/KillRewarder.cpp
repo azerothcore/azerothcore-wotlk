@@ -20,6 +20,7 @@
 #include "Group.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 // KillRewarder incapsulates logic of rewarding player upon kill with:

@@ -23,9 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -62,8 +62,7 @@ public:
 
         if (!target || !target->IsConnected())
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -76,22 +75,19 @@ public:
 
         if (playerTarget->GetGuildId())
         {
-            handler->SendSysMessage(LANG_PLAYER_IN_GUILD);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_IN_GUILD);
             return false;
         }
 
         if (sGuildMgr->GetGuildByName(guildName))
         {
-            handler->SendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
             return false;
         }
 
         if (sObjectMgr->IsReservedName(guildName) || sObjectMgr->IsProfanityName(guildName) || !sObjectMgr->IsValidCharterName(guildName))
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -99,8 +95,7 @@ public:
         if (!guild->Create(playerTarget, guildName))
         {
             delete guild;
-            handler->SendSysMessage(LANG_GUILD_NOT_CREATED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_NOT_CREATED);
             return false;
         }
 
@@ -206,22 +201,19 @@ public:
         Guild* guild = sGuildMgr->GetGuildByName(oldGuildStr);
         if (!guild)
         {
-            handler->PSendSysMessage(LANG_COMMAND_COULDNOTFIND, oldGuildStr);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_COULDNOTFIND, oldGuildStr);
             return false;
         }
 
         if (sGuildMgr->GetGuildByName(newGuildStr))
         {
-            handler->PSendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, newGuildStr);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, newGuildStr);
             return false;
         }
 
         if (!guild->SetName(newGuildStr))
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
