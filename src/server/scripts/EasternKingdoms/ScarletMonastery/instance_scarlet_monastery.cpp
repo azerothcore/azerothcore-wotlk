@@ -261,24 +261,16 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (player->HasAura(AURA_OF_ASHBRINGER))
-        {
             if (InstanceScript* instance = player->GetInstanceScript())
-            {
                 if (instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
                 {
-                    if (Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE)))
-                    {
-                        if (commanderMograine->IsAlive())
-                        {
-                            commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
-                        }
-                    }
+                    Creature* commanderMograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE));
+                    if (commanderMograine && commanderMograine->IsAlive())
+                        commanderMograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
 
                     instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
                     return true;
                 }
-            }
-        }
         return false;
     }
 };
