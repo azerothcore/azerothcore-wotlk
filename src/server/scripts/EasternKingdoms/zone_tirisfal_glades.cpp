@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Tirisfal_Glades
-SD%Complete: 100
-SDComment: Quest support: 590
-SDCategory: Tirisfal Glades
-EndScriptData */
-
-/* ContentData
-npc_calvin_montague
-*/
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -36,17 +25,17 @@ npc_calvin_montague
 
 enum Calvin
 {
-    SAY_COMPLETE = 0,
-    SPELL_FOOD = 7737,
-    QUEST_590 = 590
+    SAY_COMPLETE    = 0,
+    SPELL_FOOD      = 7737,
+    QUEST_590       = 590
 };
 
 enum event
 {
-    EVENT_EMOTE = 1,
-    EVENT_TALK = 2,
-    EVENT_DRINK_AND_QUEST_COMQUEST = 3,
-    EVENT_END = 4,
+    EVENT_EMOTE                     = 1,
+    EVENT_TALK                      = 2,
+    EVENT_DRINK_AND_QUEST_COMQUEST  = 3,
+    EVENT_END                       = 4
 };
 
 class npc_calvin_montague : public CreatureScript
@@ -74,7 +63,7 @@ public:
 
         void Reset() override
         {
-            if (m_uiPhase != 1)
+            if (!m_uiPhase)
             {
                 me->SetReactState(REACT_DEFENSIVE);
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
@@ -83,7 +72,7 @@ public:
 
         void JustReachedHome() override
         {
-            if (m_uiPhase == 1)
+            if (m_uiPhase)
             {
                 events.ScheduleEvent(EVENT_EMOTE, 2500ms);
             }
@@ -129,7 +118,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (m_uiPhase == 0 && me->HealthBelowPct(30))
+            if (!m_uiPhase&& me->HealthBelowPct(30))
             {
                 m_uiPhase = 1;
                 me->RestoreFaction();
@@ -163,7 +152,6 @@ public:
                         events.ScheduleEvent(EVENT_END, 12900ms);
                         break;
                     case EVENT_END:
-                        //me->SetStandState(UNIT_STAND_STATE_STAND);
                         me->RestoreFaction();
                         me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
