@@ -540,16 +540,16 @@ class spell_pilgrims_bounty_turkey_tracker : public SpellScript
                 switch (stackAmount)
                 {
                     case 10:
-                        target->TextEmote(TURKEY_HUNTER, target, true);
+                        target->Talk(TURKEY_HUNTER, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
                         break;
                     case 20:
-                        target->TextEmote(TURKEY_DOMINATION, target, true);
+                        target->Talk(TURKEY_DOMINATION, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
                         break;
                     case 30:
-                        target->TextEmote(TURKEY_SLAUGHTER, target, true);
+                        target->Talk(TURKEY_SLAUGHTER, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
                         break;
                     case 40:
-                        target->TextEmote(TURKEY_TRIUMPH, target, true);
+                        target->Talk(TURKEY_TRIUMPH, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
                         target->CastSpell(target, SPELL_ACHI_TURKINATOR_CREDIT, true);
                         aurEff->GetBase()->Remove();
                         break;
