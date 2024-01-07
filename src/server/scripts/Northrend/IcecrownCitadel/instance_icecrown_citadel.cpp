@@ -466,7 +466,7 @@ public:
                 case NPC_THE_LICH_KING_VALITHRIA:
                     ValithriaLichKingGUID = creature->GetGUID();
                     break;
-                case   NPC_THE_LICH_KING_LH:
+                case NPC_THE_LICH_KING_LH:
                     TheLichKingLhGUID = creature->GetGUID();
                     break;
                 case NPC_GREEN_DRAGON_COMBAT_TRIGGER:
