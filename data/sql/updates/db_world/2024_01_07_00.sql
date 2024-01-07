@@ -1,3 +1,4 @@
+-- DB update 2024_01_06_01 -> 2024_01_07_00
 -- update BroadcastTextId
 UPDATE `creature_text` SET `BroadcastTextId`=9463 WHERE `CreatureID`=14383 AND `GroupID`=0 AND `ID`=0;
 UPDATE `creature_text` SET `BroadcastTextId`=9464 WHERE `CreatureID`=14383 AND `GroupID`=1 AND `ID`=0;
