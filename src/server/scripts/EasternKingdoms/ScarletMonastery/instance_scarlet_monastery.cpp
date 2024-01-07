@@ -70,7 +70,7 @@ enum DataTypes
 class instance_scarlet_monastery : public InstanceMapScript
 {
 public:
-    instance_scarlet_monastery() : InstanceMapScript("instance_scarlet_monastery", 189) { }
+    instance_scarlet_monastery() : InstanceMapScript("instance_scarlet_monastery", 189) {}
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -142,7 +142,7 @@ public:
                     {
                         Creature* Whitemane = instance->GetCreature(WhitemaneGUID);
                         Creature* Mograine = instance->GetCreature(MograineGUID);
-                        if (!Mograine||!Whitemane)
+                        if (!Mograine || !Whitemane)
                             return;
 
                         if (Whitemane->IsAlive() && Mograine->IsAlive())
@@ -387,7 +387,7 @@ Position const summonedMograinePos = { 1033.4642f, 1399.1022f, 27.337427f, 6.257
 class npc_mograine : public CreatureScript
 {
 public:
-    npc_mograine() : CreatureScript("npc_scarlet_commander_mograine") { }
+    npc_mograine() : CreatureScript("npc_scarlet_commander_mograine") {}
 
     struct npc_mograineAI : public ScriptedAI
     {
@@ -577,7 +577,7 @@ public:
                     Whitemane->AI()->Talk(SAY_WH_INTRO, me);
                     float fx, fy, fz;
                     me->GetContactPoint(Whitemane, fx, fy, fz, 5.0f);
-                    Whitemane->GetMotionMaster()->MovePoint(POINT_WHITEMANE_TO_MOGRAINE, fx, fy,fz);
+                    Whitemane->GetMotionMaster()->MovePoint(POINT_WHITEMANE_TO_MOGRAINE, fx, fy, fz);
                     Whitemane->SetReactState(REACT_AGGRESSIVE);
                 }
                 me->GetMotionMaster()->MovementExpired();
@@ -690,7 +690,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-   private:
+    private:
         bool SayAshbringer = false;
         bool _fakeDeath = false;
         EventMap events;
@@ -708,7 +708,7 @@ public:
 class boss_high_inquisitor_whitemane : public CreatureScript
 {
 public:
-    boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
+    boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") {}
 
     struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
     {
@@ -793,7 +793,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (_Phase==0 && me->HealthBelowPct(50))
+            if (_Phase == 0 && me->HealthBelowPct(50))
             {
                 events.Reset();
                 _Phase = 1;
@@ -937,7 +937,7 @@ public:
 class npc_fairbanks : public CreatureScript
 {
 public:
-    npc_fairbanks() : CreatureScript("npc_fairbanks") { }
+    npc_fairbanks() : CreatureScript("npc_fairbanks") {}
 
     struct npc_fairbanksAI : public SmartAI
     {
