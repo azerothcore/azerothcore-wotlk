@@ -712,7 +712,7 @@ class spell_rog_vanish_purge : public SpellScript
 
     void HandleRootRemove(SpellEffIndex /*effIndex*/)
     {
-        if (!GetCaster()->HasAura(SPELL_PARALYZE)) // Root from Tainted Core SSC, should not be removed by vanish.
+        if (GetCaster() && !GetCaster()->HasAura(SPELL_PARALYZE)) // Root from Tainted Core SSC, should not be removed by vanish.
             GetCaster()->RemoveAurasWithMechanic(1 << MECHANIC_ROOT);
     }
 
@@ -742,11 +742,8 @@ class spell_rog_vanish : public SpellScript
 
     void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        if (GetCaster())
-        {
-            if (GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
-                GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
-        }
+        if (GetCaster() && GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
+            GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
     }
 
     void Register() override
