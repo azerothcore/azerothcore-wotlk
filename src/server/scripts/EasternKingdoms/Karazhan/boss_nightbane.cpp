@@ -120,7 +120,6 @@ struct boss_nightbane : public BossAI
 
     void ScheduleGround()
     {
-        DoResetThreatList();
         scheduler.Schedule(30s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastAOE(SPELL_BELLOWING_ROAR);
@@ -327,6 +326,7 @@ struct boss_nightbane : public BossAI
             if (_movePhase >= 7)
             {
                 me->SetDisableGravity(false);
+                DoResetThreatList();
                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
