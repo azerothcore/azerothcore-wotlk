@@ -26,11 +26,11 @@ enum Spells
 {
     // phase 1
     SPELL_BELLOWING_ROAR        = 39427,
+    SPELL_CLEAVE                = 30131,
     SPELL_CHARRED_EARTH         = 30129,
     SPELL_DISTRACTING_ASH       = 30130,
     SPELL_SMOLDERING_BREATH     = 30210,
     SPELL_TAIL_SWEEP            = 25653,
-    SPELL_CLEAVE                = 30131,
     // phase 2
     SPELL_RAIN_OF_BONES         = 37098,
     SPELL_SMOKING_BLAST         = 37057,
@@ -147,20 +147,20 @@ struct boss_nightbane : public BossAI
         {
             DoCastRandomTarget(SPELL_SEARING_CINDERS);
             context.Repeat(10s);
-        }).Schedule(1.5s, GROUP_GROUND, [this](TaskContext context)
+        }).Schedule(1500ms, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_CLEAVE);
-            context.Repeat(1.5s, 45s);
+            context.Repeat(1500ms, 45s);
         });
     }
 
     void ScheduleFly()
     {
         _skeletonSpawnCounter = 0;
-        DoResetThreatList();
 
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
+            DoResetThreatList();
             DoCastVictim(SPELL_RAIN_OF_BONES);
             _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
             {
