@@ -1,3 +1,4 @@
+-- DB update 2024_01_07_02 -> 2024_01_07_03
 --
 DELETE FROM `command` WHERE `name` = 'gobject respawn';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
