@@ -1,11 +1,12 @@
 -- SOULS_LICH_KING_RAND_WHISPER
 -- quest "A Feast of Souls" quest id 24547
 
-DELETE FROM `creature_text` WHERE `GroupID` BETWEEN 20 AND 35
+DELETE FROM `creature_text` WHERE `GroupID` BETWEEN 20 AND 35;
 
 DELETE
 FROM `creature_text`
 WHERE `CreatureID`=37181 AND `GroupID`=5;
+
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (37181, 5, 0, 'Take them mortal! These souls will again be mine soon enough...', 15, 0, 100, 0, 0, 17235, 37899, 0, 'A Feast of Souls Lich King (Also ICC Intro)'), 
 (37181, 5, 1, 'Soon, mortal, you too shall have a blade for a prison.', 15, 0, 100, 0, 0, 17236, 37900, 0, 'A Feast of Souls Lich King (Also ICC Intro)'),
