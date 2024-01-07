@@ -9313,9 +9313,12 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     }
 }
 
-void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
+void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool isBossEmote = false)
 {
-    Talk(textId, CHAT_MSG_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+    if (isBossEmote)
+        Talk(textId, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+    else
+        Talk(textId, CHAT_MSG_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 }
 
 void Player::Whisper(std::string_view text, Language language, Player* target, bool /*= false*/)
