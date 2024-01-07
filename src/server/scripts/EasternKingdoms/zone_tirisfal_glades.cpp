@@ -73,14 +73,10 @@ public:
         void JustReachedHome() override
         {
             if (m_uiPhase)
-            {
                 events.ScheduleEvent(EVENT_EMOTE, 2500ms);
-            }
             else
-            {
                 events.ScheduleEvent(EVENT_END, 3min);
-            }
-        }
+       }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
