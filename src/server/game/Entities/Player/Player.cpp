@@ -9364,7 +9364,7 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     }
 }
 
-void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper = false)
+void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
 {
     if (!target)
         return;
