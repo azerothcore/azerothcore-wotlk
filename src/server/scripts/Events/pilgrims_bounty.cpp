@@ -520,10 +520,10 @@ enum tTracker
 
 enum Say
 {
-    EMOTE_TURKEY_HUNTER                       = 33163,
-    EMOTE_TURKEY_DOMINATION                   = 33164,
-    EMOTE_TURKEY_SLAUGHTER                    = 33165,
-    EMOTE_TURKEY_TRIUMPH                      = 33167
+    SAY_TURKEY_HUNTER                       = 33163,
+    SAY_TURKEY_DOMINATION                   = 33164,
+    SAY_TURKEY_SLAUGHTER                    = 33165,
+    SAY_TURKEY_TRIUMPH                      = 33167
 };
 
 class spell_pilgrims_bounty_turkey_tracker : public SpellScript
@@ -540,16 +540,16 @@ class spell_pilgrims_bounty_turkey_tracker : public SpellScript
                 switch (stackAmount)
                 {
                     case 10:
-                        target->Talk(EMOTE_TURKEY_HUNTER, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+                        target->Whisper(SAY_TURKEY_HUNTER, target, true);
                         break;
                     case 20:
-                        target->Talk(EMOTE_TURKEY_DOMINATION, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+                        target->Whisper(SAY_TURKEY_DOMINATION, target, true);
                         break;
                     case 30:
-                        target->Talk(EMOTE_TURKEY_SLAUGHTER, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+                        target->Whisper(SAY_TURKEY_SLAUGHTER, target, true);
                         break;
                     case 40:
-                        target->Talk(EMOTE_TURKEY_TRIUMPH, CHAT_MSG_RAID_BOSS_WHISPER, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+                        target->Whisper(SAY_TURKEY_TRIUMPH, target, true);
                         target->CastSpell(target, SPELL_ACHI_TURKINATOR_CREDIT, true);
                         aurEff->GetBase()->Remove();
                         break;
