@@ -19,7 +19,6 @@
 #include "Battleground.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "MMapFactory.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"

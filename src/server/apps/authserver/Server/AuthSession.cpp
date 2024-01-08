@@ -28,12 +28,10 @@
 #include "Log.h"
 #include "RealmList.h"
 #include "SecretMgr.h"
-#include "TOTP.h"
-#include "Timer.h"
-#include "Util.h"
 #include "StringConvert.h"
+#include "TOTP.h"
+#include "Util.h"
 #include <boost/lexical_cast.hpp>
-#include <openssl/crypto.h>
 
 using boost::asio::ip::tcp;
 

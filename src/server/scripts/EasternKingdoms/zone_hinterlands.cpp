@@ -26,8 +26,8 @@ EndScriptData */
 npc_rinji
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 
@@ -77,7 +77,7 @@ public:
         {
             _IsByOutrunner = false;
             spawnId = 0;
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->SetImmuneToAll(true);
         }
 
         void Reset() override
@@ -90,6 +90,7 @@ public:
         {
             _IsByOutrunner = false;
             spawnId = 0;
+            me->SetImmuneToAll(true);
 
             npc_escortAI::JustRespawned();
         }
@@ -136,7 +137,7 @@ public:
 
         void sQuestAccept(Player* player, Quest const* quest) override
         {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->SetImmuneToAll(false);
             if (quest->GetQuestId() == QUEST_RINJI_TRAPPED)
             {
                 if (GameObject* go = me->FindNearestGameObject(GO_RINJI_CAGE, INTERACTION_DISTANCE))

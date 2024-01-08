@@ -38,8 +38,10 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Totem.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -49,8 +51,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2883,6 +2883,22 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
         SendMessageToSet(WorldPackets::Misc::Playsound(sound_id).Write(), true);
 }
 
+void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
+        }
+    }
+}
+
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     if (target)
@@ -2892,6 +2908,22 @@ void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
     else
     {
         SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
+    }
+}
+
+void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
+        }
     }
 }
 

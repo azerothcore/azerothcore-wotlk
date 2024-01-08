@@ -59,10 +59,11 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
+#include "M2Stores.h"
 #include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
-#include "M2Stores.h"
+#include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -72,7 +73,6 @@
 #include "PoolMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
-#include "MotdMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -573,6 +573,12 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT]);
         _rate_values[RATE_TALENT] = 1.0f;
     }
+    _rate_values[RATE_TALENT_PET] = sConfigMgr->GetOption<float>("Rate.Talent.Pet", 1.0f);
+    if (_rate_values[RATE_TALENT_PET] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
+        _rate_values[RATE_TALENT_PET] = 1.0f;
+    }
     _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
     if (_rate_values[RATE_MOVESPEED] < 0)
     {
@@ -581,18 +587,6 @@ void World::LoadConfigSettings(bool reload)
     }
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
-
-    _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = sConfigMgr->GetOption<float>("TargetPosRecalculateRange", 1.5f);
-    if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] < CONTACT_DISTANCE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be >= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], CONTACT_DISTANCE, CONTACT_DISTANCE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = CONTACT_DISTANCE;
-    }
-    else if (_rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] > NOMINAL_MELEE_RANGE)
-    {
-        LOG_ERROR("server.loading", "TargetPosRecalculateRange ({}) must be <= {}. Using {} instead.", _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE], NOMINAL_MELEE_RANGE, NOMINAL_MELEE_RANGE);
-        _rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = NOMINAL_MELEE_RANGE;
-    }
 
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);
     if (_rate_values[RATE_DURABILITY_LOSS_ON_DEATH] < 0.0f)
@@ -1287,6 +1281,8 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
 
+    _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
+
     _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
 
     ///- Read the "Data" directory from the config file
@@ -1617,9 +1613,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
-
-    LOG_INFO("server.loading", "Loading Instance Saved Gameobject State Data...");
-    sObjectMgr->LoadInstanceSavedGameobjectStateData();
 
     LOG_INFO("server.loading", "Loading Character Cache...");
     sCharacterCache->LoadCharacterCacheStorage();
@@ -3258,6 +3251,23 @@ void World::ProcessQueryCallbacks()
 void World::RemoveOldCorpses()
 {
     _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
+}
+
+void World::DoForAllOnlinePlayers(std::function<void(Player*)> exec)
+{
+    std::shared_lock lock(*HashMapHolder<Player>::GetLock());
+    for (auto const& it : ObjectAccessor::GetPlayers())
+    {
+        if (Player* player = it.second)
+        {
+            if (!player->IsInWorld())
+            {
+                continue;
+            }
+
+            exec(player);
+        }
+    }
 }
 
 bool World::IsPvPRealm() const

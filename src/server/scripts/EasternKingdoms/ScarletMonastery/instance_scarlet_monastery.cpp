@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
@@ -201,52 +202,6 @@ enum ScarletMonasteryTrashMisc
     SPELL_COSMETIC_CHAIN = 45537,
     SPELL_COSMETIC_EXPLODE = 45935,
     SPELL_FORGIVENESS = 28697,
-};
-
-class npc_scarlet_guard : public CreatureScript
-{
-public:
-    npc_scarlet_guard() : CreatureScript("npc_scarlet_guard") { }
-
-    struct npc_scarlet_guardAI : public SmartAI
-    {
-        npc_scarlet_guardAI(Creature* creature) : SmartAI(creature) { }
-
-        void Reset() override
-        {
-            SayAshbringer = false;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who && who->GetDistance2d(me) < 12.0f)
-            {
-                if (Player* player = who->ToPlayer())
-                {
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
-                    {
-                        Talk(SAY_WELCOME);
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetFacingToObject(player);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->AddAura(SPELL_AURA_MOD_ROOT, me);
-                        me->CastSpell(me, SPELL_AURA_MOD_ROOT, true);
-                        SayAshbringer = true;
-                    }
-                }
-            }
-
-            SmartAI::MoveInLineOfSight(who);
-        }
-    private:
-        bool SayAshbringer = false;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
-    }
 };
 
 enum MograineEvents
@@ -583,7 +538,7 @@ public:
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!canResurrectCheck && damage >= me->GetHealth())
+            if ((!canResurrectCheck || canResurrect) && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
@@ -733,7 +688,6 @@ public:
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
-    new npc_scarlet_guard();
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();

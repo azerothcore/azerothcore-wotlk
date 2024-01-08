@@ -4514,7 +4514,7 @@ void Spell::finish(bool ok)
         if (spellInfo && spellInfo->SpellIconID == 2056)
         {
             LOG_DEBUG("spells.aura", "Statue {} is unsummoned in spell {} finish", m_caster->GetGUID().ToString(), m_spellInfo->Id);
-            m_caster->setDeathState(JUST_DIED);
+            m_caster->setDeathState(DeathState::JustDied);
             return;
         }
     }
@@ -6077,7 +6077,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
 
             DispelChargesList dispelList;
-            target->GetDispellableAuraList(m_caster, dispelMask, dispelList);
+            target->GetDispellableAuraList(m_caster, dispelMask, dispelList, m_spellInfo);
+
             if (dispelList.empty())
                 return SPELL_FAILED_NOTHING_TO_DISPEL;
         }
@@ -6637,8 +6638,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_AURA_MOUNTED:
                 {
-                    // Xinef: disallow casting in water for mounts not increasing water movement Speed
-                    if (m_caster->IsInWater() && !m_spellInfo->HasAura(SPELL_AURA_MOD_INCREASE_SWIM_SPEED))
+                    // Disallow casting flying mounts in water
+                    if (m_caster->IsInWater() && m_spellInfo->HasAura(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
                         return SPELL_FAILED_ONLY_ABOVEWATER;
 
                     // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "the_eye.h"
 
@@ -87,23 +87,23 @@ struct boss_void_reaver : public BossAI
         scheduler.Schedule(10min, [this](TaskContext)
         {
             DoCastSelf(SPELL_BERSERK);
-        }).Schedule(15s, [this](TaskContext context)
+        }).Schedule(8300ms, [this](TaskContext context)
         {
             Talk(SAY_POUNDING);
             DoCastSelf(SPELL_POUNDING);
             scheduler.DelayGroup(GROUP_ARCANE_ORB, 3s);
-            context.Repeat(15s);
-        }).Schedule(3s, GROUP_ARCANE_ORB, [this](TaskContext context)
+            context.Repeat(12100ms, 15800ms);
+        }).Schedule(3450ms, GROUP_ARCANE_ORB, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
             else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
-            context.Repeat(3s);
-        }).Schedule(30s, [this](TaskContext context)
+            context.Repeat(2400ms, 6300ms);
+        }).Schedule(14350ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_KNOCK_AWAY);
-            context.Repeat(25s);
+            context.Repeat(20550ms, 22550ms);
         });
     }
 

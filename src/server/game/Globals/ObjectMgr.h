@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -36,7 +37,6 @@
 #include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "VehicleDefines.h"
-#include "GossipDef.h"
 #include <functional>
 #include <limits>
 #include <map>
@@ -1020,7 +1020,7 @@ public:
     void LoadCreatureClassLevelStats();
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
-    void LoadCreatureTemplate(Field* fields);
+    void LoadCreatureTemplate(Field* fields, bool triggerHook = false);
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
@@ -1444,12 +1444,6 @@ public:
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
     void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
-
-    void LoadInstanceSavedGameobjectStateData();
-    bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
-    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread

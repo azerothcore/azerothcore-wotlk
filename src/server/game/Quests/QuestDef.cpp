@@ -38,7 +38,7 @@ Quest::Quest(Field* questRecord)
     Type = questRecord[5].Get<uint16>();
     SuggestedPlayers = questRecord[6].Get<uint8>();
     TimeAllowed = questRecord[7].Get<uint32>();
-    AllowableRaces = questRecord[8].Get<uint16>();
+    AllowableRaces = questRecord[8].Get<uint32>();
     RequiredFactionId1 = questRecord[9].Get<uint16>();
     RequiredFactionId2 = questRecord[10].Get<uint16>();
     RequiredFactionValue1 = questRecord[11].Get<int32>();
@@ -252,7 +252,7 @@ int32 Quest::GetRewOrReqMoney(uint8 playerLevel) const
         }
     }
 
-    return static_cast<int32>(rewardedMoney * sWorld->getRate(RATE_DROP_MONEY));
+    return static_cast<int32>(rewardedMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY));
 }
 
 uint32 Quest::GetRewMoneyMaxLevel() const
@@ -260,7 +260,7 @@ uint32 Quest::GetRewMoneyMaxLevel() const
     if (HasFlag(QUEST_FLAGS_NO_MONEY_FROM_XP))
         return 0;
 
-    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY) * sWorld->getRate(RATE_DROP_MONEY));
+    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY));
 }
 
 bool Quest::IsAutoAccept() const

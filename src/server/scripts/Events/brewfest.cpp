@@ -16,19 +16,21 @@
  */
 
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 ///////////////////////////////////////
@@ -1367,13 +1369,15 @@ enum BrewfestRevelerEnum
     FACTION_ALLIANCE    = 1934,
     FACTION_HORDE       = 1935,
 
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
-    SPELL_BREWFEST_REVELER_TRANSFORM_BE             = 43907,
-    SPELL_BREWFEST_REVELER_TRANSFORM_ORC            = 43914,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN         = 43915,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL          = 43916,
-    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD         = 43917
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE          = 44003,
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE        = 44004,
+    SPELL_BREWFEST_REVELER_TRANSFORM_BE                   = 43907,
+    SPELL_BREWFEST_REVELER_TRANSFORM_ORC                  = 43914,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN               = 43915,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL                = 43916,
+    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD               = 43917,
+
+    SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE  = 44096
 };
 
 class spell_brewfest_reveler_transform : public AuraScript
@@ -1394,6 +1398,7 @@ class spell_brewfest_reveler_transform : public AuraScript
                 break;
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
+            case SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
                 factionId = FACTION_FRIENDLY;
                 break;
             default:

@@ -417,6 +417,7 @@ enum WorldIntConfigs
     CONFIG_CHANGE_FACTION_MAX_MONEY,
     CONFIG_WATER_BREATH_TIMER,
     CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT,
+    CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -503,9 +504,9 @@ enum Rates
     RATE_HONOR,
     RATE_ARENA_POINTS,
     RATE_TALENT,
+    RATE_TALENT_PET,
     RATE_CORPSE_DECAY_LOOTED,
     RATE_INSTANCE_RESET_TIME,
-    RATE_TARGET_POS_RECALCULATION_RANGE,
     RATE_DURABILITY_LOSS_ON_DEATH,
     RATE_DURABILITY_LOSS_DAMAGE,
     RATE_DURABILITY_LOSS_PARRY,
@@ -607,6 +608,7 @@ public:
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
+    virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "halls_of_stone.h"
 
@@ -153,7 +153,7 @@ public:
 
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     {
-                        brann->setDeathState(JUST_DIED);
+                        brann->setDeathState(DeathState::JustDied);
                         brann->Respawn();
                         brann->AI()->DoAction(5);
                     }

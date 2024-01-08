@@ -23,10 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "Language.h"
+#include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WaypointMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -163,15 +162,13 @@ public:
 
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
             return false;
         }
 
         if (target->GetEntry() == 1)
         {
-            handler->PSendSysMessage("%s%s|r", "|cffff33ff", "You want to load path to a waypoint? Aren't you?");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("%s%s|r", "|cffff33ff", "You want to load path to a waypoint? Aren't you?");
             return false;
         }
 
@@ -772,8 +769,7 @@ public:
 
             if (!target)
             {
-                handler->SendSysMessage(LANG_SELECT_CREATURE);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_SELECT_CREATURE);
                 return false;
             }
 
@@ -800,8 +796,7 @@ public:
             // Check if the user did specify a visual waypoint
             if (!target || target->GetEntry() != VISUAL_WAYPOINT)
             {
-                handler->PSendSysMessage(LANG_WAYPOINT_VP_SELECT);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_WAYPOINT_VP_SELECT);
                 return false;
             }
 
@@ -848,8 +843,7 @@ public:
 
             if (!result)
             {
-                handler->SendSysMessage("|cffff33ffPath no found.|r");
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage("|cffff33ffPath no found.|r");
                 return false;
             }
 
@@ -958,8 +952,7 @@ public:
             PreparedQueryResult result = WorldDatabase.Query(stmt);
             if (!result)
             {
-                handler->PSendSysMessage(LANG_WAYPOINT_NOTFOUND, pathid);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUND, pathid);
                 return false;
             }
 
@@ -1008,8 +1001,7 @@ public:
             PreparedQueryResult result = WorldDatabase.Query(stmt);
             if (!result)
             {
-                handler->PSendSysMessage(LANG_WAYPOINT_NOTFOUNDLAST, pathid);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUNDLAST, pathid);
                 return false;
             }
 
@@ -1056,8 +1048,7 @@ public:
             PreparedQueryResult result = WorldDatabase.Query(stmt);
             if (!result)
             {
-                handler->SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_WAYPOINT_VP_NOTFOUND);
                 return false;
             }
 

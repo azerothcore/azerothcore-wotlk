@@ -16,14 +16,15 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
  // Theirs
 
@@ -158,7 +159,7 @@ public:
                     if (Mrfloppy->isDead())
                     {
                         me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                        Mrfloppy->setDeathState(ALIVE);
+                        Mrfloppy->setDeathState(DeathState::Alive);
                         Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                         Talk(SAY_VICTORY3);
                     }
@@ -918,7 +919,8 @@ public:
                     player->AddAura(SPELL_WARTS, player);
                 else
                 {
-                    DoCast(player, SPELL_FROG_KISS); // Removes SPELL_WARTSBGONE_LIP_BALM
+                    // Removes SPELL_WARTSBGONE_LIP_BALM
+                    player->CastSpell(player, SPELL_FROG_KISS, true);
 
                     if (me->GetEntry() == NPC_LAKE_FROG)
                     {
@@ -1298,6 +1300,30 @@ public:
     }
 };
 
+// 62536 - Frog Kiss
+class spell_frog_kiss : public SpellScript
+{
+    PrepareSpellScript(spell_frog_kiss);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARTSBGONE_LIP_BALM });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->RemoveAurasDueToSpell(SPELL_WARTSBGONE_LIP_BALM);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_frog_kiss::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_grizzly_hills()
 {
     // Theirs
@@ -1319,4 +1345,6 @@ void AddSC_grizzly_hills()
     new spell_warhead_fuse();
     RegisterSpellScript(spell_q12227_outhouse_groans);
     RegisterSpellScript(spell_q12227_camera_shake);
+    RegisterSpellScript(spell_frog_kiss);
 }
+

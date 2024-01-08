@@ -45,6 +45,7 @@ enum DataTypes
     DATA_ALIVE_KEEPERS                      = 22,
     DATA_BRIDGE_ACTIVATED                   = 23,
     DATA_ACTIVATE_SHIELD                    = 24,
+    DATA_STRANGE_POOL                       = 25
 };
 
 enum SSNPCs
@@ -53,7 +54,12 @@ enum SSNPCs
     NPC_THE_LURKER_BELOW                    = 21217,
     NPC_LEOTHERAS_THE_BLIND                 = 21215,
     NPC_CYCLONE_KARATHRESS                  = 22104,
+    NPC_FATHOM_LORD_KARATHRESS              = 21214,
     NPC_LADY_VASHJ                          = 21212,
+
+    NPC_FATHOM_GUARD_SHARKKIS               = 21966,
+    NPC_FATHOM_GUARD_TIDALVESS              = 21965,
+    NPC_FATHOM_GUARD_CARIBDIS               = 21964,
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
@@ -72,7 +78,9 @@ enum SSNPCs
     GO_SHIELD_GENERATOR1                    = 185051,
     GO_SHIELD_GENERATOR2                    = 185052,
     GO_SHIELD_GENERATOR3                    = 185053,
-    GO_SHIELD_GENERATOR4                    = 185054
+    GO_SHIELD_GENERATOR4                    = 185054,
+
+    GO_STRANGE_POOL                         = 184956
 };
 
 enum SSSpells
@@ -81,6 +89,12 @@ enum SSSpells
     SPELL_RAMPART_INFECTION                 = 39042,
     SPELL_SCALDING_WATER                    = 37284,
     SPELL_FRENZY_WATER                      = 37026
+};
+
+enum KeeperCount
+{
+  MIN_KEEPER_COUNT = 0,
+  MAX_KEEPER_COUNT = 24
 };
 
 template <class AI, class T>
