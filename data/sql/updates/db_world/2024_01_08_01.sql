@@ -1,3 +1,4 @@
+-- DB update 2024_01_08_00 -> 2024_01_08_01
 -- Fix Midsummer Bonfire gossip menu option conditions
 DELETE FROM `conditions` WHERE (`SourceGroup` IN (9381, 9406, 9372, 9358, 9356, 9375, 9366, 9370, 9377, 9382, 9380, 9376, 9363, 9361, 9367, 9359, 9374, 9360, 9371, 9383, 9369, 9373, 9368, 9365, 9378, 9357, 9379, 9364, 9362)) AND (`SourceTypeOrReferenceId` = 15) AND (`ConditionTypeOrReference` = 8);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
