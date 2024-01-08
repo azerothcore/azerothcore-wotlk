@@ -66,7 +66,7 @@ enum Spells
 
 enum Say
 {
-    SOULS_LICH_KING_RAND_WHISPER = 5
+    SAY_SOULS_LICH_KING_RAND_WHISPER = 5
 };
 
 BossBoundaryData const boundaries =
@@ -1704,7 +1704,7 @@ public:
                         {
                             if (Creature* theLichKing = instance->GetCreature(TheLichKingLhGUID))
                             {
-                                theLichKing->AI()->Talk(SOULS_LICH_KING_RAND_WHISPER, player);
+                                theLichKing->AI()->Talk(SAY_SOULS_LICH_KING_RAND_WHISPER, player);
                             }
                         }
             }
