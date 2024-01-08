@@ -148,7 +148,7 @@ struct boss_nightbane : public BossAI
             context.Repeat(10s);
         }).Schedule(1500ms, GROUP_GROUND, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_CLEAVE);
+            DoCastVictim(SPELL_CLEAVE);
             context.Repeat(1500ms, 45s);
         });
     }
