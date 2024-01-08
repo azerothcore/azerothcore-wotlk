@@ -686,6 +686,10 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     }
     // all item positions resolved
 
+    // ensure player starts with full health
+    UpdateAllStats();
+    SetFullHealth();
+
     CheckAllAchievementCriteria();
 
     return true;
