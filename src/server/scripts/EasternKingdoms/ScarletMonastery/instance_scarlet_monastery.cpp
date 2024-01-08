@@ -497,15 +497,15 @@ public:
         void ScheduleGround()
         {
             _scheduler.Schedule(1s, 5s, [this](TaskContext context)
-                {
-                    DoCastVictim(SPELL_CRUSADER_STRIKE);
-                    context.Repeat(10s);
-                })
+            {
+                DoCastVictim(SPELL_CRUSADER_STRIKE);
+                context.Repeat(10s);
+            })
                 .Schedule(6s, 11s, [this](TaskContext context)
-                    {
-                        DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
-                        context.Repeat(60s);
-                    });
+            {
+                DoCastVictim(SPELL_HAMMER_OF_JUSTICE);
+                context.Repeat(60s);
+            });
         }
 
         void Reset() override
@@ -551,9 +551,9 @@ public:
             Talk(SAY_MO_AGGRO);
             DoCastSelf(SPELL_RETRIBUTION_AURA);
             _scheduler.Schedule(1s, [this](TaskContext)
-                {
-                    PullCathedral();
-                });
+            {
+                PullCathedral();
+            });
             ScheduleGround();
         }
 
@@ -599,25 +599,25 @@ public:
 
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (instance)
-            {
+            if (!instance)
+                return;
+
                 // When hit with resurrection say text
-                if (spell->Id == SPELL_SCARLET_RESURRECTION)
-                {
-                    instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
-                    events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
-                }
-                else
-                    if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)// Ashbringer Event
-                    {
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->GetMotionMaster()->MoveIdle();
-                        _playerWhoStartedAshbringer = who->ToPlayer();
-                        // Standing delay inside the cathedral
-                        SayAshbringer = true;
-                        events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
-                        events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
-                    }
+            if (spell->Id == SPELL_SCARLET_RESURRECTION)
+            {
+                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
+                events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
+            }
+
+            if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)// Ashbringer Event
+            {
+                me->SetFaction(FACTION_FRIENDLY);
+                me->GetMotionMaster()->MoveIdle();
+                _playerWhoStartedAshbringer = who->ToPlayer();
+                // Standing delay inside the cathedral
+                SayAshbringer = true;
+                events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
+                events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
             }
         }
 
@@ -809,12 +809,12 @@ public:
                                 events.Repeat(1200ms);
                                 break;
                             }
-                            else
-                                if (me->GetExactDist2d(target) < 5.0f)
-                                {
-                                    events.Repeat(4500ms, 5s);
-                                    break;
-                                }
+
+                            if (me->GetExactDist2d(target) < 5.0f)
+                            {
+                                events.Repeat(4500ms, 5s);
+                                break;
+                            }
                         }
                         events.Repeat(2600ms, 3000ms);
                         break;
@@ -826,15 +826,15 @@ public:
                             events.Repeat(22s, 35s);
                             break;
                         }
-                        else
-                            if (Unit* target = DoSelectLowestHpFriendly(40.0f))
+
+                        if (Unit* target = DoSelectLowestHpFriendly(40.0f))
+                        {
+                            if (DoCast(target, SPELL_POWER_WORD_SHIELD) == SPELL_CAST_OK)
                             {
-                                if (DoCast(target, SPELL_POWER_WORD_SHIELD) == SPELL_CAST_OK)
-                                {
-                                    events.Repeat(22s, 35s);
-                                    break;
-                                }
+                                events.Repeat(22s, 35s);
+                                break;
                             }
+                        }
                         events.Repeat(1s);
                         break;
                     case EVENT_SPELL_HEAL:
