@@ -63,7 +63,7 @@ public:
 
         void Reset() override
         {
-            if (!m_uiPhase)
+            if (!_uiPhase)
             {
                 me->SetReactState(REACT_DEFENSIVE);
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
@@ -72,7 +72,7 @@ public:
 
         void JustReachedHome() override
         {
-            if (m_uiPhase)
+            if (_uiPhase)
                 events.ScheduleEvent(EVENT_EMOTE, 2500ms);
             else
                 events.ScheduleEvent(EVENT_END, 3min);
@@ -80,7 +80,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            m_uiPhase = 0;
+            _uiPhase = 0;
             events.Reset();
         }
 
@@ -97,7 +97,7 @@ public:
 
             if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
             {
-                m_uiPlayerGUID = pDoneBy->GetGUID();
+                _uiPlayerGUID = pDoneBy->GetGUID();
             }
             else if (pDoneBy->IsPet())
             {
@@ -106,7 +106,7 @@ public:
                     // not sure if this is needed.
                     if (owner->GetTypeId() == TYPEID_PLAYER)
                     {
-                        m_uiPlayerGUID = owner->GetGUID();
+                        _uiPlayerGUID = owner->GetGUID();
                     }
                 }
             }
@@ -114,9 +114,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!m_uiPhase && me->HealthBelowPct(30))
+            if (!_uiPhase && me->HealthBelowPct(30))
             {
-                m_uiPhase = 1;
+                _uiPhase = 1;
                 me->RestoreFaction();
                 me->RemoveAllAuras();
                 me->CombatStop(true);
@@ -129,7 +129,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_EMOTE:
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _uiPlayerGUID))
                             me->SetFacingToObject(player);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
                         events.ScheduleEvent(EVENT_TALK, 4s);
@@ -143,7 +143,7 @@ public:
                         //Sniffing is used with spell 7737, but this will immediately interrupt the visual effect of eating
                         //It seems that Blizzard forgot to take this move into EVENT_END events
                         me->SetStandState(UNIT_STAND_STATE_STAND);
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_uiPlayerGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _uiPlayerGUID))
                             player->AreaExploredOrEventHappens(QUEST_590);
                         events.ScheduleEvent(EVENT_END, 12900ms);
                         break;
@@ -152,8 +152,8 @@ public:
                         me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         me->SetSheath(SHEATH_STATE_MELEE);
-                        m_uiPlayerGUID.Clear();
-                        m_uiPhase = 0;
+                        _uiPlayerGUID.Clear();
+                        _uiPhase = 0;
                         me->GetMotionMaster()->Initialize();
                         events.Reset();
                         break;
@@ -164,13 +164,15 @@ public:
 
             if (!UpdateVictim())
                 return;
+
             DoMeleeAttackIfReady();
         }
 
     private:
-        uint32 m_uiPhase = 0;
-        ObjectGuid m_uiPlayerGUID;
+        uint32 _uiPhase = 0;
+        ObjectGuid _uiPlayerGUID;
     };
+
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_calvin_montagueAI(creature);
