@@ -90,10 +90,10 @@ public:
             {
                 // case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
                 case DOOR_HIGH_INQUISITOR_ID:
-                    DoorHighInquisitorGUID = go->GetGUID();
+                    _doorHighInquisitorGUID = go->GetGUID();
                     break;
                 case DOOR_CHAPEL:
-                    DoorChapelGUID = go->GetGUID();
+                    _doorChapelGUID = go->GetGUID();
                     break;
                 default:
                     break;
@@ -114,14 +114,14 @@ public:
                 case NPC_SCARLET_CHAMPION:
                 case NPC_SCARLET_CHAPLAIN:
                 case NPC_FAIRBANKS:
-                    AshbringerNpcGUID.emplace(creature->GetGUID());
+                    _ashbringerNpcGUID.emplace(creature->GetGUID());
                     break;
                 case NPC_COMMANDER_MOGRAINE:
-                    MograineGUID = creature->GetGUID();
-                    AshbringerNpcGUID.emplace(creature->GetGUID());
+                    _mograineGUID = creature->GetGUID();
+                    _ashbringerNpcGUID.emplace(creature->GetGUID());
                     break;
                 case NPC_INQUISITOR_WHITEMANE:
-                    WhitemaneGUID = creature->GetGUID();
+                   _whitemaneGUID = creature->GetGUID();
                     break;
                 default:
                     break;
@@ -135,14 +135,17 @@ public:
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        DoUseDoorOrButton(DoorHighInquisitorGUID);
-                        encounter = IN_PROGRESS;
+                        DoUseDoorOrButton(_doorHighInquisitorGUID);
+                        _encounter = IN_PROGRESS;
                     }
                     if (data == FAIL)
                     {
-                        Creature* Whitemane = instance->GetCreature(WhitemaneGUID);
-                        Creature* Mograine = instance->GetCreature(MograineGUID);
-                        if (!Mograine || !Whitemane)
+                        Creature* Whitemane = instance->GetCreature(_whitemaneGUID);
+                        if (!Whitemane)
+                            return;
+
+                        Creature* Mograine = instance->GetCreature(_mograineGUID);
+                        if (!Mograine)
                             return;
 
                         if (Whitemane->IsAlive() && Mograine->IsAlive())
@@ -152,7 +155,7 @@ public:
                                 Whitemane->DespawnOnEvade(30s);
 
                             Mograine->DespawnOnEvade(30s);
-                            encounter = NOT_STARTED;
+                            _encounter = NOT_STARTED;
                             return;
                         }
 
@@ -160,50 +163,50 @@ public:
                         if (!Whitemane->IsAlive())
                         {
                             Mograine->DespawnOrUnsummon();
-                            encounter = data;
+                            _encounter = data;
                             return;
                         }
 
                         if (Whitemane->IsAlive() && !Mograine->IsAlive())
                         {
                             Whitemane->DespawnOnEvade(30s);
-                            encounter = data;
+                            _encounter = data;
                             return;
                         }
 
-                        encounter = data;
+                        _encounter = data;
                     }
                     if (data == SPECIAL)
-                        encounter = SPECIAL;
+                        _encounter = SPECIAL;
                     break;
                 case TYPE_ASHBRINGER_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        if (Creature* Mograine = instance->GetCreature(WhitemaneGUID))
+                        if (Creature* Mograine = instance->GetCreature(_whitemaneGUID))
                             if (Mograine->IsAlive() && !Mograine->IsInCombat())
                                 Mograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
 
                         // the ashbringer incident did not sniff out any data from whitemane
-                        if (Creature* whitemane = instance->GetCreature(WhitemaneGUID))
+                        if (Creature* whitemane = instance->GetCreature(_whitemaneGUID))
                             if (whitemane->IsAlive() && !whitemane->IsInCombat())
                                 whitemane->DespawnOrUnsummon();
 
-                        if (GameObject* go = instance->GetGameObject(DoorChapelGUID))
+                        if (GameObject* go = instance->GetGameObject(_doorChapelGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                             go->SetLootState(GO_ACTIVATED);
                             go->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
-                        for (auto const& scarletCathedralNpcGuid : AshbringerNpcGUID)
+                        for (auto const& scarletCathedralNpcGuid : _ashbringerNpcGUID)
                             if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
                                 if (scarletNpc->IsAlive() && !scarletNpc->IsInCombat())
                                     scarletNpc->SetFaction(FACTION_FRIENDLY);
                     }
-                    ashencounter = data;
+                    _ashencounter = data;
                     break;
                 case DATA_HORSEMAN_EVENT:
-                    encounter = data;
+                    _encounter = data;
                     break;
                 default:
                     break;
@@ -215,13 +218,13 @@ public:
             switch (type)
             {
                 case DATA_MOGRAINE:
-                    return MograineGUID;
+                    return _mograineGUID;
                 case DATA_WHITEMANE:
-                    return WhitemaneGUID;
+                    return _whitemaneGUID;
                 case DATA_DOOR_WHITEMANE:
-                    return DoorHighInquisitorGUID;
+                    return _doorHighInquisitorGUID;
                 case DATA_DOOR_CHAPEL:
-                    return DoorChapelGUID;
+                    return _doorChapelGUID;
                 default:
                     return ObjectGuid::Empty;
                     break;
@@ -233,13 +236,13 @@ public:
             switch (type)
             {
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
-                    return encounter;
+                    return _encounter;
                     break;
                 case DATA_HORSEMAN_EVENT:
-                    return encounter;
+                    return _encounter;
                     break;
                 case TYPE_ASHBRINGER_EVENT:
-                    return ashencounter;
+                    return _ashencounter;
                     break;
                 default:
                     return 0;
@@ -247,13 +250,13 @@ public:
             }
         }
     private:
-        ObjectGuid DoorHighInquisitorGUID;
-        ObjectGuid DoorChapelGUID;
-        ObjectGuid MograineGUID;
-        ObjectGuid WhitemaneGUID;
-        uint32 encounter{};
-        uint32 ashencounter{};
-        GuidSet AshbringerNpcGUID;
+        ObjectGuid _doorHighInquisitorGUID;
+        ObjectGuid _doorChapelGUID;
+        ObjectGuid _mograineGUID;
+        ObjectGuid _whitemaneGUID;
+        uint32 _encounter{};
+        uint32 _ashencounter{};
+        GuidSet _ashbringerNpcGUID;
     };
 };
 
@@ -377,7 +380,7 @@ enum Says
 };
 
 float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
-Position const summonedMograinePos = { 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f };
+Position const SummonedMograinePos = { 1033.4642f, 1399.1022f, 27.337427f, 6.257956981658935546f };
 
 class npc_mograine : public CreatureScript
 {
@@ -388,7 +391,7 @@ public:
     {
         npc_mograineAI(Creature* creature) : ScriptedAI(creature)
         {
-            instance = creature->GetInstanceScript();
+            _instance = creature->GetInstanceScript();
         }
 
         void AshbringerEvent(uint32 eventId)
@@ -410,7 +413,7 @@ public:
                     me->AI()->Talk(SAY_MO_AB_TALK3, _playerWhoStartedAshbringer);
                     break;
                 case EVENT_SUMMONED_HIGHLORD_MOGRAINE:
-                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, summonedMograinePos, TEMPSUMMON_TIMED_DESPAWN, 120000))
+                    if (Creature* summonedMograine = me->SummonCreature(NPC_HIGHLORD_MOGRAINE, SummonedMograinePos, TEMPSUMMON_TIMED_DESPAWN, 120000))
                     {
                         summonedMograine->SetFaction(FACTION_FRIENDLY);
                         summonedMograine->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, EQUIP_UNEQUIP);
@@ -520,15 +523,13 @@ public:
             {
                 summonedMograine->DespawnOrUnsummon();
             }
-            SayAshbringer = false;
+            _sayAshbringer = false;
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            if (instance)
-            {
-                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
-            }
+            if (_instance)
+                _instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -559,16 +560,16 @@ public:
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage > me->GetHealth() && instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) != SPECIAL && _fakeDeath)
+            if (damage > me->GetHealth() && _instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) != SPECIAL && _fakeDeath)
                 damage = 0;
 
             // On first death, fake death and open door, as well as initiate whitemane if exist
             if (damage > me->GetHealth() && !_fakeDeath)
             {
                 // On first death, fake death and open door, as well as initiate whitemane if exist
-                if (Creature* Whitemane = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE)))
+                if (Creature* Whitemane = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                 {
-                    instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
+                    _instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
                     Whitemane->AI()->Talk(SAY_WH_INTRO, me);
                     float fx, fy, fz;
                     me->GetContactPoint(Whitemane, fx, fy, fz, 5.0f);
@@ -593,56 +594,56 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !SayAshbringer)
+            if (victim->GetTypeId() == TYPEID_PLAYER && !_sayAshbringer)
                 Talk(SAY_MO_KILL);
         }
 
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (!instance)
+            if (!_instance)
                 return;
 
                 // When hit with resurrection say text
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
             {
-                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
-                events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
+                _instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
+                _events.ScheduleEvent(EVENT_RESURRECTED, 3500ms);
             }
 
-            if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)// Ashbringer Event
+            if (who && spell->Id == AB_EFFECT_000 && !_sayAshbringer)// Ashbringer Event
             {
                 me->SetFaction(FACTION_FRIENDLY);
                 me->GetMotionMaster()->MoveIdle();
                 _playerWhoStartedAshbringer = who->ToPlayer();
                 // Standing delay inside the cathedral
-                SayAshbringer = true;
-                events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
-                events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
+                _sayAshbringer = true;
+                _events.ScheduleEvent(EVENT_MOGRAINE_FACING_PLAYER, 0ms);
+                _events.ScheduleEvent(EVENT_SUMMONED_HIGHLORD_MOGRAINE, 20ms);
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (SayAshbringer)
+            if (_sayAshbringer)
             {
-                events.Update(diff);
-                while (uint32 eventId = events.ExecuteEvent())
+                _events.Update(diff);
+                while (uint32 eventId = _events.ExecuteEvent())
                 {
                     AshbringerEvent(eventId);
                 }
             }
 
-            if (!UpdateVictim() || SayAshbringer)
+            if (!UpdateVictim() || _sayAshbringer)
                 return;
 
             _scheduler.Update(diff);
 
-            events.Update(diff);
+            _events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 eventId = _events.ExecuteEvent())
             {
                 switch (eventId)
                 {
@@ -652,23 +653,23 @@ public:
                         me->InterruptNonMeleeSpells(false);
                         // How do I get rid of the animation from UNIT_STAND_STATE_DEAD to UNIT_STAND_STATE_STAND?
                         me->SetStandState(UNIT_STAND_STATE_STAND);
-                        events.ScheduleEvent(EVENT_SPELL_LAY_ON_HANDS, 0s);
+                        _events.ScheduleEvent(EVENT_SPELL_LAY_ON_HANDS, 0s);
                         break;
                     case EVENT_SPELL_LAY_ON_HANDS:
-                        if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
+                        if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             if (Whitemane->IsAlive())
                                 me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);
                             Talk(SAY_MO_RESURRECTED, Whitemane);
                         }
-                        events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
+                        _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
                         break;
                     case EVENT_MOGRAINE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                        events.ScheduleEvent(EVENT_MOVE, 3000ms);
+                        _events.ScheduleEvent(EVENT_MOVE, 3000ms);
                         break;
                     case EVENT_MOVE:
-                        if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
+                        if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             float fx, fy, fz;
@@ -685,10 +686,10 @@ public:
         }
 
     private:
-        bool SayAshbringer = false;
+        bool _sayAshbringer = false;
         bool _fakeDeath = false;
-        EventMap events;
-        InstanceScript* instance;
+        EventMap _events;
+        InstanceScript* _instance;
         TaskScheduler _scheduler;
         Player* _playerWhoStartedAshbringer = nullptr;
     };
@@ -708,7 +709,7 @@ public:
     {
         boss_high_inquisitor_whitemaneAI(Creature* creature) : ScriptedAI(creature)
         {
-            instance = creature->GetInstanceScript();
+            _instance = creature->GetInstanceScript();
         }
 
         void Reset() override
@@ -716,23 +717,21 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             _victimbuff = nullptr;
             events.Reset();
-            _Phase = 0;
+            _phase = 0;
         }
 
         void JustRespawned() override
         {
-            if (instance)
-                instance->DoUseDoorOrButton(instance->GetGuidData(DATA_DOOR_WHITEMANE));
+            if (_instance)
+                _instance->DoUseDoorOrButton(_instance->GetGuidData(DATA_DOOR_WHITEMANE));
 
             ScriptedAI::JustRespawned();
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            if (instance)
-            {
-                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
-            }
+            if (_instance)
+                _instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -747,7 +746,7 @@ public:
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // The player cannot kill her until she is releashed. Retain at least 1 life
-            if (_Phase != 2 && damage >= me->GetHealth())
+            if (_phase != 2 && damage >= me->GetHealth())
             {
                 damage = 0;
                 me->SetHealth(1);
@@ -765,9 +764,9 @@ public:
                 // Use don't know why use me->GetVictim() Unable to get the target
                 if (_victimbuff && _victimbuff->HasAura(SPELL_DEEP_SLEEP))
                     // Wait 5 seconds to revive while the debuff is still present on the player
-                    events.ScheduleEvent(EVENT_RESURRECT, 5s);
+                    _events.ScheduleEvent(EVENT_RESURRECT, 5s);
                 else
-                    events.ScheduleEvent(EVENT_RESURRECT, 1s);
+                    _events.ScheduleEvent(EVENT_RESURRECT, 1s);
             }
         }
 
@@ -782,19 +781,19 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            _events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (_Phase == 0 && me->HealthBelowPct(50))
+            if (_phase == 0 && me->HealthBelowPct(50))
             {
-                events.Reset();
-                _Phase = 1;
-                events.ScheduleEvent(EVENT_SLEEP, 0ms);
+                _events.Reset();
+                _phase = 1;
+                _events.ScheduleEvent(EVENT_SLEEP, 0ms);
             }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 eventId = _events.ExecuteEvent())
             {
                 switch (eventId)
                 {
@@ -806,24 +805,24 @@ public:
                             if (DoCast(target, SPELL_HOLY_SMITE) != SPELL_CAST_OK)
                             {
                                 me->GetMotionMaster()->MoveChase(target);
-                                events.Repeat(1200ms);
+                                _events.Repeat(1200ms);
                                 break;
                             }
 
                             if (me->GetExactDist2d(target) < 5.0f)
                             {
-                                events.Repeat(4500ms, 5s);
+                                _events.Repeat(4500ms, 5s);
                                 break;
                             }
                         }
-                        events.Repeat(2600ms, 3000ms);
+                        _events.Repeat(2600ms, 3000ms);
                         break;
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
                         // Since mograine has 0 HP, the DoSelectLowestHpFriendly function will always try to use it on him, not on himself
-                        if (_Phase != 2)
+                        if (_phase != 2)
                         {
                             DoCast(me, SPELL_POWER_WORD_SHIELD);
-                            events.Repeat(22s, 35s);
+                            _events.Repeat(22s, 35s);
                             break;
                         }
 
@@ -831,11 +830,11 @@ public:
                         {
                             if (DoCast(target, SPELL_POWER_WORD_SHIELD) == SPELL_CAST_OK)
                             {
-                                events.Repeat(22s, 35s);
+                                _events.Repeat(22s, 35s);
                                 break;
                             }
                         }
-                        events.Repeat(1s);
+                       _events.Repeat(1s);
                         break;
                     case EVENT_SPELL_HEAL:
                         if (Unit* target = DoSelectLowestHpFriendly(40.0f))
@@ -843,11 +842,11 @@ public:
                             if (target->HealthBelowPct(75))
                             {
                                 DoCast(target, SPELL_HEAL);
-                                events.Repeat(17500ms, 20s);
+                                _events.Repeat(17500ms, 20s);
                                 break;
                             }
                         }
-                        events.Repeat(5s);
+                        _events.Repeat(5s);
                         break;
                     case EVENT_SPELL_DOMINATE_MIND:
                         // The list of hates is greater than 1
@@ -858,12 +857,12 @@ public:
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                                 {
                                     DoCast(target, SPELL_DOMINATE_MIND);
-                                    events.Repeat(20s, 30s);
+                                    _events.Repeat(20s, 30s);
                                     break;
                                 }
                             }
                         }
-                        events.Repeat(10s);
+                        _events.Repeat(10s);
                         break;
                     case EVENT_SLEEP:
                         // This saves the target's "SLEEP" buff after the move is complete
@@ -872,7 +871,7 @@ public:
                         DoCast(SPELL_DEEP_SLEEP);
                         me->AttackStop();
 
-                        if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
+                        if (Creature* mograine = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_MOGRAINE)))
                         {
                             if (me->GetDistance(mograine) > 0.5f)
                             {
@@ -882,30 +881,30 @@ public:
                                 break;
                             }
                         }
-                        events.ScheduleEvent(EVENT_RESURRECT, 5s);
+                        _events.ScheduleEvent(EVENT_RESURRECT, 5s);
                         break;
                     case EVENT_RESURRECT:
-                        if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
+                        if (Creature* mograine = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_MOGRAINE)))
                         {
                             DoCast(mograine, SPELL_SCARLET_RESURRECTION);
                         }
                         me->SetSheath(SHEATH_STATE_UNARMED);
-                        events.ScheduleEvent(EVENT_SAY, 3400ms);
+                        _events.ScheduleEvent(EVENT_SAY, 3400ms);
                         break;
                     case  EVENT_SAY:
                         Talk(SAY_WH_RESURRECT);
-                        events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1400ms);
+                        _events.ScheduleEvent(EVENT_WHITEMANE_EMOTE, 1400ms);
                         break;
                     case EVENT_WHITEMANE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                        _Phase = 2;
-                        events.ScheduleEvent(EVENT_DEALY_ATTACK, 3200ms);
+                        _phase = 2;
+                        _events.ScheduleEvent(EVENT_DEALY_ATTACK, 3200ms);
                         break;
                     case EVENT_DEALY_ATTACK:
                         me->SetReactState(REACT_AGGRESSIVE);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
-                        events.ScheduleEvent(EVENT_SPELL_HEAL, 15s);
-                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 10s);
+                        _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
+                        _events.ScheduleEvent(EVENT_SPELL_HEAL, 15s);
+                        _events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 10s);
                         break;
                     default:
                         break;
@@ -916,10 +915,10 @@ public:
         }
 
     private:
-        InstanceScript* instance;
+        InstanceScript* _instance;
         Unit* _victimbuff = nullptr;
-        EventMap events;
-        uint8 _Phase{};
+        EventMap _events;
+        uint8 _phase{};
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -939,13 +938,13 @@ public:
 
         void Reset() override
         {
-            SayAshbringer = false;
+            _SayAshbringer = false;
         }
 
         // Ready to move to SmartAI
         void SpellHit(Unit* who, SpellInfo const* spell) override
         {
-            if (who && spell->Id == AB_EFFECT_000 && !SayAshbringer)
+            if (who && spell->Id == AB_EFFECT_000 && !_SayAshbringer)
             {
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetFacingToObject(who);
@@ -955,12 +954,12 @@ public:
                 // delay 10ms
                 me->SetDisplayId(MODEL_FAIRBANKS);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                SayAshbringer = true;
+                _SayAshbringer = true;
             }
         }
 
     private:
-        bool SayAshbringer = false;
+        bool _SayAshbringer = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
