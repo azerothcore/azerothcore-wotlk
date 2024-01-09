@@ -1,4 +1,8 @@
 -- Update gameobject 180045 'Stormwind Gypsy Wagon' with sniffed values
+
+-- remaining spawns (no sniffed values available)
+-- (`guid` IN (14004, 13837, 31876, 31919, 29934, 29953, 29966))
+
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 180045) AND (`guid` IN (121696, 121697, 121698, 28543, 28556, 28588, 5833, 5843, 5846));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
@@ -11,6 +15,3 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (5833, 180045, 530, 0, 0, 1, 1, -2277.489501953125, 5228.88525390625, -9.97542953491210937, 4.398232460021972656, 0, 0, -0.80901622772216796, 0.587786316871643066, 120, 255, 1, "", 49345, NULL),
 (5843, 180045, 530, 0, 0, 1, 1, -2268.447998046875, 5238.1875, -9.97545337677001953, 3.595378875732421875, 0, 0, -0.97437000274658203, 0.224951311945915222, 120, 255, 1, "", 49345, NULL),
 (5846, 180045, 530, 0, 0, 1, 1, -2261.482666015625, 5193.23291015625, -10.0657358169555664, 6.14356088638305664, 0, 0, -0.06975555419921875, 0.997564136981964111, 120, 255, 1, "", 49345, NULL);
-
--- remaining spawns (no sniffed values available)
--- (`guid` IN (14004, 13837, 31876, 31919, 29934, 29953, 29966))
