@@ -1,3 +1,4 @@
+-- DB update 2024_01_08_03 -> 2024_01_11_00
 -- Update creature 28344 'Blazzle' with sniffed values
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` = 28344) AND (`guid` IN (116));
