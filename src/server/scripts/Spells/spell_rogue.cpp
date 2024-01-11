@@ -746,7 +746,13 @@ class spell_rog_vanish : public SpellScript
         if (GetCaster())
         {
             if (!GetCaster()->HasAura(SPELL_STEALTH))
+            {
+                // Remove stealth cooldown if needed.
+                if (GetCaster()->IsPlayer() && GetCaster()->HasSpellCooldown(SPELL_STEALTH))
+                    GetCaster()->ToPlayer()->RemoveSpellCooldown(SPELL_STEALTH);
+
                 GetCaster()->CastSpell(GetCaster(), SPELL_STEALTH, true);
+            }
 
             if (GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
                 GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
