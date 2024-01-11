@@ -745,6 +745,8 @@ class spell_rog_vanish : public SpellScript
     {
         if (GetCaster())
         {
+            GetCaster()->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
+
             if (!GetCaster()->HasAura(SPELL_STEALTH))
             {
                 // Remove stealth cooldown if needed.
