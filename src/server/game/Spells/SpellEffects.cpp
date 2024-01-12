@@ -809,23 +809,6 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
                     break;
                 }
-            // Vanish (not exist)
-            case 18461:
-                {
-                    unitTarget->RemoveMovementImpairingAuras(true);
-                    unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
-
-                    // See if we already are stealthed. If so, we're done.
-                    if (unitTarget->HasAura(1784))
-                        return;
-
-                    // Reset cooldown on stealth if needed
-                    if (unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->ToPlayer()->HasSpellCooldown(1784))
-                        unitTarget->ToPlayer()->RemoveSpellCooldown(1784);
-
-                    unitTarget->CastSpell(unitTarget, 1784, true);
-                    return;
-                }
             // Demonic Empowerment -- succubus
             case 54437:
                 {
@@ -4079,18 +4062,6 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
 
     // Xinef: Set last sanctuary time
     unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS().count();
-
-    // Vanish allows to remove all threat and cast regular stealth so other spells can be used
-    if (m_caster->GetTypeId() == TYPEID_PLAYER
-            && m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE
-            && (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VANISH))
-    {
-        m_caster->ToPlayer()->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
-
-        //Clean Escape
-        if (m_caster->HasAura(23582))
-            m_caster->CastSpell(m_caster, 23583, true);
-    }
 }
 
 void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
