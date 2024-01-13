@@ -133,7 +133,7 @@ public:
     virtual void OnLogin(Player* /*player*/) { }
 
     // Called before the player is logged out
-    virtual void OnPreLogout(Player* /*player*/) { }
+    virtual void OnBeforeLogout(Player* /*player*/) { }
 
     // Called when a player logs out.
     virtual void OnLogout(Player* /*player*/) { }
