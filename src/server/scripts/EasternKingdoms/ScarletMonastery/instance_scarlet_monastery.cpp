@@ -399,12 +399,12 @@ public:
             {
                 case EVENT_MOGRAINE_FACING_PLAYER:
                     me->SetFacingToObject(_playerWhoStartedAshbringer);
-                    events.ScheduleEvent(EVENT_MOGRAINE_KNEEL, 1s, 3s);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_KNEEL, 1s, 3s);
                     break;
                 case EVENT_MOGRAINE_KNEEL:
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
                     break;
                 case EVENT_MOGRAINE_EMOTE_TALK3:
                     me->AI()->Talk(SAY_MO_AB_TALK3, _playerWhoStartedAshbringer);
@@ -418,55 +418,55 @@ public:
                         // Sniffing data shows the use of this spell transformation, but the dispersion effect of this spell is not seen in the video
                         summonedMograine->CastSpell(summonedMograine, SPELL_MOGRAINE_COMETH_DND);
                     }
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48500ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_MOVE_STOP, 48500ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_MOVE_STOP:
                     summonedMograine->StopMovingOnCurrentPos();
                     summonedMograine->AI()->Talk(SAY_HM_AB_TALK0, 200ms);
-                    events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3000ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE, 3000ms);
                     break;
                 case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE:
                     me->SetFacingToObject(summonedMograine);
-                    events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 400ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_UNIT_STAND_STATE_STAND, 400ms);
                     break;
                 case EVENT_MOGRAINE_UNIT_STAND_STATE_STAND:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetSheath(SHEATH_STATE_MELEE);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 800ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 800ms);
                     break;
                 case EVENT_MOGRAINE_EMOTE_TALK4:
                     me->AI()->Talk(SAY_MO_AB_TALK4, 200ms);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4600ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4600ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
                     summonedMograine->AI()->Talk(SAY_HM_AB_TALK1, me);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3400ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3400ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE1:
                     summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3200ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE2, 3200ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE2:
                     summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3200ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE3, 3200ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE3:
                     summonedMograine->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3200ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2, 3200ms);
                     break;
                 case EVENT_MOGRAINE_FACING_HIGHLORD_MOGRAINE2:
                     me->SetFacingToObject(summonedMograine);
-                    events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1200ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1200ms);
                     break;
                 case EVENT_MOGRAINE_EMOTE_TALK5:
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->AI()->Talk(SAY_MO_AB_TALK5, 200ms);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3000ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3000ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
                     // In Blizzard's servers, after "HIGHLORD_MOGRAINE" uses this spell, "MOGRAINE" will have a visual effect of lightning hits, and the visual effect after the hit is missing here and needs to be fixed
                     summonedMograine->CastSpell(me, SPELL_FORGIVENESS);
-                    events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1000ms);
+                    _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE, 1000ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_KILL_MOGRAINE:
                     me->KillSelf();
@@ -513,7 +513,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            events.Reset();
+            _events.Reset();
             _fakeDeath = false;
             _scheduler.CancelAll();
             if (Creature* summonedMograine = me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 100.0f))
@@ -713,7 +713,7 @@ public:
         {
             me->SetReactState(REACT_AGGRESSIVE);
             _victimbuff = nullptr;
-            events.Reset();
+            _events.Reset();
             _phase = 0;
         }
 
@@ -733,11 +733,11 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
-            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 22s, 45s);
+            _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 10ms);
+            _events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 22s, 45s);
             // This spell was not used during the single-player test on the Blizzard server,
             // it should take 2 people, and the chance of using it should be low
-            events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND, 5s, 10s);
+            _events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND, 5s, 10s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
