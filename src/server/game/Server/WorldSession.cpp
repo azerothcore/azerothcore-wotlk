@@ -580,7 +580,7 @@ void WorldSession::LogoutPlayer(bool save)
     if (_player)
     {
         //! Call script hook before other logout events
-        sScriptMgr->OnPlayerBeforeLogout(_player);
+        sScriptMgr->OnBeforePlayerLogout(_player);
 
         if (ObjectGuid lguid = _player->GetLootGUID())
             DoLootRelease(lguid);
