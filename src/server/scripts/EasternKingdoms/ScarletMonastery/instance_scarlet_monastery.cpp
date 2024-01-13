@@ -182,10 +182,6 @@ public:
                 case TYPE_ASHBRINGER_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        if (Creature* Mograine = instance->GetCreature(_whitemaneGUID))
-                            if (Mograine->IsAlive() && !Mograine->IsInCombat())
-                                Mograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO);
-
                         // the ashbringer incident did not sniff out any data from whitemane
                         if (Creature* whitemane = instance->GetCreature(_whitemaneGUID))
                             if (whitemane->IsAlive() && !whitemane->IsInCombat())
@@ -271,13 +267,15 @@ public:
             return false;
 
         InstanceScript* instance = player->GetInstanceScript();
-        if (instance && instance->GetData(TYPE_ASHBRINGER_EVENT) == NOT_STARTED)
-        {
-            instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
-            return true;
-        }
+        if (!instance || instance->GetData(TYPE_ASHBRINGER_EVENT) != NOT_STARTED)
+            return false;
 
-        return false;
+        if (Creature* Mograine = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_MOGRAINE)))
+            if (Mograine->IsAlive() && !Mograine->IsInCombat())
+                Mograine->AI()->Talk(SAY_MOGRAINE_ASHBRBINGER_INTRO, player);
+
+        instance->SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
+        return true;
     }
 };
 
