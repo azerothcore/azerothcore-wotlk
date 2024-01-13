@@ -361,6 +361,14 @@ void ScriptMgr::OnPlayerLoadFromDB(Player* player)
     });
 }
 
+void ScriptMgr::OnBeforePlayerLogout(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnBeforeLogout(player);
+        });
+}
+
 void ScriptMgr::OnPlayerLogout(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
