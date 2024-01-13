@@ -20,7 +20,6 @@
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "SmartAI.h"
 
 enum AshbringerEventMisc
