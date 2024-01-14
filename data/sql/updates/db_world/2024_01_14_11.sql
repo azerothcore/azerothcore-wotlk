@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_10 -> 2024_01_14_11
 -- SOULS_LICH_KING_RAND_WHISPER
 -- quest "A Feast of Souls" quest id 24547
 
