@@ -2,26 +2,26 @@ UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` IN
 
 /*
 GObject GUIDs
-guid;id/entry;Data3(gossip_menu)
-49453;188148;9269 -- Silithus
-49454;188149;9271
-49455;188150;9272
-54031;188049;9213 -- Ashenvale
-54944;188137;9256
-54945;188138;9257
-81467;188130;9251 -- Desolace
-81468;188134;9254
-81469;188135;9255
-81470;188139;9258 -- Stranglethorn
-81471;188143;9264
-81472;188144;9265
-81473;188145;9266 -- Searing Gorge
-81474;188146;9267
-81475;188147;9268
-81476;188151;9273 -- Hellfire
-81477;188152;9274
-81478;188153;9275
-81479;188154;9276
+guid;id/entry;Data3(gossip_menu);questID
+49453;188148;9269;11953 -- Silithus
+49454;188149;9271;11953
+49455;188150;9272;11953
+54031;188049;9213;11917 -- Ashenvale
+54944;188137;9256;11917
+54945;188138;9257;11917
+81467;188130;9251;11947 -- Desolace
+81468;188134;9254;11947
+81469;188135;9255;11947
+81470;188139;9258;11948 -- Stranglethorn
+81471;188143;9264;11948
+81472;188144;9265;11948
+81473;188145;9266;11952 -- Searing Gorge
+81474;188146;9267;11952
+81475;188147;9268;11952
+81476;188151;9273;11954 -- Hellfire
+81477;188152;9274;11954
+81478;188153;9275;11954
+81479;188154;9276;11954
 220100;187882 -- Ahune
 */
 
@@ -81,6 +81,28 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (9251, 0, 0, 'Lay your hand on the Ice Stone.', 25218, 1, 1, 0, 0, 0, 0, '', 0, 0),
 (9254, 0, 0, 'Lay your hand on the Ice Stone.', 25218, 1, 1, 0, 0, 0, 0, '', 0, 0),
 (9255, 0, 0, 'Lay your hand on the Ice Stone.', 25218, 1, 1, 0, 0, 0, 0, '', 0, 0);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15 AND `SourceGroup` IN (9213, 9251, 9254, 9255, 9256, 9257, 9258, 9264, 9265, 9266, 9267, 9268, 9269, 9271, 9272, 9273, 9274, 9275, 9276) AND `SourceEntry` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 9213, 0, 0, 0, 47, 0, 11917, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9251, 0, 0, 0, 47, 0, 11947, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9254, 0, 0, 0, 47, 0, 11947, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9255, 0, 0, 0, 47, 0, 11947, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9256, 0, 0, 0, 47, 0, 11917, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9257, 0, 0, 0, 47, 0, 11917, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9258, 0, 0, 0, 47, 0, 11948, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9264, 0, 0, 0, 47, 0, 11948, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9265, 0, 0, 0, 47, 0, 11948, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9266, 0, 0, 0, 47, 0, 11952, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9267, 0, 0, 0, 47, 0, 11952, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9268, 0, 0, 0, 47, 0, 11952, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9269, 0, 0, 0, 47, 0, 11953, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9271, 0, 0, 0, 47, 0, 11953, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9272, 0, 0, 0, 47, 0, 11953, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9273, 0, 0, 0, 47, 0, 11954, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9274, 0, 0, 0, 47, 0, 11954, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9275, 0, 0, 0, 47, 0, 11954, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress'),
+(15, 9276, 0, 0, 0, 47, 0, 11954, 8, 0, 0, 0, 0, '', 'If player has quest \'Striking Back\' in progress');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (26116, 26178, 26204, 26214, 26215, 26216);
 
