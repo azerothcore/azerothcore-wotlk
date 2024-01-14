@@ -695,7 +695,8 @@ class spell_rog_pickpocket : public SpellScript
 
 enum vanish
 {
-    SPELL_PARALYZE = 38132,
+    SPELL_STEALTH           = 1784,
+    SPELL_PARALYZE          = 38132,
     SPELL_CLEAN_ESCAPE_AURA = 23582,
     SPELL_CLEAN_ESCAPE_HEAL = 23583
 };
@@ -742,8 +743,22 @@ class spell_rog_vanish : public SpellScript
 
     void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        if (GetCaster() && GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
-            GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
+        if (GetCaster())
+        {
+            GetCaster()->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
+
+            if (!GetCaster()->HasAura(SPELL_STEALTH))
+            {
+                // Remove stealth cooldown if needed.
+                if (GetCaster()->IsPlayer() && GetCaster()->HasSpellCooldown(SPELL_STEALTH))
+                    GetCaster()->ToPlayer()->RemoveSpellCooldown(SPELL_STEALTH);
+
+                GetCaster()->CastSpell(GetCaster(), SPELL_STEALTH, true);
+            }
+
+            if (GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
+                GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
+        }
     }
 
     void Register() override
