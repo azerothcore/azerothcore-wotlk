@@ -108,12 +108,29 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (26116, 261
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (26116, 26178, 26204, 26214, 26215, 26216));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(26116, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwave Lieutenant - On Just Summoned - Say Line 0'), -- 122: Frost Nova, 8056: Frost Shock
-(26178, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hailstone Lieutenant - On Just Summoned - Say Line 0'), -- 5164: Knockdown, 5276: Freeze
-(26204, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chillwind Lieutenant - On Just Summoned - Say Line 0'), -- 6982: Gust of Wind, 23115: Frost Shock
-(26214, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Lieutenant - On Just Summoned - Say Line 0'), -- 3131: Frost Breath
-(26215, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Lieutenant - On Just Summoned - Say Line 0'), -- 14907: Frost Nova, 15089: Frost Shock
-(26216, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Templar - On Just Summoned - Say Line 0'); -- 5164: Knockdown, 14907: Frost Nova, 15089: Frost Shock
+(26116, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwave Lieutenant - On Just Summoned - Say Line 0'),
+(26116, 0, 1, 0, 0, 0, 100, 0, 12000, 20000, 28000, 40000, 0, 11, 122, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwave Lieutenant - In Combat - Cast \'Frost Nova\''),
+(26116, 0, 2, 0, 0, 0, 100, 0, 4000, 12000, 8000, 24000, 0, 11, 8056, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwave Lieutenant - In Combat - Cast \'Frost Shock\''),
+
+(26178, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hailstone Lieutenant - On Just Summoned - Say Line 0'),
+(26178, 0, 1, 0, 0, 0, 100, 0, 4000, 12000, 12000, 24000, 0, 11, 5164, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hailstone Lieutenant - In Combat - Cast \'Knockdown\''),
+(26178, 0, 2, 0, 0, 0, 100, 1, 12000, 30000, 0, 0, 0, 11, 5276, 128, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Hailstone Lieutenant - In Combat - Cast \'Freeze\' (No Repeat)'),
+
+(26204, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chillwind Lieutenant - On Just Summoned - Say Line 0'),
+(26204, 0, 1, 0, 0, 0, 100, 1, 4000, 8000, 0, 0, 0, 11, 6982, 128, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Chillwind Lieutenant - In Combat - Cast \'Gust of Wind\' (No Repeat)'),
+(26204, 0, 2, 0, 0, 0, 100, 0, 4000, 12000, 12000, 24000, 0, 11, 23115, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Chillwind Lieutenant - In Combat - Cast \'Frost Shock\''),
+
+(26214, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Lieutenant - On Just Summoned - Say Line 0'),
+(26214, 0, 1, 0, 0, 0, 100, 0, 4000, 12000, 12000, 24000, 0, 11, 3131, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Lieutenant - In Combat - Cast \'Frost Breath\''),
+
+(26215, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Lieutenant - On Just Summoned - Say Line 0'),
+(26215, 0, 1, 0, 0, 0, 100, 0, 12000, 20000, 28000, 40000, 0, 11, 14907, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Lieutenant - In Combat - Cast \'Frost Nova\''),
+(26215, 0, 2, 0, 0, 0, 100, 0, 4000, 12000, 8000, 24000, 0, 11, 15089, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Lieutenant - In Combat - Cast \'Frost Shock\''),
+
+(26216, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Templar - On Just Summoned - Say Line 0'),
+(26216, 0, 1, 0, 0, 0, 100, 0, 4000, 12000, 12000, 24000, 0, 11, 5164, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hailstone Lieutenant - In Combat - Cast \'Knockdown\''),
+(26216, 0, 2, 0, 0, 0, 100, 0, 12000, 20000, 28000, 40000, 0, 11, 14907, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Templar - In Combat - Cast \'Frost Nova\''),
+(26216, 0, 3, 0, 0, 0, 100, 0, 4000, 12000, 8000, 24000, 0, 11, 15089, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Glacial Templar - In Combat - Cast \'Frost Shock\'');
 
 DELETE FROM `spell_script_names` WHERE `spell_id` = 46592 AND `ScriptName` = 'spell_midsummer_summon_ahune_lieutenant';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (46592, 'spell_midsummer_summon_ahune_lieutenant');
