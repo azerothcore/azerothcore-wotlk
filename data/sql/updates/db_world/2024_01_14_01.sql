@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_00 -> 2024_01_14_01
 -- Midsummer gameobject spawn cleanups
 
 -- 181355, 'Standing, Exterior, Medium - MFF'
