@@ -1,30 +1,5 @@
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` IN (188049, 188130, 188134, 188135, 188137, 188138, 188139, 188143, 188144, 188145, 188146, 188147, 188148, 188149, 188150, 188151, 188152, 188153, 188154);
 
-/*
-GObject GUIDs
-guid;id/entry;Data3(gossip_menu);questID
-49453;188148;9269;11953 -- Silithus
-49454;188149;9271;11953
-49455;188150;9272;11953
-54031;188049;9213;11917 -- Ashenvale
-54944;188137;9256;11917
-54945;188138;9257;11917
-81467;188130;9251;11947 -- Desolace
-81468;188134;9254;11947
-81469;188135;9255;11947
-81470;188139;9258;11948 -- Stranglethorn
-81471;188143;9264;11948
-81472;188144;9265;11948
-81473;188145;9266;11952 -- Searing Gorge
-81474;188146;9267;11952
-81475;188147;9268;11952
-81476;188151;9273;11954 -- Hellfire
-81477;188152;9274;11954
-81478;188153;9275;11954
-81479;188154;9276;11954
-220100;187882 -- Ahune
-*/
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` IN (188049, 188130, 188134, 188135, 188137, 188138, 188139, 188143, 188144, 188145, 188146, 188147, 188148, 188149, 188150, 188151, 188152, 188153, 188154));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (188049, 1, 0, 0, 62, 0, 100, 0, 9213, 0, 0, 0, 0, 11, 46595, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ice Stone - On Gossip Option 0 Selected - Cast \'Summon Ice Stone Lieutenant, Trigger\''),
