@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_06 -> 2024_01_14_07
 -- Update gameobject 180045 'Stormwind Gypsy Wagon' with sniffed values
 
 -- remaining spawns (no sniffed values available)
