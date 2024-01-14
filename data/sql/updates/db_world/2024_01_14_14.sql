@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_13 -> 2024_01_14_14
 -- Fire Bomb (Halaa)
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 31961;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
