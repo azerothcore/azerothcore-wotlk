@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_07 -> 2024_01_14_08
 -- Move GameObjectScript go_midsummer_bonfire to SAI
 -- Alliance Bonfires
 SET @GO1  := 187944;

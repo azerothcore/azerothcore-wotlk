@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_08 -> 2024_01_14_09
 -- Update gameobject 180665 'Draconic for Dummies' with sniffed values
 DELETE FROM `gameobject` WHERE (`id` = 180665) AND (`guid` IN (268645));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
