@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_03 -> 2024_01_14_04
 -- Update 'Magical Menagerie' Cosmetic creature spawns with sniffed values
 DELETE FROM `creature` WHERE (`id1` IN (31795, 31796, 31709, 31710, 31711, 31714, 31719, 31728, 31729, 31730, 31732, 31733, 31735, 31740, 31741, 31742)) AND (`guid` IN (100693, 100774, 117101, 117166, 117221, 117622, 117880, 118577, 118687, 118745, 118867, 118880, 119351, 120256, 120411, 120515));
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES

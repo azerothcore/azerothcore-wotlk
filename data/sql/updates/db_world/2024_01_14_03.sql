@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_02 -> 2024_01_14_03
 -- Update gameobject 180046 'Chair' with sniffed values
 
 -- remaining spawns (no sniffed values available)
