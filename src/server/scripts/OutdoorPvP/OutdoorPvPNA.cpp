@@ -17,6 +17,8 @@
 
 #include "OutdoorPvPNA.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
 #include "GameGraveyard.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -33,6 +35,43 @@ OutdoorPvPNA::OutdoorPvPNA()
     m_obj = nullptr;
 }
 
+// SpawnIds from creatures
+HalaaNPCS halaaNPCHorde;
+HalaaNPCS halaaNPCAlly;
+
+void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
+{
+    if (Group* group = killer->GetGroup())
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* groupGuy = itr->GetSource();
+
+            if (!groupGuy)
+                continue;
+
+            // skip if too far away
+            if (!groupGuy->IsAtGroupRewardDistance(killed) && killer != groupGuy)
+                continue;
+
+            // creature kills must be notified, even if not inside objective / not outdoor pvp active
+            // player kills only count if active and inside objective
+            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT)
+            {
+                HandleKillImpl(groupGuy, killed);
+            }
+        }
+    }
+    else
+    {
+        // creature kills must be notified, even if not inside objective / not outdoor pvp active
+        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT))
+        {
+            HandleKillImpl(killer, killed);
+        }
+    }
+}
+
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
     if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
@@ -42,40 +81,36 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
     }
 }
 
-uint32 OPvPCapturePointNA::GetAliveGuardsCount()
+void UpdateCreatureHalaa(ObjectGuid::LowType spawnId, Map* map, float x, float y)
 {
-    uint32 cnt = 0;
-    for (auto itr = _creatures.begin(); itr != _creatures.end(); ++itr)
+    CreatureData& data = sObjectMgr->NewOrExistCreatureData(spawnId);
+
+    sObjectMgr->AddCreatureToGrid(spawnId, &data);
+
+    // Spawn if necessary (loaded grids only)
+    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
     {
-        switch (itr->first)
+        Creature* creature = new Creature();
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
         {
-            case NA_NPC_GUARD_01:
-            case NA_NPC_GUARD_02:
-            case NA_NPC_GUARD_03:
-            case NA_NPC_GUARD_04:
-            case NA_NPC_GUARD_05:
-            case NA_NPC_GUARD_06:
-            case NA_NPC_GUARD_07:
-            case NA_NPC_GUARD_08:
-            case NA_NPC_GUARD_09:
-            case NA_NPC_GUARD_10:
-            case NA_NPC_GUARD_11:
-            case NA_NPC_GUARD_12:
-            case NA_NPC_GUARD_13:
-            case NA_NPC_GUARD_14:
-            case NA_NPC_GUARD_15:
-            {
-                auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
-                for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
-                    if (itr2->second->IsAlive())
-                        ++cnt;
-                break;
-            }
-            default:
-                break;
+            LOG_ERROR("sql.sql", "AddCreature: Cannot add creature spawnId {} to map", spawnId);
+            delete creature;
+            return;
         }
     }
-    return cnt;
+}
+
+uint32 OPvPCapturePointNA::GetAliveGuardsCount()
+{
+    uint32 count = 0;
+    for (auto itr = _creatures.begin(); itr != _creatures.end(); ++itr)
+    {
+        auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
+        for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
+            if (itr2->second->IsAlive() && (itr2->second->GetEntry() == NA_HALAANI_GUARD_A || itr2->second->GetEntry() == NA_HALAANI_GUARD_H))
+                ++count;
+    }
+    return count;
 }
 
 TeamId OPvPCapturePointNA::GetControllingFaction() const
@@ -83,23 +118,41 @@ TeamId OPvPCapturePointNA::GetControllingFaction() const
     return m_ControllingFaction;
 }
 
-void OPvPCapturePointNA::SpawnNPCsForTeam(TeamId teamId)
+void OPvPCapturePointNA::DespawnCreatures(HalaaNPCS teamNPC)
 {
-    const creature_type* creatures = nullptr;
-    if (teamId == TEAM_ALLIANCE)
-        creatures = AllianceControlNPCs;
-    else if (teamId == TEAM_HORDE)
-        creatures = HordeControlNPCs;
-    else
-        return;
-    for (int i = 0; i < NA_CONTROL_NPC_NUM; ++i)
-        AddCreature(i, creatures[i].entry, creatures[i].map, creatures[i].x, creatures[i].y, creatures[i].z, creatures[i].o, 1000000);
+    for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
+    {
+        ObjectGuid::LowType spawnId = teamNPC[i];
+        auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
+        CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+        for (auto itr = bounds.first; itr != bounds.second;)
+        {
+            // can happen when closing the core
+            Creature* c = itr->second;
+            if (c)
+            {
+                ++itr;
+                c->AddObjectToRemoveList();
+                sObjectMgr->RemoveCreatureFromGrid(spawnId, data);
+                _creatures[i] = 0;
+                _creatureTypes[_creatures[i]] = 0;
+            }
+        }
+    }
 }
 
-void OPvPCapturePointNA::DeSpawnNPCs()
+void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
 {
-    for (int i = 0; i < NA_CONTROL_NPC_NUM; ++i)
-        DelCreature(i);
+    for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
+    {
+        ObjectGuid::LowType spawnId = teamNPC[i];
+        const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
+        if (data) {
+            UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
+            _creatures[i] = spawnId;
+            _creatureTypes[_creatures[i]] = i;
+        }
+    }
 }
 
 void OPvPCapturePointNA::SpawnGOsForTeam(TeamId teamId)
@@ -126,7 +179,7 @@ void OPvPCapturePointNA::SpawnGOsForTeam(TeamId teamId)
     }
 }
 
-void OPvPCapturePointNA::DeSpawnGOs()
+void OPvPCapturePointNA::DespawnGOs()
 {
     for (int i = 0; i < NA_CONTROL_GO_NUM; ++i)
     {
@@ -142,16 +195,16 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_A));
     else if (m_ControllingFaction == TEAM_HORDE)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_LOSE_H));
-
+    DespawnCreatures(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
     m_ControllingFaction = teamId;
     if (m_ControllingFaction != TEAM_NEUTRAL)
         sGraveyard->AddGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
-    DeSpawnGOs();
-    DeSpawnNPCs();
+    DespawnGOs();
     SpawnGOsForTeam(teamId);
-    SpawnNPCsForTeam(teamId);
+    SpawnNPCsForTeam(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
     m_GuardsAlive = NA_GUARDS_MAX;
     m_capturable = false;
+    m_canRecap = false;
     this->UpdateHalaaWorldState();
     if (teamId == TEAM_ALLIANCE)
     {
@@ -205,7 +258,7 @@ void OPvPCapturePointNA::HandlePlayerLeave(Player* player)
 OPvPCapturePointNA::OPvPCapturePointNA(OutdoorPvP* pvp) :
     OPvPCapturePoint(pvp), m_capturable(true), m_GuardsAlive(0), m_ControllingFaction(TEAM_NEUTRAL),
     m_WyvernStateNorth(0), m_WyvernStateSouth(0), m_WyvernStateEast(0), m_WyvernStateWest(0),
-    m_HalaaState(HALAA_N), m_RespawnTimer(NA_RESPAWN_TIME), m_GuardCheckTimer(NA_GUARD_CHECK_TIME)
+    m_HalaaState(HALAA_N), m_RespawnTimer(NA_RESPAWN_TIME), m_GuardCheckTimer(NA_GUARD_CHECK_TIME), m_canRecap(true)
 {
     SetCapturePointData(182210, 530, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
 }
@@ -222,6 +275,10 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
     if (!m_obj)
         return false;
     AddCapturePoint(m_obj);
+
+    //Remove linked graveyard at the server start to avoid players spawning in halaa
+    sGraveyard->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, TEAM_ALLIANCE, false);
+    sGraveyard->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, TEAM_HORDE, false);
 
     return true;
 }
@@ -335,6 +392,12 @@ bool OutdoorPvPNA::Update(uint32 diff)
     return m_obj->Update(diff);
 }
 
+void FlagPlayerPvP(Player* player)
+{
+    player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
+    player->UpdatePvP(true, true);
+}
+
 bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameObject* /*go*/)
 {
     std::vector<uint32> nodes;
@@ -346,32 +409,28 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_N];
             nodes[1] = FlightPathEndNodes[NA_ROOST_N];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_SOUTH:
             nodes[0] = FlightPathStartNodes[NA_ROOST_S];
             nodes[1] = FlightPathEndNodes[NA_ROOST_S];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_WEST:
             nodes[0] = FlightPathStartNodes[NA_ROOST_W];
             nodes[1] = FlightPathEndNodes[NA_ROOST_W];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         case NA_SPELL_FLY_EAST:
             nodes[0] = FlightPathStartNodes[NA_ROOST_E];
             nodes[1] = FlightPathEndNodes[NA_ROOST_E];
             player->ActivateTaxiPathTo(nodes);
-            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
-            player->UpdatePvP(true, true);
+            FlagPlayerPvP(player);
             retval = true;
             break;
         default:
@@ -387,9 +446,8 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
         ItemPosCountVec dest;
 
         int32 count = 10;
-        uint32 itemid = 24538;
         // bomb id count
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count, &noSpaceForCount);
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, NA_HALAA_BOMB, count, &noSpaceForCount);
         if (msg != EQUIP_ERR_OK)                               // convert to possible store amount
             count -= noSpaceForCount;
 
@@ -398,7 +456,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             return true;
         }
 
-        Item* item = player->StoreNewItem(dest, itemid, true);
+        Item* item = player->StoreNewItem(dest, NA_HALAA_BOMB, true);
 
         if (count > 0 && item)
         {
@@ -439,6 +497,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_N:
                 del = NA_DESTROYED_ROOST_N;
@@ -449,6 +508,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_W:
                 del = NA_DESTROYED_ROOST_W;
@@ -459,6 +519,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
+                FlagPlayerPvP(player);
                 break;
             case NA_DESTROYED_ROOST_E:
                 del = NA_DESTROYED_ROOST_E;
@@ -469,6 +530,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_S:
                 del = NA_BOMB_WAGON_S;
@@ -479,6 +541,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateSouth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_S);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_N:
                 del = NA_BOMB_WAGON_N;
@@ -489,6 +552,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateNorth = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_N);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_W:
                 del = NA_BOMB_WAGON_W;
@@ -499,6 +563,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateWest = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_W);
+                FlagPlayerPvP(player);
                 break;
             case NA_BOMB_WAGON_E:
                 del = NA_BOMB_WAGON_E;
@@ -509,6 +574,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
                 else
                     m_WyvernStateEast = WYVERN_NEU_HORDE;
                 UpdateWyvernRoostWorldState(NA_ROOST_E);
+                FlagPlayerPvP(player);
                 break;
             default:
                 return -1;
@@ -534,12 +600,34 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
 
 bool OPvPCapturePointNA::Update(uint32 diff)
 {
-    // let the controlling faction advance in phase
-    bool capturable = false;
-    if (m_ControllingFaction == TEAM_ALLIANCE && _activePlayers[0].size() > _activePlayers[1].size())
-        capturable = true;
-    else if (m_ControllingFaction == TEAM_HORDE && _activePlayers[0].size() < _activePlayers[1].size())
-        capturable = true;
+    if (!_capturePoint)
+        return false;
+
+    float radius = ((float)_capturePoint->GetGOInfo()->capturePoint.radius);
+
+    for (PlayerSet playerSet : _activePlayers)
+    {
+        for (ObjectGuid playerGuid : playerSet)
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                if (!_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
+                    HandlePlayerLeave(player);
+        }
+    }
+
+    std::list<Player*> players;
+    Acore::AnyPlayerInObjectRangeCheck checker(_capturePoint, radius);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(_capturePoint, players, checker);
+    Cell::VisitWorldObjects(_capturePoint, searcher, radius);
+
+    for (Player* player : players)
+    {
+        if (player->IsOutdoorPvPActive())
+        {
+            if (_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+                HandlePlayerEnter(player);
+        }
+    }
 
     if (m_GuardCheckTimer < diff)
     {
@@ -549,26 +637,148 @@ bool OPvPCapturePointNA::Update(uint32 diff)
         {
             m_GuardsAlive = cnt;
             if (m_GuardsAlive == 0)
+            {
                 m_capturable = true;
+                m_RespawnTimer = NA_RESPAWN_TIME;
+                sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_NA_DEFENSELESS));
+            }
+            else
+                m_capturable = false;
             // update the guard count for the players in zone
             _pvp->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
         }
     }
     else m_GuardCheckTimer -= diff;
 
-    if (m_capturable || capturable)
-    {
+    if (m_capturable) {
         if (m_RespawnTimer < diff)
         {
             // if the guards have been killed, then the challenger has one hour to take over halaa.
             // in case they fail to do it, the guards are respawned, and they have to start again.
-            if (m_ControllingFaction)
-                FactionTakeOver(m_ControllingFaction);
-            m_RespawnTimer = NA_RESPAWN_TIME;
+            if (GetControllingFaction() == TEAM_ALLIANCE) {
+                _state = OBJECTIVESTATE_ALLIANCE;
+                _value = _maxValue;
+            }
+            else
+            {
+                _state = OBJECTIVESTATE_HORDE;
+                _value = -_maxValue;
+            }
+            // we reset again the artkit, map icons, sliders and respawn Halaa for controller team
+            SendChangePhase();
+            ChangeState();
+            FactionTakeOver(GetControllingFaction());
+            return true;
         }
-        else m_RespawnTimer -= diff;
+        else if (GetControllingFaction() != TEAM_NEUTRAL) // Don't decrease the respawn timer if the team is not HORDE or ALLIANCE
+            m_RespawnTimer -= diff;
+
+        // get the difference of numbers
+        float factDiff = ((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+        if (!factDiff)
+            return false;
+
+        float maxDiff = _maxSpeed * diff;
+
+        if (factDiff < 0)
+        {
+            // horde is in majority, but it's already horde-controlled -> no change
+            if (_state == OBJECTIVESTATE_HORDE && _value <= -_maxValue)
+                return false;
+
+            if (factDiff < -maxDiff)
+                factDiff = -maxDiff;
+        }
+        else
+        {
+            // ally is in majority, but it's already ally-controlled -> no change
+            if (_state == OBJECTIVESTATE_ALLIANCE && _value >= _maxValue)
+                return false;
+
+            if (factDiff > maxDiff)
+                factDiff = maxDiff;
+        }
+
+        float oldValue = _value;
+        TeamId oldTeam = _team;
+
+        _oldState = _state;
+
+        _value += factDiff;
+
+        if (_value < -_minValue) // red
+        {
+            if (_value < -_maxValue) //check if the m_value is lower than max, that means horde capped point
+            {
+                _value = -_maxValue;
+                _state = OBJECTIVESTATE_HORDE;
+                _team = TEAM_HORDE;
+            }
+            else //then point is still in battle between teams
+            {
+                if (_oldState == OBJECTIVESTATE_NEUTRAL || _oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || _oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
+                {
+                    _state = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
+                }
+                else
+                {
+                    _state = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
+                }
+            }
+            if (GetControllingFaction() == TEAM_ALLIANCE && !m_canRecap)
+            {
+                //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
+                m_canRecap = true;
+                DespawnGOs();
+                DespawnCreatures(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
+            }
+        }
+        else //blue
+        {
+            if (_value > _maxValue) //check if the m_value is bigger than max, that means alliance capped point
+            {
+                _value = _maxValue;
+                _state = OBJECTIVESTATE_ALLIANCE;
+                _team = TEAM_ALLIANCE;
+            }
+            else //then point is still in battle between teams
+            {
+                if (_oldState == OBJECTIVESTATE_NEUTRAL || _oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || _oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE)
+                {
+                    _state = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
+                }
+                else
+                {
+                    _state = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+                }
+            }
+            if (GetControllingFaction() == TEAM_HORDE && !m_canRecap)
+            {
+                //When the point goes through neutral, the same faction can recapture again to respawn the guards, still need check blizzlike
+                m_canRecap = true;
+                DespawnGOs();
+                DespawnCreatures(GetControllingFaction() == TEAM_HORDE ? halaaNPCHorde : halaaNPCAlly);
+            }
+        }
+
+        if (_value != oldValue)
+        {
+            SendChangePhase();
+        }
+
+        if (_oldState != _state)
+        {
+            if (oldTeam != _team)
+            {
+                ChangeTeam(oldTeam);
+            }
+            ChangeState();
+            return true;
+        }
     }
-    return OPvPCapturePoint::Update(diff);
+    else
+        SendUpdateWorldState(NA_UI_TOWER_SLIDER_DISPLAY, 0); //Point is not capturable so we hide the slider
+    return false;
 }
 
 void OPvPCapturePointNA::ChangeState()
@@ -581,12 +791,14 @@ void OPvPCapturePointNA::ChangeState()
             break;
         case OBJECTIVESTATE_ALLIANCE:
             m_HalaaState = HALAA_A;
-            FactionTakeOver(TEAM_ALLIANCE);
+            if(m_canRecap)
+                FactionTakeOver(TEAM_ALLIANCE);
             artkit = 2;
             break;
         case OBJECTIVESTATE_HORDE:
             m_HalaaState = HALAA_H;
-            FactionTakeOver(TEAM_HORDE);
+            if (m_canRecap)
+                FactionTakeOver(TEAM_HORDE);
             artkit = 1;
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
@@ -665,10 +877,7 @@ void OPvPCapturePointNA::UpdateWyvernRoostWorldState(uint32 roost)
 class OutdoorPvP_nagrand : public OutdoorPvPScript
 {
 public:
-    OutdoorPvP_nagrand()
-        : OutdoorPvPScript("outdoorpvp_na")
-    {
-    }
+    OutdoorPvP_nagrand() : OutdoorPvPScript("outdoorpvp_na") { }
 
     OutdoorPvP* GetOutdoorPvP() const override
     {
@@ -676,8 +885,47 @@ public:
     }
 };
 
+struct outdoorpvp_na_halaa_creatures : public ScriptedAI
+{
+    outdoorpvp_na_halaa_creatures(Creature* creature) : ScriptedAI(creature) { }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (halaaNPCHorde.size() != NA_HALAA_CREATURE_TEAM_SPAWN && halaaNPCAlly.size() != NA_HALAA_CREATURE_TEAM_SPAWN)
+        {
+            std::list<Creature*> creatures;
+            uint32 entry = 0;
+            for (int i = 0; i < NA_HALAA_CREATURES; i++)
+            {
+                me->GetCreatureListWithEntryInGrid(creatures, PatrolCreatureEntry[i].idPatrol, 250);
+            }
+
+            if (creatures.size() == NA_HALAA_MAX_CREATURE_SPAWN)
+            {
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    Creature* const c = *itr;
+                    if (entry < NA_HALAA_CREATURE_TEAM_SPAWN)
+                    {
+                        halaaNPCHorde[entry] = c->GetSpawnId();
+                    }
+                    else
+                    {
+                        halaaNPCAlly[entry - NA_HALAA_CREATURE_TEAM_SPAWN] = c->GetSpawnId();
+                    }
+                    c->AddObjectToRemoveList();
+                    entry++;
+                    sObjectMgr->RemoveCreatureFromGrid(c->GetSpawnId(), c->GetCreatureData());
+                }
+            }
+        }
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_outdoorpvp_na()
 {
     new OutdoorPvP_nagrand();
+    RegisterCreatureAI(outdoorpvp_na_halaa_creatures);
 }
 

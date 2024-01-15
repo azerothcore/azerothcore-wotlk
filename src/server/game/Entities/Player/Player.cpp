@@ -587,8 +587,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitPrimaryProfessions();                               // to max set before any spell added
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
-    UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
-    SetFullHealth();
     if (getPowerType() == POWER_MANA)
     {
         UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
@@ -685,6 +683,10 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
         }
     }
     // all item positions resolved
+
+    // ensure player starts with full health
+    UpdateAllStats();
+    SetFullHealth();
 
     CheckAllAchievementCriteria();
 

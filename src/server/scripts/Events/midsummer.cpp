@@ -55,20 +55,6 @@ enum eBonfire
     COUNT_GO_BONFIRE_CITY       = 9,
 };
 
-class go_midsummer_bonfire : public GameObjectScript
-{
-public:
-    go_midsummer_bonfire() : GameObjectScript("go_midsummer_bonfire") { }
-
-    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 /*sender*/, uint32  /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        // we know that there is only one gossip.
-        player->CastSpell(player, SPELL_STAMP_OUT_BONFIRE, true);
-        return true;
-    }
-};
-
 static bool BonfireStampedOutState[COUNT_GO_BONFIRE_ALLIANCE + COUNT_GO_BONFIRE_HORDE];
 
 // <mapId, zoneId, teamId>, <state>
@@ -1215,7 +1201,6 @@ void AddSC_event_midsummer_scripts()
     new MidsummerPlayerScript();
 
     // NPCs
-    new go_midsummer_bonfire();
     RegisterCreatureAI(npc_midsummer_bonfire);
     RegisterCreatureAI(npc_midsummer_torch_target);
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
