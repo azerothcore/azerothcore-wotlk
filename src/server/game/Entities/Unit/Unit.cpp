@@ -558,8 +558,8 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 T
     data << GetPackGUID();
 
     data << uint8(0);                                       // new in 3.1
-    data << GetPositionX() << GetPositionY() << GetPositionZ();
-    data << GameTime::GetGameTimeMS().count();
+    data << GetPositionX() << GetPositionY() << GetPositionZ() + GetHoverHeight();
+    data << uint32(GameTime::GetGameTimeMS().count());
     data << uint8(0);
     data << uint32(sf);
     data << TransitTime;                                           // Time in between points
