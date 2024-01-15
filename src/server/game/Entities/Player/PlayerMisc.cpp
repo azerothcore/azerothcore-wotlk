@@ -499,7 +499,7 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
     for (auto const& items : allItems)
     {
         MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
+        MailDraft draft("失而复得", "我们在虚空中找到了一件物品,应该是你丢掉的吧?.$B$B随信附上,请查收."); // This is the text used in Cataclysm, it probably wasn't changed. 
 
         for (auto const& [itemEntry, itemCount] : items)
         {
