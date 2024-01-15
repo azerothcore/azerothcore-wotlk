@@ -1062,6 +1062,10 @@ public:
     explicit Player(WorldSession* session);
     ~Player() override;
 
+public:
+    //随机本职业
+    uint32 roles;
+
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     void AddToWorld() override;

@@ -1674,7 +1674,11 @@ namespace lfg
                 //else // some cleanup? LeaveLFG?
                 //  ;
             }
-
+            //grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
+            //随机副本设置职业
+            uint32 roles = proposal.players.find(pguid)->second.role;
+            player->roles = roles;
+            grp->SetLfgRoles(pguid, roles);
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
         }
 
@@ -2282,7 +2286,15 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
+            	if (player->roles == PLAYER_ROLE_TANK || player->roles == PLAYER_ROLE_HEALER)
+				// 如果玩家选择了坦克或奶妈角色，执行奖励逻辑
+                {
+                    player->AddItem(62453, 1);//T/N奖励额外兰德鲁的礼物盒
+                    //player->AddItem(49426, 1);//T/N奖励额外兰德鲁的礼物盒
+                    player->SendSystemMessage("坦克奶妈额外奖励已发放-TN宝箱*1");
+                }
                 player->RewardQuest(quest, 0, nullptr, false, true);
+            }
             else
             {
                 done = true;
@@ -2290,6 +2302,11 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
+                 if (player->roles == PLAYER_ROLE_TANK || player->roles == PLAYER_ROLE_HEALER)
+                {
+                    player->AddItem(62453, 1);//T/N奖励额外牌子
+                    player->SendSystemMessage("坦克奶妈额外奖励已发放-TN宝箱*1");
+                }
                 player->RewardQuest(quest, 0, nullptr, false, true);
             }
 
