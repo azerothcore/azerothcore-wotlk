@@ -424,6 +424,16 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
             else if (ar)
             {
+                // 检查玩家等级是否超出副本的允许范围
+                 if (dungeon->minlevel > level)
+                {
+                lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL; // 玩家等级过低，无法加入副本
+                }
+             else if (dungeon->maxlevel < level)
+                {
+                lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL; // 玩家等级过高，无法加入副本
+                }
+                
                 // Check required items
                 for (const ProgressionRequirement* itemRequirement : ar->items)
                 {
