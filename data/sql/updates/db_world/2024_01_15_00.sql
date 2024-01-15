@@ -1,3 +1,4 @@
+-- DB update 2024_01_14_14 -> 2024_01_15_00
 --
 -- Respawn event stuff
 DELETE FROM `creature` WHERE (`guid` BETWEEN 12608 AND 12634);
