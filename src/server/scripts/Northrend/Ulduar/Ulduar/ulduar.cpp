@@ -523,32 +523,48 @@ public:
     }
 };
 
-struct npc_salvaged_siege_engine : public VehicleAI
+class npc_salvaged_siege_engine : public CreatureScript
 {
-    npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
+ public:
+    npc_salvaged_siege_engine() : CreatureScript("npc_salvaged_siege_engine") {}
 
-    bool BeforeSpellClick(Unit* clicker) override
+    CreatureAI* GetAI (Creature* creature) const override
     {
-        if (Vehicle* vehicle = me->GetVehicleKit())
+        return GetUlduarAI<npc_salvaged_siege_engineAI>(creature);
+    }
+
+    struct npc_salvaged_siege_engineAI : public VehicleAI
+    {
+    
+        npc_salvaged_siege_engineAI(Creature* creature) : VehicleAI(creature)
         {
-            if (vehicle->IsVehicleInUse())
+        }
+
+        bool BeforeSpellClick(Unit* clicker) override
+        {
+            
+            if (Vehicle* vehicle = me->GetVehicleKit())
             {
-                if (Unit* turret = vehicle->GetPassenger(7))
+                if (vehicle->IsVehicleInUse())  
                 {
-                    if (Vehicle* turretVehicle = me->GetVehicleKit())
+                    if (Unit* turret = vehicle->GetPassenger(7)) 
                     {
+                        if (Vehicle* turretVehicle = turret->GetVehicleKit())
+                        {
+                         if (turretVehicle->GetAvailableSeatCount() < 1)
+                         return false;
                         if (!turretVehicle->IsVehicleInUse())
                         {
                             turret->HandleSpellClick(clicker);
                             return false;
                         }
+                        }
                     }
                 }
             }
+            return true;
         }
-
-        return true;
-    }
+    };
 };
 
 void AddSC_ulduar()
@@ -562,5 +578,5 @@ void AddSC_ulduar()
     new AreaTrigger_at_celestial_planetarium_enterance();
     new go_call_tram();
 
-    RegisterCreatureAI(npc_salvaged_siege_engine);
+    new npc_salvaged_siege_engine();
 }
