@@ -1673,8 +1673,8 @@ public:
             data >> LichKingHeroicAvailable;
             data >> BloodPrinceTrashCount;
             data >> IsBuffAvailable;
-            SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
             data >> IsSindragosaIntroDone;
+            SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
