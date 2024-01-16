@@ -226,6 +226,8 @@ public:
         {
             BossAI::Reset();
             events2.Reset();
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetDisableGravity(false);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
             me->LoadEquipment(0, true);
@@ -450,6 +452,7 @@ public:
                         akama->AI()->DoAction(ACTION_ILLIDAN_DEAD);
                         akama->SetTarget(me->GetGUID());
                         akama->GetMotionMaster()->MovePoint(0, 695.63f, 306.63f, 354.26f);
+						akama->KillSelf();  //any out of combit all ok , here kill itself.
                     }
                     events2.ScheduleEvent(EVENT_OUTRO_2, 6000);
                     break;
@@ -513,24 +516,25 @@ public:
                         me->CastSpell(target, SPELL_AGONIZING_FLAMES, false);
                     break;
                 case EVENT_PHASE_5_START:
-                    if (me->HealthBelowPct(30))
+                    if (me->HealthBelowPct(20))
                     {
-                        me->CastSpell(me, SPELL_SHADOW_PRISON, true);
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->CastSpell(me, SPELL_SHADOW_PRISON, true);
+						me->CastSpell(me, SPELL_SUMMON_MAIEV, true);
+						me->SetReactState(REACT_PASSIVE);
                         Talk(SAY_ILLIDAN_MAIEV1);
                         events.Reset();
                         events.ScheduleEvent(EVENT_PHASE_5_SCENE1, 9000);
                         events.ScheduleEvent(EVENT_PHASE_5_SCENE2, 18000);
                         events.ScheduleEvent(EVENT_PHASE_5_SCENE3, 24000);
                         events.ScheduleEvent(EVENT_PHASE_5_SCENE4, 27000);
-                        events.ScheduleEvent(EVENT_PHASE_5_SCENE5, 30000);
+                        events.ScheduleEvent(EVENT_PHASE_5_SCENE5, 31000);
                         break;
                     }
                     events.ScheduleEvent(EVENT_PHASE_5_START, 1000);
                     break;
                 case EVENT_PHASE_5_SCENE1:
-                    me->CastSpell(me, SPELL_SUMMON_MAIEV, true);
                     break;
                 case EVENT_PHASE_5_SCENE2:
                     Talk(SAY_ILLIDAN_MAIEV2);
@@ -544,7 +548,11 @@ public:
                         maiev->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                     break;
                 case EVENT_PHASE_5_SCENE5:
-                    me->SetTarget(me->GetVictim()->GetGUID());
+					me->SetReactState(REACT_AGGRESSIVE);
+					if (me->GetVictim())
+                        me->SetTarget(me->GetVictim()->GetGUID());
+					else
+                        DoMeleeAttackIfReady();
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                     {
@@ -558,7 +566,7 @@ public:
                 // PHASE 2
                 // ///////////////////////////
                 case EVENT_PHASE_2_START:
-                    if (me->HealthBelowPct(65))
+                    if (me->HealthBelowPct(80))
                     {
                         if (events2.GetNextEventTime(EVENT_SUMMON_MINIONS2) != 0)
                             events2.RescheduleEvent(EVENT_SUMMON_MINIONS2, 0);
@@ -655,7 +663,7 @@ public:
                     break;
                 case EVENT_REMOVE_DEMON_FORM:
                     me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->GetThreatMgr().ResetAllThreat();
+                    //me->GetThreatMgr().ResetAllThreat();  //趴下阶段用来清理仇恨的,仇恨不够屏蔽掉
                     events.Reset();
                     if (summons.HasEntry(NPC_MAIEV_SHADOWSONG))
                     {
@@ -809,7 +817,7 @@ public:
 
             if (instance->GetBossState(DATA_AKAMA_FINISHED) != DONE)
             {
-                me->SetReactState(REACT_PASSIVE);
+            //me->SetReactState(REACT_PASSIVE);   // might can not say with akama if with this
                 Start(false, true);
                 SetDespawnAtEnd(false);
             }
@@ -857,8 +865,8 @@ public:
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_7, 31000);
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_8, 40000);
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_9, 54000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_10, 57000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_11, 62000);
+                events.ScheduleEvent(EVENT_AKAMA_SCENE_10, 41000);  //  go before player go ,otherwise might can not say with akama
+                events.ScheduleEvent(EVENT_AKAMA_SCENE_11, 42000);
             }
             else if (pointId == POINT_ILLIDAN)
             {
