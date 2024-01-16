@@ -466,7 +466,7 @@ public:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
 
-                    if ((eyebeamTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true)))
+                    if ((eyebeamTarget = ScriptedAI::SelectTargetFromPlayerList(120.0f, 62055, false)))
                     {
                        if (!eyebeamTarget)
                             break;
