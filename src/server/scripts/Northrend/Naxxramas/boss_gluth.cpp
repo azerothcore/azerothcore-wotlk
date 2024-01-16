@@ -151,6 +151,21 @@ public:
             BossAI::JustDied(killer);
             summons.DespawnAll();
         }
+        //检测是否在房间内
+        bool IsInRoom(Unit* who)
+        {
+            if (who->GetPositionX() > 3353 || who->GetPositionX() < 3231 || who->GetPositionY() > -3086 || who->GetPositionY() < -3210 || who->GetPositionZ() > 307 || who->GetPositionZ() < 295)
+            {
+                if (who->GetGUID() == me->GetGUID())
+                {
+                    summons.DespawnAll();
+                    EnterEvadeMode();
+                }
+                return false;
+            }
+            return true;
+        }
+        //检测是否在房间内
 
         bool SelectPlayerInRoom()
         {
