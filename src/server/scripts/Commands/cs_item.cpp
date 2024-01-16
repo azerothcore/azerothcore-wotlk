@@ -93,7 +93,7 @@ public:
         else
         {
             MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-            MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
+            MailDraft draft("失而复得", "我们在虚空中找到了一件物品,应该是你丢掉的吧?.$B$B随信附上,请查收.");
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
