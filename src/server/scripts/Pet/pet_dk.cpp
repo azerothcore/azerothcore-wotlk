@@ -353,7 +353,7 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
         {
             if (caster->GetLevel() >= 60)
             {
-                damage += (caster->GetLevel() - 60) * 4;
+                damage += (caster->GetLevel() - 60) * 10;//修改DK石象鬼伤害
             }
         }
 
