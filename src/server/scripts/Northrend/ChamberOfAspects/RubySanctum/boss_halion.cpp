@@ -221,7 +221,7 @@ public:
             BossAI::Reset();
             me->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
             me->CastSpell(me, SPELL_CLEAR_DEBUFFS, false);
-
+            me->SetHealth(me->GetMaxHealth()); //防止BUG海里昂
             me->SetVisible(false);
             me->SetReactState(REACT_PASSIVE);
             _events2.Reset();
@@ -265,23 +265,31 @@ public:
         bool IsAnyPlayerValid()
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                if (Player* player = itr->GetSource())
-                    if (!player->IsGameMaster() && player->IsAlive() && me->GetHomePosition().GetExactDist2d(player) < 52.0f && me->IsWithinLOSInMap(player) && !player->HasAuraType(SPELL_AURA_MOD_INVISIBILITY) && !player->HasAuraType(SPELL_AURA_MOD_STEALTH) && !player->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
+            for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr) {
+                if (Player* player = itr->GetSource()) {
+                    if (IsInBoundary(player) && !player->IsGameMaster() && player->IsAlive() && me->GetHomePosition().GetExactDist2d(player) < 52.0f && me->IsWithinLOSInMap(player) && !player->HasAuraType(SPELL_AURA_MOD_INVISIBILITY) && !player->HasAuraType(SPELL_AURA_MOD_STEALTH) && !player->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE)) {
                         return true;
-            return false;
-        }
+                    }
+                }
+            }
+				
+				return false; // 其他情况，返回false
+		}
 
         void EnterEvadeMode(EvadeReason why) override
         {
             if (IsAnyPlayerValid())
                 return;
 
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
-                controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+				if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
+					controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
+
             BossAI::EnterEvadeMode(why);
-        }
+            instance->SetBossState(DATA_HALION, FAIL);//增加灭团检测
+            instance->SetBossState(DATA_HALION, NOT_STARTED);//修复切换难度BOSS消失     
+
+		}
 
         void AttackStart(Unit* who) override
         {
@@ -415,6 +423,7 @@ public:
 
     private:
         EventMap _events2;
+        EventMap _events;
         uint32 _livingEmberCount;
     };
 
