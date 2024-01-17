@@ -315,6 +315,7 @@ enum Misc
     ACTION_SIF_START_DOMINION   = 5,
     ACTION_SIF_TRANSFORM        = 6,
     ACTION_IRON_HONOR_DIED      = 7,
+    ACTION_BUG_CHECK            = 8,
 
     EVENT_PHASE_START           = 1,
     EVENT_PHASE_RING            = 2,
@@ -512,6 +513,23 @@ public:
             }
             else if (param == ACTION_ALLOW_HIT)
                 _isHitAllowed = true;
+            if (param == ACTION_BUG_CHECK)
+            {
+                if (_isBUG)
+                {
+                    const Map::PlayerList& bug = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = bug.begin(); itr != bug.end(); ++itr)
+                        if (Player* p = itr->GetSource())
+                        {
+                            Unit::Kill(me, p); //秒杀BUG玩家
+                            p->TeleportTo(603, 2071.022f, -102.656f, 412.3f, 5.576f);
+                            std::string pname = p->GetPlayerName();
+                            LOG_ERROR("module", "{}尝试BUG托里姆,杀", pname.c_str());
+                        }
+                    summons.DespawnAll();
+                    SpawnAllNPCs();
+                }
+            }
         }
 
         void KilledUnit(Unit* victim) override
@@ -569,17 +587,6 @@ public:
             
             if (who && who->GetPositionZ() > 430 && who->GetTypeId() == TYPEID_PLAYER)
                 damage = 0;
-            if (who && _isBUG && who->GetTypeId() == TYPEID_PLAYER)
-            {
-                const Map::PlayerList& bug = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = bug.begin(); itr != bug.end(); ++itr)
-                    if (Player* p = itr->GetSource())
-                    {
-                        Unit::Kill(me, p); //秒杀BUG玩家
-                        std::string pname = p->GetPlayerName();
-                        LOG_ERROR("module", "{}尝试BUG托里姆,杀", pname.c_str());
-                    }
-             }
 
             if (damage >= me->GetHealth())
             {
@@ -1296,6 +1303,13 @@ public:
             }
 
             me->CallForHelp(25);
+        }
+
+         void JustDied(Unit*) override
+        {
+            if (me->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    cr->AI()->DoAction(ACTION_BUG_CHECK);
         }
 
         void UpdateAI(uint32 diff) override
