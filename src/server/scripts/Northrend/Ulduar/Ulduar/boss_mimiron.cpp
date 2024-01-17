@@ -880,9 +880,9 @@ public:
             if( GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f) )
                 if( button->GetGoState() != GO_STATE_READY )
                 {
-                    button->SetLootState(GO_READY);
-                    button->UseDoorOrButton(0, false);
-                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
+                    button->SetGoState(GO_STATE_READY); // 将按钮状态设置为READY
+                    button->SetLootState(GO_READY); // 将按钮的战利品状态设置为READY
+                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE); // 移除按钮的使用标志
                 }
         }
 

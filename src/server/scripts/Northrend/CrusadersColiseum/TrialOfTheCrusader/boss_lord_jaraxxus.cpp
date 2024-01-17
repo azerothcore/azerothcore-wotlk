@@ -221,7 +221,8 @@ public:
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
-                        me->CastSpell(target, SPELL_INCINERATE_FLESH, false);
+                        //me->CastSpell(target, SPELL_INCINERATE_FLESH, false);
+                        DoCast(target, SPELL_INCINERATE_FLESH, true);//使用Docast强制函数
                     }
                     events.Repeat(20s, 25s);
                     break;
@@ -234,7 +235,8 @@ public:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
-                        me->CastSpell(target, SPELL_LEGION_FLAME, false);
+                        //me->CastSpell(target, SPELL_LEGION_FLAME, false);
+                        DoCast(target, SPELL_LEGION_FLAME, true);//使用Docast强制函数
                     }
                     events.Repeat(30s);
                     break;
@@ -253,7 +255,8 @@ public:
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
-                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        target->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 1min);
                     break;

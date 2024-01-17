@@ -556,12 +556,18 @@ public:
                 cloud->AI()->DoAction(ACTION_START_SUMMONING);
         }
 
-        void SpawnTentacle(uint32 entry)
+        void SpawnTentacle(uint32 entry, float x = 0.0f, float y = 0.0f, float z = 0.0f)
         {
-            uint32 dist = urand(38, 48);
-            float o = rand_norm() * M_PI * 2;
-            float Zplus = (dist - 38) / 6.5f;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+            if (x == 0.0f && y == 0.0f && z == 0.0f) // use default position
+            {
+                uint32 dist = urand(38, 48);
+                float o = rand_norm() * M_PI * 2;
+                float Zplus = (dist - 38) / 6.5f;
+                x = me->GetPositionX() + dist * cos(o);
+                y = me->GetPositionY() + dist * std::sin(o);
+                z = 327.2 + Zplus;
+            }
+            if (Creature* cr = me->SummonCreature(entry, x, y, z, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
             {
                 cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
                 cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);
@@ -841,15 +847,21 @@ public:
                     break;
                 case EVENT_SARA_P2_SUMMON_T1: // CRUSHER
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
-                    events.RepeatEvent((50000 + urand(0, 10000)) * _summonSpeed);
+                    events.RepeatEvent((75000 + urand(0, 15000)) * _summonSpeed);
                     break;
-                case EVENT_SARA_P2_SUMMON_T2: // CONSTRICTOR
-                    SpawnTentacle(NPC_CONSTRICTOR_TENTACLE);
-                    events.RepeatEvent((15000 + urand(0, 5000)) * _summonSpeed);
+                case EVENT_SARA_P2_SUMMON_T2: // CONSTRICTOR FROM PLAYER
+                    for (uint8 i = 0; i < 1; ++i)
+                    if (Player* target = SelectTargetFromPlayerList(100.0f))
+                    {
+                        float x, y, z;
+                        target->GetPosition(x, y, z);
+                        SpawnTentacle(NPC_CONSTRICTOR_TENTACLE, x, y, z);
+                    }                    
+                    events.RepeatEvent((22000 + urand(0, 8000)) * _summonSpeed);
                     break;
                 case EVENT_SARA_P2_SUMMON_T3: // CORRUPTOR
                     SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
-                    events.RepeatEvent((30000 + urand(0, 10000)) * _summonSpeed);
+                    events.RepeatEvent((45000 + urand(0, 15000)) * _summonSpeed);
                     break;
                 case EVENT_SARA_P2_BRAIN_LINK:
                     me->CastCustomSpell(SPELL_BRAIN_LINK, SPELLVALUE_MAX_TARGETS, 1, me, false);
@@ -884,9 +896,9 @@ public:
                     events.ScheduleEvent(EVENT_SARA_P2_MALADY, 7s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 3s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_DEATH_RAY, 15s, 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50s, 60s, 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15s, 20s, 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 30000 + urand(0, 10000), 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 75s, 90s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 22s, 30s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 45000 + urand(0, 15000), 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 0, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60000, 0, EVENT_PHASE_TWO);
                     break;
@@ -1219,7 +1231,7 @@ public:
                     break;
                 case EVENT_YS_SUMMON_GUARDIAN:
                     SummonImmortalGuardian();
-                    events.Repeat(10s);
+                    events.Repeat(20s);
                     break;
             }
         }

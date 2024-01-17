@@ -699,6 +699,7 @@ public:
                     Talk(SAY_ALGALON_COLLAPSING_STAR);
                     Talk(EMOTE_ALGALON_COLLAPSING_STAR);
                     for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
+                    if(summons.GetEntryCount(NPC_COLLAPSING_STAR) < COLLAPSING_STAR_COUNT)
                         me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
                     events.Repeat(1min);
                     break;
