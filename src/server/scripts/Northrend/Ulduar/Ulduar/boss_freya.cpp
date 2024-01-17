@@ -634,12 +634,25 @@ public:
                     events.Repeat(45s, 55s);
                     break;
                 case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    if (Is25ManRaid())
+                    std::vector<Unit*> targets;
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                {
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    targets.push_back(target);
+                }
+                if (Is25ManRaid())
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [targets](Unit* u) { return std::find(targets.begin(), targets.end(), u) == targets.end(); }))
                     {
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        targets.push_back(target);
                     }
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [targets](Unit* u) { return std::find(targets.begin(), targets.end(), u) == targets.end(); }))
+                    {
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    targets.push_back(target);
+                    }
+                }
                     events.Repeat(38s, 48s);
                     break;
             }
