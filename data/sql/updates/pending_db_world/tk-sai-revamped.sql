@@ -74,7 +74,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20049, 0, 4, 0, 74, 0, 100, 0, 0, 0, 40000, 40000, 50, 0, 11, 37260, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Blood Knight - On Friendly Between 0-50% Health - Cast \'Renew\''),
 (20049, 0, 5, 0, 15, 0, 100, 0, 0, 0, 15, 0, 0, 0, 11, 39078, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Blood Knight - Friendly Crowd Controlled - Cast \'Cleanse\''),
 (20050, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 0, 0, 11, 37274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Inquisitor - On Aggro - Cast \'Power Infusion\''),
-(20050, 0, 0, 0, 0, 0, 100, 0, 20650, 36750, 24250, 44150, 0, 0, 11, 37274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Inquisitor - In Combat - Cast \'Power Infusion\''),
+(20050, 0, 1, 0, 0, 0, 100, 0, 20650, 36750, 24250, 44150, 0, 0, 11, 37274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Inquisitor - In Combat - Cast \'Power Infusion\''),
 (20050, 0, 2, 0, 0, 0, 100, 0, 2200, 4900, 1200, 14400, 0, 0, 11, 37276, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Inquisitor - In Combat - Cast \'Mind Flay\''),
 (20050, 0, 3, 0, 0, 0, 100, 0, 3650, 8350, 3650, 19950, 0, 0, 11, 37275, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Hand Inquisitor - In Combat - Cast \'Shadow Word: Pain\''),
 (20052, 0, 0, 0, 0, 0, 100, 0, 800, 6200, 1200, 7200, 0, 0, 11, 37123, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Mechanic - In Combat - Cast \'Saw Blade\''),
