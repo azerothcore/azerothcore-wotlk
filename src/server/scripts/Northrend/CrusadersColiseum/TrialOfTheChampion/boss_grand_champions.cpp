@@ -590,6 +590,9 @@ public:
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
+                    if (me->GetFaction() != FACTION_FRIENDLY)
+                    me->SetFaction(FACTION_FRIENDLY);
+                    _EnterEvadeMode();
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(true);
                     if( pInstance )
