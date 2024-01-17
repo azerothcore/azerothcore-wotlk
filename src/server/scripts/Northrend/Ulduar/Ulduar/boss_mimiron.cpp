@@ -754,6 +754,11 @@ public:
                         Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
+                        //结束后不可选中与攻击
+                        me->SetFaction(FACTION_FRIENDLY);
+                        me->SetImmuneToAll(true);
+                        me->SetReactState(REACT_PASSIVE);
+
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                         me->GetMotionMaster()->Clear();
                         summons.DoAction(1337); // despawn summons of summons
@@ -1382,6 +1387,9 @@ public:
                 {
                     float angle = (spinningUpOrientation * 2 * M_PI) / 100.0f;
                     me->SetFacingTo(angle);
+                    if (Unit* vehicle = me->GetVehicleBase())
+                        vehicle->SetFacingTo(angle);
+
 
                     spinningUpTimer = 0;
                 }
@@ -1480,6 +1488,7 @@ public:
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         if (Unit* vehicle = me->GetVehicleBase())
                         {
+                            vehicle->SetFacingTo(angle);
                             vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                             vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         }
@@ -1947,7 +1956,7 @@ public:
         void Reset() override
         {
             me->SetCanFly(true);
-            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            me->AddUnitMovementFlag(MOVEMENTFLAG_ASCENDING);
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
