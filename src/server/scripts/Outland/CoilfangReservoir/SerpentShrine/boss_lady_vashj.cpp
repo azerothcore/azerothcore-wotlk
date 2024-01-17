@@ -86,7 +86,6 @@ struct boss_lady_vashj : public BossAI
         _count = 0;
         _recentlySpoken = false;
         _batTimer = 20s;
-        _hasBarrier = false;
         BossAI::Reset();
 
         ScheduleHealthCheckEvent(70, [&]{
@@ -171,15 +170,14 @@ struct boss_lady_vashj : public BossAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type != POINT_MOTION_TYPE || id != POINT_HOME || _hasBarrier)
+        if (type != POINT_MOTION_TYPE || id != POINT_HOME)
         {
             return;
         }
-        
+        me->AddUnitState(UNIT_STATE_ROOT);
         me->SetFacingTo(me->GetHomePosition().GetOrientation());
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
         scheduler.CancelAll();
-        me->GetMotionMaster()->Clear();
         scheduler.Schedule(2400ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_FORKED_LIGHTNING);
@@ -205,10 +203,10 @@ struct boss_lady_vashj : public BossAI
             if (!me->HasAura(SPELL_MAGIC_BARRIER))
             {
                 Talk(SAY_PHASE3);
+                me->ClearUnitState(UNIT_STATE_ROOT);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 scheduler.CancelAll();
-                _hasBarrier = false;
 
                 ScheduleSpells();
                 scheduler.Schedule(5s, [this](TaskContext context)
@@ -222,12 +220,6 @@ struct boss_lady_vashj : public BossAI
             {
                 context.Repeat(1s);
             }
-        }).Schedule(5s, [this](TaskContext context)
-        {
-            //hack to make sure she stays in place. setting non-movement flags does not seem to work
-            _hasBarrier = true;
-            me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
-            context.Repeat(5s);
         });
     }
 
@@ -268,7 +260,6 @@ struct boss_lady_vashj : public BossAI
 private:
     bool _recentlySpoken;
     bool _intro;
-    bool _hasBarrier;
     int32 _count;
     std::chrono::seconds _batTimer;
 };
