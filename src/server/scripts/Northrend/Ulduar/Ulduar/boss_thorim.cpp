@@ -354,6 +354,7 @@ public:
         bool _hardMode;
         bool _isHitAllowed;
         bool _isAlly;
+        bool _isBUG;
         uint8 _trashCounter;
 
         InstanceScript* m_pInstance;
@@ -469,15 +470,11 @@ public:
             _hardMode = false;
             _isArenaEmpty = false;
             _hitByLightning = false;
+            _isBUG = true;
 
             if (Player* t = SelectTargetFromPlayerList(1000))
                 if (t->GetTeamId() == TEAM_HORDE)
                     _isAlly = false;
-            const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                if (Player* p = itr->GetSource())
-                    if (!p->IsGameMaster() && p->GetExactDist(2227.6055f, -381.212555f, 412.133575f) < 140.5f && (p->GetExactDist(2170.8400f, -262.182f, 419.361f) > 33.6f || p->GetPositionZ() > 430))
-                        p->TeleportTo(603, 2075.286621, -106.205582, 412.298859, 5.607742); //传送BUG玩家
             
             SpawnAllNPCs();
 
@@ -510,6 +507,7 @@ public:
                     events.SetPhase(EVENT_PHASE_START);
                     events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20s);
                     _trashCounter = 0;
+                    _isBUG = false;
                 }
             }
             else if (param == ACTION_ALLOW_HIT)
@@ -571,6 +569,17 @@ public:
             
             if (who && who->GetPositionZ() > 430 && who->GetTypeId() == TYPEID_PLAYER)
                 damage = 0;
+            if (who && _isBUG && who->GetTypeId() == TYPEID_PLAYER)
+            {
+                const Map::PlayerList& bug = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = bug.begin(); itr != bug.end(); ++itr)
+                    if (Player* p = itr->GetSource())
+                    {
+                        Unit::Kill(me, p); //秒杀BUG玩家
+                        std::string pname = p->GetPlayerName();
+                        LOG_ERROR("module", "{}尝试BUG托里姆,杀", pname.c_str());
+                    }
+             }
 
             if (damage >= me->GetHealth())
             {
