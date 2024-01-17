@@ -245,6 +245,12 @@ public:
             bAchievGettingCold = true;
             bAchievCacheRare = true;
             bAchievCoolestFriends = true;
+
+            
+            me->SetFullHealth();
+            if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+                pInstance->SetData(TYPE_HODIR_HM_RESET, 0);
+
             me->SetSheath(SHEATH_STATE_MELEE);
 
             // Reset the spells cast after wipe
@@ -268,6 +274,7 @@ public:
 
         void JustEngagedWith(Unit*  /*pWho*/) override
         {
+            LOG_ERROR("module", "霍迪尔之战开始");
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
             SmallIcicles(true);
             events.Reset();
@@ -392,6 +399,7 @@ public:
         {
             if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                me->SetFullHealth();
                 boss_hodirAI::EnterEvadeMode();
                 return;
             }
@@ -403,6 +411,7 @@ public:
                     Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                         itr->GetSource()->CastSpell(itr->GetSource(), SPELL_FLASH_FREEZE_INSTAKILL, true);
+                    me->SetFullHealth();
                     EnterEvadeMode();
                 }
                 return;
