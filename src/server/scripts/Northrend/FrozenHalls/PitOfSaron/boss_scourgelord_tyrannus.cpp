@@ -130,8 +130,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim()) // 检查是否存在有效的目标
+            {
+                Reset(); // 如果没有目标，执行重置操作
                 return;
+            }
 
             if (me->GetVictim())
             {
@@ -141,6 +144,7 @@ public:
                 {
                     me->SetHealth(me->GetMaxHealth());
                     EnterEvadeMode();
+                    pInstance->SetBossState(DATA_TYRANNUS, FAIL);
                     return;
                 }
             }
