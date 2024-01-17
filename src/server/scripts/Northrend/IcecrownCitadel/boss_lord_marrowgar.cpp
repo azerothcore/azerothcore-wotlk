@@ -176,7 +176,11 @@ public:
                 {
                     bool a = me->HasAura(SPELL_BONE_STORM);
                     if (IsHeroic() || !a)
-                        me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, FarthestTargetSelector(me, 40.0f, false, true))) //选择最远的目标施放技能；
+                            me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
+                    }
+
                     events.Repeat(15s, 20s);
                 }
                 break;
@@ -201,14 +205,22 @@ public:
                 events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050ms);
                 break;
             case EVENT_BEGIN_BONE_STORM:
-                {
-                    uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
-                    if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
-                        pStorm->SetDuration(int32(_boneStormDuration));
-                    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0ms);
-                    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
-                }
-                break;
+			    {
+				    uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
+				    if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
+					    pStorm->SetDuration(int32(_boneStormDuration));
+    
+				    // 选择最远的目标
+				    Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, FarthestTargetSelector(me, 40.0f, false, true));
+                    if (target) {
+                                    // 移动到最远目标的位置
+                                    me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 25.0f, 1337);
+                                }
+				    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0ms);
+                    //events.ScheduleEvent(EVENT_END_BONE_STORM, 30000);  // 结束事件在30秒后触发
+				    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
+			    }
+			    break;
             case EVENT_BONE_STORM_MOVE:
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
@@ -217,7 +229,7 @@ public:
                         break;
                     }
                     events.Repeat(5s);
-                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
+                    Unit* unit = SelectTarget(SelectTargetMethod::MaxDistance, 0, FarthestTargetSelector(me, 0.0f, false, true)); // 选择最远的目标
                     if (!unit)
                     {
                         if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
@@ -335,20 +347,24 @@ public:
                 case 0:
                     break;
                 case 1:
+                {
+                    float height = 42.5f;
+                    if (Player* player = me->SelectNearestPlayer(12.0f))
+                        height = player->GetPositionZ();
+                    me->m_positionZ = height;
+                    me->DisableSpline();
+                    me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
+                    float nx = me->GetPositionX() + 4.0f * cos(me->GetOrientation());
+                    float ny = me->GetPositionY() + 4.0f * std::sin(me->GetOrientation());
+                    if (!me->IsWithinLOS(nx, ny, height + 3.0f))
                     {
-                        me->m_positionZ = 42.5f;
-                        me->DisableSpline();
-                        me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
-                        float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
-                        float ny = me->GetPositionY() + 5.0f * std::sin(me->GetOrientation());
-                        if (!me->IsWithinLOS(nx, ny, 42.5f))
-                        {
-                            break;
-                        }
-                        me->NearTeleportTo(nx, ny, 42.5f, me->GetOrientation());
-                        events.Repeat(450ms);
+                        if (height < 43.0f)
+                        break;
                     }
-                    break;
+                    me->NearTeleportTo(nx, ny, height, me->GetOrientation());
+                    events.Repeat(360ms);
+                }
+                break;
                 case 2:
                     events.Reset();
                     break;
