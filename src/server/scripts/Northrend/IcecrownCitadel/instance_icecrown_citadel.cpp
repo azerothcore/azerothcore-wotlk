@@ -269,6 +269,9 @@ public:
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
 
+            if (GetBossState(DATA_SINDRAGOSA) == NOT_STARTED)
+                IsSindragosaIntroDone = true;
+
             if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
             {
                 Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
@@ -1088,6 +1091,16 @@ public:
             if (!InstanceScript::SetBossState(type, state))
                 return false;
 
+            if (state == DONE)//击杀任意BOSS后执行
+            {
+                ResetPlayerCooldown(false);
+            }
+
+            if (state == FAIL)//灭团后执行
+            {
+                ResetPlayerCooldown(true);
+            }
+
             switch (type)
             {
                 case DATA_LORD_MARROWGAR:
@@ -1248,6 +1261,58 @@ public:
             return true;
         }
 
+        void ResetPlayerCooldown(bool failed)//重置玩家技能
+        {
+            Map::PlayerList const& players = instance->GetPlayers();
+            if (!players.IsEmpty())
+                for (Map::PlayerList::const_iterator itrp = players.begin(); itrp != players.end(); ++itrp)
+                {
+                    if (Player* player = itrp->GetSource())
+                    {
+                        if (failed && player->IsAlive() && !player->HasAura(19753) && !player->HasAura(5384) && !player->HasAura(32612) && !player->HasAura(642) && !player->HasAura(27827) && !player->HasAura(70157) && !player->HasAura(71289))//检查是否灭团
+                            return;
+                        player->RemoveAura(57723);//移除英勇debuff
+                        player->RemoveAura(32182);//移除英勇
+                        player->RemoveAura(57724);//移除嗜血debuff
+                        player->RemoveAura(2825);//移除嗜血
+                        player->RemoveAura(25771);//移除自律debuff
+                        player->UnsummonAllTotems();//移除所有图腾
+
+                        uint32 infTime = GameTime::GetGameTimeMS().count() + infinityCooldownDelayCheck;
+                        SpellCooldowns::iterator itr, next;
+
+                        for (itr = player->GetSpellCooldownMap().begin(); itr != player->GetSpellCooldownMap().end(); itr = next)
+                        {
+                            next = itr;
+                            ++next;
+                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                            if (!spellInfo)
+                                continue;
+
+                            // Get correct spell cooldown times
+                            uint32 remainingCooldown = player->GetSpellCooldownDelay(spellInfo->Id);
+                            int32 totalCooldown = spellInfo->RecoveryTime;
+                            int32 categoryCooldown = spellInfo->CategoryRecoveryTime;
+                            player->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, totalCooldown, nullptr);
+                            if (int32 cooldownMod = player->GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))
+                                totalCooldown += cooldownMod * IN_MILLISECONDS;
+
+                            if (!spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
+                                player->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categoryCooldown, nullptr);
+
+                            // Clear cooldown if < 10min & (passed time > 30sec)
+                            if (remainingCooldown > 0
+                                && itr->second.end < infTime
+                                && totalCooldown <= 30 * MINUTE * IN_MILLISECONDS
+                                && categoryCooldown <= 30 * MINUTE * IN_MILLISECONDS
+                                && remainingCooldown <= 30 * MINUTE * IN_MILLISECONDS
+                                )
+                                player->RemoveSpellCooldown(itr->first, true);
+                        }
+                    }
+                }
+        }
+
         void SpawnGunship()
         {
             if (!GunshipGUID && instance->HavePlayers())
@@ -1266,6 +1331,10 @@ public:
         {
             switch (type)
             {
+                case DATA_SUMMON_SINDRAGOSA:
+                    if (GetBossState(DATA_SINDRAGOSA) != DONE && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
+                        Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
+                    break;
                 case DATA_BUFF_AVAILABLE:
                     IsBuffAvailable = !!data;
                     if (!IsBuffAvailable)
