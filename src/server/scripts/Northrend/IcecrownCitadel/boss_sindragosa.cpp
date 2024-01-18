@@ -61,7 +61,10 @@ enum Spells
     SPELL_BACKLASH              = 69770,
     SPELL_ICY_GRIP              = 70117,
     SPELL_ICY_GRIP_JUMP         = 70122,
-    SPELL_BLISTERING_COLD       = 70123,
+    SPELL_BLISTERING_COLD_10    = 70123,
+    SPELL_BLISTERING_COLD_10H   = 71048,
+    SPELL_BLISTERING_COLD_25    = 71047,
+    SPELL_BLISTERING_COLD_25H   = 71049,
     SPELL_FROST_BEACON          = 70126,
     SPELL_ICE_TOMB_TARGET       = 69712,
     SPELL_ICE_TOMB_DUMMY        = 69675,
@@ -553,7 +556,29 @@ public:
                     break;
                 case EVENT_BLISTERING_COLD:
                     Talk(EMOTE_WARN_BLISTERING_COLD);
-                    me->CastSpell(me, SPELL_BLISTERING_COLD, false);
+                    //增加读条停手
+                    me->DisableRotate(true);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    me->SendMovementFlagUpdate();
+                    //增加读条停手
+                    if (Is25ManRaid())
+                    {
+                        if (me->GetMap()->IsHeroic())
+                            me->CastSpell(me, SPELL_BLISTERING_COLD_25H, false);
+                        else
+                            me->CastSpell(me, SPELL_BLISTERING_COLD_25, false);
+                    }
+                    else
+                    {
+                        if (me->GetMap()->IsHeroic())
+                            me->CastSpell(me, SPELL_BLISTERING_COLD_10H, false);
+                        else
+                            me->CastSpell(me, SPELL_BLISTERING_COLD_10, false);
+                    }
+                    //解除停手
+                    events.DelayEventsToMax(1, 0);
+                    events.ScheduleEvent(EVENT_UNROOT, 0);
+                    //解除停手
                     events.ScheduleEvent(EVENT_BLISTERING_COLD_YELL, 5s, EVENT_GROUP_LAND_PHASE);
                     if (_isThirdPhase)
                         events.RescheduleEvent(EVENT_ICY_GRIP, 65s, 70s);
@@ -1026,7 +1051,7 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
+            if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA) || GetHitUnit()->HasAura(SPELL_ICE_TOMB_UNTARGETABLE) || GetHitUnit()->HasAura(SPELL_ICE_TOMB_DAMAGE))//修复抓冰墓内玩家
                 return;
 
             GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);

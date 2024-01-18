@@ -13606,7 +13606,14 @@ void Player::_LoadSkills(PreparedQueryResult result)
             SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill, getRace(), getClass());
             if (!rcEntry)
             {
-                LOG_ERROR("entities.player", "Character {} has skill {} that does not exist.", GetGUID().ToString(), skill);
+                LOG_ERROR("entities.player", "Character {} has skill {} that does not exist.Deleted by miao", GetGUID().ToString(), skill);
+                //CharacterDatabase.Query("DELETE FROM character_skills WHERE guid = {} AND skill = {}", GetGUID().ToString(), skill);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
+
+                stmt->SetData(0, GetGUID().GetCounter());
+                stmt->SetData(1, skill);
+
+                CharacterDatabase.Execute(stmt);
                 continue;
             }
 
