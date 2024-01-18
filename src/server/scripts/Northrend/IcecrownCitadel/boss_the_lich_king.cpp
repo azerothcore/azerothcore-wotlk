@@ -958,7 +958,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4600ms, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -984,7 +984,12 @@ public:
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)
-                                Unit::Kill(me, player);
+                            {//救赎之魂fix
+                                if (player->HasAura(27827))
+                                    player->RemoveAura(27827);
+                                else if (player->IsAlive())
+                                    Unit::Kill(me, player);
+                            }
             }
             else
                 _positionCheckTimer -= diff;
@@ -1092,7 +1097,7 @@ public:
                 case EVENT_SUMMON_RAGING_SPIRIT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15s : 20s), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15123ms : 20123ms), EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_DEFILE:
                     {
@@ -1869,7 +1874,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
     };
 
@@ -2337,11 +2342,17 @@ public:
                     {
                         valid = true;
                         summoner->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL_CLONE, true);
+                        AttackStart(summoner);//增加攻击指令防止返回
+                        DoZoneInCombat();//增加攻击指令防止返回
                     }
             if (!valid)
             {
                 if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
+                {
                     plr->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL_CLONE, true);
+                    AttackStart(plr);//增加攻击指令防止返回
+                    DoZoneInCombat();//增加攻击指令防止返回
+                }
                 else
                     me->DespawnOrUnsummon(1);
             }
@@ -2367,7 +2378,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->HasUnitState(UNIT_STATE_ROOT))
+            //去掉检测if (!me->HasUnitState(UNIT_STATE_ROOT))
                 ScriptedAI::AttackStart(who);
         }
 
@@ -2421,7 +2432,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
 
     private:
@@ -2665,8 +2676,17 @@ public:
         {
             _events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
+
+            if (me->HasUnitState(UNIT_STATE_STUNNED))
+            {
+                me->GetMotionMaster()->Clear();
+                me->UpdatePosition(*me, true);
+                me->StopMovingOnCurrentPos();
+                me->SendMovementFlagUpdate();//增加客户端位置刷新
+                return;
+            }
 
             switch (_events.ExecuteEvent())
             {
@@ -3607,7 +3627,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
     };
 
@@ -3746,7 +3766,7 @@ public:
         void Reset() override
         {
             me->SetCorpseDelay(0);
-            me->SetReactState(REACT_PASSIVE);
+            me->SetReactState(REACT_DEFENSIVE);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -3756,13 +3776,22 @@ public:
 
         void JustRespawned() override
         {
-            me->SetReactState(REACT_PASSIVE);
+            me->SetReactState(REACT_DEFENSIVE);
         }
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return me->GetReactState() == REACT_AGGRESSIVE && target->GetTypeId() == TYPEID_PLAYER && target->GetExactDistSq(495.708f, -2523.76f, 1049.95f) < 40.0f * 40.0f;
+            return me->GetReactState() != REACT_PASSIVE && target->GetTypeId() == TYPEID_PLAYER && target->GetExactDistSq(495.708f, -2523.76f, 1049.95f) < 40.0f * 40.0f;
         }
+        //禁止脱战
+        void UpdateAI(uint32 diff) override
+        {
+            if (me->IsInEvadeMode())
+            {
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_STATE_EVADE);
+            }
+        }
+        //禁止脱战
     };
 
     CreatureAI* GetAI(Creature* creature) const override
