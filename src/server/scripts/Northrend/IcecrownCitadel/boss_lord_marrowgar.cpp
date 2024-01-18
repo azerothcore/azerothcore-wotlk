@@ -333,7 +333,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            events.ScheduleEvent(1, 450ms);
+            events.ScheduleEvent(1, 360ms);
             events.ScheduleEvent(2, 12s);
             me->m_positionZ = 42.5f;
         }
