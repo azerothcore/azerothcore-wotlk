@@ -528,6 +528,7 @@ public:
         {
             ASSERT(creature->GetVehicleKit());
             _instance = me->GetInstanceScript();
+            _teamIdInInstance = TeamId(me->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE));
         }
 
         void Reset() override
@@ -539,81 +540,166 @@ public:
 
         void DoAction(int32 action) override
         {
-            switch (action)
+            if (_teamIdInInstance == TEAM_HORDE)
             {
+                switch (action)
+                {
                 case ACTION_START_EVENT:
+                {
+                    // Prevent crashes
+                    if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
+                        return;
+
+                    Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
+                    if (!deathbringer || deathbringer->IsInEvadeMode())
+                        return;
+
+                    if (_guardList.empty())
                     {
-                        // Prevent crashes
-                        if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
-                            return;
-
-                        Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
-                        if (!deathbringer || deathbringer->IsInEvadeMode())
-                            return;
-
-                        if (_guardList.empty())
-                        {
-                            GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
-                            _guardList.sort(Acore::ObjectDistanceOrderPred(me));
-                        }
-                        uint32 x = 1;
-                        for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-                            (*itr)->AI()->SetData(0, x++);
-
-                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        Talk(SAY_INTRO_HORDE_1);
-                        _events.SetPhase(PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18s + 500ms, 0, PHASE_INTRO_H);
-                        _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
-
-                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
-                        {
-                            _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
-                        }
-
-                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        deathbringer->SetWalk(false);
-                        deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
+                        GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
+                        _guardList.sort(Acore::ObjectDistanceOrderPred(me));
                     }
-                    break;
+                    uint32 x = 1;
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                        (*itr)->AI()->SetData(0, x++);
+
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    Talk(SAY_INTRO_HORDE_1);
+                    _events.SetPhase(PHASE_INTRO_H);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18s + 500ms, 0, PHASE_INTRO_H);
+                    _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
+
+                    if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                    {
+                        _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
+                        teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
+                    }
+
+                    deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    deathbringer->SetWalk(false);
+                    deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
+                }
+                break;
                 case ACTION_START_OUTRO:
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
-                        me->SetDisableGravity(false);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
-                        for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-                            (*itr)->AI()->DoAction(ACTION_DESPAWN);
+                {
+                    me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
+                    me->SetDisableGravity(false);
+                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                        (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
-                        /*Talk(SAY_OUTRO_HORDE_1);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
-                    }
-                    break;
+                    me->DespawnOrUnsummon(10000);//10秒后消失防止卡战斗
+
+                    /*Talk(SAY_OUTRO_HORDE_1);
+                    _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
+                    _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
+                    _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
+                }
+                break;
                 case ACTION_EVADE:
+                {
+                    float x, y, z, o;
+                    me->GetMotionMaster()->Clear();
+                    me->GetHomePosition(x, y, z, o);
+                    me->SetPosition(x, y, z, o);
+                    me->StopMovingOnCurrentPos();
+                    me->SetDisableGravity(false);
+                    EnterEvadeMode();
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                     {
-                        float x, y, z, o;
-                        me->GetMotionMaster()->Clear();
-                        me->GetHomePosition(x, y, z, o);
-                        me->SetPosition(x, y, z, o);
-                        me->StopMovingOnCurrentPos();
-                        me->SetDisableGravity(false);
-                        EnterEvadeMode();
-                        for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-                        {
-                            (*itr)->GetMotionMaster()->Clear();
-                            (*itr)->GetHomePosition(x, y, z, o);
-                            (*itr)->SetPosition(x, y, z, o);
-                            (*itr)->StopMovingOnCurrentPos();
-                            (*itr)->SetDisableGravity(false);
-                            (*itr)->AI()->EnterEvadeMode();
-                        }
+                        (*itr)->GetMotionMaster()->Clear();
+                        (*itr)->GetHomePosition(x, y, z, o);
+                        (*itr)->SetPosition(x, y, z, o);
+                        (*itr)->StopMovingOnCurrentPos();
+                        (*itr)->SetDisableGravity(false);
+                        (*itr)->AI()->EnterEvadeMode();
                     }
-                    break;
+
+                }
+                break;
                 default:
                     break;
+                }
+            }
+            if (_teamIdInInstance == TEAM_ALLIANCE)
+            {
+                switch (action)
+                {
+                case ACTION_START_EVENT:
+                {
+                    // Prevent crashes
+                    if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
+                        return;
+
+                    Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
+                    if (!deathbringer || deathbringer->IsInEvadeMode())
+                        return;
+
+                    if (_guardList.empty())
+                    {
+                        GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
+                        _guardList.sort(Acore::ObjectDistanceOrderPred(me));
+                    }
+                    uint32 x = 1;
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                        (*itr)->AI()->SetData(0, x++);
+
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    Talk(SAY_INTRO_ALLIANCE_1);
+                    _events.SetPhase(PHASE_INTRO_A);
+                    _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500ms, 0, PHASE_INTRO_A);
+                    _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20s, 0, PHASE_INTRO_A);
+                    _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 29s + 500ms, 0, PHASE_INTRO_A);
+                    _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
+
+                    if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                    {
+                        _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
+                        teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
+                    }
+
+                    deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    deathbringer->SetWalk(false);
+                    deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
+                }
+                break;
+                case ACTION_START_OUTRO:
+                {
+                    me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
+                    me->SetDisableGravity(false);
+                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                        (*itr)->AI()->DoAction(ACTION_DESPAWN);
+
+                    me->DespawnOrUnsummon(10000);//10秒后消失防止卡战斗
+
+                    //Talk(SAY_OUTRO_ALLIANCE_1);
+                    break;
+                }
+                case ACTION_EVADE:
+                {
+                    float x, y, z, o;
+                    me->GetMotionMaster()->Clear();
+                    me->GetHomePosition(x, y, z, o);
+                    me->SetPosition(x, y, z, o);
+                    me->StopMovingOnCurrentPos();
+                    me->SetDisableGravity(false);
+                    EnterEvadeMode();
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                    {
+                        (*itr)->GetMotionMaster()->Clear();
+                        (*itr)->GetHomePosition(x, y, z, o);
+                        (*itr)->SetPosition(x, y, z, o);
+                        (*itr)->StopMovingOnCurrentPos();
+                        (*itr)->SetDisableGravity(false);
+                        (*itr)->AI()->EnterEvadeMode();
+                    }
+                }
+                break;
+                default:
+                    break;
+                }
             }
         }
 
@@ -628,10 +714,12 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE)
+            if (_teamIdInInstance == TEAM_HORDE)
             {
-                switch (id)
+                if (type == POINT_MOTION_TYPE)
                 {
+                    switch (id)
+                    {
                     case POINT_FIRST_STEP:
                         me->SetWalk(false);
                         Talk(SAY_INTRO_HORDE_3);
@@ -641,7 +729,7 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 43s + 800ms, 0, PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 47s, 0, PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 48s + 200ms, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH,  56s + 700ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 56s + 700ms, 0, PHASE_INTRO_H);
                         break;
                     /*case POINT_CORPSE:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
@@ -660,6 +748,26 @@ public:
                         break;*/
                     default:
                         break;
+                    }
+                }
+            }
+            if (_teamIdInInstance == TEAM_ALLIANCE)
+            {
+                if (type == POINT_MOTION_TYPE)
+                {
+                    switch (id)
+                    {
+                    case POINT_FIRST_STEP:
+                        me->SetWalk(false);
+                        Talk(SAY_INTRO_ALLIANCE_4);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 7s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 9s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 14s, 0, PHASE_INTRO_A);
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
         }
@@ -667,7 +775,9 @@ public:
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
-            switch (_events.ExecuteEvent())
+            if (_teamIdInInstance == TEAM_HORDE)
+            {
+                switch (_events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -739,12 +849,63 @@ public:
                         Talk(SAY_OUTRO_HORDE_4);
                         break;*/
             }
+            }
+            if (_teamIdInInstance == TEAM_ALLIANCE)
+            {
+                switch (_events.ExecuteEvent())
+                {
+                case 0:
+                    break;
+                case EVENT_INTRO_ALLIANCE_2:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_2);
+                    break;
+                case EVENT_INTRO_ALLIANCE_3:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_3);
+                    break;
+                case EVENT_INTRO_ALLIANCE_4:
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(POINT_FIRST_STEP, firstStepPos.GetPositionX(), firstStepPos.GetPositionY(), firstStepPos.GetPositionZ());
+                    break;
+                case EVENT_INTRO_ALLIANCE_5:
+                    Talk(SAY_INTRO_ALLIANCE_5);
+                    for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                        (*itr)->AI()->DoAction(ACTION_CHARGE);
+                    me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
+                    break;
+                case EVENT_INTRO_ALLIANCE_6:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    {
+                        deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_7);
+                        deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+                    }
+                    break;
+                case EVENT_INTRO_ALLIANCE_7:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    {
+                        deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_6);
+                    }
+                    break;
+                case EVENT_INTRO_FINISH:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    {
+                        deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
+                        deathbringer->SetImmuneToPC(false);
+                        me->SetImmuneToPC(true);
+                        if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
+                            deathbringer->AI()->AttackStart(target);
+                    }
+                    break;
+                }
+            }
         }
 
     private:
         EventMap _events;
         InstanceScript* _instance;
         std::list<Creature*> _guardList;
+        TeamId _teamIdInInstance;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
@@ -752,8 +913,16 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, 10953, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT);
-            SendGossipMenuFor(player, player->GetGossipTextId(10953, creature), creature->GetGUID());
+            if (TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE)) == TEAM_HORDE)
+            {
+                AddGossipItemFor(player, 10953, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT);
+                SendGossipMenuFor(player, player->GetGossipTextId(10953, creature), creature->GetGUID());
+            }
+            if (TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE)) == TEAM_ALLIANCE)
+            {
+                AddGossipItemFor(player, 10933, 0, GOSSIP_SENDER_INFO, -ACTION_START_EVENT + 1);
+                SendGossipMenuFor(player, player->GetGossipTextId(10933, creature), creature->GetGUID());
+            }
         }
 
         return true;
@@ -764,10 +933,20 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            ClearGossipMenuFor(player);
-            CloseGossipMenuFor(player);
-            if (action == -ACTION_START_EVENT)
-                creature->AI()->DoAction(ACTION_START_EVENT);
+            if (TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE)) == TEAM_HORDE)
+            {
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
+                if (action == -ACTION_START_EVENT)
+                    creature->AI()->DoAction(ACTION_START_EVENT);
+            }
+            if (TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE)) == TEAM_ALLIANCE)
+            {
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
+                if (action == -ACTION_START_EVENT + 1)
+                    creature->AI()->DoAction(ACTION_START_EVENT);
+            }
         }
 
         return true;
@@ -948,6 +1127,7 @@ public:
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
                         deathbringer->SetImmuneToPC(false);
+                        me->SetImmuneToPC(true);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -1028,7 +1208,7 @@ public:
                 me->SetWalk(false);
                 me->GetMotionMaster()->MoveCharge(chargePos[_index].GetPositionX(), chargePos[_index].GetPositionY(), chargePos[_index].GetPositionZ(), 13.0f, POINT_CHARGE);
             }
-            else if (action == ACTION_DESPAWN)
+            if (action == ACTION_DESPAWN)
                 me->DespawnOrUnsummon(1);
         }
 
