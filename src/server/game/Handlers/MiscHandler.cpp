@@ -1402,11 +1402,11 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 switch (group->GetDifficultyChangePreventionReason())
                 {
                     case DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED:
-                        ChatHandler(this).PSendSysMessage("Raid was in combat recently and may not change difficulty again for %u sec.", preventionTime);
+                        ChatHandler(this).PSendSysMessage("刚进行了副本战斗, 请等待 %u 秒后再试.", preventionTime);
                         break;
                     case DIFFICULTY_PREVENTION_CHANGE_RECENTLY_CHANGED:
                     default:
-                        ChatHandler(this).PSendSysMessage("Raid difficulty has changed recently, and may not change again for %u sec.", preventionTime);
+                        ChatHandler(this).PSendSysMessage("刚进行了副本难度切换, 请等待 %u 秒后再试.", preventionTime);
                         break;
                 }
 
@@ -1414,6 +1414,13 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 return;
             }
 
+            if (group->isRollLootActive())
+            {
+                ChatHandler(this).PSendSysMessage("装备分配中, 请稍后再试.");
+                _player->SendRaidDifficulty(group != nullptr);
+                return;
+            }
+            
             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* groupGuy = itr->GetSource();
