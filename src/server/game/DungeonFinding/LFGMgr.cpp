@@ -1689,7 +1689,6 @@ namespace lfg
             uint32 roles = proposal.players.find(pguid)->second.role;
             player->roles = roles;
             grp->SetLfgRoles(pguid, roles);
-            grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
         }
 
         // pussywizard: crashfix, group wasn't created when iterating players (no player found by guid), proposal is deleted by the calling function
@@ -2139,6 +2138,15 @@ namespace lfg
             player->GetSession()->SendLfgTeleportError(uint8(LFG_TELEPORTERROR_INVALID_LOCATION));
             return;
         }
+        
+        if (out)
+        {
+            if ((player->GetMapId() == uint32(dungeon->map)) && (!group->isRollLootActive()))//增加拾取检测防止装备丢失
+                player->TeleportToEntryPoint();
+
+            return;
+        }
+
 
         LfgTeleportError error = LFG_TELEPORTERROR_OK;
 
