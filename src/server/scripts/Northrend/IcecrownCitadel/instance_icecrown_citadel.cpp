@@ -269,10 +269,7 @@ public:
 
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
-
-            if (GetBossState(DATA_SINDRAGOSA) == NOT_STARTED)
-                IsSindragosaIntroDone = true;
-
+            
             if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
             {
                 Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
@@ -1332,10 +1329,6 @@ public:
         {
             switch (type)
             {
-                case DATA_SUMMON_SINDRAGOSA:
-                    if (GetBossState(DATA_SINDRAGOSA) != DONE && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
-                        Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                    break;
                 case DATA_BUFF_AVAILABLE:
                     IsBuffAvailable = !!data;
                     if (!IsBuffAvailable)
@@ -1743,8 +1736,8 @@ public:
             data >> LichKingHeroicAvailable;
             data >> BloodPrinceTrashCount;
             data >> IsBuffAvailable;
-            data >> IsSindragosaIntroDone;
             SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
+            data >> IsSindragosaIntroDone;
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
