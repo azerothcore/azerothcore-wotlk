@@ -281,9 +281,9 @@ public:
             if (IsAnyPlayerValid())
                 return;
 
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-				if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
-					controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+			if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
+				controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
 
             BossAI::EnterEvadeMode(why);
             instance->SetBossState(DATA_HALION, FAIL);//增加灭团检测
