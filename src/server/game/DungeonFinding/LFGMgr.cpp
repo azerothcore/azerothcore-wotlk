@@ -2300,11 +2300,11 @@ namespace lfg
             bool done = false;
             Quest const* quest = sObjectMgr->GetQuestTemplate(reward->firstQuest);
             if (!quest)
-                continue;
-
+                continue;		
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-            	if (player->roles == PLAYER_ROLE_TANK || player->roles == PLAYER_ROLE_HEALER)
+            {						
+				 if (player->roles == PLAYER_ROLE_TANK || player->roles == PLAYER_ROLE_HEALER)
 				// 如果玩家选择了坦克或奶妈角色，执行奖励逻辑
                 {
                     player->AddItem(62453, 1);//T/N奖励额外兰德鲁的礼物盒
