@@ -28,6 +28,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "icecrown_citadel.h"
+#include "GameTime.h"
 
 enum EventIds
 {
