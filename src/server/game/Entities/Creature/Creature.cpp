@@ -1666,16 +1666,6 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         return false;
     }
 
-    // xinef: fix from db
-    if ((addToMap || gridLoad) && !data->overwrittenZ)
-    {
-        float tz = map->GetHeight(data->posX, data->posY, data->posZ + 0.42f, true);
-        if (tz >= data->posZ && tz - data->posZ <= 0.42f)
-            const_cast<CreatureData*>(data)->posZ = tz + 0.1f;
-
-        const_cast<CreatureData*>(data)->overwrittenZ = true;
-    }
-
     // xinef: this has to be assigned before Create function, properly loads equipment id from DB
     m_creatureData = data;
     m_spawnId = spawnId;
