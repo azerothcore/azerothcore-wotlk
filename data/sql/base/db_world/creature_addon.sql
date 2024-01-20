@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_addon` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_addon: ~34 243 rows (approximately)
+-- Dumping data for table acore_world.creature_addon: ~35 290 rows (approximately)
 DELETE FROM `creature_addon`;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 	(1, 0, 0, 0, 1, 0, 0, NULL),

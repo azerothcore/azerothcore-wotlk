@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_model_info` (
   PRIMARY KEY (`DisplayID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System (Model related info)';
 
--- Dumping data for table acore_world.creature_model_info: ~24 227 rows (approximately)
+-- Dumping data for table acore_world.creature_model_info: ~24 339 rows (approximately)
 DELETE FROM `creature_model_info`;
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`) VALUES
 	(4, 2, 3, 2, 0),

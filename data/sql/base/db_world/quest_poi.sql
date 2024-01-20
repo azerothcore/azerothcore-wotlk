@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `quest_poi` (
   KEY `idx` (`QuestID`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_poi: ~18 630 rows (approximately)
+-- Dumping data for table acore_world.quest_poi: ~18 158 rows (approximately)
 DELETE FROM `quest_poi`;
 INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
 	(1, 0, -1, 0, 23, 0, 0, 1, 0),

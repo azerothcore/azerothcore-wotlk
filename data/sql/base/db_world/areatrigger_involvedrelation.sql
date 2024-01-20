@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_involvedrelation: ~59 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_involvedrelation: ~57 rows (approximately)
 DELETE FROM `areatrigger_involvedrelation`;
 INSERT INTO `areatrigger_involvedrelation` (`id`, `quest`) VALUES
 	(78, 155),

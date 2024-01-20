@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `game_event_creature` (
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event_creature: ~8 836 rows (approximately)
+-- Dumping data for table acore_world.game_event_creature: ~9 748 rows (approximately)
 DELETE FROM `game_event_creature`;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(2, 24),

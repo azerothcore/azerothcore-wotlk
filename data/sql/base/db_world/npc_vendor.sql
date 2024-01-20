@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `npc_vendor` (
   KEY `slot` (`slot`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Npc System';
 
--- Dumping data for table acore_world.npc_vendor: ~37 392 rows (approximately)
+-- Dumping data for table acore_world.npc_vendor: ~37 842 rows (approximately)
 DELETE FROM `npc_vendor`;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(54, 0, 2488, 0, 0, 0, 0),

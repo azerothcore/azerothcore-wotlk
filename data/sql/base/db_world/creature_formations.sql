@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_formations` (
   CONSTRAINT `creature_formations_chk_1` CHECK (((`dist` >= 0) and (`angle` >= 0)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_formations: ~4 562 rows (approximately)
+-- Dumping data for table acore_world.creature_formations: ~4 951 rows (approximately)
 DELETE FROM `creature_formations`;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 	(857, 857, 0, 0, 2, 0, 0),

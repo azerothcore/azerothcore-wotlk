@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.gameobject_loot_template: ~17 749 rows (approximately)
+-- Dumping data for table acore_world.gameobject_loot_template: ~17 907 rows (approximately)
 DELETE FROM `gameobject_loot_template`;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(167, 1349, 0, 100, 1, 1, 0, 1, 1, 'Abercrombie\'s Crate - Abercrombie\'s Crate'),

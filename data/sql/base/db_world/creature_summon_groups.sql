@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `creature_summon_groups` (
   `Comment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_summon_groups: ~636 rows (approximately)
+-- Dumping data for table acore_world.creature_summon_groups: ~657 rows (approximately)
 DELETE FROM `creature_summon_groups`;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
 	(28952, 0, 1, 28988, 6810.89, -4592.67, 440.678, 1.29927, 3, 100000, ''),

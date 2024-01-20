@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `creature_text` (
   CONSTRAINT `creature_text_chk_1` CHECK ((`Probability` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_text: ~18 279 rows (approximately)
+-- Dumping data for table acore_world.creature_text: ~18 662 rows (approximately)
 DELETE FROM `creature_text`;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 	(6, 0, 0, 'You no take candle!', 12, 0, 100, 0, 0, 0, 16658, 0, 'Kobold Vermin - Random Say on Aggro'),

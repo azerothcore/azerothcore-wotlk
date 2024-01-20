@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option_locale` (
   PRIMARY KEY (`MenuID`,`OptionID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu_option_locale: ~35 137 rows (approximately)
+-- Dumping data for table acore_world.gossip_menu_option_locale: ~35 003 rows (approximately)
 DELETE FROM `gossip_menu_option_locale`;
 INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
 	(0, 0, 'deDE', 'GOSSIP_OPTION_QUESTGIVER', ''),

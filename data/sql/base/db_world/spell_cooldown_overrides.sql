@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_cooldown_overrides` (
   `CategoryRecoveryTime` int unsigned NOT NULL DEFAULT '0',
   `StartRecoveryTime` int unsigned NOT NULL DEFAULT '0',
   `StartRecoveryCategory` int unsigned NOT NULL DEFAULT '0',
-  `Comment` text COLLATE utf8mb4_unicode_ci,
+  `Comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

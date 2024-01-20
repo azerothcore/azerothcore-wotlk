@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.areatrigger_scripts: ~143 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_scripts: ~149 rows (approximately)
 DELETE FROM `areatrigger_scripts`;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(171, 'SmartTrigger'),

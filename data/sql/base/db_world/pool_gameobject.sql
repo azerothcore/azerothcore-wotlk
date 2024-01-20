@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `pool_gameobject` (
   CONSTRAINT `pool_gameobject_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_gameobject: ~29 517 rows (approximately)
+-- Dumping data for table acore_world.pool_gameobject: ~30 065 rows (approximately)
 DELETE FROM `pool_gameobject`;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 	(21, 8085, 0, 'Ragveil - Zangarmarsh'),

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
   CONSTRAINT `item_enchantment_template_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item Random Enchantment System';
 
--- Dumping data for table acore_world.item_enchantment_template: ~28 606 rows (approximately)
+-- Dumping data for table acore_world.item_enchantment_template: ~28 599 rows (approximately)
 DELETE FROM `item_enchantment_template`;
 INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(61, 6, 7.73),
@@ -10513,8 +10513,7 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(813, 1012, 2.79),
 	(813, 1013, 2.79),
 	(813, 1014, 2.79),
-	(813, 1015, 2.79);
-INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
+	(813, 1015, 2.79),
 	(813, 1549, 1.45),
 	(813, 1550, 1.45),
 	(813, 1951, 0.1),
@@ -20028,7 +20027,8 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2034, 596, 3.74),
 	(2034, 678, 3.7),
 	(2034, 679, 3.7),
-	(2034, 680, 3.7),
+	(2034, 680, 3.7);
+INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2034, 681, 3.7),
 	(2034, 933, 2.09),
 	(2034, 934, 2.09),
@@ -20514,8 +20514,7 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2074, 215, 3.75),
 	(2074, 216, 3.75),
 	(2074, 437, 1.9),
-	(2074, 438, 1.9);
-INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
+	(2074, 438, 1.9),
 	(2074, 439, 1.9),
 	(2074, 440, 1.9),
 	(2074, 520, 2.12),
@@ -21001,8 +21000,7 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2126, 1751, 0.58),
 	(2126, 1752, 0.58),
 	(2126, 1753, 0.58),
-	(2126, 1754, 0.58);
-INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
+	(2126, 1754, 0.58),
 	(2126, 1755, 0.58),
 	(2126, 1756, 0.58),
 	(2128, 167, 5),

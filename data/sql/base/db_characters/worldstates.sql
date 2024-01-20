@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `worldstates` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Variable Saves';
 
--- Dumping data for table acore_characters.worldstates: ~102 rows (approximately)
+-- Dumping data for table acore_characters.worldstates: ~105 rows (approximately)
 DELETE FROM `worldstates`;
 INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(1, 0, NULL),

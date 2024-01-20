@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu` (
   PRIMARY KEY (`MenuID`,`TextID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu: ~5 961 rows (approximately)
+-- Dumping data for table acore_world.gossip_menu: ~5 985 rows (approximately)
 DELETE FROM `gossip_menu`;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(21, 518),

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `game_event` (
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event: ~83 rows (approximately)
+-- Dumping data for table acore_world.game_event: ~84 rows (approximately)
 DELETE FROM `game_event`;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 	(1, '2021-06-22 03:01:00', '2030-12-31 15:00:00', 525600, 20160, 341, 1, 'Midsummer Fire Festival', 0, 2),

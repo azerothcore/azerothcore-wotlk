@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   PRIMARY KEY (`creature_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature OnKill Reputation gain';
 
--- Dumping data for table acore_world.creature_onkill_reputation: ~2 036 rows (approximately)
+-- Dumping data for table acore_world.creature_onkill_reputation: ~2 035 rows (approximately)
 DELETE FROM `creature_onkill_reputation`;
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
 	(674, 21, 0, 5, 0, 5, 0, 0, 0, 0),

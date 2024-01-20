@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_equip_template: ~10 763 rows (approximately)
+-- Dumping data for table acore_world.creature_equip_template: ~10 849 rows (approximately)
 DELETE FROM `creature_equip_template`;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
 	(6, 1, 5276, 0, 0, 18019),

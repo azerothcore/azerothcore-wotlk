@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gameobject_template_addon: ~21 675 rows (approximately)
+-- Dumping data for table acore_world.gameobject_template_addon: ~21 255 rows (approximately)
 DELETE FROM `gameobject_template_addon`;
 INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`, `maxgold`, `artkit0`, `artkit1`, `artkit2`, `artkit3`) VALUES
 	(31, 84, 4, 0, 0, 0, 0, 0, 0),

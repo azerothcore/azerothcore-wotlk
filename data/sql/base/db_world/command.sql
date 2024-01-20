@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `command` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Chat System';
 
--- Dumping data for table acore_world.command: ~586 rows (approximately)
+-- Dumping data for table acore_world.command: ~589 rows (approximately)
 DELETE FROM `command`;
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('account', 0, 'Syntax: .account\r\n\r\nDisplay the access level of your account and the email adress if you possess the necessary permissions.'),

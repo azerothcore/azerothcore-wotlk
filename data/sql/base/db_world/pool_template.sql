@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `pool_template` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_template: ~5 132 rows (approximately)
+-- Dumping data for table acore_world.pool_template: ~5 134 rows (approximately)
 DELETE FROM `pool_template`;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(1, 1, ''),

@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `updates` (
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='List of all applied updates in this database.';
 
--- Dumping data for table acore_characters.updates: ~61 rows (approximately)
+-- Dumping data for table acore_characters.updates: ~4 rows (approximately)
 DELETE FROM `updates`;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 	('2023_04_24_00.sql', 'D164A70B22B2462464484614018C3218B3259AE4', 'RELEASED', '2024-01-20 13:25:01', 30),

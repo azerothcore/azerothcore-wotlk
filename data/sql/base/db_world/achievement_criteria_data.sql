@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
   PRIMARY KEY (`criteria_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Achievment system';
 
--- Dumping data for table acore_world.achievement_criteria_data: ~2 787 rows (approximately)
+-- Dumping data for table acore_world.achievement_criteria_data: ~2 815 rows (approximately)
 DELETE FROM `achievement_criteria_data`;
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
 	(100, 0, 0, 0, ''),

@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `event_scripts` (
   `o` float NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.event_scripts: ~463 rows (approximately)
+-- Dumping data for table acore_world.event_scripts: ~435 rows (approximately)
 DELETE FROM `event_scripts`;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
 	(259, 2, 10, 1770, 300000, 0, 881.63, 1230.37, 47.83, 3.1),

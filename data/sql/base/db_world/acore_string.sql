@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `acore_string` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.acore_string: ~1 154 rows (approximately)
+-- Dumping data for table acore_world.acore_string: ~1 164 rows (approximately)
 DELETE FROM `acore_string`;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
 	(1, 'You should select a character or a creature.', NULL, NULL, 'Ihr solltet einen Charakter oder eine Kreatur auswählen.', '你必须选择一个目标或者生物。', NULL, 'Debes seleccionar un personaje o una criatura.', 'Debes seleccionar un personaje o una criatura.', NULL),

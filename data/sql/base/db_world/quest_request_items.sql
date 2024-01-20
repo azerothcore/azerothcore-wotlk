@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `quest_request_items` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_request_items: ~7 745 rows (approximately)
+-- Dumping data for table acore_world.quest_request_items: ~7 450 rows (approximately)
 DELETE FROM `quest_request_items`;
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
 	(2, 1, 0, 'Yes, mighty $C, I sensed your arrival. I trust you have more news to report to me about your hunt?', 12340),

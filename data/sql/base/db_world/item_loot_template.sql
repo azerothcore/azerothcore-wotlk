@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `item_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.item_loot_template: ~5 001 rows (approximately)
+-- Dumping data for table acore_world.item_loot_template: ~4 983 rows (approximately)
 DELETE FROM `item_loot_template`;
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(4632, 789, 0, 0, 0, 1, 1, 1, 1, 'Ornate Bronze Lockbox - Stout Battlehammer'),

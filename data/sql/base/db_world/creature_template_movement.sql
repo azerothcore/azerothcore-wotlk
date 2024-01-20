@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_movement` (
   PRIMARY KEY (`CreatureId`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_template_movement: ~4 456 rows (approximately)
+-- Dumping data for table acore_world.creature_template_movement: ~4 474 rows (approximately)
 DELETE FROM `creature_template_movement`;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 	(30, 1, 0, 0, 0, 0, 0, NULL),

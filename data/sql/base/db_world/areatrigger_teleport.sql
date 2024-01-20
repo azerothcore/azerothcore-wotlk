@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_teleport: ~273 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_teleport: ~274 rows (approximately)
 DELETE FROM `areatrigger_teleport`;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
 	(45, 'Scarlet Monastery - Graveyard (Entrance)', 189, 1688.99, 1053.48, 18.6775, 0.00117),

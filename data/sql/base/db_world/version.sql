@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `version` (
 -- Dumping data for table acore_world.version: ~1 rows (approximately)
 DELETE FROM `version`;
 INSERT INTO `version` (`core_version`, `core_revision`, `db_version`, `cache_id`) VALUES
-	('AzerothCore rev. f60fb6307dc6 2024-01-20 13:20:35 +0000 (it-is-time-for-the-yearly-squash!-hopefully-the-archive-skipping-between-commits-issue-is-solved-now.-only-time-will-tell.-HAPPY-NEW-2024 branch) (Win64, RelWithDebInfo, Static)', 'f60fb6307dc6', 'ACDB 335.10-dev', 10);
+	('AzerothCore rev. bd8a08e50dfe+ 2024-01-20 14:48:23 +0100 (it-is-time-for-the-yearly-squash!-hopefully-the-archive-skipping-between-commits-issue-is-solved-now.-only-time-will-tell.-HAPPY-NEW-2024 branch) (Win64, RelWithDebInfo, Static)', 'bd8a08e50dfe+', 'ACDB 335.11-dev', 11);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
