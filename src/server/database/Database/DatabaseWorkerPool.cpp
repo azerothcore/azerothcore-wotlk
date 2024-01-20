@@ -450,10 +450,10 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
             _connections[type].clear();
             return error;
         }
-        else if (DatabaseIncompatibleVersion(connection->SelectServerVersion()))
+        else if (DatabaseIncompatibleVersion(connection->GetServerInfo()))
         {
             LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5.\n\nFound server version: {}. Server compiled with: {}.",
-                connection->SelectServerVersion(), MYSQL_VERSION_ID);
+                connection->GetServerInfo(), MYSQL_VERSION_ID);
             return 1;
         }
         else

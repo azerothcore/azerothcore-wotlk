@@ -486,7 +486,7 @@ uint32 MySQLConnection::GetServerVersion() const
     return mysql_get_server_version(m_Mysql);
 }
 
-std::string MySQLConnection::SelectServerVersion() const
+std::string MySQLConnection::GetServerInfo() const
 {
     return mysql_get_server_info(m_Mysql);
 }

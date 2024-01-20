@@ -94,9 +94,7 @@ protected:
     void Unlock();
 
     [[nodiscard]] uint32 GetServerVersion() const;
-    // This uses a query to get the server version.
-    // Useful in checking between MySQL and MariaDB
-    [[nodiscard]] std::string SelectServerVersion() const;
+    [[nodiscard]] std::string GetServerInfo() const;
     MySQLPreparedStatement* GetPreparedStatement(uint32 index);
     void PrepareStatement(uint32 index, std::string_view sql, ConnectionFlags flags);
 
