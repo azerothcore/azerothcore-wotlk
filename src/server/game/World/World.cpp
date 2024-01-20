@@ -2984,7 +2984,7 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
 void World::InitWeeklyQuestResetTime()
 {
     Seconds wstime = Seconds(sWorld->getWorldState(WS_WEEKLY_QUEST_RESET_TIME));
-    _nextWeeklyQuestReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(4, 6));
+    _nextWeeklyQuestReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(5, 7));
 
     if (wstime == 0s)
     {
@@ -3091,7 +3091,7 @@ void World::ResetWeeklyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetWeeklyQuestStatus();
 
-    _nextWeeklyQuestReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(4, 6));
+    _nextWeeklyQuestReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(5, 7));
     sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, _nextWeeklyQuestReset.count());
 
     // change available weeklies
