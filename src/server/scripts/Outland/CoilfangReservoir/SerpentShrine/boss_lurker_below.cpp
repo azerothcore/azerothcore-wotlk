@@ -79,7 +79,26 @@ struct boss_the_lurker_below : public BossAI
     void EnterEvadeMode(EvadeReason why) override
     {
         BossAI::EnterEvadeMode(why);
+        if (GameObject* pool = instance->GetGameObject(DATA_STRANGE_POOL))
+        {
+            pool->Respawn();
+            pool->SetRespawnTime(10);
+            pool->SaveRespawnTime(10);
+        }
         me->DespawnOrUnsummon(2000);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (damage >= me->GetHealth())
+        {
+            // Liquid state around his area is working awkwardly and doesn't consider him to be swimming
+            // Therefore he falls to the bottom of the lake when he dies, because he is "flying" in his pool
+            // Removing this prevents him from dropping to the bottom of the lake
+            // There is also a visual issue currently causing him to drop to the bottom of the lake but his body not update clientside
+            // So it looks as if he was floating but he has in fact dropped to the bottom of the lake, and thus becomes unlootable
+            me->SetDisableGravity(false);
+        }
     }
 
     void DoAction(int32 action) override
@@ -228,6 +247,10 @@ public:
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
                 if (Creature* lurker = go->SummonCreature(NPC_THE_LURKER_BELOW, 38.4567f, -417.324f, -18.916666f, 2.94960f, TEMPSUMMON_MANUAL_DESPAWN))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
+
+                go->DespawnOrUnsummon();
+                go->SetRespawnDelay(7 * DAY);
+                go->SaveRespawnTime();
                 return true;
             }
 

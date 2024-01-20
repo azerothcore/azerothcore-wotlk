@@ -745,6 +745,80 @@ class spell_rog_pickpocket : public SpellScript
     }
 };
 
+enum vanish
+{
+    SPELL_STEALTH           = 1784,
+    SPELL_PARALYZE          = 38132,
+    SPELL_CLEAN_ESCAPE_AURA = 23582,
+    SPELL_CLEAN_ESCAPE_HEAL = 23583
+};
+
+// 18461 - Vanish Purge (Server Side)
+class spell_rog_vanish_purge : public SpellScript
+{
+    PrepareSpellScript(spell_rog_vanish_purge);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PARALYZE });
+    }
+
+    void HandleRootRemove(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster() && !GetCaster()->HasAura(SPELL_PARALYZE)) // Root from Tainted Core SSC, should not be removed by vanish.
+            GetCaster()->RemoveAurasWithMechanic(1 << MECHANIC_ROOT);
+    }
+
+    void HandleSnareRemove(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster())
+            GetCaster()->RemoveAurasWithMechanic(1 << MECHANIC_SNARE);
+    }
+
+    void Register() override
+    {
+        // Blizzard handles EFFECT_0 as the unroot and EFFECT_1 as unsnare. Hence why they are not done in the same place.
+        OnEffectHitTarget += SpellEffectFn(spell_rog_vanish_purge::HandleRootRemove, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        OnEffectHitTarget += SpellEffectFn(spell_rog_vanish_purge::HandleSnareRemove, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
+// -1856 - Vanish
+class spell_rog_vanish : public SpellScript
+{
+    PrepareSpellScript(spell_rog_vanish);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CLEAN_ESCAPE_AURA, SPELL_CLEAN_ESCAPE_HEAL });
+    }
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster())
+        {
+            GetCaster()->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
+
+            if (!GetCaster()->HasAura(SPELL_STEALTH))
+            {
+                // Remove stealth cooldown if needed.
+                if (GetCaster()->IsPlayer() && GetCaster()->HasSpellCooldown(SPELL_STEALTH))
+                    GetCaster()->ToPlayer()->RemoveSpellCooldown(SPELL_STEALTH);
+
+                GetCaster()->CastSpell(GetCaster(), SPELL_STEALTH, true);
+            }
+
+            if (GetCaster()->HasAura(SPELL_CLEAN_ESCAPE_AURA))
+                GetCaster()->CastSpell(GetCaster(), SPELL_CLEAN_ESCAPE_HEAL, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_rog_vanish::HandleEffect, EFFECT_2, SPELL_EFFECT_SANCTUARY);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -761,5 +835,7 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_tricks_of_the_trade);
     RegisterSpellScript(spell_rog_tricks_of_the_trade_proc);
     RegisterSpellScript(spell_rog_pickpocket);
+    RegisterSpellScript(spell_rog_vanish_purge);
+    RegisterSpellScript(spell_rog_vanish);
 }
 

@@ -1760,8 +1760,8 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     // xinef: fix from db
     if ((addToMap || gridLoad) && !data->overwrittenZ)
     {
-        float tz = map->GetHeight(data->posX, data->posY, data->posZ + 1.0f, true);
-        if (tz >= data->posZ && tz - data->posZ <= 1.0f)
+        float tz = map->GetHeight(data->posX, data->posY, data->posZ + 0.42f, true);
+        if (tz >= data->posZ && tz - data->posZ <= 0.42f)
             const_cast<CreatureData*>(data)->posZ = tz + 0.1f;
 
         const_cast<CreatureData*>(data)->overwrittenZ = true;
@@ -2334,6 +2334,11 @@ const
 {
     if (!spellInfo)
         return false;
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BYPASS_MECHANIC_IMMUNITY))
+    {
+        return false;
+    }
 
     // Xinef: this should exclude self casts...
     // Spells that don't have effectMechanics.
