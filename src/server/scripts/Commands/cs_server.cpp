@@ -519,24 +519,17 @@ public:
         std::wstring wMotd   = std::wstring();
         std::string  strMotd = std::string();
 
-        if (!realmId) {
+        if (!realmId)
             realmId = static_cast<int32>(realm.Id.Realm);
-        }
 
         if (motd.empty())
-        {
             return false;
-        }
 
         if (!Utf8toWStr(motd, wMotd))
-        {
             return false;
-        }
 
         if (!WStrToUtf8(wMotd, strMotd))
-        {
             return false;
-        }
 
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
