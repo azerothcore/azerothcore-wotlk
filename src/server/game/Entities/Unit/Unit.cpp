@@ -9253,20 +9253,23 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                                         break;
                                 }
 
-                                if (cooldown && GetTypeId() == TYPEID_PLAYER)
+                                if (cooldown && ToPlayer()->HasSpellCooldown(stack_spell_id))
                                 {
-                                    if (ToPlayer()->HasSpellCooldown(stack_spell_id))
-                                        return false;
-
-                                    ToPlayer()->AddSpellCooldown(stack_spell_id, 0, cooldown);
+                                    return false;
                                 }
 
                                 CastSpell(this, stack_spell_id, true, nullptr, triggeredByAura);
 
                                 Aura* dummy = GetAura(stack_spell_id);
                                 if (!dummy || dummy->GetStackAmount() < triggerAmount)
+                                {
                                     return false;
+                                }
 
+                                if (cooldown)
+                                {
+                                    ToPlayer()->AddSpellCooldown(stack_spell_id, 0, cooldown);
+                                }
                                 RemoveAurasDueToSpell(stack_spell_id);
                                 CastSpell(victim, trigger_spell_id, true, nullptr, triggeredByAura);
                                 return true;
