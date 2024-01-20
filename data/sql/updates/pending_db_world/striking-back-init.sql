@@ -41,7 +41,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (188154, 1, 0, 0, 62, 0, 100, 0, 9276, 0, 0, 0, 0, 11, 46595, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ice Stone - On Gossip Option 0 Selected - Cast \'Summon Ice Stone Lieutenant, Trigger\''),
 (188154, 1, 1, 0, 62, 0, 100, 0, 9276, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ice Stone - On Gossip Option 0 Selected - Close Gossip');
 
-DELETE FROM `creature` WHERE `guid` IN (245628, 245629, 245630, 245631, 245632, 245633);
+DELETE FROM `creature` WHERE (`guid` IN (245628, 245629, 245630, 245631, 245632, 245633) AND `id1` IN (26116, 26178, 26204, 26214, 26215, 26216));
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1 AND `guid` IN (245628, 245629, 245630, 245631, 245632, 245633));
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 26116;
