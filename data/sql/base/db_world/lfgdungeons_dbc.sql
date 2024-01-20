@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,22 +18,22 @@
 DROP TABLE IF EXISTS `lfgdungeons_dbc`;
 CREATE TABLE IF NOT EXISTS `lfgdungeons_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name_Lang_enUS` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enGB` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_koKR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_frFR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_deDE` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_zhCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_zhTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_esES` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_esMX` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ruRU` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ptPT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ptBR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_itIT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enUS` text,
+  `Name_Lang_enGB` text,
+  `Name_Lang_koKR` text,
+  `Name_Lang_frFR` text,
+  `Name_Lang_deDE` text,
+  `Name_Lang_enCN` text,
+  `Name_Lang_zhCN` text,
+  `Name_Lang_enTW` text,
+  `Name_Lang_zhTW` text,
+  `Name_Lang_esES` text,
+  `Name_Lang_esMX` text,
+  `Name_Lang_ruRU` text,
+  `Name_Lang_ptPT` text,
+  `Name_Lang_ptBR` text,
+  `Name_Lang_itIT` text,
+  `Name_Lang_Unk` text,
   `Name_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   `MinLevel` int NOT NULL DEFAULT '0',
   `MaxLevel` int NOT NULL DEFAULT '0',
@@ -45,29 +45,29 @@ CREATE TABLE IF NOT EXISTS `lfgdungeons_dbc` (
   `Flags` int NOT NULL DEFAULT '0',
   `TypeID` int NOT NULL DEFAULT '0',
   `Faction` int NOT NULL DEFAULT '0',
-  `TextureFilename` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `TextureFilename` text,
   `ExpansionLevel` int NOT NULL DEFAULT '0',
   `Order_Index` int NOT NULL DEFAULT '0',
   `Group_Id` int NOT NULL DEFAULT '0',
-  `Description_Lang_enUS` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_enGB` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_koKR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_frFR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_deDE` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_enCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_zhCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_enTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_zhTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_esES` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_esMX` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_ruRU` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_ptPT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_ptBR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_itIT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Description_Lang_enUS` text,
+  `Description_Lang_enGB` text,
+  `Description_Lang_koKR` text,
+  `Description_Lang_frFR` text,
+  `Description_Lang_deDE` text,
+  `Description_Lang_enCN` text,
+  `Description_Lang_zhCN` text,
+  `Description_Lang_enTW` text,
+  `Description_Lang_zhTW` text,
+  `Description_Lang_esES` text,
+  `Description_Lang_esMX` text,
+  `Description_Lang_ruRU` text,
+  `Description_Lang_ptPT` text,
+  `Description_Lang_ptBR` text,
+  `Description_Lang_itIT` text,
+  `Description_Lang_Unk` text,
   `Description_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table acore_world.lfgdungeons_dbc: ~0 rows (approximately)
 DELETE FROM `lfgdungeons_dbc`;
