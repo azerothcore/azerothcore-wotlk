@@ -14,31 +14,22 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for table acore_world.worldmapoverlay_dbc
-DROP TABLE IF EXISTS `worldmapoverlay_dbc`;
-CREATE TABLE IF NOT EXISTS `worldmapoverlay_dbc` (
+-- Dumping structure for table acore_world.item_dbc
+DROP TABLE IF EXISTS `item_dbc`;
+CREATE TABLE IF NOT EXISTS `item_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `MapAreaID` int NOT NULL DEFAULT '0',
-  `AreaID_1` int NOT NULL DEFAULT '0',
-  `AreaID_2` int NOT NULL DEFAULT '0',
-  `AreaID_3` int NOT NULL DEFAULT '0',
-  `AreaID_4` int NOT NULL DEFAULT '0',
-  `MapPointX` int NOT NULL DEFAULT '0',
-  `MapPointY` int NOT NULL DEFAULT '0',
-  `TextureName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `TextureWidth` int NOT NULL DEFAULT '0',
-  `TextureHeight` int NOT NULL DEFAULT '0',
-  `OffsetX` int NOT NULL DEFAULT '0',
-  `OffsetY` int NOT NULL DEFAULT '0',
-  `HitRectTop` int NOT NULL DEFAULT '0',
-  `HitRectLeft` int NOT NULL DEFAULT '0',
-  `HitRectBottom` int NOT NULL DEFAULT '0',
-  `HitRectRight` int NOT NULL DEFAULT '0',
+  `ClassID` int NOT NULL DEFAULT '0',
+  `SubclassID` int NOT NULL DEFAULT '0',
+  `Sound_Override_Subclassid` int NOT NULL DEFAULT '0',
+  `Material` int NOT NULL DEFAULT '0',
+  `DisplayInfoID` int NOT NULL DEFAULT '0',
+  `InventoryType` int NOT NULL DEFAULT '0',
+  `SheatheType` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table acore_world.worldmapoverlay_dbc: ~0 rows (approximately)
-DELETE FROM `worldmapoverlay_dbc`;
+-- Dumping data for table acore_world.item_dbc: ~0 rows (approximately)
+DELETE FROM `item_dbc`;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

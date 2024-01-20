@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
   CONSTRAINT `item_enchantment_template_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item Random Enchantment System';
 
--- Dumping data for table acore_world.item_enchantment_template: ~28,159 rows (approximately)
+-- Dumping data for table acore_world.item_enchantment_template: ~28 606 rows (approximately)
 DELETE FROM `item_enchantment_template`;
 INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(61, 6, 7.73),
@@ -10513,7 +10513,8 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(813, 1012, 2.79),
 	(813, 1013, 2.79),
 	(813, 1014, 2.79),
-	(813, 1015, 2.79),
+	(813, 1015, 2.79);
+INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(813, 1549, 1.45),
 	(813, 1550, 1.45),
 	(813, 1951, 0.1),
@@ -20027,8 +20028,7 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2034, 596, 3.74),
 	(2034, 678, 3.7),
 	(2034, 679, 3.7),
-	(2034, 680, 3.7);
-INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
+	(2034, 680, 3.7),
 	(2034, 681, 3.7),
 	(2034, 933, 2.09),
 	(2034, 934, 2.09),
@@ -20514,7 +20514,8 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2074, 215, 3.75),
 	(2074, 216, 3.75),
 	(2074, 437, 1.9),
-	(2074, 438, 1.9),
+	(2074, 438, 1.9);
+INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2074, 439, 1.9),
 	(2074, 440, 1.9),
 	(2074, 520, 2.12),
@@ -21000,7 +21001,8 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2126, 1751, 0.58),
 	(2126, 1752, 0.58),
 	(2126, 1753, 0.58),
-	(2126, 1754, 0.58),
+	(2126, 1754, 0.58);
+INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(2126, 1755, 0.58),
 	(2126, 1756, 0.58),
 	(2128, 167, 5),
@@ -23100,15 +23102,10 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(5173, 18, 2.21),
 	(5173, 22, 2.93),
 	(5173, 24, 2.82),
-	(5173, 29, 0.1),
-	(5173, 33, 0.1),
-	(5173, 91, 0.1),
 	(5173, 93, 2.21),
 	(5173, 96, 2.93),
 	(5173, 97, 2.82),
-	(5173, 197, 0.1),
 	(5173, 228, 3),
-	(5173, 231, 0.1),
 	(5173, 256, 3),
 	(5173, 501, 3),
 	(5173, 502, 3),
@@ -23124,7 +23121,6 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(5173, 840, 3),
 	(5173, 841, 3),
 	(5173, 842, 3),
-	(5173, 927, 0.1),
 	(5173, 1009, 2.82),
 	(5173, 1010, 2.82),
 	(5173, 1011, 2.82),
@@ -23138,16 +23134,10 @@ INSERT INTO `item_enchantment_template` (`entry`, `ench`, `chance`) VALUES
 	(5173, 1180, 2.51),
 	(5173, 1181, 2.51),
 	(5173, 1182, 2.51),
-	(5173, 1399, 0.1),
 	(5173, 1547, 0.63),
 	(5173, 1548, 0.78),
 	(5173, 1549, 0.78),
 	(5173, 1550, 0.78),
-	(5173, 1913, 0.1),
-	(5173, 1952, 0.1),
-	(5173, 2067, 0.03),
-	(5173, 2068, 0.03),
-	(5173, 2069, 0.03),
 	(5174, 18, 3.05),
 	(5174, 22, 3),
 	(5174, 24, 2.9),

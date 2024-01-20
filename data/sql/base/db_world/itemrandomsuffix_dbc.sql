@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,24 +18,24 @@
 DROP TABLE IF EXISTS `itemrandomsuffix_dbc`;
 CREATE TABLE IF NOT EXISTS `itemrandomsuffix_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name_Lang_enUS` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enGB` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_koKR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_frFR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_deDE` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_zhCN` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_enTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_zhTW` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_esES` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_esMX` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ruRU` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ptPT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_ptBR` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_itIT` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Name_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enUS` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enGB` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_koKR` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_frFR` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_deDE` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enCN` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_zhCN` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_enTW` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_zhTW` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_esES` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_esMX` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ruRU` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ptPT` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_ptBR` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_itIT` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name_Lang_Unk` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Name_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
-  `InternalName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `InternalName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Enchantment_1` int NOT NULL DEFAULT '0',
   `Enchantment_2` int NOT NULL DEFAULT '0',
   `Enchantment_3` int NOT NULL DEFAULT '0',
