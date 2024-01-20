@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `item_dbc` (
   `InventoryType` int NOT NULL DEFAULT '0',
   `SheatheType` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.item_dbc: ~0 rows (approximately)
 DELETE FROM `item_dbc`;
