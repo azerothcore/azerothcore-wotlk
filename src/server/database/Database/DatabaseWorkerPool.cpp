@@ -377,6 +377,30 @@ void DatabaseWorkerPool<T>::KeepAlive()
         Enqueue(new PingOperation);
 }
 
+// Returns true if the version string given is incompatible
+//
+// Intended to be used with mysql_get_server_info()'s output as the source
+//
+// DatabaseIncompatibleVersion("8.0.35") => false
+// DatabaseIncompatibleVersion("5.6.6") => true
+// DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
+// DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
+bool DatabaseIncompatibleVersion(std::string const mysqlVersion) {
+    // default to values for MySQL
+    uint8 offset = 0;
+    uint8 versionLen = 3;
+    float minVersion = 5.7;
+
+    if (mysqlVersion.find("MariaDB") != std::string::npos)
+    {
+        versionLen = 4;
+        offset = 6;
+        minVersion = 10.5;
+    }
+    auto dbVersion = std::stof(mysqlVersion.substr(offset, versionLen));
+    return dbVersion <= minVersion;
+}
+
 template <class T>
 uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConnections)
 {
@@ -402,10 +426,10 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
             _connections[type].clear();
             return error;
         }
-        else if (connection->GetServerVersion() < MIN_MYSQL_SERVER_VERSION)
+        else if (DatabaseIncompatibleVersion(connection->SelectServerVersion()))
         {
             LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5.\n\nFound server version: {}. Server compiled with: {}.",
-                connection->GetServerVersion(), MYSQL_VERSION_ID);
+                connection->SelectServerVersion(), MYSQL_VERSION_ID);
             return 1;
         }
         else
