@@ -1,3 +1,4 @@
+-- DB update 2024_01_20_01 -> 2024_01_20_02
 -- Update gameobject 181637 'Sha'naar Relic' with sniffed values
 DELETE FROM `gameobject` WHERE (`id` = 181637) AND (`guid` IN (22052, 22053, 22054, 22055, 22056, 22057, 22058, 22059, 22060, 22061, 22062, 22063, 22064, 22065, 22066, 22067, 22068, 22069, 22070, 22071));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES

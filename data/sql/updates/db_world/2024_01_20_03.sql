@@ -1,3 +1,4 @@
+-- DB update 2024_01_20_02 -> 2024_01_20_03
 --
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (19551, 20031, 20032, 20033, 20034, 20035, 20036, 20037, 20038, 20039, 20040, 20041, 20042, 20043, 20044, 20046, 20047, 20048, 20049, 20050, 20052, 20060, 20062, 20063, 20064, 21268, 21269, 21270, 21272, 21274, 21362);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
