@@ -1209,22 +1209,22 @@ class spell_midsummer_summon_ahune_lieutenant : public SpellScript
         switch (zoneId)
         {
         case 331: // Ashenvale
-            npcEntry = 26116;
+            npcEntry = 26116; // Frostwave Lieutenant
             break;
         case 405: // Desolace
-            npcEntry = 26178;
+            npcEntry = 26178; // Hailstone Lieutenant
             break;
         case 33: // Stranglethorn Vale
-            npcEntry = 26204;
+            npcEntry = 26204; // Chillwind Lieutenant
             break;
         case 51: // Searing Gorge
-            npcEntry = 26214;
+            npcEntry = 26214; // Frigid Lieutenant
             break;
         case 1377: // Silithus
-            npcEntry = 26215;
+            npcEntry = 26215; // Glacial Lieutenant
             break;
         case 3483: // Hellfire Peninsula
-            npcEntry = 26216;
+            npcEntry = 26216; // Glacial Templar
             break;
         }
 
