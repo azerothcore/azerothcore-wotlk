@@ -524,6 +524,14 @@ public:
             return false;
         }
 
+        try {
+            std::stoi(realmId);
+        } catch (...) {
+            LOG_ERROR("misc", "Invalid realm ID {} in command .server set motd $realmId $MOTD", realmId);
+
+            return false;
+        }
+
         if (motd.empty())
         {
             return false;
