@@ -1,6 +1,6 @@
 -- Update Dalaran 'The Wonderworks' creatures with SAI and sniffed spawns
 -- updated spawns
-DELETE FROM `creature` WHERE (`id1` IN (29478, 29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785)) AND (`guid` IN (103238, 103362, 103478, 103604, 103719, 103720, 103721, 103722, 103855, 103856, 103857, 103858, 103951, 103952, 103953, 103954, 97984, 99369));
+DELETE FROM `creature` WHERE (`id1` IN (29478, 29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785, 29812, 29807)) AND (`guid` IN (103238, 103362, 103478, 103604, 103719, 103720, 103721, 103722, 103855, 103856, 103857, 103858, 103951, 103952, 103953, 103954, 97984, 99369, 106811, 106190));
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (103238, 29777, 571, 1, 1, 0, 5818.65966796875, 683.1180419921875, 648.79144287109375, 3.001966238021850585, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
 (103362, 29780, 571, 1, 1, 0, 5816.71435546875, 680.57293701171875, 649.7567138671875, 2.373647689819335937, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
@@ -19,7 +19,9 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (103953, 29785, 571, 1, 1, 0, 5805.431640625, 683.45831298828125, 648.10400390625, 5.899212837219238281, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
 (103954, 29785, 571, 1, 1, 0, 5805.34912109375, 684.46527099609375, 649.7081298828125, 4.694935798645019531, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
 (97984, 29716, 571, 1, 1, 0, 5809.9990234375, 676.80596923828125, 647.1317138671875, 1.431169986724853515, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
-(99369, 29478, 571, 1, 1, 0, 5814.22802734375, 680.5638427734375, 647.1317138671875, 1.727875947952270507, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL);
+(99369, 29478, 571, 1, 1, 0, 5814.22802734375, 680.5638427734375, 647.1317138671875, 1.727875947952270507, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
+(106811, 29812, 571, 1, 1, 0, 5812.97900390625, 686.81597900390625, 655.3677978515625, 0.820304751396179199, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL),
+(106190, 29807, 571, 1, 1, 0, 5812.986328125, 686.76739501953125, 655.3192138671875, 0, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL);
 
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (29777, 29780, 29781, 29782)) AND (`guid` IN (12451, 12452, 12453, 12454));
@@ -30,9 +32,9 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (12454, 29782, 571, 1, 1, 0, 5816.73876953125, 680.6163330078125, 648.1456298828125, 3.892084121704101562, 120, 0, 0, 0, 0, 0, "", 48632, 1, NULL);
 
 -- SAI
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785, 29807, 29812);
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (29716, 29777, 29780, 29781, 29782, 29783, 29784, 29785, 29807, 29812));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (29716, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Clockwork Assistant - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
 (29777, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Mechanical Gorilla - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
@@ -41,4 +43,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (29782, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Mechanical Sheep - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
 (29783, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Clockwork Robot - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
 (29784, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Clockwork Robot (Blue) - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
-(29785, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Clockwork Robot (Red) - On Respawn - Cast \'Serverside - Stun Self + Immune\'');
+(29785, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cosmetic Clockwork Robot (Red) - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
+(29807, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Dalaran Toy Store Plane String Hook - On Respawn - Cast \'Serverside - Stun Self + Immune\''),
+(29812, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 28782, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Dalaran Toy Store Plane String Bunny - On Respawn - Cast \'Serverside - Stun Self + Immune\'');
