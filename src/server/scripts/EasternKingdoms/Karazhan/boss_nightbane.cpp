@@ -26,6 +26,7 @@ enum Spells
 {
     // phase 1
     SPELL_BELLOWING_ROAR        = 39427,
+    SPELL_CLEAVE                = 30131,
     SPELL_CHARRED_EARTH         = 30129,
     SPELL_DISTRACTING_ASH       = 30130,
     SPELL_SMOLDERING_BREATH     = 30210,
@@ -145,6 +146,10 @@ struct boss_nightbane : public BossAI
         {
             DoCastRandomTarget(SPELL_SEARING_CINDERS);
             context.Repeat(10s);
+        }).Schedule(1500ms, GROUP_GROUND, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(1500ms, 45s);
         });
     }
 
@@ -154,6 +159,7 @@ struct boss_nightbane : public BossAI
 
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
+            DoResetThreatList();
             DoCastVictim(SPELL_RAIN_OF_BONES);
             _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
             {
@@ -320,6 +326,7 @@ struct boss_nightbane : public BossAI
             if (_movePhase >= 7)
             {
                 me->SetDisableGravity(false);
+                DoResetThreatList();
                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);

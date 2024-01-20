@@ -1241,6 +1241,7 @@ enum AcoreStrings
     LANG_OPVP_NA_CAPTURE_A              = 10026,
     LANG_OPVP_NA_LOSE_H                = 10027,
     LANG_OPVP_NA_LOSE_A                = 10028,
+    LANG_OPVP_NA_DEFENSELESS           = 10074,
     // opvp tf
     LANG_OPVP_TF_CAPTURE_H              = 10029,
     LANG_OPVP_TF_CAPTURE_A              = 10030,
