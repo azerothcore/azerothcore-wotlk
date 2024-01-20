@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS `creature_text_locale` (
   `CreatureID` int unsigned NOT NULL DEFAULT '0',
   `GroupID` tinyint unsigned NOT NULL DEFAULT '0',
   `ID` tinyint unsigned NOT NULL DEFAULT '0',
-  `Locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Text` text COLLATE utf8mb4_unicode_ci,
+  `Locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_text_locale: ~14,581 rows (approximately)
+-- Dumping data for table acore_world.creature_text_locale: ~14 733 rows (approximately)
 DELETE FROM `creature_text_locale`;
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 	(6, 0, 0, 'zhCN', '不许抢走我的蜡烛！'),
