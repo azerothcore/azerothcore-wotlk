@@ -33,6 +33,8 @@
 #include "WorldDatabase.h"
 #include <limits>
 #include <mysqld_error.h>
+#include <sstream>
+#include <vector>
 
 #ifdef ACORE_DEBUG
 #include <boost/stacktrace.hpp>
@@ -385,20 +387,42 @@ void DatabaseWorkerPool<T>::KeepAlive()
 // DatabaseIncompatibleVersion("5.6.6") => true
 // DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
 // DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
+//
+// Adapted from link
+// https://stackoverflow.com/a/2941508
 bool DatabaseIncompatibleVersion(std::string const mysqlVersion) {
+    // Small anon func to turn a version string into an array of uint8
+    auto parse = [](const std::string& input)
+    {
+        std::vector<uint8> result;
+        std::istringstream parser(input);
+        result.push_back(parser.get());
+        for(int idx = 1; idx < 3; idx++)
+        {
+            parser.get(); //Skip period
+            result.push_back(parser.get());
+        }
+        return result;
+    };
+
     // default to values for MySQL
     uint8 offset = 0;
-    uint8 versionLen = 3;
-    float minVersion = 5.7;
+    std::string minVersion = "5.7.0";
 
+    // If the version string contains "MariaDB", use that
     if (mysqlVersion.find("MariaDB") != std::string::npos)
     {
-        versionLen = 4;
-        offset = 6;
-        minVersion = 10.5;
+        // All MariaDB 10.X versions have a prefix of 5.5.5 from the
+        // mysql_get_server_info() function
+        if (mysqlVersion.rfind("5.5.5-", 0) == 0)
+            offset = 6;
+        minVersion = "10.5.0";
     }
-    auto dbVersion = std::stof(mysqlVersion.substr(offset, versionLen));
-    return dbVersion <= minVersion;
+
+    auto parsedMySQLVersion = parse(mysqlVersion.substr(offset));
+    auto parsedMinVersion = parse(minVersion);
+
+    return std::lexicographical_compare(&parsedMySQLVersion, &parsedMySQLVersion + 3, &parsedMinVersion, &parsedMinVersion + 3);
 }
 
 template <class T>
