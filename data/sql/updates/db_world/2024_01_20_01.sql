@@ -1,3 +1,4 @@
+-- DB update 2024_01_20_00 -> 2024_01_20_01
 -- respawn creatures that were deleted due to guid conflicts
 -- entries taken from updates/db_world/2023_12_12_07.sql
 DELETE FROM `creature` WHERE (`guid` BETWEEN 12635 AND 12648);
