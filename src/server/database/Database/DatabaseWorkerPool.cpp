@@ -41,7 +41,6 @@
 #include <sstream>
 #endif
 
-
 class PingOperation : public SQLOperation
 {
     //! Operation for idle delaythreads
