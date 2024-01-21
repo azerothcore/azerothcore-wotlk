@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
@@ -175,7 +177,6 @@ public:
         {
             me->SetDisableGravity(true);
             me->setActive(true);
-            me->SetFarVisible(true);
             Reset();
         }
 
@@ -1180,3 +1181,4 @@ void AddSC_boss_razorscale()
     new achievement_quick_shave();
     new achievement_iron_dwarf_medium_rare();
 }
+

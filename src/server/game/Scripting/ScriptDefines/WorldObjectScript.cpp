@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WorldObjectScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -67,3 +68,10 @@ void ScriptMgr::OnWorldObjectUpdate(WorldObject* object, uint32 diff)
         script->OnWorldObjectUpdate(object, diff);
     });
 }
+
+WorldObjectScript::WorldObjectScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<WorldObjectScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<WorldObjectScript>;

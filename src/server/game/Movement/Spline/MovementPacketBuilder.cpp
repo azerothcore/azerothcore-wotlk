@@ -67,6 +67,10 @@ namespace Movement
                 break;
         }
 
+        // add fake Enter_Cycle flag - needed for client-side cyclic movement (client will erase first spline vertex after first cycle done)
+        // Xinef: this flag breaks cycle for ground movement, client teleports npc between last and first point instead of using smooth movement
+        if (splineflags & MoveSplineFlag::Flying)
+            splineflags.enter_cycle = move_spline.isCyclic();
         data << uint32(splineflags & uint32(~MoveSplineFlag::Mask_No_Monster_Move));
 
         if (splineflags.animation)
@@ -119,11 +123,20 @@ namespace Movement
         data.append<Vector3>(&spline.getPoint(2), count);
     }
 
-    void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
+    void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data, bool flying)
     {
-        uint32 count = spline.getPointCount() - 4;
-        data << count;
-        data.append<Vector3>(&spline.getPoint(2), count);
+        uint32 count = spline.getPointCount() - 3;
+        data << uint32(count + 1);
+        if (flying)
+        {
+            data << spline.getPoint(1); // fake point, client will erase it from the spline after first cycle done
+            data.append<Vector3>(&spline.getPoint(2), count);
+        }
+        else
+        {
+            data.append<Vector3>(&spline.getPoint(2), count);
+            data << Vector3::zero(); //Xinef: fake point
+        }
     }
 
     void PacketBuilder::WriteMonsterMove(const MoveSpline& move_spline, ByteBuffer& data)
@@ -135,7 +148,7 @@ namespace Movement
         if (splineflags & MoveSplineFlag::Mask_CatmullRom)
         {
             if (splineflags.cyclic)
-                WriteCatmullRomCyclicPath(spline, data);
+                WriteCatmullRomCyclicPath(spline, data, splineflags & MoveSplineFlag::Flying);
             else
                 WriteCatmullRomPath(spline, data);
         }
@@ -185,9 +198,5 @@ namespace Movement
             data << uint8(move_spline.spline.mode());       // added in 3.1
             data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
         }
-    }
-    void PacketBuilder::WriteSplineSync(MoveSpline const& move_spline, ByteBuffer& data)
-    {
-        data << (float)move_spline.timePassed() / move_spline.Duration();
     }
 }

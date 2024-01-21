@@ -20,10 +20,10 @@
 
 #include "Define.h"
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <memory>
 
 /** ObjectRegistry holds all registry item of the same type
  */

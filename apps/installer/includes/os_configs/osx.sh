@@ -26,4 +26,4 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@3 readline boost@1.82 bash-completion curl unzip mysql@8.1 ccache
+brew install openssl@3 readline boost bash-completion curl unzip mysql ccache

@@ -15,12 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum Texts
@@ -279,7 +282,6 @@ public:
 
         void Reset() override
         {
-            _didFirstFlyPhase = false;
             _isBelow20Pct = false;
             _isThirdPhase = false;
             _isLanding = false;
@@ -322,7 +324,6 @@ public:
                 return;
             }
 
-            _didFirstFlyPhase = false;
             _isBelow20Pct = false;
             _isThirdPhase = false;
             _bombCount = 0;
@@ -339,7 +340,6 @@ public:
             events.ScheduleEvent(EVENT_ICY_GRIP, 33s + 500ms, EVENT_GROUP_LAND_PHASE);
 
             me->setActive(true);
-            me->SetFarVisible(true);
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_SINDRAGOSA, IN_PROGRESS);
 
@@ -378,7 +378,6 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFarVisible(true);
                 me->SetDisableGravity(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
@@ -451,9 +450,6 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!damage || me->IsInEvadeMode())
-                return;
-
-            if (!_didFirstFlyPhase)
                 return;
 
             if (!_isThirdPhase)
@@ -577,7 +573,6 @@ public:
                     }
 
                     _isInAirPhase = true;
-                    _didFirstFlyPhase = true;
                     Talk(SAY_AIR_PHASE);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetSpeed(MOVE_RUN, 4.28571f);
@@ -673,7 +668,6 @@ public:
     private:
         uint8 _bombCount;
         uint8 _mysticBuffetStack;
-        bool _didFirstFlyPhase;
         bool _isBelow20Pct;
         bool _isThirdPhase;
         bool _isInAirPhase;
@@ -1409,7 +1403,6 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFarVisible(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
@@ -1426,7 +1419,6 @@ public:
                 return;
 
             me->setActive(false);
-            me->SetFarVisible(false);
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
@@ -1542,7 +1534,6 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFarVisible(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
@@ -1561,8 +1552,6 @@ public:
             if (point == POINT_FROSTWYRM_LAND)
             {
                 me->setActive(false);
-                me->SetFarVisible(false);
-                me->SetFarVisible(false);
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());

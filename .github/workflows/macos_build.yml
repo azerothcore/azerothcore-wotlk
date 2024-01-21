@@ -16,7 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-11
           - macos-12
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
@@ -40,5 +39,3 @@ jobs:
         run: source ./acore.sh install-deps
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh

@@ -15,15 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum Spells
@@ -484,7 +487,6 @@ public:
 
             uint32 introDelay = 0;
             me->setActive(true);
-            me->SetFarVisible(true);
             me->SetInCombatWithZone();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToNPC(true);

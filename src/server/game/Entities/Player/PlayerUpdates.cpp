@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementMgr.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -35,6 +36,7 @@
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
 
@@ -311,7 +313,7 @@ void Player::Update(uint32 p_time)
         RegenerateAll();
     }
 
-    if (m_deathState == JUST_DIED)
+    if (m_deathState == DeathState::JustDied)
         KillPlayer();
 
     if (m_nextSave)
@@ -411,6 +413,14 @@ void Player::Update(uint32 p_time)
     {
         SetHasDelayedTeleport(false);
         TeleportTo(teleportStore_dest, teleportStore_options);
+    }
+
+    if (!IsBeingTeleported() && bRequestForcedVisibilityUpdate)
+    {
+        bRequestForcedVisibilityUpdate = false;
+        UpdateObjectVisibility(true, true);
+        m_delayed_unit_relocation_timer = 0;
+        RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
 }
 
@@ -787,8 +797,8 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                 GetPureSkillValue(_spell_idx->second->SkillLine);
 
             // Alchemy Discoveries here
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellid);
-            if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+            if (spellInfo && spellInfo->Mechanic == MECHANIC_DISCOVERY)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(
                         _spell_idx->second->SkillLine, spellid, this))
@@ -1521,11 +1531,17 @@ void Player::UpdatePotionCooldown(Spell* spell)
     SetLastPotionId(0);
 }
 
-template void Player::UpdateVisibilityOf(Player* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(DynamicObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Player* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(DynamicObject*      target,
+                                         UpdateData&         data,
+                                         std::vector<Unit*>& visibleNow);
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
@@ -1536,13 +1552,23 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
         m_seer = this;
     }
 
-    // updates visibility of all objects around point of view for current player
-    Acore::VisibleNotifier notifier(*this);
-    Cell::VisitAllObjects(m_seer, notifier, GetSightRange());
-    notifier.SendToSelf();   // send gathered data
+    Acore::VisibleNotifier notifierNoLarge(
+        *this, mapChange,
+        false); // visit only objects which are not large; default distance
+    Cell::VisitAllObjects(m_seer, notifierNoLarge,
+                          GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
+    notifierNoLarge.SendToSelf();
+
+    Acore::VisibleNotifier notifierLarge(
+        *this, mapChange, true); // visit only large objects; maximum distance
+    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
+    notifierLarge.SendToSelf();
+
+    if (mapChange)
+        m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
 }
 
-void Player::UpdateObjectVisibility(bool forced)
+void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 {
     // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
     if (!IsInWorld())
@@ -1552,19 +1578,26 @@ void Player::UpdateObjectVisibility(bool forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else if (!isBeingLoaded())
     {
+        if (!fromUpdate) // pussywizard:
+        {
+            bRequestForcedVisibilityUpdate = true;
+            return;
+        }
         Unit::UpdateObjectVisibility(true);
         UpdateVisibilityForPlayer();
     }
 }
 
 template <class T>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target, std::set<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     s64.insert(target->GetGUID());
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target, std::set<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing
     // when player moves far from its spawn point while riding it
@@ -1573,17 +1606,19 @@ inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target, std::set<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
-    v.insert(target);
+    v.push_back(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target, std::set<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
-    v.insert(target);
+    v.push_back(target);
 }
 
 template <class T>
@@ -1599,7 +1634,8 @@ inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 }
 
 template <class T>
-void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow)
+void Player::UpdateVisibilityOf(T* target, UpdateData& data,
+                                std::vector<Unit*>& visibleNow)
 {
     if (HaveAtClient(target))
     {

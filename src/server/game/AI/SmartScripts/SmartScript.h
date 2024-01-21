@@ -216,19 +216,6 @@ public:
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
-    // Xinef: Fix Combat Movement
-    void SetActualCombatDist(uint32 dist) { mActualCombatDist = dist; }
-    void RestoreMaxCombatDist() { mActualCombatDist = mMaxCombatDist; }
-    uint32 GetActualCombatDist() const { return mActualCombatDist; }
-    uint32 GetMaxCombatDist() const { return mMaxCombatDist; }
-
-    // Xinef: SmartCasterAI, replace above
-    void SetCasterActualDist(float dist) { smartCasterActualDist = dist; }
-    void RestoreCasterMaxDist() { smartCasterActualDist = smartCasterMaxDist; }
-    Powers GetCasterPowerType() const { return smartCasterPowerType; }
-    float GetCasterActualDist() const { return smartCasterActualDist; }
-    float GetCasterMaxDist() const { return smartCasterMaxDist; }
-
     bool AllowPhaseReset() const { return _allowPhaseReset; }
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
@@ -240,6 +227,10 @@ private:
     void DecPhase(uint32 p);
     void SetPhase(uint32 p);
     bool IsInPhase(uint32 p) const;
+
+    void SortEvents(SmartAIEventList& events);
+    void RaisePriority(SmartScriptHolder& e);
+    void RetryLater(SmartScriptHolder& e, bool ignoreChanceRoll = false);
 
     SmartAIEventList mEvents;
     SmartAIEventList mInstallEvents;
@@ -262,15 +253,8 @@ private:
     uint32 mLastTextID;
     uint32 mTalkerEntry;
     bool mUseTextTimer;
-
-    // Xinef: Fix Combat Movement
-    uint32 mActualCombatDist;
-    uint32 mMaxCombatDist;
-
-    // Xinef: SmartCasterAI, replace above in future
-    uint32 smartCasterActualDist;
-    uint32 smartCasterMaxDist;
-    Powers smartCasterPowerType;
+    uint32 mCurrentPriority;
+    bool mEventSortingRequired;
 
     // Xinef: misc
     bool _allowPhaseReset;

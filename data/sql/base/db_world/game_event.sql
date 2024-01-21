@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -24,13 +24,13 @@ CREATE TABLE IF NOT EXISTS `game_event` (
   `length` bigint unsigned NOT NULL DEFAULT '2592000' COMMENT 'Length in minutes of the event',
   `holiday` int unsigned NOT NULL DEFAULT '0' COMMENT 'Client side holiday id',
   `holidayStage` tinyint unsigned NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Description of the event displayed in console',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Description of the event displayed in console',
   `world_event` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '0 if normal event, 1 if world event',
   `announce` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '0 dont announce, 1 announce, 2 value from config',
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.game_event: ~83 rows (approximately)
+-- Dumping data for table acore_world.game_event: ~84 rows (approximately)
 DELETE FROM `game_event`;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 	(1, '2021-06-22 03:01:00', '2030-12-31 15:00:00', 525600, 20160, 341, 1, 'Midsummer Fire Festival', 0, 2),
@@ -78,6 +78,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 	(43, '2021-07-01 03:01:00', '2030-12-31 15:00:00', 525600, 44640, 0, 0, 'Brew of the Month July', 0, 2),
 	(44, '2021-08-01 03:01:00', '2030-12-31 15:00:00', 525600, 44640, 0, 0, 'Brew of the Month August', 0, 2),
 	(45, '2021-09-01 03:01:00', '2030-12-31 15:00:00', 525600, 44640, 0, 0, 'Brew of the Month September', 0, 2),
+	(46, '2008-09-08 10:00:00', '2008-09-24 10:00:00', 1051897, 23040, 0, 0, 'Spirit of Competition', 0, 2),
 	(48, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Wintergrasp Alliance Defence', 5, 2),
 	(49, '2000-01-01 17:00:00', '2000-01-01 17:00:00', 5184000, 2592000, 0, 0, 'Wintergrasp Horde Defence', 5, 2),
 	(50, '2021-09-19 04:01:00', '2030-12-31 15:00:00', 525600, 1440, 398, 1, 'Pirates\' Day', 0, 2),

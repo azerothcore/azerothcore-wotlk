@@ -27,8 +27,8 @@
 #include "Timer.h"
 #include "Tokenize.h"
 #include "Transaction.h"
-#include "Util.h"
 #include <errmsg.h>
+#include <mysql.h>
 #include <mysqld_error.h>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
@@ -486,6 +486,11 @@ uint32 MySQLConnection::GetServerVersion() const
     return mysql_get_server_version(m_Mysql);
 }
 
+std::string MySQLConnection::GetServerInfo() const
+{
+    return mysql_get_server_info(m_Mysql);
+}
+
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)
 {
     ASSERT(index < m_stmts.size(), "Tried to access invalid prepared statement index {} (max index {}) on database `{}`, connection type: {}",
@@ -581,7 +586,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
                 {
                     LOG_FATAL("sql.sql", "Could not re-prepare statements!");
                     std::this_thread::sleep_for(10s);
-                    std::abort();
+                    ABORT();
                 }
 
                 LOG_INFO("sql.sql", "Successfully reconnected to {} @{}:{} ({}).",
@@ -600,7 +605,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
 
                 // We could also initiate a shutdown through using std::raise(SIGTERM)
                 std::this_thread::sleep_for(10s);
-                std::abort();
+                ABORT();
             }
             else
             {
@@ -624,12 +629,12 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
         case ER_NO_SUCH_TABLE:
             LOG_ERROR("sql.sql", "Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         case ER_PARSE_ERROR:
             LOG_ERROR("sql.sql", "Error while parsing SQL. Core fix required.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         default:
             LOG_ERROR("sql.sql", "Unhandled MySQL errno {}. Unexpected behaviour possible.", errNo);

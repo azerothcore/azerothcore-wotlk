@@ -17,12 +17,13 @@
 
 #include "Creature.h"
 #include "GameObject.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 const Position OptionalSpawn[] =
@@ -35,6 +36,7 @@ const Position OptionalSpawn[] =
 ObjectData const creatureData[] =
 {
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_SHADE_OF_ARAN,        DATA_ARAN      },
     { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
     { NPC_DOROTHEE,             DATA_DOROTHEE  },
     { NPC_TITO,                 DATA_TITO      },
@@ -54,6 +56,14 @@ ObjectData const gameObjectData[] =
     { 0,                     0                          }
 };
 
+DoorData const doorData[] =
+{
+    { GO_MASTERS_TERRACE_DOOR,  DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_MASTERS_TERRACE_DOOR2, DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_NETHERSPACE_DOOR,      DATA_MALCHEZAAR, DOOR_TYPE_ROOM },
+    { 0,                        0,              DOOR_TYPE_ROOM  }
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -71,6 +81,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -186,6 +197,7 @@ public:
                 case NPC_SHADIKITH_THE_GLIDER:
                 case NPC_ROKAD_THE_RAVAGER:
                     SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    instance->ToInstanceMap()->PermBindAllPlayers();
                     break;
                 default:
                     break;
@@ -248,6 +260,7 @@ public:
                             break;
                         case DONE:
                             HandleGameObject(m_uiGamesmansExitDoor, true);
+                            instance->ToInstanceMap()->PermBindAllPlayers();
                             break;
                         }
                         default:
@@ -265,7 +278,7 @@ public:
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
                             piece->RemoveAllAuras();
-                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->setDeathState(DeathState::JustRespawned);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
@@ -361,19 +374,6 @@ public:
                     break;
                 case GO_GAMESMAN_HALL_EXIT_DOOR:
                     m_uiGamesmansExitDoor = go->GetGUID();
-                    break;
-                case GO_NETHERSPACE_DOOR:
-                    m_uiNetherspaceDoor = go->GetGUID();
-                    if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
-                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    break;
-                case GO_MASTERS_TERRACE_DOOR:
-                    MastersTerraceDoor[0] = go->GetGUID();
-                    break;
-                case GO_MASTERS_TERRACE_DOOR2:
-                    MastersTerraceDoor[1] = go->GetGUID();
                     break;
                 case GO_SIDE_ENTRANCE_DOOR:
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
@@ -484,12 +484,6 @@ public:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
                     return m_uiGamesmansExitDoor;
-                case DATA_GO_NETHER_DOOR:
-                    return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
                 case DATA_IMAGE_OF_MEDIVH:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
@@ -522,8 +516,6 @@ public:
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
-        ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
@@ -635,3 +627,4 @@ void AddSC_instance_karazhan()
     new spell_karazhan_overload();
     new spell_karazhan_blink();
 }
+

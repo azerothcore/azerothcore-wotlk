@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellScriptLoader.h"
 #include "ruby_sanctum.h"
 
 enum Texts
@@ -389,7 +391,6 @@ public:
             if (action == ACTION_BALTHARUS_DEATH)
             {
                 me->setActive(true);
-                me->SetFarVisible(true);
                 _isIntro = false;
 
                 _events.ScheduleEvent(EVENT_XERESTRASZA_EVENT_0, 6s);

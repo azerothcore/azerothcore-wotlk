@@ -27,7 +27,6 @@
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
@@ -103,9 +102,18 @@ std::string const& GameObject::GetAIName() const
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
 
-void GameObject::CleanupsBeforeDelete(bool finalCleanup)
+void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
-    WorldObject::CleanupsBeforeDelete(finalCleanup);
+    if (GetTransport() && !ToTransport())
+    {
+        GetTransport()->RemovePassenger(this);
+        SetTransport(nullptr);
+        m_movementInfo.transport.Reset();
+        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
+
+    if (IsInWorld())
+        RemoveFromWorld();
 
     if (m_uint32Values)                                      // field array can be not exist if GameOBject not loaded
         RemoveFromOwner();
@@ -173,6 +181,9 @@ void GameObject::RemoveFromWorld()
         if (m_model)
             if (GetMap()->ContainsGameObjectModel(*m_model))
                 GetMap()->RemoveGameObjectModel(*m_model);
+
+        if (Transport* transport = GetTransport())
+            transport->RemovePassenger(this, true);
 
         // If linked trap exists, despawn it
         if (GameObject* linkedTrap = GetLinkedTrap())
@@ -324,21 +335,22 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        switch (GetStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            case 0:
-                SetGoState(GO_STATE_READY);
-                SwitchDoorOrButton(true);
-                break;
-            case 1:
-                SetGoState(GO_STATE_READY);
-                break;
-            case 2:
-                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                break;
-            default:
-                SetGoState(go_state);
-                break;
+            switch (uint8 state = instance->GetStoredGameObjectState(GetSpawnId()))
+            {
+                case 0:
+                    SetGoState(GO_STATE_READY);
+                    SwitchDoorOrButton(true);
+                    break;
+                case 1:
+                case 2:
+                    SetGoState((GOState)state);
+                    break;
+                default:
+                    SetGoState(go_state);
+                    break;
+            }
         }
     }
     else
@@ -877,11 +889,7 @@ void GameObject::Update(uint32 diff)
                 if (!m_spawnedByDefault)
                 {
                     m_respawnTime = 0;
-                    if (m_spawnId)
-                        DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
-                    else
-                        Delete();
-
+                    DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
                     return;
                 }
 
@@ -1177,31 +1185,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
 
 void GameObject::DeleteFromDB()
 {
-    if (!m_spawnId)
-    {
-        LOG_ERROR("entities.gameobject", "Trying to delete not saved gameobject: {}", GetGUID().ToString());
-        return;
-    }
-
-    GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
-    if (!data)
-        return;
-
-    CharacterDatabaseTransaction charTrans = CharacterDatabase.BeginTransaction();
-
-    sMapMgr->DoForAllMapsWithMapId(data->mapid,
-        [this, charTrans](Map* map) -> void
-        {
-            // despawn all active objects, and remove their respawns
-            std::vector<GameObject*> toUnload;
-            for (auto const& pair : Acore::Containers::MapEqualRange(map->GetGameObjectBySpawnIdStore(), m_spawnId))
-                toUnload.push_back(pair.second);
-            for (GameObject* obj : toUnload)
-                map->AddObjectToRemoveList(obj);
-            map->RemoveGORespawnTime(m_spawnId);
-        }
-    );
-
+    GetMap()->RemoveGORespawnTime(m_spawnId);
     sObjectMgr->DeleteGOData(m_spawnId);
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
@@ -2190,6 +2174,15 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
 }
 
+void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
+{
+    dist += GetObjectSize();
+    if (includeMargin)
+        dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
+}
+
 void GameObject::EventInform(uint32 eventId)
 {
     if (!eventId)
@@ -2512,21 +2505,13 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (IsInstanceGameobject() && IsAbleToSaveOnDb())
+    if (IsInstanceGameobject() && IsAllowedToSaveToDB())
     {
-        // Save the gameobject state on the Database
-        if (!FindStateSavedOnInstance())
-        {
-            SaveInstanceData(GameobjectStateToInt(&state));
-        }
-        else
-        {
-            UpdateInstanceData(GameobjectStateToInt(&state));
-        }
+        SaveStateToDB();
     }
 }
 
-bool GameObject::IsInstanceGameobject()
+bool GameObject::IsInstanceGameobject() const
 {
     // Avoid checking for unecessary gameobjects whose
     // states don't matter for the dungeon progression
@@ -2545,7 +2530,7 @@ bool GameObject::IsInstanceGameobject()
     return false;
 }
 
-bool GameObject::ValidateGameobjectType()
+bool GameObject::ValidateGameobjectType() const
 {
     switch (m_goInfo->type)
     {
@@ -2560,7 +2545,7 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-uint8 GameObject::GameobjectStateToInt(GOState* state)
+uint8 GameObject::GameobjectStateToInt(GOState* state) const
 {
     uint8 m_state = 3;
 
@@ -2585,69 +2570,22 @@ uint8 GameObject::GameobjectStateToInt(GOState* state)
     return m_state;
 }
 
-bool GameObject::IsAbleToSaveOnDb()
-{
-    return m_saveStateOnDb;
-}
-
-void GameObject::UpdateSaveToDb(bool enable)
-{
-    m_saveStateOnDb = enable;
-
-    if (enable)
-    {
-        SavingStateOnDB();
-    }
-}
-
-void GameObject::SavingStateOnDB()
+void GameObject::SaveStateToDB()
 {
     if (IsInstanceGameobject())
     {
-        GOState param = GetGoState();
-        if (!FindStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            SaveInstanceData(GameobjectStateToInt(&param));
+            GOState param = GetGoState();
+            instance->StoreGameObjectState(GetSpawnId(), GameobjectStateToInt(&param));
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+            stmt->SetData(0, GetInstanceId());
+            stmt->SetData(1, GetSpawnId());
+            stmt->SetData(2, GameobjectStateToInt(&param));
+            CharacterDatabase.Execute(stmt);
         }
     }
-}
-
-void GameObject::SaveInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, id);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, state);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
-}
-
-void GameObject::UpdateInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, state);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, id);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
-}
-
-uint8 GameObject::GetStateSavedOnInstance()
-{
-    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
-}
-
-bool GameObject::FindStateSavedOnInstance()
-{
-    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
@@ -2806,7 +2744,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
         return;
 
     bool forcedFlags = GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.groupLootRules && HasLootRecipient();
-    bool targetIsGM = target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity());
+    bool targetIsGM = target->IsGameMaster() && target->GetSession()->IsGMAccount();
 
     ByteBuffer fieldBuffer;
 

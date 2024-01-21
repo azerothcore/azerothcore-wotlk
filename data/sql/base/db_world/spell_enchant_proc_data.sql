@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -54,7 +54,7 @@ INSERT INTO `spell_enchant_proc_data` (`entry`, `customChance`, `PPMChance`, `pr
 	(2641, 0, 8.53, 0, 0),
 	(2644, 0, 21.43, 0, 0),
 	(2673, 0, 1, 0, 0),
-	(2675, 0, 1, 0, 0),
+	(2675, 0, 1, 0, 2),
 	(3225, 0, 1, 0, 1),
 	(3239, 0, 3, 0, 0),
 	(3241, 0, 3, 0, 0),

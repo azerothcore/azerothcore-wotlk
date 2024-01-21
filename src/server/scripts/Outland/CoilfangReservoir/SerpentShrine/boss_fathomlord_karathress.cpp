@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
-#include "serpent_shrine.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
+#include "serpent_shrine.h"
 
 enum Talk
 {
@@ -72,19 +73,13 @@ enum Misc
 
 const Position advisorsPosition[MAX_ADVISORS] =
 {
-    {448.37f, -544.71f, -7.54f, 0.00f},
-    {457.37f, -544.71f, -7.54f, 0.00f}
+    { 448.37f, -544.71f, -7.54f, 0.00f },
+    { 457.37f, -544.71f, -7.54f, 0.00f }
 };
 
 struct boss_fathomlord_karathress : public BossAI
 {
-    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS) { }
 
     void Reset() override
     {
@@ -113,20 +108,11 @@ struct boss_fathomlord_karathress : public BossAI
             summon->SetWalk(true);
             summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS - 1], false);
         }
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
-            Talk(SAY_GAIN_ABILITY1);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
-            Talk(SAY_GAIN_ABILITY2);
-        if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
-            Talk(SAY_GAIN_ABILITY3);
-        scheduler.Schedule(1s, [this, summon](TaskContext)
+        else
         {
-            summons.Despawn(summon);
-        });
+            summon->Attack(me->GetVictim(), false);
+            summon->SetInCombatWithZone();
+        }
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -197,30 +183,29 @@ private:
 
 struct boss_fathomguard_sharkkis : public ScriptedAI
 {
-    boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature), summons(creature)
+    boss_fathomguard_sharkkis(Creature* creature) : ScriptedAI(creature), _summons(creature)
     {
         _instance = creature->GetInstanceScript();
+        SetBoundary(_instance->GetBossBoundary(DATA_FATHOM_LORD_KARATHRESS));
 
-        _scheduler.SetValidator([this]
+        scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
 
-    SummonList summons;
-
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
-        summons.DespawnAll();
-        summons.clear();
+        _summons.DespawnAll();
+        _summons.clear();
     }
 
     void JustSummoned(Creature* summon) override
     {
         summon->SetInCombatWithZone();
-        summons.Summon(summon);
+        _summons.Summon(summon);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -229,7 +214,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         {
             karathress->Attack(who, false);
         }
-        _scheduler.Schedule(2500ms, [this](TaskContext context)
+
+        scheduler.Schedule(2500ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_HURL_TRIDENT);
             context.Repeat(5s);
@@ -247,7 +233,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         }).Schedule(41250ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_THE_BEAST_WITHIN);
-            summons.DoForAllSummons([&](WorldObject* summon)
+            _summons.DoForAllSummons([&](WorldObject* summon)
             {
                 me->CastSpell(summon->ToCreature(), SPELL_BESTIAL_WRATH, true);
             });
@@ -264,6 +250,8 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY2);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -274,14 +262,14 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
     }
 
 private:
-    TaskScheduler _scheduler;
     InstanceScript* _instance;
+    SummonList _summons;
 };
 
 enum NPCTotems
@@ -307,9 +295,10 @@ enum TotemChoice
 
 struct boss_fathomguard_tidalvess : public ScriptedAI
 {
-    boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature), summons(creature)
+    boss_fathomguard_tidalvess(Creature* creature) : ScriptedAI(creature), _summons(creature)
     {
         _instance = creature->GetInstanceScript();
+        SetBoundary(_instance->GetBossBoundary(DATA_FATHOM_LORD_KARATHRESS));
 
         _scheduler.SetValidator([this]
         {
@@ -317,25 +306,21 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         });
     }
 
-    SummonList summons;
-
-    std::list<uint32> entryList;
-
     void Reset() override
     {
         _scheduler.CancelAll();
         _choice = 0;
 
-        summons.DespawnAll();
+        _summons.DespawnAll();
 
-        entryList.clear();
+        _entryList.clear();
 
-        entryList = {NPC_SPITFIRE_TOTEM, NPC_GREATER_EARTHBIND_TOTEM, NPC_GREATER_POISON_CLEANSING_TOTEM};
+        _entryList = { NPC_SPITFIRE_TOTEM, NPC_GREATER_EARTHBIND_TOTEM, NPC_GREATER_POISON_CLEANSING_TOTEM };
     }
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        _summons.Summon(summon);
         summon->Attack(me->GetVictim(), false);
         summon->SetInCombatWithZone();
     }
@@ -378,15 +363,15 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         {
             case ACTION_REMOVE_SPITFIRE:
                 _totemScheduler.CancelGroup(SPITFIRE);
-                entryList.push_back(NPC_SPITFIRE_TOTEM);
+                _entryList.push_back(NPC_SPITFIRE_TOTEM);
                 break;
             case ACTION_REMOVE_EARTHBIND:
                 _totemScheduler.CancelGroup(EARTHBIND);
-                entryList.push_back(NPC_GREATER_EARTHBIND_TOTEM);
+                _entryList.push_back(NPC_GREATER_EARTHBIND_TOTEM);
                 break;
             case ACTION_REMOVE_CLEANSING:
                 _totemScheduler.CancelGroup(CLEANSING);
-                entryList.push_back(NPC_GREATER_POISON_CLEANSING_TOTEM);
+                _entryList.push_back(NPC_GREATER_POISON_CLEANSING_TOTEM);
                 break;
             default:
                 return;
@@ -423,10 +408,10 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
             context.Repeat(10900ms, 14700ms);
         }).Schedule(15800ms, [this](TaskContext context)
         {
-            if (entryList.size() != 0) //don't summon when all totems are up
+            if (_entryList.size() != 0) //don't summon when all totems are up
             {
-                uint32 totemEntry = entryList.front();
-                entryList.pop_front();
+                uint32 totemEntry = _entryList.front();
+                _entryList.pop_front();
                 SummonTotem(totemEntry);
                 ScheduleRemoval(totemEntry);
             }
@@ -439,6 +424,8 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY1);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -460,13 +447,16 @@ private:
     TaskScheduler _totemScheduler;
     InstanceScript* _instance;
     uint8 _choice;
+    SummonList _summons;
+    std::list<uint32> _entryList;
 };
 
 struct boss_fathomguard_caribdis : public ScriptedAI
 {
-    boss_fathomguard_caribdis(Creature* creature) : ScriptedAI(creature), summons(creature)
+    boss_fathomguard_caribdis(Creature* creature) : ScriptedAI(creature), _summons(creature)
     {
         _instance = creature->GetInstanceScript();
+        SetBoundary(_instance->GetBossBoundary(DATA_FATHOM_LORD_KARATHRESS));
 
         _scheduler.SetValidator([this]
         {
@@ -474,18 +464,16 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         });
     }
 
-    SummonList summons;
-
     void Reset() override
     {
         _scheduler.CancelAll();
 
-        summons.DespawnAll();
+        _summons.DespawnAll();
     }
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        _summons.Summon(summon);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -521,6 +509,8 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
         {
             me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
+            karathress->AI()->Talk(SAY_GAIN_ABILITY3);
+            me->DespawnOrUnsummon(1000);
         }
     }
 
@@ -539,33 +529,41 @@ struct boss_fathomguard_caribdis : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     InstanceScript* _instance;
+    SummonList _summons;
 };
 
-class spell_karathress_power_of_caribdis : public SpellScriptLoader
+class spell_karathress_power_of_tidalvess : public AuraScript
 {
-public:
-    spell_karathress_power_of_caribdis() : SpellScriptLoader("spell_karathress_power_of_caribdis") { }
+    PrepareAuraScript(spell_karathress_power_of_tidalvess);
 
-    class spell_karathress_power_of_caribdis_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_karathress_power_of_caribdis_AuraScript);
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* victim = GetUnitOwner()->GetVictim())
-                GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_karathress_power_of_caribdis_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_tidalvess::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_karathress_power_of_caribdis : public AuraScript
+{
+    PrepareAuraScript(spell_karathress_power_of_caribdis);
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* victim = GetUnitOwner()->GetVictim())
+        {
+            GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -575,5 +573,7 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSerpentShrineAI(boss_fathomguard_sharkkis);
     RegisterSerpentShrineAI(boss_fathomguard_tidalvess);
     RegisterSerpentShrineAI(boss_fathomguard_caribdis);
-    new spell_karathress_power_of_caribdis();
+    RegisterSpellScript(spell_karathress_power_of_tidalvess);
+    RegisterSpellScript(spell_karathress_power_of_caribdis);
 }
+
