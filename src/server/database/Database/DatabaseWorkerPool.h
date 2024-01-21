@@ -24,6 +24,16 @@
 #include <array>
 #include <vector>
 
+// MARIADB_VERSION_ID is defined if using libmariadbclient instead of libmysqlclient
+#if MARIADB_VERSION_ID >= 100600
+#define MIN_MYSQL_CLIENT_VERSION 30203u
+#else
+#define MIN_MYSQL_CLIENT_VERSION 50700u
+#endif
+
+#define MIN_MYSQL_SERVER_VERSION "5.7.0"
+#define MIN_MARIADB_SERVER_VERSION "10.5.0"
+
 template <typename T>
 class ProducerConsumerQueue;
 

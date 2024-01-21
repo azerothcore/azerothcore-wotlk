@@ -41,13 +41,6 @@
 #include <sstream>
 #endif
 
-#if MARIADB_VERSION_ID >= 100600
-#define MIN_MYSQL_SERVER_VERSION 100500u
-#define MIN_MYSQL_CLIENT_VERSION 30203u
-#else
-#define MIN_MYSQL_SERVER_VERSION 50700u
-#define MIN_MYSQL_CLIENT_VERSION 50700u
-#endif
 
 class PingOperation : public SQLOperation
 {
@@ -388,18 +381,22 @@ void DatabaseWorkerPool<T>::KeepAlive()
 // DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
 // DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
 //
-// Adapted from link
+// Adapted from stackoverflow response
 // https://stackoverflow.com/a/2941508
-bool DatabaseIncompatibleVersion(std::string const mysqlVersion) {
-    // Small anon func to turn a version string into an array of uint8
+bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
+{
+    // anon func to turn a version string into an array of uint8
+    // "1.2.3" => [1, 2, 3]
     auto parse = [](const std::string& input)
     {
         std::vector<uint8> result;
         std::istringstream parser(input);
         result.push_back(parser.get());
-        for(int idx = 1; idx < 3; idx++)
+        for (int i = 1; i < 3; i++)
         {
-            parser.get(); //Skip period
+            // Skip period
+            parser.get();
+            // Append int from parser to output
             result.push_back(parser.get());
         }
         return result;
@@ -407,22 +404,24 @@ bool DatabaseIncompatibleVersion(std::string const mysqlVersion) {
 
     // default to values for MySQL
     uint8 offset = 0;
-    std::string minVersion = "5.7.0";
+    std::string minVersion = MIN_MYSQL_SERVER_VERSION;
 
     // If the version string contains "MariaDB", use that
     if (mysqlVersion.find("MariaDB") != std::string::npos)
     {
         // All MariaDB 10.X versions have a prefix of 5.5.5 from the
-        // mysql_get_server_info() function
+        // mysql_get_server_info() function. To make matters more
+        // annoying, this is removed in MariaDB 11.X
         if (mysqlVersion.rfind("5.5.5-", 0) == 0)
             offset = 6;
-        minVersion = "10.5.0";
+        minVersion = MIN_MARIADB_SERVER_VERSION;
     }
 
     auto parsedMySQLVersion = parse(mysqlVersion.substr(offset));
     auto parsedMinVersion = parse(minVersion);
 
-    return std::lexicographical_compare(&parsedMySQLVersion, &parsedMySQLVersion + 3, &parsedMinVersion, &parsedMinVersion + 3);
+    return std::lexicographical_compare(parsedMySQLVersion.begin(), parsedMySQLVersion.end(),
+                                        parsedMinVersion.begin(), parsedMinVersion.end());
 }
 
 template <class T>
