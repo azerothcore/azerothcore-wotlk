@@ -371,17 +371,22 @@ void DatabaseWorkerPool<T>::KeepAlive()
         Enqueue(new PingOperation);
 }
 
-// Returns true if the version string given is incompatible
-//
-// Intended to be used with mysql_get_server_info()'s output as the source
-//
-// DatabaseIncompatibleVersion("8.0.35") => false
-// DatabaseIncompatibleVersion("5.6.6") => true
-// DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
-// DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
-//
-// Adapted from stackoverflow response
-// https://stackoverflow.com/a/2941508
+/**
+* @brief Returns true if the version string given is incompatible
+*
+* Intended to be used with mysql_get_server_info()'s output as the source
+*
+* DatabaseIncompatibleVersion("8.0.35") => false
+* DatabaseIncompatibleVersion("5.6.6") => true
+* DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
+* DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
+*
+* Adapted from stackoverflow response
+* https://stackoverflow.com/a/2941508
+* 
+* @param mysqlVersion The output from GetServerInfo()/mysql_get_server_info()
+* @return Returns true if the Server version is incompatible
+*/
 bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
 {
     // anon func to turn a version string into an array of uint8
