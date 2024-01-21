@@ -2070,7 +2070,6 @@ public:
     npc_wild_wolpertinger(Creature* creature) : ScriptedAI(creature) { }
 
     ObjectGuid PlayerGUID;
-    Player* GetPlayer() { return ObjectAccessor::GetPlayer(*me, PlayerGUID); }
 
     void Reset() override
     {
@@ -2084,7 +2083,7 @@ public:
             PlayerGUID = caster->GetGUID();
             me->SetReactState(REACT_PASSIVE);
             me->CombatStop(false);
-            GetPlayer()->CombatStop();
+            caster->CombatStop();
             me->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
             me->StopMovingOnCurrentPos();
             events.ScheduleEvent(EVENT_CREATE_STUNNED_WOLPERTINGER, 5s);
@@ -2097,10 +2096,11 @@ public:
 
         switch (events.ExecuteEvent())
         {
-        case EVENT_CREATE_STUNNED_WOLPERTINGER:
-            GetPlayer()->CastSpell(GetPlayer(), SPELL_CREATE_STUNNED_WOLPERTINGER_ITEM, true);
-            me->DespawnOrUnsummon();
-            break;
+            case EVENT_CREATE_STUNNED_WOLPERTINGER:
+                if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                    player->CastSpell(player, SPELL_CREATE_STUNNED_WOLPERTINGER_ITEM, true);
+                me->DespawnOrUnsummon();
+                break;
         }
 
         if (!UpdateVictim())
