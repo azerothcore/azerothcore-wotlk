@@ -94,6 +94,7 @@ protected:
     void Unlock();
 
     [[nodiscard]] uint32 GetServerVersion() const;
+    [[nodiscard]] std::string GetServerInfo() const;
     MySQLPreparedStatement* GetPreparedStatement(uint32 index);
     void PrepareStatement(uint32 index, std::string_view sql, ConnectionFlags flags);
 
