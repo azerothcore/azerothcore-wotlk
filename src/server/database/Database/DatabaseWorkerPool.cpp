@@ -383,7 +383,7 @@ void DatabaseWorkerPool<T>::KeepAlive()
 *
 * Adapted from stackoverflow response
 * https://stackoverflow.com/a/2941508
-* 
+*
 * @param mysqlVersion The output from GetServerInfo()/mysql_get_server_info()
 * @return Returns true if the Server version is incompatible
 */
@@ -391,7 +391,7 @@ bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
 {
     // anon func to turn a version string into an array of uint8
     // "1.2.3" => [1, 2, 3]
-    auto parse = [](const std::string& input)
+    auto parse = [](std::string const& input)
     {
         std::vector<uint8> result;
         std::istringstream parser(input);
