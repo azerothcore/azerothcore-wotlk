@@ -115,11 +115,11 @@ public:
                 return false;
             }
 
-            if (me->GetThreatMgr().GetThreatListSize() > 1)
+            if (me->GetThreatManager().GetThreatListSize() > 1)
             {
-                ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
+                auto lastRef = me->GetThreatManager().GetUnsortedThreatList().end();
                 --lastRef;
-                if (Unit* lastTarget = (*lastRef)->getTarget())
+                if (Unit* lastTarget = (*lastRef)->GetVictim())
                 {
                     if (lastTarget != target)
                     {
@@ -190,7 +190,6 @@ public:
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
-                    me->TauntApply(charmer);
                 }
             }
         }

@@ -194,7 +194,7 @@ struct boss_ouro : public BossAI
     {
         if (spellInfo->Id == SPELL_SAND_BLAST && target)
         {
-            me->GetThreatMgr().ModifyThreatByPercent(target, -100);
+            me->GetThreatManager().ModifyThreatByPercent(target, -100);
         }
     }
 
@@ -270,7 +270,7 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        if (me->GetThreatMgr().GetThreatList().empty())
+        if (me->GetThreatManager().GetThreatListSize() <= 1)
         {
             DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
             me->DespawnOrUnsummon(1000);
@@ -348,7 +348,7 @@ struct npc_dirt_mound : ScriptedAI
         DoResetThreatList();
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.f, true))
         {
-            me->AddThreat(target, 1000000.f);
+            me->GetThreatManager().AddThreat(target, 1000000.f);
             AttackStart(target);
         }
     }

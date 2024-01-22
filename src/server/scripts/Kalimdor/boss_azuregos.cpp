@@ -186,7 +186,7 @@ class spell_arcane_vacuum : public SpellScript
         Unit* hitUnit = GetHitUnit();
         if (caster && hitUnit)
         {
-            caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
+            caster->GetThreatManager().ModifyThreatByPercent(hitUnit, -100);
             caster->CastSpell(hitUnit, SPELL_ARCANE_VACUUM_TP, true);
         }
     }

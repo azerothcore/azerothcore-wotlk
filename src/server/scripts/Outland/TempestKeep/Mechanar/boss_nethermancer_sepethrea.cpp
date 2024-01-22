@@ -51,11 +51,10 @@ struct boss_nethermancer_sepethrea : public BossAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        if (me->GetThreatMgr().GetThreatListSize() > 1)
+        if (me->GetThreatManager().GetThreatListSize() > 1)
         {
-            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-            --lastRef;
-            if (Unit* lastTarget = (*lastRef)->getTarget())
+            auto lastRef = me->GetThreatManager().GetCurrentVictim();
+            if (Unit* lastTarget = lastRef)
             {
                 if (lastTarget != target)
                 {
@@ -110,7 +109,7 @@ struct boss_nethermancer_sepethrea : public BossAI
         if (Unit* victim = me->GetVictim())
         {
             summon->AI()->AttackStart(victim);
-            summon->AddThreat(victim, 1000.0f);
+            summon->GetThreatManager().AddThreat(victim, 1000.0f);
             summon->SetInCombatWithZone();
         }
     }
@@ -143,14 +142,14 @@ struct npc_raging_flames : public ScriptedAI
     // It's more tricky actually
     void FixateRandomTarget()
     {
-        me->GetThreatMgr().ClearAllThreat();
+        me->GetThreatManager().ClearAllThreat();
 
         if (TempSummon* summon = me->ToTempSummon())
             if (Creature* summoner = summon->GetSummonerCreatureBase())
                 if (summoner->IsAIEnabled)
                 {
                     if (Unit* target = summoner->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
-                        me->AddThreat(target, 1000000.0f);
+                        me->GetThreatManager().AddThreat(target, 1000000.0f);
                     else
                         me->KillSelf();
                 }

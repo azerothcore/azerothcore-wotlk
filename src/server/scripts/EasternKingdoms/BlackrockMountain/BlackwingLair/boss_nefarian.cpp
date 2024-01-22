@@ -681,11 +681,11 @@ struct boss_nefarian : public BossAI
                 case EVENT_CLASSCALL:
                     if (classesPresent.empty())
                     {
-                        for (auto& ref : me->GetThreatMgr().GetThreatList())
+                        for (auto& ref : me->GetThreatManager().GetSortedThreatList())
                         {
-                            if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            if (ref->GetVictim() && ref->GetVictim()->GetTypeId() == TYPEID_PLAYER)
                             {
-                                classesPresent.insert(ref->getTarget()->getClass());
+                                classesPresent.insert(ref->GetVictim()->getClass());
                             }
                         }
                     }

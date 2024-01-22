@@ -134,7 +134,7 @@ struct boss_curator : public BossAI
         if (Unit* target = summon->SelectNearbyTarget(nullptr, 40.0f))
         {
             summon->AI()->AttackStart(target);
-            summon->AddThreat(target, 1000.0f);
+            summon->GetThreatManager().AddThreat(target, 1000.0f);
         }
         summon->SetInCombatWithZone();
     }

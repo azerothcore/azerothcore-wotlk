@@ -115,7 +115,7 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
+                me->GetThreatManager().ClearAllThreat();
                 me->CombatStop(true);
                 Talk(SAY_FREE);
                 return;
@@ -484,7 +484,7 @@ struct npc_magister_aledis : public ScriptedAI
             _events.Reset();
             me->RestoreFaction();
             me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(true);
             me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetImmuneToPC(true);

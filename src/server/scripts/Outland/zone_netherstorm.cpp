@@ -667,12 +667,12 @@ public:
             // some code to cast spell Mana Burn on random target which has mana
             if (ManaBurnTimer <= diff)
             {
-                std::list<HostileReference*> AggroList = me->GetThreatMgr().GetThreatList();
                 std::list<Unit*> UnitsWithMana;
 
-                for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
+                auto tlist = me->GetThreatManager().GetUnsortedThreatList();
+                for (auto t : tlist)
                 {
-                    if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                    if (Unit* unit = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID()))
                     {
                         if (unit->GetCreateMana() > 0)
                             UnitsWithMana.push_back(unit);

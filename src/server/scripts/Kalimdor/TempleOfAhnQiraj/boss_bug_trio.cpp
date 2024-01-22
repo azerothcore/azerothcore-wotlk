@@ -165,7 +165,7 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        if (me->GetThreatMgr().GetThreatListSize())
+        if (me->GetThreatManager().GetThreatListSize())
             DoResetThreatList();
         if (Creature* dying = instance->GetCreature(_creatureDying))
         {
@@ -461,7 +461,7 @@ class spell_vem_knockback : public SpellScript
         {
             if (Creature* cCaster = GetCaster()->ToCreature())
             {
-                cCaster->GetThreatMgr().ModifyThreatByPercent(target, -80);
+                cCaster->GetThreatManager().ModifyThreatByPercent(target, -80);
             }
         }
     }

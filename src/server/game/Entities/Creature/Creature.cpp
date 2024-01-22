@@ -178,11 +178,7 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             if (assistant && assistant->CanAssistTo(m_owner, victim))
             {
                 assistant->SetNoCallAssistance(true);
-                assistant->CombatStart(victim);
-                if (assistant->IsAIEnabled)
-                    assistant->AI()->AttackStart(victim);
-
-                assistant->SetLastDamagedTimePtr(m_owner->GetLastDamagedTimePtr());
+                assistant->EngageWithTarget(victim);
             }
         }
     }
@@ -206,8 +202,8 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     {
         if (m_owner.IsInCombatWith(victim))
         {
-            m_owner.GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
-            m_owner.GetThreatMgr().AddThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+            m_owner.GetThreatManager().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatManager().AddThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
@@ -594,6 +590,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         AIM_Initialize();
     }
 
+    GetThreatManager().UpdateOnlineStates(true, true);
     return true;
 }
 
@@ -663,6 +660,8 @@ void Creature::Update(uint32 diff)
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
             if (!IsAlive())
                 break;
+
+            GetThreatManager().Update(diff);
 
             // if creature is charmed, switch to charmed AI
             if (NeedChangeAI)
@@ -821,22 +820,7 @@ void Creature::Update(uint32 diff)
                             }
                         };
 
-                        if (GetThreatMgr().GetThreatListSize() <= 1)
-                        {
-                            EnterEvade();
-                        }
-                        else
-                        {
-                            if (HostileReference* ref = GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_cannotReachTarget))
-                            {
-                                ref->removeReference();
-                                SetCannotReachTarget();
-                            }
-                            else
-                            {
-                                EnterEvade();
-                            }
-                        }
+                        EnterEvade();
                     }
                 }
             }
@@ -1149,7 +1133,136 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
     if (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING)
         AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
 
+    GetThreatManager().Initialize();
     return true;
+}
+
+Unit* Creature::SelectVictim()
+{
+    Unit* target = nullptr;
+
+    ThreatMgr& mgr = GetThreatManager();
+
+    if (mgr.CanHaveThreatList())
+    {
+        target = mgr.SelectVictim();
+        while (!target)
+        {
+            Unit* newTarget = nullptr;
+            // nothing found to attack - try to find something we're in combat with (but don't have a threat entry for yet) and start attacking it
+            for (auto const& pair : GetCombatManager().GetPvECombatRefs())
+            {
+                newTarget = pair.second->GetOther(this);
+                if (!mgr.IsThreatenedBy(newTarget, true))
+                {
+                    mgr.AddThreat(newTarget, 0.0f, nullptr, true, true);
+                    break;
+                }
+                else
+                    newTarget = nullptr;
+            }
+            if (!newTarget)
+                break;
+            target = mgr.SelectVictim();
+        }
+    }
+    else if (!HasReactState(REACT_PASSIVE))
+    {
+        // We're a player pet, probably
+        target = getAttackerForHelper();
+        if (!target && IsSummon())
+        {
+            if (Unit* owner = ToTempSummon()->GetOwner())
+            {
+                if (owner->IsInCombat())
+                    target = owner->getAttackerForHelper();
+                if (!target)
+                {
+                    for (ControlSet::const_iterator itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end(); ++itr)
+                    {
+                        if ((*itr)->IsInCombat())
+                        {
+                            target = (*itr)->getAttackerForHelper();
+                            if (target)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+        return nullptr;
+
+    if (target && _IsTargetAcceptable(target) && CanCreatureAttack(target))
+    {
+        if (!HasSpellFocus(nullptr))
+            SetInFront(target);
+        return target;
+    }
+
+    /// @todo a vehicle may eat some mob, so mob should not evade
+    if (GetVehicle())
+        return nullptr;
+
+    // search nearby enemy before enter evade mode
+    if (HasReactState(REACT_AGGRESSIVE))
+    {
+        target = SelectNearestTargetInAttackDistance(m_CombatDistance ? m_CombatDistance : ATTACK_DISTANCE);
+
+        if (target && _IsTargetAcceptable(target) && CanCreatureAttack(target))
+            return target;
+    }
+
+    Unit::AuraEffectList const& iAuras = GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
+    if (!iAuras.empty())
+    {
+        for (Unit::AuraEffectList::const_iterator itr = iAuras.begin(); itr != iAuras.end(); ++itr)
+        {
+            if ((*itr)->GetBase()->IsPermanent())
+            {
+                AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_OTHER);
+                break;
+            }
+        }
+        return nullptr;
+    }
+
+    // enter in evade mode in other case
+    AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_HOSTILES);
+
+    return nullptr;
+}
+
+void Creature::AtEnterCombat()
+{
+    Unit::AtEnterCombat();
+
+    if (!(GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_ALLOW_MOUNTED_COMBAT))
+        Dismount();
+
+    if (IsPet() || IsGuardian()) // update pets' speed for catchup OOC speed
+    {
+        UpdateSpeed(MOVE_RUN, true);
+        UpdateSpeed(MOVE_SWIM, true);
+        UpdateSpeed(MOVE_FLIGHT, true);
+    }
+}
+
+void Creature::AtExitCombat()
+{
+    Unit::AtExitCombat();
+
+    ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
+    if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED))
+        SetUInt32Value(UNIT_DYNAMIC_FLAGS, GetCreatureTemplate()->dynamicflags);
+
+    if (IsPet() || IsGuardian()) // update pets' speed for catchup OOC speed
+    {
+        UpdateSpeed(MOVE_RUN, true);
+        UpdateSpeed(MOVE_SWIM, true);
+        UpdateSpeed(MOVE_FLIGHT, true);
+    }
 }
 
 bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
@@ -3681,11 +3794,11 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
 {
     if (victim)
     {
-        float currentThreat = GetThreatMgr().GetThreat(victim);
+        float currentThreat = GetThreatManager().GetThreat(victim);
 
         if (percent != 0.0f)
         {
-            GetThreatMgr().ModifyThreatByPercent(victim, percent);
+            GetThreatManager().ModifyThreatByPercent(victim, percent);
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);

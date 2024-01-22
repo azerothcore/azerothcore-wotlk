@@ -340,7 +340,7 @@ struct npc_malchezaar_axe : public ScriptedAI
                     DoModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
-                me->AddThreat(target, 1000000.0f);
+                me->GetThreatManager().AddThreat(target, 1000000.0f);
             }
 
             context.Repeat(7500ms, 20s);

@@ -255,10 +255,10 @@ struct boss_nightbane : public BossAI
     void DoCastOnFarAwayPlayers(uint32 spellid, bool triggered, float tresholddistance)
     {
         //resembles DoCastToAllHostilePlayers a bit/lot
-        ThreatContainer::StorageType targets = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+        auto tList = me->GetThreatManager().GetUnsortedThreatList();
+        for (auto t : tList)
         {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID()))
             {
                 if (unit->IsPlayer() && !unit->IsWithinDist(me, tresholddistance, false))
                 {

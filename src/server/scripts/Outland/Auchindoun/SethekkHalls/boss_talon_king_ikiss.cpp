@@ -66,7 +66,7 @@ struct boss_talon_king_ikiss : public BossAI
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
             }).Schedule(6500ms, [this](TaskContext /*context*/)
             {
-                me->GetThreatMgr().ResetAllThreat();
+                me->GetThreatManager().ResetAllThreat();
             });
         });
 

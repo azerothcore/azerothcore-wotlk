@@ -79,24 +79,6 @@ struct boss_hazzarah : public BossAI
         events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
     }
 
-    bool CanAIAttack(Unit const* target) const override
-    {
-        if (me->GetThreatMgr().GetThreatListSize() > 1)
-        {
-            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-            --lastRef;
-            if (Unit* lastTarget = (*lastRef)->getTarget())
-            {
-                if (lastTarget != target)
-                {
-                    return !target->HasAura(SPELL_SLEEP);
-                }
-            }
-        }
-
-        return true;
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())

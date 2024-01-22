@@ -171,8 +171,8 @@ public:
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
-                    creatureCaster->GetThreatMgr().ResetAllThreat();
-                    creatureCaster->GetThreatMgr().AddThreat(target, 1);
+                    creatureCaster->GetThreatManager().ResetAllThreat();
+                    creatureCaster->GetThreatManager().AddThreat(target, 1);
                     creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
                 }
             }

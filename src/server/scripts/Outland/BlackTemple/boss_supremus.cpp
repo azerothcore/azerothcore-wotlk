@@ -104,10 +104,10 @@ struct boss_supremus : public BossAI
     Unit* FindHatefulStrikeTarget()
     {
         Unit* target = nullptr;
-        ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
+        auto tlist = me->GetThreatManager().GetUnsortedThreatList();
+        for (auto t : tlist)
         {
-            Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
+            Unit* unit = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID());
             if (unit && me->IsWithinMeleeRange(unit))
                 if (!target || unit->GetHealth() > target->GetHealth())
                     target = unit;
@@ -146,7 +146,7 @@ struct boss_supremus : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
             {
                 DoResetThreatList();
-                me->AddThreat(target, 5000000.0f);
+                me->GetThreatManager().AddThreat(target, 5000000.0f);
                 Talk(EMOTE_NEW_TARGET);
             }
             events.ScheduleEvent(EVENT_SWITCH_TARGET, 10000, EVENT_GROUP_ABILITIES);

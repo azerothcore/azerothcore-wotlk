@@ -1223,7 +1223,7 @@ public:
                     if (Unit* target = SelectTargetFromPlayerList(100.0f, 0, true))
                     {
                         DoResetThreatList();
-                        me->AddThreat(target, 5000.0f);
+                        me->GetThreatManager().AddThreat(target, 5000.0f);
                         AttackStart(target);
                         me->CastSpell(target, SPELL_SHADOW_STEP, false);
                     }
@@ -1735,7 +1735,7 @@ public:
             s->SetInCombatWithZone();
             if (Unit* target = s->SelectNearestPlayer(350.0f))
             {
-                s->AddThreat(target, 1000.0f);
+                s->GetThreatManager().AddThreat(target, 1000.0f);
                 s->AI()->AttackStart(target);
             }
             s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);

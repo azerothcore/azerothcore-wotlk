@@ -81,7 +81,7 @@ struct boss_buru : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        me->AddThreat(who, 1000000.f);
+        me->GetThreatManager().AddThreat(who, 1000000.f);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
         _phase = PHASE_EGG;
@@ -122,7 +122,7 @@ struct boss_buru : public BossAI
         {
             DoResetThreatList();
             AttackStart(victim);
-            me->AddThreat(victim, 1000000.f);
+            me->GetThreatManager().AddThreat(victim, 1000000.f);
             Talk(EMOTE_TARGET, victim);
         }
     }

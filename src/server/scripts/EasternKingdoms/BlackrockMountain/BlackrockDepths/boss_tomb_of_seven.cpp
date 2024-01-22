@@ -203,7 +203,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
             if (me->IsAlive())

@@ -500,7 +500,7 @@ public:
                             case 0:
                                 if (Creature* mob = me->SummonCreature(ASPECT_RAVEN, AspectRavenSummon, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                 {
-                                    mob->AddThreat(me, 10000.0f);
+                                    mob->GetThreatManager().AddThreat(me, 10000.0f);
                                     mob->AI()->AttackStart(me);
                                 }
                                 EventTimer = 2000;

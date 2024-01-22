@@ -786,7 +786,7 @@ public:
         {
             if (!me->IsAlive())
                 return;
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(true);
             me->GetMotionMaster()->MoveTargetedHome();
             Reset();
@@ -907,7 +907,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatManager().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -947,11 +947,7 @@ public:
                     if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
                     {
                         //_instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                        _instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4s);
                     }
                     break;
@@ -1122,7 +1118,7 @@ public:
         {
             if (!me->IsAlive())
                 return;
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(true);
             me->GetMotionMaster()->MoveTargetedHome();
             Reset();
@@ -1243,7 +1239,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatManager().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -1286,11 +1282,7 @@ public:
                     if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
                     {
                         //_instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                        _instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4s);
                     }
                     break;
@@ -1498,7 +1490,7 @@ struct gunship_npc_AI : public ScriptedAI
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
-        me->GetThreatMgr().ClearAllThreat();
+        me->GetThreatManager().ClearAllThreat();
         me->CombatStop(true);
         me->GetMotionMaster()->MoveTargetedHome();
         Reset();
@@ -1559,7 +1551,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
-        me->GetThreatMgr().ClearAllThreat();
+        me->GetThreatManager().ClearAllThreat();
         me->CombatStop(true);
         me->GetMotionMaster()->MoveTargetedHome();
         Reset();
@@ -1622,7 +1614,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
                         anyValid = true;
                         me->SetInCombatWith(p);
                         p->SetInCombatWith(me);
-                        me->AddThreat(p, 0.0f);
+                        me->GetThreatManager().AddThreat(p, 0.0f);
                     }
         }
         else
@@ -1783,7 +1775,7 @@ public:
                         if (Player* player = me->SelectNearestPlayer(50.0f))
                         {
                             me->SetInCombatWithZone();
-                            me->AddThreat(player, 1.0f);
+                            me->GetThreatManager().AddThreat(player, 1.0f);
                         }
                         me->CastSpell((Unit*)nullptr, SPELL_BELOW_ZERO, false);
                         break;
@@ -1864,7 +1856,7 @@ public:
                             anyValid = true;
                             me->SetInCombatWith(p);
                             p->SetInCombatWith(me);
-                            me->AddThreat(p, 0.0f);
+                            me->GetThreatManager().AddThreat(p, 0.0f);
                         }
             }
             else

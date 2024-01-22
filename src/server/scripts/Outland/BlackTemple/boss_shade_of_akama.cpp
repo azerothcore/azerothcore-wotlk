@@ -171,7 +171,7 @@ struct boss_shade_of_akama : public BossAI
                 akama->SetReactState(REACT_AGGRESSIVE);
                 akama->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 DoCast(akama, SPELL_THREAT, true);
-                me->AddThreat(akama, 900000.0f);
+                me->GetThreatManager().AddThreat(akama, 900000.0f);
                 akama->AI()->DoCast(me, SPELL_FIXATE, true);
                 AttackStart(akama);
             }
@@ -179,7 +179,7 @@ struct boss_shade_of_akama : public BossAI
             ScheduleTimedEvent(3500ms, [&]
             {
                 if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
-                    me->AddThreat(akama, 900000.0f);
+                    me->GetThreatManager().AddThreat(akama, 900000.0f);
             }, 3500ms);
         }
     }

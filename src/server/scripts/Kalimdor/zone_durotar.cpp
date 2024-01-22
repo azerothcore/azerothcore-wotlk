@@ -171,7 +171,7 @@ public:
                     _tigerGuid = vehicle->GetBase()->GetGUID();
                     if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
                     {
-                        me->AddThreat(tiger, 500000.0f);
+                        me->GetThreatManager().AddThreat(tiger, 500000.0f);
                         DoCast(me, SPELL_FURIOUS_BITE);
                     }
                 }

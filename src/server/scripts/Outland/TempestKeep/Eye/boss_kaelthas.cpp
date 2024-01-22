@@ -1267,14 +1267,14 @@ class spell_kaelthas_nether_beam : public SpellScript
     {
         PreventHitEffect(effIndex);
 
-        ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().GetThreatList();
-        std::list<Unit*> targetList;
-        for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
-        {
-            Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
-                targetList.push_back(target);
-        }
+            std::list<Unit*> targetList;
+            auto tList = GetCaster()->GetThreatManager().GetUnsortedThreatList();
+            for (auto t : tList)
+            {
+                Unit* target = ObjectAccessor::GetUnit(*GetCaster(), t->GetVictim()->GetGUID());
+                if (target && target->GetTypeId() == TYPEID_PLAYER)
+                    targetList.push_back(target);
+            }
 
         Acore::Containers::RandomResize(targetList, 5);
         for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)

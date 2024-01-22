@@ -1541,7 +1541,7 @@ public:
             if (who && damagetype == DIRECT_DAMAGE)
             {
                 DoResetThreatList();
-                me->AddThreat(who, 100000);
+                me->GetThreatManager().AddThreat(who, 100000);
                 AttackStart(who);
                 me->InterruptNonMeleeSpells(false);
             }

@@ -91,7 +91,7 @@ struct boss_murmur : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (me->GetThreatMgr().GetThreatList().empty())
+        if (me->GetThreatManager().GetThreatListSize() < 1)
         {
             BossAI::EnterEvadeMode(why);
         }

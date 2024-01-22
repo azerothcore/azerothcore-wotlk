@@ -406,6 +406,8 @@ struct boss_alar : public BossAI
         {
             DoMeleeAttackIfReady();
         }
+
+
     }
 
     Position DeterminePhoenixPosition(Position playerPosition)

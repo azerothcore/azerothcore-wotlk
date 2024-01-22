@@ -172,7 +172,7 @@ struct boss_leotheras_the_blind : public BossAI
         if (me->GetDistance2d(target) > 40.0f)
         {
             me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
-            me->AddThreat(target, 0.0f);
+            me->GetThreatManager().AddThreat(target, 0.0f);
         }
         else
         {
@@ -331,7 +331,7 @@ class spell_leotheras_whirlwind : public SpellScript
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        GetCaster()->GetThreatMgr().ResetAllThreat();
+        GetCaster()->GetThreatManager().ResetAllThreat();
 
         if (roll_chance_i(33))
             if (Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))

@@ -48,7 +48,7 @@ void FollowerAI::AttackStart(Unit* who)
     if (me->Attack(who, true))
     {
         // This is done in Unit::Attack function which wont bug npcs by not adding threat upon combat start...
-        //me->AddThreat(who, 0.0f);
+        //me->GetThreatManager().AddThreat(who, 0.0f);
         //me->SetInCombatWith(who);
         //who->SetInCombatWith(me);
 
@@ -153,7 +153,7 @@ void FollowerAI::JustRespawned()
 void FollowerAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->RemoveAllAuras();
-    me->GetThreatMgr().ClearAllThreat();
+    me->GetThreatManager().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);
 

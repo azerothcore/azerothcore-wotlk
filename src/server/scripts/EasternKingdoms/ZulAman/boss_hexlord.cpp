@@ -602,7 +602,7 @@ public:
                 if (me->Attack(who, false))
                 {
                     me->GetMotionMaster()->MoveChase(who, 20);
-                    me->AddThreat(who, 0.0f);
+                    me->GetThreatManager().AddThreat(who, 0.0f);
                 }
             }
         }
@@ -690,7 +690,7 @@ struct boss_gazakrothAI : public boss_hexlord_addAI
             if (me->Attack(who, false))
             {
                 me->GetMotionMaster()->MoveChase(who, 20);
-                me->AddThreat(who, 0.0f);
+                me->GetThreatManager().AddThreat(who, 0.0f);
             }
         }
     }
@@ -833,7 +833,7 @@ public:
                 if (me->Attack(who, false))
                 {
                     me->GetMotionMaster()->MoveChase(who, 20);
-                    me->AddThreat(who, 0.0f);
+                    me->GetThreatManager().AddThreat(who, 0.0f);
                 }
             }
         }

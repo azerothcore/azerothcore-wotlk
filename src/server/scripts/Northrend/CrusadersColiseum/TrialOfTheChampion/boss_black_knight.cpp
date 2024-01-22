@@ -429,7 +429,7 @@ public:
                     DoResetThreatList();
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                     {
-                        me->AddThreat(target, 100.0f);
+                        me->GetThreatManager().AddThreat(target, 100.0f);
                         AttackStart(target);
                     }
                     break;

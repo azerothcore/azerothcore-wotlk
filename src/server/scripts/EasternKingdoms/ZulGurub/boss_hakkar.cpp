@@ -161,7 +161,7 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 30s, 40s);
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        if (me->GetThreatMgr().GetThreatListSize() > 1)
+                        if (me->GetThreatManager().GetThreatListSize() > 1)
                         {
                             if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
                             {
@@ -187,7 +187,7 @@ public:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
                         {
                             DoCast(victim, SPELL_ASPECT_OF_MARLI, true);
-                            me->GetThreatMgr().ModifyThreatByPercent(victim, -100.f);
+                            me->GetThreatManager().ModifyThreatByPercent(victim, -100.f);
                         }
                         events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 45s);
                         break;
@@ -199,7 +199,7 @@ public:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
                         {
                             DoCast(victim, SPELL_ASPECT_OF_ARLOKK, true);
-                            me->GetThreatMgr().ModifyThreatByPercent(victim, -100.f);
+                            me->GetThreatManager().ModifyThreatByPercent(victim, -100.f);
                         }
                         events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 10s, 15s);
                         break;

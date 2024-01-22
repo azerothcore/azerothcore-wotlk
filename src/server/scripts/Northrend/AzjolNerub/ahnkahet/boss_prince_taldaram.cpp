@@ -412,19 +412,13 @@ struct boss_taldaram : public BossAI
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
-                    if (!t_list.empty())
+                    auto tList = me->GetThreatManager().GetUnsortedThreatList();
+                    for (auto t : tList)
                     {
-                        for (HostileReference const* reference : t_list)
+                        Unit const* pTarget = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID());
+                        if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
                         {
-                            if (reference)
-                            {
-                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                                {
-                                    ++count;
-                                }
-                            }
+                            ++count;
                         }
                     }
 

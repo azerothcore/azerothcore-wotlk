@@ -82,7 +82,7 @@ struct boss_jindo : public BossAI
         {
             case NPC_BRAIN_WASH_TOTEM:
                 summon->SetReactState(REACT_PASSIVE);
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, me->GetThreatMgr().GetThreatListSize() > 1 ? 1 : 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, me->GetThreatManager().GetThreatListSize() > 1 ? 1 : 0))
                 {
                     summon->CastSpell(target, summon->m_spells[0], true);
                 }
@@ -133,7 +133,7 @@ struct boss_jindo : public BossAI
                 events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 14s, 20s);
                 break;
             case EVENT_HEX:
-                if (me->GetThreatMgr().GetThreatListSize() > 1)
+                if (me->GetThreatManager().GetThreatListSize() > 1)
                     DoCastVictim(SPELL_HEX, true);
                 events.ScheduleEvent(EVENT_HEX, 12s, 20s);
                 break;
@@ -155,11 +155,10 @@ struct boss_jindo : public BossAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        if (me->GetThreatMgr().GetThreatListSize() > 1)
+        if (me->GetThreatManager().GetThreatListSize() > 1)
         {
-            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-            --lastRef;
-            if (Unit* lastTarget = (*lastRef)->getTarget())
+            auto lastRef = me->GetThreatManager().GetCurrentVictim();
+            if (Unit* lastTarget = lastRef)
             {
                 if (lastTarget != target)
                 {

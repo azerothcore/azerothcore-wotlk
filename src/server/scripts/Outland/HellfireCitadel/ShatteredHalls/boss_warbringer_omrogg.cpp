@@ -170,7 +170,7 @@ struct boss_warbringer_omrogg : public BossAI
                     {
                         DoResetThreatList();
                         if (Unit* newTarget = SelectTarget(SelectTargetMethod::Random, 1))
-                            me->AddThreat(newTarget, 2250.f);
+                            me->GetThreatManager().AddThreat(newTarget, 2250.f);
                         HandleHeadTalk(SAY_ON_BEATDOWN);
                         context.Schedule(1200ms, GROUP_NON_BURNING_PHASE, [this](TaskContext /*context*/)
                         {
@@ -200,7 +200,7 @@ struct boss_warbringer_omrogg : public BossAI
                                     {
                                         DoResetThreatList();
                                         if (Unit* newTarget = SelectTarget(SelectTargetMethod::Random, 1))
-                                            me->AddThreat(newTarget, 2250.f);
+                                            me->GetThreatManager().AddThreat(newTarget, 2250.f);
                                         me->SetReactState(REACT_AGGRESSIVE);
                                         context.Schedule(4850ms, 8500ms, GROUP_BURNING_PHASE, [this](TaskContext context)
                                             {

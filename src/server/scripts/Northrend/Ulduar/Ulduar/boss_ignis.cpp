@@ -140,7 +140,7 @@ public:
                             heat->ModStackAmount(-1);
                         }
                         me->CastSpell(me, SPELL_MOLTEN, true);
-                        me->GetThreatMgr().ResetAllThreat();
+                        me->GetThreatManager().ResetAllThreat();
                     }
                 }
             }

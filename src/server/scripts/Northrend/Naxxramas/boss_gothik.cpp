@@ -472,10 +472,10 @@ public:
                     {
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
-                    me->GetThreatMgr().resetAggro(NotOnSameSide(me));
+                    DoResetThreatList();
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
-                        me->GetThreatMgr().AddThreat(pTarget, 100.0f);
+                        me->GetThreatManager().AddThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
                     }
                     events.Repeat(20s);

@@ -338,7 +338,7 @@ public:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
                         DoResetThreatList();
-                        me->AddThreat(target, 50000.0f);
+                        me->GetThreatManager().AddThreat(target, 50000.0f);
                         me->CastSpell(target, SPELL_FEL_STEAK_MORPH, true);
                         me->CastSpell(target, SPELL_FEL_STEAK, true);
                         events.Repeat(30s);

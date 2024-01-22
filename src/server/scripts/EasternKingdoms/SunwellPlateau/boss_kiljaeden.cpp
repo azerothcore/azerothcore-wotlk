@@ -330,7 +330,7 @@ public:
                 me->SetTarget();
                 me->SetReactState(REACT_PASSIVE);
                 me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
+                me->GetThreatManager().ClearAllThreat();
                 me->SetRegeneratingHealth(false);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);

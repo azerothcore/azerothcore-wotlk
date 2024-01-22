@@ -179,7 +179,7 @@ struct boss_attumen : public BossAI
             {
                 Unit* target = nullptr;
                 std::vector<Unit*> target_list;
-                for (auto* ref : me->GetThreatMgr().GetUnsortedThreatList())
+                for (auto* ref : me->GetThreatManager().GetUnsortedThreatList())
                 {
                     target = ref->GetVictim();
                     if (target && !target->IsWithinDist(me, 8.00f, false) && target->IsWithinDist(me, 25.0f, false))
@@ -381,39 +381,9 @@ private:
     uint8 _phase;
 };
 
-class spell_midnight_fixate : public AuraScript
-{
-    PrepareAuraScript(spell_midnight_fixate)
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* target = GetTarget();
-        if (Unit* caster = GetCaster())
-        {
-            caster->TauntApply(target);
-        }
-    }
-
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* target = GetTarget();
-        if (Unit* caster = GetCaster())
-        {
-            caster->TauntFadeOut(target);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_midnight_fixate::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_midnight_fixate::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 void AddSC_boss_attumen()
 {
     RegisterKarazhanCreatureAI(boss_midnight);
     RegisterKarazhanCreatureAI(boss_attumen);
-    RegisterSpellScript(spell_midnight_fixate);
 }
 

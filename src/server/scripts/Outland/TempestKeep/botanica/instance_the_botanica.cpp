@@ -63,8 +63,7 @@ public:
             GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
             for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
             {
-                (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+                (*itr)->GetThreatManager().AddThreat(GetUnitOwner(), 10000000.0f);
                 _falconSet.insert((*itr)->GetGUID());
             }
         }
@@ -74,8 +73,7 @@ public:
             for (ObjectGuid const& guid : _falconSet)
                 if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
-                    falcon->TauntFadeOut(GetUnitOwner());
-                    falcon->AddThreat(GetUnitOwner(), -10000000.0f);
+                    falcon->GetThreatManager().AddThreat(GetUnitOwner(), -10000000.0f);
                 }
         }
 

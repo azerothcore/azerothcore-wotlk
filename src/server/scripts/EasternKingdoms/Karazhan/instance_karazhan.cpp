@@ -603,7 +603,7 @@ public:
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->GetThreatMgr().ResetAllThreat();
+            GetCaster()->GetThreatManager().ResetAllThreat();
             if (Unit* target = GetHitUnit())
                 GetCaster()->CastSpell(target, SPELL_BLINK, true);
         }

@@ -672,7 +672,7 @@ public:
 
     bool operator() (WorldObject* target) const
     {
-        if (target == _victim && _me->GetThreatMgr().GetThreatListSize() > 1)
+        if (target == _victim && _me->GetThreatManager().GetThreatListSize() > 1)
             return true;
 
         if (target->GetTypeId() != TYPEID_PLAYER)

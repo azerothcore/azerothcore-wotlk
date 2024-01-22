@@ -261,7 +261,7 @@ class spell_teron_gorefiend_shadowy_construct : public AuraScript
             if (Player* player = i->GetSource())
             {
                 if (GetUnitOwner()->IsValidAttackTarget(player))
-                    GetUnitOwner()->AddThreat(player, 1000000.0f);
+                    GetUnitOwner()->GetThreatManager().AddThreat(player, 1000000.0f);
             }
 
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_BRIEF_STUN, true);

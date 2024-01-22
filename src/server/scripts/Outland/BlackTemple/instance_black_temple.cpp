@@ -209,8 +209,7 @@ public:
             GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
             for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
             {
-                (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+                (*itr)->GetThreatManager().AddThreat(GetUnitOwner(), 10000000.0f);
                 _turtleSet.insert((*itr)->GetGUID());
             }
         }
@@ -220,8 +219,7 @@ public:
             for (ObjectGuid const& guid : _turtleSet)
                 if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
-                    turtle->TauntFadeOut(GetUnitOwner());
-                    turtle->AddThreat(GetUnitOwner(), -10000000.0f);
+                    turtle->GetThreatManager().AddThreat(GetUnitOwner(), -10000000.0f);
                 }
         }
 

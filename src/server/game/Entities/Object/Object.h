@@ -432,8 +432,9 @@ public:
 
     virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
     [[nodiscard]] uint32 GetPhaseMask() const { return m_phaseMask; }
-    bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
     [[nodiscard]] bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
+    bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
+    static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
 
     [[nodiscard]] uint32 GetZoneId() const;
     [[nodiscard]] uint32 GetAreaId() const;

@@ -984,14 +984,14 @@ public:
                         me->SetImmuneToNPC(false);
                         if (Creature* gyth = me->FindNearestCreature(NPC_GYTH, 100.0f, true))
                         {
-                            me->AddThreat(gyth, 1000000.f);
+                            me->GetThreatManager().AddThreat(gyth, 1000000.f);
                             me->AI()->AttackStart(gyth);
                         }
                         if (Creature* rend = me->FindNearestCreature(NPC_WARCHIEF_REND_BLACKHAND, 100.0f, true))
                         {
                             if (!rend->IsImmuneToNPC() && rend->isTargetableForAttack())
                             {
-                                me->AddThreat(rend, 100000.f);
+                                me->GetThreatManager().AddThreat(rend, 100000.f);
                                 if (!me->FindNearestCreature(NPC_GYTH, 100.0f, true))
                                 {
                                     me->AI()->AttackStart(rend);

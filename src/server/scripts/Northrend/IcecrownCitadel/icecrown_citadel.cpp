@@ -769,7 +769,7 @@ public:
                 _handledWP4 = false;
 
                 me->CombatStop();
-                me->GetThreatMgr().ClearAllThreat();
+                me->GetThreatManager().ClearAllThreat();
             }
         }
 
@@ -1763,15 +1763,15 @@ public:
                 Position myPos = me->GetPosition();
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->GetThreatMgr().GetThreatList();
-                const ThreatContainer::StorageType target_tl = c->GetThreatMgr().GetThreatList();
-                DoResetThreatList();
-                for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->GetThreatMgr().AddThreat((*iter)->getTarget(), (*iter)->GetThreat());
 
-                c->GetThreatMgr().ResetAllThreat();
-                for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->GetThreatMgr().AddThreat((*iter)->getTarget(), (*iter)->GetThreat());
+                DoResetThreatList();
+                auto ttlist = c->GetThreatManager().GetUnsortedThreatList();
+                for (auto t : ttlist)
+                    me->GetThreatManager().AddThreat(t->GetVictim(), t->GetThreat());
+
+                auto me_tl = me->GetThreatManager().GetUnsortedThreatList();
+                for (auto m : me_tl)
+                    c->GetThreatManager().AddThreat(m->GetVictim(), m->GetThreat());
             }
         }
 
@@ -2026,7 +2026,7 @@ public:
                     }
                     l->AI()->Talk(0);
                     l->AI()->AttackStart(target);
-                    l->AddThreat(target, 1.0f);
+                    l->GetThreatManager().AddThreat(target, 1.0f);
                     for (uint8 i = 0; i < 5; ++i)
                     {
                         float dist = 2.0f + rand_norm() * 4.0f;
@@ -2036,7 +2036,7 @@ public:
                         if (Creature* c = l->SummonCreature(NPC_VENGEFUL_FLESHREAPER, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30 * MINUTE * IN_MILLISECONDS))
                         {
                             c->AI()->AttackStart(l->GetVictim());
-                            c->AddThreat(l->GetVictim(), 1.0f);
+                            c->GetThreatManager().AddThreat(l->GetVictim(), 1.0f);
                             if (!hasTarget)
                                 c->GetMotionMaster()->MoveJump(c->GetPositionX(), c->GetPositionY() + 55.0f, c->GetPositionZ(), 20.0f, 6.0f);
                         }

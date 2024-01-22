@@ -135,10 +135,10 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        auto list = me->GetThreatManager().GetUnsortedThreatList();
+        for (auto item : list)
         {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, item->GetVictim()->GetGUID()))
             {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                 {
@@ -158,10 +158,10 @@ SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        auto list = me->GetThreatManager().GetUnsortedThreatList();
+        for (auto item : list)
         {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit* unit = ObjectAccessor::GetUnit(*me, item->GetVictim()->GetGUID()))
             {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     return me->CastSpell(unit, spellid, triggered);
@@ -337,9 +337,9 @@ void UnitAI::FillAISpellInfo()
     }
 }
 
-ThreatMgr& UnitAI::GetThreatMgr()
+ThreatMgr& UnitAI::GetThreatManager()
 {
-    return me->GetThreatMgr();
+    return me->GetThreatManager();
 }
 
 void UnitAI::SortByDistance(std::list<Unit*>& list, bool ascending)
@@ -427,7 +427,7 @@ bool NonTankTargetSelector::operator()(Unit const* target) const
     if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
         return false;
 
-    if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())
+    if (Unit* currentVictim = _source->GetThreatManager().GetCurrentVictim())
         return target != currentVictim;
 
     return target != _source->GetVictim();

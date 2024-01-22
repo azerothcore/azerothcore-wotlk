@@ -153,7 +153,7 @@ public:
                     {
                         me->SetInCombatWith(player);
                         player->SetInCombatWith(me);
-                        me->AddThreat(player, 0.0f);
+                        me->GetThreatManager().AddThreat(player, 0.0f);
                     }
                 }
             }
@@ -322,17 +322,17 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->GetThreatMgr().GetThreatList().begin();
-                        for (; i != me->GetThreatMgr().GetThreatList().end(); ++i)
+                        auto tlist = me->GetThreatManager().GetUnsortedThreatList();
+                        for (auto t : tlist)
                         {
-                            if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            if (t->GetVictim()->GetTypeId() == TYPEID_PLAYER)
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
                                 {
                                     for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                                     {
-                                        if ((*i)->getTarget()->GetGUID() == *itr)
+                                        if (t->GetVictim()->GetGUID() == *itr)
                                         {
                                             inList = true;
                                             break;
@@ -341,7 +341,7 @@ public:
                                 }
                                 if (!inList)
                                 {
-                                    targets.push_back((*i)->getTarget());
+                                    targets.push_back(t->GetVictim());
                                 }
                             }
                         }

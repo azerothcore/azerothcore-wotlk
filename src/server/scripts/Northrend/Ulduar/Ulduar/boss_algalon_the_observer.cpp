@@ -1005,7 +1005,7 @@ public:
                     if (Player* target = SelectTargetFromPlayerList(250.0f))
                     {
                         AttackStart(target);
-                        me->AddThreat(target, 100.0f);
+                        me->GetThreatManager().AddThreat(target, 100.0f);
                     }
                     me->SetInCombatWithZone();
                     break;

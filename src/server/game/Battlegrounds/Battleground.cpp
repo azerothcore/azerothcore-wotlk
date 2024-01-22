@@ -844,11 +844,8 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             player->SpawnCorpseBones();
         }
         else
-        {
             //needed cause else in av some creatures will kill the players at the end
             player->CombatStop();
-            player->getHostileRefMgr().deleteReferences();
-        }
 
         uint32 winner_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_HONOR_FIRST);
         uint32 loser_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_FIRST);

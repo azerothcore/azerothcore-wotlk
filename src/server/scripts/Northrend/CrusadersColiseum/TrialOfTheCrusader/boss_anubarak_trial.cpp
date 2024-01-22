@@ -457,7 +457,7 @@ public:
                     DoZoneInCombat();
                     if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                     {
-                        me->AddThreat(t, 20000.0f);
+                        me->GetThreatManager().AddThreat(t, 20000.0f);
                         AttackStart(t);
                     }
                 }

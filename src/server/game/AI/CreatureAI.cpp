@@ -105,10 +105,37 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     }
 
     Map* map = creature->GetMap();
-    if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
+    if (creature->CanHaveThreatList())
     {
-        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map {} that isn't a dungeon (creature entry = {})", map->GetId(), creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
-        return;
+        if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
+        {
+            LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map {} that isn't a dungeon (creature entry = {})", map->GetId(), creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+            return;
+        }
+
+        if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
+        {
+            if (Unit* nearTarget = creature->SelectNearestTarget(maxRangeToNearestTarget))
+                creature->AI()->AttackStart(nearTarget);
+            else if (creature->IsSummon())
+            {
+                if (Unit* summoner = creature->ToTempSummon()->GetSummoner()->ToUnit())
+                {
+                    Unit* target = summoner->getAttackerForHelper();
+                    if (!target && !summoner->GetThreatManager().IsThreatListEmpty())
+                        target = summoner->GetThreatManager().GetAnyTarget();
+                    if (target && (creature->IsFriendlyTo(summoner) || creature->IsHostileTo(target)))
+                        creature->AI()->AttackStart(target);
+                }
+            }
+        }
+        // Intended duplicated check, the code above this should select a victim
+        // If it can't find a suitable attack target then we should error out.
+        if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
+        {
+            LOG_ERROR("misc.dozoneincombat", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
+            return;
+        }
     }
 
     Map::PlayerList const& playerList = map->GetPlayers();
@@ -121,22 +148,19 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     {
         if (Player* player = itr->GetSource())
         {
-            if (!IsValidCombatTarget(creature, player))
+            if (player->IsAlive())
             {
-                continue;
-            }
+                if (!IsValidCombatTarget(creature, player))
+                {
+                    continue;
+                }
 
-            if (!creature->IsWithinDistInMap(player, maxRangeToNearestTarget))
-            {
-                continue;
-            }
+                if (!creature->IsWithinDistInMap(player, maxRangeToNearestTarget))
+                {
+                    continue;
+                }
 
-            creature->SetInCombatWith(player);
-            player->SetInCombatWith(creature);
-
-            if (creature->CanHaveThreatList())
-            {
-                creature->AddThreat(player, 0.0f);
+                creature->SetInCombatWith(player);
             }
         }
     }
@@ -280,11 +304,13 @@ bool CreatureAI::UpdateVictim()
     // xinef: if we have any victim, just return true
     else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
         return true;
-    else if (me->GetThreatMgr().isThreatListEmpty())
+    else if (me->GetThreatManager().GetThreatListSize() <= 1)
     {
         EnterEvadeMode();
         return false;
     }
+    else
+        me->AttackStop();
 
     return true;
 }
@@ -302,7 +328,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     // sometimes bosses stuck in combat?
-    me->GetThreatMgr().ClearAllThreat();
+    me->GetThreatManager().ClearAllThreat();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);

@@ -1078,8 +1078,8 @@ public:
                                         continue;
                                     c->SetInCombatWith(s);
                                     s->SetInCombatWith(c);
-                                    c->AddThreat(s, 0.0f);
-                                    s->AddThreat(c, 0.0f);
+                                    c->GetThreatManager().AddThreat(s, 0.0f);
+                                    s->GetThreatManager().AddThreat(c, 0.0f);
                                 }
                         }
                     events.RescheduleEvent(10, 3000);
@@ -1125,7 +1125,7 @@ public:
                 return;
 
             me->RemoveEvadeAuras();
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);

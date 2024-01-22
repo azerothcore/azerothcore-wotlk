@@ -242,7 +242,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            me->GetThreatMgr().ClearAllThreat();
+            me->GetThreatManager().ClearAllThreat();
             me->CombatStop(false);
             me->SetLootRecipient(nullptr);
 
@@ -312,7 +312,7 @@ public:
             if (summoned->GetEntry() == NPC_HIGH_INQUISITOR_VALROTH)
                 m_uiValrothGUID = summoned->GetGUID();
 
-            summoned->AddThreat(me, 0.0f);
+            summoned->GetThreatManager().AddThreat(me, 0.0f);
             summoned->SetImmuneToPC(false);
             summons.Summon(summoned);
         }

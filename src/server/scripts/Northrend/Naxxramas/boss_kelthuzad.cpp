@@ -439,14 +439,14 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                        for (auto itr : threatList)
+                        auto tList = me->GetThreatManager().GetUnsortedThreatList();
+                        for (auto t : tList)
                         {
-                            if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
+                            if (t->GetVictim()->GetTypeId() == TYPEID_PLAYER
+                                    && t->GetVictim()->getPowerType() == POWER_MANA
+                                    && t->GetVictim()->GetPower(POWER_MANA))
                                     {
-                                        unitList.push_back(itr->getTarget());
+                                        unitList.push_back(t->GetVictim());
                                     }
                         }
                         if (!unitList.empty())
@@ -598,7 +598,7 @@ public:
 
             if (me->GetEntry() != NPC_UNSTOPPABLE_ABOMINATION && me->GetEntry() != NPC_GUARDIAN_OF_ICECROWN)
             {
-                me->AddThreat(who, 1000000.0f);
+                me->GetThreatManager().AddThreat(who, 1000000.0f);
             }
         }
 

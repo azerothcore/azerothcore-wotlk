@@ -101,7 +101,7 @@ public:
             {
                 if (Unit* target = me->SelectNearestTarget(50.0f))
                 {
-                    me->AddThreat(target, 0.0f);
+                    me->GetThreatManager().AddThreat(target, 0.0f);
                     AttackStart(target);
                 }
             }
@@ -137,7 +137,7 @@ public:
                 {
                     if (!dalronn->IsInCombat() && who)
                     {
-                        dalronn->AddThreat(who, 0.0f);
+                        dalronn->GetThreatManager().AddThreat(who, 0.0f);
                         dalronn->AI()->AttackStart(who);
                     }
                 }
@@ -199,7 +199,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
                         DoResetThreatList();
-                        me->AddThreat(target, 10000.0f);
+                        me->GetThreatManager().AddThreat(target, 10000.0f);
                         me->CastSpell(target, SPELL_CHARGE, false);
                     }
                     events.Repeat(5s, 10s);
@@ -266,7 +266,7 @@ public:
             {
                 if (Unit* target = me->SelectNearestTarget(50.0f))
                 {
-                    me->AddThreat(target, 0.0f);
+                    me->GetThreatManager().AddThreat(target, 0.0f);
                     AttackStart(target);
                 }
             }
@@ -305,7 +305,7 @@ public:
                 {
                     if (!skarvald->IsInCombat() && who)
                     {
-                        skarvald->AddThreat(who, 0.0f);
+                        skarvald->GetThreatManager().AddThreat(who, 0.0f);
                         skarvald->AI()->AttackStart(who);
                     }
                 }

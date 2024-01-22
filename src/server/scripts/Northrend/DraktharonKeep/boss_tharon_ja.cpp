@@ -162,7 +162,7 @@ public:
                     if (me->HealthBelowPct(50))
                     {
                         Talk(SAY_FLESH);
-                        me->GetThreatMgr().ResetAllThreat();
+                        me->GetThreatManager().ResetAllThreat();
                         me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
@@ -258,7 +258,7 @@ public:
         void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            GetUnitOwner()->GetThreatMgr().ResetAllThreat();
+            GetUnitOwner()->GetThreatManager().ResetAllThreat();
             GetUnitOwner()->GetMotionMaster()->Clear();
             GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
             GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);

@@ -288,16 +288,16 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+        
+        auto tList = me->GetThreatManager().GetUnsortedThreatList();
+        for (auto t : tList)
         {
-            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if (pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().GetThreat(pUnit))
+            Unit* pUnit = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID());
+            if (pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatManager().GetThreat(pUnit))
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
-                if (HostileReference* ref = me->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->AddThreat(10000000.0f * threatMod);
+                me->GetThreatManager().ModifyThreatByPercent(pUnit, -100);
+                me->GetThreatManager().AddThreat(pUnit, 10000000.0f * threatMod);
             }
         }
     }
@@ -443,7 +443,7 @@ struct boss_kagani_nightstrike : public boss_priestess_lackey_commonAI
             me->CastSpell(me, SPELL_VANISH, false);
             DoResetThreatList();
             if (Unit* unit = SelectTarget(SelectTargetMethod::Random, 0))
-                me->AddThreat(unit, 1000.0f);
+                me->GetThreatManager().AddThreat(unit, 1000.0f);
 
             events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
             break;
@@ -687,9 +687,9 @@ struct boss_yazzai : public boss_priestess_lackey_commonAI
         case EVENT_SPELL_BLINK:
         {
             bool InMeleeRange = false;
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            auto tList = me->GetThreatManager().GetUnsortedThreatList();
+            for (auto t : tList)
+                if (Unit* target = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID()))
                     if (target->IsWithinMeleeRange(me))
                     {
                         InMeleeRange = true;

@@ -448,7 +448,7 @@ public:
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->AttackStart(pWho);
-                    cr->AddThreat(pWho, 10.0f);
+                    cr->GetThreatManager().AddThreat(pWho, 10.0f);
                 }
             }
         }
@@ -555,18 +555,18 @@ public:
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
 
-                            float threatFeugen = feugen->GetThreatMgr().GetThreat(feugen->GetVictim());
-                            float threatStalagg = me->GetThreatMgr().GetThreat(me->GetVictim());
+                            float threatFeugen = feugen->GetThreatManager().GetThreat(feugen->GetVictim());
+                            float threatStalagg = me->GetThreatManager().GetThreat(me->GetVictim());
                             Unit* tankFeugen = feugen->GetVictim();
                             Unit* tankStalagg = me->GetVictim();
 
-                            feugen->GetThreatMgr().ModifyThreatByPercent(tankFeugen, -100);
-                            feugen->AddThreat(tankStalagg, threatFeugen);
+                            feugen->GetThreatManager().ModifyThreatByPercent(tankFeugen, -100);
+                            feugen->GetThreatManager().AddThreat(tankStalagg, threatFeugen);
                             feugen->CastSpell(tankStalagg, SPELL_MAGNETIC_PULL, true);
                             feugen->AI()->DoAction(ACTION_MAGNETIC_PULL);
 
-                            me->GetThreatMgr().ModifyThreatByPercent(tankStalagg, -100);
-                            me->AddThreat(tankFeugen, threatStalagg);
+                            me->GetThreatManager().ModifyThreatByPercent(tankStalagg, -100);
+                            me->GetThreatManager().AddThreat(tankFeugen, threatStalagg);
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);
                         }

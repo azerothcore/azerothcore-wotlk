@@ -162,7 +162,7 @@ struct boss_shade_of_aran : public BossAI
             if (me->Attack(who, false))
             {
                 me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
-                me->AddThreat(who, 0.0f);
+                me->GetThreatManager().AddThreat(who, 0.0f);
             }
         }
     }

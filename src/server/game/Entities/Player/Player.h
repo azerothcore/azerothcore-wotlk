@@ -1840,6 +1840,7 @@ public:
 
     void UpdateAfkReport(time_t currTime);
     void UpdatePvPFlag(time_t currTime);
+    void SetContestedPvP(Player* attackedPlayer = nullptr);
     void UpdateFFAPvPFlag(time_t currTime);
     void UpdateContestedPvP(uint32 currTime);
     void SetContestedPvPTimer(uint32 newTime) {m_contestedPvPTimer = newTime;}
@@ -1998,6 +1999,7 @@ public:
     bool UpdatePosition(const Position& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
 
     void ProcessTerrainStatusUpdate() override;
+    void AtExitCombat() override;
 
     void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
     void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!

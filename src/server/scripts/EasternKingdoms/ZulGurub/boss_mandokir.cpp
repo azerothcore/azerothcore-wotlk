@@ -458,7 +458,7 @@ public:
                             events.DelayEvents(1500ms);
                             if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
                             {
-                                me->GetThreatMgr().ModifyThreatByPercent(mainTarget, -100);
+                                me->GetThreatManager().ModifyThreatByPercent(mainTarget, -100);
                             }
                         }
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, 30s, 40s);
@@ -470,10 +470,10 @@ public:
                     case EVENT_CLEAVE:
                         {
                             std::list<Unit*> meleeRangeTargets;
-                            auto i = me->GetThreatMgr().GetThreatList().begin();
-                            for (; i != me->GetThreatMgr().GetThreatList().end(); ++i)
+                            auto i = me->GetThreatManager().GetUnsortedThreatList().begin();
+                            for (; i != me->GetThreatManager().GetUnsortedThreatList().end(); ++i)
                             {
-                                Unit* target = (*i)->getTarget();
+                                Unit* target = (*i)->GetVictim();
                                 if (me->IsWithinMeleeRange(target))
                                 {
                                     meleeRangeTargets.push_back(target);

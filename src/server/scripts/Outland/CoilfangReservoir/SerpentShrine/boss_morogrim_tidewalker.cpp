@@ -199,13 +199,13 @@ class spell_morogrim_tidewalker_water_globule_new_target : public SpellScript
 
         // Xinef: if we have target we currently follow, return
         if (Unit* target = GetCaster()->GetVictim())
-            if (GetCaster()->GetThreatMgr().GetThreat(target) >= 100000.0f)
+            if (GetCaster()->GetThreatManager().GetThreat(target) >= 100000.0f)
                 return;
 
         // Xinef: acquire new target
         // TODO: sniffs to see how this actually happens
         if (Unit* target = GetHitUnit())
-            GetCaster()->AddThreat(target, 1000000.0f);
+            GetCaster()->GetThreatManager().AddThreat(target, 1000000.0f);
     }
 
     void Register() override

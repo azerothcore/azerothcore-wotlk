@@ -85,11 +85,10 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (me->GetThreatMgr().GetThreatListSize() > 1)
+            if (me->GetThreatManager().GetThreatListSize() > 1)
             {
-                ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-                --lastRef;
-                if (Unit* lastTarget = (*lastRef)->getTarget())
+                auto lastRef = me->GetThreatManager().GetSortedThreatList().begin();
+                if (Unit* lastTarget = (*lastRef)->GetVictim())
                 {
                     if (lastTarget != target)
                     {
@@ -168,10 +167,10 @@ public:
                         if (_thousandBladesTargets.empty())
                         {
                             std::vector<Unit*> targetList;
-                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-                            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                            auto tList = me->GetThreatManager().GetUnsortedThreatList();
+                            for (auto t : tList)
                             {
-                                if (Unit* target = (*itr)->getTarget())
+                                if (Unit* target = t->GetVictim())
                                 {
                                     if (target->IsAlive() && target->IsWithinDist2d(me, 100.f))
                                     {

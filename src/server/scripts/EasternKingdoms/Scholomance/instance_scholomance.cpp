@@ -246,42 +246,6 @@ public:
     };
 };
 
-class spell_scholomance_fixate : public SpellScriptLoader
-{
-public:
-    spell_scholomance_fixate() : SpellScriptLoader("spell_scholomance_fixate") { }
-
-    class spell_scholomance_fixate_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_scholomance_fixate_AuraScript);
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
-                caster->TauntApply(target);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
-                caster->TauntFadeOut(target);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_scholomance_fixate_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_scholomance_fixate_AuraScript();
-    }
-};
-
 class spell_scholomance_boon_of_life : public SpellScriptLoader
 {
 public:
@@ -298,7 +262,7 @@ public:
                     if (Creature* creature = target->ToCreature())
                     {
                         creature->AI()->AttackStart(caster);
-                        creature->AddThreat(caster, 10000.0f);
+                        creature->GetThreatManager().AddThreat(caster, 10000.0f);
                     }
         }
 
@@ -361,10 +325,10 @@ public:
 
         Unit* SelectUnitCasting()
         {
-          ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-          for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+          auto tList = me->GetThreatManager().GetUnsortedThreatList();
+          for (auto t : tList)
           {
-              if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+              if (Unit* unit = ObjectAccessor::GetUnit(*me, t->GetVictim()->GetGUID()))
               {
                   if (unit->HasUnitState(UNIT_STATE_CASTING))
                   {
@@ -460,7 +424,6 @@ public:
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
-    new spell_scholomance_fixate();
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }

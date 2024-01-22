@@ -365,7 +365,7 @@ public:
                 return;
             }
 
-            me->AddThreat(summoner->ToUnit(), 500000.0f);
+            me->GetThreatManager().AddThreat(summoner->ToUnit(), 500000.0f);
             AttackStart(summoner->ToUnit());
         }
 
@@ -390,7 +390,7 @@ public:
                 if (TempSummon* ts = me->ToTempSummon())
                     if (Unit* summoner = ts->GetSummonerUnit())
                     {
-                        me->AddThreat(summoner, 500000.0f);
+                        me->GetThreatManager().AddThreat(summoner, 500000.0f);
                         AttackStart(summoner);
                     }
             }

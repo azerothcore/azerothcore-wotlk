@@ -128,11 +128,11 @@ public:
                         std::list<Unit*> meleeRangeTargets;
                         Unit* finalTarget = nullptr;
                         uint8 counter = 0;
-                        auto i = me->GetThreatMgr().GetThreatList().begin();
-                        for (; i != me->GetThreatMgr().GetThreatList().end(); ++i, ++counter)
+                        auto tlist = me->GetThreatManager().GetUnsortedThreatList();
+                        for (auto t : tlist)
                         {
                             // Gather all units with melee range
-                            Unit* target = (*i)->getTarget();
+                            Unit* target = t->GetVictim();
                             if (me->IsWithinMeleeRange(target))
                             {
                                 meleeRangeTargets.push_back(target);
@@ -140,7 +140,7 @@ public:
                             // and add threat to most hated
                             if (counter < RAID_MODE(2, 3))
                             {
-                                me->AddThreat(target, 500.0f);
+                                me->GetThreatManager().AddThreat(target, 500.0f);
                             }
                         }
                         counter = 0;

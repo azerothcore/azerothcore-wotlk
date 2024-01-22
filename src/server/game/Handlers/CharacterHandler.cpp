@@ -961,7 +961,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     if (pCurrChar->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP))
     {
-        pCurrChar->SetContestedPvP(nullptr, false);
+        pCurrChar->SetContestedPvP(nullptr);
     }
 
     // Apply at_login requests

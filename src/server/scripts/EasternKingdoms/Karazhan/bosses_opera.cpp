@@ -1203,7 +1203,7 @@ struct boss_romulo : public ScriptedAI
         {
             if (Julianne->GetVictim())
             {
-                me->AddThreat(Julianne->GetVictim(), 1.0f);
+                me->GetThreatManager().AddThreat(Julianne->GetVictim(), 1.0f);
                 AttackStart(Julianne->GetVictim());
             }
         }

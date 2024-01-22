@@ -415,7 +415,7 @@ void ScriptedAI::DoAddThreat(Unit* unit, float amount)
     if (!unit)
         return;
 
-    me->GetThreatMgr().AddThreat(unit, amount);
+    me->GetThreatManager().AddThreat(unit, amount);
 }
 
 void ScriptedAI::DoModifyThreatByPercent(Unit* unit, int32 pct)
@@ -423,7 +423,7 @@ void ScriptedAI::DoModifyThreatByPercent(Unit* unit, int32 pct)
     if (!unit)
         return;
 
-    me->GetThreatMgr().ModifyThreatByPercent(unit, pct);
+    me->GetThreatManager().ModifyThreatByPercent(unit, pct);
 }
 
 void ScriptedAI::DoResetThreat(Unit* unit)
@@ -431,18 +431,18 @@ void ScriptedAI::DoResetThreat(Unit* unit)
     if (!unit)
         return;
 
-    me->GetThreatMgr().ResetThreat(unit);
+    me->GetThreatManager().ResetThreat(unit);
 }
 
 void ScriptedAI::DoResetThreatList()
 {
-    if (!me->CanHaveThreatList() || me->GetThreatMgr().isThreatListEmpty())
+    if (!me->CanHaveThreatList() || me->GetThreatManager().GetThreatListSize() > 0)
     {
         LOG_ERROR("entities.unit.ai", "DoResetThreatList called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;
     }
 
-    me->GetThreatMgr().ResetAllThreat();
+    me->GetThreatManager().ResetAllThreat();
 }
 
 float ScriptedAI::DoGetThreat(Unit* unit)
@@ -450,7 +450,7 @@ float ScriptedAI::DoGetThreat(Unit* unit)
     if (!unit)
         return 0.0f;
 
-    return me->GetThreatMgr().GetThreat(unit);
+    return me->GetThreatManager().GetThreat(unit);
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o)
@@ -655,9 +655,9 @@ void BossAI::TeleportCheaters()
     float x, y, z;
     me->GetPosition(x, y, z);
 
-    ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-        if (Unit* target = (*itr)->getTarget())
+    auto list = me->GetThreatManager().GetUnsortedThreatList();
+    for (auto item : list)
+        if (Unit* target = item->GetVictim())
             if (target->GetTypeId() == TYPEID_PLAYER && !IsInBoundary(target))
                 target->NearTeleportTo(x, y, z, 0);
 }

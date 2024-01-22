@@ -228,7 +228,7 @@ struct boss_jeklik : public BossAI
                 context.Repeat(25s);
             }).Schedule(10s, PHASE_TWO, [this](TaskContext context)
             {
-                if (me->GetThreatMgr().GetThreatListSize())
+                if (me->GetThreatManager().GetThreatListSize())
                 {
                     // summon up to 2 bat riders
                     if (batRidersCount < 2)

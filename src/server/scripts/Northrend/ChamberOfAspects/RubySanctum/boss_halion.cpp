@@ -1153,7 +1153,7 @@ public:
             GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->GetThreatMgr().clearReferences();
+            GetTarget()->GetThreatManager().ClearAllThreat();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
@@ -1163,7 +1163,7 @@ public:
             GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->GetThreatMgr().clearReferences();
+            GetTarget()->GetThreatManager().ClearAllThreat();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
