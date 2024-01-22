@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `emotes_dbc`;
 CREATE TABLE IF NOT EXISTS `emotes_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `EmoteSlashCommand` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `EmoteSlashCommand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `AnimID` int NOT NULL DEFAULT '0',
   `EmoteFlags` int NOT NULL DEFAULT '0',
   `EmoteSpecProc` int NOT NULL DEFAULT '0',
