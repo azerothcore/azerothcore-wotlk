@@ -382,7 +382,6 @@ struct CreatureData
     uint32 dynamicflags{0};
     uint32 ScriptId;
     bool dbData{true};
-    bool overwrittenZ{false};
 };
 
 struct CreatureModelInfo
