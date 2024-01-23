@@ -1,3 +1,4 @@
+-- DB update 2024_01_21_00 -> 2024_01_23_00
 -- revert squish 8.0 game_event changes
 UPDATE `game_event` SET `start_time` = '2021-06-22 00:01:00', `end_time` = '2030-12-31 12:00:00' WHERE `eventEntry` = 1;
 UPDATE `game_event` SET `start_time` = '2021-12-16 01:00:00', `end_time` = '2030-12-31 12:00:00' WHERE `eventEntry` = 2;
