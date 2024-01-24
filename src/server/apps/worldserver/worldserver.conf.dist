@@ -2741,6 +2741,13 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Rate.RewardQuestMoney
+#        Description: Allows to tweak the amount of money rewarded by quests (does not affect RewardBonusMoney).
+#        Default:     1
+
+Rate.RewardQuestMoney = 1
+
+#
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
 #                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
