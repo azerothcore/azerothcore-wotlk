@@ -4698,8 +4698,8 @@ void Spell::SendSpellStart()
     //LOG_DEBUG("spells.aura", "Sending SMSG_SPELL_START id={}", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
-
-    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !m_spellInfo->IsChanneled())
+    //                                                                                                                                             Filter out spells that has casttime but not channeled attribute
+    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && (!m_spellInfo->IsChanneled() || !m_spellInfo->HasCastTimeEntry(1)))
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
