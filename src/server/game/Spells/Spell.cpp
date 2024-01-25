@@ -6021,7 +6021,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     // xinef: do not skip triggered spells if they posses prevention type (eg. Bladestorm vs Hand of Protection)
     if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURAS) || (m_spellInfo->PreventionType > SPELL_PREVENTION_TYPE_NONE && m_triggeredByAuraSpell && m_triggeredByAuraSpell.spellInfo->IsPositive()))
     {
-        castResult = CheckCasterAurasHasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURAS);
+        castResult = CheckCasterAuras(HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURAS));
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
