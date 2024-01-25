@@ -5231,7 +5231,7 @@ void Spell::TakeCastItem()
         return;
 
     // not remove cast item at triggered spell (equipping, weapon damage, etc)
-    if HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_ITEM)
+    if (HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_ITEM))
         return;
 
     ItemTemplate const* proto = m_CastItem->GetTemplate();
