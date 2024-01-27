@@ -2750,7 +2750,7 @@ Rate.RewardQuestMoney = 1
 #
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
-#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
+#                     is at MaxPlayerLevel.
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
