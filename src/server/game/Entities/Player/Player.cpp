@@ -553,7 +553,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
 
     // set starting level
-    uint32 start_level = getClass() != CLASS_DEATH_KNIGHT
+    uint32 start_level = !IsClass(CLASS_DEATH_KNIGHT)
                          ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                          : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
@@ -568,7 +568,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
 
     InitRunes();
 
-    SetUInt32Value(PLAYER_FIELD_COINAGE, getClass() != CLASS_DEATH_KNIGHT
+    SetUInt32Value(PLAYER_FIELD_COINAGE, !IsClass(CLASS_DEATH_KNIGHT)
                                          ? sWorld->getIntConfig(CONFIG_START_PLAYER_MONEY)
                                          : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_MONEY));
     SetHonorPoints(sWorld->getIntConfig(CONFIG_START_HONOR_POINTS));
@@ -633,7 +633,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
                 switch (iProto->Spells[0].SpellCategory)
                 {
                     case SPELL_CATEGORY_FOOD:                                // food
-                        count = getClass() == CLASS_DEATH_KNIGHT ? 10 : 4;
+                        count = IsClass(CLASS_DEATH_KNIGHT) ? 10 : 4;
                         break;
                     case SPELL_CATEGORY_DRINK:                                // drink
                         count = 2;
@@ -1460,7 +1460,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        if (getClass() == CLASS_DEATH_KNIGHT && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
+        if (IsClass(CLASS_DEATH_KNIGHT) && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
         {
             SendTransferAborted(mapid, TRANSFER_ABORT_UNIQUE_MESSAGE, 1);
             return false;
@@ -1745,7 +1745,7 @@ void Player::RegenerateAll()
     Regenerate(POWER_MANA);
 
     // Runes act as cooldowns, and they don't need to send any data
-    if (getClass() == CLASS_DEATH_KNIGHT)
+    if (IsClass(CLASS_DEATH_KNIGHT))
         for (uint8 i = 0; i < MAX_RUNES; ++i)
         {
             // xinef: implement grace
@@ -1775,7 +1775,7 @@ void Player::RegenerateAll()
         }
 
         Regenerate(POWER_RAGE);
-        if (getClass() == CLASS_DEATH_KNIGHT)
+        if (IsClass(CLASS_DEATH_KNIGHT))
             Regenerate(POWER_RUNIC_POWER);
 
         m_regenTimerCount -= 2000;
@@ -6386,7 +6386,7 @@ void Player::DuelComplete(DuelCompleteType type)
         opponent->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
 
         // Credit for quest Death's Challenge
-        if (getClass() == CLASS_DEATH_KNIGHT && opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
+        if (IsClass(CLASS_DEATH_KNIGHT) && opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
         {
             opponent->CastSpell(opponent, 52994, true);
         }
@@ -6782,7 +6782,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     }
 
     // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
-    if (getClass() == CLASS_DRUID)
+    if (IsClass(CLASS_DRUID))
     {
         int32 dpsMod = 0;
         int32 feral_bonus = 0;
@@ -9839,7 +9839,7 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
     if (apply)
     {
         m_spellMods[mod->op].push_back(mod);
-        if (getClass() == CLASS_MAGE)
+        if (IsClass(CLASS_MAGE))
             m_spellMods[mod->op].sort(MageSpellModPred());
         else
             m_spellMods[mod->op].sort(SpellModPred());
@@ -10273,7 +10273,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // only one mount ID for both sides. Probably not good to use 315 in case DBC nodes
     // change but I couldn't find a suitable alternative. OK to use class because only DK
     // can use this taxi.
-    uint32 mount_display_id = sObjectMgr->GetTaxiMountDisplayId(sourcenode, GetTeamId(true), npc == nullptr || (sourcenode == 315 && getClass() == CLASS_DEATH_KNIGHT));
+    uint32 mount_display_id = sObjectMgr->GetTaxiMountDisplayId(sourcenode, GetTeamId(true), npc == nullptr || (sourcenode == 315 && IsClass(CLASS_DEATH_KNIGHT)));
 
     // in spell case allow 0 model
     if ((mount_display_id == 0 && spellid == 0) || sourcepath == 0)
@@ -11322,7 +11322,7 @@ WorldLocation Player::GetStartPosition() const
 {
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     uint32 mapId = info->mapId;
-    if (getClass() == CLASS_DEATH_KNIGHT && HasSpell(50977))
+    if (IsClass(CLASS_DEATH_KNIGHT) && HasSpell(50977))
         return WorldLocation(0, 2352.0f, -5709.0f, 154.5f, 0.0f);
     return WorldLocation(mapId, info->positionX, info->positionY, info->positionZ, 0);
 }
@@ -11816,7 +11816,7 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             {
                 skillValue = maxValue;
             }
-            else if (getClass() == CLASS_DEATH_KNIGHT)
+            else if (IsClass(CLASS_DEATH_KNIGHT))
             {
                 skillValue = std::min(std::max<uint16>({ 1, uint16((GetLevel() - 1) * 5) }), maxValue);
             }
@@ -11849,7 +11849,7 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             {
                 skillValue = maxValue;
             }
-            else if (getClass() == CLASS_DEATH_KNIGHT)
+            else if (IsClass(CLASS_DEATH_KNIGHT))
             {
                 skillValue = std::min(std::max<uint16>({ uint16(1), uint16((GetLevel() - 1) * 5) }), maxValue);
             }
@@ -13374,7 +13374,7 @@ static RuneType runeSlotTypes[MAX_RUNES] =
 
 void Player::InitRunes()
 {
-    if (getClass() != CLASS_DEATH_KNIGHT)
+    if (!IsClass(CLASS_DEATH_KNIGHT))
         return;
 
     m_runes = new Runes;
@@ -13540,7 +13540,7 @@ uint32 Player::CalculateTalentsPoints() const
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel() - 9;
 
     uint32 talentPointsForLevel = 0;
-    if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
+    if (!IsClass(CLASS_DEATH_KNIGHT) || GetMapId() != 609)
     {
         talentPointsForLevel = base_talent;
     }
@@ -14172,19 +14172,21 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
-    if (getClass() == CLASS_DEATH_KNIGHT)
+    if (IsClass(CLASS_DEATH_KNIGHT))
     {
         if (CanSeeDKPet())
             return true;
         else if (spellid == 52150) // Raise Dead
             return false;
     }
-    else if (getClass() == CLASS_MAGE)
+
+    if (IsClass(CLASS_MAGE))
     {
         if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
             return true;
     }
-    else if (getClass() == CLASS_HUNTER)
+
+    if (IsClass(CLASS_HUNTER))
     {
         return true;
     }
@@ -15169,7 +15171,7 @@ void Player::ActivateSpec(uint8 spec)
     AutoUnequipOffhandIfNeed();
 
     // Xinef: Patch 3.2.0: Switching spec removes paladins spell Righteous Fury (25780)
-    if (getClass() == CLASS_PALADIN)
+    if (IsClass(CLASS_PALADIN))
         RemoveAurasDueToSpell(25780);
 
     // Xinef: Remove talented single target auras at other targets

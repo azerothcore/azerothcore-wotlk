@@ -133,8 +133,6 @@ void Player::SetSheath(SheathState sheathed)
 
 uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const
 {
-    uint8 playerClass = getClass();
-
     uint8 slots[4];
     slots[0] = NULL_SLOT;
     slots[1] = NULL_SLOT;
@@ -246,23 +244,23 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             switch (proto->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_LIBRAM:
-                    if (playerClass == CLASS_PALADIN)
+                    if (IsClass(CLASS_PALADIN))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_IDOL:
-                    if (playerClass == CLASS_DRUID)
+                    if (IsClass(CLASS_DRUID))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_TOTEM:
-                    if (playerClass == CLASS_SHAMAN)
+                    if (IsClass(CLASS_SHAMAN))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_MISC:
-                    if (playerClass == CLASS_WARLOCK)
+                    if (IsClass(CLASS_WARLOCK))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_SIGIL:
-                    if (playerClass == CLASS_DEATH_KNIGHT)
+                    if (IsClass(CLASS_DEATH_KNIGHT))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
             }
@@ -2394,39 +2392,37 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
             return EQUIP_ERR_CANT_EQUIP_SKILL;
     }
 
-    uint8 _class = getClass();
-
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
     if (proto->Class == ITEM_CLASS_ARMOR)
     {
         // Check for shields
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(IsClass(CLASS_PALADIN) || IsClass(CLASS_WARRIOR) || IsClass(CLASS_SHAMAN)))
         {
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
         }
 
         // Check for librams.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && _class != CLASS_PALADIN)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && !IsClass(CLASS_PALADIN))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // CHeck for idols.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && _class != CLASS_DRUID)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for totems.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && _class != CLASS_SHAMAN)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && !IsClass(CLASS_SHAMAN))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for sigils.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && _class != CLASS_DEATH_KNIGHT)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && !IsClass(CLASS_DEATH_KNIGHT))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
@@ -2436,33 +2432,33 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         proto->InventoryType != INVTYPE_CLOAK)
     {
         uint32 subclassToCompare = ITEM_SUBCLASS_ARMOR_CLOTH;
-        switch (_class)
+        if (IsClass(CLASS_DEATH_KNIGHT) || IsClass(CLASS_PALADIN))
         {
-            case CLASS_WARRIOR:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
-                {
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-                }
-                [[fallthrough]];
-            case CLASS_DEATH_KNIGHT:
-            case CLASS_PALADIN:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
-                break;
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
-                break;
-            case CLASS_ROGUE:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
-                {
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-                }
-                [[fallthrough]];
-            case CLASS_DRUID:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
-                break;
-            default:
-                break;
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
+        }
+        else if (IsClass(CLASS_WARRIOR))
+        {
+            if ((proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat()))
+            {
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
+        }
+        else if (IsClass(CLASS_HUNTER) || IsClass(CLASS_SHAMAN))
+        {
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
+        }
+        else if (IsClass(CLASS_DRUID))
+        {
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
+        }
+        else if (IsClass(CLASS_ROGUE))
+        {
+            if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
+            {
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
         }
 
         if (proto->SubClass > subclassToCompare)
@@ -2772,7 +2768,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
-                uint32 cooldownSpell = getClass() == CLASS_ROGUE ? 6123 : 6119;
+                uint32 cooldownSpell = IsClass(CLASS_ROGUE) ? 6123 : 6119;
                 SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cooldownSpell);
 
                 if (!spellProto)
@@ -4645,7 +4641,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 }
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
                 {
-                    if (getClass() == CLASS_SHAMAN)
+                    if (IsClass(CLASS_SHAMAN))
                     {
                         float addValue = 0.0f;
                         if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)

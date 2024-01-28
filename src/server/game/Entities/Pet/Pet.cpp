@@ -107,7 +107,7 @@ void Pet::AddToWorld()
     {
         if (Player* owner = GetOwner())
         {
-            if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
+            if (getPetType() == SUMMON_PET && owner->IsClass(CLASS_WARLOCK))
             {
                 owner->SetLastPetSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
             }
@@ -238,7 +238,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     bool forceLoadFromDB = false;
     sScriptMgr->OnBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
 
-    if (!forceLoadFromDB && (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())) // DK Pet exception
+    if (!forceLoadFromDB && (owner->IsClass(CLASS_DEATH_KNIGHT) && !owner->CanSeeDKPet())) // DK Pet exception
         return false;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(petInfo->CreatedBySpellId);
@@ -1043,12 +1043,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             if (petType == MAX_PET_TYPE)
             {
                 // The petType was not overwritten by the hook, continue with default initialization
-                if (owner->getClass() == CLASS_WARLOCK ||
-                        owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-                        owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-                        owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
+                if (owner->IsClass(CLASS_WARLOCK) ||
+                        owner->IsClass(CLASS_SHAMAN) ||          // Fire Elemental
+                        owner->IsClass(CLASS_DEATH_KNIGHT) ||    // Risen Ghoul
+                        owner->IsClass(CLASS_MAGE))              // Water Elemental with glyph
                     petType = SUMMON_PET;
-                else if (owner->getClass() == CLASS_HUNTER)
+                else if (owner->IsClass(CLASS_HUNTER))
                 {
                     petType = HUNTER_PET;
                 }
@@ -1080,7 +1080,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     uint32 attackTime = BASE_ATTACK_TIME;
-    if (owner->getClass() != CLASS_HUNTER && cinfo->BaseAttackTime >= 1000)
+    if (!owner->IsClass(CLASS_HUNTER) && cinfo->BaseAttackTime >= 1000)
         attackTime = cinfo->BaseAttackTime;
 
     SetAttackTime(BASE_ATTACK, attackTime);
