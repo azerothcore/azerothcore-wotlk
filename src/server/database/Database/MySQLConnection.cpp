@@ -27,8 +27,8 @@
 #include "Timer.h"
 #include "Tokenize.h"
 #include "Transaction.h"
-#include "Util.h"
 #include <errmsg.h>
+#include <mysql.h>
 #include <mysqld_error.h>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
@@ -484,6 +484,11 @@ void MySQLConnection::Unlock()
 uint32 MySQLConnection::GetServerVersion() const
 {
     return mysql_get_server_version(m_Mysql);
+}
+
+std::string MySQLConnection::GetServerInfo() const
+{
+    return mysql_get_server_info(m_Mysql);
 }
 
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)

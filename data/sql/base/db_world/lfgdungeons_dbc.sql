@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `lfgdungeons_dbc` (
   `Description_Lang_Unk` text,
   `Description_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.lfgdungeons_dbc: ~0 rows (approximately)
 DELETE FROM `lfgdungeons_dbc`;

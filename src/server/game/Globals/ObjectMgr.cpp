@@ -2466,7 +2466,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
     {
         Creature* creature = new Creature();
-        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
         {
             LOG_ERROR("sql.sql", "AddCreature: Cannot add creature entry {} to map", entry);
             delete creature;
