@@ -507,8 +507,6 @@ public:
         if (m_pInstance && m_pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == IN_PROGRESS)
             if (m_pInstance->GetData(SKADI_IN_RANGE) == 1)
             {
-                // 4分钟后将BOSS移下坐骑
-                m_pInstance->GetBossAI()->ScheduleActionAfterDelay(ACTION_REMOVE_SKADI, 240s);
                 uint8 count = m_pInstance->GetData(SKADI_HITS) + 1;
                 m_pInstance->SetData(SKADI_HITS, count);
 
