@@ -441,7 +441,7 @@ enum DamageEffectType : uint8
 };
 
 // Used for context checks during functions like class comparisons
-enum ClassContext
+enum ClassContext : uint8
 {
     CLASS_CONTEXT_NONE                  = 0, // Default
     CLASS_CONTEXT_CREATE                = 1,

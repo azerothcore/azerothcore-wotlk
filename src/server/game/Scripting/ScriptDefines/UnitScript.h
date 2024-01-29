@@ -71,6 +71,8 @@ public:
 
     [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
 
+    [[nodiscard]] virtual Optional<bool> IsClass(Unit const* /*unit*/, Classes /*unitClass*/, ClassContext /*context*/) { return std::nullopt; }
+
     /**
      * @brief This hook runs in Unit::Update
      *
