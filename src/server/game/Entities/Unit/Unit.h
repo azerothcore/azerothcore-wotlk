@@ -440,6 +440,26 @@ enum DamageEffectType : uint8
     SELF_DAMAGE             = 5
 };
 
+// Used for context checks during functions like class comparisons
+enum ClassContext
+{
+    CLASS_CONTEXT_NONE                  = 0, // Default
+    CLASS_CONTEXT_CREATE                = 1,
+    CLASS_CONTEXT_TELEPORT              = 2,
+    CLASS_CONTEXT_QUEST                 = 3,
+    CLASS_CONTEXT_STATS                 = 4,
+    CLASS_CONTEXT_TAXI                  = 5,
+    CLASS_CONTEXT_SKILL                 = 6,
+    CLASS_CONTEXT_TALENT                = 7,
+    CLASS_CONTEXT_ABILITY               = 8,
+    CLASS_CONTEXT_EQUIP_RELIC           = 9,
+    CLASS_CONTEXT_EQUIP_SHIELDS         = 10,
+    CLASS_CONTEXT_EQUIP_ARMOR_CLASS     = 11,
+    CLASS_CONTEXT_EQUIP_WEAPON          = 12,
+    CLASS_CONTEXT_GRAVEYARD             = 13
+
+};
+
 // Value masks for UNIT_FIELD_FLAGS
 // EnumUtils: DESCRIBE THIS
 enum UnitFlags : uint32
@@ -1436,7 +1456,7 @@ public:
     void setRace(uint8 race);
     [[nodiscard]] uint32 getRaceMask() const { return 1 << (getRace(true) - 1); }
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
-    [[nodiscard]] bool IsClass(Classes unitClass) const;
+    [[nodiscard]] bool IsClass(Classes unitClass, ClassContext context = CLASS_CONTEXT_NONE) const;
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
     [[nodiscard]] DisplayRace GetDisplayRaceFromModelId(uint32 modelId) const;

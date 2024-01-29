@@ -446,7 +446,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->IsClass(CLASS_HUNTER))
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 8.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 8.0f);
@@ -459,7 +459,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->IsClass(CLASS_HUNTER))
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 17.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 17.0f);
@@ -472,7 +472,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->IsClass(CLASS_HUNTER))
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 26.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 26.0f);
@@ -1673,7 +1673,7 @@ class spell_gen_pet_summoned : public SpellScript
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
         {
-            PetType newPetType = (player->IsClass(CLASS_HUNTER)) ? HUNTER_PET : SUMMON_PET;
+            PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY)) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
             if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
             {

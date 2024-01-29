@@ -109,7 +109,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_STABLEPET:
-                    if (!IsClass(CLASS_HUNTER))
+                    if (!IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY))
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_QUESTGIVER:
