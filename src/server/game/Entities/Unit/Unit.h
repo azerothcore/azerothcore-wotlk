@@ -456,8 +456,8 @@ enum ClassContext : uint8
     CLASS_CONTEXT_EQUIP_SHIELDS         = 10,
     CLASS_CONTEXT_EQUIP_ARMOR_CLASS     = 11,
     CLASS_CONTEXT_EQUIP_WEAPON          = 12,
-    CLASS_CONTEXT_GRAVEYARD             = 13
-
+    CLASS_CONTEXT_GRAVEYARD             = 13,
+    CLASS_CONTEXT_CLASS_TRAINER         = 14
 };
 
 // Value masks for UNIT_FIELD_FLAGS
