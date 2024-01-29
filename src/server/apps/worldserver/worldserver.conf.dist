@@ -3354,7 +3354,7 @@ Guild.BankTabCost1 = 2500000
 Guild.BankTabCost2 = 5000000
 Guild.BankTabCost3 = 10000000
 Guild.BankTabCost4 = 25000000
-Guild.BankTabCost5 = 50000000#
+Guild.BankTabCost5 = 50000000
 
 #
 #     Guild.MemberLimit
