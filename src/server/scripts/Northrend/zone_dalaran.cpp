@@ -811,9 +811,11 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
         init.MovebyPath(_movementArray);
         init.SetFly();
         init.SetCyclic();
-        // TODO: set correct flight speed
-        // one full loop is 10.76 seconds
-        //init.SetVelocity(7.0f);
+        // one full loop is 10.76 seconds (sniffed value)
+        // loop diameter is approx. 9.225f (calculated from waypoints below)
+        // with a circumference of approx. 28.98f
+        // this results in flying speed of approx. 2.7f
+        init.SetVelocity(2.7f);
         init.Launch();
 
         scheduler.Schedule(420ms, [this](TaskContext context)
@@ -823,10 +825,6 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
                 else
                     context.Repeat();
             });
-
-        // seems to still have the issue that was already fixed in TC
-        // https://github.com/TrinityCore/TrinityCore/issues/22448
-        // so it actually includes the spawn point into the spline (?)
     }
 
     void UpdateAI(uint32 diff) override
@@ -836,9 +834,9 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
 
 private:
     Movement::PointsArray const _movementArray = {
-        // SPAWN    (5809.888,  683.5779,  653.6859)
-        G3D::Vector3(5808.225,  687.1498,  653.6322),
-        G3D::Vector3(5809.8423, 683.6158,  653.6862),
+        // cyclic movementspine unfortunately includes spawn into loop
+        // which results in an imperfect loop right now
+        // CO1 SPAWN(5809.888,  683.5779,  653.6859)
         G3D::Vector3(5813.709,  682.51855, 653.6033),
         G3D::Vector3(5816.815,  684.8459,  653.5755),
         G3D::Vector3(5817.1997, 688.83527, 653.631),
@@ -846,7 +844,6 @@ private:
         G3D::Vector3(5809.9287, 690.98224, 653.7697),
         G3D::Vector3(5808.225,  687.1498,  653.6322),
         G3D::Vector3(5809.8423, 683.6158,  653.6862),
-        G3D::Vector3(5813.709,  682.51855, 653.6033),
     };
 };
 
