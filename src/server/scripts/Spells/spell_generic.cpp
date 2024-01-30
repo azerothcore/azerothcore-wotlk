@@ -1673,7 +1673,7 @@ class spell_gen_pet_summoned : public SpellScript
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
         {
-            PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY)) ? HUNTER_PET : SUMMON_PET;
+            PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET)) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
             if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
             {

@@ -14173,7 +14173,7 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
-    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
     {
         if (CanSeeDKPet())
             return true;
@@ -14181,13 +14181,13 @@ bool Player::CanResummonPet(uint32 spellid)
             return false;
     }
 
-    if (IsClass(CLASS_MAGE, CLASS_CONTEXT_ABILITY))
+    if (IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))
     {
         if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
             return true;
     }
 
-    if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY))
+    if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
     {
         return true;
     }

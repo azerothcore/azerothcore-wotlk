@@ -440,7 +440,6 @@ enum DamageEffectType : uint8
     SELF_DAMAGE             = 5
 };
 
-// Used for context checks during functions like class comparisons
 enum ClassContext : uint8
 {
     CLASS_CONTEXT_NONE                  = 0, // Default
@@ -452,12 +451,13 @@ enum ClassContext : uint8
     CLASS_CONTEXT_SKILL                 = 6,
     CLASS_CONTEXT_TALENT                = 7,
     CLASS_CONTEXT_ABILITY               = 8,
-    CLASS_CONTEXT_EQUIP_RELIC           = 9,
-    CLASS_CONTEXT_EQUIP_SHIELDS         = 10,
-    CLASS_CONTEXT_EQUIP_ARMOR_CLASS     = 11,
-    CLASS_CONTEXT_EQUIP_WEAPON          = 12,
-    CLASS_CONTEXT_GRAVEYARD             = 13,
-    CLASS_CONTEXT_CLASS_TRAINER         = 14
+    CLASS_CONTEXT_PET                   = 9,
+    CLASS_CONTEXT_EQUIP_RELIC           = 10,
+    CLASS_CONTEXT_EQUIP_SHIELDS         = 11,
+    CLASS_CONTEXT_EQUIP_ARMOR_CLASS     = 12,
+    CLASS_CONTEXT_EQUIP_WEAPON          = 13,
+    CLASS_CONTEXT_GRAVEYARD             = 14,
+    CLASS_CONTEXT_CLASS_TRAINER         = 15
 };
 
 // Value masks for UNIT_FIELD_FLAGS
