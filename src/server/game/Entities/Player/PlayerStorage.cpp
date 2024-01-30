@@ -2268,16 +2268,13 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
                     // In fact it's a visual bug, everything works properly... I need sniffs of operations with
                     // binded to account items from off server.
 
-                    switch (getClass())
+                    if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
                     {
-                        case CLASS_HUNTER:
-                        case CLASS_SHAMAN:
-                            allowEquip = (itemSkill == SKILL_MAIL);
-                            break;
-                        case CLASS_PALADIN:
-                        case CLASS_WARRIOR:
-                            allowEquip = (itemSkill == SKILL_PLATE_MAIL);
-                            break;
+                        allowEquip = (itemSkill == SKILL_PLATE_MAIL);
+                    }
+                    else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+                    {
+                        allowEquip = (itemSkill == SKILL_MAIL);
                     }
                 }
                 if (!allowEquip && GetSkillValue(itemSkill) == 0)
