@@ -455,7 +455,7 @@ enum ClassContext : uint8
     CLASS_CONTEXT_EQUIP_RELIC           = 10,
     CLASS_CONTEXT_EQUIP_SHIELDS         = 11,
     CLASS_CONTEXT_EQUIP_ARMOR_CLASS     = 12,
-    CLASS_CONTEXT_EQUIP_WEAPON          = 13,
+    CLASS_CONTEXT_WEAPON_SWAP           = 13,
     CLASS_CONTEXT_GRAVEYARD             = 14,
     CLASS_CONTEXT_CLASS_TRAINER         = 15
 };
