@@ -9840,7 +9840,7 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
     if (apply)
     {
         m_spellMods[mod->op].push_back(mod);
-        if (IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS))
+        if (IsClass(CLASS_MAGE, CLASS_CONTEXT_ABILITY))
             m_spellMods[mod->op].sort(MageSpellModPred());
         else
             m_spellMods[mod->op].sort(SpellModPred());
