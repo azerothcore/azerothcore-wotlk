@@ -553,7 +553,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
 
     // set starting level
-    uint32 start_level = !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_CREATE)
+    uint32 start_level = !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT)
                          ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                          : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
@@ -568,7 +568,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
 
     InitRunes();
 
-    SetUInt32Value(PLAYER_FIELD_COINAGE, !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_CREATE)
+    SetUInt32Value(PLAYER_FIELD_COINAGE, !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT)
                                          ? sWorld->getIntConfig(CONFIG_START_PLAYER_MONEY)
                                          : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_MONEY));
     SetHonorPoints(sWorld->getIntConfig(CONFIG_START_HONOR_POINTS));
@@ -633,7 +633,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
                 switch (iProto->Spells[0].SpellCategory)
                 {
                     case SPELL_CATEGORY_FOOD:                                // food
-                        count = IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_CREATE) ? 10 : 4;
+                        count = IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT) ? 10 : 4;
                         break;
                     case SPELL_CATEGORY_DRINK:                                // drink
                         count = 2;
@@ -11323,7 +11323,7 @@ WorldLocation Player::GetStartPosition() const
 {
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     uint32 mapId = info->mapId;
-    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_CREATE) && HasSpell(50977))
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT) && HasSpell(50977))
         return WorldLocation(0, 2352.0f, -5709.0f, 154.5f, 0.0f);
     return WorldLocation(mapId, info->positionX, info->positionY, info->positionZ, 0);
 }
