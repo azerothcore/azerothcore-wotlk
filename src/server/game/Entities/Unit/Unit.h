@@ -451,7 +451,6 @@ enum ClassContext : uint8
     CLASS_CONTEXT_SKILL                 = 6,
     CLASS_CONTEXT_TALENT_POINT_CALC     = 7,
     CLASS_CONTEXT_ABILITY               = 8,
-    CLASS_CONTEXT_ABILITY                = 99,
     CLASS_CONTEXT_PET                   = 9,
     CLASS_CONTEXT_EQUIP_RELIC           = 10,
     CLASS_CONTEXT_EQUIP_SHIELDS         = 11,
