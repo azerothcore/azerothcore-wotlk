@@ -443,7 +443,7 @@ enum DamageEffectType : uint8
 enum ClassContext : uint8
 {
     CLASS_CONTEXT_NONE                  = 0, // Default
-    CLASS_CONTEXT_INIT                = 1,
+    CLASS_CONTEXT_INIT                  = 1,
     CLASS_CONTEXT_TELEPORT              = 2,
     CLASS_CONTEXT_QUEST                 = 3,
     CLASS_CONTEXT_STATS                 = 4,
