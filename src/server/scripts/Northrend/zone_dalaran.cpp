@@ -807,6 +807,10 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
 {
     npc_cosmetic_toy_plane(Creature* creature) : ScriptedAI(creature)
     {
+    }
+
+    void Reset() override
+    {
         Movement::MoveSplineInit init(me);
         init.MovebyPath(_movementArray);
         init.SetFly();
