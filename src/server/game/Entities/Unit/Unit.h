@@ -1457,7 +1457,7 @@ public:
     void setRace(uint8 race);
     [[nodiscard]] uint32 getRaceMask() const { return 1 << (getRace(true) - 1); }
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
-    [[nodiscard]] virtual bool IsClass(Classes unitClass, ClassContext context = CLASS_CONTEXT_NONE) const { return (getClass() == unitClass); }
+    [[nodiscard]] virtual bool IsClass(Classes unitClass, ClassContext /*context*/) const { return (getClass() == unitClass); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
     [[nodiscard]] DisplayRace GetDisplayRaceFromModelId(uint32 modelId) const;
