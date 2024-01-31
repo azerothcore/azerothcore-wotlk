@@ -21283,15 +21283,6 @@ void Unit::setRace(uint8 race)
         m_race = race;
 }
 
-bool Unit::IsClass(Classes unitClass, ClassContext context) const
-{
-    Optional<bool> scriptResult = sScriptMgr->IsClass(this, unitClass, context);
-    if (scriptResult != std::nullopt)
-        return *scriptResult;
-    else
-        return (getClass() == unitClass);
-}
-
 DisplayRace Unit::GetDisplayRaceFromModelId(uint32 modelId) const
 {
     if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(modelId))

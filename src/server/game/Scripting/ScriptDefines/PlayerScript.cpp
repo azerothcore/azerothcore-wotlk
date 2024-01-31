@@ -1038,6 +1038,19 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
     return true;
 }
 
+Optional<bool> ScriptMgr::IsClass(Player const* player, Classes unitClass, ClassContext context)
+{
+    if (ScriptRegistry<PlayerScript>::ScriptPointerList.empty())
+        return {};
+    for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
+    {
+        Optional<bool> scriptResult = script->IsClass(player, unitClass, context);
+        if (scriptResult != std::nullopt)
+            return scriptResult;
+    }
+    return {};
+}
+
 void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

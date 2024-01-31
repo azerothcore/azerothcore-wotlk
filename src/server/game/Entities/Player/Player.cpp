@@ -1269,6 +1269,15 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     return true;
 }
 
+bool Player::IsClass(Classes unitClass, ClassContext context) const
+{
+    Optional<bool> scriptResult = sScriptMgr->IsClass(this, unitClass, context);
+    if (scriptResult != std::nullopt)
+        return *scriptResult;
+    else
+        return (getClass() == unitClass);
+}
+
 void Player::ToggleAFK()
 {
     ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK);

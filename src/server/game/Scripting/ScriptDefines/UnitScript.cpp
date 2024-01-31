@@ -204,19 +204,6 @@ bool ScriptMgr::OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuff
     return false;
 }
 
-Optional<bool> ScriptMgr::IsClass(Unit const* unit, Classes unitClass, ClassContext context)
-{
-    if (ScriptRegistry<UnitScript>::ScriptPointerList.empty())
-        return {};
-    for (auto const& [scriptID, script] : ScriptRegistry<UnitScript>::ScriptPointerList)
-    {
-        Optional<bool> scriptResult = script->IsClass(unit, unitClass, context);
-        if (scriptResult != std::nullopt)
-            return scriptResult;
-    }
-    return {};
-}
-
 void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)

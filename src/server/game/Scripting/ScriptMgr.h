@@ -401,6 +401,7 @@ public: /* PlayerScript */
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
+    std::optional<bool> IsClass(Player const* player, Classes playerClass, ClassContext context);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
     void OnUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
@@ -545,7 +546,6 @@ public: /* UnitScript */
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
     bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
-    std::optional<bool> IsClass(Unit const* unit, Classes unitClass, ClassContext context);
     void OnUnitUpdate(Unit* unit, uint32 diff);
     void OnDisplayIdChange(Unit* unit, uint32 displayId);
     void OnUnitEnterEvadeMode(Unit* unit, uint8 why);
