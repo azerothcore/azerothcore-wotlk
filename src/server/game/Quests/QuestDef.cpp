@@ -47,22 +47,21 @@ Quest::Quest(Field* questRecord)
     RewardXPDifficulty = questRecord[14].Get<uint8>();
     RewardMoney = questRecord[15].Get<int32>();
     RewardMoneyDifficulty = questRecord[16].Get<uint32>();
-    RewardBonusMoney = questRecord[17].Get<uint32>();
-    RewardDisplaySpell = questRecord[18].Get<uint32>();
-    RewardSpell = questRecord[19].Get<int32>();
-    RewardHonor = questRecord[20].Get<uint32>();
-    RewardKillHonor = questRecord[21].Get<float>();
-    StartItem = questRecord[22].Get<uint32>();
-    Flags = questRecord[23].Get<uint32>();
-    RewardTitleId = questRecord[24].Get<uint8>();
-    RequiredPlayerKills = questRecord[25].Get<uint8>();
-    RewardTalents = questRecord[26].Get<uint8>();
-    RewardArenaPoints = questRecord[27].Get<uint16>();
+    RewardDisplaySpell = questRecord[17].Get<uint32>();
+    RewardSpell = questRecord[18].Get<int32>();
+    RewardHonor = questRecord[19].Get<uint32>();
+    RewardKillHonor = questRecord[20].Get<float>();
+    StartItem = questRecord[21].Get<uint32>();
+    Flags = questRecord[22].Get<uint32>();
+    RewardTitleId = questRecord[23].Get<uint8>();
+    RequiredPlayerKills = questRecord[24].Get<uint8>();
+    RewardTalents = questRecord[25].Get<uint8>();
+    RewardArenaPoints = questRecord[26].Get<uint16>();
 
     for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
     {
-        RewardItemId[i] = questRecord[28 + i * 2].Get<uint32>();
-        RewardItemIdCount[i] = questRecord[29 + i * 2].Get<uint16>();
+        RewardItemId[i] = questRecord[27 + i * 2].Get<uint32>();
+        RewardItemIdCount[i] = questRecord[28 + i * 2].Get<uint16>();
 
         if (RewardItemId[i])
             ++_rewItemsCount;
@@ -70,8 +69,8 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
     {
-        RewardChoiceItemId[i] = questRecord[36 + i * 2].Get<uint32>();
-        RewardChoiceItemCount[i] = questRecord[37 + i * 2].Get<uint16>();
+        RewardChoiceItemId[i] = questRecord[35 + i * 2].Get<uint32>();
+        RewardChoiceItemCount[i] = questRecord[36 + i * 2].Get<uint16>();
 
         if (RewardChoiceItemId[i])
             ++_rewChoiceItemsCount;
@@ -79,26 +78,26 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
     {
-        RewardFactionId[i] = questRecord[48 + i * 3].Get<uint16>();
-        RewardFactionValueId[i] = questRecord[49 + i * 3].Get<int32>();
-        RewardFactionValueIdOverride[i] = questRecord[50 + i * 3].Get<int32>();
+        RewardFactionId[i] = questRecord[47 + i * 3].Get<uint16>();
+        RewardFactionValueId[i] = questRecord[48 + i * 3].Get<int32>();
+        RewardFactionValueIdOverride[i] = questRecord[49 + i * 3].Get<int32>();
     }
 
-    POIContinent = questRecord[63].Get<uint16>();
-    POIx = questRecord[64].Get<float>();
-    POIy = questRecord[65].Get<float>();
-    POIPriority = questRecord[66].Get<uint32>();
-    Title = questRecord[67].Get<std::string>();
-    Objectives = questRecord[68].Get<std::string>();
-    Details = questRecord[69].Get<std::string>();
-    AreaDescription = questRecord[70].Get<std::string>();
-    CompletedText = questRecord[71].Get<std::string>();
+    POIContinent = questRecord[62].Get<uint16>();
+    POIx = questRecord[63].Get<float>();
+    POIy = questRecord[64].Get<float>();
+    POIPriority = questRecord[65].Get<uint32>();
+    Title = questRecord[66].Get<std::string>();
+    Objectives = questRecord[67].Get<std::string>();
+    Details = questRecord[68].Get<std::string>();
+    AreaDescription = questRecord[69].Get<std::string>();
+    CompletedText = questRecord[70].Get<std::string>();
 
     for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
-        RequiredNpcOrGo[i] = questRecord[72 + i].Get<int32>();
-        RequiredNpcOrGoCount[i] = questRecord[76 + i].Get<uint16>();
-        ObjectiveText[i] = questRecord[101 + i].Get<std::string>();
+        RequiredNpcOrGo[i] = questRecord[71 + i].Get<int32>();
+        RequiredNpcOrGoCount[i] = questRecord[75 + i].Get<uint16>();
+        ObjectiveText[i] = questRecord[100 + i].Get<std::string>();
 
         if (RequiredNpcOrGo[i])
             ++_reqCreatureOrGOcount;
@@ -106,14 +105,14 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        ItemDrop[i] = questRecord[80 + i].Get<uint32>();
-        ItemDropQuantity[i] = questRecord[84 + i].Get<uint16>();
+        ItemDrop[i] = questRecord[79 + i].Get<uint32>();
+        ItemDropQuantity[i] = questRecord[83 + i].Get<uint16>();
     }
 
     for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
-        RequiredItemId[i] = questRecord[88 + i].Get<uint32>();
-        RequiredItemCount[i] = questRecord[94 + i].Get<uint16>();
+        RequiredItemId[i] = questRecord[87 + i].Get<uint32>();
+        RequiredItemCount[i] = questRecord[93 + i].Get<uint16>();
 
         if (RequiredItemId[i])
             ++_reqItemsCount;
@@ -252,15 +251,19 @@ int32 Quest::GetRewOrReqMoney(uint8 playerLevel) const
         }
     }
 
-    return static_cast<int32>(rewardedMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY));
+    return static_cast<int32>(rewardedMoney * sWorld->getRate(RATE_REWARD_QUEST_MONEY));
 }
 
 uint32 Quest::GetRewMoneyMaxLevel() const
 {
-    if (HasFlag(QUEST_FLAGS_NO_MONEY_FROM_XP))
-        return 0;
+    uint32 rewMoney = 0;
 
-    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY));
+    if (HasFlag(QUEST_FLAGS_NO_MONEY_FROM_XP))
+        return rewMoney;
+
+    rewMoney = (XPValue(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) * (6 * COPPER));
+    // https://wowpedia.fandom.com/wiki/Quest?oldid=1035002 Formula is XP gained * 6c
+    return static_cast<int32>(rewMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY));
 }
 
 bool Quest::IsAutoAccept() const
