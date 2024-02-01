@@ -23,7 +23,7 @@ WHERE `CreatureID`=3976;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
  (3976, 0, 0, 'Infidels! They must be purified!', 14, 0, 100, 0, 0, 5835, 2847, 0, 'mograine SAY_MO_AGGRO'),
  (3976, 1, 0, 'Unworthy.', 14, 0, 100, 0, 0, 5836, 6197, 0, 'mograine SAY_MO_KILL'),
- (3976, 2, 0, 'At your side, milady!', 14, 0, 100, 0, 0, 5837, 18026, 0, 'mograine SAY_MO_RESSURECTED'),
+ (3976, 2, 0, 'At your side, milady!', 14, 0, 100, 15, 0, 5837, 18026, 0, 'mograine SAY_MO_RESSURECTED'),
  (3976, 3, 0, 'You hold my father\'s blade, $n. My soldiers are yours TO control, my $g Lord:Lady;. Take them... LEAD them... The impure must be purged. They must be cleansed of their taint.', 12, 0, 100, 1, 0, 0, 12390, 0, 'mograine SAY_ASHBRINGER_ONE'),
  (3976, 4, 0, 'Father... But... How?', 12, 0, 100, 6, 0, 0, 12470, 0, 'mograine SAY_ASHBRINGER_TWO'),
  (3976, 5, 0, 'Forgive me, father! Please...', 12, 0, 100, 20, 0, 0, 12472, 0, 'mograine SAY_ASHBRINGER_THREE'),

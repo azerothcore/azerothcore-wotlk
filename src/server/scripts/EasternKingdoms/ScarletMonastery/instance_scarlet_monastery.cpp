@@ -311,7 +311,7 @@ enum MograineEvents
 {
     EVENT_RESURRECTED                       = 1,
     EVENT_SPELL_LAY_ON_HANDS                = 2,
-    EVENT_MOGRAINE_EMOTE                    = 3,
+    EVENT_MOGRAINE_SAY                      = 3,
     EVENT_MOVE                              = 4
 };
 
@@ -656,18 +656,20 @@ public:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             if (Whitemane->IsAlive())
-                                me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);
-                            Talk(SAY_MO_RESURRECTED, Whitemane);
+                                me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);                            
                         }
-                        _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE, 500ms);
+                        _events.ScheduleEvent(EVENT_MOGRAINE_SAY, 200ms);
                         break;
-                    case EVENT_MOGRAINE_EMOTE:
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                    case EVENT_MOGRAINE_SAY:
+                        if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
+                        {
+                            Talk(SAY_MO_RESURRECTED, Whitemane);
+                        }                        
                         _events.ScheduleEvent(EVENT_MOVE, 3000ms);
                         break;
                     case EVENT_MOVE:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
-                        {
+                        {                            
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             float fx, fy, fz;
                             Whitemane->GetContactPoint(me, fx, fy, fz, 0.0f);
@@ -895,7 +897,7 @@ public:
                     case EVENT_WHITEMANE_EMOTE:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                         _phase = 2;
-                        _events.ScheduleEvent(EVENT_DEALY_ATTACK, 3200ms);
+                        _events.ScheduleEvent(EVENT_DEALY_ATTACK, 1400ms);
                         break;
                     case EVENT_DEALY_ATTACK:
                         me->SetReactState(REACT_AGGRESSIVE);
