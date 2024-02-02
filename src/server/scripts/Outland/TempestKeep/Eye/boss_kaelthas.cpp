@@ -116,12 +116,12 @@ enum Spells
 
     // Sanguinar
     SPELL_BELLOWING_ROAR                = 44863,
-    
+
     // Capernian
     SPELL_CAPERNIAN_FIREBALL            = 36971,
     SPELL_CONFLAGRATION                 = 37018,
     SPELL_ARCANE_BURST                  = 36970,
-    
+
     // Telonicus
     SPELL_BOMB                          = 37036,
     SPELL_REMOTE_TOY                    = 37027,
@@ -864,7 +864,7 @@ struct npc_telonicus : public ScriptedAI
         Talk(SAY_TELONICUS_DEATH);
         DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
     }
-    
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
