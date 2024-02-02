@@ -1804,6 +1804,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
+    std::vector<std::unique_ptr<SavedItem>> savedItems;
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
         ObjectGuid itemGuid;
@@ -1849,11 +1850,21 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
                 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
                 if (msg == EQUIP_ERR_OK)
                 {
+                    savedItems.emplace_back(std::make_unique<SavedItem>(uItem, dstpos));
                     _player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                     _player->StoreItem(sDest, uItem, true);
                 }
                 else
+                {
                     _player->SendEquipError(msg, uItem, nullptr);
+                    _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED,uItem,nullptr);
+
+                    for (uint8_t j = 0; j < savedItems.size(); ++j)
+                    {
+                        _player->SwapItem(savedItems[j].get()->item->GetPos(), savedItems[j].get()->dstpos);
+                    }
+                    break;
+                }
 
                 continue;
             }
