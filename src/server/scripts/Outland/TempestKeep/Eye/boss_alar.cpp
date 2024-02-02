@@ -103,7 +103,7 @@ struct boss_alar : public BossAI
 
     void JustReachedHome() override
     {
-        BossAI:JustReachedHome();
+        me->SetActive(false);
         if (me->IsEngaged())
         {
             ConstructWaypointsAndMove();
