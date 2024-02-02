@@ -50,7 +50,7 @@ enum Yells
     SAY_SANGUINAR_DEATH                 = 1,
     SAY_CAPERNIAN_DEATH                 = 1,
     SAY_TELONICUS_DEATH                 = 1,
-    SAY_THALADRED_TAUNT                 = 2
+    EMOTE_THALADRED_FIXATE              = 2
 };
 
 enum Spells
@@ -898,15 +898,13 @@ struct npc_thaladred : public ScriptedAI
     {
         ScheduleTimedEvent(100ms, [&]
         {
-            if (Map* map = me->GetMap())
+            DoResetThreatList();
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
-                map->DoForAllPlayers([&](Player* player)
-                {
-                    me->AddThreat(player, 10000000.0f);
-                });
+                me->AddThreat(target, 10000000.0f);
+                //me->Say(EMOTE_THALADRED_FIXATE, target);
+                Talk(EMOTE_THALADRED_FIXATE, target);
             }
-            Talk(SAY_THALADRED_TAUNT);
-
         }, 10000ms);
         ScheduleTimedEvent(4000ms, 19350ms, [&]
         {
