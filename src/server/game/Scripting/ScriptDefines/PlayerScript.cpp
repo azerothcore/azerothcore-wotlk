@@ -1045,7 +1045,7 @@ Optional<bool> ScriptMgr::IsClass(Player const* player, Classes unitClass, Class
     for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
     {
         Optional<bool> scriptResult = script->IsClass(player, unitClass, context);
-        if (scriptResult != std::nullopt)
+        if (scriptResult)
             return scriptResult;
     }
     return {};
