@@ -61,23 +61,17 @@ enum Misc
     POINT_MIDDLE                = 5,
     POINT_DIVE                  = 6,
 
-    EVENT_SWITCH_PLATFORM       = 1,
-    EVENT_START_QUILLS          = 2,
-    EVENT_RELOCATE_MIDDLE       = 3,
-    EVENT_REBIRTH               = 4,
-    EVENT_SPELL_MELT_ARMOR      = 5,
-    EVENT_SPELL_FLAME_PATCH     = 6,
-    EVENT_SPELL_CHARGE          = 7,
-    EVENT_SPELL_DIVE_BOMB       = 8,
-    EVENT_START_DIVE            = 9,
-    EVENT_CAST_DIVE_BOMB        = 10,
-    EVENT_SUMMON_DIVE_PHOENIX   = 11,
-    EVENT_REBIRTH_DIVE          = 12,
-    EVENT_SPELL_BERSERK         = 13,
-    EVENT_QUILL_COOLDOWN        = 14,
+    EVENT_RELOCATE_MIDDLE       = 1,
+    EVENT_REBIRTH               = 2,
+    EVENT_START_DIVE            = 3,
+    EVENT_CAST_DIVE_BOMB        = 4,
+    EVENT_SUMMON_DIVE_PHOENIX   = 5,
+    EVENT_REBIRTH_DIVE          = 6,
+    EVENT_QUILL_COOLDOWN        = 7,
+    EVENT_SPELL_BERSERK         = 8,
 
-    EVENT_MOVE_TO_PHASE_2       = 20,
-    EVENT_FINISH_DIVE           = 21
+    EVENT_MOVE_TO_PHASE_2       = 9,
+    EVENT_FINISH_DIVE           = 10
 };
 
 enum GroupAlar
@@ -225,6 +219,10 @@ struct boss_alar : public BossAI
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
         }, 30s);
+        ScheduleUniqueTimedEvent(10min, [&]
+        {
+            DoCastSelf(SPELL_BERSERK);
+        }, EVENT_SPELL_BERSERK);
         ScheduleMainSpellAttack(0s);
     }
 
