@@ -28,6 +28,7 @@ enum Spells
     SPELL_FLAME_QUILLS              = 34229,
     SPELL_QUILL_MISSILE_1           = 34269, // 21
     SPELL_QUILL_MISSILE_2           = 34314, // 3
+    SPELL_CLEAR_ALL_DEBUFFS         = 34098,
     SPELL_FLAME_BUFFET              = 34121,
     SPELL_EMBER_BLAST               = 34341,
     SPELL_REBIRTH_PHASE2            = 34342,
@@ -180,6 +181,7 @@ struct boss_alar : public BossAI
             me->InterruptNonMeleeSpells(false);
             me->SetHealth(me->GetMaxHealth());
             me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS);
             DoCastSelf(SPELL_EMBER_BLAST, true);
             scheduler.CancelAll();
             ScheduleUniqueTimedEvent(8s, [&]{
