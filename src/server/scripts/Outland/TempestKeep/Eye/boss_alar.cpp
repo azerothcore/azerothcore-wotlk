@@ -314,9 +314,6 @@ struct boss_alar : public BossAI
         */
         BossAI::UpdateAI(diff);
     }
-        
-
-
 
 private:
     bool _startPath;
@@ -324,6 +321,21 @@ private:
     uint8 _noQuillTimes;
     uint8 _phoenixSummons;
     std::chrono::seconds _platformMoveRepeatTimer;
+};
+
+class CastQuill : public BasicEvent
+{
+public:
+    CastQuill(Unit* caster, uint32 spellId) : _caster(caster), _spellId(spellId){ }
+
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+    {
+        _caster->CastSpell(_caster, _spellId, true);
+        return true;
+    }
+private:
+    Unit* _caster;
+    uint32 _spellId;
 };
 
 class spell_alar_flame_quills : public SpellScriptLoader
@@ -459,7 +471,6 @@ public:
 
 void AddSC_boss_alar()
 {
-    new boss_alar();
     RegisterTheEyeAI(boss_alar);
     new spell_alar_flame_quills();
     new spell_alar_ember_blast();
