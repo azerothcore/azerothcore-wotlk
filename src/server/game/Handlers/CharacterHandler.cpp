@@ -1805,6 +1805,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
     std::vector<std::unique_ptr<SavedItem>> savedItems;
+    uint8 errorId = 0;
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
         ObjectGuid itemGuid;
@@ -1830,7 +1831,6 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
 
         InventoryResult msg;
-
         Item* uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (uItem)
         {
@@ -1856,9 +1856,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
                 }
                 else
                 {
-                    _player->SendEquipError(msg, uItem, nullptr);
-                    _player->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED,uItem,nullptr);
-
+                    errorId = 4;
                     for (uint8_t j = 0; j < savedItems.size(); ++j)
                     {
                         _player->SwapItem(savedItems[j].get()->item->GetPos(), savedItems[j].get()->dstpos);
@@ -1891,7 +1889,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
     }
 
     WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
-    data << uint8(0);                                       // 4 - equipment swap failed - inventory is full
+    data << uint8(errorId);                                       // 4 - equipment swap failed - inventory is full
     SendPacket(&data);
 }
 
