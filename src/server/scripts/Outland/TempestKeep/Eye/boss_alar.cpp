@@ -85,282 +85,245 @@ enum qruseoftheAshtongue
     QUEST_RUSE_OF_THE_ASHTONGUE = 10946,
 };
 
-class boss_alar : public CreatureScript
+struct boss_alar : public BossAI
 {
-public:
-    boss_alar() : CreatureScript("boss_alar") { }
 
-    struct boss_alarAI : public BossAI
+    boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
-        boss_alarAI(Creature* creature) : BossAI(creature, DATA_ALAR)
+        //_startPath = true;
+        _phoenixSummons = 2;
+        SetCombatMovement(false);
+        scheduler.SetValidator([this]
         {
-            startPath = true;
-            SetCombatMovement(false);
-        }
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
-        uint8 platform;
-        uint8 noQuillTimes;
-        bool startPath;
+    void JustReachedHome() override
+    {
+        BossAI:JustReachedHome();
+        //_startPath = true;
+        ConstructWaypointsAndMove();
+    }
 
-        void JustReachedHome() override
+    void Reset() override
+    {
+        BossAI::Reset();
+        _platform = 0;
+        _noQuillTimes = 0;
+        _platformMoveRepeatTimer = 0s;
+        me->SetModelVisible(true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        ConstructWaypointsAndMove();
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        ScheduleTimedEvent(0s, [&]
         {
-            BossAI::JustReachedHome();
-            startPath = true;
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            platform = 0;
-            noQuillTimes = 0;
-            me->SetModelVisible(true);
-            me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_FIRE, true);
-            me->SetReactState(REACT_AGGRESSIVE);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 0);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            me->SetModelVisible(true);
-            BossAI::JustDied(killer);
-
-            // Xinef: Ruse of the Ashtongue (10946)
-            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            if (roll_chance_i(20 * _noQuillTimes))
             {
-                Player* player = itr->GetSource();
+                _noQuillTimes = 0;
+                _platform = RAND(0, 3);
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
+                _platformMoveRepeatTimer = 16s;
+            }
+            else
+            {
+                if (_noQuillTimes++ > 0)
+                {
+                    me->SetOrientation(alarPoints[_platform].GetOrientation());
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                }
+                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
+                _platform = (_platform++)%4;
+                _platformMoveRepeatTimer = 30s;
+
+            }
+            me->setAttackTimer(BASE_ATTACK, 20000);
+        }, _platformMoveRepeatTimer);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        me->SetModelVisible(true);
+
+        if (Map* map = me->GetMap())
+        {
+            map->DoForAllPlayers([&](Player* player)
+            {
                 if (player->GetQuestStatus(QUEST_RUSE_OF_THE_ASHTONGUE) == QUEST_STATUS_INCOMPLETE)
+                {
                     if (player->HasAura(SPELL_ASHTONGUE_RUSE))
+                    {
                         player->AreaExploredOrEventHappens(QUEST_RUSE_OF_THE_ASHTONGUE);
-            }
+                    }
+                }
+            });
         }
+    }
 
-        void JustSummoned(Creature* summon) override
+    void MoveInLineOfSight(Unit* /*who*/) override { }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
         {
-            summons.Summon(summon);
-            if (summon->GetEntry() == NPC_EMBER_OF_ALAR)
-                summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_FIRE, true);
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth() && platform < POINT_MIDDLE)
+            damage = 0;
+            me->InterruptNonMeleeSpells(false);
+            me->SetHealth(me->GetMaxHealth());
+            me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_EMBER_BLAST, true);
+            me->setAttackTimer(BASE_ATTACK, 16000);
+            scheduler.CancelAll();
+            ScheduleUniqueTimedEvent(8s, [&]{
+                me->SetPosition(alarPoints[POINT_MIDDLE]);
+            }, EVENT_RELOCATE_MIDDLE);
+            ScheduleUniqueTimedEvent(12s, [&]
             {
-                damage = 0;
-                if (events.GetNextEventTime(EVENT_REBIRTH) == 0)
-                {
-                    me->InterruptNonMeleeSpells(false);
-                    me->SetHealth(me->GetMaxHealth());
-                    me->SetReactState(REACT_PASSIVE);
-                    me->CastSpell(me, SPELL_EMBER_BLAST, true);
+                me->RemoveAurasDueToSpell(SPELL_EMBER_BLAST);
+                DoCastSelf(SPELL_REBIRTH_PHASE2);
+            }, EVENT_MOVE_TO_PHASE_2);
+            ScheduleUniqueTimedEvent(16001ms, [&]{
+                me->SetReactState(REACT_AGGRESSIVE);
+                _platform = POINT_MIDDLE;
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                ScheduleAbilities();
+            }, EVENT_REBIRTH);
 
-                    me->setAttackTimer(BASE_ATTACK, 16000);
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_RELOCATE_MIDDLE, 8000);
-                    events.ScheduleEvent(EVENT_MOVE_TO_PHASE_2, 12000);
-                    events.ScheduleEvent(EVENT_REBIRTH, 16001);
+        }
+    }
+
+    void ScheduleAbilities()
+    {
+        ScheduleTimedEvent(67s, [&]
+        {
+            DoCastVictim(SPELL_MELT_ARMOR);
+        }, 60s);
+        ScheduleTimedEvent(10s, [&]
+        {
+            DoCastRandomTarget(SPELL_CHARGE, 0, 50.0f);
+        }, 30s);
+        ScheduleTimedEvent(20s, [&]
+        {
+            // find spell from sniffs?
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
+            {
+                me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
+            }
+        }, 30s);
+        ScheduleTimedEvent(30s, [&]
+        {
+            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
+            scheduler.DelayAll(15s);
+            me->setAttackTimer(BASE_ATTACK, 20000);
+        }, 30s);
+    }
+
+    void DoDiveBomb()
+    {
+        ScheduleUniqueTimedEvent(2s, [&]
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
+            {
+                for (uint8 i = 0; i < _phoenixSummons; ++i)
+                {
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 }
             }
+        }, EVENT_SUMMON_DIVE_PHOENIX);
+        ScheduleUniqueTimedEvent(6s, [&]{
+            me->SetModelVisible(true);
+            DoCastSelf(SPELL_REBIRTH_DIVE);
+        }, EVENT_REBIRTH_DIVE);
+        ScheduleUniqueTimedEvent(10s, [&]{
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
+        }, EVENT_FINISH_DIVE);
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
+        {
+            DoCast(target, SPELL_DIVE_BOMB);
+            me->SetPosition(*target);
+            me->StopMovingOnCurrentPos();
+        }
+        me->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
+
+    }
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE)
+        {
+            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && me->IsInCombat())
+            {
+                //_startPath = true;
+                ConstructWaypointsAndMove();
+            }
+            return;
         }
 
-        void MovementInform(uint32 type, uint32 id) override
+        switch(id)
         {
-            if (type != POINT_MOTION_TYPE)
-            {
-                if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
-                    startPath = true;
-                return;
-            }
-
-            if (id == POINT_PLATFORM)
+            case POINT_PLATFORM:
                 me->setAttackTimer(BASE_ATTACK, 1000);
-            else if (id == POINT_QUILL)
-                events.ScheduleEvent(EVENT_START_QUILLS, 1000);
-            else if (id == POINT_DIVE)
-            {
-                events.ScheduleEvent(EVENT_START_DIVE, 1000);
-                events.ScheduleEvent(EVENT_CAST_DIVE_BOMB, 5000);
-            }
+                break;
+            case POINT_QUILL:
+                ScheduleUniqueTimedEvent(1s, [&]{
+                    DoCastSelf(SPELL_FLAME_QUILLS);
+                }, EVENT_START_QUILLS);
+                break;
+            case POINT_DIVE:
+                ScheduleUniqueTimedEvent(1s, [&]
+                {
+                    DoCastSelf(SPELL_DIVE_BOMB_VISUAL);
+                }, EVENT_START_DIVE);
+                ScheduleUniqueTimedEvent(5s, [&]
+                {
+                    DoDiveBomb();
+                }, EVENT_CAST_DIVE_BOMB);
+                break;
+            default:
+                return;
         }
+    }
 
-        void UpdateAI(uint32 diff) override
+    void ConstructWaypointsAndMove()
+    {
+        me->StopMoving();
+        _startPath = false;
+        if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
         {
-            if (startPath)
+            Movement::PointsArray pathPoints;
+            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+            for (uint8 i = 0; i < i_path->size(); ++i)
             {
-                me->StopMoving();
-                startPath = false;
-                if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
-                {
-                    Movement::PointsArray pathPoints;
-                    pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    for (uint8 i = 0; i < i_path->size(); ++i)
-                    {
-                        WaypointData const* node = i_path->at(i);
-                        pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                    }
-                    me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-                }
+                WaypointData const* node = i_path->at(i);
+                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
             }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SWITCH_PLATFORM:
-                    if (roll_chance_i(20 * noQuillTimes))
-                    {
-                        noQuillTimes = 0;
-                        platform = RAND(0, 3);
-                        me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
-                        events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 16000);
-                    }
-                    else
-                    {
-                        if (noQuillTimes++ > 0)
-                        {
-                            me->SetOrientation(alarPoints[platform].GetOrientation());
-                            me->SummonCreature(NPC_EMBER_OF_ALAR, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        }
-                        me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[platform], false, true);
-                        platform = (platform + 1) % 4;
-                        events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 30000);
-                    }
-                    me->setAttackTimer(BASE_ATTACK, 20000);
-                    break;
-                case EVENT_START_QUILLS:
-                    me->CastSpell(me, SPELL_FLAME_QUILLS, false);
-                    break;
-                case EVENT_RELOCATE_MIDDLE:
-                    me->SetPosition(alarPoints[POINT_MIDDLE]);
-                    break;
-                case EVENT_MOVE_TO_PHASE_2:
-                    me->RemoveAurasDueToSpell(SPELL_EMBER_BLAST);
-                    me->CastSpell(me, SPELL_REBIRTH_PHASE2, false);
-                    break;
-                case EVENT_REBIRTH:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    platform = POINT_MIDDLE;
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-
-                    events.ScheduleEvent(EVENT_SPELL_MELT_ARMOR, 67000);
-                    events.ScheduleEvent(EVENT_SPELL_CHARGE, 10000);
-                    events.ScheduleEvent(EVENT_SPELL_FLAME_PATCH, 20000);
-                    events.ScheduleEvent(EVENT_SPELL_DIVE_BOMB, 30000);
-                    break;
-                case EVENT_SPELL_MELT_ARMOR:
-                    me->CastSpell(me->GetVictim(), SPELL_MELT_ARMOR, false);
-                    events.ScheduleEvent(EVENT_SPELL_MELT_ARMOR, 60000);
-                    break;
-                case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_CHARGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_CHARGE, 30000);
-                    break;
-                case EVENT_SPELL_FLAME_PATCH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
-                    events.ScheduleEvent(EVENT_SPELL_FLAME_PATCH, 30000);
-                    break;
-                case EVENT_SPELL_DIVE_BOMB:
-                    me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
-                    events.ScheduleEvent(EVENT_SPELL_DIVE_BOMB, 30000);
-                    events.DelayEvents(15000);
-                    me->setAttackTimer(BASE_ATTACK, 20000);
-                    break;
-                case EVENT_START_DIVE:
-                    me->CastSpell(me, SPELL_DIVE_BOMB_VISUAL, false);
-                    break;
-                case EVENT_CAST_DIVE_BOMB:
-                    events.ScheduleEvent(EVENT_SUMMON_DIVE_PHOENIX, 2000);
-                    events.ScheduleEvent(EVENT_REBIRTH_DIVE, 6000);
-                    events.ScheduleEvent(EVENT_FINISH_DIVE, 10000);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
-                    {
-                        me->CastSpell(target, SPELL_DIVE_BOMB, false);
-                        me->SetPosition(*target);
-                        me->StopMovingOnCurrentPos();
-                    }
-
-                    me->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
-                    break;
-                case EVENT_SUMMON_DIVE_PHOENIX:
-                    {
-                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true);
-                        me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        break;
-                    }
-                case EVENT_REBIRTH_DIVE:
-                    me->SetModelVisible(true);
-                    me->CastSpell(me, SPELL_REBIRTH_DIVE, false);
-                    break;
-                case EVENT_FINISH_DIVE:
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    break;
-                case EVENT_SPELL_BERSERK:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-            }
-
-            if (me->isAttackReady())
-            {
-                if (me->IsWithinMeleeRange(me->GetVictim()))
-                {
-                    me->AttackerStateUpdate(me->GetVictim());
-                    me->resetAttackTimer();
-                }
-                else
-                {
-                    me->resetAttackTimer();
-                    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                        if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                            if (me->IsWithinMeleeRange(unit))
-                            {
-                                me->AttackerStateUpdate(unit);
-                                return;
-                            }
-
-                    me->CastSpell(me, SPELL_FLAME_BUFFET, false);
-                }
-            }
+            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheEyeAI<boss_alarAI>(creature);
-    }
-};
-
-class CastQuill : public BasicEvent
-{
-public:
-    CastQuill(Unit* caster, uint32 spellId) : _caster(caster), _spellId(spellId)
-    {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+    void UpdateAI(uint32 diff) override
     {
-        _caster->CastSpell(_caster, _spellId, true);
-        return true;
+        /*
+        if (_startPath)
+        {
+            ConstructWaypointsAndMove();
+        }
+        */
+        BossAI::UpdateAI(diff);
     }
+        
+
+
 
 private:
-    Unit* _caster;
-    uint32 _spellId;
+    bool _startPath;
+    uint8 _platform;
+    uint8 _noQuillTimes;
+    uint8 _phoenixSummons;
+    std::chrono::seconds _platformMoveRepeatTimer;
 };
 
 class spell_alar_flame_quills : public SpellScriptLoader
@@ -497,6 +460,7 @@ public:
 void AddSC_boss_alar()
 {
     new boss_alar();
+    RegisterTheEyeAI(boss_alar);
     new spell_alar_flame_quills();
     new spell_alar_ember_blast();
     new spell_alar_ember_blast_death();
