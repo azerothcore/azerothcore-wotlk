@@ -63,15 +63,10 @@ enum Misc
 
     EVENT_RELOCATE_MIDDLE       = 1,
     EVENT_REBIRTH               = 2,
-    EVENT_START_DIVE            = 3,
-    EVENT_CAST_DIVE_BOMB        = 4,
-    EVENT_SUMMON_DIVE_PHOENIX   = 5,
-    EVENT_REBIRTH_DIVE          = 6,
-    EVENT_QUILL_COOLDOWN        = 7,
-    EVENT_SPELL_BERSERK         = 8,
+    EVENT_SPELL_BERSERK         = 3,
 
-    EVENT_MOVE_TO_PHASE_2       = 9,
-    EVENT_FINISH_DIVE           = 10
+    EVENT_MOVE_TO_PHASE_2       = 4,
+    EVENT_FINISH_DIVE           = 5
 };
 
 enum GroupAlar
@@ -228,7 +223,7 @@ struct boss_alar : public BossAI
 
     void DoDiveBomb()
     {
-        ScheduleUniqueTimedEvent(2s, [&]
+        scheduler.Schedule(2s, [this](TaskContext)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
             {
@@ -237,14 +232,14 @@ struct boss_alar : public BossAI
                     me->SummonCreature(NPC_EMBER_OF_ALAR, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 }
             }
-        }, EVENT_SUMMON_DIVE_PHOENIX);
-        ScheduleUniqueTimedEvent(6s, [&]{
+        }).Schedule(6s, [this](TaskContext)
+        {
             me->SetModelVisible(true);
             DoCastSelf(SPELL_REBIRTH_DIVE);
-        }, EVENT_REBIRTH_DIVE);
-        ScheduleUniqueTimedEvent(10s, [&]{
+        }).Schedule(10s, [this](TaskContext)
+        {
             me->GetMotionMaster()->MoveChase(me->GetVictim());
-        }, EVENT_FINISH_DIVE);
+        });
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
         {
             DoCast(target, SPELL_DIVE_BOMB);
@@ -277,14 +272,13 @@ struct boss_alar : public BossAI
                 ScheduleMainSpellAttack(10s);
                 break;
             case POINT_DIVE:
-                ScheduleUniqueTimedEvent(1s, [&]
+                scheduler.Schedule(1s, [this](TaskContext)
                 {
                     DoCastSelf(SPELL_DIVE_BOMB_VISUAL);
-                }, EVENT_START_DIVE);
-                ScheduleUniqueTimedEvent(5s, [&]
+                }).Schedule(5s, [this](TaskContext)
                 {
                     DoDiveBomb();
-                }, EVENT_CAST_DIVE_BOMB);
+                });
                 break;
             default:
                 return;
