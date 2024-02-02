@@ -73,6 +73,7 @@ enum Misc
     EVENT_SUMMON_DIVE_PHOENIX   = 11,
     EVENT_REBIRTH_DIVE          = 12,
     EVENT_SPELL_BERSERK         = 13,
+    EVENT_QUILL_COOLDOWN        = 14,
 
     EVENT_MOVE_TO_PHASE_2       = 20,
     EVENT_FINISH_DIVE           = 21
@@ -103,15 +104,21 @@ struct boss_alar : public BossAI
     {
         BossAI:JustReachedHome();
         //_startPath = true;
-        ConstructWaypointsAndMove();
+        if (me->IsEngaged())
+        {
+            ConstructWaypointsAndMove();
+        }
     }
 
     void Reset() override
     {
         BossAI::Reset();
+        LOG_ERROR("server", "Message: reset, constructing waypoints");
+        _canAttackCooldown = true;
+        _baseAttackOverride = false;
         _platform = 0;
         _noQuillTimes = 0;
-        _platformMoveRepeatTimer = 0s;
+        _platformMoveRepeatTimer = 16s;
         me->SetModelVisible(true);
         me->SetReactState(REACT_AGGRESSIVE);
         ConstructWaypointsAndMove();
@@ -128,6 +135,11 @@ struct boss_alar : public BossAI
                 _platform = RAND(0, 3);
                 me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
+                _baseAttackOverride = true;
+                ScheduleUniqueTimedEvent(16s, [&]
+                {
+                    _baseAttackOverride = false;
+                }, EVENT_QUILL_COOLDOWN);
             }
             else
             {
@@ -137,12 +149,27 @@ struct boss_alar : public BossAI
                     me->SummonCreature(NPC_EMBER_OF_ALAR, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                _platform = (_platform++)%4;
+                _platform = (_platform+1)%4;
                 _platformMoveRepeatTimer = 30s;
 
             }
-            me->setAttackTimer(BASE_ATTACK, 20000);
         }, _platformMoveRepeatTimer);
+        ScheduleTimedEvent(0ms, [&]
+        {
+            if (!me->isMoving())
+            {
+                LOG_ERROR("server", "Message: I am NOT moving. CanAttackCD {}", std::to_string(_canAttackCooldown));
+                if (_canAttackCooldown && !_baseAttackOverride)
+                    me->setAttackTimer(BASE_ATTACK, 1000);
+                    _canAttackCooldown = false;
+            }
+            else
+            {
+                LOG_ERROR("server", "Message: I am moving. CanAttackCD {}", std::to_string(_canAttackCooldown));
+                _canAttackCooldown = true;
+                me->setAttackTimer(BASE_ATTACK, 20000);
+            }
+        }, 1500ms);
     }
 
     void JustDied(Unit* killer) override
@@ -250,23 +277,25 @@ struct boss_alar : public BossAI
         me->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
 
     }
+
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE)
         {
-            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && me->IsInCombat())
+            LOG_ERROR("server", "Message: not point motion type");
+            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
             {
                 //_startPath = true;
+                LOG_ERROR("server", "Message: constructing waypoints because of escort motion, finalized and in combat");
                 ConstructWaypointsAndMove();
             }
             return;
         }
 
+        LOG_ERROR("server", "Message: checking for a specific point with id {}", std::to_string(id));
+
         switch(id)
         {
-            case POINT_PLATFORM:
-                me->setAttackTimer(BASE_ATTACK, 1000);
-                break;
             case POINT_QUILL:
                 ScheduleUniqueTimedEvent(1s, [&]{
                     DoCastSelf(SPELL_FLAME_QUILLS);
@@ -289,6 +318,7 @@ struct boss_alar : public BossAI
 
     void ConstructWaypointsAndMove()
     {
+        LOG_ERROR("server", "Message: {}", "contructing waypoints");
         me->StopMoving();
         _startPath = false;
         if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
@@ -313,10 +343,37 @@ struct boss_alar : public BossAI
         }
         */
         BossAI::UpdateAI(diff);
+
+        if (me->isAttackReady())
+        {
+            if (me->IsWithinMeleeRange(me->GetVictim()))
+            {
+                me->AttackerStateUpdate(me->GetVictim());
+                me->resetAttackTimer();
+            }
+            else
+            {
+                me->resetAttackTimer();
+                if (Map* map = me->GetMap())
+                {
+                    map->DoForAllPlayers([&](Player* player)
+                    {
+                        if (player->IsInCombatWith(me) && me->IsWithinMeleeRange(player))
+                        {
+                            me->AttackerStateUpdate(player);
+                            return;
+                        }
+                    });
+                }
+                me->CastSpell(me, SPELL_FLAME_BUFFET);
+            }
+        }
     }
 
 private:
     bool _startPath;
+    bool _canAttackCooldown;
+    bool _baseAttackOverride;
     uint8 _platform;
     uint8 _noQuillTimes;
     uint8 _phoenixSummons;
