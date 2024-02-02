@@ -79,6 +79,11 @@ enum Misc
     EVENT_FINISH_DIVE           = 21
 };
 
+enum GroupAlar
+{
+    GROUP_FLAME_BUFFET          = 1
+};
+
 // Xinef: Ruse of the Ashtongue (10946)
 enum qruseoftheAshtongue
 {
@@ -91,19 +96,13 @@ struct boss_alar : public BossAI
 
     boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
-        //_startPath = true;
         _phoenixSummons = 2;
         SetCombatMovement(false);
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void JustReachedHome() override
     {
         BossAI:JustReachedHome();
-        //_startPath = true;
         if (me->IsEngaged())
         {
             ConstructWaypointsAndMove();
@@ -113,7 +112,6 @@ struct boss_alar : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        LOG_ERROR("server", "Message: reset, constructing waypoints");
         _canAttackCooldown = true;
         _baseAttackOverride = false;
         _platform = 0;
@@ -135,11 +133,6 @@ struct boss_alar : public BossAI
                 _platform = RAND(0, 3);
                 me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
-                _baseAttackOverride = true;
-                ScheduleUniqueTimedEvent(16s, [&]
-                {
-                    _baseAttackOverride = false;
-                }, EVENT_QUILL_COOLDOWN);
             }
             else
             {
@@ -154,22 +147,7 @@ struct boss_alar : public BossAI
 
             }
         }, _platformMoveRepeatTimer);
-        ScheduleTimedEvent(0ms, [&]
-        {
-            if (!me->isMoving())
-            {
-                LOG_ERROR("server", "Message: I am NOT moving. CanAttackCD {}", std::to_string(_canAttackCooldown));
-                if (_canAttackCooldown && !_baseAttackOverride)
-                    me->setAttackTimer(BASE_ATTACK, 1000);
-                    _canAttackCooldown = false;
-            }
-            else
-            {
-                LOG_ERROR("server", "Message: I am moving. CanAttackCD {}", std::to_string(_canAttackCooldown));
-                _canAttackCooldown = true;
-                me->setAttackTimer(BASE_ATTACK, 20000);
-            }
-        }, 1500ms);
+        ScheduleMainSpellAttack(0s);
     }
 
     void JustDied(Unit* killer) override
@@ -203,7 +181,6 @@ struct boss_alar : public BossAI
             me->SetHealth(me->GetMaxHealth());
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_EMBER_BLAST, true);
-            me->setAttackTimer(BASE_ATTACK, 16000);
             scheduler.CancelAll();
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
@@ -245,8 +222,8 @@ struct boss_alar : public BossAI
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
-            me->setAttackTimer(BASE_ATTACK, 20000);
         }, 30s);
+        ScheduleMainSpellAttack(0s);
     }
 
     void DoDiveBomb()
@@ -282,24 +259,22 @@ struct boss_alar : public BossAI
     {
         if (type != POINT_MOTION_TYPE)
         {
-            LOG_ERROR("server", "Message: not point motion type");
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
             {
-                //_startPath = true;
-                LOG_ERROR("server", "Message: constructing waypoints because of escort motion, finalized and in combat");
                 ConstructWaypointsAndMove();
             }
             return;
         }
 
-        LOG_ERROR("server", "Message: checking for a specific point with id {}", std::to_string(id));
-
         switch(id)
         {
             case POINT_QUILL:
-                ScheduleUniqueTimedEvent(1s, [&]{
+                scheduler.CancelGroup(GROUP_FLAME_BUFFET);
+                scheduler.Schedule(1s, [this](TaskContext)
+                {
                     DoCastSelf(SPELL_FLAME_QUILLS);
-                }, EVENT_START_QUILLS);
+                });
+                ScheduleMainSpellAttack(10s);
                 break;
             case POINT_DIVE:
                 ScheduleUniqueTimedEvent(1s, [&]
@@ -316,11 +291,21 @@ struct boss_alar : public BossAI
         }
     }
 
+    void ScheduleMainSpellAttack(std::chrono::seconds timer)
+    {
+        scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
+        {
+            if (!me->IsWithinMeleeRange(me->GetVictim()) && !me->isMoving())
+            {
+                DoCastVictim(SPELL_FLAME_BUFFET);
+            }
+            context.Repeat(2s);
+        });
+    }
+
     void ConstructWaypointsAndMove()
     {
-        LOG_ERROR("server", "Message: {}", "contructing waypoints");
         me->StopMoving();
-        _startPath = false;
         if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
         {
             Movement::PointsArray pathPoints;
@@ -334,44 +319,7 @@ struct boss_alar : public BossAI
         }
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        /*
-        if (_startPath)
-        {
-            ConstructWaypointsAndMove();
-        }
-        */
-        BossAI::UpdateAI(diff);
-
-        if (me->isAttackReady())
-        {
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                me->AttackerStateUpdate(me->GetVictim());
-                me->resetAttackTimer();
-            }
-            else
-            {
-                me->resetAttackTimer();
-                if (Map* map = me->GetMap())
-                {
-                    map->DoForAllPlayers([&](Player* player)
-                    {
-                        if (player->IsInCombatWith(me) && me->IsWithinMeleeRange(player))
-                        {
-                            me->AttackerStateUpdate(player);
-                            return;
-                        }
-                    });
-                }
-                me->CastSpell(me, SPELL_FLAME_BUFFET);
-            }
-        }
-    }
-
 private:
-    bool _startPath;
     bool _canAttackCooldown;
     bool _baseAttackOverride;
     uint8 _platform;
