@@ -2301,9 +2301,9 @@ bool Pet::IsPermanentPetFor(Player* owner) const
         case SUMMON_PET:
             if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET))
                 return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
-            if (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
+            else if (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
                 return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
-            if (owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))
+            else if (owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))
                 return GetEntry() == 37994;
             else
                 return false;
