@@ -773,6 +773,19 @@ struct npc_lord_sanguinar : public ScriptedAI
         Talk(SAY_SANGUINAR_DEATH);
         DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 struct npc_capernian : public ScriptedAI
@@ -807,6 +820,19 @@ struct npc_capernian : public ScriptedAI
         Talk(SAY_CAPERNIAN_DEATH);
         DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 struct npc_telonicus : public ScriptedAI
@@ -837,6 +863,19 @@ struct npc_telonicus : public ScriptedAI
     {
         Talk(SAY_TELONICUS_DEATH);
         DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+    
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -893,6 +932,19 @@ struct npc_thaladred : public ScriptedAI
     {
         Talk(SAY_THALADRED_DEATH);
         DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
