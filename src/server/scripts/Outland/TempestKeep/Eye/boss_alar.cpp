@@ -39,15 +39,18 @@ enum Spells
     SPELL_DIVE_BOMB                 = 35181
 };
 
-const Position alarPoints[7] =
+// @todo: Alar doesnt seem to move to waypoints but instead to the triggers in p1
+const Position alarPoints[9] =
 {
-    {340.15f, 58.65f, 17.71f, 4.60f},
-    {388.09f, 31.54f, 20.18f, 1.61f},
-    {388.18f, -32.85f, 20.18f, 0.52f},
-    {340.29f, -60.19f, 17.72f, 5.71f},
-    {332.0f, 0.01f, 43.0f, 0.0f},
-    {331.0f, 0.01f, -2.38f, 0.0f},
-    {332.0f, 0.01f, 43.0f, 0.0f}
+    {335.638f, 59.4879f, 17.9319f, 4.60f}, //first platform
+    {388.751007f, 31.731199f, 20.263599f, 1.61f},
+    {388.790985f, -33.105900f, 20.263599f, 0.52f},
+    {332.722992f, -61.159f, 17.979099f, 5.71f},
+    {258.959015f, -38.687099f, 20.262899f, 5.11f},
+    {259.2277997, -35.879002f, 20.263f, 4.91f}, //sixth platform
+    {332.0f, 0.01f, 43.0f, 0.0f}, //quill
+    {331.0f, 0.01f, -2.38f, 0.0f}, //middle (p2)
+    {332.0f, 0.01f, 43.0f, 0.0f} // dive
 };
 
 enum Misc
@@ -57,9 +60,9 @@ enum Misc
     NPC_FLAME_PATCH             = 20602,
 
     POINT_PLATFORM              = 0,
-    POINT_QUILL                 = 4,
-    POINT_MIDDLE                = 5,
-    POINT_DIVE                  = 6,
+    POINT_QUILL                 = 6,
+    POINT_MIDDLE                = 7,
+    POINT_DIVE                  = 8,
 
     EVENT_RELOCATE_MIDDLE       = 1,
     EVENT_REBIRTH               = 2,
@@ -67,6 +70,13 @@ enum Misc
 
     EVENT_MOVE_TO_PHASE_2       = 4,
     EVENT_FINISH_DIVE           = 5
+};
+
+enum PlatformMoveDirections
+{
+    DIRECTION_ANTI_CLOCKWISE    = 0,
+    DIRECTION_CLOCKWISE         = 1,
+    DIRECTION_ACROSS            = 2
 };
 
 enum GroupAlar
@@ -86,7 +96,6 @@ struct boss_alar : public BossAI
 
     boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
-        _phoenixSummons = 2;
         SetCombatMovement(false);
     }
 
@@ -104,7 +113,9 @@ struct boss_alar : public BossAI
         BossAI::Reset();
         _canAttackCooldown = true;
         _baseAttackOverride = false;
+        _spawnPhoenixes = false;
         _platform = 0;
+        _platformRoll = 0;
         _noQuillTimes = 0;
         _platformMoveRepeatTimer = 16s;
         me->SetModelVisible(true);
@@ -120,7 +131,7 @@ struct boss_alar : public BossAI
             if (roll_chance_i(20 * _noQuillTimes))
             {
                 _noQuillTimes = 0;
-                _platform = RAND(0, 3);
+                _platform = RAND(0, 5);
                 me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
             }
@@ -129,12 +140,30 @@ struct boss_alar : public BossAI
                 if (_noQuillTimes++ > 0)
                 {
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
-                    me->SummonCreature(NPC_EMBER_OF_ALAR, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                    if (_spawnPhoenixes)
+                    {
+                        SpawnPhoenixes(3, me);
+                    }
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                _platform = (_platform+1)%4;
+                //_platform = (_platform+1)%4;
+                _platformRoll = RAND(0, 2);
+                switch(_platformRoll)
+                {
+                    case DIRECTION_ANTI_CLOCKWISE:
+                        _platform = (_platform+5)%6;
+                        _spawnPhoenixes = false;
+                        break;
+                    case DIRECTION_CLOCKWISE:
+                        _platform = (_platform+1)%6;
+                        _spawnPhoenixes = false;
+                        break;
+                    case DIRECTION_ACROSS:
+                        _platform = (_platform+3)%6;
+                        _spawnPhoenixes = true;
+                        break;
+                }
                 _platformMoveRepeatTimer = 30s;
-
             }
         }, _platformMoveRepeatTimer);
         ScheduleMainSpellAttack(0s);
@@ -221,16 +250,24 @@ struct boss_alar : public BossAI
         ScheduleMainSpellAttack(0s);
     }
 
+    void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt)
+    {
+        if (targetToSpawnAt)
+        {
+            for (uint8 i = 0; i < count; ++i)
+            {
+                me->SummonCreature(NPC_EMBER_OF_ALAR, *targetToSpawnAt, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+            }
+        }
+    }
+
     void DoDiveBomb()
     {
         scheduler.Schedule(2s, [this](TaskContext)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
             {
-                for (uint8 i = 0; i < _phoenixSummons; ++i)
-                {
-                    me->SummonCreature(NPC_EMBER_OF_ALAR, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                }
+                SpawnPhoenixes(2, target);
             }
         }).Schedule(6s, [this](TaskContext)
         {
@@ -316,9 +353,10 @@ struct boss_alar : public BossAI
 private:
     bool _canAttackCooldown;
     bool _baseAttackOverride;
+    bool _spawnPhoenixes;
     uint8 _platform;
+    uint8 _platformRoll;
     uint8 _noQuillTimes;
-    uint8 _phoenixSummons;
     std::chrono::seconds _platformMoveRepeatTimer;
 };
 
