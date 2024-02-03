@@ -171,9 +171,10 @@ struct boss_halazzi : public BossAI
         {
             case PHASE_LYNX:
             case PHASE_ENRAGE:
-                if (_phase != PHASE_NONE)
+                if (_phase == PHASE_MERGE)
                 {
                     DoCastSelf(SPELL_TRANSFORM_MERGE, true);
+                    me->RemoveAurasDueToSpell(SPELL_TRANSFORM_SPLIT2);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                 }
                 summons.DespawnAll();
