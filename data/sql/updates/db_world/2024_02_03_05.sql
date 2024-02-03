@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_04 -> 2024_02_03_05
 -- Update creature 26221 'Earthen Ring Elder' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26221) AND (`guid` IN (90494, 90495, 90496, 90498, 90499, 90508));
