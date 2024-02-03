@@ -110,6 +110,16 @@ struct boss_high_astromancer_solarian : public BossAI
         BossAI::JustEngagedWith(who);
         me->CallForHelp(105.0f);
 
+        _movementScheduler.Schedule(2s, [this](TaskContext context)
+        {
+            me->GetMotionMaster()->Clear();
+            if (me->GetDistance2d(me->GetVictim()) > 40.0f)
+            {
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 20.0f);
+                me->CastStop();
+            }
+            context.Repeat(2s);
+        });
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
@@ -194,6 +204,7 @@ struct boss_high_astromancer_solarian : public BossAI
             return;
 
         scheduler.Update(diff);
+        _movementScheduler.Update(diff);
 
         if (me->GetReactState() == REACT_AGGRESSIVE)
         {
@@ -214,6 +225,8 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
+private:
+    TaskScheduler _movementScheduler;
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public AuraScript
