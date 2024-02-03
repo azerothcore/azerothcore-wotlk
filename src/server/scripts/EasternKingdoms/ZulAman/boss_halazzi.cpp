@@ -147,13 +147,10 @@ struct boss_halazzi : public BossAI
                     Talk(SAY_SABER);
                     DoCastVictim(SPELL_SABER_LASH, true);
                 }, 30s);
-                ScheduleTimedEvent(1s, [&]
-                {
-                    if (HealthBelowPct(25 * (3 - _transformCount)))
-                    {
-                        EnterPhase(PHASE_SPLIT);
-                    }
-                }, 1s);
+
+                ScheduleHealthCheckEvent(25 * (3 - _transformCount), [&]{
+                    EnterPhase(PHASE_SPLIT);
+                });
                 break;
             case PHASE_SPLIT:
                 Talk(SAY_SPLIT);
@@ -192,7 +189,7 @@ struct boss_halazzi : public BossAI
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveFollow(lynx, 0, 0);
                     ++_transformCount;
-                    ScheduleTimedEvent(1s, [&]
+                    ScheduleTimedEvent(2s, [&]
                     {
                         if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
                         {
@@ -208,7 +205,7 @@ struct boss_halazzi : public BossAI
                                 }
                             }
                         }
-                    }, 1s);
+                    }, 2s);
                 }
                 break;
             default:
