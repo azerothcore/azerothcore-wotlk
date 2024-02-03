@@ -161,9 +161,8 @@ struct boss_halazzi : public BossAI
                 break;
             case PHASE_HUMAN:
                 DoCastSelf(SPELL_SUMMON_LYNX, true);
-                uint32 humanFormHealth = (me->GetMaxHealth())/0.66666666;
-                me->SetMaxHealth(humanFormHealth);
-                me->SetHealth(humanFormHealth);
+                me->SetMaxHealth(_humanFormHealth);
+                me->SetHealth(_humanFormHealth);
                 ScheduleTimedEvent(10s, [&]
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
