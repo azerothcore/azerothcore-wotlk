@@ -221,7 +221,7 @@ struct boss_alar : public BossAI
 
     void ScheduleAbilities()
     {
-        ScheduleTimedEvent(67s, [&]
+        ScheduleTimedEvent(57s, [&]
         {
             DoCastVictim(SPELL_MELT_ARMOR);
         }, 60s);
