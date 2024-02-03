@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_02 -> 2024_02_03_03
 -- Update creature 25951 'Heretic Emissary' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 25951) AND (`guid` IN (86643));

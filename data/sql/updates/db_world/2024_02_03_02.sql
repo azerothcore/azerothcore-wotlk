@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_01 -> 2024_02_03_02
 -- Update creature 25980 'Heretic Bodyguard' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 25980) AND (`guid` IN (90920, 91009));

@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_03 -> 2024_02_03_04
 -- Update creature 25949 'Ice Caller Briatha' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 25949) AND (`guid` IN (245627));

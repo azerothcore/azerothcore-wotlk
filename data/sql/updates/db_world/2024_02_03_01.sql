@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_00 -> 2024_02_03_01
 -- Update creature 26124 'Midsummer Merchant' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 26124) AND (`guid` IN (86179, 86224));
