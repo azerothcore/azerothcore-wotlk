@@ -285,7 +285,7 @@ private:
 struct npc_halazzi_lynx : public ScriptedAI
 {
     npc_halazzi_lynx(Creature* creature) : ScriptedAI(creature) { }
-    
+
     void Reset() override
     {
         scheduler.CancelAll();
