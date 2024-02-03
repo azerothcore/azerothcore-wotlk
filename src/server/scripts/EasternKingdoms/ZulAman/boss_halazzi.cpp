@@ -67,6 +67,13 @@ enum Yells
     SAY_DEATH                   = 5
 };
 
+enum Groups
+{
+    GROUP_LYNX                  = 0,
+    GROUP_HUMAN                 = 1,
+    GROUP_MERGE                 = 2
+};
+
 struct boss_halazzi : public BossAI
 {
     boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZIEVENT)
@@ -81,12 +88,20 @@ struct boss_halazzi : public BossAI
     {
         BossAI::Reset();
         _transformCount = 0;
+        _healthCheckPercentage = 0;
         _phase = PHASE_NONE;
         _lynxFormHealth = me->GetMaxHealth();
         _healthPortion = _lynxFormHealth/4;
         _humanFormHealth = (me->GetMaxHealth())/0.66666666;
         EnterPhase(PHASE_LYNX);
         DoCastSelf(SPELL_DUAL_WIELD, true);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+        summon->Attack(me->GetVictim(), false);
+        summon->SetInCombatWithZone();
     }
 
     void JustEngagedWith(Unit* who) override
@@ -105,6 +120,32 @@ struct boss_halazzi : public BossAI
         if (damage >= me->GetHealth() && _phase != PHASE_ENRAGE)
         {
             damage = 0;
+        }
+        else
+        {
+            if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
+            {
+                _healthCheckPercentage = 25 * (3 - _transformCount);
+                if (!HealthAbovePct(_healthCheckPercentage))
+                {
+                    EnterPhase(PHASE_SPLIT);
+                }
+            }
+            else if (_phase == PHASE_HUMAN)
+            {
+                if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
+                {
+                    if (!HealthAbovePct(20) || !lynx->HealthAbovePct(20))
+                    {
+                        EnterPhase(PHASE_MERGE);
+                    }
+                }
+                else
+                {
+                    //should not really happen
+                    EnterEvadeMode();
+                }
+            }
         }
     }
 
@@ -130,7 +171,7 @@ struct boss_halazzi : public BossAI
         {
             case PHASE_LYNX:
             case PHASE_ENRAGE:
-                if (_phase == PHASE_MERGE)
+                if (_phase != PHASE_NONE)
                 {
                     DoCastSelf(SPELL_TRANSFORM_MERGE, true);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -138,18 +179,16 @@ struct boss_halazzi : public BossAI
                 summons.DespawnAll();
                 me->SetMaxHealth(_lynxFormHealth);
                 me->SetHealth(_lynxFormHealth - _healthPortion * _transformCount);
-                ScheduleTimedEvent(16s, [&]
+                scheduler.CancelGroup(GROUP_MERGE);
+                scheduler.Schedule(16s, GROUP_LYNX, [this](TaskContext context)
                 {
                     DoCastSelf(SPELL_FRENZY);
-                }, 10s, 15s);
-                ScheduleTimedEvent(20s, [&]
+                    context.Repeat(10s, 15s);
+                }).Schedule(20s, GROUP_LYNX, [this](TaskContext context)
                 {
                     Talk(SAY_SABER);
                     DoCastVictim(SPELL_SABER_LASH, true);
-                }, 30s);
-
-                ScheduleHealthCheckEvent(25 * (3 - _transformCount), [&]{
-                    EnterPhase(PHASE_SPLIT);
+                    context.Repeat(30s);
                 });
                 break;
             case PHASE_SPLIT:
@@ -157,10 +196,12 @@ struct boss_halazzi : public BossAI
                 DoCastSelf(SPELL_TRANSFORM_SPLIT, true);
                 break;
             case PHASE_HUMAN:
+                scheduler.CancelGroup(GROUP_MERGE);
                 DoCastSelf(SPELL_SUMMON_LYNX, true);
                 me->SetMaxHealth(_humanFormHealth);
                 me->SetHealth(_humanFormHealth);
-                ScheduleTimedEvent(10s, [&]
+                scheduler.CancelGroup(GROUP_LYNX);
+                scheduler.Schedule(10s, GROUP_HUMAN, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
@@ -173,23 +214,25 @@ struct boss_halazzi : public BossAI
                             DoCast(target, SPELL_FLAMESHOCK);
                         }
                     }
-                }, 10s, 15s);
-                ScheduleTimedEvent(12s, [&]
+                    context.Repeat(10s, 15s);
+                }).Schedule(12s, GROUP_HUMAN, [this](TaskContext context)
                 {
                     DoCastSelf(SPELL_SUMMON_TOTEM);
-                }, 20s);
+                    context.Repeat(20s);
+                });
                 break;
             case PHASE_MERGE:
                 if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
                 {
                     Talk(SAY_MERGE);
+                    scheduler.CancelGroup(GROUP_HUMAN);
                     lynx->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     lynx->GetMotionMaster()->Clear();
                     lynx->GetMotionMaster()->MoveFollow(me, 0, 0);
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveFollow(lynx, 0, 0);
                     ++_transformCount;
-                    ScheduleTimedEvent(2s, [&]
+                    scheduler.Schedule(2s, GROUP_MERGE, [this](TaskContext context)
                     {
                         if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
                         {
@@ -205,7 +248,8 @@ struct boss_halazzi : public BossAI
                                 }
                             }
                         }
-                    }, 2s);
+                        context.Repeat(2s);
+                    });
                 }
                 break;
             default:
@@ -233,6 +277,7 @@ private:
     uint32 _humanFormHealth;
     uint32 _healthPortion;
     uint8 _transformCount;
+    uint32 _healthCheckPercentage;
     PhaseHalazzi _phase;
 };
 // Spirits Lynx AI
