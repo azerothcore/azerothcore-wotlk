@@ -146,7 +146,6 @@ struct boss_alar : public BossAI
                     }
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                //_platform = (_platform+1)%4;
                 _platformRoll = RAND(0, 2);
                 switch(_platformRoll)
                 {
@@ -306,7 +305,7 @@ struct boss_alar : public BossAI
                 {
                     DoCastSelf(SPELL_FLAME_QUILLS);
                 });
-                ScheduleMainSpellAttack(10s);
+                ScheduleMainSpellAttack(13s);
                 break;
             case POINT_DIVE:
                 scheduler.Schedule(1s, [this](TaskContext)
