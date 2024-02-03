@@ -1,3 +1,4 @@
+-- DB update 2024_02_03_06 -> 2024_02_03_07
 -- Fix Dalaran Toy Store Plane behaviour
 
 -- Update creature 29802 'Cosmetic Toy Plane' with sniffed values
