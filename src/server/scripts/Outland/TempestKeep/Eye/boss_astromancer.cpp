@@ -109,6 +109,7 @@ struct boss_high_astromancer_solarian : public BossAI
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
         me->CallForHelp(105.0f);
+        me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
