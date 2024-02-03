@@ -40,7 +40,7 @@ enum Spells
 enum UniqueEvents
 {
     EVENT_BERSERK               = 0
-}
+};
 
 enum Hal_CreatureIds
 {
@@ -82,6 +82,9 @@ struct boss_halazzi : public BossAI
         BossAI::Reset();
         _transformCount = 0;
         _phase = PHASE_NONE;
+        _lynxFormHealth = me->GetMaxHealth();
+        _healthPortion = _lynxFormHealth/4;
+        _humanFormHealth = (me->GetMaxHealth())/0.66666666;
         EnterPhase(PHASE_LYNX);
         DoCastSelf(SPELL_DUAL_WIELD, true);
     }
@@ -133,10 +136,8 @@ struct boss_halazzi : public BossAI
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                 }
                 summons.DespawnAll();
-                uint32 lynxFormHealth = me->GetMaxHealth();
-                me->SetMaxHealth(lynxFormHealth);
-                uint32 healthPortion = lynxFormHealth/4;
-                me->SetHealth(lynxFormHealth - healthPortion * _transformCount);
+                me->SetMaxHealth(_lynxFormHealth);
+                me->SetHealth(_lynxFormHealth - _healthPortion * _transformCount);
                 ScheduleTimedEvent(16s, [&]
                 {
                     DoCastSelf(SPELL_FRENZY);
@@ -232,6 +233,9 @@ struct boss_halazzi : public BossAI
         Talk(SAY_DEATH);
     }
 private:
+    uint32 _lynxFormHealth;
+    uint32 _humanFormHealth;
+    uint32 _healthPortion;
     uint8 _transformCount;
     PhaseHalazzi _phase;
 };
