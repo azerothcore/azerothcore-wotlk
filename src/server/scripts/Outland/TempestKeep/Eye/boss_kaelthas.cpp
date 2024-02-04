@@ -467,24 +467,42 @@ struct boss_kaelthas : public BossAI
         me->SetFacingTo(M_PI);
         me->SetWalk(true);
         Talk(SAY_PHASE5_NUTS);
-        ScheduleUniqueTimedEvent(2500ms, [&]
+        scheduler.Schedule(2500ms, [this](TaskContext)
         {
+            LOG_ERROR("server", "Event 2");
             me->SetTarget();
             DoCastSelf(SPELL_KAEL_EXPLODES1, true);
             DoCastSelf(SPELL_KAEL_GAINING_POWER);
             me->SetDisableGravity(true);
-        }, EVENT_SCENE_2);
-        ScheduleUniqueTimedEvent(4000ms, [&]
+        }).Schedule(4s, [this](TaskContext)
         {
+            LOG_ERROR("server", "Event 3");
             me->SetTarget();
             for (uint8 i = 0; i < 2; ++i)
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
             me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 76.0f, false, true);
             DoCastSelf(SPELL_GROW, true);
-        }, EVENT_SCENE_3);
+        });
+        // ScheduleUniqueTimedEvent(2500ms, [&]
+        // {
+        //     me->SetTarget();
+        //     DoCastSelf(SPELL_KAEL_EXPLODES1, true);
+        //     DoCastSelf(SPELL_KAEL_GAINING_POWER);
+        //     me->SetDisableGravity(true);
+        // }, EVENT_SCENE_2);
+        // ScheduleUniqueTimedEvent(4000ms, [&]
+        // {
+        //     me->SetTarget();
+        //     for (uint8 i = 0; i < 2; ++i)
+        //         if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
+        //             trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
+        //     me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 76.0f, false, true);
+        //     DoCastSelf(SPELL_GROW, true);
+        // }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
         {
+            LOG_ERROR("server", "Event 4");
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES2, true);
@@ -495,6 +513,7 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_4);
         ScheduleUniqueTimedEvent(10000ms, [&]
         {
+            LOG_ERROR("server", "Event 5");
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES3, true);
@@ -505,18 +524,21 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_5);
         ScheduleUniqueTimedEvent(14000ms, [&]
         {
+            LOG_ERROR("server", "Event 6");
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES4, true);
             DoCastSelf(SPELL_NETHERBEAM_AURA3, true);
         }, EVENT_SCENE_6);
         ScheduleUniqueTimedEvent(17500ms, [&]
         {
+            LOG_ERROR("server", "Event 7");
             SetRoomState(GO_STATE_ACTIVE);
             me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
             me->SendMovementFlagUpdate();
         }, EVENT_SCENE_7);
         ScheduleUniqueTimedEvent(19000ms, [&]
         {
+            LOG_ERROR("server", "Event 8");
             summons.DespawnEntry(WORLD_TRIGGER);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA1);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
@@ -630,12 +652,9 @@ struct boss_kaelthas : public BossAI
         {
             if (Creature* summonedCreature = summon->ToCreature())
             {
-                for (uint32 npcId = NPC_LORD_SANGUINAR; npcId <= NPC_THALADRED; ++npcId)
+                if (summonedCreature->GetEntry() >= 21268 && summonedCreature->GetEntry() <= 21274)
                 {
-                    if (summonedCreature->GetEntry() != npcId)
-                    {
-                        summonedCreature->DespawnOrUnsummon();
-                    }
+                    summonedCreature->DespawnOrUnsummon();
                 }
             }
         });
