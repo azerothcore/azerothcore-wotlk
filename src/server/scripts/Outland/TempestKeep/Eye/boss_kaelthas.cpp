@@ -902,7 +902,6 @@ struct npc_thaladred : public ScriptedAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
                 me->AddThreat(target, 10000000.0f);
-                //me->Say(EMOTE_THALADRED_FIXATE, target);
                 Talk(EMOTE_THALADRED_FIXATE, target);
             }
         }, 10000ms);
