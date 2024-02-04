@@ -402,7 +402,6 @@ public:
                     _events.ScheduleEvent(EVENT_MOGRAINE_KNEEL, 1s, 3s);
                     break;
                 case EVENT_MOGRAINE_KNEEL:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK3, 1s, 2s);
                     break;
@@ -431,15 +430,14 @@ public:
                     break;
                 case EVENT_MOGRAINE_UNIT_STAND_STATE_STAND:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 800ms);
+                    _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK4, 1200ms);
                     break;
                 case EVENT_MOGRAINE_EMOTE_TALK4:
-                    me->AI()->Talk(SAY_MO_AB_TALK4, 200ms);
+                    me->AI()->Talk(SAY_MO_AB_TALK4);
                     _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK, 4600ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE_TALK:
-                    summonedMograine->AI()->Talk(SAY_HM_AB_TALK1, me);
+                    summonedMograine->AI()->Talk(SAY_HM_AB_TALK1);
                     _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_EMOTE1, 3400ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_EMOTE1:
@@ -459,8 +457,7 @@ public:
                     _events.ScheduleEvent(EVENT_MOGRAINE_EMOTE_TALK5, 1200ms);
                     break;
                 case EVENT_MOGRAINE_EMOTE_TALK5:
-                    me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->AI()->Talk(SAY_MO_AB_TALK5, 200ms);
+                    me->AI()->Talk(SAY_MO_AB_TALK5);
                     _events.ScheduleEvent(EVENT_HIGHLORD_MOGRAINE_CASTSPELL, 3000ms);
                     break;
                 case EVENT_HIGHLORD_MOGRAINE_CASTSPELL:
