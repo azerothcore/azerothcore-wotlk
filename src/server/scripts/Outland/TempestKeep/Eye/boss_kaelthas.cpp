@@ -421,7 +421,7 @@ struct npc_lord_sanguinar : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        summonedCreature->SetReactState(REACT_PASSIVE);
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -471,7 +471,7 @@ struct npc_capernian : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        summonedCreature->SetReactState(REACT_PASSIVE);
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -527,7 +527,7 @@ struct npc_telonicus : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        summonedCreature->SetReactState(REACT_PASSIVE);
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -580,7 +580,7 @@ struct npc_thaladred : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        summonedCreature->SetReactState(REACT_PASSIVE);
+        me->SetReactState(REACT_PASSIVE);
         me->SetWalk(true);
     }
 
