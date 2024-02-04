@@ -55,7 +55,7 @@ enum Yells
 
 enum Spells
 {
-    // Phase 2 spells
+    // _phase 2 spells
     SPELL_SUMMON_WEAPONS                = 36976,
     SPELL_SUMMON_WEAPONA                = 36958,
     SPELL_SUMMON_WEAPONB                = 36959,
@@ -65,10 +65,10 @@ enum Spells
     SPELL_SUMMON_WEAPONF                = 36963,
     SPELL_SUMMON_WEAPONG                = 36964,
 
-    // Phase 3 spells
+    // _phase 3 spells
     SPELL_RESURRECTION                  = 36450,
 
-    // Phase 4 spells
+    // _phase 4 spells
     SPELL_FIREBALL                      = 36805,
     SPELL_ARCANE_DISRUPTION             = 36834,
     SPELL_PHOENIX                       = 36723,
@@ -99,7 +99,7 @@ enum Spells
     SPELL_PURE_NETHER_BEAM2             = 36197,
     SPELL_PURE_NETHER_BEAM3             = 36198,
 
-    // Phase 5 spells
+    // _phase 5 spells
     SPELL_GRAVITY_LAPSE                 = 35941,
     SPELL_GRAVITY_LAPSE_TELEPORT1       = 35966,
     SPELL_GRAVITY_LAPSE_KNOCKBACK       = 34480,
@@ -227,7 +227,7 @@ struct boss_kaelthas : public BossAI
 
     void PrepareAdvisors()
     {
-        for (uint8 advisorData = DATA_KAEL_ADVISOR1; advisorData <= DATA_KAEL_ADVISOR4; ++advisorData)
+        for (uint8 advisorData = DATA_THALADRED; advisorData <= DATA_TELONICUS; ++advisorData)
         {
             if (Creature* advisor = instance->GetCreature(advisorData))
             {
@@ -245,11 +245,11 @@ struct boss_kaelthas : public BossAI
         if (type == DATA_RESURRECT_CAST && data == DATA_RESURRECT_CAST)
         {
             summons.DoForAllSummons([&](WorldObject* summon){
-                if (Creature* summon = summon->ToCreature())
+                if (Creature* summonedCreature = summon->ToCreature())
                 {
-                    summon->SetReactState(REACT_PASSIVE);
-                    summon->setDeathState(DeathState::JustRespawned);
-                    summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    summonedCreature->SetReactState(REACT_PASSIVE);
+                    summonedCreature->setDeathState(DeathState::JustRespawned);
+                    summonedCreature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
             });
         }
@@ -285,15 +285,15 @@ struct boss_kaelthas : public BossAI
 
     void AttackStart(Unit* who) override
     {
-        if (phase == PHASE_FINAL /* check is scheduled&& events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0*/)
+        if (_phase == PHASE_FINAL /* check is scheduled&& events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0*/)
             BossAI::AttackStart(who);
     }
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
+        if (_phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
         {
-            phase = PHASE_SINGLE_ADVISOR;
+            _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
             Talk(SAY_INTRO);
             ScheduleUniqueTimedEvent(23s, [&]
@@ -309,7 +309,6 @@ struct boss_kaelthas : public BossAI
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         thaladred->AI()->AttackStart(target);
                     thaladred->SetInCombatWithZone();
-                    thaladred->AI()->Talk(SAY_THALADRED_AGGRO);
                 }
             }, EVENT_PREFIGHT_PHASE12);
         }
@@ -333,26 +332,32 @@ struct boss_kaelthas : public BossAI
             summon->GetMotionMaster()->MoveRandom(20.0f);
     }
 
-    void DoAction(uint32 action) override
+    void DoAction(int32 action) override
     {
         switch(action)
         {
             case ACTION_START_SANGUINAR:
                 IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR, EVENT_PREFIGHT_PHASE21, EVENT_PREFIGHT_PHASE22);
+                break;
             case ACTION_START_CAPERNIAN:
                 IntroduceNewAdvisor(SAY_INTRO_CAPERNIAN, ACTION_START_CAPERNIAN, EVENT_PREFIGHT_PHASE31, EVENT_PREFIGHT_PHASE32);
+                break;
             case ACTION_START_TELONICUS:
                 IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS, EVENT_PREFIGHT_PHASE41, EVENT_PREFIGHT_PHASE42);
+                break;
             case ACTION_START_WEAPONS:
                 //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE51, 3000);
                 //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE52, 9000);
+                me->Yell("fin!", LANG_UNIVERSAL);
+                LOG_ERROR("server", "TO BE IMPLEMENTED {}", "weapons");
+                break;
         }
     }
 
     void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction, Misc eventTalk, Misc eventAttack)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
-        EyeNPCs advisorNPCId = 0;
+        EyeNPCs advisorNPCId = NPC_THALADRED;
         ScheduleUniqueTimedEvent(2s, [&]
         {
             Talk(talkIntroduction);
@@ -362,7 +367,7 @@ struct boss_kaelthas : public BossAI
         {
             case ACTION_START_SANGUINAR:
                 attackStartTimer = 14500ms;
-                advisorNPCId = NPC_SANGUINAR;
+                advisorNPCId = NPC_LORD_SANGUINAR;
                 break;
             case ACTION_START_CAPERNIAN:
                 attackStartTimer = 9000ms;
@@ -385,12 +390,28 @@ struct boss_kaelthas : public BossAI
             }
         }, eventAttack);
     }
+
+    void UpdateAI(uint32 diff) override
+    {   
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+    bool CheckEvadeIfOutOfCombatArea() const override
+    {
+        return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
+    }
 private:
     uint32 _phase;
 };
 struct npc_lord_sanguinar : public ScriptedAI
 {
     npc_lord_sanguinar(Creature* creature) : ScriptedAI(creature) {
+        _instance = creature->GetInstanceScript();
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -400,6 +421,7 @@ struct npc_lord_sanguinar : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        summonedCreature->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -433,12 +455,13 @@ struct npc_lord_sanguinar : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 private:
-    InstanceScript _instance;
+    InstanceScript* _instance;
 };
 
 struct npc_capernian : public ScriptedAI
 {
     npc_capernian(Creature* creature) : ScriptedAI(creature) {
+        _instance = creature->GetInstanceScript();
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -448,6 +471,7 @@ struct npc_capernian : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        summonedCreature->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -487,12 +511,13 @@ struct npc_capernian : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 private:
-    InstanceScript _instance;
+    InstanceScript* _instance;
 };
 
 struct npc_telonicus : public ScriptedAI
 {
     npc_telonicus(Creature* creature) : ScriptedAI(creature) {
+        _instance = creature->GetInstanceScript();
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -502,6 +527,7 @@ struct npc_telonicus : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        summonedCreature->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -538,12 +564,13 @@ struct npc_telonicus : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 private:
-    InstanceScript _instance;
+    InstanceScript* _instance;
 };
 
 struct npc_thaladred : public ScriptedAI
 {
     npc_thaladred(Creature* creature) : ScriptedAI(creature) {
+        _instance = creature->GetInstanceScript();
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -553,6 +580,7 @@ struct npc_thaladred : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        summonedCreature->SetReactState(REACT_PASSIVE);
         me->SetWalk(true);
     }
 
@@ -611,7 +639,7 @@ struct npc_thaladred : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 private:
-    InstanceScript _instance;
+    InstanceScript* _instance;
 };
 
 class spell_kaelthas_kael_phase_two : public SpellScriptLoader
