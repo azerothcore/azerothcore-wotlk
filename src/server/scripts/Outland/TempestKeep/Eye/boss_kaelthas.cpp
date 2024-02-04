@@ -346,8 +346,31 @@ struct boss_kaelthas : public BossAI
                 IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS);
                 break;
             case ACTION_START_WEAPONS:
-                //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE51, 3000);
-                //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE52, 9000);
+                ScheduleUniqueTimedEvent(3s, [&]{
+                    Talk(SAY_PHASE2_WEAPON);
+                    DoCastSelf(SPELL_SUMMON_WEAPONS);
+                    _phase = PHASE_WEAPONS;
+                }, EVENT_PREFIGHT_PHASE51);
+                ScheduleUniqueTimedEvent(9s, [&]{
+                    summons.DoForAllSummons([&](WorldObject* summon)
+                    {
+                        if (Creature* summonedCreature = summon->ToCreature())
+                        {
+                            if (!summonedCreature->GetSpawnId())
+                            {
+                                summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                                summonedCreature->SetInCombatWithZone();
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                                {
+                                    summonedCreature->AI()->AttackStart(target);
+                                }
+                            }
+                        }
+                    });
+                    ScheduleUniqueTimedEvent(2min, [&]{
+                        PhaseAllAdvisorsExecute(); 
+                    }, EVENT_PREFIGHT_PHASE61);
+                }, EVENT_PREFIGHT_PHASE52);
                 break;
         }
     }
@@ -387,6 +410,51 @@ struct boss_kaelthas : public BossAI
                 advisor->SetInCombatWithZone();
             }
         });
+    }
+
+    void PhaseAllAdvisorsExecute()
+    {
+
+        _phase = PHASE_ALL_ADVISORS;
+        Talk(SAY_PHASE3_ADVANCE);
+        ScheduleUniqueTimedEvent(6s, [&]{
+            DoCastSelf(SPELL_RESURRECTION);
+        }, EVENT_PREFIGHT_PHASE62);
+        ScheduleUniqueTimedEvent(12s, [&]{
+            summons.DoForAllSummons([&](WorldObject* summon)
+            {
+                if (Creature* summonedCreature = summon->ToCreature())
+                {
+                    if (summonedCreature->GetSpawnId())
+                    {
+                        summonedCreature->SetReactState(REACT_AGGRESSIVE);
+                        summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        summonedCreature->SetInCombatWithZone();
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            summonedCreature->AI()->AttackStart(target);
+                        }
+                    }
+                }
+            });
+            ScheduleUniqueTimedEvent(3min, [&]{
+                PhaseKaelExecute();
+            }, EVENT_PREFIGHT_PHASE71);
+        }, EVENT_PREFIGHT_PHASE63);
+    }
+
+    void PhaseKaelExecute()
+    {
+        scheduler.CancelAll();
+        Talk(SAY_PHASE4_INTRO2);
+        _phase = PHASE_FINAL;
+        DoResetThreatList();
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+        {
+            AttackStart(target);
+        }
+        //run spell
     }
 
     void UpdateAI(uint32 diff) override
