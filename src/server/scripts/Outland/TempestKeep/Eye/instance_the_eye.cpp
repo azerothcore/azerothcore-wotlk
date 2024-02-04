@@ -20,6 +20,21 @@
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_KAELTHAS,         DATA_KAELTHAS       },
+    { NPC_THALADRED,        DATA_THALADRED      },
+    { NPC_LORD_SANGUINAR,   DATA_LORD_SANGUINAR },
+    { NPC_CAPERNIAN,        DATA_CAPERNIAN      },
+    { NPC_TELONICUS,        DATA_TELONICUS      },
+    { 0,                    0                   }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,               0                 }
+};
+
 class instance_the_eye : public InstanceMapScript
 {
 public:
