@@ -45,6 +45,7 @@ public:
         instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            LoadObjectData(creatureData, gameObjectData);
             SetBossNumber(MAX_ENCOUNTER);
         }
 
@@ -81,6 +82,7 @@ public:
                     LordSanguinarGUID = creature->GetGUID();
                     break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* gobject) override
@@ -113,14 +115,6 @@ public:
                     return AlarGUID;
                 case NPC_KAELTHAS:
                     return KaelthasGUID;
-                case DATA_KAEL_ADVISOR1:
-                    return ThaladredTheDarkenerGUID;
-                case DATA_KAEL_ADVISOR2:
-                    return LordSanguinarGUID;
-                case DATA_KAEL_ADVISOR3:
-                    return GrandAstromancerCapernianGUID;
-                case DATA_KAEL_ADVISOR4:
-                    return MasterEngineerTelonicusGUID;
             }
 
             return ObjectGuid::Empty;
