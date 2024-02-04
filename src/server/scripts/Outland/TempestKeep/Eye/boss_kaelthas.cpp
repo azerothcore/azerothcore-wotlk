@@ -334,44 +334,49 @@ struct boss_kaelthas : public BossAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        if (_phase = PHASE_SINGLE_ADVISOR)
         {
-            case ACTION_START_SANGUINAR:
-                IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR);
-                break;
-            case ACTION_START_CAPERNIAN:
-                IntroduceNewAdvisor(SAY_INTRO_CAPERNIAN, ACTION_START_CAPERNIAN);
-                break;
-            case ACTION_START_TELONICUS:
-                IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS);
-                break;
-            case ACTION_START_WEAPONS:
-                ScheduleUniqueTimedEvent(3s, [&]{
-                    Talk(SAY_PHASE2_WEAPON);
-                    DoCastSelf(SPELL_SUMMON_WEAPONS);
-                    _phase = PHASE_WEAPONS;
-                }, EVENT_PREFIGHT_PHASE51);
-                ScheduleUniqueTimedEvent(9s, [&]{
-                    summons.DoForAllSummons([&](WorldObject* summon)
-                    {
-                        if (Creature* summonedCreature = summon->ToCreature())
+            switch(action)
+            {
+                case ACTION_START_SANGUINAR:
+                    IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR);
+                    break;
+                case ACTION_START_CAPERNIAN:
+                    IntroduceNewAdvisor(SAY_INTRO_CAPERNIAN, ACTION_START_CAPERNIAN);
+                    break;
+                case ACTION_START_TELONICUS:
+                    IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS);
+                    break;
+                case ACTION_START_WEAPONS:
+                    ScheduleUniqueTimedEvent(3s, [&]{
+                        Talk(SAY_PHASE2_WEAPON);
+                        DoCastSelf(SPELL_SUMMON_WEAPONS);
+                        _phase = PHASE_WEAPONS;
+                    }, EVENT_PREFIGHT_PHASE51);
+                    ScheduleUniqueTimedEvent(9s, [&]{
+                        summons.DoForAllSummons([&](WorldObject* summon)
                         {
-                            if (!summonedCreature->GetSpawnId())
+                            if (Creature* summonedCreature = summon->ToCreature())
                             {
-                                summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                                summonedCreature->SetInCombatWithZone();
-                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                                if (!summonedCreature->GetSpawnId())
                                 {
-                                    summonedCreature->AI()->AttackStart(target);
+                                    summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                                    summonedCreature->SetInCombatWithZone();
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                                    {
+                                        summonedCreature->AI()->AttackStart(target);
+                                    }
                                 }
                             }
-                        }
-                    });
-                    ScheduleUniqueTimedEvent(2min, [&]{
-                        PhaseAllAdvisorsExecute(); 
-                    }, EVENT_PREFIGHT_PHASE61);
-                }, EVENT_PREFIGHT_PHASE52);
-                break;
+                        });
+                        ScheduleUniqueTimedEvent(2min, [&]{
+                            PhaseAllAdvisorsExecute(); 
+                        }, EVENT_PREFIGHT_PHASE61);
+                    }, EVENT_PREFIGHT_PHASE52);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -398,6 +403,8 @@ struct boss_kaelthas : public BossAI
                 attackStartTimer = 10400ms;
                 advisorNPCId = NPC_TELONICUS;
                 break;
+            default:
+                break;
         }
         scheduler.Schedule(attackStartTimer, [this, advisorNPCId](TaskContext)
         {
@@ -414,7 +421,20 @@ struct boss_kaelthas : public BossAI
 
     void PhaseAllAdvisorsExecute()
     {
-
+        //remove all weapons so they don't get revived
+        summons.DoForAllSummons([&](WorldObject* summon)
+        {
+            if (Creature* summonedCreature = summon->ToCreature())
+            {
+                for (uint32 npcId = NPC_LORD_SANGUINAR; npcId <= NPC_THALADRED; ++npcId)
+                {
+                    if (summonedCreature->GetEntry() != npcId)
+                    {
+                        summonedCreature->DespawnOrUnsummon();
+                    }
+                }
+            }
+        });
         _phase = PHASE_ALL_ADVISORS;
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
