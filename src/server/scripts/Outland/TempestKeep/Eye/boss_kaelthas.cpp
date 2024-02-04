@@ -337,31 +337,29 @@ struct boss_kaelthas : public BossAI
         switch(action)
         {
             case ACTION_START_SANGUINAR:
-                IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR, EVENT_PREFIGHT_PHASE21, EVENT_PREFIGHT_PHASE22);
+                IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR);
                 break;
             case ACTION_START_CAPERNIAN:
-                IntroduceNewAdvisor(SAY_INTRO_CAPERNIAN, ACTION_START_CAPERNIAN, EVENT_PREFIGHT_PHASE31, EVENT_PREFIGHT_PHASE32);
+                IntroduceNewAdvisor(SAY_INTRO_CAPERNIAN, ACTION_START_CAPERNIAN);
                 break;
             case ACTION_START_TELONICUS:
-                IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS, EVENT_PREFIGHT_PHASE41, EVENT_PREFIGHT_PHASE42);
+                IntroduceNewAdvisor(SAY_INTRO_TELONICUS, ACTION_START_TELONICUS);
                 break;
             case ACTION_START_WEAPONS:
                 //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE51, 3000);
                 //events2.ScheduleEvent(EVENT_PREFIGHT_PHASE52, 9000);
-                me->Yell("fin!", LANG_UNIVERSAL);
-                LOG_ERROR("server", "TO BE IMPLEMENTED {}", "weapons");
                 break;
         }
     }
 
-    void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction, Misc eventTalk, Misc eventAttack)
+    void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
         EyeNPCs advisorNPCId = NPC_THALADRED;
-        ScheduleUniqueTimedEvent(2s, [&]
+        scheduler.Schedule(2s, [this, talkIntroduction](TaskContext)
         {
             Talk(talkIntroduction);
-        }, eventTalk);
+        });
         //switch because talk times are different
         switch(kaelAction)
         {
@@ -378,7 +376,7 @@ struct boss_kaelthas : public BossAI
                 advisorNPCId = NPC_TELONICUS;
                 break;
         }
-        ScheduleUniqueTimedEvent(attackStartTimer, [&]
+        scheduler.Schedule(attackStartTimer, [this, advisorNPCId](TaskContext)
         {
             if (Creature* advisor = summons.GetCreatureWithEntry(advisorNPCId))
             {
@@ -388,7 +386,7 @@ struct boss_kaelthas : public BossAI
                     advisor->AI()->AttackStart(target);
                 advisor->SetInCombatWithZone();
             }
-        }, eventAttack);
+        });
     }
 
     void UpdateAI(uint32 diff) override
