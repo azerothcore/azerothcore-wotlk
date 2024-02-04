@@ -28,9 +28,9 @@ enum AshbringerEventMisc
     AURA_OF_ASHBRINGER             = 28282,
 
     NPC_COMMANDER_MOGRAINE         = 3976,
-    NPC_INQUISITOR_WHITEMANE       = 3977,
-    NPC_SCARLET_MYRIDON            = 4295,
+    NPC_INQUISITOR_WHITEMANE       = 3977,   
     NPC_SCARLET_SORCERER           = 4294,
+    NPC_SCARLET_MYRIDON            = 4295,
     NPC_SCARLET_DEFENDER           = 4298,
     NPC_SCARLET_CHAPLAIN           = 4299,
     NPC_SCARLET_WIZARD             = 4300,
@@ -880,15 +880,14 @@ public:
                                 break;
                             }
                         }
-                        _events.ScheduleEvent(EVENT_RESURRECT, 5s);
+                        _events.ScheduleEvent(EVENT_RESURRECT, 3200ms);
                         break;
                     case EVENT_RESURRECT:
                         if (Creature* mograine = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_MOGRAINE)))
                         {
                             DoCast(mograine, SPELL_SCARLET_RESURRECTION);
                         }
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        _events.ScheduleEvent(EVENT_SAY, 3400ms);
+                        _events.ScheduleEvent(EVENT_SAY,1900ms);
                         break;
                     case  EVENT_SAY:
                         Talk(SAY_WH_RESURRECT);
