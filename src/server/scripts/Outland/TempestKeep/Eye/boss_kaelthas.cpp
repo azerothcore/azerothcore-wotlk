@@ -94,10 +94,15 @@ enum Spells
     SPELL_KEAL_STUNNED                  = 36185,
     SPELL_KAEL_FULL_POWER               = 36187,
     SPELL_FLOATING_DROWNED              = 36550,
+    SPELL_DARK_BANISH_STATE             = 52241, // wrong visual apparently
+    SPELL_ARCANE_EXPLOSION_VISUAL       = 34807,
 
     SPELL_PURE_NETHER_BEAM1             = 36196,
     SPELL_PURE_NETHER_BEAM2             = 36197,
     SPELL_PURE_NETHER_BEAM3             = 36198,
+    SPELL_PURE_NETHER_BEAM4             = 36201,
+    SPELL_PURE_NETHER_BEAM5             = 36290,
+    SPELL_PURE_NETHER_BEAM6             = 36291,
 
     // _phase 5 spells
     SPELL_GRAVITY_LAPSE                 = 35941,
@@ -205,6 +210,13 @@ enum KaelActions
     ACTION_START_WEAPONS                = 3
 };
 
+enum SpellGroups
+{
+    GROUP_PYROBLAST                     = 0,
+    GROUP_SHOCK_BARRIER                 = 1,
+    GROUP_NETHER_BEAM                   = 2
+};
+
 const Position triggersPos[6] =
 {
     {799.11f, -38.95f, 85.0f, 0.0f},
@@ -281,6 +293,14 @@ struct boss_kaelthas : public BossAI
         SetRoomState(GO_STATE_READY);
         me->SetDisableGravity(false);
         me->SetWalk(false);
+        ScheduleHealthCheckEvent(50, [&]{
+            scheduler.CancelAll();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
+            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+            me->SendMeleeAttackStop();
+        });
     }
 
     void AttackStart(Unit* who) override
@@ -380,6 +400,196 @@ struct boss_kaelthas : public BossAI
         }
     }
 
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        if (point == POINT_MIDDLE)
+        {
+            ExecuteMiddleEvent();
+        }
+        else if (point == POINT_START_LAST_PHASE)
+        {
+            me->SetDisableGravity(false);
+            me->SetWalk(false);
+            me->RemoveAurasDueToSpell(SPELL_KAEL_FULL_POWER);
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            ScheduleTimedEvent(0ms, [&]
+            {
+                DoCastVictim(SPELL_FIREBALL);
+            }, 2400ms, 7500ms);
+            ScheduleTimedEvent(10000ms, [&]
+            {
+                DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
+            }, 30250ms, 50650ms);
+            ScheduleTimedEvent(20000ms, [&]
+            {
+                Talk(SAY_SUMMON_PHOENIX);
+                DoCastSelf(SPELL_PHOENIX);
+            }, 31450ms, 66550ms);
+            ScheduleTimedEvent(5s, [&]
+            {
+                scheduler.DelayAll(30s);
+                me->setAttackTimer(BASE_ATTACK, 30000);
+                DoCastSelf(SPELL_GRAVITY_LAPSE);
+                DoCastSelf(SPELL_SUMMON_NETHER_VAPOR);
+                scheduler.Schedule(4s, GROUP_NETHER_BEAM, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_NETHER_BEAM);
+                    context.Repeat(4s);
+                }).Schedule(0s, GROUP_SHOCK_BARRIER, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_SHOCK_BARRIER);
+                    context.Repeat(10s);
+                }).Schedule(20500ms, GROUP_SHOCK_BARRIER, [this](TaskContext)
+                {
+                    scheduler.CancelGroup(GROUP_SHOCK_BARRIER);
+                }).Schedule(32s, [this](TaskContext)
+                {
+                    summons.DespawnEntry(NPC_NETHER_VAPOR);
+                    scheduler.CancelGroup(GROUP_NETHER_BEAM);
+                    me->SetTarget(me->GetVictim()->GetGUID());
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                });
+                me->SetTarget();
+                me->GetMotionMaster()->Clear();
+                me->StopMoving();
+                Talk(SAY_GRAVITYLAPSE);
+            }, 90s);
+            scheduler.DelayAll(60s);
+            if (me->GetVictim())
+            {
+                me->SetTarget(me->GetVictim()->GetGUID());
+                AttackStart(me->GetVictim());
+            }
+        }
+    }
+
+    void ExecuteMiddleEvent()
+    {
+        me->SetTarget();
+        me->SetFacingTo(M_PI);
+        me->SetWalk(true);
+        Talk(SAY_PHASE5_NUTS);
+        ScheduleUniqueTimedEvent(2500ms, [&]
+        {
+            me->SetTarget();
+            DoCastSelf(SPELL_KAEL_EXPLODES1, true);
+            DoCastSelf(SPELL_KAEL_GAINING_POWER);
+            me->SetDisableGravity(true);
+        }, EVENT_SCENE_2);
+        ScheduleUniqueTimedEvent(4000ms, [&]
+        {
+            me->SetTarget();
+            for (uint8 i = 0; i < 2; ++i)
+                if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
+                    trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
+            me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 76.0f, false, true);
+            DoCastSelf(SPELL_GROW, true);
+        }, EVENT_SCENE_3);
+        ScheduleUniqueTimedEvent(7000ms, [&]
+        {
+            me->SetTarget();
+            DoCastSelf(SPELL_GROW, true);
+            DoCastSelf(SPELL_KAEL_EXPLODES2, true);
+            DoCastSelf(SPELL_NETHERBEAM_AURA1, true);
+            for (uint8 i = 0; i < 2; ++i)
+                if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i + 2], TEMPSUMMON_TIMED_DESPAWN, 60000))
+                    trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
+        }, EVENT_SCENE_4);
+        ScheduleUniqueTimedEvent(10000ms, [&]
+        {
+            me->SetTarget();
+            DoCastSelf(SPELL_GROW, true);
+            DoCastSelf(SPELL_KAEL_EXPLODES3, true);
+            DoCastSelf(SPELL_NETHERBEAM_AURA2, true);
+            for (uint8 i = 0; i < 2; ++i)
+                if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i + 4], TEMPSUMMON_TIMED_DESPAWN, 60000))
+                    trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
+        }, EVENT_SCENE_5);
+        ScheduleUniqueTimedEvent(14000ms, [&]
+        {
+            DoCastSelf(SPELL_GROW, true);
+            DoCastSelf(SPELL_KAEL_EXPLODES4, true);
+            DoCastSelf(SPELL_NETHERBEAM_AURA3, true);
+        }, EVENT_SCENE_6);
+        ScheduleUniqueTimedEvent(17500ms, [&]
+        {
+            SetRoomState(GO_STATE_ACTIVE);
+            me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
+            me->SendMovementFlagUpdate();
+        }, EVENT_SCENE_7);
+        ScheduleUniqueTimedEvent(19000ms, [&]
+        {
+            summons.DespawnEntry(WORLD_TRIGGER);
+            me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA1);
+            me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
+            me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA3);
+            DoCastSelf(SPELL_KAEL_EXPLODES5, true);
+            DoCastSelf(SPELL_FLOATING_DROWNED);
+            //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
+        }, EVENT_SCENE_8);
+        ScheduleUniqueTimedEvent(22000ms, [&]
+        {
+            DoCastSelf(SPELL_DARK_BANISH_STATE, true);
+            DoCastSelf(SPELL_ARCANE_EXPLOSION_VISUAL, true);
+            me->SummonCreature(NPC_WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM1, true);
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() - 5, me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM2, true);
+        }, EVENT_SCENE_9);
+        ScheduleUniqueTimedEvent(22800ms, [&]
+        {
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() - 5, me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM1, true);
+        }, EVENT_SCENE_10);
+        ScheduleUniqueTimedEvent(23600ms, [&]
+        {
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM2, true);
+        }, EVENT_SCENE_11);
+        ScheduleUniqueTimedEvent(24500ms, [&]
+        {
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM1, true);
+        }, EVENT_SCENE_12);
+        ScheduleUniqueTimedEvent(24800ms, [&]
+        {
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() - 5, me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM2, true);
+        }, EVENT_SCENE_13);
+        ScheduleUniqueTimedEvent(25300ms, [&]
+        {
+            if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX()-5, me->GetPositionY()+5, me->GetPositionZ()+15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
+        }, EVENT_SCENE_14);
+        ScheduleUniqueTimedEvent(32000ms, [&]
+        {
+            me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
+            me->RemoveAurasDueToSpell(SPELL_KEAL_STUNNED);
+            DoCastSelf(SPELL_KAEL_FULL_POWER);
+            DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+            DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
+            DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
+            DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
+            me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_WALKING);
+            me->SendMovementFlagUpdate();
+        }, EVENT_SCENE_15);
+        ScheduleUniqueTimedEvent(36000ms, [&]
+        {
+            summons.DespawnEntry(WORLD_TRIGGER);
+            me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
+            me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
+        }, EVENT_SCENE_16);
+    }
+
     void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
@@ -474,7 +684,56 @@ struct boss_kaelthas : public BossAI
         {
             AttackStart(target);
         }
-        //run spell
+        ScheduleTimedEvent(1000ms, [&]
+        {
+            DoCastVictim(SPELL_FIREBALL);
+        }, 2400ms, 7500ms);
+        ScheduleTimedEvent(15000ms, [&]
+        {
+            DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
+        }, 30250ms, 50650ms);
+        ScheduleTimedEvent(30000ms, [&]
+        {
+            Talk(SAY_SUMMON_PHOENIX);
+            DoCastSelf(SPELL_PHOENIX);
+        }, 31450ms, 66550ms);
+        //sequence
+        ScheduleTimedEvent(20s, [&]
+        {
+            if (roll_chance_i(50))
+                Talk(SAY_MINDCONTROL);
+            me->CastCustomSpell(SPELL_MIND_CONTROL, SPELLVALUE_MAX_TARGETS, 3, me, false);
+            scheduler.Schedule(3s, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_ARCANE_DISRUPTION);
+            });
+        }, 50s);
+        ScheduleTimedEvent(40s, [&]
+        {
+            scheduler.Schedule(3s, [this](TaskContext)
+            {
+                if (roll_chance_i(50))
+                    Talk(SAY_MINDCONTROL);
+                me->CastCustomSpell(SPELL_MIND_CONTROL, SPELLVALUE_MAX_TARGETS, 3, me, false);
+            }).Schedule(6s, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_ARCANE_DISRUPTION);
+            });
+        }, 50s);
+        ScheduleTimedEvent(60s, [&]
+        {
+            Talk(SAY_PYROBLAST);
+            DoCastSelf(SPELL_SHOCK_BARRIER);
+            scheduler.DelayAll(10s);
+            scheduler.Schedule(0s, GROUP_PYROBLAST, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_PYROBLAST);
+                context.Repeat(4s);
+            }).Schedule(8500ms, GROUP_PYROBLAST, [this](TaskContext)
+            {
+                scheduler.CancelGroup(GROUP_PYROBLAST);
+            });
+        }, 50s);
     }
 
     void UpdateAI(uint32 diff) override
