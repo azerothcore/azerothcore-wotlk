@@ -1,3 +1,4 @@
+-- DB update 2024_02_04_00 -> 2024_02_04_01
 --
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (20060, 20062, 20063, 20064);
 
