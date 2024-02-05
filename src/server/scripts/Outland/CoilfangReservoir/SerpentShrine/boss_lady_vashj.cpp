@@ -304,7 +304,7 @@ struct npc_tainted_elemental : public ScriptedAI
     {
         if (!UpdateVictim())
             return;
-        
+
         scheduler.Update(diff);
     }
 
