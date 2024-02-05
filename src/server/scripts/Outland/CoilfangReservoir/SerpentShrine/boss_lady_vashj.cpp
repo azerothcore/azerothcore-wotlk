@@ -91,6 +91,8 @@ struct boss_lady_vashj : public BossAI
 
         ScheduleHealthCheckEvent(70, [&]{
             Talk(SAY_PHASE2);
+            scheduler.CancelAll();
+            me->CastStop();
             me->SetReactState(REACT_PASSIVE);
             me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
         });
@@ -178,7 +180,6 @@ struct boss_lady_vashj : public BossAI
         me->AddUnitState(UNIT_STATE_ROOT);
         me->SetFacingTo(me->GetHomePosition().GetOrientation());
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
-        scheduler.CancelAll();
         scheduler.Schedule(2400ms, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
