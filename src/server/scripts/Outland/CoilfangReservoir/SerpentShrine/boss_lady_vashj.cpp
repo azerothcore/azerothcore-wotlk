@@ -57,7 +57,9 @@ enum Spells
     SPELL_SUMMON_SPOREBAT2          = 38490,
     SPELL_SUMMON_SPOREBAT3          = 38492,
     SPELL_SUMMON_SPOREBAT4          = 38493,
-    SPELL_TOXIC_SPORES              = 38574
+    SPELL_TOXIC_SPORES              = 38574,
+
+    SPELL_POISON_BOLT               = 38253
 };
 
 enum Misc
@@ -272,6 +274,42 @@ private:
     std::chrono::seconds _batTimer;
 };
 
+struct npc_tainted_elemental : public ScriptedAI
+{
+    npc_tainted_elemental(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetInCombatWithZone();
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+        {
+            me->AddThreat(target, 1000.0f);
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(100ms, 500ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_POISON_BOLT);
+            context.Repeat(2350ms, 2650ms);
+        }).Schedule(15s, [this](TaskContext)
+        {
+            me->DespawnOrUnsummon();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+        
+        scheduler.Update(diff);
+    }
+
+};
+
 class spell_lady_vashj_magic_barrier : public AuraScript
 {
     PrepareAuraScript(spell_lady_vashj_magic_barrier);
@@ -411,6 +449,7 @@ class spell_lady_vashj_summons : public SpellScript
 void AddSC_boss_lady_vashj()
 {
     RegisterSerpentShrineAI(boss_lady_vashj);
+    RegisterSerpentShrineAI(npc_tainted_elemental);
     RegisterSpellScript(spell_lady_vashj_magic_barrier);
     RegisterSpellScript(spell_lady_vashj_remove_tainted_cores);
     RegisterSpellScript(spell_lady_vashj_summon_sporebat);
