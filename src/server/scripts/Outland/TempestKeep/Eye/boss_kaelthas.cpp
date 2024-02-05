@@ -454,7 +454,6 @@ struct boss_kaelthas : public BossAI
                 me->StopMoving();
                 Talk(SAY_GRAVITYLAPSE);
             }, 90s);
-            scheduler.DelayAll(60s);
             if (me->GetVictim())
             {
                 me->SetTarget(me->GetVictim()->GetGUID());
