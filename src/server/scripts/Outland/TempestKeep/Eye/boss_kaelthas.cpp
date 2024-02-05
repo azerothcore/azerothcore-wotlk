@@ -408,7 +408,6 @@ struct boss_kaelthas : public BossAI
             me->RemoveAurasDueToSpell(SPELL_KAEL_FULL_POWER);
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-            LOG_ERROR("server", "Start last phase");
             //re-set validator
             scheduler.SetValidator([this]{
                 return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -466,7 +465,6 @@ struct boss_kaelthas : public BossAI
 
     void ExecuteMiddleEvent()
     {
-        LOG_ERROR("server", "Middle event executed!");
         scheduler.ClearValidator();
         me->SetTarget();
         me->SetFacingTo(M_PI);
@@ -475,14 +473,12 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(2500ms, [&]
         {
             me->SetTarget();
-            LOG_ERROR("server", "Event 2");
             DoCastSelf(SPELL_KAEL_EXPLODES1, true);
             DoCastSelf(SPELL_KAEL_GAINING_POWER);
             me->SetDisableGravity(true);
         }, EVENT_SCENE_2);
         ScheduleUniqueTimedEvent(4000ms, [&]
         {
-            LOG_ERROR("server", "Event 3");
             me->SetTarget();
             for (uint8 i = 0; i < 2; ++i)
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -492,7 +488,6 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
         {
-            LOG_ERROR("server", "Event 4");
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES2, true);
@@ -503,7 +498,6 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_4);
         ScheduleUniqueTimedEvent(10000ms, [&]
         {
-            LOG_ERROR("server", "Event 5");
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES3, true);
@@ -514,21 +508,18 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_5);
         ScheduleUniqueTimedEvent(14000ms, [&]
         {
-            LOG_ERROR("server", "Event 6");
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES4, true);
             DoCastSelf(SPELL_NETHERBEAM_AURA3, true);
         }, EVENT_SCENE_6);
         ScheduleUniqueTimedEvent(17500ms, [&]
         {
-            LOG_ERROR("server", "Event 7");
             SetRoomState(GO_STATE_ACTIVE);
             me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
             me->SendMovementFlagUpdate();
         }, EVENT_SCENE_7);
         ScheduleUniqueTimedEvent(19000ms, [&]
         {
-            LOG_ERROR("server", "Event 8");
             summons.DespawnEntry(WORLD_TRIGGER);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA1);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
@@ -539,7 +530,6 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_8);
         ScheduleUniqueTimedEvent(22000ms, [&]
         {
-            LOG_ERROR("server", "Event 9");
             DoCastSelf(SPELL_DARK_BANISH_STATE, true);
             DoCastSelf(SPELL_ARCANE_EXPLOSION_VISUAL, true);
             me->SummonCreature(NPC_WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
@@ -550,7 +540,6 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_9);
         ScheduleUniqueTimedEvent(22800ms, [&]
         {
-            LOG_ERROR("server", "Event 10");
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() - 5, me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -558,13 +547,11 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_10);
         ScheduleUniqueTimedEvent(23600ms, [&]
         {
-            LOG_ERROR("server", "Event 11");
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM2, true);
         }, EVENT_SCENE_11);
         ScheduleUniqueTimedEvent(24500ms, [&]
         {
-            LOG_ERROR("server", "Event 12");
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY() - 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -572,19 +559,16 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_12);
         ScheduleUniqueTimedEvent(24800ms, [&]
         {
-            LOG_ERROR("server", "Event 13");
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() - 5, me->GetPositionY() + 5, me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM2, true);
         }, EVENT_SCENE_13);
         ScheduleUniqueTimedEvent(25300ms, [&]
         {
-            LOG_ERROR("server", "Event 14");
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX()-5, me->GetPositionY()+5, me->GetPositionZ()+15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
         }, EVENT_SCENE_14);
         ScheduleUniqueTimedEvent(32000ms, [&]
         {
-            LOG_ERROR("server", "Event 15");
             me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
             me->RemoveAurasDueToSpell(SPELL_KEAL_STUNNED);
             DoCastSelf(SPELL_KAEL_FULL_POWER);
@@ -597,8 +581,9 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_15);
         ScheduleUniqueTimedEvent(36000ms, [&]
         {
-            LOG_ERROR("server", "Event 16");
             summons.DespawnEntry(WORLD_TRIGGER);
+            me->CastStop();
+            me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
             me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
         }, EVENT_SCENE_16);
