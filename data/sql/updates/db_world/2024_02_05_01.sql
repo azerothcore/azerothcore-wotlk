@@ -1,3 +1,4 @@
+-- DB update 2024_02_05_00 -> 2024_02_05_01
 -- Update creature 25924 'Twilight Speaker Viktor' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 25924) AND (`guid` IN (245626));
