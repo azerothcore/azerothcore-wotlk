@@ -383,7 +383,7 @@ struct boss_kaelthas : public BossAI
                         }
                     });
                     ScheduleUniqueTimedEvent(2min, [&]{
-                        PhaseAllAdvisorsExecute(); 
+                        PhaseAllAdvisorsExecute();
                     }, EVENT_PREFIGHT_PHASE61);
                 }, EVENT_PREFIGHT_PHASE52);
                 break;
@@ -733,7 +733,7 @@ struct boss_kaelthas : public BossAI
     }
 
     void UpdateAI(uint32 diff) override
-    {   
+    {
         scheduler.Update(diff);
 
         if (!UpdateVictim())
@@ -854,7 +854,6 @@ struct npc_capernian : public ScriptedAI
             }
             _hasDied = true;
         }
-       
     }
 
     void UpdateAI(uint32 diff) override
