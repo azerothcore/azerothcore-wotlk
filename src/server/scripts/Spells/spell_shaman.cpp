@@ -992,7 +992,7 @@ class spell_sha_mana_spring_totem : public SpellScript
         int32 damage = GetEffectValue();
         if (Unit* target = GetHitUnit())
             if (Unit* caster = GetCaster())
-                if (target->getPowerType() == POWER_MANA)
+                if (target->HasActivePowerType(POWER_MANA))
                     caster->CastCustomSpell(target, SPELL_SHAMAN_MANA_SPRING_TOTEM_ENERGIZE, &damage, 0, 0, true, 0, 0, GetOriginalCaster()->GetGUID());
     }
 
@@ -1017,7 +1017,7 @@ class spell_sha_mana_tide_totem : public SpellScript
         if (Unit* caster = GetCaster())
             if (Unit* unitTarget = GetHitUnit())
             {
-                if (unitTarget->getPowerType() == POWER_MANA)
+                if (unitTarget->HasActivePowerType(POWER_MANA))
                 {
                     int32 effValue = GetEffectValue();
                     // Glyph of Mana Tide

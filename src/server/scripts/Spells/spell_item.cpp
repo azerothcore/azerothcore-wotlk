@@ -576,7 +576,7 @@ class spell_item_skull_of_impeding_doom : public AuraScript
 
     void CalculateManaLeechAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (!GetCaster() || GetCaster()->getPowerType() != POWER_MANA)
+        if (!GetCaster() || !GetCaster()->HasActivePowerType(POWER_MANA))
             return;
 
         amount = GetCaster()->GetMaxPower(POWER_MANA) * 0.12f; // 5 ticks which reduce health by 60%
