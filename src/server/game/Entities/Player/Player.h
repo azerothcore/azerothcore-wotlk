@@ -1170,6 +1170,8 @@ public:
 
     void InitStatsForLevel(bool reapplyMods = false);
 
+    [[nodiscard]] bool HasActivePowerType(Powers power) override;
+
     // .cheat command related
     [[nodiscard]] bool GetCommandStatus(uint32 command) const { return _activeCheats & command; }
     void SetCommandStatusOn(uint32 command) { _activeCheats |= command; }

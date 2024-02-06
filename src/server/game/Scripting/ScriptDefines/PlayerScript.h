@@ -324,6 +324,8 @@ public:
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
 
+    [[nodiscard]] virtual Optional<bool> OnPlayerHasActivePowerType(Player const* /*player*/, Powers /*power*/) { return std::nullopt; }
+
     /**
      * @brief This hook called before gathering skill gain is applied to the character.
      *

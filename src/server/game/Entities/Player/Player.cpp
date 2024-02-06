@@ -2714,6 +2714,15 @@ void Player::InitStatsForLevel(bool reapplyMods)
         pet->SynchronizeLevelWithOwner();
 }
 
+bool Player::HasActivePowerType(Powers power)
+{
+    Optional<bool> scriptResult = sScriptMgr->OnPlayerHasActivePowerType(this, power);
+    if (scriptResult != std::nullopt)
+        return *scriptResult;
+    else
+        return (getPowerType() == power);
+}
+
 void Player::SendInitialSpells()
 {
     uint32 curTime = GameTime::GetGameTimeMS().count();
