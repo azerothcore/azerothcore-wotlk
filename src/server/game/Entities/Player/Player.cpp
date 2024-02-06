@@ -1271,7 +1271,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
 bool Player::IsClass(Classes unitClass, ClassContext context) const
 {
-    Optional<bool> scriptResult = sScriptMgr->IsClass(this, unitClass, context);
+    Optional<bool> scriptResult = sScriptMgr->OnPlayerIsClass(this, unitClass, context);
     if (scriptResult != std::nullopt)
         return *scriptResult;
     else

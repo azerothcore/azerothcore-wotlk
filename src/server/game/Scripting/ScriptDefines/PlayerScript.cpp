@@ -1038,13 +1038,13 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
     return true;
 }
 
-Optional<bool> ScriptMgr::IsClass(Player const* player, Classes unitClass, ClassContext context)
+Optional<bool> ScriptMgr::OnPlayerIsClass(Player const* player, Classes unitClass, ClassContext context)
 {
     if (ScriptRegistry<PlayerScript>::ScriptPointerList.empty())
         return {};
     for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
     {
-        Optional<bool> scriptResult = script->IsClass(player, unitClass, context);
+        Optional<bool> scriptResult = script->OnPlayerIsClass(player, unitClass, context);
         if (scriptResult)
             return scriptResult;
     }
