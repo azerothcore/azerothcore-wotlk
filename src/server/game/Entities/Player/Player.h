@@ -771,6 +771,14 @@ struct ItemPosCount
 };
 typedef std::vector<ItemPosCount> ItemPosCountVec;
 
+struct SavedItem
+{
+    Item* item;
+    uint16 dstpos;
+
+    SavedItem(Item* _item, uint16 dstpos) : item(_item), dstpos(dstpos) {}
+};
+
 enum TransferAbortReason
 {
     TRANSFER_ABORT_NONE                     = 0x00,

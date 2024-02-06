@@ -45,7 +45,12 @@ enum Yells
     SAY_THALADRED_AGGRO                 = 0,
     SAY_SANGUINAR_AGGRO                 = 0,
     SAY_CAPERNIAN_AGGRO                 = 0,
-    SAY_TELONICUS_AGGRO                 = 0
+    SAY_TELONICUS_AGGRO                 = 0,
+    SAY_THALADRED_DEATH                 = 1,
+    SAY_SANGUINAR_DEATH                 = 1,
+    SAY_CAPERNIAN_DEATH                 = 1,
+    SAY_TELONICUS_DEATH                 = 1,
+    EMOTE_THALADRED_FIXATE              = 2
 };
 
 enum Spells
@@ -103,7 +108,28 @@ enum Spells
     SPELL_NETHER_BEAM                   = 35869,
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
-    SPELL_REMOTE_TOY_STUN               = 37029
+    SPELL_REMOTE_TOY_STUN               = 37029,
+
+    // Advisors
+    // Universal
+    SPELL_KAEL_PHASE_TWO                = 36709,
+
+    // Sanguinar
+    SPELL_BELLOWING_ROAR                = 44863,
+
+    // Capernian
+    SPELL_CAPERNIAN_FIREBALL            = 36971,
+    SPELL_CONFLAGRATION                 = 37018,
+    SPELL_ARCANE_BURST                  = 36970,
+
+    // Telonicus
+    SPELL_BOMB                          = 37036,
+    SPELL_REMOTE_TOY                    = 37027,
+
+    // Thaladred
+    SPELL_PSYCHIC_BLOW                  = 36966,
+    SPELL_REND                          = 36965,
+    SPELL_SILENCE                       = 30225
 };
 
 enum Misc
@@ -721,6 +747,204 @@ public:
     }
 };
 
+struct npc_lord_sanguinar : public ScriptedAI
+{
+    npc_lord_sanguinar(Creature* creature) : ScriptedAI(creature) {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(0s, [&]{
+            DoCastSelf(SPELL_BELLOWING_ROAR);
+        }, 15s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_SANGUINAR_DEATH);
+        DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_capernian : public ScriptedAI
+{
+    npc_capernian(Creature* creature) : ScriptedAI(creature) {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(0ms, [&]{
+            DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
+        }, 2500ms);
+        ScheduleTimedEvent(7000ms, 10000ms, [&]{
+            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 30.0f);
+        }, 18500ms, 20500ms);
+        ScheduleTimedEvent(3s, [&]{
+            DoCastRandomTarget(SPELL_ARCANE_BURST, 0, 8.0f);
+        }, 6s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_CAPERNIAN_DEATH);
+        DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_telonicus : public ScriptedAI
+{
+    npc_telonicus(Creature* creature) : ScriptedAI(creature) {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(0ms, [&]{
+            DoCastVictim(SPELL_BOMB);
+        }, 3600ms, 7100ms);
+        ScheduleTimedEvent(13250ms, [&]{
+            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 100.0f);
+        }, 15750ms);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_TELONICUS_DEATH);
+        DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_thaladred : public ScriptedAI
+{
+    npc_thaladred(Creature* creature) : ScriptedAI(creature) {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetWalk(true);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(100ms, [&]
+        {
+            DoResetThreatList();
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                me->AddThreat(target, 10000000.0f);
+                Talk(EMOTE_THALADRED_FIXATE, target);
+            }
+        }, 10000ms);
+        ScheduleTimedEvent(4000ms, 19350ms, [&]
+        {
+            DoCastVictim(SPELL_PSYCHIC_BLOW);
+        }, 15700ms, 48900ms);
+        ScheduleTimedEvent(3000ms, 6050ms, [&]
+        {
+            DoCastVictim(SPELL_REND);
+        }, 15700ms, 48900ms);
+        ScheduleTimedEvent(3000ms,6050ms, [&]
+        {
+            if (Unit* victim = me->GetVictim())
+            {
+                if (victim->IsNonMeleeSpellCast(false, false, true))
+                {
+                    DoCastVictim(SPELL_SILENCE);
+                }
+            }
+        }, 3600ms, 15200ms);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_THALADRED_DEATH);
+        DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 class spell_kaelthas_kael_phase_two : public SpellScriptLoader
 {
 public:
@@ -1052,6 +1276,10 @@ public:
 void AddSC_boss_kaelthas()
 {
     new boss_kaelthas();
+    RegisterTheEyeAI(npc_lord_sanguinar);
+    RegisterTheEyeAI(npc_capernian);
+    RegisterTheEyeAI(npc_telonicus);
+    RegisterTheEyeAI(npc_thaladred);
     new spell_kaelthas_kael_phase_two();
     new spell_kaelthas_remote_toy();
     new spell_kaelthas_summon_weapons();

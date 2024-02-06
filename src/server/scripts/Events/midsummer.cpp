@@ -485,6 +485,27 @@ struct npc_midsummer_torch_target : public ScriptedAI
 // SPELLS
 ///////////////////////////////
 
+class spell_fire_festival_fortitude : public SpellScript
+{
+    PrepareSpellScript(spell_fire_festival_fortitude)
+
+    void SelectTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+
+        GetCaster()->GetMap()->DoForAllPlayers([&](Player* p)
+            {
+                if (p->GetZoneId() == GetCaster()->GetZoneId())
+                    targets.push_back(p);
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fire_festival_fortitude::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+    }
+};
+
 class spell_bonfires_blessing : public AuraScript
 {
     PrepareAuraScript(spell_bonfires_blessing)
@@ -1249,6 +1270,7 @@ void AddSC_event_midsummer_scripts()
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 
     // Spells
+    RegisterSpellScript(spell_fire_festival_fortitude);
     RegisterSpellScript(spell_bonfires_blessing);
     RegisterSpellScript(spell_gen_crab_disguise);
     RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
