@@ -258,7 +258,7 @@ elseif (MSVC)
       file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _programfiles)
     endif()
     set(_OPENSSL_ROOT_HINTS HINTS "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (32-bit)_is1;Inno Setup: App Path]")
-	set(_OPENSSL_MSI_INSTALL_GUIDS "A1EEC576-43B9-4E75-9E02-03DA542D2A38" "31D2408A-9CAE-4988-9EC3-F40FDE7D6AE5")
+    set(_OPENSSL_MSI_INSTALL_GUIDS "A1EEC576-43B9-4E75-9E02-03DA542D2A38" "31D2408A-9CAE-4988-9EC3-F40FDE7D6AE5")
   endif()
 
   # If OpenSSL was installed using .msi package instead of .exe, Inno Setup registry values are not written to Uninstall\OpenSSL
