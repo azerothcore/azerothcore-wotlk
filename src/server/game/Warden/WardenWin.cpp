@@ -266,6 +266,7 @@ void WardenWin::ForceChecks()
 {
     if (_dataSent)
     {
+        _interrupted = true;
         _interruptCounter++;
     }
 
