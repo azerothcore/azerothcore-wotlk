@@ -20,6 +20,21 @@
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_KAELTHAS,         DATA_KAELTHAS       },
+    { NPC_THALADRED,        DATA_THALADRED      },
+    { NPC_LORD_SANGUINAR,   DATA_LORD_SANGUINAR },
+    { NPC_CAPERNIAN,        DATA_CAPERNIAN      },
+    { NPC_TELONICUS,        DATA_TELONICUS      },
+    { 0,                    0                   }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,               0                 }
+};
+
 class instance_the_eye : public InstanceMapScript
 {
 public:
@@ -30,6 +45,7 @@ public:
         instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            LoadObjectData(creatureData, gameObjectData);
             SetBossNumber(MAX_ENCOUNTER);
         }
 
@@ -66,6 +82,7 @@ public:
                     LordSanguinarGUID = creature->GetGUID();
                     break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* gobject) override
@@ -98,14 +115,6 @@ public:
                     return AlarGUID;
                 case NPC_KAELTHAS:
                     return KaelthasGUID;
-                case DATA_KAEL_ADVISOR1:
-                    return ThaladredTheDarkenerGUID;
-                case DATA_KAEL_ADVISOR2:
-                    return LordSanguinarGUID;
-                case DATA_KAEL_ADVISOR3:
-                    return GrandAstromancerCapernianGUID;
-                case DATA_KAEL_ADVISOR4:
-                    return MasterEngineerTelonicusGUID;
             }
 
             return ObjectGuid::Empty;
