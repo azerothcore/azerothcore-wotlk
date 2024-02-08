@@ -992,11 +992,11 @@ void ScriptMgr::PetitionShowList(Player* player, Creature* creature, uint32& Cha
     });
 }
 
-void ScriptMgr::OnRewardKillRewarder(Player* player, bool isDungeon, float& rate)
+void ScriptMgr::OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnRewardKillRewarder(player, isDungeon, rate);
+        script->OnRewardKillRewarder(player, rewarder, isDungeon, rate);
     });
 }
 
