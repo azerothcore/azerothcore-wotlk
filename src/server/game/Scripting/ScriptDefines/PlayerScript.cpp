@@ -1046,17 +1046,19 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     });
 }
 
-Optional<bool> ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
+bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
 {
-    if (ScriptRegistry<PlayerScript>::ScriptPointerList.empty())
-        return {};
-    for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return script->OnPlayerHasActivePowerType(player, power);
+        });
+
+    if (ret && *ret)
     {
-        Optional<bool> scriptResult = script->OnPlayerHasActivePowerType(player, power);
-        if (scriptResult)
-            return scriptResult;
+        return true;
     }
-    return {};
+
+    return false;
 }
 
 void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {

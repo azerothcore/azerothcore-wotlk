@@ -2715,9 +2715,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 bool Player::HasActivePowerType(Powers power)
 {
-    Optional<bool> scriptResult = sScriptMgr->OnPlayerHasActivePowerType(this, power);
-    if (scriptResult != std::nullopt)
-        return *scriptResult;
+    if (sScriptMgr->OnPlayerHasActivePowerType(this, power))
+        return true;
     else
         return (getPowerType() == power);
 }
