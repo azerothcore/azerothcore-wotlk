@@ -264,13 +264,10 @@ bool WardenWin::IsCheckInProgress()
 */
 void WardenWin::ForceChecks()
 {
-    if (_dataSent && !_interrupted)
+    if (_dataSent)
     {
         _interruptCounter++;
     }
-
-    _interrupted = true;
-    _interruptCounter++;
 
     RequestChecks();
 }
