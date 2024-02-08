@@ -68,6 +68,7 @@ struct boss_high_astromancer_solarian : public BossAI
 
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
+            me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_VOID_BOLT);
@@ -109,10 +110,21 @@ struct boss_high_astromancer_solarian : public BossAI
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
         me->CallForHelp(105.0f);
+        me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
+            me->GetMotionMaster()->Clear();
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+            {
+                DoCast(target, SPELL_ARCANE_MISSILES);
+            }
+            else
+            {
+                //no targets in required range
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 30.0f);
+                me->CastStop();
+            }
             context.Repeat(800ms, 7300ms);
         }).Schedule(21800ms, [this](TaskContext context)
         {
