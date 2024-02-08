@@ -69,7 +69,6 @@ struct boss_high_astromancer_solarian : public BossAI
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
             me->ResumeChasingVictim();
-            
             scheduler.Schedule(3s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_VOID_BOLT);
