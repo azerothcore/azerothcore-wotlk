@@ -227,7 +227,11 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
     uint32 _s = getMSTime();
 
+    #ifdef __APPLE__
+    if mysql_stmt_bind_named_param(msql_STMT, msql_BIND))
+    #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+    #endif
     {
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
