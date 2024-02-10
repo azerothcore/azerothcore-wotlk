@@ -228,7 +228,7 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
     uint32 _s = getMSTime();
 
 #ifdef __APPLE__
-    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetNumParameters(), nullptr))
+    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
 #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
 #endif
