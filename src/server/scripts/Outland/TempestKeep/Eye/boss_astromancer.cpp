@@ -65,7 +65,6 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         BossAI::Reset();
         me->SetModelVisible(true);
-        me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
