@@ -401,6 +401,7 @@ public: /* PlayerScript */
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
+    std::optional<bool> OnPlayerIsClass(Player const* player, Classes playerClass, ClassContext context);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool OnPlayerHasActivePowerType(Player const* player, Powers power);
     void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);

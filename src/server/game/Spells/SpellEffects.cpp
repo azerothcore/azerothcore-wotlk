@@ -3077,7 +3077,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     if (creatureTarget->IsPet())
         return;
 
-    if (m_caster->getClass() != CLASS_HUNTER)
+    if (!m_caster->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
         return;
 
     // cast finish successfully
@@ -3209,7 +3209,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     // Reset cooldowns
-    if (owner->getClass() != CLASS_HUNTER)
+    if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
     {
         pet->m_CreatureSpellCooldowns.clear();
         owner->PetSpellInitialize();
@@ -5746,7 +5746,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
     Player* player = m_caster->ToPlayer();
 
-    if (player->getClass() != CLASS_DEATH_KNIGHT)
+    if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
         return;
 
     // needed later
@@ -5814,7 +5814,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->GetPetGUID() || unitTarget->getClass() != CLASS_HUNTER)
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->GetPetGUID() || !unitTarget->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
         return;
 
     uint32 creatureEntry = m_spellInfo->Effects[effIndex].MiscValue;
