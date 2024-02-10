@@ -172,6 +172,7 @@ struct boss_alar : public BossAI
         if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
         {
             damage = 0;
+            me->SetReactState(REACT_PASSIVE);
             scheduler.CancelAll();
             me->InterruptNonMeleeSpells(false);
             DoCastSelf(SPELL_EMBER_BLAST, true);
@@ -190,8 +191,6 @@ struct boss_alar : public BossAI
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 ScheduleAbilities();
             }, EVENT_REBIRTH);
-            me->SetReactState(REACT_PASSIVE);
-
         }
     }
 
