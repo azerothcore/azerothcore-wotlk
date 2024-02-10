@@ -1,5 +1,4 @@
 --
-
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 181598;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 181598) AND (`source_type` = 1) AND (`id` IN (0));
