@@ -188,11 +188,10 @@ struct boss_alar : public BossAI
             }, EVENT_RELOCATE_MIDDLE);
             ScheduleUniqueTimedEvent(12s, [&]
             {
-                me->RemoveAurasDueToSpell(SPELL_EMBER_BLAST);
+                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
             }, EVENT_MOVE_TO_PHASE_2);
             ScheduleUniqueTimedEvent(16001ms, [&]{
-                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 me->SetReactState(REACT_AGGRESSIVE);
                 _platform = POINT_MIDDLE;
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
