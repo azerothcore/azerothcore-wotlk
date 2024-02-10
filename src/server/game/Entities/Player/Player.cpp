@@ -600,13 +600,13 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitPrimaryProfessions();                               // to max set before any spell added
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
-    if (getPowerType() == POWER_MANA)
+    if (HasActivePowerType(POWER_MANA))
     {
         UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     }
 
-    if (getPowerType() == POWER_RUNIC_POWER)
+    if (HasActivePowerType(POWER_RUNIC_POWER))
     {
         SetPower(POWER_RUNE, 8);
         SetMaxPower(POWER_RUNE, 8);
@@ -2056,22 +2056,21 @@ void Player::RegenerateHealth()
 void Player::ResetAllPowers()
 {
     SetHealth(GetMaxHealth());
-    switch (getPowerType())
+    if (HasActivePowerType(POWER_MANA))
     {
-        case POWER_MANA:
-            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-            break;
-        case POWER_RAGE:
-            SetPower(POWER_RAGE, 0);
-            break;
-        case POWER_ENERGY:
-            SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-            break;
-        case POWER_RUNIC_POWER:
-            SetPower(POWER_RUNIC_POWER, 0);
-            break;
-        default:
-            break;
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    }
+    if (HasActivePowerType(POWER_RAGE))
+    {
+        SetPower(POWER_RAGE, 0);
+    }
+    if (HasActivePowerType(POWER_ENERGY))
+    {
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+    }
+    if (HasActivePowerType(POWER_RUNIC_POWER))
+    {
+        SetPower(POWER_RUNIC_POWER, 0);
     }
 }
 
@@ -2808,6 +2807,14 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
+}
+
+bool Player::HasActivePowerType(Powers power)
+{
+    if (sScriptMgr->OnPlayerHasActivePowerType(this, power))
+        return true;
+    else
+        return (getPowerType() == power);
 }
 
 void Player::SendInitialSpells()

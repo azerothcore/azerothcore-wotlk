@@ -485,6 +485,27 @@ struct npc_midsummer_torch_target : public ScriptedAI
 // SPELLS
 ///////////////////////////////
 
+class spell_fire_festival_fortitude : public SpellScript
+{
+    PrepareSpellScript(spell_fire_festival_fortitude)
+
+    void SelectTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+
+        GetCaster()->GetMap()->DoForAllPlayers([&](Player* p)
+            {
+                if (p->GetZoneId() == GetCaster()->GetZoneId())
+                    targets.push_back(p);
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_fire_festival_fortitude::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+    }
+};
+
 class spell_bonfires_blessing : public AuraScript
 {
     PrepareAuraScript(spell_bonfires_blessing)
@@ -1195,6 +1216,49 @@ class spell_midsummer_torch_catch : public SpellScript
     }
 };
 
+// 46592 - Summon Ahune Lieutenant
+class spell_midsummer_summon_ahune_lieutenant : public SpellScript
+{
+    PrepareSpellScript(spell_midsummer_summon_ahune_lieutenant);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        uint32 zoneId = caster->GetZoneId();
+        uint32 npcEntry = 0;
+
+        switch (zoneId)
+        {
+        case 331: // Ashenvale
+            npcEntry = 26116; // Frostwave Lieutenant
+            break;
+        case 405: // Desolace
+            npcEntry = 26178; // Hailstone Lieutenant
+            break;
+        case 33: // Stranglethorn Vale
+            npcEntry = 26204; // Chillwind Lieutenant
+            break;
+        case 51: // Searing Gorge
+            npcEntry = 26214; // Frigid Lieutenant
+            break;
+        case 1377: // Silithus
+            npcEntry = 26215; // Glacial Lieutenant
+            break;
+        case 3483: // Hellfire Peninsula
+            npcEntry = 26216; // Glacial Templar
+            break;
+        }
+
+        if (npcEntry)
+            caster->SummonCreature(npcEntry, caster->GetPosition(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, MINUTE * IN_MILLISECONDS);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_midsummer_summon_ahune_lieutenant::HandleDummy, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_event_midsummer_scripts()
 {
     // Player
@@ -1206,6 +1270,7 @@ void AddSC_event_midsummer_scripts()
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 
     // Spells
+    RegisterSpellScript(spell_fire_festival_fortitude);
     RegisterSpellScript(spell_bonfires_blessing);
     RegisterSpellScript(spell_gen_crab_disguise);
     RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
@@ -1215,5 +1280,6 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
+    RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
 }
 

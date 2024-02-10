@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,11 +19,11 @@ DROP TABLE IF EXISTS `log_arena_memberstats`;
 CREATE TABLE IF NOT EXISTS `log_arena_memberstats` (
   `fight_id` int unsigned NOT NULL,
   `member_id` tinyint unsigned NOT NULL,
-  `name` char(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` char(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `guid` int unsigned NOT NULL,
   `team` int unsigned NOT NULL,
   `account` int unsigned NOT NULL,
-  `ip` char(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `damage` int unsigned NOT NULL,
   `heal` int unsigned NOT NULL,
   `kblows` int unsigned NOT NULL,
