@@ -238,14 +238,6 @@ struct boss_alar : public BossAI
         }
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
-    {
-        if (summon->GetEntry() == NPC_EMBER_OF_ALAR)
-        {
-            me->SetHealth(me->GetMaxHealth()-(me->GetMaxHealth()*0.02));
-        }
-    }
-
     void DoDiveBomb()
     {
         scheduler.Schedule(2s, [this](TaskContext)
@@ -360,7 +352,7 @@ private:
     uint32 _spellId;
 };
 
-class spell_alar_flame_quils : public AuraScript
+class spell_alar_flame_quills : public AuraScript
 {
     PrepareAuraScript(spell_alar_flame_quills);
 
@@ -390,8 +382,12 @@ class spell_alar_ember_blast : public SpellScript
     {
         PreventHitEffect(effIndex);
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-            if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_ALAR)))
+        {
+            if (Creature* alar = instance->GetCreature(DATA_ALAR))
+            {
                 Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
+            }
+        }       
     }
 
     void Register() override
