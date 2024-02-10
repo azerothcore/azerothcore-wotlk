@@ -181,10 +181,8 @@ struct boss_alar : public BossAI
             damage = 0;
             scheduler.CancelAll();
             me->InterruptNonMeleeSpells(false);
-            me->SetHealth(me->GetMaxHealth());
-            me->SetReactState(REACT_PASSIVE);
-            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             DoCastSelf(SPELL_EMBER_BLAST, true);
+            me->SetHealth(me->GetMaxHealth());
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
             }, EVENT_RELOCATE_MIDDLE);
@@ -194,11 +192,13 @@ struct boss_alar : public BossAI
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
             }, EVENT_MOVE_TO_PHASE_2);
             ScheduleUniqueTimedEvent(16001ms, [&]{
+                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 me->SetReactState(REACT_AGGRESSIVE);
                 _platform = POINT_MIDDLE;
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 ScheduleAbilities();
             }, EVENT_REBIRTH);
+            me->SetReactState(REACT_PASSIVE);
 
         }
     }
@@ -241,6 +241,14 @@ struct boss_alar : public BossAI
             {
                 me->SummonCreature(NPC_EMBER_OF_ALAR, *targetToSpawnAt, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
             }
+        }
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit*) override
+    {
+        if (summon->GetEntry() == NPC_EMBER_OF_ALAR)
+        {
+            me->SetHealth(me->GetMaxHealth()-(me->GetMaxHealth()*0.02));
         }
     }
 
