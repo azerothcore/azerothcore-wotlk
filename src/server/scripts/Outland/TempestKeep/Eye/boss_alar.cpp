@@ -126,14 +126,14 @@ struct boss_alar : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        ScheduleTimedEvent(0s, [&]
+        scheduler.Schedule(0s, [this](TaskContext context)
         {
             if (roll_chance_i(20 * _noQuillTimes))
             {
                 _noQuillTimes = 0;
                 _platformRoll = RAND(0, 1);
                 _platform = _platformRoll ? 0 : 3;
-                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[_platform], false, true);
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
             }
             else
@@ -143,11 +143,12 @@ struct boss_alar : public BossAI
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
                     SpawnPhoenixes(1, me);
                 }
-                _platform = (_platform+1)%4;
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                _platformMoveRepeatTimer
+                _platform = (_platform+1)%4;
+                _platformMoveRepeatTimer = 30s;
             }
-        }, _platformMoveRepeatTimer);
+            context.Repeat(_platformMoveRepeatTimer);
+        });
         ScheduleMainSpellAttack(0s);
     }
 
