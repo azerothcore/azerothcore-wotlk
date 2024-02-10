@@ -46,7 +46,6 @@ enum GossipHBD {
     GOSSIP_HBD3 = 4,
 };
 
-
 class npc_braug_dimspirit : public CreatureScript
 {
 public:
