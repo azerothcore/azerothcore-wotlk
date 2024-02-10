@@ -46,8 +46,8 @@ const Position alarPoints[9] =
     {388.751007f, 31.731199f, 20.263599f, 1.61f},
     {388.790985f, -33.105900f, 20.263599f, 0.52f},
     {332.722992f, -61.159f, 17.979099f, 5.71f},
-    {258.959015f, -38.687099f, 20.262899f, 5.21f},
-    {259.2277997, 35.879002f, 20.263f, 4.81f}, //sixth platform
+    {258.959015f, -38.687099f, 20.262899f, 5.21f}, //pre-nerf only
+    {259.2277997, 35.879002f, 20.263f, 4.81f}, //pre-nerf only
     {332.0f, 0.01f, 43.0f, 0.0f}, //quill
     {331.0f, 0.01f, -2.38f, 0.0f}, //middle (p2)
     {332.0f, 0.01f, 43.0f, 0.0f} // dive
@@ -131,8 +131,9 @@ struct boss_alar : public BossAI
             if (roll_chance_i(20 * _noQuillTimes))
             {
                 _noQuillTimes = 0;
-                _platform = RAND(0, 5);
-                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
+                _platformRoll = RAND(0, 1);
+                _platform = _platformRoll ? 0 : 3;
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[_platform], false, true);
                 _platformMoveRepeatTimer = 16s;
             }
             else
@@ -140,29 +141,11 @@ struct boss_alar : public BossAI
                 if (_noQuillTimes++ > 0)
                 {
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
-                    if (_spawnPhoenixes)
-                    {
-                        SpawnPhoenixes(3, me);
-                    }
+                    SpawnPhoenixes(1, me);
                 }
+                _platform = (_platform+1)%4;
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                _platformRoll = RAND(0, 2);
-                switch(_platformRoll)
-                {
-                    case DIRECTION_ANTI_CLOCKWISE:
-                        _platform = (_platform+5)%6;
-                        _spawnPhoenixes = false;
-                        break;
-                    case DIRECTION_CLOCKWISE:
-                        _platform = (_platform+1)%6;
-                        _spawnPhoenixes = false;
-                        break;
-                    case DIRECTION_ACROSS:
-                        _platform = (_platform+3)%6;
-                        _spawnPhoenixes = true;
-                        break;
-                }
-                _platformMoveRepeatTimer = 30s;
+                _platformMoveRepeatTimer
             }
         }, _platformMoveRepeatTimer);
         ScheduleMainSpellAttack(0s);
@@ -195,12 +178,12 @@ struct boss_alar : public BossAI
         if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
         {
             damage = 0;
+            scheduler.CancelAll();
             me->InterruptNonMeleeSpells(false);
             me->SetHealth(me->GetMaxHealth());
             me->SetReactState(REACT_PASSIVE);
-            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS);
+            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             DoCastSelf(SPELL_EMBER_BLAST, true);
-            scheduler.CancelAll();
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
             }, EVENT_RELOCATE_MIDDLE);
