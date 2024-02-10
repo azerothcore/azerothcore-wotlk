@@ -37,11 +37,15 @@ EndContentData */
 ## npc_braug_dimspirit
 ######*/
 
-#define GOSSIP_HBD1 "Ysera"
-#define GOSSIP_HBD2 "Neltharion"
-#define GOSSIP_HBD3 "Nozdormu"
-#define GOSSIP_HBD4 "Alexstrasza"
-#define GOSSIP_HBD5 "Malygos"
+enum GossipHBD {
+    GOSSIP_HBD_MENU = 4763,
+    GOSSIP_HBD1 = 0,
+    GOSSIP_HBD2 = 1,
+    GOSSIP_HBD4 = 2,
+    GOSSIP_HBD5 = 3,
+    GOSSIP_HBD3 = 4,
+};
+
 
 class npc_braug_dimspirit : public CreatureScript
 {
@@ -71,11 +75,11 @@ public:
 
         if (player->GetQuestStatus(6627) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_HBD_MENU, GOSSIP_HBD1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_HBD_MENU, GOSSIP_HBD2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_HBD_MENU, GOSSIP_HBD3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_HBD_MENU, GOSSIP_HBD4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_HBD_MENU, GOSSIP_HBD5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, 5820, creature->GetGUID());
         }
