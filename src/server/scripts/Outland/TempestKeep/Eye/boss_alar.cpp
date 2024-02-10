@@ -72,13 +72,6 @@ enum Misc
     EVENT_FINISH_DIVE           = 5
 };
 
-enum PlatformMoveDirections
-{
-    DIRECTION_ANTI_CLOCKWISE    = 0,
-    DIRECTION_CLOCKWISE         = 1,
-    DIRECTION_ACROSS            = 2
-};
-
 enum GroupAlar
 {
     GROUP_FLAME_BUFFET          = 1
