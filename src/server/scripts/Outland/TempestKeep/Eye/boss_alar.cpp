@@ -174,11 +174,11 @@ struct boss_alar : public BossAI
             damage = 0;
             me->SetReactState(REACT_PASSIVE);
             scheduler.CancelAll();
-            me->CastStop(0, true);
+            me->CastStop();
             me->SetHealth(me->GetMaxHealth());
             scheduler.Schedule(1s, [this](TaskContext)
             {
-                DoCastSelf(SPELL_EMBER_BLAST, true);
+                DoCastSelf(SPELL_EMBER_BLAST, true); //spellscript doesn't trigger
             });
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
@@ -387,7 +387,7 @@ class spell_alar_ember_blast : public SpellScript
             {
                 Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
             }
-        }       
+        }
     }
 
     void Register() override
