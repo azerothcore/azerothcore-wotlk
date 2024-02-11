@@ -3529,11 +3529,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         return SPELL_FAILED_SPELL_IN_PROGRESS;
     }
 
-    if (m_spellInfo->Id == 34341)
-    {
-        LOG_ERROR("server", "reached part where spellscripts are loaded for ember blast part 1");
-    }
-
     LoadScripts();
 
     OnSpellLaunch();
@@ -8459,10 +8454,6 @@ void Spell::CheckEffectExecuteData()
 
 void Spell::LoadScripts()
 {
-    if (m_spellInfo->Id == 34341)
-    {
-        LOG_ERROR("server", "reached part where spellscripts are loaded for ember blast part 2");
-    }
     if (_scriptsLoaded)
         return;
     _scriptsLoaded = true;
