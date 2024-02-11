@@ -176,19 +176,14 @@ struct boss_alar : public BossAI
             scheduler.CancelAll();
             me->CastStop();
             me->SetHealth(me->GetMaxHealth());
-            scheduler.Schedule(1s, [this](TaskContext)
-            {
-                DoCastSelf(SPELL_EMBER_BLAST, true); //spellscript doesn't trigger
-            });
+            DoCastSelf(SPELL_EMBER_BLAST, true); //spellscript doesn't trigger
+
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
             }, EVENT_RELOCATE_MIDDLE);
             ScheduleUniqueTimedEvent(12s, [&]
             {
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                me->SetModelVisible(true);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
             }, EVENT_MOVE_TO_PHASE_2);
             ScheduleUniqueTimedEvent(16001ms, [&]{
@@ -399,24 +394,34 @@ class spell_alar_ember_blast : public SpellScript
     }
 };
 
-class spell_alar_ember_blast_death : public SpellScript
+class spell_alar_ember_blast_death : public AuraScript
 {
-    PrepareSpellScript(spell_alar_ember_blast_death);
+    PrepareAuraScript(spell_alar_ember_blast_death);
 
-    void HandleScriptEffect(SpellEffIndex effIndex)
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PreventHitDefaultEffect(effIndex);
-        GetCaster()->SetModelVisible(false);
+        PreventDefaultAction(); // xinef: prevent default action after change that invisibility in instances is executed instantly even for creatures
+        Unit* target = GetTarget();
+        InvisibilityType type = InvisibilityType(aurEff->GetMiscValue());
+        target->m_invisibility.AddFlag(type);
+        target->m_invisibility.AddValue(type, aurEff->GetAmount());
 
-        GetCaster()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        GetCaster()->SetStandState(UNIT_STAND_STATE_DEAD);
-        GetCaster()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        GetCaster()->m_delayed_unit_relocation_timer = 1000;
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
+        GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+        GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast_death::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
