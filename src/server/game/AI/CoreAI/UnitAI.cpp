@@ -228,26 +228,11 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
 
 SpellCastResult UnitAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
-    if (spellId == 34341)
-    {
-        LOG_ERROR("server", "ember blast being cast!");
-    }
-
     if (!victim)
         return SPELL_FAILED_BAD_TARGETS;
 
-    if (spellId == 34341)
-    {
-        LOG_ERROR("server", "not bad targets");
-    }
-
     if (me->HasUnitState(UNIT_STATE_CASTING) && !triggered)
         return SPELL_FAILED_SPELL_IN_PROGRESS;
-
-    if (spellId == 34341)
-    {
-        LOG_ERROR("server", "no spell in progress");
-    }
 
     return me->CastSpell(victim, spellId, triggered);
 }

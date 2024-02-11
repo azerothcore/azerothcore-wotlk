@@ -8467,10 +8467,6 @@ void Spell::LoadScripts()
         return;
     _scriptsLoaded = true;
     sScriptMgr->CreateSpellScripts(m_spellInfo->Id, m_loadedScripts);
-    if (m_spellInfo->Id == 34341)
-    {
-        LOG_ERROR("server", "created {} spell scripts", std::to_string(m_loadedScripts.size()));
-    }
     for (std::list<SpellScript*>::iterator itr = m_loadedScripts.begin(); itr != m_loadedScripts.end();)
     {
         if (!(*itr)->_Load(this))
@@ -8481,18 +8477,11 @@ void Spell::LoadScripts()
             m_loadedScripts.erase(bitr);
             continue;
         }
-        if (m_spellInfo->Id  == 34341)
-        {
-            LOG_ERROR("server", "Spell::LoadScripts: Script `{}` for spell `{}` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
-        }
 
         LOG_DEBUG("spells.aura", "Spell::LoadScripts: Script `{}` for spell `{}` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
         (*itr)->Register();
         ++itr;
     }
-
-   
-    LOG_ERROR("server", "amount of spells loaded {}", std::to_string(m_loadedScripts.size()));
 }
 
 void Spell::CallScriptBeforeCastHandlers()
