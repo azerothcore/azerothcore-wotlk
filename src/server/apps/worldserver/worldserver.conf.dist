@@ -3069,9 +3069,9 @@ Rate.RepairCost = 1
 #        Description: Should the player leave their group when they log out?
 #                     (It does not affect raids or dungeon finder groups)
 #
-#        Default:     1 - (Enabled)
+#        Default:     0 - (Disabled)
 
-LeaveGroupOnLogout.Enabled = 1
+LeaveGroupOnLogout.Enabled = 0
 
 #
 #    Group.Raid.LevelRestriction

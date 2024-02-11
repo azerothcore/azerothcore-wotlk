@@ -140,7 +140,7 @@ public:
         uint8 oldLevel = playerTarget->GetLevel();
 
         // set starting level
-        uint32 startLevel = playerTarget->getClass() != CLASS_DEATH_KNIGHT
+        uint32 startLevel = !playerTarget->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT)
                             ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                             : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 

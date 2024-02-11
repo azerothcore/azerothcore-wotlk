@@ -853,12 +853,12 @@ public:
         {
             if (p->getPowerType() != POWER_MANA)
                 return true;
-            if (p->getClass() == CLASS_HUNTER)
+            if (p->IsClass(CLASS_HUNTER))
                 return true;
             uint8 maxIndex = p->GetMostPointsTalentTree();
-            if ((p->getClass() == CLASS_PALADIN && maxIndex >= 1) || (p->getClass() == CLASS_SHAMAN && maxIndex == 1) || (p->getClass() == CLASS_DRUID && maxIndex == 1))
+            if ((p->IsClass(CLASS_PALADIN) && maxIndex >= 1) || (p->IsClass(CLASS_SHAMAN) && maxIndex == 1) || (p->IsClass(CLASS_DRUID) && maxIndex == 1))
                 return true;
-            if (_removeHealers == ((p->getClass() == CLASS_DRUID && maxIndex == 2) || (p->getClass() == CLASS_PALADIN && maxIndex == 0) || (p->getClass() == CLASS_PRIEST && maxIndex <= 1) || (p->getClass() == CLASS_SHAMAN && maxIndex == 2)))
+            if (_removeHealers == ((p->IsClass(CLASS_DRUID) && maxIndex == 2) || (p->IsClass(CLASS_PALADIN) && maxIndex == 0) || (p->IsClass(CLASS_PRIEST) && maxIndex <= 1) || (p->IsClass(CLASS_SHAMAN) && maxIndex == 2)))
                 return true;
 
             return false;
