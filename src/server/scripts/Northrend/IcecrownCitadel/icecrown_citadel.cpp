@@ -2856,8 +2856,7 @@ public:
                 {
                     c->AI()->AttackStart(target);
                     DoZoneInCombat(c);
-                    uint8 Class = target->getClass();
-                    if (Class != CLASS_DRUID)
+                    if (!target->IsClass(CLASS_DRUID))
                         if (Player* p = target->ToPlayer())
                         {
                             if (Item* i = p->GetWeaponForAttack(BASE_ATTACK))
@@ -2869,7 +2868,7 @@ public:
 
                             target->CastSpell(c, 60352, true); // Mirror Image, clone visual appearance
                         }
-                    c->AI()->DoAction(Class);
+                    c->AI()->DoAction(target->getClass());
                 }
             }
         }

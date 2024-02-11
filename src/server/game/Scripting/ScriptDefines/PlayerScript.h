@@ -22,6 +22,7 @@
 
 // TODO to remove
 #include "AchievementMgr.h"
+#include "KillRewarder.h"
 
 class PlayerScript : public ScriptObject
 {
@@ -314,13 +315,15 @@ public:
 
     virtual void PetitionShowList(Player* /*player*/, Creature* /*creature*/, uint32& /*CharterEntry*/, uint32& /*CharterDispayID*/, uint32& /*CharterCost*/) { }
 
-    virtual void OnRewardKillRewarder(Player* /*player*/, bool /*isDungeon*/, float& /*rate*/) { }
+    virtual void OnRewardKillRewarder(Player* /*player*/, KillRewarder* /*rewarder*/, bool /*isDungeon*/, float& /*rate*/) { }
 
     [[nodiscard]] virtual bool CanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
 
     virtual void OnDeleteFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*guid*/) { }
 
     [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
+
+    [[nodiscard]] virtual Optional<bool> OnPlayerIsClass(Player const* /*player*/, Classes /*playerClass*/, ClassContext /*context*/) { return std::nullopt; }
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
 
