@@ -395,6 +395,7 @@ class spell_alar_ember_blast : public SpellScript
 
     void Register() override
     {
+        LOG_ERROR("server", "ember blast spellscript of ember of Al'ar registered");
         OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast::HandleForceCast, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
     }
 };
@@ -426,6 +427,7 @@ class spell_alar_ember_blast_death : public AuraScript
 
     void Register() override
     {
+        LOG_ERROR("server", "ember blast spellscript of Al'ar registered");
         OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
     }

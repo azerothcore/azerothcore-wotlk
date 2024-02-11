@@ -29,7 +29,23 @@ void ScriptMgr::CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scri
         if (!tempScript)
             continue;
 
+        if (spellId == 34341)
+        {
+            if (tempScript)
+                LOG_ERROR("server", "created spell tempscript ember blast. size of scriptvector {}", std::to_string(scriptVector.size()));
+            else
+                LOG_ERROR("server", "failed to make temp spellscript for ember blast");
+        }
+
         SpellScript* script = tempScript->GetSpellScript();
+
+        if (spellId == 34341)
+        {
+            if (script)
+                LOG_ERROR("server", "created spell script ember blast. size of scriptvector {}", std::to_string(scriptVector.size()));
+            else
+                LOG_ERROR("server", "failed to make spellscript for ember blast");
+        }
 
         if (!script)
             continue;
@@ -51,6 +67,14 @@ void ScriptMgr::CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& script
             continue;
 
         AuraScript* script = tempScript->GetAuraScript();
+
+        if (spellId == 34341)
+        {
+            if (script)
+                LOG_ERROR("server", "created aura script ember blast. size of scriptvector {}", std::to_string(scriptVector.size()));
+            else
+                LOG_ERROR("server", "failed to make aura script for ember blast");
+        }
 
         if (!script)
             continue;
