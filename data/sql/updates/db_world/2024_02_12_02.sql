@@ -1,3 +1,4 @@
+-- DB update 2024_02_12_01 -> 2024_02_12_02
 -- Update gameobject 201716 'Chemical Wagon' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` = 201716) AND (`guid` IN (242298, 242308, 242309, 242310, 242311, 242312, 242313, 242314, 242315, 242316, 242317, 242318, 242319));
