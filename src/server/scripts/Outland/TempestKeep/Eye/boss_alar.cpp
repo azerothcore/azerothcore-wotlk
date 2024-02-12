@@ -301,7 +301,7 @@ struct boss_alar : public BossAI
     {
         scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
         {
-            if (!me->IsWithinMeleeRange(me->GetVictim()) && !me->isMoving())
+            if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
             {
                 DoCastVictim(SPELL_FLAME_BUFFET);
             }
