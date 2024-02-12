@@ -1,3 +1,4 @@
+-- DB update 2024_02_12_04 -> 2024_02_12_05
 --
 
 UPDATE `creature_text` SET `BroadcastTextId`=1925 WHERE `CreatureID`=1717 AND `GroupID`=0 AND `ID`=0;
