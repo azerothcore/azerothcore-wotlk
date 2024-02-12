@@ -46,8 +46,8 @@ const Position alarPoints[9] =
     {388.751007f, 31.731199f, 20.263599f, 1.61f},
     {388.790985f, -33.105900f, 20.263599f, 0.52f},
     {332.722992f, -61.159f, 17.979099f, 5.71f},
-    {258.959015f, -38.687099f, 20.262899f, 5.21f},
-    {259.2277997, 35.879002f, 20.263f, 4.81f}, //sixth platform
+    {258.959015f, -38.687099f, 20.262899f, 5.21f}, //pre-nerf only
+    {259.2277997, 35.879002f, 20.263f, 4.81f}, //pre-nerf only
     {332.0f, 0.01f, 43.0f, 0.0f}, //quill
     {331.0f, 0.01f, -2.38f, 0.0f}, //middle (p2)
     {332.0f, 0.01f, 43.0f, 0.0f} // dive
@@ -70,13 +70,6 @@ enum Misc
 
     EVENT_MOVE_TO_PHASE_2       = 4,
     EVENT_FINISH_DIVE           = 5
-};
-
-enum PlatformMoveDirections
-{
-    DIRECTION_ANTI_CLOCKWISE    = 0,
-    DIRECTION_CLOCKWISE         = 1,
-    DIRECTION_ACROSS            = 2
 };
 
 enum GroupAlar
@@ -126,12 +119,13 @@ struct boss_alar : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        ScheduleTimedEvent(0s, [&]
+        scheduler.Schedule(0s, [this](TaskContext context)
         {
             if (roll_chance_i(20 * _noQuillTimes))
             {
                 _noQuillTimes = 0;
-                _platform = RAND(0, 5);
+                _platformRoll = RAND(0, 1);
+                _platform = _platformRoll ? 0 : 3;
                 me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
             }
@@ -140,31 +134,14 @@ struct boss_alar : public BossAI
                 if (_noQuillTimes++ > 0)
                 {
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
-                    if (_spawnPhoenixes)
-                    {
-                        SpawnPhoenixes(3, me);
-                    }
+                    SpawnPhoenixes(1, me);
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
-                _platformRoll = RAND(0, 2);
-                switch(_platformRoll)
-                {
-                    case DIRECTION_ANTI_CLOCKWISE:
-                        _platform = (_platform+5)%6;
-                        _spawnPhoenixes = false;
-                        break;
-                    case DIRECTION_CLOCKWISE:
-                        _platform = (_platform+1)%6;
-                        _spawnPhoenixes = false;
-                        break;
-                    case DIRECTION_ACROSS:
-                        _platform = (_platform+3)%6;
-                        _spawnPhoenixes = true;
-                        break;
-                }
+                _platform = (_platform+1)%4;
                 _platformMoveRepeatTimer = 30s;
             }
-        }, _platformMoveRepeatTimer);
+            context.Repeat(_platformMoveRepeatTimer);
+        });
         ScheduleMainSpellAttack(0s);
     }
 
@@ -195,18 +172,18 @@ struct boss_alar : public BossAI
         if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
         {
             damage = 0;
-            me->InterruptNonMeleeSpells(false);
-            me->SetHealth(me->GetMaxHealth());
             me->SetReactState(REACT_PASSIVE);
-            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS);
-            DoCastSelf(SPELL_EMBER_BLAST, true);
             scheduler.CancelAll();
+            me->CastStop();
+            me->SetHealth(me->GetMaxHealth());
+            DoCastSelf(SPELL_EMBER_BLAST, true); //spellscript doesn't trigger
+
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
             }, EVENT_RELOCATE_MIDDLE);
             ScheduleUniqueTimedEvent(12s, [&]
             {
-                me->RemoveAurasDueToSpell(SPELL_EMBER_BLAST);
+                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
             }, EVENT_MOVE_TO_PHASE_2);
             ScheduleUniqueTimedEvent(16001ms, [&]{
@@ -215,7 +192,6 @@ struct boss_alar : public BossAI
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 ScheduleAbilities();
             }, EVENT_REBIRTH);
-
         }
     }
 
@@ -374,143 +350,103 @@ private:
     uint32 _spellId;
 };
 
-class spell_alar_flame_quills : public SpellScriptLoader
+class spell_alar_flame_quills : public AuraScript
 {
-public:
-    spell_alar_flame_quills() : SpellScriptLoader("spell_alar_flame_quills") { }
+    PrepareAuraScript(spell_alar_flame_quills);
 
-    class spell_alar_flame_quills_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_alar_flame_quills_AuraScript);
+        PreventDefaultAction();
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
+        // 24 spells in total
+        for (uint8 i = 0; i < 21; ++i)
+            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), GetUnitOwner()->m_Events.CalculateTime(i * 40));
+        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), GetUnitOwner()->m_Events.CalculateTime(22 * 40));
+        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), GetUnitOwner()->m_Events.CalculateTime(23 * 40));
+        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), GetUnitOwner()->m_Events.CalculateTime(24 * 40));
+    }
 
-            // 24 spells in total
-            for (uint8 i = 0; i < 21; ++i)
-                GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), GetUnitOwner()->m_Events.CalculateTime(i * 40));
-            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), GetUnitOwner()->m_Events.CalculateTime(22 * 40));
-            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), GetUnitOwner()->m_Events.CalculateTime(23 * 40));
-            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), GetUnitOwner()->m_Events.CalculateTime(24 * 40));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_alar_flame_quills_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_alar_flame_quills_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_alar_flame_quills::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_alar_ember_blast : public SpellScriptLoader
+class spell_alar_ember_blast : public SpellScript
 {
-public:
-    spell_alar_ember_blast() : SpellScriptLoader("spell_alar_ember_blast") { }
+    PrepareSpellScript(spell_alar_ember_blast);
 
-    class spell_alar_ember_blast_SpellScript : public SpellScript
+    void HandleForceCast(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_alar_ember_blast_SpellScript);
-
-        void HandleForceCast(SpellEffIndex effIndex)
+        PreventHitEffect(effIndex);
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
         {
-            PreventHitEffect(effIndex);
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_ALAR)))
-                    Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
+            if (Creature* alar = instance->GetCreature(DATA_ALAR))
+            {
+                Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
+            }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast_SpellScript::HandleForceCast, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_alar_ember_blast_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast::HandleForceCast, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
-class spell_alar_ember_blast_death : public SpellScriptLoader
+class spell_alar_ember_blast_death : public AuraScript
 {
-public:
-    spell_alar_ember_blast_death() : SpellScriptLoader("spell_alar_ember_blast_death") { }
+    PrepareAuraScript(spell_alar_ember_blast_death);
 
-    class spell_alar_ember_blast_death_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_alar_ember_blast_death_AuraScript);
+        PreventDefaultAction(); // xinef: prevent default action after change that invisibility in instances is executed instantly even for creatures
+        Unit* target = GetTarget();
+        InvisibilityType type = InvisibilityType(aurEff->GetMiscValue());
+        target->m_invisibility.AddFlag(type);
+        target->m_invisibility.AddValue(type, aurEff->GetAmount());
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction(); // xinef: prevent default action after change that invisibility in instances is executed instantly even for creatures
-            Unit* target = GetTarget();
-            InvisibilityType type = InvisibilityType(aurEff->GetMiscValue());
-            target->m_invisibility.AddFlag(type);
-            target->m_invisibility.AddValue(type, aurEff->GetAmount());
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
+        GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+        GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
+    }
 
-            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
-            GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-            GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death_AuraScript::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death_AuraScript::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_alar_ember_blast_death_AuraScript();
+        GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_alar_dive_bomb : public SpellScriptLoader
+class spell_alar_dive_bomb : public AuraScript
 {
-public:
-    spell_alar_dive_bomb() : SpellScriptLoader("spell_alar_dive_bomb") { }
+    PrepareAuraScript(spell_alar_dive_bomb);
 
-    class spell_alar_dive_bomb_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_alar_dive_bomb_AuraScript);
+        GetUnitOwner()->SetModelVisible(false);
+        GetUnitOwner()->SetDisplayId(DISPLAYID_INVISIBLE);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->SetModelVisible(false);
-            GetUnitOwner()->SetDisplayId(DISPLAYID_INVISIBLE);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_alar_dive_bomb_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_alar_dive_bomb_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_alar_dive_bomb::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_alar()
 {
     RegisterTheEyeAI(boss_alar);
-    new spell_alar_flame_quills();
-    new spell_alar_ember_blast();
-    new spell_alar_ember_blast_death();
-    new spell_alar_dive_bomb();
+    RegisterSpellScript(spell_alar_flame_quills);
+    RegisterSpellScript(spell_alar_ember_blast);
+    RegisterSpellScript(spell_alar_ember_blast_death);
+    RegisterSpellScript(spell_alar_dive_bomb);
 }
 
