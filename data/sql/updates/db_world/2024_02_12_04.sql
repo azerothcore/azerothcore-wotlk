@@ -1,3 +1,4 @@
+-- DB update 2024_02_12_03 -> 2024_02_12_04
 -- rage winterchill
 DELETE FROM `waypoint_data` WHERE `id` = 177670;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
