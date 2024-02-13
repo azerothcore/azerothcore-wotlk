@@ -1,3 +1,4 @@
+-- DB update 2024_02_13_00 -> 2024_02_13_01
 -- disables buff stacking for items 49856, 49857, 49858, 49859, 49861, 49860
 
 -- making sure group is free
