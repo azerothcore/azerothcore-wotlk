@@ -35,6 +35,14 @@ EndContentData */
 ## npc_the_scourge_cauldron
 ######*/
 
+enum CreatureIds
+{
+    NPC_CAULDRON_LORD_BILEMW      = 11075,
+    NPC_CAULDRON_LORD_RAZARCH     = 11076,
+    NPC_CAULDRON_LORD_MALVINIOUS  = 11077,
+    NPC_CAULDRON_LORD_SOULWRATH   = 11078
+};
+
 class npc_the_scourge_cauldron : public CreatureScript
 {
 public:
@@ -78,9 +86,9 @@ public:
                     if (player->GetQuestStatus(5216) == QUEST_STATUS_INCOMPLETE ||
                         player->GetQuestStatus(5229) == QUEST_STATUS_INCOMPLETE)
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(11075, 30.0f))
+                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_BILEMW, 30.0f))
                         {
-                            me->SummonCreature(11075, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(NPC_CAULDRON_LORD_BILEMW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
                     break;
@@ -88,9 +96,9 @@ public:
                     if (player->GetQuestStatus(5219) == QUEST_STATUS_INCOMPLETE ||
                         player->GetQuestStatus(5231) == QUEST_STATUS_INCOMPLETE)
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(11077, 30.0f))
+                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_MALVINIOUS, 30.0f))
                         {
-                            me->SummonCreature(11077, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
                     break;
@@ -98,9 +106,9 @@ public:
                     if (player->GetQuestStatus(5225) == QUEST_STATUS_INCOMPLETE ||
                         player->GetQuestStatus(5235) == QUEST_STATUS_INCOMPLETE)
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(11078, 30.0f))
+                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_SOULWRATH, 30.0f))
                         {
-                            me->SummonCreature(11078, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
                     break;
@@ -108,11 +116,13 @@ public:
                     if (player->GetQuestStatus(5222) == QUEST_STATUS_INCOMPLETE ||
                         player->GetQuestStatus(5233) == QUEST_STATUS_INCOMPLETE)
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(11076, 30.0f))
+                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_RAZARCH, 30.0f))
                         {
-                            me->SummonCreature(11076, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
+                    break;
+                default:
                     break;
             }
         }
