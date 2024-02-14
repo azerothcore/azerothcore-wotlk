@@ -27,7 +27,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
  (3976, 3, 0, 'You hold my father\'s blade, $n. My soldiers are yours TO control, my $g Lord:Lady;. Take them... LEAD them... The impure must be purged. They must be cleansed of their taint.', 12, 0, 100, 1, 0, 0, 12390, 0, 'mograine SAY_ASHBRINGER_ONE'),
  (3976, 4, 0, 'Father... But... How?', 12, 0, 100, 6, 0, 0, 12470, 0, 'mograine SAY_ASHBRINGER_TWO'),
  (3976, 5, 0, 'Forgive me, father! Please...', 12, 0, 100, 20, 0, 0, 12472, 0, 'mograine SAY_ASHBRINGER_THREE'),
- (3976, 6, 0, 'Bow down! Kneel BEFORE the Ashbringer! A NEW dawn approaches, brothers AND sisters! Our message will be delivered TO the filth of this world through the chosen one!', 14, 0, 100, 0, 0, 0, 12389, 3, 'Ashbringer EVENT intro yell');
+ (3976, 6, 0, 'Bow down! Kneel BEFORE the Ashbringer! A NEW dawn approaches, brothers AND sisters! Our message will be delivered TO the filth of this world through the chosen one!', 14, 0, 100, 0, 0, 0, 12389, 0, 'Ashbringer EVENT intro yell');
 
 -- Highlord Mograine ---
 -- Highlord Mograine say
