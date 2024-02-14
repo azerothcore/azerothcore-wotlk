@@ -80,7 +80,7 @@ public:
                         //A creature is summoned without being summoned
                         if (!me->FindNearestCreature(11075, 30.0f))
                         {
-                            me->SummonCreature(11075, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(11075, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
                     break;
@@ -100,7 +100,7 @@ public:
                         //A creature is summoned without being summoned
                         if (!me->FindNearestCreature(11078, 30.0f))
                         {
-                            me->SummonCreature(11078, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
+                            me->SummonCreature(11078, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             DoDie();
                         }
                     break;
