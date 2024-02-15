@@ -990,6 +990,10 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
     if (pItem->IsSoulBound())
         return EQUIP_ERR_CANT_DROP_SOULBOUND;
 
+    // Prevent swapping limited duration items into guild bank
+    if (pItem->GetTemplate()->Duration > 0)
+        return EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
+
     // Make sure destination bank tab exists
     if (m_container >= m_pGuild->_GetPurchasedTabsSize())
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
