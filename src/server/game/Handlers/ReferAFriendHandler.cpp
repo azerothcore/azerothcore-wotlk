@@ -27,10 +27,10 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
 
-    Player* target = ObjectAccessor::GetPlayer(*_player, guid);
+    Player* target = ObjectAccessor::GetPlayer(*m_player, guid);
 
     // check cheating
-    uint8 levels = _player->GetGrantableLevels();
+    uint8 levels = m_player->GetGrantableLevels();
     uint8 error = 0;
     if (!target)
         error = ERR_REFER_A_FRIEND_NO_TARGET;
@@ -38,13 +38,13 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
         error = ERR_REFER_A_FRIEND_INSUFFICIENT_GRANTABLE_LEVELS;
     else if (GetRecruiterId() != target->GetSession()->GetAccountId())
         error = ERR_REFER_A_FRIEND_NOT_REFERRED_BY;
-    else if (target->GetTeamId() != _player->GetTeamId())
+    else if (target->GetTeamId() != m_player->GetTeamId())
         error = ERR_REFER_A_FRIEND_DIFFERENT_FACTION;
-    else if (target->GetLevel() >= _player->GetLevel())
+    else if (target->GetLevel() >= m_player->GetLevel())
         error = ERR_REFER_A_FRIEND_TARGET_TOO_HIGH;
     else if (target->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
         error = ERR_REFER_A_FRIEND_GRANT_LEVEL_MAX_I;
-    else if (target->GetGroup() != _player->GetGroup())
+    else if (target->GetGroup() != m_player->GetGroup())
         error = ERR_REFER_A_FRIEND_NOT_IN_GROUP;
 
     if (error)
@@ -59,7 +59,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     }
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
-    data2 << _player->GetPackGUID();
+    data2 << m_player->GetPackGUID();
     target->GetSession()->SendPacket(&data2);
 }
 
@@ -70,7 +70,7 @@ void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
 
-    Player* other = ObjectAccessor::GetPlayer(*_player, guid);
+    Player* other = ObjectAccessor::GetPlayer(*m_player, guid);
     if (!other)
         return;
 
@@ -82,5 +82,5 @@ void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
     else
         return;
 
-    _player->GiveLevel(_player->GetLevel() + 1);
+    m_player->GiveLevel(m_player->GetLevel() + 1);
 }

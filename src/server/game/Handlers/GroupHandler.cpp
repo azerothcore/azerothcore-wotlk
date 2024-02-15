@@ -443,7 +443,7 @@ void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
     if (!grp && !grpInvite)
         return;
 
-    if (_player->InBattleground())
+    if (m_player->InBattleground())
     {
         SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
         return;
@@ -595,7 +595,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
                 return;
         }
 
-        group->SetTargetIcon(x, _player->GetGUID(), guid);
+        group->SetTargetIcon(x, m_player->GetGUID(), guid);
     }
 }
 
@@ -605,7 +605,7 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
     if (!group)
         return;
 
-    if (_player->InBattleground())
+    if (m_player->InBattleground())
         return;
 
     /** error handling **/
@@ -729,9 +729,9 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG))
         {
             // Check if player is in BG
-            if (_player->InBattleground())
+            if (m_player->InBattleground())
             {
-                _player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
+                m_player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
                 return;
             }
         }
@@ -1092,7 +1092,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket& /*recvData*/)
 {
     // every time the player checks the character screen
-    _player->SendRaidInfo();
+    m_player->SendRaidInfo();
 }
 
 void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)

@@ -27,7 +27,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 
-    ObjectGuid vehicleGUID = _player->GetCharmGUID();
+    ObjectGuid vehicleGUID = m_player->GetCharmGUID();
 
     if (!vehicleGUID)                                       // something wrong here...
     {
@@ -39,10 +39,10 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
     recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
-    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
+    if (!m_player->m_mover || !m_player->m_mover->IsInWorld() || m_player->m_mover->IsDuringRemoveFromWorld() || guid != m_player->m_mover->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
-        _player->ExitVehicle();
+        m_player->ExitVehicle();
         return;
     }
 
@@ -50,9 +50,9 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
     mi.guid = guid;
     ReadMovementInfo(recvData, &mi);
 
-    _player->m_mover->m_movementInfo = mi;
+    m_player->m_mover->m_movementInfo = mi;
 
-    _player->ExitVehicle();
+    m_player->ExitVehicle();
 }
 
 void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
@@ -143,25 +143,25 @@ void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
     ObjectGuid guid;
     data >> guid;
 
-    if (Player* player = ObjectAccessor::GetPlayer(*_player, guid))
+    if (Player* player = ObjectAccessor::GetPlayer(*m_player, guid))
     {
         if (!player->GetVehicleKit())
             return;
-        if (!player->IsInRaidWith(_player))
+        if (!player->IsInRaidWith(m_player))
             return;
-        if (!player->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+        if (!player->IsWithinDistInMap(m_player, INTERACTION_DISTANCE))
             return;
         // Xinef:
-        if (!_player->FindMap() || _player->FindMap()->IsBattleArena())
+        if (!m_player->FindMap() || m_player->FindMap()->IsBattleArena())
             return;
 
-        _player->EnterVehicle(player);
+        m_player->EnterVehicle(player);
     }
 }
 
 void WorldSession::HandleEjectPassenger(WorldPacket& data)
 {
-    Vehicle* vehicle = _player->GetVehicleKit();
+    Vehicle* vehicle = m_player->GetVehicleKit();
     if (!vehicle)
     {
         data.rfinish();                                     // prevent warnings spam
@@ -174,7 +174,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
 
     if (guid.IsPlayer())
     {
-        Player* player = ObjectAccessor::GetPlayer(*_player, guid);
+        Player* player = ObjectAccessor::GetPlayer(*m_player, guid);
         if (!player)
         {
             LOG_ERROR("network.opcode", "Player {} tried to eject player {} from vehicle, but the latter was not found in world!", GetPlayer()->GetGUID().ToString(), guid.ToString());
@@ -196,7 +196,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
     }
     else if (guid.IsCreature())
     {
-        Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
+        Unit* unit = ObjectAccessor::GetUnit(*m_player, guid);
         if (!unit) // creatures can be ejected too from player mounts
         {
             LOG_ERROR("network.opcode", "Player {} tried to eject creature guid {} from vehicle, but the latter was not found in world!", GetPlayer()->GetGUID().ToString(), guid.ToString());

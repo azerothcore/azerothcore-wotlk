@@ -78,7 +78,7 @@ void WorldSession::SendBfEntered(uint32 BattleId)
     data << uint32(BattleId);
     data << uint8(1);                                       //unk
     data << uint8(1);                                       //unk
-    data << uint8(_player->isAFK() ? 1 : 0);                //Clear AFK
+    data << uint8(m_player->isAFK() ? 1 : 0);                //Clear AFK
     SendPacket(&data);
 }
 
@@ -106,7 +106,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
 
     if (Accepted)
     {
-        Bf->PlayerAcceptInviteToQueue(_player);
+        Bf->PlayerAcceptInviteToQueue(m_player);
     }
 }
 
@@ -125,12 +125,12 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
     //If player accept invitation
     if (Accepted)
     {
-        Bf->PlayerAcceptInviteToWar(_player);
+        Bf->PlayerAcceptInviteToWar(m_player);
     }
     else
     {
-        if (_player->GetZoneId() == Bf->GetZoneId())
-            Bf->KickPlayerFromBattlefield(_player->GetGUID());
+        if (m_player->GetZoneId() == Bf->GetZoneId())
+            Bf->KickPlayerFromBattlefield(m_player->GetGUID());
     }
 }
 
@@ -144,5 +144,5 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
     if (!Bf)
         return;
 
-    Bf->AskToLeaveQueue(_player);
+    Bf->AskToLeaveQueue(m_player);
 }

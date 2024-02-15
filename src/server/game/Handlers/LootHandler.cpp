@@ -48,7 +48,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         //    go = nullptr;
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player)))
+        if (!go || ((go->GetOwnerGUID() != m_player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(m_player)))
         {
             player->SendLootRelease(lguid);
             return;
@@ -84,7 +84,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
         bool lootAllowed = creature && creature->IsAlive() == (player->IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY) && creature->loot.loot_type == LOOT_PICKPOCKETING);
-        if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+        if (!lootAllowed || !creature->IsWithinDistInMap(m_player, INTERACTION_DISTANCE))
         {
             player->SendLootError(lguid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
             return;
@@ -285,7 +285,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         GameObject* go = GetPlayer()->GetMap()->GetGameObject(lguid);
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player)))
+        if (!go || ((go->GetOwnerGUID() != m_player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(m_player)))
         {
             return;
         }
@@ -337,7 +337,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     else if (lguid.IsCorpse())        // ONLY remove insignia at BG
     {
         Corpse* corpse = ObjectAccessor::GetCorpse(*player, lguid);
-        if (!corpse || !corpse->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+        if (!corpse || !corpse->IsWithinDistInMap(m_player, INTERACTION_DISTANCE))
             return;
 
         loot = &corpse->loot;
@@ -383,7 +383,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
         bool lootAllowed = creature && creature->IsAlive() == (player->IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY) && creature->loot.loot_type == LOOT_PICKPOCKETING);
-        if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+        if (!lootAllowed || !creature->IsWithinDistInMap(m_player, INTERACTION_DISTANCE))
             return;
 
         loot = &creature->loot;
@@ -425,30 +425,30 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     recvData >> lootguid >> slotid >> target_playerguid;
 
-    if (!_player->GetGroup() || _player->GetGroup()->GetMasterLooterGuid() != _player->GetGUID() || _player->GetGroup()->GetLootMethod() != MASTER_LOOT)
+    if (!m_player->GetGroup() || m_player->GetGroup()->GetMasterLooterGuid() != m_player->GetGUID() || m_player->GetGroup()->GetLootMethod() != MASTER_LOOT)
     {
-        _player->SendLootError(lootguid, LOOT_ERROR_DIDNT_KILL);
+        m_player->SendLootError(lootguid, LOOT_ERROR_DIDNT_KILL);
         return;
     }
 
-    Player* target = ObjectAccessor::GetPlayer(*_player, target_playerguid);
+    Player* target = ObjectAccessor::GetPlayer(*m_player, target_playerguid);
     if (!target)
     {
-        _player->SendLootError(lootguid, LOOT_ERROR_PLAYER_NOT_FOUND);
+        m_player->SendLootError(lootguid, LOOT_ERROR_PLAYER_NOT_FOUND);
         return;
     }
 
     LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
-    if (_player->GetLootGUID() != lootguid)
+    if (m_player->GetLootGUID() != lootguid)
     {
-        _player->SendLootError(lootguid, LOOT_ERROR_DIDNT_KILL);
+        m_player->SendLootError(lootguid, LOOT_ERROR_DIDNT_KILL);
         return;
     }
 
-    if (!_player->IsInRaidWith(target))
+    if (!m_player->IsInRaidWith(target))
     {
-        _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
+        m_player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
         //LOG_DEBUG("network", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
         return;
     }
@@ -490,11 +490,11 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (msg != EQUIP_ERR_OK)
     {
         if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
-            _player->SendLootError(lootguid, LOOT_ERROR_MASTER_UNIQUE_ITEM);
+            m_player->SendLootError(lootguid, LOOT_ERROR_MASTER_UNIQUE_ITEM);
         else if (msg == EQUIP_ERR_INVENTORY_FULL)
-            _player->SendLootError(lootguid, LOOT_ERROR_MASTER_INV_FULL);
+            m_player->SendLootError(lootguid, LOOT_ERROR_MASTER_INV_FULL);
         else
-            _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
+            m_player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
 
         return;
     }

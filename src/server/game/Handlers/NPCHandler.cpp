@@ -128,7 +128,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     data << uint32(trainer_spells->spellList.size());
 
     // reputation discount
-    float fDiscountMod = _player->GetReputationPriceDiscount(unit);
+    float fDiscountMod = m_player->GetReputationPriceDiscount(unit);
     bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
 
     uint32 count = 0;
@@ -142,7 +142,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         {
             if (!tSpell->learnedSpell[i])
                 continue;
-            if (!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
+            if (!m_player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
             {
                 valid = false;
                 break;
@@ -155,12 +155,12 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         if (!valid)
             continue;
 
-        if (tSpell->reqSpell && !_player->HasSpell(tSpell->reqSpell))
+        if (tSpell->reqSpell && !m_player->HasSpell(tSpell->reqSpell))
         {
             continue;
         }
 
-        TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+        TrainerSpellState state = m_player->GetTrainerSpellState(tSpell);
 
         data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
         data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
@@ -237,32 +237,32 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     if (!trainer_spell)
         return;
 
-    if (trainer_spell->reqSpell && !_player->HasSpell(trainer_spell->reqSpell))
+    if (trainer_spell->reqSpell && !m_player->HasSpell(trainer_spell->reqSpell))
     {
         return;
     }
 
     // can't be learn, cheat? Or double learn with lags...
-    if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
+    if (m_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
         return;
 
     // apply reputation discount
-    uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
+    uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * m_player->GetReputationPriceDiscount(unit)));
 
     // check money requirement
-    if (!_player->HasEnoughMoney(nSpellCost))
+    if (!m_player->HasEnoughMoney(nSpellCost))
         return;
 
-    _player->ModifyMoney(-int32(nSpellCost));
+    m_player->ModifyMoney(-int32(nSpellCost));
 
     unit->SendPlaySpellVisual(179); // 53 SpellCastDirected
-    unit->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
+    unit->SendPlaySpellImpact(m_player->GetGUID(), 362); // 113 EmoteSalute
 
     // learn explicitly or cast explicitly
     if (trainer_spell->IsCastable())
-        _player->CastSpell(_player, trainer_spell->spell, true);
+        m_player->CastSpell(m_player, trainer_spell->spell, true);
     else
-        _player->learnSpell(spellId);
+        m_player->learnSpell(spellId);
 
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
     data << guid;
@@ -288,7 +288,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     // set faction visible if needed
     if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
-        _player->GetReputationMgr().SetVisible(factionTemplateEntry);
+        m_player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
     // remove fake death
@@ -303,22 +303,22 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     // If spiritguide, no need for gossip menu, just put player into resurrect queue
     if (unit->IsSpiritGuide())
     {
-        Battleground* bg = _player->GetBattleground();
+        Battleground* bg = m_player->GetBattleground();
         if (bg)
         {
-            bg->AddPlayerToResurrectQueue(unit->GetGUID(), _player->GetGUID());
-            sBattlegroundMgr->SendAreaSpiritHealerQueryOpcode(_player, bg, unit->GetGUID());
+            bg->AddPlayerToResurrectQueue(unit->GetGUID(), m_player->GetGUID());
+            sBattlegroundMgr->SendAreaSpiritHealerQueryOpcode(m_player, bg, unit->GetGUID());
             return;
         }
     }
 
-    if (!sScriptMgr->OnGossipHello(_player, unit))
+    if (!sScriptMgr->OnGossipHello(m_player, unit))
     {
-        //        _player->TalkedToCreature(unit->GetEntry(), unit->GetGUID());
-        _player->PrepareGossipMenu(unit, unit->GetCreatureTemplate()->GossipMenuId, true);
-        _player->SendPreparedGossip(unit);
+        //        m_player->TalkedToCreature(unit->GetEntry(), unit->GetGUID());
+        m_player->PrepareGossipMenu(unit, unit->GetCreatureTemplate()->GossipMenuId, true);
+        m_player->SendPreparedGossip(unit);
     }
-    unit->AI()->sGossipHello(_player);
+    unit->AI()->sGossipHello(m_player);
 }
 
 /*void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recvData)
@@ -332,7 +332,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     recvData >> guid >> unk >> option;
 
-    if (_player->PlayerTalkClass->GossipOptionCoded(option))
+    if (m_player->PlayerTalkClass->GossipOptionCoded(option))
     {
         LOG_DEBUG("network.opcode", "reading string");
         recvData >> code;
@@ -352,13 +352,13 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     if (!code.empty())
     {
-        if (!Script->GossipSelectWithCode(_player, unit, _player->PlayerTalkClass->GossipOptionSender (option), _player->PlayerTalkClass->GossipOptionAction(option), code.c_str()))
-            unit->OnGossipSelect (_player, option);
+        if (!Script->GossipSelectWithCode(m_player, unit, m_player->PlayerTalkClass->GossipOptionSender (option), m_player->PlayerTalkClass->GossipOptionAction(option), code.c_str()))
+            unit->OnGossipSelect (m_player, option);
     }
     else
     {
-        if (!Script->OnGossipSelect (_player, unit, _player->PlayerTalkClass->GossipOptionSender (option), _player->PlayerTalkClass->GossipOptionAction (option)))
-           unit->OnGossipSelect (_player, option);
+        if (!Script->OnGossipSelect (m_player, unit, m_player->PlayerTalkClass->GossipOptionSender (option), m_player->PlayerTalkClass->GossipOptionAction (option)))
+           unit->OnGossipSelect (m_player, option);
     }
 }*/
 
@@ -386,33 +386,33 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 
 void WorldSession::SendSpiritResurrect()
 {
-    _player->ResurrectPlayer(0.5f, true);
+    m_player->ResurrectPlayer(0.5f, true);
 
-    _player->DurabilityLossAll(0.25f, true);
+    m_player->DurabilityLossAll(0.25f, true);
 
     // get corpse nearest graveyard
     GraveyardStruct const* corpseGrave = nullptr;
 
     // Search for any graveyards near the player's corpse.
-    corpseGrave = sGraveyard->GetClosestGraveyard(_player, _player->GetTeamId(), _player->HasCorpse());
+    corpseGrave = sGraveyard->GetClosestGraveyard(m_player, m_player->GetTeamId(), m_player->HasCorpse());
 
     // now can spawn bones
-    _player->SpawnCorpseBones();
+    m_player->SpawnCorpseBones();
 
     // teleport to nearest from corpse graveyard, if different from nearest to player ghost
     if (corpseGrave)
     {
-        GraveyardStruct const* ghostGrave = sGraveyard->GetClosestGraveyard(_player, _player->GetTeamId());
+        GraveyardStruct const* ghostGrave = sGraveyard->GetClosestGraveyard(m_player, m_player->GetTeamId());
 
         if (corpseGrave != ghostGrave)
-            _player->TeleportTo(corpseGrave->Map, corpseGrave->x, corpseGrave->y, corpseGrave->z, _player->GetOrientation());
+            m_player->TeleportTo(corpseGrave->Map, corpseGrave->x, corpseGrave->y, corpseGrave->z, m_player->GetOrientation());
         // or update at original position
         //else
-        //    _player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
+        //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
     }
     // or update at original position
     //else
-    //    _player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
+    //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
 }
 
 void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
@@ -446,14 +446,14 @@ void WorldSession::SendBindPoint(Creature* npc)
     uint32 bindspell = 3286;
 
     // send spell for homebinding (3286)
-    npc->CastSpell(_player, bindspell, true);
+    npc->CastSpell(m_player, bindspell, true);
 
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
     data << npc->GetGUID();
     data << uint32(bindspell);
     SendPacket(&data);
 
-    _player->PlayerTalkClass->SendCloseGossip();
+    m_player->PlayerTalkClass->SendCloseGossip();
 }
 
 void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
@@ -574,7 +574,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
     if (!petStable)
         return;
 
-    Pet* pet = _player->GetPet();
+    Pet* pet = m_player->GetPet();
 
     // can't place in stable dead pet
     if ((pet && (!pet->IsAlive() || pet->getPetType() != HUNTER_PET))
@@ -591,7 +591,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
             if (pet)
             {
                 // stable summoned pet
-                _player->RemovePet(pet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + freeSlot));
+                m_player->RemovePet(pet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + freeSlot));
                 std::swap(petStable->StabledPets[freeSlot], petStable->CurrentPet);
                 SendStableResult(STABLE_SUCCESS_STABLE);
                 return;
@@ -599,7 +599,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
             stmt->SetData(0, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + freeSlot));
-            stmt->SetData(1, _player->GetGUID().GetCounter());
+            stmt->SetData(1, m_player->GetGUID().GetCounter());
             stmt->SetData(2, petStable->UnslottedPets[0].PetNumber);
             CharacterDatabase.Execute(stmt);
 
@@ -652,7 +652,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
     }
 
     CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate((*stabledPet)->CreatureId);
-    if (!creatureInfo || !creatureInfo->IsTameable(_player->CanTameExoticPets()))
+    if (!creatureInfo || !creatureInfo->IsTameable(m_player->CanTameExoticPets()))
     {
         // if problem in exotic pet
         if (creatureInfo && creatureInfo->IsTameable(true))
@@ -663,7 +663,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
         return;
     }
 
-    Pet* oldPet = _player->GetPet();
+    Pet* oldPet = m_player->GetPet();
     if (oldPet)
     {
         // try performing a swap, client sends this packet instead of swap when starting from stabled slot
@@ -673,7 +673,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
             return;
         }
 
-        _player->RemovePet(oldPet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
+        m_player->RemovePet(oldPet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
     }
     else if (petStable->UnslottedPets.size() == 1)
     {
@@ -685,7 +685,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petStable->UnslottedPets[0].PetNumber);
         CharacterDatabase.Execute(stmt);
 
@@ -699,8 +699,8 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
         return;
     }
 
-    Pet* newPet = new Pet(_player, HUNTER_PET);
-    if (!newPet->LoadPetFromDB(_player, 0, petnumber, false))
+    Pet* newPet = new Pet(m_player, HUNTER_PET);
+    if (!newPet->LoadPetFromDB(m_player, 0, petnumber, false))
     {
         delete newPet;
 
@@ -710,7 +710,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
         // update current pet slot in db immediately to maintain slot consistency, dismissed pet was already saved
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PET_SAVE_NOT_IN_SLOT);
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petnumber);
         CharacterDatabase.Execute(stmt);
 
@@ -721,7 +721,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
         // update current pet slot in db immediately to maintain slot consistency, dismissed pet was already saved
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PET_SAVE_AS_CURRENT);
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petnumber);
         CharacterDatabase.Execute(stmt);
 
@@ -750,10 +750,10 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
     if (petStable.MaxStabledPets < MAX_PET_STABLES)
     {
         StableSlotPricesEntry const* SlotPrice = sStableSlotPricesStore.LookupEntry(petStable.MaxStabledPets + 1);
-        if (_player->HasEnoughMoney(SlotPrice->Price))
+        if (m_player->HasEnoughMoney(SlotPrice->Price))
         {
             ++petStable.MaxStabledPets;
-            _player->ModifyMoney(-int32(SlotPrice->Price));
+            m_player->ModifyMoney(-int32(SlotPrice->Price));
             SendStableResult(STABLE_SUCCESS_BUY_SLOT);
         }
         else
@@ -806,7 +806,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     }
 
     CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate((*stabledPet)->CreatureId);
-    if (!creatureInfo || !creatureInfo->IsTameable(_player->CanTameExoticPets()))
+    if (!creatureInfo || !creatureInfo->IsTameable(m_player->CanTameExoticPets()))
     {
         // if problem in exotic pet
         if (creatureInfo && creatureInfo->IsTameable(true))
@@ -816,7 +816,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
         return;
     }
 
-    Pet* oldPet = _player->GetPet();
+    Pet* oldPet = m_player->GetPet();
     if (oldPet)
     {
         if (!oldPet->IsAlive() || !oldPet->IsHunterPet())
@@ -825,7 +825,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
             return;
         }
 
-        _player->RemovePet(oldPet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
+        m_player->RemovePet(oldPet, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
     }
     else if (petStable->UnslottedPets.size() == 1)
     {
@@ -837,7 +837,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PetSaveMode(PET_SAVE_FIRST_STABLE_SLOT + std::distance(petStable->StabledPets.begin(), stabledPet)));
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petStable->UnslottedPets[0].PetNumber);
         CharacterDatabase.Execute(stmt);
 
@@ -852,8 +852,8 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     }
 
     // summon unstabled pet
-    Pet* newPet = new Pet(_player, HUNTER_PET);
-    if (!newPet->LoadPetFromDB(_player, 0, petId, false))
+    Pet* newPet = new Pet(m_player, HUNTER_PET);
+    if (!newPet->LoadPetFromDB(m_player, 0, petId, false))
     {
         delete newPet;
         SendStableResult(STABLE_ERR_STABLE);
@@ -864,7 +864,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
         // update current pet slot in db immediately to maintain slot consistency, dismissed pet was already saved
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PET_SAVE_NOT_IN_SLOT);
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petId);
         CharacterDatabase.Execute(stmt);
     }
@@ -873,7 +873,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
         // update current pet slot in db immediately to maintain slot consistency, dismissed pet was already saved
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->SetData(0, PET_SAVE_AS_CURRENT);
-        stmt->SetData(1, _player->GetGUID().GetCounter());
+        stmt->SetData(1, m_player->GetGUID().GetCounter());
         stmt->SetData(2, petId);
         CharacterDatabase.Execute(stmt);
 
@@ -902,21 +902,21 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     // reputation discount
-    float discountMod = _player->GetReputationPriceDiscount(unit);
+    float discountMod = m_player->GetReputationPriceDiscount(unit);
 
-    sScriptMgr->OnBeforePlayerDurabilityRepair(_player, npcGUID, itemGUID, discountMod, guildBank);
+    sScriptMgr->OnBeforePlayerDurabilityRepair(m_player, npcGUID, itemGUID, discountMod, guildBank);
 
     if (itemGUID)
     {
         LOG_DEBUG("network", "ITEM: Repair item, item {}, npc {}", itemGUID.ToString(), npcGUID.ToString());
 
-        Item* item = _player->GetItemByGuid(itemGUID);
+        Item* item = m_player->GetItemByGuid(itemGUID);
         if (item)
-            _player->DurabilityRepair(item->GetPos(), true, discountMod, guildBank);
+            m_player->DurabilityRepair(item->GetPos(), true, discountMod, guildBank);
     }
     else
     {
         LOG_DEBUG("network", "ITEM: Repair all items, npc {}", npcGUID.ToString());
-        _player->DurabilityRepairAll(true, discountMod, guildBank);
+        m_player->DurabilityRepairAll(true, discountMod, guildBank);
     }
 }

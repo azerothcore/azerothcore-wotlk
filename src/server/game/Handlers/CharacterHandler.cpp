@@ -1053,7 +1053,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     m_playerLoading = false;
 
     // Handle Login-Achievements (should be handled after loading)
-    _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
+    m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
 
     // Xinef: fix vendors falling of player vehicle, due to isBeingLoaded checks
     if (pCurrChar->IsInWorld())
@@ -1305,23 +1305,23 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
     uint8 inactive;
     recvData >> replistid >> inactive;
 
-    _player->GetReputationMgr().SetInactive(replistid, inactive);
+    m_player->GetReputationMgr().SetInactive(replistid, inactive);
 }
 
 void WorldSession::HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet)
 {
     if (packet.ShowHelm)
-        _player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_HELM);
+        m_player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_HELM);
     else
-        _player->SetPlayerFlag(PLAYER_FLAGS_HIDE_HELM);
+        m_player->SetPlayerFlag(PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet)
 {
     if (packet.ShowCloak)
-        _player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
+        m_player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
     else
-        _player->SetPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
+        m_player->SetPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
 }
 
 void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
@@ -1497,20 +1497,20 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 
     BarberShopStyleEntry const* bs_hair = sBarberShopStyleStore.LookupEntry(Hair);
 
-    if (!bs_hair || bs_hair->type != 0 || bs_hair->race != _player->getRace() || bs_hair->gender != _player->getGender())
+    if (!bs_hair || bs_hair->type != 0 || bs_hair->race != m_player->getRace() || bs_hair->gender != m_player->getGender())
         return;
 
     BarberShopStyleEntry const* bs_facialHair = sBarberShopStyleStore.LookupEntry(FacialHair);
 
-    if (!bs_facialHair || bs_facialHair->type != 2 || bs_facialHair->race != _player->getRace() || bs_facialHair->gender != _player->getGender())
+    if (!bs_facialHair || bs_facialHair->type != 2 || bs_facialHair->race != m_player->getRace() || bs_facialHair->gender != m_player->getGender())
         return;
 
     BarberShopStyleEntry const* bs_skinColor = sBarberShopStyleStore.LookupEntry(SkinColor);
 
-    if (bs_skinColor && (bs_skinColor->type != 3 || bs_skinColor->race != _player->getRace() || bs_skinColor->gender != _player->getGender()))
+    if (bs_skinColor && (bs_skinColor->type != 3 || bs_skinColor->race != m_player->getRace() || bs_skinColor->gender != m_player->getGender()))
         return;
 
-    GameObject* go = _player->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_BARBER_CHAIR, 5.0f);
+    GameObject* go = m_player->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_BARBER_CHAIR, 5.0f);
     if (!go)
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
@@ -1519,7 +1519,7 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
         return;
     }
 
-    if (_player->getStandState() != UNIT_STAND_STATE_SIT_LOW_CHAIR + go->GetGOInfo()->barberChair.chairheight)
+    if (m_player->getStandState() != UNIT_STAND_STATE_SIT_LOW_CHAIR + go->GetGOInfo()->barberChair.chairheight)
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(2);
@@ -1527,12 +1527,12 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
         return;
     }
 
-    uint32 cost = _player->GetBarberShopCost(bs_hair->hair_id, Color, bs_facialHair->hair_id, bs_skinColor);
+    uint32 cost = m_player->GetBarberShopCost(bs_hair->hair_id, Color, bs_facialHair->hair_id, bs_skinColor);
 
     // 0 - ok
     // 1, 3 - not enough money
     // 2 - you have to seat on barber chair
-    if (!_player->HasEnoughMoney(cost))
+    if (!m_player->HasEnoughMoney(cost))
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(1);                                  // no money
@@ -1546,18 +1546,18 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
         SendPacket(&data);
     }
 
-    _player->ModifyMoney(-int32(cost));                     // it isn't free
-    _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_AT_BARBER, cost);
+    m_player->ModifyMoney(-int32(cost));                     // it isn't free
+    m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_AT_BARBER, cost);
 
-    _player->SetByteValue(PLAYER_BYTES, 2, uint8(bs_hair->hair_id));
-    _player->SetByteValue(PLAYER_BYTES, 3, uint8(Color));
-    _player->SetByteValue(PLAYER_BYTES_2, 0, uint8(bs_facialHair->hair_id));
+    m_player->SetByteValue(PLAYER_BYTES, 2, uint8(bs_hair->hair_id));
+    m_player->SetByteValue(PLAYER_BYTES, 3, uint8(Color));
+    m_player->SetByteValue(PLAYER_BYTES_2, 0, uint8(bs_facialHair->hair_id));
     if (bs_skinColor)
-        _player->SetByteValue(PLAYER_BYTES, 0, uint8(bs_skinColor->hair_id));
+        m_player->SetByteValue(PLAYER_BYTES, 0, uint8(bs_skinColor->hair_id));
 
-    _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP, 1);
+    m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP, 1);
 
-    _player->SetStandState(0);                              // stand up
+    m_player->SetStandState(0);                              // stand up
 }
 
 void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
@@ -1571,14 +1571,14 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
         return;
     }
 
-    if (uint32 glyph = _player->GetGlyph(slot))
+    if (uint32 glyph = m_player->GetGlyph(slot))
     {
         if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
         {
-            _player->RemoveAurasDueToSpell(glyphEntry->SpellId);
+            m_player->RemoveAurasDueToSpell(glyphEntry->SpellId);
 
             // Removed any triggered auras
-            Unit::AuraMap& ownedAuras = _player->GetOwnedAuras();
+            Unit::AuraMap& ownedAuras = m_player->GetOwnedAuras();
             for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
             {
                 Aura* aura = iter->second;
@@ -1586,16 +1586,16 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
                 {
                     if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
                     {
-                        _player->RemoveOwnedAura(iter);
+                        m_player->RemoveOwnedAura(iter);
                         continue;
                     }
                 }
                 ++iter;
             }
 
-            _player->SendLearnPacket(glyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
-            _player->SetGlyph(slot, 0, true);
-            _player->SendTalentsInfoData(false);
+            m_player->SendLearnPacket(glyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
+            m_player->SetGlyph(slot, 0, true);
+            m_player->SendTalentsInfoData(false);
         }
     }
 }
@@ -1777,7 +1777,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
         }
 
         // xinef: some cheating checks
-        Item* item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        Item* item = m_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (!item || item->GetGUID() != itemGuid)
         {
             eqSet.Items[i].Clear();
@@ -1787,7 +1787,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
         eqSet.Items[i] = itemGuid;
     }
 
-    _player->SetEquipmentSet(index, eqSet);
+    m_player->SetEquipmentSet(index, eqSet);
 }
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
@@ -1797,7 +1797,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
 
-    _player->DeleteEquipmentSet(setGuid);
+    m_player->DeleteEquipmentSet(setGuid);
 }
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
@@ -1821,25 +1821,25 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             continue;
 
         // Only equip weapons in combat
-        if (_player->IsInCombat() && i != EQUIPMENT_SLOT_MAINHAND && i != EQUIPMENT_SLOT_OFFHAND && i != EQUIPMENT_SLOT_RANGED)
+        if (m_player->IsInCombat() && i != EQUIPMENT_SLOT_MAINHAND && i != EQUIPMENT_SLOT_OFFHAND && i != EQUIPMENT_SLOT_RANGED)
             continue;
 
         Item* item = nullptr;
         if (itemGuid)
-            item = _player->GetItemByGuid(itemGuid);
+            item = m_player->GetItemByGuid(itemGuid);
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
 
         InventoryResult msg;
-        Item* uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        Item* uItem = m_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (uItem)
         {
             if (uItem->IsEquipped())
             {
-                msg = _player->CanUnequipItem(dstpos, true);
+                msg = m_player->CanUnequipItem(dstpos, true);
                 if (msg != EQUIP_ERR_OK)
                 {
-                    _player->SendEquipError(msg, uItem, nullptr);
+                    m_player->SendEquipError(msg, uItem, nullptr);
                     continue;
                 }
             }
@@ -1847,19 +1847,19 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             if (!item)
             {
                 ItemPosCountVec sDest;
-                msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
+                msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
                 if (msg == EQUIP_ERR_OK)
                 {
                     savedItems.emplace_back(std::make_unique<SavedItem>(uItem, dstpos));
-                    _player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
-                    _player->StoreItem(sDest, uItem, true);
+                    m_player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    m_player->StoreItem(sDest, uItem, true);
                 }
                 else
                 {
                     errorId = 4;
                     for (uint8_t j = 0; j < savedItems.size(); ++j)
                     {
-                        _player->SwapItem(savedItems[j].get()->item->GetPos(), savedItems[j].get()->dstpos);
+                        m_player->SwapItem(savedItems[j].get()->item->GetPos(), savedItems[j].get()->dstpos);
                     }
                     break;
                 }
@@ -1876,15 +1876,15 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             if (!item->IsEquipped())
             {
                 uint16 _candidatePos;
-                msg = _player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
+                msg = m_player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
                 if (msg != EQUIP_ERR_OK)
                 {
-                    _player->SendEquipError(msg, item, nullptr);
+                    m_player->SendEquipError(msg, item, nullptr);
                     continue;
                 }
             }
 
-            _player->SwapItem(item->GetPos(), dstpos);
+            m_player->SwapItem(item->GetPos(), dstpos);
         }
     }
 

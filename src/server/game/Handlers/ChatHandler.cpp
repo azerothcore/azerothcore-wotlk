@@ -286,7 +286,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (ChatHandler(this).ParseCommands(msg.c_str()))
             return;
 
-        if (!_player->CanSpeak())
+        if (!m_player->CanSpeak())
         {
             std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
@@ -339,7 +339,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         ++_addonMessageReceiveCount;
     }
 
-    sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
+    sScriptMgr->OnBeforeSendChatMessage(m_player, type, lang, msg);
 
     switch (type)
     {
@@ -678,11 +678,11 @@ void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
     if (emoteId != EMOTE_ONESHOT_NONE && emoteId != EMOTE_ONESHOT_WAVE)
         return;
 
-    if (!_player->IsAlive() || _player->HasUnitState(UNIT_STATE_DIED))
+    if (!m_player->IsAlive() || m_player->HasUnitState(UNIT_STATE_DIED))
         return;
 
-    sScriptMgr->OnPlayerEmote(_player, emoteId);
-    _player->HandleEmoteCommand(emoteId);
+    sScriptMgr->OnPlayerEmote(m_player, emoteId);
+    m_player->HandleEmoteCommand(emoteId);
 }
 
 namespace Acore
@@ -767,7 +767,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
             break;
     }
 
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
+    Unit* unit = ObjectAccessor::GetUnit(*m_player, guid);
 
     CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
@@ -800,7 +800,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, _player, _player, GetPlayer()->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, m_player, m_player, GetPlayer()->GetName());
     player->GetSession()->SendPacket(&data);
 }
 

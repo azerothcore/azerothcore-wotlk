@@ -72,28 +72,28 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& pa
         return;
     }
 
-    Item* item = _player->GetItemByPos(packet.Bag, packet.Slot);
+    Item* item = m_player->GetItemByPos(packet.Bag, packet.Slot);
     if (!item)
         return;
 
     ItemPosCountVec dest;
-    InventoryResult msg = _player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
+    InventoryResult msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
     if (msg != EQUIP_ERR_OK)
     {
-        _player->SendEquipError(msg, item, nullptr);
+        m_player->SendEquipError(msg, item, nullptr);
         return;
     }
 
     if (dest.size() == 1 && dest[0].pos == item->GetPos())
     {
-        _player->SendEquipError(EQUIP_ERR_NONE, item, nullptr);
+        m_player->SendEquipError(EQUIP_ERR_NONE, item, nullptr);
         return;
     }
 
-    _player->RemoveItem(packet.Bag, packet.Slot, true);
-    _player->ItemRemovedQuestCheck(item->GetEntry(), item->GetCount());
-    _player->BankItem(dest, item, true);
-    _player->UpdateTitansGrip();
+    m_player->RemoveItem(packet.Bag, packet.Slot, true);
+    m_player->ItemRemovedQuestCheck(item->GetEntry(), item->GetCount());
+    m_player->BankItem(dest, item, true);
+    m_player->UpdateTitansGrip();
 }
 
 void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet)
@@ -106,38 +106,38 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
         return;
     }
 
-    Item* item = _player->GetItemByPos(packet.Bag, packet.Slot);
+    Item* item = m_player->GetItemByPos(packet.Bag, packet.Slot);
     if (!item)
         return;
 
-    if (_player->IsBankPos(packet.Bag, packet.Slot))                    // moving from bank to inventory
+    if (m_player->IsBankPos(packet.Bag, packet.Slot))                    // moving from bank to inventory
     {
         ItemPosCountVec dest;
-        InventoryResult msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item, false);
+        InventoryResult msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item, false);
         if (msg != EQUIP_ERR_OK)
         {
-            _player->SendEquipError(msg, item, nullptr);
+            m_player->SendEquipError(msg, item, nullptr);
             return;
         }
 
-        _player->RemoveItem(packet.Bag, packet.Slot, true);
-        if (Item const* storedItem = _player->StoreItem(dest, item, true))
-            _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+        m_player->RemoveItem(packet.Bag, packet.Slot, true);
+        if (Item const* storedItem = m_player->StoreItem(dest, item, true))
+            m_player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
     }
     else                                                    // moving from inventory to bank
     {
         ItemPosCountVec dest;
-        InventoryResult msg = _player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
+        InventoryResult msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
         if (msg != EQUIP_ERR_OK)
         {
-            _player->SendEquipError(msg, item, nullptr);
+            m_player->SendEquipError(msg, item, nullptr);
             return;
         }
 
-        _player->RemoveItem(packet.Bag, packet.Slot, true);
-        _player->ItemRemovedQuestCheck(item->GetEntry(), item->GetCount());
-        _player->BankItem(dest, item, true);
-        _player->UpdateTitansGrip();
+        m_player->RemoveItem(packet.Bag, packet.Slot, true);
+        m_player->ItemRemovedQuestCheck(item->GetEntry(), item->GetCount());
+        m_player->BankItem(dest, item, true);
+        m_player->UpdateTitansGrip();
     }
 }
 
@@ -152,7 +152,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
         return;
     }
 
-    uint32 slot = _player->GetBankBagSlotCount();
+    uint32 slot = m_player->GetBankBagSlotCount();
 
     // next slot
     ++slot;
@@ -170,20 +170,20 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
 
     uint32 price = slotEntry->price;
 
-    if (!_player->HasEnoughMoney(price))
+    if (!m_player->HasEnoughMoney(price))
     {
         packet.Result = ERR_BANKSLOT_INSUFFICIENT_FUNDS;
         SendPacket(packet.Write());
         return;
     }
 
-    _player->SetBankBagSlotCount(slot);
-    _player->ModifyMoney(-int32(price));
+    m_player->SetBankBagSlotCount(slot);
+    m_player->ModifyMoney(-int32(price));
 
     packet.Result = ERR_BANKSLOT_OK;
     SendPacket(packet.Write());
 
-    _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
+    m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
 }
 
 void WorldSession::SendShowBank(ObjectGuid guid)

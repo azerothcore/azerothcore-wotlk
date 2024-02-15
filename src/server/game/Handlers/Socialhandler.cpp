@@ -31,7 +31,7 @@ void WorldSession::HandleContactListOpcode(WorldPacket& recv_data)
     uint32 flags;
     recv_data >> flags;
 
-    _player->GetSocial()->SendSocialList(_player, flags);
+    m_player->GetSocial()->SendSocialList(m_player, flags);
 }
 
 void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
@@ -93,7 +93,7 @@ void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
     ObjectGuid FriendGUID;
     recv_data >> FriendGUID;
 
-    _player->GetSocial()->RemoveFromSocialList(FriendGUID, SOCIAL_FLAG_FRIEND);
+    m_player->GetSocial()->RemoveFromSocialList(FriendGUID, SOCIAL_FLAG_FRIEND);
 
     sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, FriendGUID, false);
 
@@ -140,7 +140,7 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)
     ObjectGuid IgnoreGUID;
     recv_data >> IgnoreGUID;
 
-    _player->GetSocial()->RemoveFromSocialList(IgnoreGUID, SOCIAL_FLAG_IGNORED);
+    m_player->GetSocial()->RemoveFromSocialList(IgnoreGUID, SOCIAL_FLAG_IGNORED);
     sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, IgnoreGUID, false);
 }
 
@@ -149,5 +149,5 @@ void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     std::string note;
     recv_data >> guid >> note;
-    _player->GetSocial()->SetFriendNote(guid, note);
+    m_player->GetSocial()->SetFriendNote(guid, note);
 }

@@ -109,7 +109,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _lastAuctionListOwnerItemsMSTime(0),
     AntiDOS(this),
     m_GUIDLow(0),
-    _player(nullptr),
+    m_player(nullptr),
     m_Socket(sock),
     _security(sec),
     _skipQueue(skipQueue),
@@ -158,7 +158,7 @@ WorldSession::~WorldSession()
     LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
 
     ///- unload player if not unloaded
-    if (_player)
+    if (m_player)
         LogoutPlayer(true);
 
     /// - If have unclosed socket, close it
@@ -183,7 +183,7 @@ bool WorldSession::IsGMAccount() const
 
 std::string const& WorldSession::GetPlayerName() const
 {
-    return _player ? _player->GetName() : DefaultPlayerName;
+    return m_player ? m_player->GetName() : DefaultPlayerName;
 }
 
 std::string WorldSession::GetPlayerInfo() const
@@ -192,9 +192,9 @@ std::string WorldSession::GetPlayerInfo() const
 
     ss << "[Player: ";
 
-    if (!m_playerLoading && _player)
+    if (!m_playerLoading && m_player)
     {
-        ss << _player->GetName() << ' ' << _player->GetGUID().ToString() << ", ";
+        ss << m_player->GetName() << ' ' << m_player->GetGUID().ToString() << ", ";
     }
 
     ss << "Account: " << GetAccountId() << "]";
@@ -322,7 +322,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             switch (opHandle->Status)
             {
             case STATUS_LOGGEDIN:
-                if (!_player)
+                if (!m_player)
                 {
                     // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
                     //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
@@ -335,7 +335,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         LOG_DEBUG("network", "Delaying processing of message with status STATUS_LOGGEDIN: No players in the world for account id {}", GetAccountId());
                     }
                 }
-                else if (_player->IsInWorld())
+                else if (m_player->IsInWorld())
                 {
                     if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                     {
@@ -354,14 +354,14 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                 break;
             case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
-                if (!_player && !m_playerRecentlyLogout) // There's a short delay between _player = null and m_playerRecentlyLogout = true during logout
+                if (!m_player && !m_playerRecentlyLogout) // There's a short delay between m_player = null and m_playerRecentlyLogout = true during logout
                 {
                     LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
                             "the player has not logged in yet and not recently logout");
                 }
                 else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
-                    // not expected _player or must checked in packet hanlder
+                    // not expected m_player or must checked in packet hanlder
                     if (!sScriptMgr->CanPacketReceive(this, *packet))
                         break;
 
@@ -372,7 +372,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 break;
             case STATUS_TRANSFER:
-                if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                if (m_player && !m_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
                     if (!sScriptMgr->CanPacketReceive(this, *packet))
                     {
@@ -571,101 +571,101 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 void WorldSession::LogoutPlayer(bool save)
 {
     // finish pending transfers before starting the logout
-    while (_player && _player->IsBeingTeleportedFar())
+    while (m_player && m_player->IsBeingTeleportedFar())
         HandleMoveWorldportAck();
 
     m_playerLogout = true;
     m_playerSave = save;
 
-    if (_player)
+    if (m_player)
     {
         //! Call script hook before other logout events
-        sScriptMgr->OnBeforePlayerLogout(_player);
+        sScriptMgr->OnBeforePlayerLogout(m_player);
 
-        if (ObjectGuid lguid = _player->GetLootGUID())
+        if (ObjectGuid lguid = m_player->GetLootGUID())
             DoLootRelease(lguid);
 
         ///- If the player just died before logging out, make him appear as a ghost
         //FIXME: logout must be delayed in case lost connection with client in time of combat
-        if (_player->GetDeathTimer())
+        if (m_player->GetDeathTimer())
         {
-            _player->getHostileRefMgr().deleteReferences(true);
-            _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            m_player->getHostileRefMgr().deleteReferences(true);
+            m_player->BuildPlayerRepop();
+            m_player->RepopAtGraveyard();
         }
-        else if (_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        else if (m_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         {
             // this will kill character by SPELL_AURA_SPIRIT_OF_REDEMPTION
-            _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
-            _player->KillPlayer();
-            _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            m_player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+            m_player->KillPlayer();
+            m_player->BuildPlayerRepop();
+            m_player->RepopAtGraveyard();
         }
-        else if (_player->HasPendingBind())
+        else if (m_player->HasPendingBind())
         {
-            _player->RepopAtGraveyard();
-            _player->SetPendingBind(0, 0);
+            m_player->RepopAtGraveyard();
+            m_player->SetPendingBind(0, 0);
         }
 
         // pussywizard: leave whole bg on logout (character stays ingame when necessary)
         // pussywizard: GetBattleground() checked inside
-        _player->LeaveBattleground();
+        m_player->LeaveBattleground();
 
         // pussywizard: checked first time
-        if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
-            _player->RepopAtGraveyard();
+        if (!m_player->IsBeingTeleportedFar() && !m_player->m_InstanceValid && !m_player->IsGameMaster())
+            m_player->RepopAtGraveyard();
 
-        sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
+        sOutdoorPvPMgr->HandlePlayerLeaveZone(m_player, m_player->GetZoneId());
 
         // pussywizard: remove from battleground queues on logout
         for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(i))
+            if (BattlegroundQueueTypeId bgQueueTypeId = m_player->GetBattlegroundQueueTypeId(i))
             {
                 // track if player logs out after invited to join BG
-                if (_player->IsInvitedForBattlegroundInstance())
+                if (m_player->IsInvitedForBattlegroundInstance())
                 {
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                     {
                         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                        stmt->SetData(0, _player->GetGUID().GetCounter());
+                        stmt->SetData(0, m_player->GetGUID().GetCounter());
                         stmt->SetData(1, BG_DESERTION_TYPE_INVITE_LOGOUT);
                         CharacterDatabase.Execute(stmt);
                     }
 
-                    sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
+                    sScriptMgr->OnBattlegroundDesertion(m_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
 
-                _player->RemoveBattlegroundQueueId(bgQueueTypeId);
-                sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
+                m_player->RemoveBattlegroundQueueId(bgQueueTypeId);
+                sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(m_player->GetGUID(), true);
             }
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
-        if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
+        if (Guild* guild = sGuildMgr->GetGuildById(m_player->GetGuildId()))
             guild->HandleMemberLogout(this);
 
         ///- Remove pet
-        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+        m_player->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
 
         // pussywizard: on logout remove auras that are removed at map change (before saving to db)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
-        _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
+        m_player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
         ///- If the player is in a group and LeaveGroupOnLogout is enabled or if the player is invited to a group, remove him. If the group is then only 1 person, disband the group.
-        if (!_player->GetGroup() || sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
-            _player->UninviteFromGroup();
+        if (!m_player->GetGroup() || sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+            m_player->UninviteFromGroup();
 
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
-        if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
-            _player->RemoveFromGroup();
+        if (m_player->GetGroup() && !m_player->GetGroup()->isRaidGroup() && !m_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+            m_player->RemoveFromGroup();
 
         // pussywizard: checked second time after being removed from a group
-        if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
-            _player->RepopAtGraveyard();
+        if (!m_player->IsBeingTeleportedFar() && !m_player->m_InstanceValid && !m_player->IsGameMaster())
+            m_player->RepopAtGraveyard();
 
         // Repop at GraveYard or other player far teleport will prevent saving player because of not present map
         // Teleport player immediately for correct player save
-        while (_player && _player->IsBeingTeleportedFar())
+        while (m_player && m_player->IsBeingTeleportedFar())
             HandleMoveWorldportAck();
 
         ///- empty buyback items and save the player in the database
@@ -676,50 +676,50 @@ void WorldSession::LogoutPlayer(bool save)
             for (int j = BUYBACK_SLOT_START; j < BUYBACK_SLOT_END; ++j)
             {
                 eslot = j - BUYBACK_SLOT_START;
-                _player->SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), ObjectGuid::Empty);
-                _player->SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
-                _player->SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, 0);
+                m_player->SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), ObjectGuid::Empty);
+                m_player->SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
+                m_player->SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, 0);
             }
-            _player->SaveToDB(false, true);
+            m_player->SaveToDB(false, true);
         }
 
         ///- Leave all channels before player delete...
-        _player->CleanupChannels();
+        m_player->CleanupChannels();
 
         //! Send update to group and reset stored max enchanting level
-        if (_player->GetGroup())
+        if (m_player->GetGroup())
         {
-            _player->GetGroup()->SendUpdate();
-            _player->GetGroup()->ResetMaxEnchantingLevel();
+            m_player->GetGroup()->SendUpdate();
+            m_player->GetGroup()->ResetMaxEnchantingLevel();
 
-            if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
+            if (m_player->GetMap()->IsDungeon() || m_player->GetMap()->IsRaidOrHeroicDungeon())
             {
-                Map::PlayerList const &playerList = _player->GetMap()->GetPlayers();
+                Map::PlayerList const &playerList = m_player->GetMap()->GetPlayers();
                 if (playerList.IsEmpty())
-                    _player->TeleportToEntryPoint();
+                    m_player->TeleportToEntryPoint();
             }
         }
 
         //! Broadcast a logout message to the player's friends
-        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID(), true);
-        sSocialMgr->RemovePlayerSocial(_player->GetGUID());
+        sSocialMgr->SendFriendStatus(m_player, FRIEND_OFFLINE, m_player->GetGUID(), true);
+        sSocialMgr->RemovePlayerSocial(m_player->GetGUID());
 
         //! Call script hook before deletion
-        sScriptMgr->OnPlayerLogout(_player);
+        sScriptMgr->OnPlayerLogout(m_player);
 
-        METRIC_EVENT("player_events", "Logout", _player->GetName());
+        METRIC_EVENT("player_events", "Logout", m_player->GetName());
 
         LOG_INFO("entities.player", "Account: {} (IP: {}) Logout Character:[{}] ({}) Level: {}",
-            GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(), _player->GetLevel());
+            GetAccountId(), GetRemoteAddress(), m_player->GetName(), m_player->GetGUID().ToString(), m_player->GetLevel());
 
         //! Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
         // calls to GetMap in this case may cause crashes
-        _player->CleanupsBeforeDelete();
-        if (Map* _map = _player->FindMap())
+        m_player->CleanupsBeforeDelete();
+        if (Map* _map = m_player->FindMap())
         {
-            _map->RemovePlayerFromMap(_player, true);
+            _map->RemovePlayerFromMap(m_player, true);
             _map->AfterPlayerUnlinkFromMap();
         }
 
@@ -747,8 +747,8 @@ void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
     if (m_Socket)
     {
-        LOG_INFO("network.kick", "Account: {} Character: '{}' {} kicked with reason: {}", GetAccountId(), _player ? _player->GetName() : "<none>",
-            _player ? _player->GetGUID().ToString() : "", reason);
+        LOG_INFO("network.kick", "Account: {} Character: '{}' {} kicked with reason: {}", GetAccountId(), m_player ? m_player->GetName() : "<none>",
+            m_player ? m_player->GetGUID().ToString() : "", reason);
 
         m_Socket->CloseSocket();
     }
@@ -908,7 +908,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
     }
     else
     {
-        // _player can be nullptr and packet received after logout but m_GUID still store correct guid
+        // m_player can be nullptr and packet received after logout but m_GUID still store correct guid
         if (!m_GUIDLow)
             return;
 
@@ -1285,11 +1285,11 @@ void WorldSession::SendAddonsInfo()
 
 void WorldSession::SetPlayer(Player* player)
 {
-    _player = player;
+    m_player = player;
 
     // set m_GUID that can be used while player loggined and later until m_playerRecentlyLogout not reset
-    if (_player)
-        m_GUIDLow = _player->GetGUID().GetCounter();
+    if (m_player)
+        m_GUIDLow = m_player->GetGUID().GetCounter();
 }
 
 void WorldSession::ProcessQueryCallbacks()

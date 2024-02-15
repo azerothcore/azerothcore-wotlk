@@ -169,33 +169,33 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
 
-    ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamIdInvited());
+    ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(m_player->GetArenaTeamIdInvited());
     if (!arenaTeam)
         return;
 
     // Check if player is already in another team of the same size
-    if (_player->GetArenaTeamId(arenaTeam->GetSlot()))
+    if (m_player->GetArenaTeamId(arenaTeam->GetSlot()))
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ALREADY_IN_ARENA_TEAM);
         return;
     }
 
     // Only allow members of the other faction to join the team if cross faction interaction is enabled
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && _player->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(arenaTeam->GetCaptain()))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && m_player->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(arenaTeam->GetCaptain()))
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
         return;
     }
 
     // Add player to team
-    if (!arenaTeam->AddMember(_player->GetGUID()))
+    if (!arenaTeam->AddMember(m_player->GetGUID()))
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_INTERNAL);
         return;
     }
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_JOIN_SS, _player->GetGUID(), 2, _player->GetName().c_str(), arenaTeam->GetName(), "");
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_JOIN_SS, m_player->GetGUID(), 2, m_player->GetName().c_str(), arenaTeam->GetName(), "");
 }
 
 void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
@@ -203,7 +203,7 @@ void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
 
     // Remove invite from player
-    _player->SetArenaTeamIdInvited(0);
+    m_player->SetArenaTeamIdInvited(0);
 }
 
 void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
@@ -225,7 +225,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
     }
 
     // Team captain can't leave the team if other members are still present
-    if (_player->GetGUID() == arenaTeam->GetCaptain() && arenaTeam->GetMembersSize() > 1)
+    if (m_player->GetGUID() == arenaTeam->GetCaptain() && arenaTeam->GetMembersSize() > 1)
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAM_LEADER_LEAVE_S);
         return;
@@ -236,7 +236,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
     {
         GroupQueueInfo ginfo;
         BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
-        if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        if (queue.GetPlayerGroupInfoData(m_player->GetGUID(), &ginfo))
         {
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
@@ -247,17 +247,17 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
     }
 
     // If team consists only of the captain, disband the team
-    if (_player->GetGUID() == arenaTeam->GetCaptain())
+    if (m_player->GetGUID() == arenaTeam->GetCaptain())
     {
         arenaTeam->Disband(this);
         delete arenaTeam;
         return;
     }
     else
-        arenaTeam->DelMember(_player->GetGUID(), true);
+        arenaTeam->DelMember(m_player->GetGUID(), true);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEAVE_SS, _player->GetGUID(), 2, _player->GetName().c_str(), arenaTeam->GetName(), "");
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEAVE_SS, m_player->GetGUID(), 2, m_player->GetName().c_str(), arenaTeam->GetName(), "");
 
     // Inform player who left
     SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, arenaTeam->GetName(), "", 0);
@@ -273,7 +273,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
     if (ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId))
     {
         // Only captain can disband the team
-        if (arenaTeam->GetCaptain() != _player->GetGUID())
+        if (arenaTeam->GetCaptain() != m_player->GetGUID())
             return;
 
         // Teams cannot be disbanded during queues
@@ -281,7 +281,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
         {
             GroupQueueInfo ginfo;
             BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
-            if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+            if (queue.GetPlayerGroupInfoData(m_player->GetGUID(), &ginfo))
                 if (ginfo.IsInvitedToBGInstanceGUID)
                     return;
         }
@@ -311,7 +311,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
         return;
 
     // Only captain can remove members
-    if (arenaTeam->GetCaptain() != _player->GetGUID())
+    if (arenaTeam->GetCaptain() != m_player->GetGUID())
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_PERMISSIONS);
         return;
@@ -340,7 +340,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     {
         GroupQueueInfo ginfo;
         BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
-        if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        if (queue.GetPlayerGroupInfoData(m_player->GetGUID(), &ginfo))
         {
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
@@ -357,7 +357,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     arenaTeam->DelMember(member->Guid, true);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, ObjectGuid::Empty, 3, name, arenaTeam->GetName(), _player->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, ObjectGuid::Empty, 3, name, arenaTeam->GetName(), m_player->GetName());
 }
 
 void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
@@ -376,7 +376,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
         return;
 
     // Only captain can pass leadership
-    if (arenaTeam->GetCaptain() != _player->GetGUID())
+    if (arenaTeam->GetCaptain() != m_player->GetGUID())
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_PERMISSIONS);
         return;
@@ -400,7 +400,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
     arenaTeam->SetCaptain(member->Guid);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, ObjectGuid::Empty, 3, _player->GetName().c_str(), name, arenaTeam->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, ObjectGuid::Empty, 3, m_player->GetName().c_str(), name, arenaTeam->GetName());
 }
 
 void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)
