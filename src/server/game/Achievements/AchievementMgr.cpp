@@ -480,7 +480,7 @@ bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target,
 
 AchievementMgr::AchievementMgr(Player* player)
 {
-    _player = player;
+    m_player = player;
 }
 
 AchievementMgr::~AchievementMgr()
@@ -493,19 +493,19 @@ void AchievementMgr::Reset()
     {
         WorldPacket data(SMSG_ACHIEVEMENT_DELETED, 4);
         data << uint32(iter->first);
-        _player->SendDirectMessage(&data);
+        m_player->SendDirectMessage(&data);
     }
 
     for (CriteriaProgressMap::const_iterator iter = _criteriaProgress.begin(); iter != _criteriaProgress.end(); ++iter)
     {
         WorldPacket data(SMSG_CRITERIA_DELETED, 4);
         data << uint32(iter->first);
-        _player->SendDirectMessage(&data);
+        m_player->SendDirectMessage(&data);
     }
 
     _completedAchievements.clear();
     _criteriaProgress.clear();
-    DeleteFromDB(_player->GetGUID().GetCounter());
+    DeleteFromDB(m_player->GetGUID().GetCounter());
 
     // re-fill data
     CheckAllAchievementCriteria();
@@ -514,7 +514,7 @@ void AchievementMgr::Reset()
 void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
     // disable for gamemasters with GM-mode enabled
-    if (_player->IsGameMaster())
+    if (m_player->IsGameMaster())
         return;
 
     LOG_DEBUG("achievement", "AchievementMgr::ResetAchievementCriteria({}, {}, {})", condition, value, evenIfCriteriaComplete);
@@ -795,7 +795,7 @@ static const uint32 achievIdForDungeon[][4] =
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
     // disable for gamemasters with GM-mode enabled
-    if (_player->IsGameMaster())
+    if (m_player->IsGameMaster())
         return;
 
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
@@ -2081,7 +2081,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         return;
     }
 
-    LOG_DEBUG("achievement", "AchievementMgr::SetCriteriaProgress({}, {}) for {}", entry->ID, changeValue, _player->GetGUID().ToString());
+    LOG_DEBUG("achievement", "AchievementMgr::SetCriteriaProgress({}, {}) for {}", entry->ID, changeValue, m_player->GetGUID().ToString());
 
     CriteriaProgress* progress = GetCriteriaProgress(entry);
     if (!progress)
@@ -2153,7 +2153,7 @@ void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entr
 
     WorldPacket data(SMSG_CRITERIA_DELETED, 4);
     data << uint32(entry->ID);
-    _player->SendDirectMessage(&data);
+    m_player->SendDirectMessage(&data);
 
     _criteriaProgress.erase(criteriaProgress);
 }
@@ -2227,10 +2227,10 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
     // disable for gamemasters with GM-mode enabled
-    if (_player->IsGameMaster())
+    if (m_player->IsGameMaster())
     {
         LOG_INFO("achievement", "Not available in GM mode.");
-        ChatHandler(_player->GetSession()).PSendSysMessage("Not available in GM mode");
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
         return;
     }
 
@@ -2274,7 +2274,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(_player->GetSession()->GetSecurity()))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(m_player->GetSession()->GetSecurity()))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);

@@ -699,8 +699,8 @@ public:
             return false;
         }
 
-        Player* _player = handler->GetSession()->GetPlayer();
-        if (target->GetGUID() == _player->GetGUID())
+        Player* m_player = handler->GetSession()->GetPlayer();
+        if (target->GetGUID() == m_player->GetGUID())
         {
             handler->SendErrorMessage(LANG_CANT_TELEPORT_SELF);
             return false;
@@ -722,28 +722,28 @@ public:
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
-                if (!_player->IsGameMaster())
+                if (!m_player->IsGameMaster())
                 {
                     handler->SendErrorMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     return false;
                 }
 
-                if (!_player->GetMap()->IsBattlegroundOrArena())
+                if (!m_player->GetMap()->IsBattlegroundOrArena())
                 {
-                    _player->SetEntryPoint();
+                    m_player->SetEntryPoint();
                 }
 
-                _player->SetBattlegroundId(targetPlayer->GetBattlegroundId(), targetPlayer->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+                m_player->SetBattlegroundId(targetPlayer->GetBattlegroundId(), targetPlayer->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
             }
             else if (map->IsDungeon())
             {
                 // we have to go to instance, and can go to player only if:
                 //   1) we are in his group (either as leader or as member)
                 //   2) we are not bound to any group and have GM mode on
-                if (_player->GetGroup())
+                if (m_player->GetGroup())
                 {
                     // we are in group, we can go only if we are in the player group
-                    if (_player->GetGroup() != targetPlayer->GetGroup())
+                    if (m_player->GetGroup() != targetPlayer->GetGroup())
                     {
                         handler->SendErrorMessage(LANG_CANNOT_GO_TO_INST_PARTY, nameLink.c_str());
                         return false;
@@ -752,7 +752,7 @@ public:
                 else
                 {
                     // we are not in group, let's verify our GM mode
-                    if (!_player->IsGameMaster())
+                    if (!m_player->IsGameMaster())
                     {
                         handler->SendErrorMessage(LANG_CANNOT_GO_TO_INST_GM, nameLink.c_str());
                         return false;
@@ -760,41 +760,41 @@ public:
                 }
 
                 // if the GM is bound to another instance, he will not be bound to another one
-                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUID(), targetPlayer->GetMapId(), targetPlayer->GetDifficulty(map->IsRaid()));
+                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(m_player->GetGUID(), targetPlayer->GetMapId(), targetPlayer->GetDifficulty(map->IsRaid()));
                 if (!bind)
                 {
                     if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetConnectedPlayer()->GetInstanceId()))
                     {
-                        sInstanceSaveMgr->PlayerBindToInstance(_player->GetGUID(), save, !save->CanReset(), _player);
+                        sInstanceSaveMgr->PlayerBindToInstance(m_player->GetGUID(), save, !save->CanReset(), m_player);
                     }
                 }
 
                 if (map->IsRaid())
                 {
-                    _player->SetRaidDifficulty(targetPlayer->GetRaidDifficulty());
+                    m_player->SetRaidDifficulty(targetPlayer->GetRaidDifficulty());
                 }
                 else
                 {
-                    _player->SetDungeonDifficulty(targetPlayer->GetDungeonDifficulty());
+                    m_player->SetDungeonDifficulty(targetPlayer->GetDungeonDifficulty());
                 }
             }
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
             // stop flight if need
-            if (_player->IsInFlight())
+            if (m_player->IsInFlight())
             {
-                _player->GetMotionMaster()->MovementExpired();
-                _player->CleanupAfterTaxiFlight();
+                m_player->GetMotionMaster()->MovementExpired();
+                m_player->CleanupAfterTaxiFlight();
             }
             else // save only in non-flight case
             {
-                _player->SaveRecallPosition();
+                m_player->SaveRecallPosition();
             }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (m_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, m_player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                m_player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
@@ -818,18 +818,18 @@ public:
             }
 
             // stop flight if need
-            if (_player->IsInFlight())
+            if (m_player->IsInFlight())
             {
-                _player->GetMotionMaster()->MovementExpired();
-                _player->CleanupAfterTaxiFlight();
+                m_player->GetMotionMaster()->MovementExpired();
+                m_player->CleanupAfterTaxiFlight();
             }
             // save only in non-flight case
             else
             {
-                _player->SaveRecallPosition();
+                m_player->SaveRecallPosition();
             }
 
-            _player->TeleportTo(map, x, y, z, _player->GetOrientation());
+            m_player->TeleportTo(map, x, y, z, m_player->GetOrientation());
         }
 
         return true;
@@ -848,8 +848,8 @@ public:
             return false;
         }
 
-        Player* _player = handler->GetSession()->GetPlayer();
-        if (target->GetGUID() == _player->GetGUID())
+        Player* m_player = handler->GetSession()->GetPlayer();
+        if (target->GetGUID() == m_player->GetGUID())
         {
             handler->SendErrorMessage(LANG_CANT_TELEPORT_SELF);
             return false;
@@ -914,7 +914,7 @@ public:
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
             if (handler->needReportToTarget(targetPlayer))
             {
-                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
+                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(m_player->GetName()).c_str());
             }
 
             // stop flight if need

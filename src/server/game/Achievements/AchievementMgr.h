@@ -293,7 +293,7 @@ public:
     void SendAllAchievementData() const;
     void SendRespondInspectAchievements(Player* player) const;
     [[nodiscard]] bool HasAchieved(uint32 achievementId) const;
-    [[nodiscard]] Player* GetPlayer() const { return _player; }
+    [[nodiscard]] Player* GetPlayer() const { return m_player; }
     void UpdateTimedAchievements(uint32 timeDiff);
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
@@ -313,7 +313,7 @@ private:
     bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
     void BuildAllDataPacket(WorldPacket* data) const;
 
-    Player* _player;
+    Player* m_player;
     CriteriaProgressMap _criteriaProgress;
     CompletedAchievementMap _completedAchievements;
     typedef std::map<uint32, uint32> TimedAchievementMap;

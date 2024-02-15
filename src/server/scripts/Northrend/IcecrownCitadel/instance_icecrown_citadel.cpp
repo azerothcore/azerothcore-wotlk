@@ -1081,8 +1081,8 @@ public:
         void RemoveBackPack()
         {
             for (auto const& itr : instance->GetPlayers())
-                if (Player* _player = itr.GetSource())
-                    _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
+                if (Player* m_player = itr.GetSource())
+                    m_player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, m_player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override

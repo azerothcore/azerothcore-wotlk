@@ -361,7 +361,7 @@ public:
     AccountTypes GetSecurity() const { return _security; }
     bool CanSkipQueue() const { return _skipQueue; }
     uint32 GetAccountId() const { return _accountId; }
-    Player* GetPlayer() const { return _player; }
+    Player* GetPlayer() const { return m_player; }
     std::string const& GetPlayerName() const;
     std::string GetPlayerInfo() const;
 
@@ -1142,7 +1142,7 @@ private:
     GuidSet _legitCharacters;
 
     ObjectGuid::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
-    Player* _player;
+    Player* m_player;
     std::shared_ptr<WorldSocket> m_Socket;
     std::string m_Address;
 

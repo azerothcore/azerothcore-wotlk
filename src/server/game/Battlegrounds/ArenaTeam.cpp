@@ -1056,9 +1056,9 @@ void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type,
     Stats.WeekWins = 0;
     Stats.SeasonWins = 0;
 
-    for (auto const& _player : playerList)
+    for (auto const& m_player : playerList)
     {
-        ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamId(GetSlotByType(type)));
+        ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(m_player->GetArenaTeamId(GetSlotByType(type)));
         if (!team)
             continue;
 

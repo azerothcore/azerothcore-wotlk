@@ -118,17 +118,17 @@ void WorldSession::HandleMoveWorldportAck()
     oldMap->AfterPlayerUnlinkFromMap();
 
     // pussywizard: transport teleport couldn't teleport us to the same map (some other teleport pending, reqs not met, etc.), but we still have transport set until player moves! clear it if map differs (crashfix)
-    if (Transport* t = _player->GetTransport())
-        if (!t->IsInMap(_player))
+    if (Transport* t = m_player->GetTransport())
+        if (!t->IsInMap(m_player))
         {
-            t->RemovePassenger(_player);
-            _player->m_transport = nullptr;
-            _player->m_movementInfo.transport.Reset();
-            _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            t->RemovePassenger(m_player);
+            m_player->m_transport = nullptr;
+            m_player->m_movementInfo.transport.Reset();
+            m_player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefMgr().IsEmpty())
-        _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
+    if (!m_player->getHostileRefMgr().IsEmpty())
+        m_player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
@@ -140,43 +140,43 @@ void WorldSession::HandleMoveWorldportAck()
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     // pussywizard: player supposed to enter bg map
-    if (_player->InBattleground())
+    if (m_player->InBattleground())
     {
         // but landed on another map, cleanup data
         if (!mEntry->IsBattlegroundOrArena())
-            _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+            m_player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
         // everything ok
-        else if (Battleground* bg = _player->GetBattleground())
+        else if (Battleground* bg = m_player->GetBattleground())
         {
-            if (_player->IsInvitedForBattlegroundInstance()) // GMs are not invited, so they are not added to participants
-                bg->AddPlayer(_player);
+            if (m_player->IsInvitedForBattlegroundInstance()) // GMs are not invited, so they are not added to participants
+                bg->AddPlayer(m_player);
         }
     }
 
     // pussywizard: arena spectator stuff
     {
-        if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && _player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
+        if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && m_player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
         {
-            _player->ClearReceivedSpectatorResetFor();
-            _player->SetIsSpectator(true);
-            ArenaSpectator::SendCommand(_player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
-            ((BattlegroundMap*)newMap)->GetBG()->AddSpectator(_player);
-            ArenaSpectator::HandleResetCommand(_player);
+            m_player->ClearReceivedSpectatorResetFor();
+            m_player->SetIsSpectator(true);
+            ArenaSpectator::SendCommand(m_player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
+            ((BattlegroundMap*)newMap)->GetBG()->AddSpectator(m_player);
+            ArenaSpectator::HandleResetCommand(m_player);
         }
         else
-            _player->SetIsSpectator(false);
+            m_player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
 
-        if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
+        if (uint32 inviteInstanceId = m_player->GetPendingSpectatorInviteInstanceId())
         {
             if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId, BATTLEGROUND_TYPE_NONE))
-                tbg->RemoveToBeTeleported(_player->GetGUID());
-            _player->SetPendingSpectatorInviteInstanceId(0);
+                tbg->RemoveToBeTeleported(m_player->GetGUID());
+            m_player->SetPendingSpectatorInviteInstanceId(0);
         }
     }
 
-    // xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
+    // xinef: do this again, player can be teleported inside bg->AddPlayer(m_player)!!!!
     CellCoord pair2(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
@@ -241,7 +241,7 @@ void WorldSession::HandleMoveWorldportAck()
 
     // mount allow check
     if (!allowMount)
-        _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        m_player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
@@ -275,7 +275,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     LOG_DEBUG("network.opcode", "Guid {}", guid.ToString());
     LOG_DEBUG("network.opcode", "Flags {}, time {}", flags, time / IN_MILLISECONDS);
 
-    Player* plMover = _player->m_mover->ToPlayer();
+    Player* plMover = m_player->m_mover->ToPlayer();
 
     if (!plMover || !plMover->IsBeingTeleportedNear())
         return;
@@ -335,7 +335,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 {
     uint16 opcode = recvData.GetOpcode();
 
-    Unit* mover = _player->m_mover;
+    Unit* mover = m_player->m_mover;
 
     ASSERT(mover);                      // there must always be a mover
 
@@ -556,7 +556,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
+    mover->SendMessageToSet(&data, m_player);
 
     mover->m_movementInfo = movementInfo;
 
@@ -585,7 +585,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
         if (movementInfo.pos.GetPositionZ() < plrMover->GetMap()->GetMinHeight(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY()))
-            if (!plrMover->GetBattleground() || !plrMover->GetBattleground()->HandlePlayerUnderMap(_player))
+            if (!plrMover->GetBattleground() || !plrMover->GetBattleground()->HandlePlayerUnderMap(m_player))
             {
                 if (plrMover->IsAlive())
                 {
@@ -621,7 +621,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     recvData >> guid.ReadAsPacked();
 
     // pussywizard: special check, only player mover allowed here
-    if (guid != _player->m_mover->GetGUID() || guid != _player->GetGUID())
+    if (guid != m_player->m_mover->GetGUID() || guid != m_player->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
         return;
@@ -686,29 +686,29 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
             return;
     }
 
-    sScriptMgr->AnticheatSetUnderACKmount(_player);
+    sScriptMgr->AnticheatSetUnderACKmount(m_player);
 
     // skip all forced speed changes except last and unexpected
     // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
-    if (_player->m_forced_speed_changes[force_move_type] > 0)
+    if (m_player->m_forced_speed_changes[force_move_type] > 0)
     {
-        --_player->m_forced_speed_changes[force_move_type];
-        if (_player->m_forced_speed_changes[force_move_type] > 0)
+        --m_player->m_forced_speed_changes[force_move_type];
+        if (m_player->m_forced_speed_changes[force_move_type] > 0)
             return;
     }
 
-    if (!_player->GetTransport() && std::fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
+    if (!m_player->GetTransport() && std::fabs(m_player->GetSpeed(move_type) - newspeed) > 0.01f)
     {
-        if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
+        if (m_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
         {
             LOG_ERROR("network.opcode", "{}SpeedChange player {} is NOT correct (must be {} instead {}), force set to correct value",
-                           move_type_name[move_type], _player->GetName(), _player->GetSpeed(move_type), newspeed);
-            _player->SetSpeed(move_type, _player->GetSpeedRate(move_type), true);
+                           move_type_name[move_type], m_player->GetName(), m_player->GetSpeed(move_type), newspeed);
+            m_player->SetSpeed(move_type, m_player->GetSpeedRate(move_type), true);
         }
         else                                                // must be lesser - cheating
         {
             LOG_INFO("network.opcode", "Player {} from account id {} kicked for incorrect speed (must be {} instead {})",
-                           _player->GetName(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
+                           m_player->GetName(), GetAccountId(), m_player->GetSpeed(move_type), newspeed);
             KickPlayer("Incorrect speed");
         }
     }
@@ -721,11 +721,11 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
+    if (GetPlayer()->IsInWorld() && m_player->m_mover && m_player->m_mover->IsInWorld())
     {
-        if (_player->m_mover->GetGUID() != guid)
+        if (m_player->m_mover->GetGUID() != guid)
             LOG_ERROR("network.opcode", "HandleSetActiveMoverOpcode: incorrect mover guid: mover is {} and should be {}",
-                guid.ToString(), _player->m_mover->GetGUID().ToString());
+                guid.ToString(), m_player->m_mover->GetGUID().ToString());
     }
 }
 
@@ -737,7 +737,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
     recvData >> old_mover_guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
-    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || old_mover_guid != _player->m_mover->GetGUID())
+    if (!m_player->m_mover || !m_player->m_mover->IsInWorld() || m_player->m_mover->IsDuringRemoveFromWorld() || old_mover_guid != m_player->m_mover->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
         return;
@@ -747,7 +747,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
     mi.guid = old_mover_guid;
     ReadMovementInfo(recvData, &mi);
 
-    _player->m_mover->m_movementInfo = mi;
+    m_player->m_mover->m_movementInfo = mi;
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
@@ -766,7 +766,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
-    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
+    if (!m_player->m_mover || !m_player->m_mover->IsInWorld() || m_player->m_mover->IsDuringRemoveFromWorld() || guid != m_player->m_mover->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
         return;
@@ -778,19 +778,19 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
-    _player->m_mover->m_movementInfo = movementInfo;
+    m_player->m_mover->m_movementInfo = movementInfo;
 
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
     data << guid.WriteAsPacked();
-    _player->m_mover->BuildMovementPacket(&data);
-    _player->SetCanTeleport(true);
+    m_player->m_mover->BuildMovementPacket(&data);
+    m_player->SetCanTeleport(true);
     // knockback specific info
     data << movementInfo.jump.sinAngle;
     data << movementInfo.jump.cosAngle;
     data << movementInfo.jump.xyspeed;
     data << movementInfo.jump.zspeed;
 
-    _player->SendMessageToSet(&data, false);
+    m_player->SendMessageToSet(&data, false);
 }
 
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
@@ -827,7 +827,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
-    if (!_player->IsAlive() || _player->IsInCombat())
+    if (!m_player->IsAlive() || m_player->IsInCombat())
         return;
 
     ObjectGuid summoner_guid;
@@ -835,7 +835,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     recvData >> summoner_guid;
     recvData >> agree;
 
-    if (agree && _player->IsSummonAsSpectator())
+    if (agree && m_player->IsSummonAsSpectator())
     {
         ChatHandler chc(this);
         if (Player* summoner = ObjectAccessor::FindPlayer(summoner_guid))
@@ -845,8 +845,8 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 
         agree = false;
     }
-    _player->SetSummonAsSpectator(false);
-    _player->SummonIfPossible(agree, summoner_guid);
+    m_player->SetSummonAsSpectator(false);
+    m_player->SummonIfPossible(agree, summoner_guid);
 }
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
@@ -956,7 +956,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
 
-    Unit* mover = _player->m_mover;
+    Unit* mover = m_player->m_mover;
     if (!mover || guid != mover->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
@@ -988,7 +988,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
     WorldPacket data(MSG_MOVE_ROOT, 64);
     WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
+    mover->SendMessageToSet(&data, m_player);
 }
 
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
@@ -996,7 +996,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
 
-    Unit* mover = _player->m_mover;
+    Unit* mover = m_player->m_mover;
     if (!mover || guid != mover->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
@@ -1033,5 +1033,5 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
 
     WorldPacket data(MSG_MOVE_UNROOT, 64);
     WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
+    mover->SendMessageToSet(&data, m_player);
 }

@@ -1609,31 +1609,31 @@ class spell_item_deviate_fish : public SpellScript
 class PartyTimeEmoteEvent : public BasicEvent
 {
 public:
-    PartyTimeEmoteEvent(Player* player) : _player(player) { }
+    PartyTimeEmoteEvent(Player* player) : m_player(player) { }
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        if (!_player->HasAura(SPELL_PARTY_TIME))
+        if (!m_player->HasAura(SPELL_PARTY_TIME))
         {
             return true;
         }
 
-        if (_player->isMoving())
+        if (m_player->isMoving())
         {
-            _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
+            m_player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }
         else
         {
-            _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
+            m_player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }
 
-        _player->m_Events.AddEvent(this, RAND(_player->m_Events.CalculateTime(5000), _player->m_Events.CalculateTime(10000), _player->m_Events.CalculateTime(15000)));
+        m_player->m_Events.AddEvent(this, RAND(m_player->m_Events.CalculateTime(5000), m_player->m_Events.CalculateTime(10000), m_player->m_Events.CalculateTime(15000)));
 
         return false; // do not delete re-added event in EventProcessor::Update
     }
 
 private:
-    Player* _player;
+    Player* m_player;
 };
 
 class spell_item_party_time : public AuraScript

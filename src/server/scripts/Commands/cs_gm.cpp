@@ -189,11 +189,11 @@ public:
     //Enable\Disable Invisible mode
     static bool HandleGMVisibleCommand(ChatHandler* handler, Optional<bool> visibleArg)
     {
-        Player* _player = handler->GetSession()->GetPlayer();
+        Player* m_player = handler->GetSession()->GetPlayer();
 
         if (!visibleArg)
         {
-            handler->PSendSysMessage(LANG_YOU_ARE, _player->isGMVisible() ? handler->GetAcoreString(LANG_VISIBLE) : handler->GetAcoreString(LANG_INVISIBLE));
+            handler->PSendSysMessage(LANG_YOU_ARE, m_player->isGMVisible() ? handler->GetAcoreString(LANG_VISIBLE) : handler->GetAcoreString(LANG_INVISIBLE));
             return true;
         }
 
@@ -201,18 +201,18 @@ public:
 
         if (*visibleArg)
         {
-            if (_player->HasAura(VISUAL_AURA))
-                _player->RemoveAurasDueToSpell(VISUAL_AURA);
+            if (m_player->HasAura(VISUAL_AURA))
+                m_player->RemoveAurasDueToSpell(VISUAL_AURA);
 
-            _player->SetGMVisible(true);
-            _player->UpdateObjectVisibility();
+            m_player->SetGMVisible(true);
+            m_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_VISIBLE);
         }
         else
         {
-            _player->AddAura(VISUAL_AURA, _player);
-            _player->SetGMVisible(false);
-            _player->UpdateObjectVisibility();
+            m_player->AddAura(VISUAL_AURA, m_player);
+            m_player->SetGMVisible(false);
+            m_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_INVISIBLE);
         }
 

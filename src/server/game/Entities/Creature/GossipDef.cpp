@@ -767,18 +767,18 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
     }
 
     // Xinef: recheck completion on reward display
-    Player* _player = _session->GetPlayer();
-    QuestStatusMap::iterator qsitr = _player->getQuestStatusMap().find(quest->GetQuestId());
-    if (qsitr != _player->getQuestStatusMap().end() && qsitr->second.Status == QUEST_STATUS_INCOMPLETE)
+    Player* m_player = _session->GetPlayer();
+    QuestStatusMap::iterator qsitr = m_player->getQuestStatusMap().find(quest->GetQuestId());
+    if (qsitr != m_player->getQuestStatusMap().end() && qsitr->second.Status == QUEST_STATUS_INCOMPLETE)
     {
         for (uint8 i = 0; i < 6; ++i)
             if (quest->RequiredItemId[i] && qsitr->second.ItemCount[i] < quest->RequiredItemCount[i])
-                if (_player->GetItemCount(quest->RequiredItemId[i], false) >= quest->RequiredItemCount[i])
+                if (m_player->GetItemCount(quest->RequiredItemId[i], false) >= quest->RequiredItemCount[i])
                     qsitr->second.ItemCount[i] = quest->RequiredItemCount[i];
 
-        if (_player->CanCompleteQuest(quest->GetQuestId()))
+        if (m_player->CanCompleteQuest(quest->GetQuestId()))
         {
-            _player->CompleteQuest(quest->GetQuestId());
+            m_player->CompleteQuest(quest->GetQuestId());
             canComplete = true;
         }
     }

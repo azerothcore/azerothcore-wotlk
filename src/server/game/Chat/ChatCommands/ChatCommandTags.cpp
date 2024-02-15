@@ -98,9 +98,9 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
     {
         _guid = ObjectGuid::Create<HighGuid::Player>(val.get<ObjectGuid::LowType>());
 
-        if ((_player = ObjectAccessor::FindPlayerByLowGUID(_guid.GetCounter())))
+        if ((m_player = ObjectAccessor::FindPlayerByLowGUID(_guid.GetCounter())))
         {
-            _name = _player->GetName();
+            _name = m_player->GetName();
         }
         else if (!sCharacterCache->GetCharacterNameByGuid(_guid, _name))
         {
@@ -119,9 +119,9 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
         if (!normalizePlayerName(_name))
             return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_INVALID, STRING_VIEW_FMT_ARG(_name));
 
-        if ((_player = ObjectAccessor::FindPlayerByName(_name)))
+        if ((m_player = ObjectAccessor::FindPlayerByName(_name)))
         {
-            _guid = _player->GetGUID();
+            _guid = m_player->GetGUID();
         }
         else if (!(_guid = sCharacterCache->GetCharacterGuidByName(_name)))
         {
@@ -133,7 +133,7 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
 }
 
 Acore::ChatCommands::PlayerIdentifier::PlayerIdentifier(Player& player)
-    : _name(player.GetName()), _guid(player.GetGUID()), _player(&player) {}
+    : _name(player.GetName()), _guid(player.GetGUID()), m_player(&player) {}
 
 /*static*/ Optional<Acore::ChatCommands::PlayerIdentifier> Acore::ChatCommands::PlayerIdentifier::FromTarget(ChatHandler* handler)
 {

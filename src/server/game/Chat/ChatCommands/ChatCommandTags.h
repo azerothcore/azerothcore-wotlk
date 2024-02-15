@@ -169,7 +169,7 @@ namespace Acore::ChatCommands
     {
         using value_type = Player*;
 
-        PlayerIdentifier() : _name(), _guid(), _player(nullptr) {}
+        PlayerIdentifier() : _name(), _guid(), m_player(nullptr) {}
         PlayerIdentifier(Player& player);
 
         operator ObjectGuid() const { return _guid; }
@@ -178,8 +178,8 @@ namespace Acore::ChatCommands
 
         std::string const& GetName() const { return _name; }
         ObjectGuid GetGUID() const { return _guid; }
-        bool IsConnected() const { return (_player != nullptr); }
-        Player* GetConnectedPlayer() const { return _player; }
+        bool IsConnected() const { return (m_player != nullptr); }
+        Player* GetConnectedPlayer() const { return m_player; }
 
         ChatCommandResult TryConsume(ChatHandler const* handler, std::string_view args);
 
@@ -196,7 +196,7 @@ namespace Acore::ChatCommands
         private:
             std::string _name;
             ObjectGuid _guid;
-            Player* _player;
+            Player* m_player;
     };
 
     template <typename linktag>

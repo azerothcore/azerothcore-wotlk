@@ -28,8 +28,8 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
     uint32 talent_id, requested_rank;
     recvData >> talent_id >> requested_rank;
 
-    _player->LearnTalent(talent_id, requested_rank);
-    _player->SendTalentsInfoData(false);
+    m_player->LearnTalent(talent_id, requested_rank);
+    m_player->SendTalentsInfoData(false);
 }
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
@@ -48,10 +48,10 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
     {
         recvPacket >> talentId >> talentRank;
 
-        _player->LearnTalent(talentId, talentRank);
+        m_player->LearnTalent(talentId, talentRank);
     }
 
-    _player->SendTalentsInfoData(false);
+    m_player->SendTalentsInfoData(false);
 
     recvPacket.rfinish();
 }
@@ -69,14 +69,14 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!unit->isCanTrainingAndResetTalentsOf(_player))
+    if (!unit->isCanTrainingAndResetTalentsOf(m_player))
         return;
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    if (!(_player->resetTalents()))
+    if (!(m_player->resetTalents()))
     {
         WorldPacket data(MSG_TALENT_WIPE_CONFIRM, 8 + 4);  //you have not any talent
         data << uint64(0);
@@ -85,8 +85,8 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
         return;
     }
 
-    _player->SendTalentsInfoData(false);
-    unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"
+    m_player->SendTalentsInfoData(false);
+    unit->CastSpell(m_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 
 void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)

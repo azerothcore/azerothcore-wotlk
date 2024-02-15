@@ -51,7 +51,7 @@ Copied events should probably have a new owner
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     LOG_DEBUG("network", "CMSG_CALENDAR_GET_CALENDAR [{}]", guid.ToString());
 
     time_t currTime = GameTime::GetGameTime().count();
@@ -101,7 +101,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     uint32 boundCounter = 0;
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
-        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(_player->GetGUID(), Difficulty(i));
+        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(m_player->GetGUID(), Difficulty(i));
         for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
         {
             if (itr->second.perm)
@@ -189,17 +189,17 @@ void WorldSession::HandleCalendarGetEvent(WorldPacket& recvData)
     uint64 eventId;
     recvData >> eventId;
 
-    LOG_DEBUG("network", "CMSG_CALENDAR_GET_EVENT. Player [{}] Event [{}]", _player->GetGUID().ToString(), eventId);
+    LOG_DEBUG("network", "CMSG_CALENDAR_GET_EVENT. Player [{}] Event [{}]", m_player->GetGUID().ToString(), eventId);
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
-        sCalendarMgr->SendCalendarEvent(_player->GetGUID(), *calendarEvent, CALENDAR_SENDTYPE_GET);
+        sCalendarMgr->SendCalendarEvent(m_player->GetGUID(), *calendarEvent, CALENDAR_SENDTYPE_GET);
     else
-        sCalendarMgr->SendCalendarCommandResult(_player->GetGUID(), CALENDAR_ERROR_EVENT_INVALID);
+        sCalendarMgr->SendCalendarCommandResult(m_player->GetGUID(), CALENDAR_ERROR_EVENT_INVALID);
 }
 
 void WorldSession::HandleCalendarGuildFilter(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER [{}]", _player->GetGUID().ToString());
+    LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER [{}]", m_player->GetGUID().ToString());
 
     uint32 minLevel;
     uint32 maxLevel;
@@ -207,7 +207,7 @@ void WorldSession::HandleCalendarGuildFilter(WorldPacket& recvData)
 
     recvData >> minLevel >> maxLevel >> minRank;
 
-    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
+    if (Guild* guild = sGuildMgr->GetGuildById(m_player->GetGuildId()))
         guild->MassInviteToEvent(this, minLevel, maxLevel, minRank);
 
     LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER: Min level [{}], Max level [{}], Min rank [{}]", minLevel, maxLevel, minRank);
@@ -215,7 +215,7 @@ void WorldSession::HandleCalendarGuildFilter(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "CMSG_CALENDAR_ARENA_TEAM [{}]", _player->GetGUID().ToString());
+    LOG_DEBUG("network", "CMSG_CALENDAR_ARENA_TEAM [{}]", m_player->GetGUID().ToString());
 
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
@@ -238,7 +238,7 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
 
 void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
 
     std::string title;
     std::string description;
@@ -271,7 +271,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     // If the event is a guild event, check if the player is in a guild
     if (CalendarEvent::IsGuildEvent(flags) || CalendarEvent::IsGuildAnnouncement(flags))
     {
-        if (!_player->GetGuildId())
+        if (!m_player->GetGuildId())
         {
             recvData.rfinish();
             sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_PLAYER_NOT_IN_GUILD);
@@ -282,7 +282,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     // Check if the player reached the max number of events allowed to create
     if (CalendarEvent::IsGuildEvent(flags) || CalendarEvent::IsGuildAnnouncement(flags))
     {
-        if (sCalendarMgr->GetGuildEvents(_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
+        if (sCalendarMgr->GetGuildEvents(m_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
         {
             recvData.rfinish();
             sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_EVENTS_EXCEEDED);
@@ -367,7 +367,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     time_t oldEventTime;
 
     uint64 eventId;
@@ -424,7 +424,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint64 eventId;
 
     recvData >> eventId;
@@ -435,7 +435,7 @@ void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 eventTime;
@@ -458,7 +458,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
         // Ensure that the player has access to the event
         if (oldEvent->IsGuildEvent() || oldEvent->IsGuildAnnouncement())
         {
-            if (oldEvent->GetGuildId() != _player->GetGuildId())
+            if (oldEvent->GetGuildId() != m_player->GetGuildId())
             {
                 sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
                 return;
@@ -476,7 +476,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
         // Check if the player reached the max number of events allowed to create
         if (oldEvent->IsGuildEvent() || oldEvent->IsGuildAnnouncement())
         {
-            if (sCalendarMgr->GetGuildEvents(_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
+            if (sCalendarMgr->GetGuildEvents(m_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
             {
                 sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_EVENTS_EXCEEDED);
                 return;
@@ -522,7 +522,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_INVITE");
 
-    ObjectGuid playerGuid = _player->GetGUID();
+    ObjectGuid playerGuid = m_player->GetGUID();
 
     uint64 eventId;
     uint64 inviteId;
@@ -563,7 +563,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    if (_player->GetTeamId() != inviteeTeamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
+    if (m_player->GetTeamId() != inviteeTeamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
     {
         sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_NOT_ALLIED);
         return;
@@ -600,7 +600,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     }
     else
     {
-        if (isGuildEvent && inviteeGuildId == _player->GetGuildId())
+        if (isGuildEvent && inviteeGuildId == m_player->GetGuildId())
         {
             sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_NO_GUILD_INVITES);
             return;
@@ -614,7 +614,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint64 eventId;
     bool tentative;
 
@@ -623,7 +623,7 @@ void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
     {
-        if (calendarEvent->IsGuildEvent() && calendarEvent->GetGuildId() != _player->GetGuildId())
+        if (calendarEvent->IsGuildEvent() && calendarEvent->GetGuildId() != m_player->GetGuildId())
         {
             sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_PLAYER_NOT_IN_GUILD);
             return;
@@ -640,7 +640,7 @@ void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 status;
@@ -676,7 +676,7 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     ObjectGuid invitee;
     uint64 eventId;
     uint64 ownerInviteId; // isn't it sender's inviteId?
@@ -704,7 +704,7 @@ void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -736,7 +736,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -765,7 +765,7 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint64 eventId;
     ObjectGuid complainGUID;
 
@@ -777,7 +777,7 @@ void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
 {
-    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid guid = m_player->GetGUID();
     uint32 pending = sCalendarMgr->GetPlayerNumPending(guid);
 
     LOG_DEBUG("network", "CMSG_CALENDAR_GET_NUM_PENDING: [{}] Pending: {}", guid.ToString(), pending);

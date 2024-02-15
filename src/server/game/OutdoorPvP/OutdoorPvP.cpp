@@ -457,8 +457,8 @@ bool OPvPCapturePoint::Update(uint32 diff)
 void OutdoorPvP::SendUpdateWorldState(uint32 field, uint32 value)
 {
     if (_sendUpdate)
-        for (auto const& _player : _players)
-            for (auto itr : _player)
+        for (auto const& m_player : _players)
+            for (auto itr : m_player)
                 if (Player* const player = ObjectAccessor::FindPlayer(itr))
                     player->SendUpdateWorldState(field, value);
 }

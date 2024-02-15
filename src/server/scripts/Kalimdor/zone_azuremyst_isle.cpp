@@ -257,7 +257,7 @@ public:
         {
             if (quest->GetQuestId() == QUEST_A_CRY_FOR_HELP)
             {
-                _player = player->GetGUID();
+                m_player = player->GetGUID();
                 _events.ScheduleEvent(EVENT_ACCEPT_QUEST, 2s);
             }
         }
@@ -295,7 +295,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACCEPT_QUEST:
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_player))
                         {
                             Talk(SAY_START, player);
                         }
@@ -303,7 +303,7 @@ public:
                         _events.ScheduleEvent(EVENT_START_ESCORT, 1s);
                         break;
                     case EVENT_START_ESCORT:
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_player))
                         {
                             npc_escortAI::Start(true, false, player->GetGUID());
                         }
@@ -313,7 +313,7 @@ public:
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
                         break;
                     case EVENT_TALK_END:
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, m_player))
                         {
                             Talk(SAY_END1, player);
                         }
@@ -331,7 +331,7 @@ public:
         }
     private:
         EventMap _events;
-        ObjectGuid _player;
+        ObjectGuid m_player;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
