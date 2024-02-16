@@ -101,6 +101,15 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
     return !player->IsInWorld();
 }
 
+//===========================================================================
+Player* WorldSession::ActivePlayer() const
+{
+    if (!m_player || !m_player->IsInWorld())
+        return nullptr;
+    // Return the active Player object for the current session
+    return m_player;
+}
+
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
