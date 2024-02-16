@@ -783,7 +783,6 @@ Creature* Battlefield::SpawnCreature(uint32 entry, Position pos, TeamId teamId)
 
 Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, float o, TeamId teamId)
 {
-    //Get map object
     Map* map = sMapMgr->CreateBaseMap(m_MapId);
     if (!map)
     {
@@ -798,26 +797,34 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    Creature* creature = new Creature(true);
-    if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
+    std::unique_ptr<Creature> creature;
+
+    try
     {
-        LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
-        delete creature;
+        creature = std::make_unique<Creature>(true);
+
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
+        {
+            LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
+            return nullptr;
+        }
+
+        creature->SetFaction(BattlefieldFactions[teamId]);
+        creature->SetHomePosition(x, y, z, o);
+
+        creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
+        creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
+
+        map->AddToMap(creature.get());
+        creature->setActive(true);
+
+        return creature.release();
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Exception during creature creation: {}", e.what());
         return nullptr;
     }
-
-    creature->SetFaction(BattlefieldFactions[teamId]);
-    creature->SetHomePosition(x, y, z, o);
-
-    // force using DB speeds -- do we really need this?
-    creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
-    creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
-
-    // Set creature in world
-    map->AddToMap(creature);
-    creature->setActive(true);
-
-    return creature;
 }
 
 // Method for spawning gameobject on map
