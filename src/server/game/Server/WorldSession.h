@@ -88,7 +88,6 @@ namespace WorldPackets
         class LogoutRequest;
         class ShowingCloak;
         class ShowingHelm;
-        class PlayerLogout;
         class PlayedTimeClient;
     }
 
@@ -601,7 +600,7 @@ public:                                                 // opcodes handlers
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
     void HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& logoutRequest);
-    void HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogout& playerLogout);
+    void HandlePlayerLogoutOpcode(WorldPacket &msg);
     void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
     // GM Ticket opcodes

@@ -87,14 +87,6 @@ namespace WorldPackets
             WorldPacket const* Write() override { return &_worldPacket; }
         };
 
-        class PlayerLogout final : public ClientPacket
-        {
-        public:
-            PlayerLogout(WorldPacket&& packet) : ClientPacket(std::move(packet)) { }
-
-            void Read() override { }
-        };
-
         class PlayedTimeClient final : public ClientPacket
         {
         public:
