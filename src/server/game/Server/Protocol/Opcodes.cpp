@@ -129,7 +129,7 @@ void OpcodeTable::Initialize()
     static_assert(status == STATUS_NEVER || status == STATUS_UNHANDLED, "Invalid status for server opcode"); \
     ValidateAndSetServerOpcode(opcode, #opcode, status)
 
-    /*0x001*/ DEFINE_HANDLER(CMSG_BOOTME,                                                           STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x001*/ DEFINE_HANDLER(CMSG_BOOTME, STATUS_AUTHED, PROCESS_INPLACE, &WorldSession::BootMeHandler);
     /*0x002*/ DEFINE_HANDLER(CMSG_DBLOOKUP,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x003*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_DBLOOKUP,                                           STATUS_NEVER);
     /*0x004*/ DEFINE_HANDLER(CMSG_QUERY_OBJECT_POSITION,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

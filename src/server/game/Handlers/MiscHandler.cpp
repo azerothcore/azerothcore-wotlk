@@ -1791,3 +1791,13 @@ void WorldSession::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
         HandleMovementOpcodes(recvPacket);
     }
 }
+
+//===========================================================================
+void WorldSession::BootMeHandler(WorldPacket& msg)
+{
+    if (!IsGMAccount()) {
+        SendNotification(LANG_PERMISSION_DENIED);
+        return;
+    }
+    m_Socket->CloseSocket();
+}

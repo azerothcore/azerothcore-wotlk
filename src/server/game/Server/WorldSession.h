@@ -1083,6 +1083,8 @@ public:                                                 // opcodes handlers
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
+    void BootMeHandler(WorldPacket& msg);
+
 private:
     void ProcessQueryCallbacks();
 
