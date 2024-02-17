@@ -169,7 +169,7 @@ WorldSession::~WorldSession()
 
     ///- unload player if not unloaded
     if (m_player)
-        LogoutPlayer(true);
+        PlayerLogout(true);
 
     /// - If have unclosed socket, close it
     if (m_Socket)
@@ -510,7 +510,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
         if (ShouldLogOut(currentTime) && !m_playerLoading)
         {
-            LogoutPlayer(true);
+            PlayerLogout(true);
         }
 
         if (m_Socket && !m_Socket->IsOpen())
@@ -578,7 +578,7 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 }
 
 /// %Log the player out
-void WorldSession::LogoutPlayer(bool save)
+void WorldSession::PlayerLogout(bool save)
 {
     // finish pending transfers before starting the logout
     while (m_player && m_player->IsBeingTeleportedFar())

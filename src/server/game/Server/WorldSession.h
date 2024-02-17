@@ -400,7 +400,7 @@ public:
         return (_logoutTime > 0 && currTime >= _logoutTime + 20);
     }
 
-    void LogoutPlayer(bool save);
+    void PlayerLogout(bool save);
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
@@ -1163,7 +1163,7 @@ private:
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer
-    bool m_playerLogout;                                // code processed in LogoutPlayer
+    bool m_playerLogout;                                // code processed in PlayerLogout
     bool m_playerRecentlyLogout;
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;

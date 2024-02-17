@@ -87,7 +87,7 @@ namespace AccountMgr
                 {
                     WorldSession* s = p->GetSession();
                     s->KickPlayer("Delete account");            // mark session to remove at next session list update
-                    s->LogoutPlayer(false);                     // logout player without waiting next session list update
+                    s->PlayerLogout(false);                     // logout player without waiting next session list update
                 }
 
                 Player::DeleteFromDB(guid.GetCounter(), accountId, false, true);       // no need to update realm characters

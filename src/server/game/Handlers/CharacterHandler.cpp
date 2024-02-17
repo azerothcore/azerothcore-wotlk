@@ -722,7 +722,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
                 return;
             }
 
-            uint8 limitA = 10, limitB = 10, limitC = 10; // pussywizard: this somehow froze (probably, ahh crash logs ...), and while (far) have never frozen in LogoutPlayer o_O maybe it's the combination of while(far); while(near);
+            uint8 limitA = 10, limitB = 10, limitC = 10; // pussywizard: this somehow froze (probably, ahh crash logs ...), and while (far) have never frozen in PlayerLogout o_O maybe it's the combination of while(far); while(near);
             while (sess->GetPlayer() && (sess->GetPlayer()->IsBeingTeleportedFar() || (sess->GetPlayer()->IsInWorld() && sess->GetPlayer()->IsBeingTeleportedNear())))
             {
                 if (limitA == 0 || --limitA == 0)
