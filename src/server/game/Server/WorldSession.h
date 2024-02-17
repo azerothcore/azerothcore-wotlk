@@ -600,7 +600,7 @@ public:                                                 // opcodes handlers
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
     void HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& logoutRequest);
-    void HandlePlayerLogoutOpcode(WorldPacket &msg);
+    void HandlePlayerLogout(WorldPacket &msg);
     void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
     // GM Ticket opcodes

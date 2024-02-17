@@ -474,7 +474,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     SetLogoutStartTime(GameTime::GetGameTime().count());
 }
 
-void WorldSession::HandlePlayerLogoutOpcode(WorldPacket &msg)
+void WorldSession::HandlePlayerLogout(WorldPacket &msg)
 {
 }
 
