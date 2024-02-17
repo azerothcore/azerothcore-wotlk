@@ -4349,7 +4349,7 @@ void Player::DeleteOldItems(uint32 keepDays)
 
     if (result)
     {
-        LOG_INFO("server.loading", "Player::DeleteOldItems: Found {} character(s) to delete", result->GetRowCount());
+        LOG_INFO("server.loading", "Player::DeleteOldItems: Found {} item(s) to delete", result->GetRowCount());
         do
         {
             Field* fields = result->Fetch();
