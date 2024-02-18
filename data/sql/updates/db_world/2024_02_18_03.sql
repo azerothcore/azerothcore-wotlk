@@ -1,3 +1,4 @@
+-- DB update 2024_02_18_02 -> 2024_02_18_03
 -- Update creature 38030 'Crown Underling' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 38030) AND (`guid` IN (244601, 244602, 244603, 244604, 244605));
