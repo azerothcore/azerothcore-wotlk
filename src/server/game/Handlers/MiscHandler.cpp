@@ -1801,3 +1801,26 @@ void WorldSession::BootMeHandler(WorldPacket& msg)
     }
     m_Socket->CloseSocket();
 }
+
+//===========================================================================
+void WorldSession::GmResurrectHandler(WorldPacket& msg)
+{
+    if (!IsGMAccount()) {
+        SendNotification(LANG_PERMISSION_DENIED);
+        return;
+    }
+
+    // READ THE MESSAGE DATA
+    char name[MAX_PLAYER_NAME];
+    msg.GetString(name, MAX_PLAYER_NAME);
+
+    // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME
+    Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
+    if (!playerPtr) {
+        // TODO: SendGmResurrectFailure();
+        return;
+    }
+
+    playerPtr->ResurrectPlayer(100.0f);
+    // TODO: SendGmResurrectSuccess();
+}

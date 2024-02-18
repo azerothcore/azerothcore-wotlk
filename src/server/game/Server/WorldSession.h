@@ -1084,6 +1084,7 @@ public:                                                 // opcodes handlers
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
     void BootMeHandler(WorldPacket& msg);
+    void GmResurrectHandler(WorldPacket& msg);
 
 private:
     void ProcessQueryCallbacks();

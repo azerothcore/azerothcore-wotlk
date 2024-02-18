@@ -682,7 +682,7 @@ void OpcodeTable::Initialize()
     /*0x227*/ DEFINE_HANDLER(CMSG_SERVER_COMMAND,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x228*/ DEFINE_HANDLER(CMSG_GM_SILENCE,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x229*/ DEFINE_HANDLER(CMSG_GM_REVEALTO,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x22A*/ DEFINE_HANDLER(CMSG_GM_RESURRECT,                                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x22A*/ DEFINE_HANDLER(CMSG_GM_RESURRECT, STATUS_LOGGEDIN, PROCESS_INPLACE, &WorldSession::GmResurrectHandler);
     /*0x22B*/ DEFINE_HANDLER(CMSG_GM_SUMMONMOB,                                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x22C*/ DEFINE_HANDLER(CMSG_GM_MOVECORPSE,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x22D*/ DEFINE_HANDLER(CMSG_GM_FREEZE,                                                        STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
