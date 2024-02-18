@@ -119,6 +119,9 @@ public:
         return *this;
     }
 
+    //===========================================================================
+    ByteBuffer& GetString(char* string, uint32_t maxChars);
+
     void clear()
     {
         _storage.clear();

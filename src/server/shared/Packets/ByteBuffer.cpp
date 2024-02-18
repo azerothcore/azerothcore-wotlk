@@ -74,6 +74,18 @@ ByteBuffer& ByteBuffer::operator>>(double& value)
     return *this;
 }
 
+//===========================================================================
+ByteBuffer& ByteBuffer::GetString(char* string, uint32_t maxChars)
+{
+    ASSERT(string);
+    ASSERT(_storage.size());
+    while (_rpos <= _storage.size()-1) {
+        string[_rpos] = _storage.at(_rpos);
+        _rpos++;
+    }
+    return *this;
+}
+
 std::string ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/)
 {
     std::string value;
