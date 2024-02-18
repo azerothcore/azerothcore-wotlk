@@ -1,3 +1,4 @@
+-- DB update 2024_02_18_07 -> 2024_02_18_08
 -- Update creature 37214 'Crown Lackey' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 37214) AND (`guid` IN (244581, 244582, 244583, 244584, 244585, 244586, 244587, 244588, 244589, 244590));
