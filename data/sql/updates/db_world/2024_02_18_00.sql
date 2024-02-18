@@ -1,3 +1,4 @@
+-- DB update 2024_02_13_01 -> 2024_02_18_00
 -- Update creature 38032 'Crown Sprayer' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 38032) AND (`guid` IN (244532, 244533, 244534, 244535, 244536, 244537, 244538, 244539, 244540, 244541, 244542, 244543, 244544));

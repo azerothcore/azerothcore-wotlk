@@ -1,3 +1,4 @@
+-- DB update 2024_02_18_00 -> 2024_02_18_01
 -- Update gameobject 19878 'Parts Crate' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` = 19878) AND (`guid` IN (15));
