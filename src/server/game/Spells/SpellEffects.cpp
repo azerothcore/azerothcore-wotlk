@@ -421,7 +421,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage += int32(CalculatePct(pdamage * baseTotalTicks, pct_dir));
 
                             uint32 pct_dot = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, (effIndex + 2)) / 3;
-                            m_spellValue->EffectBasePoints[1] = m_spellInfo->Effects[EFFECT_1].CalcBaseValue(int32(CalculatePct(pdamage * baseTotalTicks, pct_dot)));
+                            uint32 oldPdamage = uint32(std::max(aura->GetOldAmount(), 0));
+                            m_spellValue->EffectBasePoints[1] = m_spellInfo->Effects[EFFECT_1].CalcBaseValue(int32(CalculatePct(oldPdamage * baseTotalTicks, pct_dot)));
 
                             apply_direct_bonus = false;
                             // Glyph of Conflagrate
