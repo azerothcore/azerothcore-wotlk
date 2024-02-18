@@ -1,3 +1,4 @@
+-- DB update 2024_02_18_04 -> 2024_02_18_05
 -- Update creature 38006 'Crown Hoodlum' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` = 38006) AND (`guid` IN (244616, 244617, 244618, 244619, 244620));
