@@ -67,7 +67,6 @@ enum Spells
 enum Misc
 {
     MAX_ADVISORS                    = 2,
-    NPC_SEER_OLUM                   = 22820,
     GO_CAGE                         = 185474,
 };
 
