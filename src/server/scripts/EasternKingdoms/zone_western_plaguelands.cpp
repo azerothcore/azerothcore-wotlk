@@ -149,10 +149,10 @@ public:
                         break;
 
                         //A creature is summoned if not already present
-                    Creature* razrch = ObjectAccessor::GetCreature(*me, razrchGUID);
-                    if (razrch)   break;
+                    if (ObjectAccessor::GetCreature(*me, razrchGUID))
+                        break;
 
-                    if (razrch = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* razrch = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         razrchGUID = razrch->GetGUID();
                         DoDie();
