@@ -1159,7 +1159,9 @@ enum AcoreStrings
 
     LANG_CMD_CAST_ERROR_CODE            = 5084,
 
-    // Room for more strings    5084-9999
+    LANG_CMD_GO_RESPAWN                 = 5085,
+
+    // Room for more strings    5086-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1239,6 +1241,7 @@ enum AcoreStrings
     LANG_OPVP_NA_CAPTURE_A              = 10026,
     LANG_OPVP_NA_LOSE_H                = 10027,
     LANG_OPVP_NA_LOSE_A                = 10028,
+    LANG_OPVP_NA_DEFENSELESS           = 10074,
     // opvp tf
     LANG_OPVP_TF_CAPTURE_H              = 10029,
     LANG_OPVP_TF_CAPTURE_A              = 10030,

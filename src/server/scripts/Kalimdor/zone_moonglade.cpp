@@ -65,7 +65,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
-                if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
+                if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_TAXI) && player->GetTeamId() == TEAM_HORDE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -80,29 +80,42 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->getClass() != CLASS_DRUID)
+        if (player->GetTeamId() != TEAM_HORDE)
         {
-            SendGossipMenuFor(player, 4916, creature->GetGUID());
-        }
-        else if (player->GetTeamId() != TEAM_HORDE)
-        {
-            if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_QUEST) && player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
             {
                 AddGossipItemFor(player, 4042, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
 
-            SendGossipMenuFor(player, 4917, creature->GetGUID());
+            if (player->IsClass(CLASS_DRUID))
+            {
+                SendGossipMenuFor(player, 4917, creature->GetGUID());
+            }
+            else
+            {
+                SendGossipMenuFor(player, 4916, creature->GetGUID());
+            }
         }
-        else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
+        else if (player->GetTeamId() == TEAM_HORDE)
         {
-            AddGossipItemFor(player, 4042, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_TAXI))
+            {
+                AddGossipItemFor(player, 4042, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            }
 
-            if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_QUEST) && player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
             {
                 AddGossipItemFor(player, 4042, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             }
 
-            SendGossipMenuFor(player, 4918, creature->GetGUID());
+            if (player->IsClass(CLASS_DRUID))
+            {
+                SendGossipMenuFor(player, 4918, creature->GetGUID());
+            }
+            else
+            {
+                SendGossipMenuFor(player, 4916, creature->GetGUID());
+            }
         }
         return true;
     }
@@ -176,7 +189,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
-                if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
+                if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_TAXI) && player->GetTeamId() == TEAM_ALLIANCE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_ALLY);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -191,29 +204,41 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->getClass() != CLASS_DRUID)
+        if (player->GetTeamId() != TEAM_ALLIANCE)
         {
-            SendGossipMenuFor(player, 4913, creature->GetGUID());
-        }
-        else if (player->GetTeamId() != TEAM_ALLIANCE)
-        {
-            if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_QUEST) && player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
             {
                 AddGossipItemFor(player, 4041, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
-
-            SendGossipMenuFor(player, 4915, creature->GetGUID());
+            if (player->IsClass(CLASS_DRUID))
+            {
+                SendGossipMenuFor(player, 4915, creature->GetGUID());
+            }
+            else
+            {
+                SendGossipMenuFor(player, 4913, creature->GetGUID());
+            }
         }
-        else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
+        else if (player->GetTeamId() == TEAM_ALLIANCE)
         {
-            AddGossipItemFor(player, 4041, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_TAXI))
+            {
+                AddGossipItemFor(player, 4041, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            }
 
-            if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
+            if (player->IsClass(CLASS_DRUID, CLASS_CONTEXT_QUEST) && player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
             {
                 AddGossipItemFor(player, 4041, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             }
 
-            SendGossipMenuFor(player, 4914, creature->GetGUID());
+            if (player->IsClass(CLASS_DRUID))
+            {
+                SendGossipMenuFor(player, 4914, creature->GetGUID());
+            }
+            else
+            {
+                SendGossipMenuFor(player, 4913, creature->GetGUID());
+            }
         }
         return true;
     }

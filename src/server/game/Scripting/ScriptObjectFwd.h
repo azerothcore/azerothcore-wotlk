@@ -79,6 +79,7 @@ class WorldSocket;
 enum ArenaTeamInfoType : uint8;
 enum AuraRemoveMode : uint8;
 enum BattlegroundDesertionType : uint8;
+enum ClassContext : uint8;
 enum ContentLevels : uint8;
 enum DamageEffectType : uint8;
 enum EnchantmentSlot : uint8;

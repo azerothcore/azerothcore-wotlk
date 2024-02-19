@@ -140,7 +140,7 @@ public:
         uint8 oldLevel = playerTarget->GetLevel();
 
         // set starting level
-        uint32 startLevel = playerTarget->getClass() != CLASS_DEATH_KNIGHT
+        uint32 startLevel = !playerTarget->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT)
                             ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                             : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
@@ -290,10 +290,9 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-        HashMapHolder<Player>::MapType const& plist = ObjectAccessor::GetPlayers();
-        for (auto itr = plist.begin(); itr != plist.end(); ++itr)
-            itr->second->SetAtLoginFlag(atLogin);
+        sWorld->DoForAllOnlinePlayers([&] (Player* player){
+            player->SetAtLoginFlag(atLogin);
+        });
 
         return true;
     }

@@ -1196,8 +1196,8 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
     return player->GetLevel() >= 10
-           && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-           && player->getClass() == GetCreatureTemplate()->trainer_class;
+        && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
+        && player->IsClass((Classes)GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER);
 }
 
 bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
@@ -1211,7 +1211,7 @@ bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= null
     {
         case TRAINER_TYPE_CLASS:
         case TRAINER_TYPE_PETS:
-            if (m_creatureInfo->trainer_class && m_creatureInfo->trainer_class != player->getClass())
+            if (m_creatureInfo->trainer_class && !player->IsClass((Classes)m_creatureInfo->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
             {
                 if (npcFlags)
                     *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
@@ -1627,7 +1627,7 @@ bool Creature::isVendorWithIconSpeak() const
     return m_creatureInfo->IconName == "Speak" && m_creatureData->npcflag & UNIT_NPC_FLAG_VENDOR;
 }
 
-bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool gridLoad, bool allowDuplicate /*= false*/)
+bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate /*= false*/)
 {
     if (!allowDuplicate)
     {
@@ -1664,16 +1664,6 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     {
         LOG_ERROR("sql.sql", "Creature (SpawnId: {}) not found in table `creature`, can't load. ", spawnId);
         return false;
-    }
-
-    // xinef: fix from db
-    if ((addToMap || gridLoad) && !data->overwrittenZ)
-    {
-        float tz = map->GetHeight(data->posX, data->posY, data->posZ + 1.0f, true);
-        if (tz >= data->posZ && tz - data->posZ <= 1.0f)
-            const_cast<CreatureData*>(data)->posZ = tz + 0.1f;
-
-        const_cast<CreatureData*>(data)->overwrittenZ = true;
     }
 
     // xinef: this has to be assigned before Create function, properly loads equipment id from DB
@@ -2191,6 +2181,11 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
 {
     if (!spellInfo)
         return false;
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BYPASS_MECHANIC_IMMUNITY))
+    {
+        return false;
+    }
 
     // Xinef: this should exclude self casts...
     // Spells that don't have effectMechanics.

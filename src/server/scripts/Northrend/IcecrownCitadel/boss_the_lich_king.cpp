@@ -32,7 +32,6 @@
 #include "Vehicle.h"
 #include "Weather.h"
 #include "icecrown_citadel.h"
-#include "GridNotifiersImpl.h"
 
 enum Texts
 {

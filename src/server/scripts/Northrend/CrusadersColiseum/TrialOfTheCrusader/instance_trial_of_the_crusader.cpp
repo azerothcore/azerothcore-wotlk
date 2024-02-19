@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "InstanceMapScript.h"

@@ -19,7 +19,6 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
 #include "nexus.h"
 
 enum Spells

@@ -17,7 +17,6 @@
 
 #include "the_slave_pens.h"
 #include "AreaTriggerScript.h"
-#include "CreatureScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
 

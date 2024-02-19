@@ -15,11 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
 #include "the_black_morass.h"

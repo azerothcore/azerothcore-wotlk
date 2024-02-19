@@ -1418,7 +1418,7 @@ public:
                         {
                             stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
                         }
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                        else if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R2))
                         {
                             stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
                         }
@@ -1432,7 +1432,7 @@ public:
                         {
                             stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
                         }
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                        else if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R2))
                         {
                             stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
                         }

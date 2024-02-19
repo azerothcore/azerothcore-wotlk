@@ -23,7 +23,6 @@
 */
 
 #include "Creature.h"
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"

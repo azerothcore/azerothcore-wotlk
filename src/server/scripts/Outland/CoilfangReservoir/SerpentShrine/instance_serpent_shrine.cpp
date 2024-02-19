@@ -22,6 +22,7 @@
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "serpent_shrine.h"
+#include "ScriptedCreature.h"
 
 DoorData const doorData[] =
 {
@@ -39,12 +40,25 @@ ObjectData const creatureData[] =
     { 0,                          0                           }
 };
 
+ObjectData const gameObjectData[] =
+{
+    { GO_STRANGE_POOL, DATA_STRANGE_POOL },
+    { 0,               0                 }
+};
+
 MinionData const minionData[] =
 {
     { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_LORD_KARATHRESS },
     { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_LORD_KARATHRESS },
     { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_LORD_KARATHRESS },
     { 0,                          0,                          }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_FATHOM_LORD_KARATHRESS, new RectangleBoundary(456.86f, 571.56f, -602.07f, -449.59f) },
+    { DATA_MOROGRIM_TIDEWALKER,    new RectangleBoundary(304.32f, 457.59f, -786.5f, -661.3f) },
+    { DATA_LADY_VASHJ,             new CircleBoundary(Position(29.99f, -922.409f), 83.65f) }
 };
 
 class instance_serpent_shrine : public InstanceMapScript
@@ -61,8 +75,9 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
             LoadMinionData(minionData);
+            LoadBossBoundaries(boundaries);
 
             _aliveKeepersCount = 0;
         }
@@ -300,6 +315,52 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
     }
 };
 
+struct npc_rancid_mushroom : public ScriptedAI
+{
+    npc_rancid_mushroom(Creature* creature) : ScriptedAI(creature) { }
+
+    enum Spells : uint32
+    {
+        SPELL_GROW        = 31698,
+        SPELL_SPORE_CLOUD = 38652
+    };
+
+    void InitializeAI() override
+    {
+        scheduler.Schedule(1150ms, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_GROW);
+            context.Repeat(1200ms, 3400ms);
+        })
+        .Schedule(22950ms, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SPORE_CLOUD);
+            me->KillSelf();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+};
+
+class spell_rancid_spore_cloud : public AuraScript
+{
+    PrepareAuraScript(spell_rancid_spore_cloud);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        GetCaster()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_rancid_spore_cloud::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_instance_serpentshrine_cavern()
 {
     new instance_serpent_shrine();
@@ -307,5 +368,7 @@ void AddSC_instance_serpentshrine_cavern()
     RegisterSpellAndAuraScriptPair(spell_serpentshrine_cavern_serpentshrine_parasite_trigger, spell_serpentshrine_cavern_serpentshrine_parasite_trigger_aura);
     RegisterSpellScript(spell_serpentshrine_cavern_infection);
     RegisterSpellScript(spell_serpentshrine_cavern_coilfang_water);
+    RegisterSerpentShrineAI(npc_rancid_mushroom);
+    RegisterSpellScript(spell_rancid_spore_cloud);
 }
 

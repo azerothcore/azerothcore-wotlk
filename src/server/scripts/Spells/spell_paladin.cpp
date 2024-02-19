@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Group.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -484,7 +483,7 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        return GetTarget()->getPowerType() == POWER_MANA;
+        return GetTarget()->HasActivePowerType(POWER_MANA);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -970,7 +969,7 @@ class spell_pal_lay_on_hands : public SpellScript
 
         // Xinef: Glyph of Divinity
         if (Unit* target = GetExplTargetUnit())
-            if (target->getPowerType() == POWER_MANA)
+            if (target->HasActivePowerType(POWER_MANA))
                 _manaAmount = target->GetPower(POWER_MANA);
 
         return SPELL_CAST_OK;
