@@ -124,34 +124,9 @@ bool PvPCombatReference::Update(uint32 tdiff)
     return true;
 }
 
-void PvPCombatReference::Refresh()
+void PvPCombatReference::RefreshTimer()
 {
     _combatTimer = PVP_COMBAT_TIMEOUT;
-
-    bool needFirstAI = false, needSecondAI = false;
-    if (_suppressFirst)
-    {
-        _suppressFirst = false;
-        needFirstAI = first->GetCombatManager().UpdateOwnerCombatState();
-    }
-    if (_suppressSecond)
-    {
-        _suppressSecond = false;
-        needSecondAI = second->GetCombatManager().UpdateOwnerCombatState();
-    }
-
-    if (needFirstAI)
-        CombatManager::NotifyAICombat(first, second);
-    if (needSecondAI)
-        CombatManager::NotifyAICombat(second, first);
-}
-
-void PvPCombatReference::SuppressFor(Unit* who)
-{
-    Suppress(who);
-    if (who->GetCombatManager().UpdateOwnerCombatState())
-        if (who->IsAIEnabled)
-            who->GetAI()->JustExitedCombat();
 }
 
 void CombatManager::Update(uint32 tdiff)

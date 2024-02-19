@@ -70,11 +70,13 @@ struct CombatReference
 
 protected:
     void Refresh();
+    void Suppress(Unit* who) { (who == first ? _suppressFirst : _suppressSecond) = true; }
+
     CombatReference(Unit* a, Unit* b, bool pvp = false) : first(a), second(b), _isPvP(pvp) { }
 
     bool _suppressFirst = false;
     bool _suppressSecond = false;
-    
+
     friend class CombatManager;
 };
 
@@ -92,8 +94,7 @@ private:
     PvPCombatReference(Unit* first, Unit* second) : CombatReference(first, second, true) { }
 
     bool Update(uint32 tdiff);
-    void Refresh();
-    void Suppress(Unit* who) { (who == first ? _suppressFirst : _suppressSecond) = true; }
+    void RefreshTimer();
 
     uint32 _combatTimer = PVP_COMBAT_TIMEOUT;
     bool _suppressFirst = false;
