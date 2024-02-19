@@ -66,8 +66,7 @@ enum Spells
 
 enum Misc
 {
-    MAX_ADVISORS                    = 2,
-    GO_CAGE                         = 185474,
+    GO_CAGE                         = 185474
 };
 
 const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
