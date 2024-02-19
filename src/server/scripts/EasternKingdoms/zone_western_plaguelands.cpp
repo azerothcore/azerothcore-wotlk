@@ -100,6 +100,7 @@ public:
                     if (player->GetQuestStatus(5216) != QUEST_STATUS_INCOMPLETE &&
                         player->GetQuestStatus(5229) != QUEST_STATUS_INCOMPLETE)
                         break;
+
                         //A creature is summoned if not already present
                     if (Creature* c = ObjectAccessor::GetCreature(*me, bilemawGUID))
                         break;
