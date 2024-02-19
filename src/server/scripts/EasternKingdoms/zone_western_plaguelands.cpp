@@ -49,8 +49,7 @@ enum AreaIds
     AREA_DALSON_TEARS             =200,
     AREA_GAHRRON_WITHER           =201,
     AREA_WRITH_HAUNT              =202
-};
-   
+};   
 
 class npc_the_scourge_cauldron : public CreatureScript
 {
