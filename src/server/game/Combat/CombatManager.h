@@ -85,11 +85,6 @@ struct PvPCombatReference : public CombatReference
 {
     static const uint32 PVP_COMBAT_TIMEOUT = 5 * IN_MILLISECONDS;
 
-    // suppressed combat refs do not generate a combat state for one side of the relation
-    // (used by: vanish, feign death)
-    void SuppressFor(Unit* who);
-    bool IsSuppressedFor(Unit const* who) const { return (who == first) ? _suppressFirst : _suppressSecond; }
-
 private:
     PvPCombatReference(Unit* first, Unit* second) : CombatReference(first, second, true) { }
 
@@ -97,8 +92,6 @@ private:
     void RefreshTimer();
 
     uint32 _combatTimer = PVP_COMBAT_TIMEOUT;
-    bool _suppressFirst = false;
-    bool _suppressSecond = false;
 
     friend class CombatManager;
 };
