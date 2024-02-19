@@ -73,19 +73,18 @@ const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
 
 struct boss_fathomlord_karathress : public BossAI
 {
-    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
-    {
-        if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
-        {
-            olum->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            olum->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-        }
-    }
+    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS){ }
 
     void Reset() override
     {
         BossAI::Reset();
         _recentlySpoken = false;
+
+        if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
+        {
+            olum->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            olum->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        }
 
         ScheduleHealthCheckEvent(75, [&]{
             instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
