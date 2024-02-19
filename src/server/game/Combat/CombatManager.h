@@ -64,6 +64,7 @@ struct CombatReference
     CombatReference& operator=(CombatReference const&) = delete;
 
 protected:
+    void Refresh();
     CombatReference(Unit* a, Unit* b, bool pvp = false) : first(a), second(b), _isPvP(pvp) { }
 
     friend class CombatManager;

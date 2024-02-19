@@ -88,6 +88,26 @@ void CombatReference::EndCombat()
     delete this;
 }
 
+void CombatReference::Refresh()
+{
+    bool needFirstAI = false, needSecondAI = false;
+    if (_suppressFirst)
+    {
+        _suppressFirst = false;
+        needFirstAI = first->GetCombatManager().UpdateOwnerCombatState();
+    }
+    if (_suppressSecond)
+    {
+        _suppressSecond = false;
+        needSecondAI = second->GetCombatManager().UpdateOwnerCombatState();
+    }
+
+    if (needFirstAI)
+        CombatManager::NotifyAICombat(first, second);
+    if (needSecondAI)
+        CombatManager::NotifyAICombat(second, first);
+}
+
 bool PvPCombatReference::Update(uint32 tdiff)
 {
     if (_combatTimer <= tdiff)
