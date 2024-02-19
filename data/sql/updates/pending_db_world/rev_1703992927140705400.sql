@@ -72,3 +72,9 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 11078;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (11078, 0, 0, '$C - I will consume your light!', 14, 0, 100, 0, 0, 0, 6497, 0, 'Cauldron Lord Soulwrath'),
 (11078, 1, 0, '%s emerges from the shadows to defend the cauldron!', 12, 0, 100, 0, 0, 0, 6546, 0, 'Cauldron Lord Soulwrath');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1784;
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 1784) AND (`source_type` = 0) AND (`id` IN (1));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1784, 0, 1, 0, 106, 0, 100, 0, 4000, 8000, 12000, 20000, 0, 10, 11, 11969, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hostile targets within 0-10 yards - Self: Cast spell  Fire Nova (11969) on Self');
+

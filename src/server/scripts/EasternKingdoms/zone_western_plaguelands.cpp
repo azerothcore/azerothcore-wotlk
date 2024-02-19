@@ -37,11 +37,20 @@ EndContentData */
 
 enum CreatureIds
 {
-    NPC_CAULDRON_LORD_BILEMW      = 11075,
+    NPC_CAULDRON_LORD_BILEMAW     = 11075,
     NPC_CAULDRON_LORD_RAZARCH     = 11076,
     NPC_CAULDRON_LORD_MALVINIOUS  = 11077,
     NPC_CAULDRON_LORD_SOULWRATH   = 11078
 };
+
+enum AreaIds
+{
+    AREA_FELSTONE_FIELD           =199,
+    AREA_DALSON_TEARS             =200,
+    AREA_GAHRRON_WITHER           =201,
+    AREA_WRITH_HAUNT              =202
+};
+   
 
 class npc_the_scourge_cauldron : public CreatureScript
 {
@@ -71,6 +80,11 @@ public:
                 me->SetRespawnDelay(600);
         }
 
+        ObjectGuid bilemawGUID;
+        ObjectGuid malvinousGUID;
+        ObjectGuid soulwrathGUID;
+        ObjectGuid razrchGUID;
+
         void MoveInLineOfSight(Unit* who) override
         {
             if (!who)
@@ -82,45 +96,68 @@ public:
 
             switch (me->GetAreaId())
             {
-                case 199:                                   //felstone
-                    if (player->GetQuestStatus(5216) == QUEST_STATUS_INCOMPLETE ||
-                        player->GetQuestStatus(5229) == QUEST_STATUS_INCOMPLETE)
+                case AREA_FELSTONE_FIELD:                                   //felstone
+                    if (player->GetQuestStatus(5216) != QUEST_STATUS_INCOMPLETE &&
+                        player->GetQuestStatus(5229) != QUEST_STATUS_INCOMPLETE)
+                        break;
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_BILEMW, 30.0f))
-                        {
-                            me->SummonCreature(NPC_CAULDRON_LORD_BILEMW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
-                            DoDie();
-                        }
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, bilemawGUID))
+                        break;
+
+                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    {
+                        bilemawGUID = summoned->GetGUID();
+                        DoDie();
+                    }
+
                     break;
-                case 200:                                   //dalson
-                    if (player->GetQuestStatus(5219) == QUEST_STATUS_INCOMPLETE ||
-                        player->GetQuestStatus(5231) == QUEST_STATUS_INCOMPLETE)
+                case AREA_DALSON_TEARS:                                   //dalson
+                    if (player->GetQuestStatus(5219) != QUEST_STATUS_INCOMPLETE &&
+                        player->GetQuestStatus(5231) != QUEST_STATUS_INCOMPLETE)
+                        break;
+
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_MALVINIOUS, 30.0f))
-                        {
-                            me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
-                            DoDie();
-                        }
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, malvinousGUID))
+                        break;
+
+                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    {
+                        malvinousGUID = summoned->GetGUID();
+                        DoDie();
+                    }
+
                     break;
-                case 201:                                   //gahrron
-                    if (player->GetQuestStatus(5225) == QUEST_STATUS_INCOMPLETE ||
-                        player->GetQuestStatus(5235) == QUEST_STATUS_INCOMPLETE)
+                case AREA_GAHRRON_WITHER:                                   //gahrron
+                    if (player->GetQuestStatus(5225) != QUEST_STATUS_INCOMPLETE &&
+                        player->GetQuestStatus(5235) != QUEST_STATUS_INCOMPLETE)
+                        break;
+
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_SOULWRATH, 30.0f))
-                        {
-                            me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
-                            DoDie();
-                        }
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, soulwrathGUID))
+                        break;
+
+                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    {
+                        soulwrathGUID = summoned->GetGUID();
+                        DoDie();
+                    }
+
                     break;
-                case 202:                                   //writhing
-                    if (player->GetQuestStatus(5222) == QUEST_STATUS_INCOMPLETE ||
-                        player->GetQuestStatus(5233) == QUEST_STATUS_INCOMPLETE)
+                case AREA_WRITH_HAUNT:                                   //writhing
+                    if (player->GetQuestStatus(5222) != QUEST_STATUS_INCOMPLETE &&
+                        player->GetQuestStatus(5233) != QUEST_STATUS_INCOMPLETE)
+                        break;
+
                         //A creature is summoned without being summoned
-                        if (!me->FindNearestCreature(NPC_CAULDRON_LORD_RAZARCH, 30.0f))
-                        {
-                            me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
-                            DoDie();
-                        }
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, razrchGUID))
+                        break;
+
+                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    {
+                        razrchGUID = summoned->GetGUID();
+                        DoDie();
+                    }
+
                     break;
                 default:
                     break;
