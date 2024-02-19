@@ -100,6 +100,7 @@ class CombatManager
         static bool CanBeginCombat(Unit const* a, Unit const* b);
 
         CombatManager(Unit* owner) : _owner(owner) { }
+        ~CombatManager();
         void Update(uint32 tdiff); // called from Unit::Update
 
         Unit* GetOwner() const { return _owner; }
@@ -120,6 +121,7 @@ class CombatManager
         // flags any pvp refs for suppression on owner's side - these refs will not generate combat until refreshed
         void SuppressPvPCombat();
         void EndAllPvECombat();
+        void RevalidateCombat();
         void EndAllPvPCombat();
         void EndAllCombat() { EndAllPvECombat(); EndAllPvPCombat(); }
 
@@ -134,7 +136,6 @@ class CombatManager
         Unit* const _owner;
         std::unordered_map<ObjectGuid, CombatReference*> _pveRefs;
         std::unordered_map<ObjectGuid, PvPCombatReference*> _pvpRefs;
-
 
     friend struct CombatReference;
     friend struct PvPCombatReference;
