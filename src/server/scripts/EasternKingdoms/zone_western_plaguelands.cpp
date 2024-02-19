@@ -101,10 +101,10 @@ public:
                         break;
 
                         //A creature is summoned if not already present
-                    if (Creature* bilemaw = ObjectAccessor::GetCreature(*me, bilemawGUID))
-                        break;
+                    Creature* bilemaw = ObjectAccessor::GetCreature(*me, bilemawGUID);
+                    if (bilemaw)  break;
 
-                    if (Creature* bilemaw = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (bilemaw = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         bilemawGUID = bilemaw->GetGUID();
                         DoDie();
@@ -117,10 +117,10 @@ public:
                         break;
 
                         //A creature is summoned if not already present
-                    if (Creature* malvinous = ObjectAccessor::GetCreature(*me, malvinousGUID))
-                        break;
+                    Creature* malvinous = ObjectAccessor::GetCreature(*me, malvinousGUID);
+                    if (malvinous) break;
 
-                    if (Creature* malvinous = me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (malvinous = me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         malvinousGUID = malvinous->GetGUID();
                         DoDie();
@@ -133,10 +133,10 @@ public:
                         break;
 
                         //A creature is summoned if not already present
-                    if (Creature* soulwrath = ObjectAccessor::GetCreature(*me, soulwrathGUID))
-                        break;
+                    Creature* soulwrath = ObjectAccessor::GetCreature(*me, soulwrathGUID);
+                    if (soulwrath) break;
 
-                    if (Creature* soulwrath = me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (soulwrath = me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         soulwrathGUID = soulwrath->GetGUID();
                         DoDie();
@@ -149,10 +149,10 @@ public:
                         break;
 
                         //A creature is summoned if not already present
-                    if (Creature* razrch = ObjectAccessor::GetCreature(*me, razrchGUID))
-                        break;
+                    Creature* razrch = ObjectAccessor::GetCreature(*me, razrchGUID);
+                    if (razrch)   break;
 
-                    if (Creature* razrch = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (razrch = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         razrchGUID = razrch->GetGUID();
                         DoDie();
