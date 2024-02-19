@@ -60,6 +60,11 @@ struct CombatReference
 
     void EndCombat();
 
+    // suppressed combat refs do not generate a combat state for one side of the relation
+    // (used by: vanish, feign death and launched out of combat but not yet landed spell missiles)
+    void SuppressFor(Unit* who);
+    bool IsSuppressedFor(Unit const* who) const { return (who == first) ? _suppressFirst : _suppressSecond; }
+
     CombatReference(CombatReference const&) = delete;
     CombatReference& operator=(CombatReference const&) = delete;
 
@@ -67,6 +72,9 @@ protected:
     void Refresh();
     CombatReference(Unit* a, Unit* b, bool pvp = false) : first(a), second(b), _isPvP(pvp) { }
 
+    bool _suppressFirst = false;
+    bool _suppressSecond = false;
+    
     friend class CombatManager;
 };
 

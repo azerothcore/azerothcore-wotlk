@@ -108,6 +108,14 @@ void CombatReference::Refresh()
         CombatManager::NotifyAICombat(second, first);
 }
 
+void CombatReference::SuppressFor(Unit* who)
+{
+    Suppress(who);
+    if (who->GetCombatManager().UpdateOwnerCombatState())
+        if (UnitAI* ai = who->GetAI())
+            ai->JustExitedCombat();
+}
+
 bool PvPCombatReference::Update(uint32 tdiff)
 {
     if (_combatTimer <= tdiff)
