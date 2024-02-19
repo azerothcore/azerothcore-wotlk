@@ -104,9 +104,9 @@ public:
                     if (Creature* bilemaw = ObjectAccessor::GetCreature(*me, bilemawGUID))
                         break;
 
-                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* bilemaw = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
-                        bilemawGUID = summoned->GetGUID();
+                        bilemawGUID = bilemaw->GetGUID();
                         DoDie();
                     }
 
@@ -120,9 +120,9 @@ public:
                     if (Creature* malvinous = ObjectAccessor::GetCreature(*me, malvinousGUID))
                         break;
 
-                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* malvinous = me->SummonCreature(NPC_CAULDRON_LORD_MALVINIOUS, 1865.0482f, -1569.235f, 58.944912f, 3.176499128341674804f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
-                        malvinousGUID = summoned->GetGUID();
+                        malvinousGUID = malvinous->GetGUID();
                         DoDie();
                     }
 
@@ -136,9 +136,9 @@ public:
                     if (Creature* soulwrath = ObjectAccessor::GetCreature(*me, soulwrathGUID))
                         break;
 
-                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* soulwrath = me->SummonCreature(NPC_CAULDRON_LORD_SOULWRATH, 1678.6357f, -2278.093f, 58.927708f, 3.543018341064453125f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
-                        soulwrathGUID = summoned->GetGUID();
+                        soulwrathGUID = soulwrath->GetGUID();
                         DoDie();
                     }
 
@@ -152,9 +152,9 @@ public:
                     if (Creature* razrch = ObjectAccessor::GetCreature(*me, razrchGUID))
                         break;
 
-                    if (Creature* summoned = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* razrch = me->SummonCreature(NPC_CAULDRON_LORD_RAZARCH, 1473.2244f, -1863.1766f, 58.43403f, 1.821926474571228027f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
-                        razrchGUID = summoned->GetGUID();
+                        razrchGUID = razrch->GetGUID();
                         DoDie();
                     }
 
