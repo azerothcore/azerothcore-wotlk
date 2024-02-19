@@ -130,6 +130,10 @@ public:
                     if (Creature* vashj = GetCreature(DATA_LADY_VASHJ))
                         vashj->AI()->JustSummoned(creature);
                     break;
+                case NPC_SEER_OLUM:
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                    break;
                 default:
                     break;
             }

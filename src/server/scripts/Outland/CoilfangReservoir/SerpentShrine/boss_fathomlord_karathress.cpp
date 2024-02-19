@@ -80,12 +80,6 @@ struct boss_fathomlord_karathress : public BossAI
         BossAI::Reset();
         _recentlySpoken = false;
 
-        if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
-        {
-            olum->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            olum->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-        }
-
         ScheduleHealthCheckEvent(75, [&]{
             instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard) {
                 if (fathomguard->IsAlive())
