@@ -611,8 +611,8 @@ public:
         {
             SendActionMenu(player, go, action);
             CloseGossipMenuFor(player);
+            go->DespawnOrUnsummon();
         }
-        go->DespawnOrUnsummon();
         return true;
     }
 
