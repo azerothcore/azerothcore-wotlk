@@ -634,7 +634,6 @@ public:
 
     void SendActionMenu(Player* player, GameObject* go, uint32 action)
     {
-        _result = SPELL_CAST_OK;
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -649,7 +648,9 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 4:
                 _result = player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
                 break;
-        LOG_ERROR("server", "Result of spellcast {}", std::to_string(_result));
+            default:
+                _result = SPELL_CAST_OK;
+                break;
         }
         if (_result == SPELL_CAST_OK)
         {
