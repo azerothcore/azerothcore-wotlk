@@ -1,3 +1,4 @@
+-- DB update 2024_02_19_00 -> 2024_02_20_00
 -- remove faulty cages with unsniffed posis
 DELETE FROM `gameobject` WHERE `id` = 185952 AND `guid` IN (265632, 265651, 265656, 265661, 265685, 265896, 266592, 266807, 267674, 267748, 268069, 268937); 
 -- add new correct cage from sniff
