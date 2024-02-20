@@ -611,7 +611,6 @@ public:
         {
             SendActionMenu(player, go, action);
             CloseGossipMenuFor(player);
-            go->DespawnOrUnsummon();
         }
         return true;
     }
@@ -633,24 +632,32 @@ public:
         return true;
     }
 
-    void SendActionMenu(Player* player, GameObject* /*go*/, uint32 action)
+    void SendActionMenu(Player* player, GameObject* go, uint32 action)
     {
+        _result = SPELL_CAST_OK;
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->CastSpell(player, SPELL_SUMMON_KARROG, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_KARROG, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
                 break;
+        LOG_ERROR("server", "Result of spellcast {}", std::to_string(_result));
+        }
+        if (_result == SPELL_CAST_OK)
+        {
+            go->DespawnOrUnsummon();
         }
     }
+private:
+    SpellCastResult _result;
 };
 
 /*######
