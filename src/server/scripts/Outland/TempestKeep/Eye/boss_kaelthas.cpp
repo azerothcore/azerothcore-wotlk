@@ -961,7 +961,7 @@ struct npc_thaladred : public ScriptedAI
         ScheduleTimedEvent(100ms, [&]
         {
             DoResetThreatList();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 me->AddThreat(target, 10000000.0f);
                 Talk(EMOTE_THALADRED_FIXATE, target);
