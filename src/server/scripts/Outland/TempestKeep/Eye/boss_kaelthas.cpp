@@ -824,6 +824,18 @@ struct npc_capernian : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+        {
+            if (me->Attack(who, false))
+            {
+                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->AddThreat(who, 0.0f);
+            }
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         if (!_hasDied)
@@ -831,7 +843,17 @@ struct npc_capernian : public ScriptedAI
             Talk(SAY_CAPERNIAN_AGGRO);
         }
         ScheduleTimedEvent(0ms, [&]{
-            DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
+
+            if (!me->CanCastSpell(SPELL_CAPERNIAN_FIREBALL))
+            {
+                me->ResumeChasingVictim();
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f);
+                DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
+            }
+
         }, 2500ms);
         ScheduleTimedEvent(7000ms, 10000ms, [&]{
             DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 30.0f);
