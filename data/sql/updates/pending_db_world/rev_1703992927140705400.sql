@@ -41,8 +41,8 @@ SET @ENTRY := 11077;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 0, 0, 0, 100, 0, 0, 0, 3000, 4000, 11, 12471, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Every 3 - 4 seconds (0 - 0s initially) (IC) - Self: Cast spell  Shadow Bolt (12471) on Victim'),
-(@ENTRY, 0, 1, 0, 0, 0, 100, 0, 11000, 13000, 20000, 25200, 11, 17204, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 20 - 25.2 seconds (11 - 13s initially) (IC) - Self: Cast spell  Summon Skeleton (17204) on None'),
+(@ENTRY, 0, 0, 0, 0, 0, 100, 0, 0, 0, 6000, 10000, 11, 12471, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Every 6 - 10 seconds (0 - 0s initially) (IC) - Self: Cast spell  Shadow Bolt (12471) with flags combat move on Victim'),
+(@ENTRY, 0, 1, 0, 0, 0, 100, 0, 11000, 13000, 20000, 25200, 11, 17204, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Every 20 - 25.2 seconds (11 - 13s initially) (IC) - Self: Cast spell  Summon Skeleton (17204) on Self'),
 (@ENTRY, 0, 2, 0, 2, 0, 100, 0, 0, 50, 15000, 19000, 11, 17173, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'When health between 0%-50%% (cooldown 15000 - 19000 ms) - Self: Cast spell  Drain Life (17173) on Victim'),
 (@ENTRY, 0, 3, 0, 4, 0, 50, 256, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'On aggro - Self: Talk Who dares to approach this cauldron?  Taste my dark blade! (0) to Victim'),
 (@ENTRY, 0, 4, 0, 54, 0, 100, 0, 0, 0, 0, 0, 11, 10389, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On just summoned - Self: Cast spell  Spawn Smoke (10389) on Self'),
@@ -62,9 +62,10 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 11, 10389, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On just summoned - Self: Cast spell  Spawn Smoke (10389) on Self'),
 (@ENTRY, 0, 1, 0, 54, 0, 50, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On just summoned - Self: Talk %s emerges from the shadows to defend the cauldron! (1) to invoker'),
-(@ENTRY, 0, 2, 0, 26, 0, 100, 0, 0, 8, 12000, 15000, 11, 10966, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'On only hostile unit in line of sight (in combat) (wait 12000 - 15000 ms before next event trigger) - Self: Cast spell  Uppercut (10966) on Victim'),
+(@ENTRY, 0, 2, 0, 26, 0, 100, 0, 1, 8, 12000, 15000, 11, 10966, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'On only non hostile unit in line of sight (in combat) (wait 12000 - 15000 ms before next event trigger) - Self: Cast spell  Uppercut (10966) on Victim'),
 (@ENTRY, 0, 3, 0, 0, 0, 100, 0, 5000, 8000, 14000, 20000, 11, 12946, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Every 14 - 20 seconds (5 - 8s initially) (IC) - Self: Cast spell  Putrid Stench (12946) on Victim'),
 (@ENTRY, 0, 4, 0, 4, 0, 50, 256, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'On aggro - Self: Talk $C - I will consume your light! (0) to Victim');
+
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 11078 AND `SourceId` = 0;
 
