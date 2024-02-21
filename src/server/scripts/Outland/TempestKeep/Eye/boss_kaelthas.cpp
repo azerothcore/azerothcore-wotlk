@@ -824,7 +824,6 @@ struct npc_capernian : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
     }
 
-
     void AttackStart(Unit* who) override
     {
         if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
