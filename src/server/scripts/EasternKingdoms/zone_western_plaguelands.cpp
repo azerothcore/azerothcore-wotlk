@@ -69,7 +69,7 @@ public:
         ObjectGuid malvinousGUID;
         ObjectGuid soulwrathGUID;
         ObjectGuid razrchGUID;
-        
+
         void Reset() override {}
 
         void JustEngagedWith(Unit* /*who*/) override {}
