@@ -1116,6 +1116,8 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
+    [[nodiscard]] bool IsClass(Classes playerClass, ClassContext context = CLASS_CONTEXT_NONE) const override;
+
     void SetInWater(bool apply);
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }

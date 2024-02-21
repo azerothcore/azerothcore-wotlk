@@ -1029,7 +1029,7 @@ class spell_class_call_handler : public SpellScript
             targets.remove_if([spellInfo](WorldObject const* target) -> bool
             {
                 Player const* player = target->ToPlayer();
-                if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
+                if (!player || player->IsClass(CLASS_DEATH_KNIGHT)) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
                 {
                     return true;
                 }

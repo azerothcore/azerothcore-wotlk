@@ -399,10 +399,11 @@ public: /* PlayerScript */
     bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
     void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
-    void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
+    void OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
+    std::optional<bool> OnPlayerIsClass(Player const* player, Classes playerClass, ClassContext context);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool OnPlayerHasActivePowerType(Player const* player, Powers power);
     void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);

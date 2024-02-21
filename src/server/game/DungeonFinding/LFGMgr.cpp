@@ -1152,7 +1152,7 @@ namespace lfg
                     baseAP = p->GetTotalAttackPowerValue(BASE_ATTACK);
                     rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
                     maxPower = 0;
-                    if (p->getClass() == CLASS_DRUID)
+                    if (p->IsClass(CLASS_DRUID))
                         maxPower = p->GetMaxPower(POWER_MANA);
                     else
                         maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());

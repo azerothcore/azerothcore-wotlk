@@ -1268,8 +1268,8 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
     return player->GetLevel() >= 10
-           && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-           && player->getClass() == GetCreatureTemplate()->trainer_class;
+        && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
+        && player->IsClass((Classes)GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER);
 }
 
 bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
@@ -1283,7 +1283,7 @@ bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= null
     {
         case TRAINER_TYPE_CLASS:
         case TRAINER_TYPE_PETS:
-            if (m_creatureInfo->trainer_class && m_creatureInfo->trainer_class != player->getClass())
+            if (m_creatureInfo->trainer_class && !player->IsClass((Classes)m_creatureInfo->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
             {
                 if (npcFlags)
                     *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
