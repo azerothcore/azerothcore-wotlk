@@ -69,12 +69,11 @@ public:
         ObjectGuid malvinousGUID;
         ObjectGuid soulwrathGUID;
         ObjectGuid razrchGUID;
-
         
         void Reset() override {}
 
         void JustEngagedWith(Unit* /*who*/) override {}
-        
+
         void DoDie()
         {
             //summoner dies here
@@ -88,7 +87,7 @@ public:
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
         {
             DoDie();
-        }        
+        }
 
         void MoveInLineOfSight(Unit* who) override
         {
@@ -112,7 +111,7 @@ public:
 
                     if (Creature* bilemaw = me->SummonCreature(NPC_CAULDRON_LORD_BILEMAW, 1728.6443f, -1174.7982f, 59.05936f, 2.356194496154785156f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
-                        bilemawGUID = bilemaw->GetGUID();                        
+                        bilemawGUID = bilemaw->GetGUID();
                     }
 
                     break;
