@@ -1902,4 +1902,3 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 DELETE FROM `gameobject` WHERE (`id` IN (2413))
 AND (`guid` IN (42809, 42852, 42812, 42807, 42811, 42808, 42435, 42810));
 DELETE FROM `gameobject_addon` WHERE (`guid` IN (42809, 42852, 42812, 42807, 42811, 42808, 42435, 42810));
-DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 1) AND (`guid` IN (42809, 42852, 42812, 42807, 42811, 42808, 42435, 42810));
