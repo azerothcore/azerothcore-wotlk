@@ -87,9 +87,8 @@ uint32 UpdateTime::GetPercentile(uint8 p)
     double index = (double(p) / 100.0) * (GetDatasetSize() - 1);
 
     // If the index is an integer, return the value at that index
-    if (index == floor(index)) {
+    if (index == floor(index))
        return _orderedUpdateTimeDataTable[index];
-    }
 
     // Otherwise, perform linear interpolation
     int lowerIndex = floor(index);
@@ -139,7 +138,6 @@ void UpdateTime::SortUpdateTimeDataTable()
         endUpdateTable = std::next(_updateTimeDataTable.begin(), _updateTimeTableIndex);
 
     std::copy(_updateTimeDataTable.begin(), endUpdateTable, _orderedUpdateTimeDataTable.begin());
-
 
     auto endOrderedUpdateTable = _orderedUpdateTimeDataTable.end();
     if (!_updateTimeDataTable[_updateTimeDataTable.size() - 1])
