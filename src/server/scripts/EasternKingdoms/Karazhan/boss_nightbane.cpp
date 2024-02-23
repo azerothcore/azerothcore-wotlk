@@ -15,15 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Nightbane
-SD%Complete: 80
-SDComment: SDComment: Timers may incorrect
-SDCategory: Karazhan
-EndScriptData */
-
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "karazhan.h"
@@ -32,6 +26,7 @@ enum Spells
 {
     // phase 1
     SPELL_BELLOWING_ROAR        = 39427,
+    SPELL_CLEAVE                = 30131,
     SPELL_CHARRED_EARTH         = 30129,
     SPELL_DISTRACTING_ASH       = 30130,
     SPELL_SMOLDERING_BREATH     = 30210,
@@ -46,7 +41,7 @@ enum Spells
 
 enum Says
 {
-    EMOTE_SUMMON                = 0, // Not used in script
+    EMOTE_SUMMON                = 0,
     YELL_AGGRO                  = 1,
     YELL_FLY_PHASE              = 2,
     YELL_LAND_PHASE             = 3,
@@ -57,6 +52,11 @@ enum Groups
 {
     GROUP_GROUND                = 0,
     GROUP_FLYING                = 1
+};
+
+enum Points
+{
+    POINT_DESPAWN = 10 // Other points used dynamically throughout the script
 };
 
 float IntroWay[8][3] =
@@ -77,77 +77,49 @@ struct boss_nightbane : public BossAI
     {
         _intro = true;
         _skeletonCount = 5;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
+        _movePhase = 0;
     }
 
     void Reset() override
     {
         BossAI::Reset();
         _skeletonscheduler.CancelAll();
-        Phase = 1;
-        MovePhase = 0;
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
         me->SetSpeed(MOVE_RUN, 2.0f);
         me->SetDisableGravity(_intro);
         me->SetWalk(false);
         me->setActive(true);
 
-        if (instance)
-        {
-            if (instance->GetData(DATA_NIGHTBANE) == DONE)
-                me->DisappearAndDie();
-            else
-                instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
-        }
-
-        HandleTerraceDoors(true);
-
         _flying = false;
         _movement = false;
+        _intro = true;
+        Phase = 1;
+        _movePhase = 0;
 
-        if (!_intro)
-        {
-            //when boss is reset and we're past the intro
-            //cannot despawn, but have to move to a location where he normally is
-            //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
-            Position preSpawnPosis = me->GetHomePosition();
-            me->NearTeleportTo(preSpawnPosis);
-            instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
-            _intro = true;
-            Phase = 1;
-            MovePhase = 0;
-        }
-
-        ScheduleHealthCheckEvent({25, 50, 70}, [&]{
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
             TakeOff();
         });
     }
 
-    void HandleTerraceDoors(bool open)
+    void EnterEvadeMode(EvadeReason why) override
     {
-        if (instance)
-        {
-            instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_1), open);
-            instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_2), open);
-        }
+        BossAI::EnterEvadeMode(why);
+        me->SetDisableGravity(true);
+        me->SendMovementFlagUpdate();
+        me->GetMotionMaster()->MoveTakeoff(POINT_DESPAWN, -11013.246f, -1770.5212f, 166.50139f);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
-        if (instance)
-            instance->SetData(DATA_NIGHTBANE, IN_PROGRESS);
+        BossAI::JustEngagedWith(who);
+        _intro = false;
 
-        HandleTerraceDoors(false);
         Talk(YELL_AGGRO);
         ScheduleGround();
     }
 
-    void ScheduleGround() {
+    void ScheduleGround()
+    {
         scheduler.Schedule(30s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastAOE(SPELL_BELLOWING_ROAR);
@@ -174,14 +146,20 @@ struct boss_nightbane : public BossAI
         {
             DoCastRandomTarget(SPELL_SEARING_CINDERS);
             context.Repeat(10s);
+        }).Schedule(1500ms, GROUP_GROUND, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(1500ms, 45s);
         });
     }
 
-    void ScheduleFly() {
+    void ScheduleFly()
+    {
         _skeletonSpawnCounter = 0;
 
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
+            DoResetThreatList();
             DoCastVictim(SPELL_RAIN_OF_BONES);
             _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
             {
@@ -217,14 +195,6 @@ struct boss_nightbane : public BossAI
             ScriptedAI::AttackStart(who);
     }
 
-    void JustDied(Unit* /*killer*/) override
-    {
-        if (instance)
-            instance->SetData(DATA_NIGHTBANE, DONE);
-
-        HandleTerraceDoors(true);
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
         if (!_intro && !_flying)
@@ -236,19 +206,21 @@ struct boss_nightbane : public BossAI
         if (type != POINT_MOTION_TYPE)
             return;
 
+        if (id == POINT_DESPAWN)
+        {
+            me->DespawnOnEvade();
+        }
+
         if (_intro)
         {
             if (id >= 8)
             {
-                _intro = false;
-                //me->SetHomePosition(IntroWay[7][0], IntroWay[7][1], IntroWay[7][2], 0);
-                //doesn't need home position because we have to "despawn" boss on reset
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetInCombatWithZone();
                 return;
             }
 
-            MovePhase = id + 1;
+            _movePhase = id + 1;
             return;
         }
 
@@ -263,7 +235,7 @@ struct boss_nightbane : public BossAI
             }
 
             if (id < 8)
-                MovePhase = id + 1;
+                _movePhase = id + 1;
             else
             {
                 Phase = 1;
@@ -332,9 +304,9 @@ struct boss_nightbane : public BossAI
     {
         if (_intro)
         {
-            if (MovePhase)
+            if (_movePhase)
             {
-                if (MovePhase >= 7)
+                if (_movePhase >= 7)
                 {
                     me->SetDisableGravity(false);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
@@ -342,25 +314,27 @@ struct boss_nightbane : public BossAI
                 }
                 else
                 {
-                    me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
+                    me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
                 }
-                MovePhase = 0;
+                _movePhase = 0;
             }
             return;
         }
 
-        if (_flying && MovePhase)
+        if (_flying && _movePhase)
         {
-            if (MovePhase >= 7)
+            if (_movePhase >= 7)
             {
                 me->SetDisableGravity(false);
+                DoResetThreatList();
                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
             }
             else
-                me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
+                me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
 
-            MovePhase = 0;
+            _movePhase = 0;
         }
 
         if (!UpdateVictim())
@@ -394,24 +368,28 @@ private:
     bool _flying;
     bool _movement;
 
-    uint32 MovePhase;
+    uint32 _movePhase;
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
 };
+
 class go_blackened_urn : public GameObjectScript
 {
 public:
     go_blackened_urn() : GameObjectScript("go_blackened_urn") { }
 
-    //if we summon an entity instead of using a sort of invisible entity, we could unsummon boss on reset
-    //right now that doesn't work because of how the urn works
-    bool OnGossipHello(Player* player, GameObject* go) override
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        if (InstanceScript* pInstance = go->GetInstanceScript())
+        if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetGuidData(DATA_NIGHTBANE)))
-                    cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+            if (instance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+            {
+                if (Creature* nightbane = instance->GetCreature(DATA_NIGHTBANE))
+                {
+                    nightbane->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+                    nightbane->AI()->Talk(EMOTE_SUMMON);
+                }
+            }
         }
 
         return false;

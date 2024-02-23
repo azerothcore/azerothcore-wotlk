@@ -16,10 +16,8 @@
  */
 
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"

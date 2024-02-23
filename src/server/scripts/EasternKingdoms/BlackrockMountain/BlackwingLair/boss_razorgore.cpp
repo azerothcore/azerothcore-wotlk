@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "blackwing_lair.h"
 
 enum Say
@@ -290,7 +292,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-            if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION))
+            if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION) && !player->GetPet())
                 if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                 {
                     razor->AI()->SetGUID(player->GetGUID());
@@ -347,3 +349,4 @@ void AddSC_boss_razorgore()
     new go_orb_of_domination();
     new spell_egg_event();
 }
+

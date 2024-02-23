@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountScript.h"
 #include "Channel.h"
+#include "CreatureScript.h"
 #include "Group.h"
 #include "Guild.h"
-#include "ScriptMgr.h"
+#include "PlayerScript.h"
 
 enum IPLoggingTypes
 {

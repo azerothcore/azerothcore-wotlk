@@ -16,10 +16,10 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Group.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -53,8 +53,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -62,8 +61,7 @@ public:
 
         if (!cache)
         {
-            handler->PSendSysMessage(LANG_COMMAND_CACHE_NOT_FOUND, player->GetName());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_CACHE_NOT_FOUND, player->GetName());
             return false;
         }
 
@@ -84,8 +82,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -104,8 +101,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 

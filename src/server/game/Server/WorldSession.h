@@ -332,6 +332,8 @@ public:
     WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
+    bool IsGMAccount() const;
+
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }

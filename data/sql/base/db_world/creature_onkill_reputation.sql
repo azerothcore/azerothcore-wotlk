@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   PRIMARY KEY (`creature_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature OnKill Reputation gain';
 
--- Dumping data for table acore_world.creature_onkill_reputation: ~2,036 rows (approximately)
+-- Dumping data for table acore_world.creature_onkill_reputation: ~2 035 rows (approximately)
 DELETE FROM `creature_onkill_reputation`;
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
 	(674, 21, 0, 5, 0, 5, 0, 0, 0, 0),
@@ -258,7 +258,7 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(9464, 576, 0, 7, 0, 60, 0, 0, 0, 0),
 	(9536, 169, 0, 7, 0, -125, 0, 0, 0, 0),
 	(9559, 87, 21, 5, 0, 25, 7, 0, -125, 0),
-	(9816, 749, 0, 5, 0, 50, 0, 0, 0, 0),
+	(9816, 749, 0, 5, 0, 20, 0, 0, 0, 0),
 	(10060, 87, 21, 5, 0, 25, 7, 0, -125, 0),
 	(10199, 576, 0, 7, 0, 100, 0, 0, 0, 0),
 	(10267, 169, 0, 7, 0, -125, 0, 0, 0, 0),
@@ -672,7 +672,6 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(17229, 967, 0, 7, 0, 15, 0, 0, 0, 0),
 	(17248, 967, 0, 7, 0, 15, 0, 0, 0, 0),
 	(17259, 946, 947, 4, 0, 5, 4, 0, 5, 1),
-	(17261, 935, 0, 7, 0, 12, 0, 0, 0, 0),
 	(17264, 946, 947, 4, 0, 5, 4, 0, 5, 1),
 	(17269, 946, 947, 4, 0, 5, 4, 0, 5, 1),
 	(17270, 946, 947, 4, 0, 5, 4, 0, 5, 1),

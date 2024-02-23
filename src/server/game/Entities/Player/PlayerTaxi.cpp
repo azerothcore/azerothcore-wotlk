@@ -17,8 +17,8 @@
 
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
 
 void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level)
 {

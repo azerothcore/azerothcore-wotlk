@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_model_info` (
   PRIMARY KEY (`DisplayID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System (Model related info)';
 
--- Dumping data for table acore_world.creature_model_info: ~23,729 rows (approximately)
+-- Dumping data for table acore_world.creature_model_info: ~24 339 rows (approximately)
 DELETE FROM `creature_model_info`;
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`) VALUES
 	(4, 2, 3, 2, 0),
@@ -12220,7 +12220,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(17883, 2, 0, 0, 17884),
 	(17884, 0, 0, 1, 17883),
 	(17886, 0, 0, 0, 0),
-	(17887, 2, 0, 0, 0),
+	(17887, 9, 15.75, 0, 0),
 	(17888, 0, 0, 2, 0),
 	(17889, 0, 0, 2, 0),
 	(17890, 0, 0, 2, 0),
@@ -12568,10 +12568,10 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(18251, 2.5, 5, 0, 0),
 	(18252, 0.2288, 1.65, 1, 18262),
 	(18253, 0.383, 1.5, 0, 18258),
-	(18254, 1, 1.5, 0, 18255),
-	(18255, 1.2, 1.8, 0, 18561),
-	(18256, 1, 1.5, 1, 18257),
-	(18257, 1, 1.5, 1, 18256),
+	(18254, 1, 1.5, 0, 0),
+	(18255, 1.2, 1.8, 0, 0),
+	(18256, 1, 1.5, 1, 0),
+	(18257, 1, 1.5, 1, 0),
 	(18258, 0.383, 1.5, 0, 18253),
 	(18259, 0.383, 1.5, 1, 18260),
 	(18260, 0.383, 1.5, 1, 18259),
@@ -12621,7 +12621,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(18306, 0.389, 1.5, 0, 0),
 	(18307, 1, 1.5, 0, 0),
 	(18308, 0.3672, 1.8, 0, 18309),
-	(18309, 0.306, 1.5, 1, 18308),
+	(18309, 0.306, 1.5, 1, 0),
 	(18310, 0, 0, 2, 0),
 	(18311, 0.9932, 1.95, 0, 0),
 	(18312, 1, 1, 2, 0),
@@ -15019,7 +15019,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(20736, 2.5, 7.5, 0, 0),
 	(20737, 0, 0, 0, 0),
 	(20738, 0.28, 1.2, 2, 0),
-	(20739, 2, 0, 0, 0),
+	(20739, 6.315, 6, 0, 0),
 	(20740, 0.208, 1.5, 1, 20741),
 	(20741, 0.306, 1.5, 0, 20742),
 	(20742, 0.306, 1.5, 0, 20741),

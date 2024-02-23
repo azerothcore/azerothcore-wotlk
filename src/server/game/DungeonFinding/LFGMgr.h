@@ -633,6 +633,9 @@ namespace lfg
         bool m_Testing;
     };
 
+    template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>
+    auto format_as(T f) { return fmt::underlying(f); }
+
 } // namespace lfg
 
 #define sLFGMgr lfg::LFGMgr::instance()

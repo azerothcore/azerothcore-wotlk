@@ -385,10 +385,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 damage += damage / 4;
                         }
                     }
-                    // Immolate - hidden delay for conflagrate
-                    else if (m_spellInfo->SpellFamilyFlags[0] & 0x4)
-                    {
-                    }
                     // Conflagrate - consumes Immolate or Shadowflame
                     else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                     {
@@ -812,23 +808,6 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         m_caster->CastSpell(m_caster, 65047, true); // Mirror Image
 
                     break;
-                }
-            // Vanish (not exist)
-            case 18461:
-                {
-                    unitTarget->RemoveMovementImpairingAuras(true);
-                    unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
-
-                    // See if we already are stealthed. If so, we're done.
-                    if (unitTarget->HasAura(1784))
-                        return;
-
-                    // Reset cooldown on stealth if needed
-                    if (unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->ToPlayer()->HasSpellCooldown(1784))
-                        unitTarget->ToPlayer()->RemoveSpellCooldown(1784);
-
-                    unitTarget->CastSpell(unitTarget, 1784, true);
-                    return;
                 }
             // Demonic Empowerment -- succubus
             case 54437:
@@ -1930,13 +1909,6 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         case 48542:                                         // Revitalize
             damage = int32(CalculatePct(unitTarget->GetMaxPower(power), damage));
             break;
-        case 67490:                                         // Runic Mana Injector (mana gain increased by 25% for engineers - 3.2.0 patch change)
-            {
-                if (Player* player = m_caster->ToPlayer())
-                    if (player->HasSkill(SKILL_ENGINEERING))
-                        AddPct(damage, 25);
-                break;
-            }
         case 71132:                                         // Glyph of Shadow Word: Pain
             damage = int32(CalculatePct(unitTarget->GetCreateMana(), 1));  // set 1 as value, missing in dbc
             break;
@@ -2581,7 +2553,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     uint32 dispelMask  = SpellInfo::GetDispelMask(DispelType(dispel_type));
 
     DispelChargesList dispel_list;
-    unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list);
+    unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list, m_spellInfo);
     if (dispel_list.empty())
         return;
 
@@ -3836,7 +3808,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             caster->RewardPlayerAndGroupAtEvent(18388, unitTarget);
                             if (Creature* target = unitTarget->ToCreature())
                             {
-                                target->setDeathState(CORPSE);
+                                target->setDeathState(DeathState::Corpse);
                                 target->RemoveCorpse();
                             }
                         }
@@ -4090,18 +4062,6 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
 
     // Xinef: Set last sanctuary time
     unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS().count();
-
-    // Vanish allows to remove all threat and cast regular stealth so other spells can be used
-    if (m_caster->GetTypeId() == TYPEID_PLAYER
-            && m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE
-            && (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VANISH))
-    {
-        m_caster->ToPlayer()->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
-
-        //Clean Escape
-        if (m_caster->HasAura(23582))
-            m_caster->CastSpell(m_caster, 23583, true);
-    }
 }
 
 void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
@@ -4934,7 +4894,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         Player* player = m_caster->ToPlayer();
         if (player)
         {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
             // charge changes fall time
             player->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 
@@ -4961,22 +4920,12 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             sScriptMgr->AnticheatSetUnderACKmount(player);
         }
     }
-
-    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET && m_caster->ToPlayer())
-    {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
-    }
 }
 
 void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
-
-    if (m_caster->ToPlayer())
-    {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
-    }
 
     if (m_targets.HasDst())
     {
@@ -5169,7 +5118,6 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(unitTarget->ToPlayer(), true);
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
     }
 }
@@ -5254,7 +5202,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
     pet->ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
     pet->RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
-    pet->setDeathState(ALIVE);
+    pet->setDeathState(DeathState::Alive);
     pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED))); // xinef: just in case
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
     pet->SetDisplayId(pet->GetNativeDisplayId());
@@ -6064,8 +6012,11 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         Position pos;
 
         // xinef: do not use precalculated position for effect summon pet in this function
-        // it means it was cast by NPC and should have its position overridden
-        if (totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        // it means it was cast by NPC and should have its position overridden unless the
+        // target position is specified in the DB AND the effect has no or zero radius
+        if ((totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
+            (GetSpellInfo()->Effects[i].TargetA.GetTarget() == TARGET_DEST_DB &&
+            (!GetSpellInfo()->Effects[i].HasRadius() || GetSpellInfo()->Effects[i].RadiusEntry->RadiusMax == 0)))
         {
             pos = *destTarget;
         }

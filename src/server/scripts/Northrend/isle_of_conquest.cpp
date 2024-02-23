@@ -17,12 +17,13 @@
 
 #include "BattlegroundIC.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum eIoCTurrent
 {
@@ -514,3 +515,4 @@ void AddSC_isle_of_conquest()
     new spell_ioc_parachute_ic();
     new spell_ioc_launch();
 }
+

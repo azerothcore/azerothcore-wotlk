@@ -1,0 +1,43 @@
+name: docker tag and build
+description: a helper action to shorten generating docker tags and building
+inputs:
+  component-name:
+    description: name of the component/docker image (eg worldserver, authserver)
+    type: string
+    required: true
+  push:
+    description: whether to push the image or not
+    type: boolean
+    required: true
+  version:
+    description: version tag to use for docker image
+    required: true
+    type: string
+  dockerfile:
+    description: dockerfile to use
+    required: false
+    default: apps/docker/Dockerfile
+runs:
+  using: composite
+  steps:
+    - name: Get Docker Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: acore/ac-wotlk-${{ inputs.component-name }}
+        tags: |
+          type=raw,value=${{ inputs.version }}
+          type=ref,event=branch
+
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ github.workspace }}
+        file: ${{ inputs.dockerfile }}
+        push: ${{ inputs.push }}
+        tags: ${{ steps.meta.outputs.tags }}
+        target:  ${{ inputs.component-name }}
+        build-args: |
+          USER_ID=1000
+          GROUP_ID=1000
+          DOCKER_USER=acore

@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
 
 enum Talk
@@ -36,6 +37,8 @@ enum Spells
     SPELL_CLEANSING_FIELD       = 37934,
     SPELL_BLUE_BEAM             = 38015,
     SPELL_ELEMENTAL_SPAWNIN     = 25035,
+    SPELL_PURIFY_ELEMENTAL      = 36461,
+    SPELL_SUMMON_ELEMENTAL      = 36459,
 
     SPELL_SUMMON_CORRUPTED1     = 38188,
     SPELL_SUMMON_CORRUPTED2     = 38189,
@@ -68,317 +71,292 @@ enum Spells
 enum Misc
 {
     GROUP_ABILITIES                 = 1,
+    GROUP_OOC_PURIFY_ELEMENTALS     = 2,
+
+    NPC_PURIFIED_WATER_ELEMENTAL    = 21260,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
-
-    EVENT_SPELL_MARK_OF_CORRUPTION1 = 1,
-    EVENT_SPELL_MARK_OF_CORRUPTION2 = 2,
-    EVENT_SPELL_MARK_OF_CORRUPTION3 = 3,
-    EVENT_SPELL_MARK_OF_CORRUPTION4 = 4,
-    EVENT_SPELL_MARK_OF_CORRUPTION5 = 5,
-    EVENT_SPELL_MARK_OF_CORRUPTION6 = 6,
-    EVENT_SPELL_MARK_OF_HYDROSS1    = 7,
-    EVENT_SPELL_MARK_OF_HYDROSS2    = 8,
-    EVENT_SPELL_MARK_OF_HYDROSS3    = 9,
-    EVENT_SPELL_MARK_OF_HYDROSS4    = 10,
-    EVENT_SPELL_MARK_OF_HYDROSS5    = 11,
-    EVENT_SPELL_MARK_OF_HYDROSS6    = 12,
-    EVENT_SPELL_WATER_TOMB          = 13,
-    EVENT_SPELL_VILE_SLUDGE         = 14,
-    EVENT_SPELL_ENRAGE              = 15,
-    EVENT_CHECK_AURA                = 16,
-    EVENT_KILL_TALK                 = 17
+    NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253
 };
 
-class boss_hydross_the_unstable : public CreatureScript
+enum WaterElementalPathIds
 {
-public:
-    boss_hydross_the_unstable() : CreatureScript("boss_hydross_the_unstable") { }
+    PATH_CENTER                     = 5,
+    PATH_END                        = 12
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_hydross_the_unstable : public BossAI
+{
+    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE), _recentlySpoken(false) { }
+
+    void Reset() override
     {
-        return GetSerpentShrineAI<boss_hydross_the_unstableAI>(creature);
+        _Reset();
+        _recentlySpoken = false;
+        SummonTaintedElementalOOC();
     }
 
-    struct boss_hydross_the_unstableAI : public BossAI
+    void SummonTaintedElementalOOC()
     {
-        boss_hydross_the_unstableAI(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE)
+        me->m_Events.AddEventAtOffset([this] {
+            DoCastAOE(SPELL_SUMMON_ELEMENTAL);
+            SummonTaintedElementalOOC();
+        }, 12s, 12s, GROUP_OOC_PURIFY_ELEMENTALS);
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        if (!me->HasAura(SPELL_BLUE_BEAM))
         {
+            me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
         }
+    }
 
-        void Reset() override
+    void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
+    {
+        if (movementType == WAYPOINT_MOTION_TYPE)
         {
-            BossAI::Reset();
-        }
-
-        void JustReachedHome() override
-        {
-            BossAI::JustReachedHome();
-            if (!me->HasAura(SPELL_BLUE_BEAM))
-                me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
-        }
-
-        void SetForm(bool corrupt, bool initial)
-        {
-            events.CancelEventGroup(GROUP_ABILITIES);
-            DoResetThreatList();
-
-            if (corrupt)
+            if (pathId == PATH_CENTER)
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, false);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-                me->CastSpell(me, SPELL_CORRUPTION, true);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION1, 0, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION2, 15000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION3, 30000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION4, 45000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION5, 60000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION6, 75000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_VILE_SLUDGE, 7000, GROUP_ABILITIES);
+                summon->SetFacingToObject(me);
+                DoCast(summon, SPELL_PURIFY_ELEMENTAL);
+
+                // Happens even if Hydross is dead, so completely detached to the spell, which is nothing but a dummy anyways.
+                summon->m_Events.AddEventAtOffset([summon] {
+                    summon->UpdateEntry(NPC_PURIFIED_WATER_ELEMENTAL);
+                }, 1s);
             }
-            else
+            else if (pathId == PATH_END)
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
-                me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS1, 0, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS2, 15000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS3, 30000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS4, 45000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS5, 60000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS6, 75000, GROUP_ABILITIES);
-                events.ScheduleEvent(EVENT_SPELL_WATER_TOMB, 7000, GROUP_ABILITIES);
-            }
-
-            if (initial)
-                return;
-
-            if (corrupt)
-            {
-                Talk(SAY_SWITCH_TO_CORRUPT);
-                for (uint32 i = SPELL_SUMMON_CORRUPTED1; i <= SPELL_SUMMON_CORRUPTED4; ++i)
-                    me->CastSpell(me, i, true);
-            }
-            else
-            {
-                Talk(SAY_SWITCH_TO_CLEAN);
-                for (uint32 i = SPELL_SUMMON_PURIFIED1; i <= SPELL_SUMMON_PURIFIED4; ++i)
-                    me->CastSpell(me, i, true);
+                summon->DespawnOrUnsummon();
             }
         }
+    }
 
-        void JustEngagedWith(Unit* who) override
+    void SetForm(bool corrupt, bool initial)
+    {
+        scheduler.CancelGroup(GROUP_ABILITIES);
+        DoResetThreatList();
+
+        if (corrupt)
         {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
+            me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, false);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+            DoCastSelf(SPELL_CORRUPTION, true);
 
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-            events.ScheduleEvent(EVENT_CHECK_AURA, 1000);
-            SetForm(false, true);
+            scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION1);
+            }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION2);
+            }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION3);
+            }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION4);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION5);
+            }).Schedule(90s, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_MARK_OF_CORRUPTION6);
+                context.Repeat(15s);
+            }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_VILE_SLUDGE, 0, 0.0f, true, true);
+                context.Repeat(9700ms, 32800ms);
+            });
+        }
+        else
+        {
+            me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
+            me->RemoveAurasDueToSpell(SPELL_CORRUPTION);
+
+            scheduler.Schedule(15s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS1);
+            }).Schedule(30s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS2);
+            }).Schedule(45s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS3);
+            }).Schedule(60s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS4);
+            }).Schedule(75s, GROUP_ABILITIES, [this](TaskContext)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS5);
+            }).Schedule(90s, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_MARK_OF_HYDROSS6);
+                context.Repeat(15s);
+            }).Schedule(12150ms, GROUP_ABILITIES, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_WATER_TOMB, 0, 0.0f, true, true);
+                context.Repeat(9700ms, 32800ms);
+            });
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        if (initial)
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            return;
+        }
+
+        if (corrupt)
+        {
+            Talk(SAY_SWITCH_TO_CORRUPT);
+            for (uint32 spellId = SPELL_SUMMON_CORRUPTED1; spellId <= SPELL_SUMMON_CORRUPTED4; ++spellId)
             {
-                Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                DoCastSelf(spellId, true);
             }
         }
-
-        void JustSummoned(Creature* summon) override
+        else
         {
-            summons.Summon(summon);
-            summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
-            summon->SetInCombatWithZone();
-
-            if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
-                summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-            else
-                summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            summons.Despawn(summon);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
-            BossAI::JustDied(killer);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            Talk(SAY_SWITCH_TO_CLEAN);
+            for (uint32 spellId = SPELL_SUMMON_PURIFIED1; spellId <= SPELL_SUMMON_PURIFIED4; ++spellId)
             {
-                case EVENT_CHECK_AURA:
-                    if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
-                        SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
-                    events.ScheduleEvent(EVENT_CHECK_AURA, 1000);
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS1:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS1, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS2:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS2, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS3:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS3, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS4:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS4, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS5:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS5, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_HYDROSS6:
-                    me->CastSpell(me, SPELL_MARK_OF_HYDROSS6, false);
-                    events.ScheduleEvent(EVENT_SPELL_MARK_OF_HYDROSS6, 15000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION1:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION1, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION2:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION2, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION3:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION3, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION4:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION4, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION5:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION5, false);
-                    break;
-                case EVENT_SPELL_MARK_OF_CORRUPTION6:
-                    me->CastSpell(me, SPELL_MARK_OF_CORRUPTION6, false);
-                    events.ScheduleEvent(EVENT_SPELL_MARK_OF_CORRUPTION6, 15000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_WATER_TOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                        me->CastSpell(target, SPELL_WATER_TOMB, false);
-                    events.ScheduleEvent(EVENT_SPELL_WATER_TOMB, 7000, GROUP_ABILITIES);
-                    break;
-                case EVENT_SPELL_VILE_SLUDGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                        me->CastSpell(target, SPELL_VILE_SLUDGE, false);
-                    events.ScheduleEvent(EVENT_SPELL_VILE_SLUDGE, 15000, GROUP_ABILITIES);
-                    break;
+                DoCastSelf(spellId, true);
             }
-
-            DoMeleeAttackIfReady();
         }
-    };
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        SetForm(false, true);
+        me->m_Events.CancelEventGroup(GROUP_OOC_PURIFY_ELEMENTALS);
+
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
+            {
+                SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
+            }
+            context.Repeat(1s);
+        }).Schedule(10min, [this](TaskContext)
+        {
+            DoCastSelf(SPELL_ENRAGE, true);
+        });
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (!_recentlySpoken)
+        {
+            Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
+            _recentlySpoken = true;
+        }
+        scheduler.Schedule(6s, [this](TaskContext)
+        {
+            _recentlySpoken = false;
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+
+        summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
+
+        if (summon->GetEntry() == NPC_PURE_SPAWN_OF_HYDROSS)
+        {
+            summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+        }
+        else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
+        {
+            summon->setActive(true);
+            summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
+        }
+        else
+        {
+            summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        summons.Despawn(summon);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
+        BossAI::JustDied(killer);
+    }
+private:
+    bool _recentlySpoken;
 };
 
-class spell_hydross_cleansing_field_aura : public SpellScriptLoader
+class spell_hydross_cleansing_field_aura : public AuraScript
 {
-public:
-    spell_hydross_cleansing_field_aura() : SpellScriptLoader("spell_hydross_cleansing_field_aura") { }
+    PrepareAuraScript(spell_hydross_cleansing_field_aura);
 
-    class spell_hydross_cleansing_field_aura_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_cleansing_field_aura_AuraScript)
+        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-        }
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hydross_cleansing_field_aura_AuraScript();
+        if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_hydross_cleansing_field_command : public SpellScriptLoader
+class spell_hydross_cleansing_field_command : public AuraScript
 {
-public:
-    spell_hydross_cleansing_field_command() : SpellScriptLoader("spell_hydross_cleansing_field_command") { }
+    PrepareAuraScript(spell_hydross_cleansing_field_command);
 
-    class spell_hydross_cleansing_field_command_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_cleansing_field_command_AuraScript)
+        if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
+            GetTarget()->InterruptNonMeleeSpells(false);
+        else
+            GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
-                GetTarget()->InterruptNonMeleeSpells(false);
-            else
-                GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hydross_cleansing_field_command_AuraScript();
+        AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_hydross_mark_of_hydross : public SpellScriptLoader
+class spell_hydross_mark_of_hydross : public AuraScript
 {
-public:
-    spell_hydross_mark_of_hydross() : SpellScriptLoader("spell_hydross_mark_of_hydross") { }
+    PrepareAuraScript(spell_hydross_mark_of_hydross);
 
-    class spell_hydross_mark_of_hydross_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hydross_mark_of_hydross_AuraScript)
+        GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hydross_mark_of_hydross_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_hydross_the_unstable()
 {
-    new boss_hydross_the_unstable();
-    new spell_hydross_cleansing_field_aura();
-    new spell_hydross_cleansing_field_command();
-    new spell_hydross_mark_of_hydross();
+    RegisterSerpentShrineAI(boss_hydross_the_unstable);
+    RegisterSpellScript(spell_hydross_cleansing_field_aura);
+    RegisterSpellScript(spell_hydross_cleansing_field_command);
+    RegisterSpellScript(spell_hydross_mark_of_hydross);
 }
+

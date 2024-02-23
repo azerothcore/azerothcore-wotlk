@@ -383,7 +383,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         if (plrMover)
         {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
             sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
         }
 
@@ -405,7 +404,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
             return;
@@ -427,7 +425,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
                 //LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
@@ -440,7 +437,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
 
@@ -461,8 +457,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-
                 bool foundNewTransport = false;
                 plrMover->m_transport->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))

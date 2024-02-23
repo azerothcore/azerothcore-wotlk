@@ -17,15 +17,13 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
-#include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -498,3 +496,4 @@ void AddSC_event_love_in_the_air()
     RegisterSpellScript(spell_love_is_in_the_air_romantic_picnic);
     RegisterSpellScript(spell_gen_aura_service_uniform);
 }
+

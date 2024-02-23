@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
-*/
-
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
+/*
+    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
+*/
 
 enum Yells
 {
@@ -929,3 +929,4 @@ void AddSC_boss_twin_valkyr()
     new spell_valkyr_touch();
     new spell_valkyr_ball_periodic_dummy();
 }
+

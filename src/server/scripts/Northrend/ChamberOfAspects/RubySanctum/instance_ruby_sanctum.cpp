@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "ruby_sanctum.h"
@@ -125,7 +127,7 @@ public:
                 case GO_BURNING_TREE_3:
                 case GO_BURNING_TREE_4:
                 case GO_TWILIGHT_FLAME_RING:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_FLAME_RING:
                     FlameRingGUID = go->GetGUID();
@@ -143,7 +145,7 @@ public:
                 case GO_BURNING_TREE_2:
                 case GO_BURNING_TREE_3:
                 case GO_BURNING_TREE_4:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }
@@ -279,3 +281,4 @@ void AddSC_instance_ruby_sanctum()
     new instance_ruby_sanctum();
     new spell_ruby_sanctum_rallying_shout();
 }
+
