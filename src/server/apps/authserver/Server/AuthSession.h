@@ -18,6 +18,7 @@
 #ifndef __AUTHSESSION_H__
 #define __AUTHSESSION_H__
 
+#include <WowServices/AccountInfo.h>
 #include "AsyncCallbackProcessor.h"
 #include "BigNumber.h"
 #include "ByteBuffer.h"
@@ -45,13 +46,14 @@ enum AuthStatus
     STATUS_CLOSED
 };
 
-// cppcheck-suppress ctuOneDefinitionRuleViolation
 struct AccountInfo
 {
+    uint32_t    m_accountId = 0;
+    std::string m_accountName;
+    uint32_t    m_accountFlags = 0;
+
     void LoadResult(Field* fields);
 
-    uint32 Id = 0;
-    std::string Login;
     bool IsLockedToIP = false;
     std::string LockCountry;
     std::string LastIP;

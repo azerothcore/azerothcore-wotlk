@@ -147,20 +147,21 @@ void AccountInfo::LoadResult(Field* fields)
     // aa.gmlevel (, more query-specific fields)
     // FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 LEFT JOIN ip_banned ipb ON ipb.ip = ? WHERE a.username = ?
 
-    Id = fields[0].Get<uint32>();
-    Login = fields[1].Get<std::string>();
-    IsLockedToIP = fields[2].Get<bool>();
-    LockCountry = fields[3].Get<std::string>();
-    LastIP = fields[4].Get<std::string>();
-    FailedLogins = fields[5].Get<uint32>();
-    IsBanned = fields[6].Get<bool>() || fields[8].Get<bool>();
-    IsPermanentlyBanned = fields[7].Get<bool>() || fields[9].Get<bool>();
-    SecurityLevel = static_cast<AccountTypes>(fields[10].Get<uint8>()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[10].Get<uint8>());
+    m_accountId = fields[0].Get<uint32>();
+    m_accountName = fields[1].Get<std::string>();
+    m_accountFlags = fields[2].Get<uint32_t>();
+    IsLockedToIP = fields[3].Get<bool>();
+    LockCountry = fields[4].Get<std::string>();
+    LastIP = fields[5].Get<std::string>();
+    FailedLogins = fields[6].Get<uint32>();
+    IsBanned = fields[7].Get<bool>() || fields[8].Get<bool>();
+    IsPermanentlyBanned = fields[9].Get<bool>() || fields[10].Get<bool>();
+    SecurityLevel = static_cast<AccountTypes>(fields[11].Get<uint8>()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[1].Get<uint8>());
 
     // Use our own uppercasing of the account name instead of using UPPER() in mysql query
     // This is how the account was created in the first place and changing it now would result in breaking
     // login for all accounts having accented characters in their name
-    Utf8ToUpperOnlyLatin(Login);
+    Utf8ToUpperOnlyLatin(m_accountName);
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) :
@@ -306,7 +307,7 @@ bool AuthSession::HandleLogonChallenge()
     for (int i = 0; i < 4; ++i)
         _localizationName[i] = challenge->country[4 - i - 1];
 
-    // Get the account details from the account table
+    // Retrieve the account from the database
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
     stmt->SetData(0, GetRemoteIpAddress().to_string());
     stmt->SetData(1, login);
@@ -338,7 +339,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     // If the IP is 'locked', check that the player comes indeed from the correct IP address
     if (_accountInfo.IsLockedToIP)
     {
-        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to IP - '{}' is logging in from '{}'", _accountInfo.Login, _accountInfo.LastIP, ipAddress);
+        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to IP - '{}' is logging in from '{}'", _accountInfo.m_accountName, _accountInfo.LastIP, ipAddress);
         if (_accountInfo.LastIP != ipAddress)
         {
             pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
@@ -351,12 +352,12 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(ipAddress))
             _ipCountry = location->CountryCode;
 
-        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to ip", _accountInfo.Login);
+        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to ip", _accountInfo.m_accountName);
         if (_accountInfo.LockCountry.empty() || _accountInfo.LockCountry == "00")
-            LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to country", _accountInfo.Login);
+            LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to country", _accountInfo.m_accountName);
         else if (!_ipCountry.empty())
         {
-            LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to country: '{}' Player country is '{}'", _accountInfo.Login, _accountInfo.LockCountry, _ipCountry);
+            LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to country: '{}' Player country is '{}'", _accountInfo.m_accountName, _accountInfo.LockCountry, _ipCountry);
             if (_ipCountry != _accountInfo.LockCountry)
             {
                 pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
@@ -373,14 +374,14 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         {
             pkt << uint8(WOW_FAIL_BANNED);
             SendPacket(pkt);
-            LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Banned account {} tried to login!", ipAddress, port, _accountInfo.Login);
+            LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Banned account {} tried to login!", ipAddress, port, _accountInfo.m_accountName);
             return;
         }
         else
         {
             pkt << uint8(WOW_FAIL_SUSPENDED);
             SendPacket(pkt);
-            LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Temporarily banned account {} tried to login!", ipAddress, port, _accountInfo.Login);
+            LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Temporarily banned account {} tried to login!", ipAddress, port, _accountInfo.m_accountName);
             return;
         }
     }
@@ -388,10 +389,10 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     uint8 securityFlags = 0;
 
     // Check if a TOTP token is needed
-    if (!fields[11].IsNull())
+    if (!fields[12].IsNull())
     {
         securityFlags = 4;
-        _totpSecret = fields[11].Get<Binary>();
+        _totpSecret = fields[12].Get<Binary>();
 
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
@@ -399,16 +400,16 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
             if (!success)
             {
                 pkt << uint8(WOW_FAIL_DB_BUSY);
-                LOG_ERROR("server.authserver", "[AuthChallenge] Account '{}' has invalid ciphertext for TOTP token key stored", _accountInfo.Login);
+                LOG_ERROR("server.authserver", "[AuthChallenge] Account '{}' has invalid ciphertext for TOTP token key stored", _accountInfo.m_accountName);
                 SendPacket(pkt);
                 return;
             }
         }
     }
 
-    _srp6.emplace(_accountInfo.Login,
-        fields[12].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[13].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>());
+    _srp6.emplace(_accountInfo.m_accountName,
+        fields[13].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>(),
+        fields[14].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     // Fill the response packet with the result
     if (AuthHelper::IsAcceptedClientBuild(_build))
@@ -443,7 +444,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
             pkt << uint8(1);
 
         LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} is using '{}' locale ({})",
-            ipAddress, port, _accountInfo.Login, _localizationName, GetLocaleByName(_localizationName));
+            ipAddress, port, _accountInfo.m_accountName, _localizationName, GetLocaleByName(_localizationName));
 
         _status = STATUS_LOGON_PROOF;
     }
@@ -509,7 +510,7 @@ bool AuthSession::HandleLogonProof()
             return true;
         }
 
-        LOG_DEBUG("server.authserver", "'{}:{}' User '{}' successfully authenticated", GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login);
+        LOG_DEBUG("server.authserver", "'{}:{}' User '{}' successfully authenticated", GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.m_accountName);
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -520,7 +521,7 @@ bool AuthSession::HandleLogonProof()
         stmt->SetData(1, address);
         stmt->SetData(2, GetLocaleByName(_localizationName));
         stmt->SetData(3, _os);
-        stmt->SetData(4, _accountInfo.Login);
+        stmt->SetData(4, _accountInfo.m_accountName);
         LoginDatabase.DirectExecute(stmt);
 
         // Finish SRP6 and send the final result to the client
@@ -533,7 +534,7 @@ bool AuthSession::HandleLogonProof()
             proof.M2 = M2;
             proof.cmd = AUTH_LOGON_PROOF;
             proof.error = 0;
-            proof.AccountFlags = 0x00800000;    // 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
+            proof.AccountFlags = _accountInfo.m_accountFlags;
             proof.SurveyId = 0;
             proof.LoginFlags = 0;               // 0x1 = has account message
 
@@ -564,7 +565,7 @@ bool AuthSession::HandleLogonProof()
         SendPacket(packet);
 
         LOG_INFO("server.authserver.hack", "'{}:{}' [AuthChallenge] account {} tried to login with invalid password!",
-            GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login);
+            GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.m_accountName);
 
         uint32 MaxWrongPassCount = sConfigMgr->GetOption<int32>("WrongPass.MaxCount", 0);
 
@@ -572,7 +573,7 @@ bool AuthSession::HandleLogonProof()
         if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
             LoginDatabasePreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
-            logstmt->SetData(0, _accountInfo.Id);
+            logstmt->SetData(0, _accountInfo.m_accountId);
             logstmt->SetData(1, GetRemoteIpAddress().to_string());
             logstmt->SetData(2, "Login to WoW Failed - Incorrect Password");
 
@@ -583,7 +584,7 @@ bool AuthSession::HandleLogonProof()
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
-            stmt->SetData(0, _accountInfo.Login);
+            stmt->SetData(0, _accountInfo.m_accountName);
             LoginDatabase.Execute(stmt);
 
             if (++_accountInfo.FailedLogins >= MaxWrongPassCount)
@@ -594,12 +595,12 @@ bool AuthSession::HandleLogonProof()
                 if (WrongPassBanType)
                 {
                     stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
-                    stmt->SetData(0, _accountInfo.Id);
+                    stmt->SetData(0, _accountInfo.m_accountId);
                     stmt->SetData(1, WrongPassBanTime);
                     LoginDatabase.Execute(stmt);
 
                     LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} got banned for '{}' seconds because it failed to authenticate '{}' times",
-                        GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login, WrongPassBanTime, _accountInfo.FailedLogins);
+                        GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.m_accountName, WrongPassBanTime, _accountInfo.FailedLogins);
                 }
                 else
                 {
@@ -609,7 +610,7 @@ bool AuthSession::HandleLogonProof()
                     LoginDatabase.Execute(stmt);
 
                     LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] IP got banned for '{}' seconds because account {} failed to authenticate '{}' times",
-                        GetRemoteIpAddress().to_string(), GetRemotePort(), WrongPassBanTime, _accountInfo.Login, _accountInfo.FailedLogins);
+                        GetRemoteIpAddress().to_string(), GetRemotePort(), WrongPassBanTime, _accountInfo.m_accountName, _accountInfo.FailedLogins);
                 }
             }
         }
@@ -686,11 +687,11 @@ bool AuthSession::HandleReconnectProof()
 
     sAuthReconnectProof_C* reconnectProof = reinterpret_cast<sAuthReconnectProof_C*>(GetReadBuffer().GetReadPointer());
 
-    if (_accountInfo.Login.empty())
+    if (_accountInfo.m_accountName.empty())
         return false;
 
     Acore::Crypto::SHA1 sha;
-    sha.UpdateData(_accountInfo.Login);
+    sha.UpdateData(_accountInfo.m_accountName);
     sha.UpdateData(reconnectProof->R1, 16);
     sha.UpdateData(_reconnectProof);
     sha.UpdateData(_sessionKey);
@@ -719,7 +720,7 @@ bool AuthSession::HandleReconnectProof()
     else
     {
         LOG_ERROR("server.authserver.hack", "'{}:{}' [ERROR] user {} tried to login, but session is invalid.", GetRemoteIpAddress().to_string(),
-            GetRemotePort(), _accountInfo.Login);
+            GetRemotePort(), _accountInfo.m_accountName);
         return false;
     }
 }
@@ -729,7 +730,7 @@ bool AuthSession::HandleRealmList()
     LOG_DEBUG("server.authserver", "Entering _HandleRealmList");
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALM_CHARACTER_COUNTS);
-    stmt->SetData(0, _accountInfo.Id);
+    stmt->SetData(0, _accountInfo.m_accountId);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::RealmListCallback, this, std::placeholders::_1)));
     _status = STATUS_WAITING_FOR_REALM_LIST;

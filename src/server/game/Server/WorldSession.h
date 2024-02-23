@@ -330,7 +330,7 @@ class WorldSession
 public:
     Player* ActivePlayer() const;
 
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool IsGMAccount() const;
@@ -1153,6 +1153,7 @@ private:
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    uint32_t m_accountFlags;
     std::string _accountName;
     uint8 m_expansion;
     uint32 m_total_time;

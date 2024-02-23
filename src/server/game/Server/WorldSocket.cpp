@@ -343,7 +343,10 @@ struct AuthSession
 
 struct AccountInfo
 {
-    uint32 Id;
+    uint32      m_accountId;
+    // TODO:    m_accountName
+    uint32_t    m_accountFlags;
+
     ::SessionKey SessionKey;
     std::string LastIP;
     bool IsLockedToIP;
@@ -369,20 +372,21 @@ struct AccountInfo
         // LEFT JOIN account_banned ab ON a.id = ab.id
         // LEFT JOIN account r ON a.id = r.recruiter
         // WHERE a.username = ? ORDER BY aa.RealmID DESC LIMIT 1
-        Id = fields[0].Get<uint32>();
-        SessionKey = fields[1].Get<Binary, SESSION_KEY_LENGTH>();
-        LastIP = fields[2].Get<std::string>();
-        IsLockedToIP = fields[3].Get<bool>();
-        LockCountry = fields[4].Get<std::string>();
-        Expansion = fields[5].Get<uint8>();
-        MuteTime = fields[6].Get<int64>();
+        m_accountId = fields[0].Get<uint32>();
+        m_accountFlags = fields[1].Get<uint32_t>();
+        SessionKey = fields[2].Get<Binary, SESSION_KEY_LENGTH>();
+        LastIP = fields[3].Get<std::string>();
+        IsLockedToIP = fields[4].Get<bool>();
+        LockCountry = fields[5].Get<std::string>();
+        Expansion = fields[6].Get<uint8>();
+        MuteTime = fields[7].Get<int64>();
         Locale = LocaleConstant(fields[7].Get<uint8>());
-        Recruiter = fields[8].Get<uint32>();
-        OS = fields[9].Get<std::string>();
-        TotalTime = fields[10].Get<uint32>();
-        Security = AccountTypes(fields[11].Get<uint8>());
-        IsBanned = fields[12].Get<uint64>() != 0;
-        IsRectuiter = fields[13].Get<uint32>() != 0;
+        Recruiter = fields[9].Get<uint32>();
+        OS = fields[10].Get<std::string>();
+        TotalTime = fields[11].Get<uint32>();
+        Security = AccountTypes(fields[12].Get<uint8>());
+        IsBanned = fields[13].Get<uint64>() != 0;
+        IsRectuiter = fields[14].Get<uint32>() != 0;
 
         uint32 world_expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
         if (Expansion > world_expansion)
@@ -618,7 +622,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sha.GetDigest() != authSession->Digest)
     {
         SendAuthResponseError(AUTH_FAILED);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: {} ('{}') address: {}", account.Id, authSession->Account, address);
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: {} ('{}') address: {}", account.m_accountId, authSession->Account, address);
         DelayedCloseSocket();
         return;
     }
@@ -634,7 +638,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
             SendAuthResponseError(AUTH_FAILED);
             LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs. Original IP: {}, new IP: {}).", account.LastIP, address);
             // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
-            sScriptMgr->OnFailedAccountLogin(account.Id);
+            sScriptMgr->OnFailedAccountLogin(account.m_accountId);
             DelayedCloseSocket();
             return;
         }
@@ -646,7 +650,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
             SendAuthResponseError(AUTH_FAILED);
             LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: {}, new country: {}).", account.LockCountry, _ipCountry);
             // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
-            sScriptMgr->OnFailedAccountLogin(account.Id);
+            sScriptMgr->OnFailedAccountLogin(account.m_accountId);
             DelayedCloseSocket();
             return;
         }
@@ -659,7 +663,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
         stmt->SetData(0, account.MuteTime);
-        stmt->SetData(1, account.Id);
+        stmt->SetData(1, account.m_accountId);
         LoginDatabase.Execute(stmt);
     }
 
@@ -667,7 +671,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         SendAuthResponseError(AUTH_BANNED);
         LOG_ERROR("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
-        sScriptMgr->OnFailedAccountLogin(account.Id);
+        sScriptMgr->OnFailedAccountLogin(account.m_accountId);
         DelayedCloseSocket();
         return;
     }
@@ -679,7 +683,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         SendAuthResponseError(AUTH_UNAVAILABLE);
         LOG_DEBUG("network", "WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
-        sScriptMgr->OnFailedAccountLogin(account.Id);
+        sScriptMgr->OnFailedAccountLogin(account.m_accountId);
         DelayedCloseSocket();
         return;
     }
@@ -694,13 +698,13 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     LoginDatabase.Execute(stmt);
 
     // At this point, we can safely hook a successful login
-    sScriptMgr->OnAccountLogin(account.Id);
+    sScriptMgr->OnAccountLogin(account.m_accountId);
 
     _authed = true;
 
-    sScriptMgr->OnLastIpUpdate(account.Id, address);
+    sScriptMgr->OnLastIpUpdate(account.m_accountId, address);
 
-    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new WorldSession(account.m_accountId, account.m_accountFlags, std::move(authSession->Account), shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);

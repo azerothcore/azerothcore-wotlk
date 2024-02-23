@@ -20,6 +20,8 @@
 */
 
 #include "WorldSession.h"
+
+#include <WowServices/AccountInfo.h>
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
 #include "CharacterPackets.h"
@@ -111,7 +113,7 @@ Player* WorldSession::ActivePlayer() const
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
+WorldSession::WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
     m_muteTime(mute_time),
     m_timeOutTime(0),
@@ -124,6 +126,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
+    m_accountFlags(accountFlags),
     _accountName(std::move(name)),
     m_expansion(expansion),
     m_total_time(TotalTime),
@@ -186,9 +189,10 @@ WorldSession::~WorldSession()
     LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
+//===========================================================================
 bool WorldSession::IsGMAccount() const
 {
-    return GetSecurity() >= SEC_GAMEMASTER;
+    return ((m_accountFlags & (uint32_t)AccountFlag::FLAG_GM) == (uint32_t)AccountFlag::FLAG_GM);
 }
 
 std::string const& WorldSession::GetPlayerName() const
