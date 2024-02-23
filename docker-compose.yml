@@ -9,7 +9,7 @@ version: '3'
 services:
   ac-database:
     container_name: ac-database
-    image: mysql:8.0
+    image: mysql:8.3
     networks:
       - ac-network
     ports:

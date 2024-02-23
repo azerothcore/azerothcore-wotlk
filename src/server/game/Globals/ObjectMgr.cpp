@@ -4413,27 +4413,27 @@ void ObjectMgr::LoadQuests()
                          "ID, QuestType, QuestLevel, MinLevel, QuestSortID, QuestInfoID, SuggestedGroupNum, TimeAllowed, AllowableRaces,"
                          //      9                     10                   11                    12
                          "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, "
-                         //      13                14              15             16                 17                18                 19           20           21
-                         "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardMoneyDifficulty, RewardBonusMoney,  RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
-                         //   22       23       24              25                26               27
+                         //      13                14              15             16                       17               18           19           20
+                         "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardMoneyDifficulty, RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
+                         //   21       22       23              24                25               26
                          "StartItem, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
-                         //    28           29           30          31            32              33            34             35
+                         //    27           28           29          30            31              32            33             34
                          "RewardItem1, RewardAmount1, RewardItem2, RewardAmount2, RewardItem3, RewardAmount3, RewardItem4, RewardAmount4, "
-                         //        36                      37                      38                      39                      40                      41                      42                      43                      44                      45                     46                      47
+                         //        35                      36                      37                      38                      39                      40                      41                      42                      43                      44                     45                      46
                          "RewardChoiceItemID1, RewardChoiceItemQuantity1, RewardChoiceItemID2, RewardChoiceItemQuantity2, RewardChoiceItemID3, RewardChoiceItemQuantity3, RewardChoiceItemID4, RewardChoiceItemQuantity4, RewardChoiceItemID5, RewardChoiceItemQuantity5, RewardChoiceItemID6, RewardChoiceItemQuantity6, "
-                         //       48                 49                     50                  51                  52                     53                 54                  55                     56                  57                  58                    59                   60                 61                      62
+                         //       47                 48                     49                  50                  51                     52                 53                  54                     55                  56                  57                    58                   59                 60                      61
                          "RewardFactionID1, RewardFactionValue1, RewardFactionOverride1, RewardFactionID2, RewardFactionValue2, RewardFactionOverride2, RewardFactionID3, RewardFactionValue3, RewardFactionOverride3, RewardFactionID4, RewardFactionValue4, RewardFactionOverride4, RewardFactionID5, RewardFactionValue5,  RewardFactionOverride5,"
-                         //   62        64      65        66
+                         //   61        63      64        65
                          "POIContinent, POIx, POIy, POIPriority, "
-                         //   67          68               69           70                    71
+                         //   66          67               68           69                    70
                          "LogTitle, LogDescription, QuestDescription, AreaDescription, QuestCompletionLog, "
-                         //      72                73                74                75                   76                     77                    78                      79
+                         //      71                72                73                74                   75                     76                    77                      78
                          "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-                         //  80          81         82         83           84                  85                 86                  87
+                         //  79          80         81         82           83                  84                 85                  86
                          "ItemDrop1, ItemDrop2, ItemDrop3, ItemDrop4, ItemDropQuantity1, ItemDropQuantity2, ItemDropQuantity3, ItemDropQuantity4, "
-                         //      88               89               90               91               92               93                94                  95                  96                  97                  98                  99
+                         //      87               88               89               90               91               92                93                  94                  95                  96                  97                  98
                          "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
-                         //  100          101             102             103             104
+                         //  99           100             101             102             103
                          "Unknown0, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4"
                          " FROM quest_template");
     if (!result)
