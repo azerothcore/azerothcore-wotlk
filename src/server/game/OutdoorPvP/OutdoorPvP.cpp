@@ -555,7 +555,7 @@ bool OutdoorPvP::HandleCustomSpell(Player* player, uint32 spellId, GameObject* g
 
 bool OPvPCapturePoint::HandleCustomSpell(Player* player, uint32 /*spellId*/, GameObject* /*go*/)
 {
-    return player->IsOutdoorPvPActive();
+    return false;
 }
 
 bool OutdoorPvP::HandleOpenGo(Player* player, GameObject* go)
