@@ -32,18 +32,6 @@ enum HyjalBosses
     BOSS_ARCHIMONDE = 0,
 };
 
-struct hyjalUnits
-{
-    uint32 unitEntry;
-    float x, y, z, o;
-};
-
-struct hyjalWaves
-{
-    uint32 waveTimer;
-    std::vector<hyjalUnits> waveUnits;
-};
-
 enum DataTypes
 {
     DATA_ANETHERON              = 1,
@@ -140,9 +128,7 @@ enum GameobjectIds
 
 enum Misc
 {
-    MAX_WAVES = 9,
-    MAX_OVERRUN_WAVES = 3,
-    MAX_NIGHT_ELF_WAVES = 1
+    MAX_STANDARD_WAVES = 9
 };
 
 template <class AI, class T>
