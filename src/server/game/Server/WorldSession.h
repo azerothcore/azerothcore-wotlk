@@ -1086,6 +1086,7 @@ public:                                                 // opcodes handlers
 
     void BootMeHandler(WorldPacket& msg);
     void GmResurrectHandler(WorldPacket& msg);
+    void LearnSpellHandler(WorldPacket& msg);
     void SendGmResurrectFailure();
     void SendGmResurrectSuccess();
     void SendWhoIsResponse(char const* response);

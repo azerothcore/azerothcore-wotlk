@@ -144,7 +144,7 @@ void OpcodeTable::Initialize()
     /*0x00D*/ DEFINE_HANDLER(CMSG_MOVE_CHARACTER_CHEAT,                                             STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x00E*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_CHARACTER_CHEAT,                               STATUS_NEVER);
     /*0x00F*/ DEFINE_HANDLER(CMSG_RECHARGE,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x010*/ DEFINE_HANDLER(CMSG_LEARN_SPELL,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x010*/ DEFINE_HANDLER(CMSG_LEARN_SPELL, STATUS_LOGGEDIN, PROCESS_INPLACE, &WorldSession::LearnSpellHandler);
     /*0x011*/ DEFINE_HANDLER(CMSG_CREATEMONSTER,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x012*/ DEFINE_HANDLER(CMSG_DESTROYMONSTER,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x013*/ DEFINE_HANDLER(CMSG_CREATEITEM,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

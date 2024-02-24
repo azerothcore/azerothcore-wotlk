@@ -1792,3 +1792,19 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     playerPtr->Resurrect(100.0f);
     SendGmResurrectSuccess();
 }
+
+//===========================================================================
+void WorldSession::LearnSpellHandler(WorldPacket& msg)
+{
+    if (!IsGMAccount()) {
+        SendNotification(LANG_PERMISSION_DENIED);
+        return;
+    }
+    if (!ActivePlayer()) {
+        return;
+    }
+    // READ THE MESSAGE DATA
+    int spellId = msg.read<int>();
+    // LEARN THE SPELL
+    ActivePlayer()->LearnSpell(spellId);
+}
