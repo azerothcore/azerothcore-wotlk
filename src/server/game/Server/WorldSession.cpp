@@ -1745,6 +1745,22 @@ void WorldSession::InitializeSessionCallback(CharacterDatabaseQueryHolder const&
 }
 
 //===========================================================================
+void WorldSession::SendGmResurrectFailure()
+{
+    WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
+    msg << 1u;
+    SendPacket(&msg);
+}
+
+//===========================================================================
+void WorldSession::SendGmResurrectSuccess()
+{
+    WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
+    msg << 0u;
+    SendPacket(&msg);
+}
+
+//===========================================================================
 void WorldSession::SendWhoIsResponse(const char* response)
 {
     WorldPacket outbound(SMSG_WHOIS, strlen(response)+1);

@@ -1126,6 +1126,7 @@ void WorldSession::HandleWorldTeleport(WorldPacket& msg)
     playerPtr->TeleportTo(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
 }
 
+//===========================================================================
 void WorldSession::WhoIsHandler(WorldPacket& msg)
 {
     if (!IsGMAccount()) {
@@ -1781,10 +1782,10 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME
     Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
     if (!playerPtr) {
-        // TODO: SendGmResurrectFailure();
+        SendGmResurrectFailure();
         return;
     }
 
     playerPtr->ResurrectPlayer(100.0f);
-    // TODO: SendGmResurrectSuccess();
+    SendGmResurrectSuccess();
 }
