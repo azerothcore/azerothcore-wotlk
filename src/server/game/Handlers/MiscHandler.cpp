@@ -1126,64 +1126,28 @@ void WorldSession::HandleWorldTeleport(WorldPacket& msg)
     playerPtr->TeleportTo(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
 }
 
-void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
+void WorldSession::WhoIsHandler(WorldPacket& msg)
 {
-    LOG_DEBUG("network", "Received opcode CMSG_WHOIS");
-    std::string charname;
-    recv_data >> charname;
-
-    if (!AccountMgr::IsAdminAccount(GetSecurity()))
-    {
+    if (!IsGMAccount()) {
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
 
-    if (charname.empty() || !normalizePlayerName (charname))
-    {
-        SendNotification(LANG_NEED_CHARACTER_NAME);
+    // READ THE MESSAGE DATA
+    char name[MAX_PLAYER_NAME] = "\0";
+    msg.GetString(name, MAX_PLAYER_NAME);
+
+    FormatCharacterName(name);
+
+    // FIND A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME PROVIDED
+    Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
+    if (!playerPtr) {
+        SendWhoIsResponse("Character not found");
         return;
     }
 
-    Player* player = ObjectAccessor::FindPlayerByName(charname, false);
-
-    if (!player)
-    {
-        SendNotification(LANG_PLAYER_NOT_EXIST_OR_OFFLINE, charname.c_str());
-        return;
-    }
-
-    uint32 accid = player->GetSession()->GetAccountId();
-
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_WHOIS);
-
-    stmt->SetData(0, accid);
-
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (!result)
-    {
-        SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());
-        return;
-    }
-
-    Field* fields = result->Fetch();
-    std::string acc = fields[0].Get<std::string>();
-    if (acc.empty())
-        acc = "Unknown";
-    std::string email = fields[1].Get<std::string>();
-    if (email.empty())
-        email = "Unknown";
-    std::string lastip = fields[2].Get<std::string>();
-    if (lastip.empty())
-        lastip = "Unknown";
-
-    std::string msg = charname + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastip;
-
-    WorldPacket data(SMSG_WHOIS, msg.size() + 1);
-    data << msg;
-    SendPacket(&data);
-
-    LOG_DEBUG("network", "Received whois command from player {} for character {}", GetPlayer()->GetName(), charname);
+    // RESPOND WITH THE ACCOUNT NAME FOR THE NAMED PLAYER
+    SendWhoIsResponse(playerPtr->GetSession()->GetAccountName());
 }
 
 void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)

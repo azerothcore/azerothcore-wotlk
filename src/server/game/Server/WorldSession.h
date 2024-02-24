@@ -928,7 +928,6 @@ public:                                                 // opcodes handlers
     void HandleSetTitleOpcode(WorldPacket& recvData);
     void HandleRealmSplitOpcode(WorldPacket& recvData);
     void HandleTimeSyncResp(WorldPacket& recvData);
-    void HandleWhoisOpcode(WorldPacket& recvData);
     void HandleResetInstancesOpcode(WorldPacket& recvData);
     void HandleHearthAndResurrect(WorldPacket& recvData);
     void HandleInstanceLockResponse(WorldPacket& recvPacket);
@@ -1087,6 +1086,8 @@ public:                                                 // opcodes handlers
 
     void BootMeHandler(WorldPacket& msg);
     void GmResurrectHandler(WorldPacket& msg);
+    void SendWhoIsResponse(char const* response);
+    void WhoIsHandler(WorldPacket& msg);
 
 private:
     void ProcessQueryCallbacks();

@@ -1743,3 +1743,11 @@ void WorldSession::InitializeSessionCallback(CharacterDatabaseQueryHolder const&
     SendClientCacheVersion(clientCacheVersion);
     SendTutorialsData();
 }
+
+//===========================================================================
+void WorldSession::SendWhoIsResponse(const char* response)
+{
+    WorldPacket outbound(SMSG_WHOIS, strlen(response)+1);
+    outbound << response;
+    SendPacket(&outbound);
+}
