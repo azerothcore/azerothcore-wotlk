@@ -1779,6 +1779,8 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     char name[MAX_PLAYER_NAME];
     msg.GetString(name, MAX_PLAYER_NAME);
 
+    FormatCharacterName(name);
+
     // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME
     Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
     if (!playerPtr) {
