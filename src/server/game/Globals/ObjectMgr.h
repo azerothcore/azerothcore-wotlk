@@ -693,6 +693,8 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 
 bool normalizePlayerName(std::string& name);
 
+void FormatCharacterName(char* name);
+
 struct LanguageDesc
 {
     Language lang_id;

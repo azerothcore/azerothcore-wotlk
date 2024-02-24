@@ -225,6 +225,20 @@ bool normalizePlayerName(std::string& name)
     return true;
 }
 
+//===========================================================================
+void FormatCharacterName(char* name)
+{
+    size_t len = strlen(name);
+    if (*name >= 'a' && *name <= 'z') {
+        *name -= 32;
+    }
+    for (size_t i = 1; i < len; i++) {
+        if (name[i] >= 'A' && name[i] <= 'Z') {
+            name[i] += 32;
+        }
+    }
+}
+
 LanguageDesc lang_description[LANGUAGES_COUNT] =
 {
     { LANG_ADDON,           0, 0                       },
