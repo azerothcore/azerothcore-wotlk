@@ -553,7 +553,7 @@ bool OutdoorPvP::HandleCustomSpell(Player* player, uint32 spellId, GameObject* g
     return false;
 }
 
-bool OPvPCapturePoint::HandleCustomSpell(Player* player, uint32 /*spellId*/, GameObject* /*go*/)
+bool OPvPCapturePoint::HandleCustomSpell(Player* /*player*/, uint32 /*spellId*/, GameObject* /*go*/)
 {
     return false;
 }
