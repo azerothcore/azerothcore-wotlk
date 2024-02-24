@@ -333,6 +333,8 @@ public:
     WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
+    char const* GetAccountName();
+
     bool IsGMAccount() const;
 
     bool PlayerLoading() const { return m_playerLoading; }
@@ -1154,7 +1156,7 @@ private:
     bool _skipQueue;
     uint32 _accountId;
     uint32_t m_accountFlags;
-    std::string _accountName;
+    std::string m_accountName;  // TODO: replace by a C string implementation
     uint8 m_expansion;
     uint32 m_total_time;
 
