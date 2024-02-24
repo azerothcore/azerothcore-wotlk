@@ -96,7 +96,7 @@ public:
             if (!spellInfo->IsAbilityOfSkillType(SKILL_INTERNAL))
                 continue;
 
-            handler->GetSession()->GetPlayer()->learnSpell(i);
+            handler->GetSession()->GetPlayer()->LearnSpell(i);
         }
 
         handler->SendSysMessage(LANG_LEARNING_GM_SKILLS);
@@ -148,7 +148,7 @@ public:
             if (!SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
-            handler->GetSession()->GetPlayer()->learnSpell(spellInfo->Id);
+            handler->GetSession()->GetPlayer()->LearnSpell(spellInfo->Id);
         }
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
@@ -283,7 +283,7 @@ public:
         for (LanguageDesc const& langDesc : lang_description)
             if (uint32 langSpellId = langDesc.spell_id)
             {
-                handler->GetPlayer()->learnSpell(langSpellId);
+                handler->GetPlayer()->LearnSpell(langSpellId);
                 handler->GetPlayer()->SetSkill(langDesc.skill_id, 0, 300, 300);
             }
 
@@ -408,7 +408,7 @@ public:
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
-            player->learnSpell(skillLine->Spell);
+            player->LearnSpell(skillLine->Spell);
         }
     }
 

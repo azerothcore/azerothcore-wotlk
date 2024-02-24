@@ -2640,7 +2640,7 @@ class spell_item_book_of_glyph_mastery : public SpellScript
 
         // learn random explicit discovery recipe (if any)
         if (uint32 discoveredSpellId = GetExplicitDiscoverySpell(spellId, caster))
-            caster->learnSpell(discoveredSpellId);
+            caster->LearnSpell(discoveredSpellId);
     }
 
     void Register() override

@@ -798,7 +798,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(
                         _spell_idx->second->SkillLine, spellid, this))
-                    learnSpell(discoveredSpell);
+                    LearnSpell(discoveredSpell);
             }
 
             uint32 craft_skill_gain =

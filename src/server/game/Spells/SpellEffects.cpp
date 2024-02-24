@@ -2533,7 +2533,7 @@ void Spell::EffectLearnSpell(SpellEffIndex effIndex)
     Player* player = unitTarget->ToPlayer();
 
     uint32 spellToLearn = (m_spellInfo->Id == 483 || m_spellInfo->Id == 55884) ? damage : m_spellInfo->Effects[effIndex].TriggerSpell;
-    player->learnSpell(spellToLearn);
+    player->LearnSpell(spellToLearn);
 
     LOG_DEBUG("spells.aura", "Spell: Player {} has learned spell {} from Npc {}",
         player->GetGUID().ToString(), spellToLearn, m_caster->GetGUID().ToString());

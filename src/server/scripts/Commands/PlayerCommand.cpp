@@ -43,7 +43,7 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
         return false;
     }
 
-    targetPlayer->learnSpell(spell->Id, false);
+    targetPlayer->LearnSpell(spell->Id, false);
 
     if (allRanks)
     {
@@ -51,7 +51,7 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
 
         while ((spellId = sSpellMgr->GetNextSpellInChain(spellId)))
         {
-            targetPlayer->learnSpell(spellId, false);
+            targetPlayer->LearnSpell(spellId, false);
         }
     }
 
