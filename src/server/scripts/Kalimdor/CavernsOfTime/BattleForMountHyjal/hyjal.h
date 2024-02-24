@@ -32,6 +32,18 @@ enum HyjalBosses
     BOSS_ARCHIMONDE = 0,
 };
 
+struct hyjalUnits
+{
+    uint32 unitEntry;
+    float x, y, z, o;
+};
+
+struct hyjalWaves
+{
+    uint32 waveTimer;
+    std::vector<hyjalUnits> waveUnits;
+};
+
 enum DataTypes
 {
     DATA_ANETHERON              = 1,
@@ -66,26 +78,55 @@ enum WorldStateIds
 enum CreaturesIds
 {
     // Trash Mobs summoned in waves
-    NECROMANCER                 = 17899,
-    ABOMINATION                 = 17898,
-    GHOUL                       = 17895,
-    BANSHEE                     = 17905,
-    CRYPT_FIEND                 = 17897,
-    GARGOYLE                    = 17906,
-    FROST_WYRM                  = 17907,
-    GIANT_INFERNAL              = 17908,
-    FEL_STALKER                 = 17916,
+    NPC_NECRO                   = 17899,
+    NPC_ABOMI                   = 17898,
+    NPC_GHOUL                   = 17895,
+    NPC_BANSH                   = 17905,
+    NPC_CRYPT                   = 17897,
+    NPC_GARGO                   = 17906,
+    NPC_FROST                   = 17907,
+    NPC_INFER                   = 17908,
+    NPC_STALK                   = 17916,
+    NPC_BUILD                   = 18304,    // Serverside creature? Not found in CreateObject packets, but seen as targets
 
-    JAINA                       = 17772,
-    THRALL                      = 17852,
-    TYRANDE                     = 17948,
+    // Alliance Base
+    NPC_JAINA                   = 17772,
+    NPC_ALLIANCE_PEASANT        = 17931,
+    NPC_ALLIANCE_KNIGHT         = 17920,
+    NPC_ALLIANCE_FOOTMAN        = 17919,
+    NPC_ALLIANCE_RIFLEMAN       = 17921,
+    NPC_ALLIANCE_PRIEST         = 17928,
+    NPC_ALLIANCE_SORCERESS      = 17922,
 
-    // Bosses summoned after every 8 waves
-    RAGE_WINTERCHILL            = 17767,
-    ANETHERON                   = 17808,
-    KAZROGAL                    = 17888,
-    AZGALOR                     = 17842,
-    ARCHIMONDE                  = 17968,
+    // Horde Base
+    NPC_THRALL                  = 17852,
+    NPC_HORDE_HEADHUNTER        = 17934,
+    NPC_HORDE_SHAMAN            = 17936,
+    NPC_HORDE_GRUNT             = 17932,
+    NPC_HORDE_HEALING_WARD      = 18036,
+    NPC_TAUREN_WARRIOR          = 17933,
+    NPC_HORDE_WITCH_DOCTOR      = 17935,
+    NPC_HORDE_PEON              = 17937,
+    NPC_INFERNAL_RELAY          = 18242,
+    NPC_INFERNAL_TARGET         = 21075,
+
+    // Night Elf Base
+    NPC_TYRANDE                 = 17948,
+    NPC_DRUID_OF_THE_TALON      = 3794,
+    NPC_DRUID_OF_THE_CLAW       = 3795,
+    NPC_NELF_ANCIENT_PROT       = 18487,
+    NPC_NELF_ANCIENT_OF_LORE    = 18486,
+    NPC_NELF_ANCIENT_OF_WAR     = 18485,
+    NPC_NELF_ARCHER             = 17943,
+    NPC_NELF_HUNTRESS           = 17945,
+    NPC_DRYAD                   = 17944,
+
+    // Bosses
+    NPC_WINTERCHILL             = 17767,
+    NPC_ANETHERON               = 17808,
+    NPC_KAZROGAL                = 17888,
+    NPC_AZGALOR                 = 17842,
+    NPC_ARCHIMONDE              = 17968,
     NPC_WORLD_TRIGGER_TINY      = 21987
 };
 
@@ -94,8 +135,14 @@ enum GameobjectIds
     GO_HORDE_ENCAMPMENT_PORTAL  = 182060,
     GO_NIGHT_ELF_VILLAGE_PORTAL = 182061,
     GO_ANCIENT_GEM              = 185557,
-    GO_ANCIENT_VEIN             = 185557,
-    GO_ROARING_FLAME            = 182592
+    GO_FLAME                    = 182260
+};
+
+enum Misc
+{
+    MAX_WAVES = 9,
+    MAX_OVERRUN_WAVES = 3,
+    MAX_NIGHT_ELF_WAVES = 1
 };
 
 template <class AI, class T>
