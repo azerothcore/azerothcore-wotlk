@@ -4854,7 +4854,7 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     }
 
     Player* player = m_caster->ToPlayer();
-    player->ResurrectPlayer(0.0f);
+    player->Resurrect(0.0f);
 
     player->SetHealth(health);
     player->SetPower(POWER_MANA, mana);
@@ -5541,7 +5541,7 @@ void Spell::EffectSpiritHeal(SpellEffIndex /*effIndex*/)
 
     //m_spellInfo->Effects[i].BasePoints; == 99 (percent?)
     //unitTarget->ToPlayer()->setResurrect(m_caster->GetGUID(), unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), unitTarget->GetMaxHealth(), unitTarget->GetMaxPower(POWER_MANA));
-    unitTarget->ToPlayer()->ResurrectPlayer(1.0f);
+    unitTarget->ToPlayer()->Resurrect(1.0f);
     unitTarget->ToPlayer()->SpawnCorpseBones();
     */
 }

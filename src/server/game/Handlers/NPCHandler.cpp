@@ -386,7 +386,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 
 void WorldSession::SendSpiritResurrect()
 {
-    m_player->ResurrectPlayer(0.5f, true);
+    m_player->Resurrect(0.5f, true);
 
     m_player->DurabilityLossAll(0.25f, true);
 
@@ -408,11 +408,11 @@ void WorldSession::SendSpiritResurrect()
             m_player->TeleportTo(corpseGrave->Map, corpseGrave->x, corpseGrave->y, corpseGrave->z, m_player->GetOrientation());
         // or update at original position
         //else
-        //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
+        //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in Resurrect
     }
     // or update at original position
     //else
-    //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
+    //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in Resurrect
 }
 
 void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)

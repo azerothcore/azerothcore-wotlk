@@ -529,7 +529,7 @@ void BattlegroundSA::TeleportPlayers()
 
             if (!player->IsAlive())
             {
-                player->ResurrectPlayer(1.0f);
+                player->Resurrect(1.0f);
                 player->SpawnCorpseBones();
             }
 

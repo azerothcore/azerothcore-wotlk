@@ -2013,7 +2013,7 @@ public:
     [[nodiscard]] bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     [[nodiscard]] WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
-    void ResurrectPlayer(float restore_percent, bool applySickness = false);
+    void Resurrect(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
     void RepopAtGraveyard();
 

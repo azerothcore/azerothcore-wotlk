@@ -5150,7 +5150,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
             if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                 RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             if (!IsAlive())
-                ResurrectPlayer(1.0f);
+                Resurrect(1.0f);
         }
 
         const WorldLocation& _loc = GetEntryPoint();
@@ -5840,7 +5840,7 @@ void Player::LoadCorpse(PreparedQueryResult result)
             ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(_corpseLocation.GetMapId())->Instanceable());
         }
         else
-            ResurrectPlayer(0.5f);
+            Resurrect(0.5f);
     }
 
     RemoveAtLoginFlag(AT_LOGIN_RESURRECT);
