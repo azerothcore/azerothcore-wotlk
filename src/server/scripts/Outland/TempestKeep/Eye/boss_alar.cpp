@@ -183,6 +183,7 @@ struct boss_alar : public BossAI
             }, EVENT_RELOCATE_MIDDLE);
             ScheduleUniqueTimedEvent(12s, [&]
             {
+                me->SetVisible(true);
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
             }, EVENT_MOVE_TO_PHASE_2);
@@ -394,36 +395,59 @@ class spell_alar_ember_blast : public SpellScript
     }
 };
 
-class spell_alar_ember_blast_death : public AuraScript
+class spell_alar_ember_blast_death : public SpellScript
 {
-    PrepareAuraScript(spell_alar_ember_blast_death);
+    PrepareSpellScript(spell_alar_ember_blast_death);
 
-    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PreventDefaultAction(); // xinef: prevent default action after change that invisibility in instances is executed instantly even for creatures
-        Unit* target = GetTarget();
-        InvisibilityType type = InvisibilityType(aurEff->GetMiscValue());
-        target->m_invisibility.AddFlag(type);
-        target->m_invisibility.AddValue(type, aurEff->GetAmount());
-
-        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
-        GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
-    }
-
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitCreature())
+        {
+            GetCaster()->SetVisible(false);
+            GetCaster()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            GetCaster()->SetStandState(UNIT_STAND_STATE_DEAD);
+            GetCaster()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+            GetCaster()->m_delayed_unit_relocation_timer = 1000;
+        }
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast_death::HandleScriptEffect, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY);
     }
 };
+
+// class spell_alar_ember_blast_death : public AuraScript
+// {
+//     PrepareAuraScript(spell_alar_ember_blast_death);
+
+//     void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+//     {
+//         PreventDefaultAction(); // xinef: prevent default action after change that invisibility in instances is executed instantly even for creatures
+//         Unit* target = GetTarget();
+//         InvisibilityType type = InvisibilityType(aurEff->GetMiscValue());
+//         target->m_invisibility.AddFlag(type);
+//         target->m_invisibility.AddValue(type, aurEff->GetAmount());
+
+//         GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+//         GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
+//         GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+//         GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
+//     }
+
+//     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+//     {
+//         GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+//         GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
+//     }
+
+//     void Register() override
+//     {
+//         OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+//         OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+//     }
+// };
 
 class spell_alar_dive_bomb : public AuraScript
 {
