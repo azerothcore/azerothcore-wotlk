@@ -69,7 +69,8 @@ enum Misc
     EVENT_SPELL_BERSERK         = 3,
 
     EVENT_MOVE_TO_PHASE_2       = 4,
-    EVENT_FINISH_DIVE           = 5
+    EVENT_FINISH_DIVE           = 5,
+    EVENT_INVISIBLE             = 6
 };
 
 enum GroupAlar
@@ -177,12 +178,19 @@ struct boss_alar : public BossAI
             me->CastStop();
             me->SetHealth(me->GetMaxHealth());
             DoCastSelf(SPELL_EMBER_BLAST, true); //spellscript doesn't trigger
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            ScheduleUniqueTimedEvent(1s, [&]{
+                me->SetVisible(false);
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }, EVENT_INVISIBLE);
+            me->SetVisible(false);
 
             ScheduleUniqueTimedEvent(8s, [&]{
                 me->SetPosition(alarPoints[POINT_MIDDLE]);
             }, EVENT_RELOCATE_MIDDLE);
             ScheduleUniqueTimedEvent(12s, [&]
             {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetVisible(true);
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                 DoCastSelf(SPELL_REBIRTH_PHASE2);
@@ -395,29 +403,6 @@ class spell_alar_ember_blast : public SpellScript
     }
 };
 
-class spell_alar_ember_blast_death : public SpellScript
-{
-    PrepareSpellScript(spell_alar_ember_blast_death);
-
-    void HandleScriptEffect(SpellEffIndex effIndex)
-    {
-        PreventHitEffect(effIndex);
-        if (Unit* target = GetHitCreature())
-        {
-            GetCaster()->SetVisible(false);
-            GetCaster()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetCaster()->SetStandState(UNIT_STAND_STATE_DEAD);
-            GetCaster()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-            GetCaster()->m_delayed_unit_relocation_timer = 1000;
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast_death::HandleScriptEffect, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY);
-    }
-};
-
 // class spell_alar_ember_blast_death : public AuraScript
 // {
 //     PrepareAuraScript(spell_alar_ember_blast_death);
@@ -470,7 +455,7 @@ void AddSC_boss_alar()
     RegisterTheEyeAI(boss_alar);
     RegisterSpellScript(spell_alar_flame_quills);
     RegisterSpellScript(spell_alar_ember_blast);
-    RegisterSpellScript(spell_alar_ember_blast_death);
+    //RegisterSpellScript(spell_alar_ember_blast_death);
     RegisterSpellScript(spell_alar_dive_bomb);
 }
 
