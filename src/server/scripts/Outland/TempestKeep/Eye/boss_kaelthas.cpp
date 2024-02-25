@@ -207,14 +207,16 @@ enum KaelActions
     ACTION_START_SANGUINAR              = 0,
     ACTION_START_CAPERNIAN              = 1,
     ACTION_START_TELONICUS              = 2,
-    ACTION_START_WEAPONS                = 3
+    ACTION_START_WEAPONS                = 3,
+    ACTION_PROGRESS_PHASE_CHECK = 4
 };
 
 enum SpellGroups
 {
-    GROUP_PYROBLAST                     = 0,
-    GROUP_SHOCK_BARRIER                 = 1,
-    GROUP_NETHER_BEAM                   = 2
+    GROUP_PROGRESS_PHASE                = 0,
+    GROUP_PYROBLAST                     = 1,
+    GROUP_SHOCK_BARRIER                 = 2,
+    GROUP_NETHER_BEAM                   = 3
 };
 
 const Position triggersPos[6] =
@@ -382,11 +384,44 @@ struct boss_kaelthas : public BossAI
                             }
                         }
                     });
-                    ScheduleUniqueTimedEvent(2min, [&]{
+                    scheduler.Schedule(2min, GROUP_PROGRESS_PHASE, [this](TaskContext)
+                    {
                         PhaseAllAdvisorsExecute();
-                    }, EVENT_PREFIGHT_PHASE61);
+                    });
                 }, EVENT_PREFIGHT_PHASE52);
                 break;
+            case ACTION_PROGRESS_PHASE_CHECK:
+                if (_phase == PHASE_WEAPONS)
+                {
+                    summons.DoForAllSummons([&](WorldObject* summon)
+                    {
+                        if (Creature* summonedCreature = summon->ToCreature())
+                        {
+                            if (summonedCreature->IsAlive())
+                            {
+                                PhaseAllAdvisorsExecute();
+                                return;                            
+                            }
+                        }
+                    });
+                }
+                else if (_phase == PHASE_WEAPONS)
+                {
+                    summons.DoForAllSummons([&](WorldObject* summon)
+                    {
+                        if (Creature* summonedCreature = summon->ToCreature())
+                        {
+                            if (summonedCreature->IsAlive())
+                            {
+                                if (summonedCreature->GetEntry() >= NPC_LORD_SANGUINAR && summonedCreature->GetEntry() <= NPC_THALADRED)
+                                {
+                                    PhaseKaelExecute();
+                                    return;    
+                                }
+                            }
+                        }
+                    });
+                }
             default:
                 break;
         }
@@ -629,17 +664,7 @@ struct boss_kaelthas : public BossAI
 
     void PhaseAllAdvisorsExecute()
     {
-        //remove all weapons so they don't get revived
-        summons.DoForAllSummons([&](WorldObject* summon)
-        {
-            if (Creature* summonedCreature = summon->ToCreature())
-            {
-                if (summonedCreature->GetEntry() >= 21268 && summonedCreature->GetEntry() <= 21274)
-                {
-                    summonedCreature->DespawnOrUnsummon();
-                }
-            }
-        });
+        scheduler.CancelGroup(GROUP_PROGRESS_PHASE);
         _phase = PHASE_ALL_ADVISORS;
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
@@ -662,9 +687,10 @@ struct boss_kaelthas : public BossAI
                     }
                 }
             });
-            ScheduleUniqueTimedEvent(3min, [&]{
+            scheduler.Schedule(3min, GROUP_PROGRESS_PHASE, [this](TaskContext)
+            {
                 PhaseKaelExecute();
-            }, EVENT_PREFIGHT_PHASE71);
+            });
         }, EVENT_PREFIGHT_PHASE63);
     }
 
@@ -785,6 +811,7 @@ struct npc_lord_sanguinar : public ScriptedAI
             if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
             {
                 kael->AI()->DoAction(ACTION_START_CAPERNIAN);
+                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
             }
             _hasDied = true;
         }
@@ -872,6 +899,7 @@ struct npc_capernian : public ScriptedAI
             if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
             {
                 kael->AI()->DoAction(ACTION_START_TELONICUS);
+                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
             }
             _hasDied = true;
         }
@@ -934,6 +962,7 @@ struct npc_telonicus : public ScriptedAI
             if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
             {
                 kael->AI()->DoAction(ACTION_START_WEAPONS);
+                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
             }
             _hasDied = true;
         }
@@ -1018,6 +1047,7 @@ struct npc_thaladred : public ScriptedAI
             if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
             {
                 kael->AI()->DoAction(ACTION_START_SANGUINAR);
+                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
             }
             _hasDied = true;
         }
