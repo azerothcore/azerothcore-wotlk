@@ -871,7 +871,7 @@ struct npc_capernian : public ScriptedAI
         {
             if (me->Attack(who, false))
             {
-                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->GetMotionMaster()->MoveChase(who, 30.0f, 0);
                 me->AddThreat(who, 0.0f);
             }
         }
@@ -891,7 +891,7 @@ struct npc_capernian : public ScriptedAI
             }
             else
             {
-                me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f);
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 30.0f);
                 DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
             }
 
