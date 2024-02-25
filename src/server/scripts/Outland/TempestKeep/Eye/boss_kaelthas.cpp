@@ -145,6 +145,8 @@ enum Misc
     DATA_RESURRECT_CAST                 = 1,
     NPC_WORLD_TRIGGER                   = 19871,
     NPC_NETHER_VAPOR                    = 21002,
+    NPC_NETHERSTRAND_LONGBOW            = 21268,
+    NPC_STAFF_OF_DISINTEGRATION         = 21274,
 
     PHASE_NONE                          = 0,
     PHASE_SINGLE_ADVISOR                = 1,
@@ -208,7 +210,7 @@ enum KaelActions
     ACTION_START_CAPERNIAN              = 1,
     ACTION_START_TELONICUS              = 2,
     ACTION_START_WEAPONS                = 3,
-    ACTION_PROGRESS_PHASE_CHECK = 4
+    ACTION_PROGRESS_PHASE_CHECK         = 4
 };
 
 enum SpellGroups
@@ -393,21 +395,28 @@ struct boss_kaelthas : public BossAI
             case ACTION_PROGRESS_PHASE_CHECK:
                 if (_phase == PHASE_WEAPONS)
                 {
-                    summons.DoForAllSummons([&](WorldObject* summon)
+                    bool aliveWeapon = false;
+                    summons.DoForAllSummons([&aliveWeapon](WorldObject* summon)
                     {
                         if (Creature* summonedCreature = summon->ToCreature())
                         {
                             if (summonedCreature->IsAlive())
                             {
-                                PhaseAllAdvisorsExecute();
-                                return;                            
+                                if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
+                                {
+                                    aliveWeapon = true;
+                                    return;
+                                }                         
                             }
                         }
                     });
+                    if (!aliveWeapon)
+                        PhaseAllAdvisorsExecute();
                 }
-                else if (_phase == PHASE_WEAPONS)
+                else if (_phase == PHASE_ALL_ADVISORS)
                 {
-                    summons.DoForAllSummons([&](WorldObject* summon)
+                    bool advisorAlive = false;
+                    summons.DoForAllSummons([&advisorAlive](WorldObject* summon)
                     {
                         if (Creature* summonedCreature = summon->ToCreature())
                         {
@@ -415,12 +424,14 @@ struct boss_kaelthas : public BossAI
                             {
                                 if (summonedCreature->GetEntry() >= NPC_LORD_SANGUINAR && summonedCreature->GetEntry() <= NPC_THALADRED)
                                 {
-                                    PhaseKaelExecute();
+                                    advisorAlive = true;
                                     return;    
                                 }
                             }
                         }
                     });
+                    if (!advisorAlive)
+                        PhaseKaelExecute();
                 }
             default:
                 break;
@@ -669,6 +680,20 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
             DoCastSelf(SPELL_RESURRECTION);
+            // hack to despawn weapons as the resurrect hits them despite filtering
+            summons.DoForAllSummons([&](WorldObject* summon)
+            {
+                if (Creature* summonedCreature = summon->ToCreature())
+                {
+                    if (summonedCreature->IsAlive())
+                    {
+                        if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
+                        {
+                            summonedCreature->DespawnOrUnsummon();
+                        }                         
+                    }
+                }
+            });
         }, EVENT_PREFIGHT_PHASE62);
         ScheduleUniqueTimedEvent(12s, [&]{
             summons.DoForAllSummons([&](WorldObject* summon)
@@ -804,16 +829,16 @@ struct npc_lord_sanguinar : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (!_hasDied)
+        if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
         {
-            Talk(SAY_SANGUINAR_DEATH);
-            DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
-            if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
+            kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+            if (!_hasDied)
             {
+                Talk(SAY_SANGUINAR_DEATH);
+                DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
                 kael->AI()->DoAction(ACTION_START_CAPERNIAN);
-                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+                _hasDied = true;
             }
-            _hasDied = true;
         }
     }
 
@@ -892,16 +917,16 @@ struct npc_capernian : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (!_hasDied)
+        if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
         {
-            Talk(SAY_CAPERNIAN_DEATH);
-            DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
-            if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
+            kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+            if (!_hasDied)
             {
+                Talk(SAY_CAPERNIAN_DEATH);
+                DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
                 kael->AI()->DoAction(ACTION_START_TELONICUS);
-                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+                _hasDied = true;
             }
-            _hasDied = true;
         }
     }
 
@@ -955,16 +980,16 @@ struct npc_telonicus : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (!_hasDied)
+        if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
         {
-            Talk(SAY_TELONICUS_DEATH);
-            DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
-            if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
+            kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+            if (!_hasDied)
             {
+                Talk(SAY_TELONICUS_DEATH);
+                DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
                 kael->AI()->DoAction(ACTION_START_WEAPONS);
-                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+                _hasDied = true;
             }
-            _hasDied = true;
         }
     }
 
@@ -1040,16 +1065,16 @@ struct npc_thaladred : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (!_hasDied)
+        if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
         {
-            Talk(SAY_THALADRED_DEATH);
-            DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
-            if (Creature* kael = _instance->GetCreature(DATA_KAELTHAS))
+            kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+            if (!_hasDied)
             {
+                Talk(SAY_THALADRED_DEATH);
+                DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
                 kael->AI()->DoAction(ACTION_START_SANGUINAR);
-                kael->AI()->DoAction(ACTION_PROGRESS_PHASE_CHECK);
+                _hasDied = true;
             }
-            _hasDied = true;
         }
     }
 
@@ -1070,200 +1095,140 @@ private:
     bool _hasDied;
 };
 
-class spell_kaelthas_kael_phase_two : public SpellScriptLoader
+class spell_kaelthas_kael_phase_two : public SpellScript
 {
-public:
-    spell_kaelthas_kael_phase_two() : SpellScriptLoader("spell_kaelthas_kael_phase_two") { }
+    PrepareSpellScript(spell_kaelthas_kael_phase_two);
 
-    class spell_kaelthas_kael_phase_two_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_kaelthas_kael_phase_two_SpellScript);
+        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                if (Creature* kael = instance->GetCreature(DATA_KAELTHAS))
+                    kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
+        return true;
+    }
 
-        bool Load() override
-        {
-            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_KAELTHAS)))
-                        kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
-            return true;
-        }
-
-        void Register() override
-        {
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_kael_phase_two_SpellScript();
     }
 };
 
-class spell_kaelthas_remote_toy : public SpellScriptLoader
+class spell_kaelthas_remote_toy : public AuraScript
 {
-public:
-    spell_kaelthas_remote_toy() : SpellScriptLoader("spell_kaelthas_remote_toy") { }
+    PrepareAuraScript(spell_kaelthas_remote_toy);
 
-    class spell_kaelthas_remote_toy_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_kaelthas_remote_toy_AuraScript);
+        PreventDefaultAction();
+        if (roll_chance_i(66))
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_REMOTE_TOY_STUN, true);
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (roll_chance_i(66))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_REMOTE_TOY_STUN, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_remote_toy_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_remote_toy_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_remote_toy::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_kaelthas_summon_weapons : public SpellScriptLoader
+class spell_kaelthas_summon_weapons : public SpellScript
 {
-public:
-    spell_kaelthas_summon_weapons() : SpellScriptLoader("spell_kaelthas_summon_weapons") { }
+    PrepareSpellScript(spell_kaelthas_summon_weapons);
 
-    class spell_kaelthas_summon_weapons_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_kaelthas_summon_weapons_SpellScript);
+        PreventHitEffect(effIndex);
+        for (uint32 i = SPELL_SUMMON_WEAPONA; i <= SPELL_SUMMON_WEAPONG; ++i)
+            GetCaster()->CastSpell(GetCaster(), i, true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            for (uint32 i = SPELL_SUMMON_WEAPONA; i <= SPELL_SUMMON_WEAPONG; ++i)
-                GetCaster()->CastSpell(GetCaster(), i, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_weapons_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_summon_weapons_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_weapons::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_kaelthas_resurrection : public SpellScriptLoader
+class spell_kaelthas_resurrection : public SpellScript
 {
-public:
-    spell_kaelthas_resurrection() : SpellScriptLoader("spell_kaelthas_resurrection") { }
+    PrepareSpellScript(spell_kaelthas_resurrection);
 
-    class spell_kaelthas_resurrection_SpellScript : public SpellScript
+    void HandleBeforeCast()
     {
-        PrepareSpellScript(spell_kaelthas_resurrection_SpellScript);
+        GetCaster()->GetAI()->SetData(DATA_RESURRECT_CAST, DATA_RESURRECT_CAST);
+    }
 
-        void HandleBeforeCast()
-        {
-            GetCaster()->GetAI()->SetData(DATA_RESURRECT_CAST, DATA_RESURRECT_CAST);
-        }
-
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_kaelthas_resurrection_SpellScript::HandleBeforeCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_kaelthas_resurrection_SpellScript();
+        targets.remove(GetCaster());
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            if (target->GetEntry() < NPC_LORD_SANGUINAR && target->GetEntry() > NPC_THALADRED)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_resurrection::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        BeforeCast += SpellCastFn(spell_kaelthas_resurrection::HandleBeforeCast);
     }
 };
 
-class spell_kaelthas_mind_control : public SpellScriptLoader
+class spell_kaelthas_mind_control : public SpellScript
 {
-public:
-    spell_kaelthas_mind_control() : SpellScriptLoader("spell_kaelthas_mind_control") { }
+    PrepareSpellScript(spell_kaelthas_mind_control);
 
-    class spell_kaelthas_mind_control_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kaelthas_mind_control_SpellScript);
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_mind_control_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_kaelthas_burn : public SpellScriptLoader
+class spell_kaelthas_burn : public AuraScript
 {
-public:
-    spell_kaelthas_burn() : SpellScriptLoader("spell_kaelthas_burn") { }
+    PrepareAuraScript(spell_kaelthas_burn);
 
-    class spell_kaelthas_burn_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_kaelthas_burn_AuraScript);
+        Unit::DealDamage(GetUnitOwner(), GetUnitOwner(), GetUnitOwner()->CountPctFromMaxHealth(5) + 1);
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            Unit::DealDamage(GetUnitOwner(), GetUnitOwner(), GetUnitOwner()->CountPctFromMaxHealth(5) + 1);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_burn_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_burn_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_burn::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_kaelthas_flame_strike : public SpellScriptLoader
+class spell_kaelthas_flame_strike : public AuraScript
 {
-public:
-    spell_kaelthas_flame_strike() : SpellScriptLoader("spell_kaelthas_flame_strike") { }
+    PrepareAuraScript(spell_kaelthas_flame_strike);
 
-    class spell_kaelthas_flame_strike_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_kaelthas_flame_strike_AuraScript);
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveAllAuras();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLAME_STRIKE_DAMAGE, true);
-            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_kaelthas_flame_strike_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kaelthas_flame_strike_AuraScript();
+        GetUnitOwner()->RemoveAllAuras();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLAME_STRIKE_DAMAGE, true);
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_kaelthas_flame_strike::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1290,111 +1255,78 @@ private:
     Player* _owner;
 };
 
-class spell_kaelthas_gravity_lapse : public SpellScriptLoader
+class spell_kaelthas_gravity_lapse : public SpellScript
 {
-public:
-    spell_kaelthas_gravity_lapse() : SpellScriptLoader("spell_kaelthas_gravity_lapse") { }
+    PrepareSpellScript(spell_kaelthas_gravity_lapse);
 
-    class spell_kaelthas_gravity_lapse_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_kaelthas_gravity_lapse_SpellScript);
-
-        bool Load() override
-        {
-            _currentSpellId = SPELL_GRAVITY_LAPSE_TELEPORT1;
-            return true;
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (_currentSpellId < SPELL_GRAVITY_LAPSE_TELEPORT1 + 25)
-                if (Player* target = GetHitPlayer())
-                {
-                    GetCaster()->CastSpell(target, _currentSpellId++, true);
-                    target->m_Events.AddEvent(new lapseTeleport(target), target->m_Events.CalculateTime(1));
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kaelthas_gravity_lapse_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-
-    private:
-        uint32 _currentSpellId;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_kaelthas_gravity_lapse_SpellScript();
+        _currentSpellId = SPELL_GRAVITY_LAPSE_TELEPORT1;
+        return true;
     }
-};
 
-class spell_kaelthas_nether_beam : public SpellScriptLoader
-{
-public:
-    spell_kaelthas_nether_beam() : SpellScriptLoader("spell_kaelthas_nether_beam") { }
-
-    class spell_kaelthas_nether_beam_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_kaelthas_nether_beam_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().GetThreatList();
-            std::list<Unit*> targetList;
-            for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
+        PreventHitEffect(effIndex);
+        if (_currentSpellId < SPELL_GRAVITY_LAPSE_TELEPORT1 + 25)
+            if (Player* target = GetHitPlayer())
             {
-                Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-                if (target && target->GetTypeId() == TYPEID_PLAYER)
-                    targetList.push_back(target);
+                GetCaster()->CastSpell(target, _currentSpellId++, true);
+                target->m_Events.AddEvent(new lapseTeleport(target), target->m_Events.CalculateTime(1));
             }
+    }
 
-            Acore::Containers::RandomResize(targetList, 5);
-            for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kaelthas_nether_beam_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_nether_beam_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_gravity_lapse::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+
+private:
+    uint32 _currentSpellId;
+};
+
+class spell_kaelthas_nether_beam : public SpellScript
+{
+    PrepareSpellScript(spell_kaelthas_nether_beam);
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+
+        ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().GetThreatList();
+        std::list<Unit*> targetList;
+        for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
+        {
+            Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
+            if (target && target->GetTypeId() == TYPEID_PLAYER)
+                targetList.push_back(target);
+        }
+
+        Acore::Containers::RandomResize(targetList, 5);
+        for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+            GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_nether_beam::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_kaelthas_summon_nether_vapor : public SpellScriptLoader
+class spell_kaelthas_summon_nether_vapor : public SpellScript
 {
-public:
-    spell_kaelthas_summon_nether_vapor() : SpellScriptLoader("spell_kaelthas_summon_nether_vapor") { }
+    PrepareSpellScript(spell_kaelthas_summon_nether_vapor);
 
-    class spell_kaelthas_summon_nether_vapor_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_kaelthas_summon_nether_vapor_SpellScript);
+        PreventHitEffect(effIndex);
+        for (uint32 i = 0; i < 5; ++i)
+            GetCaster()->SummonCreature(NPC_NETHER_VAPOR, GetCaster()->GetPositionX() + 6 * cos(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionY() + 6 * std::sin(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionZ() + 7.0f + i, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            for (uint32 i = 0; i < 5; ++i)
-                GetCaster()->SummonCreature(NPC_NETHER_VAPOR, GetCaster()->GetPositionX() + 6 * cos(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionY() + 6 * std::sin(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionZ() + 7.0f + i, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_nether_vapor_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kaelthas_summon_nether_vapor_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_nether_vapor::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1405,15 +1337,15 @@ void AddSC_boss_kaelthas()
     RegisterTheEyeAI(npc_capernian);
     RegisterTheEyeAI(npc_telonicus);
     RegisterTheEyeAI(npc_thaladred);
-    new spell_kaelthas_kael_phase_two();
-    new spell_kaelthas_remote_toy();
-    new spell_kaelthas_summon_weapons();
-    new spell_kaelthas_resurrection();
-    new spell_kaelthas_mind_control();
-    new spell_kaelthas_burn();
-    new spell_kaelthas_flame_strike();
-    new spell_kaelthas_gravity_lapse();
-    new spell_kaelthas_nether_beam();
-    new spell_kaelthas_summon_nether_vapor();
+    RegisterSpellScript(spell_kaelthas_kael_phase_two);
+    RegisterSpellScript(spell_kaelthas_remote_toy);
+    RegisterSpellScript(spell_kaelthas_summon_weapons);
+    RegisterSpellScript(spell_kaelthas_resurrection);
+    RegisterSpellScript(spell_kaelthas_mind_control);
+    RegisterSpellScript(spell_kaelthas_burn);
+    RegisterSpellScript(spell_kaelthas_flame_strike);
+    RegisterSpellScript(spell_kaelthas_gravity_lapse);
+    RegisterSpellScript(spell_kaelthas_nether_beam);
+    RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
 }
 
