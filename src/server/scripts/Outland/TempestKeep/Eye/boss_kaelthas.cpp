@@ -257,9 +257,12 @@ struct boss_kaelthas : public BossAI
             summons.DoForAllSummons([&](WorldObject* summon){
                 if (Creature* summonedCreature = summon->ToCreature())
                 {
-                    summonedCreature->SetReactState(REACT_PASSIVE);
-                    summonedCreature->setDeathState(DeathState::JustRespawned);
-                    summonedCreature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    if (summonedCreature->GetEntry() >= NPC_LORD_SANGUINAR && summonedCreature->GetEntry() <= NPC_THALADRED)
+                    {
+                        summonedCreature->SetReactState(REACT_PASSIVE);
+                        summonedCreature->setDeathState(DeathState::JustRespawned);
+                        summonedCreature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    }
                 }
             });
         }
@@ -680,23 +683,6 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
             DoCastSelf(SPELL_RESURRECTION);
-            // hack to despawn weapons as the resurrect hits them despite filtering
-            summons.DoForAllSummons([&](WorldObject* summon)
-            {
-                if (Creature* summonedCreature = summon->ToCreature())
-                {
-                    if (summonedCreature->IsAlive())
-                    {
-                        if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
-                        {
-                            if (summonedCreature->isDead())
-                            {
-                                summonedCreature->DespawnOrUnsummon();
-                            }
-                        }
-                    }
-                }
-            });
         }, EVENT_PREFIGHT_PHASE62);
         ScheduleUniqueTimedEvent(12s, [&]{
             summons.DoForAllSummons([&](WorldObject* summon)
@@ -1159,25 +1145,8 @@ class spell_kaelthas_resurrection : public SpellScript
         GetCaster()->GetAI()->SetData(DATA_RESURRECT_CAST, DATA_RESURRECT_CAST);
     }
 
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        targets.remove(GetCaster());
-        targets.remove_if([&](WorldObject const* target) -> bool
-        {
-            if (target->GetEntry() < NPC_LORD_SANGUINAR && target->GetEntry() > NPC_THALADRED)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        });
-    }
-
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_resurrection::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
         BeforeCast += SpellCastFn(spell_kaelthas_resurrection::HandleBeforeCast);
     }
 };
