@@ -406,7 +406,7 @@ struct boss_kaelthas : public BossAI
                                 {
                                     aliveWeapon = true;
                                     return;
-                                }                         
+                                }
                             }
                         }
                     });
@@ -425,7 +425,7 @@ struct boss_kaelthas : public BossAI
                                 if (summonedCreature->GetEntry() >= NPC_LORD_SANGUINAR && summonedCreature->GetEntry() <= NPC_THALADRED)
                                 {
                                     advisorAlive = true;
-                                    return;    
+                                    return;
                                 }
                             }
                         }
@@ -689,8 +689,11 @@ struct boss_kaelthas : public BossAI
                     {
                         if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
                         {
-                            summonedCreature->DespawnOrUnsummon();
-                        }                         
+                            if (summonedCreature->isDead())
+                            {
+                                summonedCreature->DespawnOrUnsummon();
+                            }
+                        }
                     }
                 }
             });
