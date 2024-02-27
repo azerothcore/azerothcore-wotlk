@@ -191,8 +191,7 @@ bool SummonList::IsAnyCreatureInCombat() const
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
-    IsFleeing(false),
-    _isCombatMovementAllowed(true)
+    IsFleeing(false)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -209,7 +208,7 @@ void ScriptedAI::AttackStartNoMove(Unit* who)
 
 void ScriptedAI::AttackStart(Unit* who)
 {
-    if (IsCombatMovementAllowed())
+    if (me->IsCombatMovementAllowed())
         CreatureAI::AttackStart(who);
     else
         AttackStartNoMove(who);
@@ -535,11 +534,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
 
     if (ranged >= 0)
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
-}
-
-void ScriptedAI::SetCombatMovement(bool allowMovement)
-{
-    _isCombatMovementAllowed = allowMovement;
 }
 
 enum eNPCs

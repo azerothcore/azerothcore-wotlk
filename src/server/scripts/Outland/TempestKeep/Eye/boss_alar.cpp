@@ -90,7 +90,7 @@ struct boss_alar : public BossAI
 
     boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     void JustReachedHome() override
