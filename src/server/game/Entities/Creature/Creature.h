@@ -461,7 +461,6 @@ protected:
     bool m_regenHealth;
     bool m_regenPower;
     bool m_AI_locked;
-    bool _isCombatMovementAllowed;
 
     SpellSchoolMask m_meleeDamageSchoolMask;
     uint32 m_originalEntry;
@@ -510,6 +509,7 @@ private:
 
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
+    bool _isCombatMovementAllowed;
 };
 
 class AssistDelayEvent : public BasicEvent
