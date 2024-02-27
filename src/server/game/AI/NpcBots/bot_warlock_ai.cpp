@@ -647,7 +647,7 @@ public:
                 uint32 healthStone = InitSpell(me, CREATE_HEALTHSTONE_1);
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(healthStone);
                 //ASSERT(spellInfo);
-                uint32 rank = spellInfo->GetRank();
+                uint32 rank = spellInfo ? spellInfo->GetRank() : 1;
                 //ASSERT(rank >= 1 && rank <= 8);
                 spellInfo = sSpellMgr->GetSpellInfo(_healthStoneSpells[rank - 1]);
                 ASSERT(spellInfo);
