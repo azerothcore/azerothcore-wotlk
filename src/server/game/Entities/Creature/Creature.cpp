@@ -877,10 +877,9 @@ bool Creature::IsFreeToMove()
 {
     uint32 moveFlags = m_movementInfo.GetMovementFlags();
     // Do not reposition ourself when we are not allowed to move
-    if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove()) &&
+    if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove() || !IsCombatMovementAllowed()) &&
         (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE ||
-        moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) ||
-        !IsCombatMovementAllowed())
+        moveFlags & MOVEMENTFLAG_SPLINE_ENABLED))
     {
         return false;
     }
