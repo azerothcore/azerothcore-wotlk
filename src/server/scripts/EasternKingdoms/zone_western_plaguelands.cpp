@@ -134,7 +134,7 @@ public:
     {
         npc_andorhal_towerAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void MoveInLineOfSight(Unit* who) override

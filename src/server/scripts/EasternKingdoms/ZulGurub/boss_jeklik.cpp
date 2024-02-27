@@ -123,7 +123,7 @@ struct boss_jeklik : public BossAI
 
         me->SetDisableGravity(false);
         me->SetReactState(REACT_PASSIVE);
-        BossAI::SetCombatMovement(false);
+        BossAI::me->SetCombatMovement(false);
         batRidersCount = 0;
 
         DoCastSelf(SPELL_GREEN_CHANNELING, true);
@@ -148,7 +148,7 @@ struct boss_jeklik : public BossAI
         BossAI::PathEndReached(pathId);
 
         me->SetDisableGravity(false);
-        SetCombatMovement(true);
+        me->SetCombatMovement(true);
         me->SetReactState(REACT_AGGRESSIVE);
 
         //
