@@ -21,7 +21,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
-#include "hyjal_trash.h"
 
 enum Spells
 {
@@ -49,118 +48,11 @@ enum Misc
     POINT_COMBAT_START  = 7
 };
 
-class boss_kazrogal : public CreatureScript
+struct boss_kazrogal : public BossAI
 {
 public:
-    boss_kazrogal() : CreatureScript("boss_kazrogal") { }
+    boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHyjalAI<boss_kazrogalAI>(creature);
-    }
-
-    struct boss_kazrogalAI : public hyjal_trashAI
-    {
-        boss_kazrogalAI(Creature* creature) : hyjal_trashAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-            go = false;
-        }
-
-        uint32 CleaveTimer;
-        uint32 WarStompTimer;
-        uint32 MarkTimer;
-        uint32 MarkTimerBase;
-        bool go;
-
-        void Reset() override
-        {
-            damageTaken = 0;
-            CleaveTimer = 5000;
-            WarStompTimer = 15000;
-            MarkTimer = 45000;
-            MarkTimerBase = 45000;
-
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, IN_PROGRESS);
-            Talk(SAY_ONAGGRO);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            Talk(SAY_ONSLAY);
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (waypointId == POINT_COMBAT_START && instance)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THRALL));
-                if (target && target->IsAlive())
-                    me->AddThreat(target, 0.0f);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            hyjal_trashAI::JustDied(killer);
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, DONE);
-            DoPlaySoundToSet(me, SOUND_ONDEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (IsEvent)
-            {
-                //Must update npc_escortAI
-                npc_escortAI::UpdateAI(diff);
-                if (!go)
-                {
-                    go = true;
-                    me->GetMotionMaster()->MovePath(PATH_KAZROGAL, false);
-                }
-            }
-
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            if (CleaveTimer <= diff)
-            {
-                DoCast(me, SPELL_CLEAVE);
-                CleaveTimer = 6000 + rand() % 15000;
-            }
-            else CleaveTimer -= diff;
-
-            if (WarStompTimer <= diff)
-            {
-                DoCast(me, SPELL_WARSTOMP);
-                WarStompTimer = 60000;
-            }
-            else WarStompTimer -= diff;
-
-            if (MarkTimer <= diff)
-            {
-                DoCastAOE(SPELL_MARK);
-
-                MarkTimerBase -= 5000;
-                if (MarkTimerBase < 5500)
-                    MarkTimerBase = 5500;
-                MarkTimer = MarkTimerBase;
-                Talk(SAY_MARK);
-            }
-            else MarkTimer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-    };
 };
 
 class spell_mark_of_kazrogal : public SpellScriptLoader
@@ -223,7 +115,7 @@ public:
 
 void AddSC_boss_kazrogal()
 {
-    new boss_kazrogal();
-    new spell_mark_of_kazrogal();
+    RegisterHyjalAI(boss_kazrogal);
+    RegisterSpellScript(spell_mark_of_kazrogal);
 }
 

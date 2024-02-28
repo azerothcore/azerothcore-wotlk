@@ -61,6 +61,25 @@ ObjectData const objectData[] =
     { 0, 0 }
 };
 
+Milliseconds hyjalWaveTimers[4][MAX_WAVES_STANDARD]
+{
+    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Winterchill
+    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Anetheron
+    { 130000ms, 155000ms, 130000ms, 155000ms, 130000ms, 130000ms, 155000ms, 225000ms, 0ms },    // Kaz'rogal
+    { 130000ms, 190000ms, 190000ms, 190000ms, 130000ms, 155000ms, 190000ms, 225000ms, 0ms }     // Azgalor
+};
+
+Milliseconds hyjalRetreatTimers[2][MAX_WAVES_RETREAT]
+{
+    { 10000ms, 6000ms , 0ms },   // Alliance
+    { 10000ms, 40000ms, 0ms }    // Horde
+};
+
+Milliseconds hyjalNightElfWaveTimers[1][MAX_WAVES_NIGHT_ELF]
+{
+    { 0ms }
+};
+
 class instance_hyjal : public InstanceMapScript
 {
 public:
@@ -97,8 +116,6 @@ public:
             _roaringFlameHorde.clear();
             _ancientGemAlliance.clear();
             _ancientGemHorde.clear();
-
-            ArchiYell          = false;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -265,7 +282,6 @@ public:
                     // Spawn Overrun waves
                     ScheduleWaves(1ms, START_WAVE_ALLIANCE_RETREAT, MAX_WAVES_RETREAT, hyjalRetreatTimers[0]);
 
-                    allianceRetreat = data;
                     SaveToDB();
                     break;
                 case DATA_HORDE_RETREAT:
@@ -286,7 +302,6 @@ public:
 
                     ScheduleWaves(1ms, START_WAVE_HORDE_RETREAT, MAX_WAVES_RETREAT, hyjalRetreatTimers[1]);
 
-                    hordeRetreat = data;
                     SaveToDB();
                     break;
                 case DATA_SPAWN_WAVES:
@@ -378,7 +393,7 @@ public:
                     if (_currentWave >= maxWaves)
                         return;
 
-                    trash = 0;    // Overrun event trash can modify the counter, so we set it to 0 at the start of every wave. World Update is sent the first 
+                    trash = 0;    // Overrun event trash can modify the counter, so we set it to 0 at the start of every wave. World Update is sent in the first spawn
                     instance->SummonCreatureGroup(startWaves + _currentWave);   // _currentWave should be 0 when this function is first called
 
                     // Check if it's time to summon Infernals
@@ -409,21 +424,7 @@ public:
         }
 
     protected:
-        ObjectGuid RageWinterchill;
-        ObjectGuid Anetheron;
-        ObjectGuid Kazrogal;
-        ObjectGuid Azgalor;
-        ObjectGuid Archimonde;
-        ObjectGuid JainaProudmoore;
-        ObjectGuid Thrall;
-        ObjectGuid TyrandeWhisperwind;
-        ObjectGuid HordeGate;
-        ObjectGuid ElfGate;
         uint32 trash;
-        uint32 hordeRetreat;
-        uint32 allianceRetreat;
-        bool ArchiYell;
-
         uint8 _currentWave;
         TaskScheduler _scheduler;
         GuidSet _encounterNPCs;

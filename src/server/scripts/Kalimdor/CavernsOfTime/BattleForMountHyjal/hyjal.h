@@ -54,14 +54,14 @@ enum DataTypes
     DATA_RESET_NIGHT_ELF        = 24
 };
 
-enum WorldStateIds
+enum HyjalWorldStateIds
 {
     WORLD_STATE_WAVES           = 2842,
     WORLD_STATE_ENEMY           = 2453,
     WORLD_STATE_ENEMYCOUNT      = 2454
 };
 
-enum CreaturesIds
+enum HyjalCreaturesIds
 {
     // Trash Mobs summoned in waves
     NPC_NECRO                   = 17899,
@@ -116,7 +116,7 @@ enum CreaturesIds
     NPC_WORLD_TRIGGER_TINY      = 21987
 };
 
-enum GameobjectIds
+enum HyjalGameobjectIds
 {
     GO_HORDE_ENCAMPMENT_PORTAL  = 182060,
     GO_NIGHT_ELF_VILLAGE_PORTAL = 182061,
@@ -124,12 +124,12 @@ enum GameobjectIds
     GO_FLAME                    = 182260
 };
 
-enum Spells
+enum HyjalSpells
 {
     SPELL_INFERNAL              = 32148
 };
 
-enum Misc
+enum HyjalMisc
 {
     MAX_WAVES_STANDARD          = 9,
     MAX_WAVES_RETREAT           = 3,
@@ -145,29 +145,12 @@ enum Misc
     CONTEXT_GROUP_WAVES         = 1
 };
 
-Milliseconds hyjalWaveTimers[4][MAX_WAVES_STANDARD]
-{
-    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Winterchill
-    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Anetheron
-    { 130000ms, 155000ms, 130000ms, 155000ms, 130000ms, 130000ms, 155000ms, 225000ms, 0ms },    // Kaz'rogal
-    { 130000ms, 190000ms, 190000ms, 190000ms, 130000ms, 155000ms, 190000ms, 225000ms, 0ms }     // Azgalor
-};
-
-Milliseconds hyjalRetreatTimers[2][MAX_WAVES_RETREAT]
-{
-    { 10000ms, 6000ms , 0ms },   // Alliance
-    { 10000ms, 40000ms, 0ms }    // Horde
-};
-
-Milliseconds hyjalNightElfWaveTimers[1][MAX_WAVES_NIGHT_ELF]
-{
-    { 0ms }
-};
-
 template <class AI, class T>
 inline AI* GetHyjalAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HyjalScriptName);
 }
+
+#define RegisterHyjalAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetHyjalAI)
 
 #endif

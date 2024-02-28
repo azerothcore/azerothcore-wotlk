@@ -20,7 +20,6 @@ void AddSC_instance_blackfathom_deeps();     //Blackfathom Depths
 void AddSC_hyjal();                          //CoT Battle for Mt. Hyjal
 void AddSC_boss_archimonde();
 void AddSC_instance_mount_hyjal();
-void AddSC_hyjal_trash();
 void AddSC_boss_rage_winterchill();
 void AddSC_boss_anetheron();
 void AddSC_boss_kazrogal();
@@ -104,7 +103,6 @@ void AddKalimdorScripts()
     AddSC_hyjal();                          //CoT Battle for Mt. Hyjal
     AddSC_boss_archimonde();
     AddSC_instance_mount_hyjal();
-    AddSC_hyjal_trash();
     AddSC_boss_rage_winterchill();
     AddSC_boss_anetheron();
     AddSC_boss_kazrogal();
