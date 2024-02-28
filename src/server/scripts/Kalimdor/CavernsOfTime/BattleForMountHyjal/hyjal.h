@@ -34,26 +34,24 @@ enum HyjalBosses
 
 enum DataTypes
 {
-    DATA_ANETHERON              = 1,
-    DATA_ANETHERONEVENT         = 2,
-    DATA_ARCHIMONDE             = 3,
-    DATA_ARCHIMONDEEVENT        = 4,
-    DATA_AZGALOR                = 5,
-    DATA_AZGALOREVENT           = 6,
-    DATA_JAINAPROUDMOORE        = 7,
-    DATA_KAZROGAL               = 8,
-    DATA_KAZROGALEVENT          = 9,
-    DATA_RAGEWINTERCHILL        = 10,
-    DATA_RAGEWINTERCHILLEVENT   = 11,
-    DATA_THRALL                 = 12,
-    DATA_TYRANDEWHISPERWIND     = 13,
-    DATA_TRASH                  = 14,
-    DATA_RESET_TRASH_COUNT      = 15,
-    DATA_ALLIANCE_RETREAT       = 16,
-    DATA_HORDE_RETREAT          = 17,
-    DATA_RAIDDAMAGE             = 18,
-    DATA_RESET_RAIDDAMAGE       = 19,
-    TYPE_RETREAT                = 20
+    DATA_WINTERCHILL            = 1,
+    DATA_ANETHERON              = 2,
+    DATA_KAZROGAL               = 3,
+    DATA_AZGALOR                = 4,
+    DATA_ARCHIMONDE             = 5,
+
+    DATA_ALLIANCE_RETREAT       = 11,
+    DATA_HORDE_RETREAT          = 12,
+
+    DATA_JAINA                  = 13,
+    DATA_THRALL                 = 14,
+    DATA_TYRANDE                = 15,
+
+    DATA_SPAWN_WAVES            = 20,
+    DATA_SPAWN_INFERNALS        = 21,
+    DATA_RESET_ALLIANCE         = 22,
+    DATA_RESET_HORDE            = 23,
+    DATA_RESET_NIGHT_ELF        = 24
 };
 
 enum WorldStateIds
@@ -126,9 +124,44 @@ enum GameobjectIds
     GO_FLAME                    = 182260
 };
 
+enum Spells
+{
+    SPELL_INFERNAL              = 32148
+};
+
 enum Misc
 {
-    MAX_STANDARD_WAVES = 9
+    MAX_WAVES_STANDARD          = 9,
+    MAX_WAVES_RETREAT           = 3,
+    MAX_WAVES_NIGHT_ELF         = 1,
+    START_WAVE_WINTERCHILL      = 0,
+    START_WAVE_ANETHERON        = 9,
+    START_WAVE_KAZROGAL         = 18,
+    START_WAVE_AZGALOR          = 27,
+    START_WAVE_ALLIANCE_RETREAT = 36,
+    START_WAVE_HORDE_RETREAT    = 39,
+    START_WAVE_NIGHT_ELF        = 42,
+
+    CONTEXT_GROUP_WAVES         = 1
+};
+
+Milliseconds hyjalWaveTimers[4][MAX_WAVES_STANDARD]
+{
+    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Winterchill
+    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Anetheron
+    { 130000ms, 155000ms, 130000ms, 155000ms, 130000ms, 130000ms, 155000ms, 225000ms, 0ms },    // Kaz'rogal
+    { 130000ms, 190000ms, 190000ms, 190000ms, 130000ms, 155000ms, 190000ms, 225000ms, 0ms }     // Azgalor
+};
+
+Milliseconds hyjalRetreatTimers[2][MAX_WAVES_RETREAT]
+{
+    { 10000ms, 6000ms , 0ms },   // Alliance
+    { 10000ms, 40000ms, 0ms }    // Horde
+};
+
+Milliseconds hyjalNightElfWaveTimers[1][MAX_WAVES_NIGHT_ELF]
+{
+    { 0ms }
 };
 
 template <class AI, class T>

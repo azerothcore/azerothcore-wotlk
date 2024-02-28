@@ -27,7 +27,7 @@ EndScriptData */
 #include "InstanceScript.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
-#include "hyjal_trash.h"
+#include "hyjal.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event
@@ -37,57 +37,29 @@ EndScriptData */
 4 - Archimonde event
 */
 
-/*
-Rage Winterchill
-Wave 1: 130000
-Wave 2: 130000
-Wave 3: 130000
-Wave 4: 130000
-Wave 5: 130000
-Wave 6: 130000
-Wave 7: 130000
-Wave 8: 190000
+DoorData const doorData[] =
+{
+    { GO_HORDE_ENCAMPMENT_PORTAL,  DATA_ALLIANCE_RETREAT, DOOR_TYPE_PASSAGE },
+    { GO_NIGHT_ELF_VILLAGE_PORTAL, DATA_HORDE_RETREAT,    DOOR_TYPE_PASSAGE }
+};
 
-Anetheron
-Wave 1: 130000
-Wave 2: 130000
-Wave 3: 130000
-Wave 4: 130000
-Wave 5: 130000
-Wave 6: 130000
-Wave 7: 130000
-Wave 8: 190000
+ObjectData const creatureData[] =
+{
+    { NPC_WINTERCHILL, DATA_WINTERCHILL },
+    { NPC_ANETHERON,   DATA_ANETHERON   },
+    { NPC_KAZROGAL,    DATA_KAZROGAL    },
+    { NPC_AZGALOR,     DATA_AZGALOR     },
+    { NPC_ARCHIMONDE,  DATA_ARCHIMONDE  },
+    { NPC_THRALL,      DATA_THRALL      },
+    { NPC_JAINA,       DATA_JAINA       },
+    { NPC_TYRANDE,     DATA_TYRANDE     },
+    { 0,               0                }
+};
 
-Alliance Overrun
-Wave 1: 10000
-Wave 2: 4000
-
-3rd Boss
-Wave 1: 130000
-Wave 2: 155000
-Wave 3: 130000
-Wave 4: 155000
-Wave 5: 130000
-Wave 6: 130000
-Wave 7: 155000
-Wave 8: 225000
-
-4rd Boss
-Wave 1: 130000
-Wave 2: 190000
-Wave 3: 190000
-Wave 4: 190000
-Wave 5: 130000
-Wave 6: 155000
-Wave 7: 190000
-Wave 8: 225000
-
-Horde Overrun
-Wave 1: 10000
-Wave 2: 40000
-*/
-
-#define YELL_EFFORTS        "All of your efforts have been in vain, for the draining of the World Tree has already begun. Soon the heart of your world will beat no more."
+ObjectData const objectData[] =
+{
+    { 0, 0 }
+};
 
 class instance_hyjal : public InstanceMapScript
 {
@@ -101,18 +73,21 @@ public:
 
     struct instance_mount_hyjal_InstanceMapScript : public InstanceScript
     {
-        instance_mount_hyjal_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_mount_hyjal_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+            SetBossNumber(EncounterCount);
+            LoadDoorData(doorData);
+            LoadObjectData(creatureData, objectData);
+        }
 
         void Initialize() override
         {
             SetHeaders(DataHeader);
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-            RaidDamage         = 0;
             trash              = 0;
-            hordeRetreat       = 0;
-            allianceRetreat    = 0;
 
+            _currentWave = 0;
             _encounterNPCs.clear();
             _baseAlliance.clear();
             _baseHorde.clear();
@@ -126,33 +101,10 @@ public:
             ArchiYell          = false;
         }
 
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < EncounterCount; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                    return true;
-
-            return false;
-        }
-
         void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
-                case GO_HORDE_ENCAMPMENT_PORTAL:
-                    HordeGate = go->GetGUID();
-                    if (allianceRetreat)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    else
-                        HandleGameObject(ObjectGuid::Empty, false, go);
-                    break;
-                case GO_NIGHT_ELF_VILLAGE_PORTAL:
-                    ElfGate = go->GetGUID();
-                    if (hordeRetreat)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    else
-                        HandleGameObject(ObjectGuid::Empty, false, go);
-                    break;
                 case GO_ANCIENT_GEM:
                     if (go->GetPositionY() > -2500.f)
                         _ancientGemAlliance.insert(go->GetGUID());
@@ -168,25 +120,13 @@ public:
                     go->DespawnOrUnsummon();
                     break;
             }
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_ARCHIMONDE:
-                    Archimonde = creature->GetGUID();
-                    break;
-                case NPC_JAINA:
-                    JainaProudmoore = creature->GetGUID();
-                    break;
-                case NPC_THRALL:
-                    Thrall = creature->GetGUID();
-                    break;
-                case NPC_TYRANDE:
-                    TyrandeWhisperwind = creature->GetGUID();
-                    break;
-
                     // Alliance base
                 case NPC_ALLIANCE_PEASANT:
                 case NPC_ALLIANCE_KNIGHT:
@@ -194,6 +134,7 @@ public:
                 case NPC_ALLIANCE_RIFLEMAN:
                 case NPC_ALLIANCE_PRIEST:
                 case NPC_ALLIANCE_SORCERESS:
+                case NPC_JAINA:
                     _baseAlliance.insert(creature->GetGUID());
                     break;
                     // Horde base
@@ -204,6 +145,7 @@ public:
                 case NPC_TAUREN_WARRIOR:
                 case NPC_HORDE_WITCH_DOCTOR:
                 case NPC_HORDE_PEON:
+                case NPC_THRALL:
                     _baseHorde.insert(creature->GetGUID());
                     break;
                     // Elf base
@@ -215,6 +157,7 @@ public:
                 case NPC_NELF_ARCHER:
                 case NPC_NELF_HUNTRESS:
                 case NPC_DRYAD:
+                case NPC_TYRANDE:
                     _baseNightElf.insert(creature->GetGUID());
                     break;
 
@@ -229,7 +172,7 @@ public:
                 {
                     switch (creature->GetEntry())
                     {
-                    case NPC_WINTERCHILL: SetData(DATA_RAGEWINTERCHILL, IN_PROGRESS); break;
+                    case NPC_WINTERCHILL: SetData(DATA_WINTERCHILL, IN_PROGRESS); break;
                     case NPC_ANETHERON: SetData(DATA_ANETHERON, IN_PROGRESS); break;
                     case NPC_KAZROGAL: SetData(DATA_KAZROGAL, IN_PROGRESS); break;
                     case NPC_AZGALOR: SetData(DATA_AZGALOR, IN_PROGRESS); break;
@@ -248,132 +191,171 @@ public:
                     if (creature->IsSummon())
                     {
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
-                        _encounterNPCs.insert(creature->GetGUID());                 // Used for despawning on wipe
+                        _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        void OnUnitDeath(Unit* unit) override
         {
-            switch (identifier)
-            {
-                case DATA_RAGEWINTERCHILL:
-                    return RageWinterchill;
-                case DATA_ANETHERON:
-                    return Anetheron;
-                case DATA_KAZROGAL:
-                    return Kazrogal;
-                case DATA_AZGALOR:
-                    return Azgalor;
-                case DATA_ARCHIMONDE:
-                    return Archimonde;
-                case DATA_JAINAPROUDMOORE:
-                    return JainaProudmoore;
-                case DATA_THRALL:
-                    return Thrall;
-                case DATA_TYRANDEWHISPERWIND:
-                    return TyrandeWhisperwind;
-            }
+            InstanceScript::OnUnitDeath(unit);
 
-            return ObjectGuid::Empty;
+            switch (unit->ToCreature()->GetEntry())
+            {
+            case NPC_NECRO:
+            case NPC_ABOMI:
+            case NPC_GHOUL:
+            case NPC_BANSH:
+            case NPC_CRYPT:
+            case NPC_GARGO:
+            case NPC_FROST:
+            case NPC_INFER:
+            case NPC_STALK:
+                if (unit->ToCreature()->IsSummon())
+                {
+                    DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
+                    _encounterNPCs.erase(unit->ToCreature()->GetGUID());             // Used for despawning on wipe
+
+                    if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
+                        SetData(DATA_SPAWN_WAVES, 0);
+                }
+                break;
+            }
         }
 
         void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
-                case DATA_RAGEWINTERCHILLEVENT:
-                    m_auiEncounter[0] = data;
-                    break;
-                case DATA_ANETHERONEVENT:
-                    m_auiEncounter[1] = data;
-                    break;
-                case DATA_KAZROGALEVENT:
-                    m_auiEncounter[2] = data;
-                    break;
-                case DATA_AZGALOREVENT:
-                    {
-                        m_auiEncounter[3] = data;
-                        if (data == DONE)
-                        {
-                            if (ArchiYell)
-                                break;
-
-                            ArchiYell = true;
-
-                            Creature* creature = instance->GetCreature(Azgalor);
-                            if (creature)
-                            {
-                                Creature* unit = creature->SummonCreature(NPC_WORLD_TRIGGER_TINY, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-
-                                Map* map = creature->GetMap();
-                                if (map->IsDungeon() && unit)
-                                {
-                                    unit->SetVisible(false);
-                                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.IsEmpty())
-                                        return;
-
-                                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    {
-                                        if (Player* player = i->GetSource())
-                                        {
-                                            WorldPacket packet;
-                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, player, YELL_EFFORTS);
-                                            player->SendDirectMessage(&packet);
-                                            player->PlayDirectSound(10986, player);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case DATA_ARCHIMONDEEVENT:
-                    m_auiEncounter[4] = data;
-                    break;
-                case DATA_RESET_TRASH_COUNT:
-                    trash = 0;
-                    break;
-                case DATA_TRASH:
-                    if (data)
-                        trash = data;
-                    else
-                        trash--;
-                    DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, trash);
-                    break;
-                    /*
-                case TYPE_RETREAT:
-                    if (data == SPECIAL)
-                    {
-                        if (!m_uiAncientGemGUID.empty())
-                        {
-                            for (ObjectGuid const& guid : m_uiAncientGemGUID)
-                            {
-                                //don't know how long it expected
-                                DoRespawnGameObject(guid, DAY);
-                            }
-                        }
-                    }
-                    break;
-                    */
                 case DATA_ALLIANCE_RETREAT:
+                    // Spawn Ancient Gems
+                    for (ObjectGuid const& guid : _ancientGemAlliance)
+                        instance->GetGameObject(guid)->Respawn();
+
+                    // Move all alliance NPCs near Jaina (only happens in this base, not Horde's)
+                    if (Creature* jaina = GetCreature(DATA_JAINA))
+                    {
+                        for (ObjectGuid const& guid : _baseAlliance)
+                        {
+                            if (instance->GetCreature(guid));
+                            {
+                                float x, y, z;
+                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(jaina));
+                                instance->GetCreature(guid)->SetWalk(true);
+                                instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
+                            }
+                        }
+                    }
+
+                    // Despawn all alliance NPCs
+                    _scheduler.Schedule(11000ms, [this](TaskContext)
+                        {
+                            for (ObjectGuid const& guid : _baseAlliance)
+                                instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                            // Spawn Roaring Flame after a delay
+                            _scheduler.Schedule(30s, [this](TaskContext)
+                                {
+                                    for (ObjectGuid const& guid : _roaringFlameAlliance)
+                                        instance->GetGameObject(guid)->Respawn();
+                                });
+                        });
+
+                    // Spawn Overrun waves
+                    ScheduleWaves(1ms, START_WAVE_ALLIANCE_RETREAT, MAX_WAVES_RETREAT, hyjalRetreatTimers[0]);
+
                     allianceRetreat = data;
-                    HandleGameObject(HordeGate, true);
                     SaveToDB();
                     break;
                 case DATA_HORDE_RETREAT:
+                    for (ObjectGuid const& guid : _ancientGemHorde)
+                        instance->GetGameObject(guid)->Respawn();
+
+                    _scheduler.Schedule(11000ms, [this](TaskContext)
+                        {
+                            for (ObjectGuid const& guid : _baseHorde)
+                                instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                            _scheduler.Schedule(30s, [this](TaskContext)
+                                {
+                                    for (ObjectGuid const& guid : _roaringFlameHorde)
+                                        instance->GetGameObject(guid)->Respawn();
+                                });
+                        });
+
+                    ScheduleWaves(1ms, START_WAVE_HORDE_RETREAT, MAX_WAVES_RETREAT, hyjalRetreatTimers[1]);
+
                     hordeRetreat = data;
-                    HandleGameObject(ElfGate, true);
                     SaveToDB();
                     break;
-                case DATA_RAIDDAMAGE:
-                    RaidDamage += data;
-                    if (RaidDamage >= MINRAIDDAMAGE)
-                        RaidDamage = MINRAIDDAMAGE;
+                case DATA_SPAWN_WAVES:
+                    if (GetBossState(DATA_WINTERCHILL) != DONE)
+                        ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
+                    else if (GetBossState(DATA_ANETHERON) != DONE)
+                        ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON - 1]);
+                    else if (GetBossState(DATA_KAZROGAL) != DONE)
+                        ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL - 1]);
+                    else if (GetBossState(DATA_AZGALOR) != DONE)
+                        ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR - 1]);
                     break;
-                case DATA_RESET_RAIDDAMAGE:
-                    RaidDamage = 0;
+                case DATA_SPAWN_INFERNALS:
+                    for (ObjectGuid const& guid : _infernalTargets)
+                        if (Creature* infernal = instance->GetCreature(guid))
+                            infernal->GetAI()->DoCastSelf(SPELL_INFERNAL);
+
+                    break;
+                case DATA_RESET_ALLIANCE:
+                    for (ObjectGuid const& guid : _baseAlliance)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    for (ObjectGuid const& guid : _encounterNPCs)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    _scheduler.Schedule(300s, [this](TaskContext)
+                        {
+                            for (ObjectGuid const& guid : _baseAlliance)
+                                instance->GetCreature(guid)->Respawn();
+                        });
+
+                    _currentWave = 0;
+                    trash = 0;
+                    break;
+                case DATA_RESET_HORDE:
+                    for (ObjectGuid const& guid : _baseHorde)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    for (ObjectGuid const& guid : _encounterNPCs)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    _scheduler.Schedule(300s, [this](TaskContext)
+                        {
+                            for (ObjectGuid const& guid : _baseHorde)
+                                instance->GetCreature(guid)->Respawn();
+                        });
+
+                    _currentWave = 0;
+                    trash = 0;
+                    break;
+                case DATA_RESET_NIGHT_ELF:
+                    for (ObjectGuid const& guid : _baseNightElf)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    for (ObjectGuid const& guid : _encounterNPCs)
+                        instance->GetCreature(guid)->DespawnOrUnsummon();
+
+                    GetCreature(DATA_ARCHIMONDE)->DespawnOrUnsummon();
+
+                    _scheduler.Schedule(300s, [this](TaskContext)
+                        {
+                            for (ObjectGuid const& guid : _baseNightElf)
+                                instance->GetCreature(guid)->Respawn();
+
+                            GetCreature(DATA_ARCHIMONDE)->Respawn();
+                        });
+
+                    _currentWave = 0;
+                    trash = 0;
                     break;
             }
 
@@ -385,42 +367,39 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const override
+        void ScheduleWaves(Milliseconds time, uint8 startWaves, uint8 maxWaves, Milliseconds timerptr[])
         {
-            switch (type)
-            {
-                case DATA_RAGEWINTERCHILLEVENT:
-                    return m_auiEncounter[0];
-                case DATA_ANETHERONEVENT:
-                    return m_auiEncounter[1];
-                case DATA_KAZROGALEVENT:
-                    return m_auiEncounter[2];
-                case DATA_AZGALOREVENT:
-                    return m_auiEncounter[3];
-                case DATA_ARCHIMONDEEVENT:
-                    return m_auiEncounter[4];
-                case DATA_TRASH:
-                    return trash;
-                case DATA_ALLIANCE_RETREAT:
-                    return allianceRetreat;
-                case DATA_HORDE_RETREAT:
-                    return hordeRetreat;
-                case DATA_RAIDDAMAGE:
-                    return RaidDamage;
-            }
-            return 0;
-        }
+            // No overlapping!
+            _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
 
-        void StartStandardWaves(std::array<hyjalWaves, MAX_WAVES> data)
-        {
-            int i = 0;
-            _scheduler.Schedule(1ms, [this](TaskContext context)
+            _scheduler.Schedule(1ms, [this, time, startWaves, maxWaves, timerptr](TaskContext context)
                 {
-                    for (std::array<hyjalWaves, MAX_WAVES> wave : data[i])
+                    // If all waves reached, cancel scheduling new ones
+                    if (_currentWave >= maxWaves)
+                        return;
+
+                    trash = 0;    // Overrun event trash can modify the counter, so we set it to 0 at the start of every wave. World Update is sent the first 
+                    instance->SummonCreatureGroup(startWaves + _currentWave);   // _currentWave should be 0 when this function is first called
+
+                    // Check if it's time to summon Infernals
+                    if (GetBossState(DATA_KAZROGAL) == DONE && GetBossState(DATA_AZGALOR) != DONE)
                     {
-                        instance->SummonCreatureGroup
+                        switch (_currentWave + 1)
+                        {
+                        case 3:
+                        case 4:
+                        case 7:
+                            SetData(DATA_SPAWN_INFERNALS, 1);
+                            break;
+                        default:
+                            break;
+                        }
                     }
-                    context.Repeat();
+
+                    context.Repeat(timerptr[_currentWave]);
+                    DoUpdateWorldState(WORLD_STATE_WAVES, ++_currentWave);
+
+                    context.SetGroup(CONTEXT_GROUP_WAVES);
                 });
         }
 
@@ -429,32 +408,7 @@ public:
             _scheduler.Update(diff);
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> m_auiEncounter[3];
-            data >> m_auiEncounter[4];
-            data >> allianceRetreat;
-            data >> hordeRetreat;
-            data >> RaidDamage;
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << m_auiEncounter[0] << ' '
-                << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' '
-                << m_auiEncounter[3] << ' '
-                << m_auiEncounter[4]<< ' '
-                << allianceRetreat << ' '
-                << hordeRetreat << ' '
-                << RaidDamage;
-        }
-
     protected:
-        uint32 m_auiEncounter[EncounterCount];
         ObjectGuid RageWinterchill;
         ObjectGuid Anetheron;
         ObjectGuid Kazrogal;
@@ -468,9 +422,9 @@ public:
         uint32 trash;
         uint32 hordeRetreat;
         uint32 allianceRetreat;
-        uint32 RaidDamage;
         bool ArchiYell;
 
+        uint8 _currentWave;
         TaskScheduler _scheduler;
         GuidSet _encounterNPCs;
         GuidSet _baseAlliance;

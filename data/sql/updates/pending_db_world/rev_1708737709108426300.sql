@@ -549,3 +549,101 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (534, 2, 42, 17895 , 5373.57, -3272.718, 1620.646, 4.991662, 7, 0, 'Night Elf Wave'),
 (534, 2, 42, 17895 , 5365.245, -3274.99, 1620.959, 5.226511, 7, 0, 'Night Elf Wave'),
 (534, 2, 42, 17898 , 5361.223, -3266.657, 1619.216, 5.216855, 7, 0, 'Night Elf Wave');
+
+DELETE FROM `npc_text` WHERE `ID` IN (9224, 9409, 9415);
+INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`) VALUES
+(9224, 'Stranger, make haste and contact Lady Jaina Proudmoore. Her small Alliance force is bravely attempting to blunt the Burning Legion\'s initial assault and delay the approach of Archimonde.', NULL, 14867),
+(9409, NULL, 'Your continued help against the Burning Legion would still be appreciated. Thrall could use your assistance in his encampment to the west of here.', 15498),
+(9415, NULL, 'Congratulations! A great victory has been won today.', 15512);
+
+DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 7552);
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(7552, 32918, 0, 'My companions and I are with you, Lady Proudmoore.', 14697, 0, 0, 0, 0, 0, 0, '', 0, 0),
+(7552, 32919, 0, 'We are ready for whatever Archimonde might send our way, Lady Proudmoore.', 15392, 0, 0, 0, 0, 0, 0, '', 0, 0),
+(7552, 32920, 0, 'Until we meet again, Lady Proudmoore.', 15415, 0, 0, 0, 0, 0, 0, '', 0, 0);
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 7552);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7552, 9168),
+(7552, 9387),
+(7552, 9380);
+
+DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 7581);
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(7581, 35378, 0, 'I am with you, Thrall.', 14869, 0, 0, 0, 0, 0, 0, '', 0, 0),
+(7581, 35377, 0, 'We have nothing to fear.', 15444, 0, 0, 0, 0, 0, 0, '', 0, 0),
+(7581, 35379, 0, 'Until we meet again, Thrall.', 15448, 0, 0, 0, 0, 0, 0, '', 0, 0);
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 7581);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7581, 9224),
+(7581, 9225),
+(7581, 9396),
+(7581, 9398);
+
+DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 7706);
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(7706, 34158, 0, 'I would be grateful for any aid you can provide, Priestess.', 15499, 0, 0, 0, 0, 0, 0, '', 0, 0);
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 7706);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7706, 9415),
+(7706, 9410),
+(7706, 9408),
+(7706, 9409);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` IN (7552, 7581, 7706));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Jaina Text
+(14, 7552, 9168, 0, 0, 13, 0, 1, 3, 2, 1, 0, 0, '', 'Show gossip text if Rage Winterchill is not defeated'),
+
+(14, 7552, 9380, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip text if Rage Winterchill is defeated'),
+(14, 7552, 9380, 0, 0, 13, 0, 2, 3, 2, 1, 0, 0, '', 'Show gossip text if Anetheron is not defeated'),
+
+(14, 7552, 9387, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip text if Rage Winterchill is defeated'),
+(14, 7552, 9387, 0, 0, 13, 0, 2, 3, 2, 0, 0, 0, '', 'Show gossip text if Anetheron is defeated'),
+
+-- Thrall Text
+(14, 7581, 9224, 0, 0, 13, 0, 2, 3, 2, 1, 0, 0, '', 'Show gossip text if Anetheron is not defeated'),
+
+(14, 7581, 9225, 0, 0, 13, 0, 2, 3, 2, 0, 0, 0, '', 'Show gossip text if Anetheron is defeated'),
+(14, 7581, 9225, 0, 0, 13, 0, 3, 3, 2, 1, 0, 0, '', 'Show gossip text if Kaz\'rogal is not defeated'),
+
+(14, 7581, 9396, 0, 0, 13, 0, 3, 3, 2, 0, 0, 0, '', 'Show gossip text if Kaz\'rogal is defeated'),
+(14, 7581, 9396, 0, 0, 13, 0, 4, 3, 2, 1, 0, 0, '', 'Show gossip text if Azgalor is not defeated'),
+
+(14, 7581, 9398, 0, 0, 13, 0, 3, 3, 2, 0, 0, 0, '', 'Show gossip text if Kaz\'rogal is defeated'),
+(14, 7581, 9398, 0, 0, 13, 0, 4, 3, 2, 0, 0, 0, '', 'Show gossip text if Azgalor is defeated'),
+
+-- Tyrande Text
+(14, 7706, 9380, 0, 0, 13, 0, 2, 3, 2, 1, 0, 0, '', 'Show gossip text if Anetheron is not defeated'),
+(14, 7706, 9380, 0, 0, 13, 0, 4, 3, 2, 1, 0, 0, '', 'Show gossip text if Azgalor is not defeated'),
+
+(14, 7706, 9409, 0, 0, 13, 0, 2, 3, 2, 0, 0, 0, '', 'Show gossip text if Anetheron is defeated'),
+(14, 7706, 9409, 0, 0, 13, 0, 4, 3, 2, 1, 0, 0, '', 'Show gossip text if Azgalor is not defeated'),
+
+(14, 7706, 9410, 0, 0, 13, 0, 4, 3, 2, 0, 0, 0, '', 'Show gossip text if Azgalor is defeated'),
+
+(14, 7706, 9415, 0, 0, 13, 0, 5, 3, 2, 0, 0, 0, '', 'Show gossip text if Archimonde is defeated');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` IN (7552, 7581, 7706));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Jaina Options
+(15, 7552, 32918, 0, 0, 13, 0, 1, 3, 2, 1, 0, 0, '', 'Show gossip option if Rage Winterchill is not defeated'),
+
+(15, 32919, 9380, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip option if Rage Winterchill is defeated'),
+(15, 32919, 9380, 0, 0, 13, 0, 2, 3, 2, 1, 0, 0, '', 'Show gossip option if Anetheron is not defeated'),
+
+(15, 32920, 9387, 0, 0, 13, 0, 1, 3, 2, 0, 0, 0, '', 'Show gossip option if Rage Winterchill is defeated'),
+(15, 32920, 9387, 0, 0, 13, 0, 2, 3, 2, 0, 0, 0, '', 'Show gossip option if Anetheron is defeated'),
+
+-- Thrall Options
+(15, 7581, 35377, 0, 0, 13, 0, 2, 3, 2, 0, 0, 0, '', 'Show gossip option if Anetheron is defeated'),
+(15, 7581, 35377, 0, 0, 13, 0, 3, 3, 2, 1, 0, 0, '', 'Show gossip option if Kaz\'rogal is not defeated'),
+
+(15, 7581, 35378, 0, 0, 13, 0, 3, 3, 2, 0, 0, 0, '', 'Show gossip option if Kaz\'rogal is defeated'),
+(15, 7581, 35378, 0, 0, 13, 0, 4, 3, 2, 1, 0, 0, '', 'Show gossip option if Azgalor is not defeated'),
+
+(15, 7581, 35379, 0, 0, 13, 0, 3, 3, 2, 0, 0, 0, '', 'Show gossip option if Kaz\'rogal is defeated'),
+(15, 7581, 35379, 0, 0, 13, 0, 4, 3, 2, 0, 0, 0, '', 'Show gossip option if Azgalor is defeated'),
+
+-- Tyrande Options
+(15, 7706, 34158, 0, 0, 13, 0, 4, 3, 2, 0, 0, 0, '', 'Show gossip option if Azgalor is defeated'),
+(15, 7706, 34158, 0, 0, 13, 0, 5, 3, 2, 1, 0, 0, '', 'Show gossip option if Archimonde is not defeated');
