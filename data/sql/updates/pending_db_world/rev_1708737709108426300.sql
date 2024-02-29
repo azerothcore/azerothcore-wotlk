@@ -550,6 +550,16 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (534, 2, 42, 17895 , 5365.245, -3274.99, 1620.959, 5.226511, 7, 0, 'Night Elf Wave'),
 (534, 2, 42, 17898 , 5361.223, -3266.657, 1619.216, 5.216855, 7, 0, 'Night Elf Wave');
 
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 17852 AND `summonerType` = 0;
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
+(17852, 0, 0, 17920, 5489.70947265625, -2781.63037109375, 1497.728271484375, 1.326450228691101074, 3, 21000, 'Horde Retreat'),
+(17852, 0, 0, 17920, 5480.392578125, -2778.908447265625, 1497.069091796875, 1.047197580337524414, 3, 21000, 'Horde Retreat'),
+(17852, 0, 0, 17772, 5486.3046875, -2777.719970703125, 1496.6873779296875, 1.082104086875915527, 3, 21000, 'Horde Retreat');
+
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_jaina' WHERE (`entry` = 17772);
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_thrall' WHERE (`entry` = 17852);
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_tyrande' WHERE (`entry` = 17948);
+
 DELETE FROM `npc_text` WHERE `ID` IN (9224, 9409, 9415, 9169, 9228, 9381, 9397, 10675);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`) VALUES
 (9224, 'Stranger, make haste and contact Lady Jaina Proudmoore. Her small Alliance force is bravely attempting to blunt the Burning Legion\'s initial assault and delay the approach of Archimonde.', NULL, 14867),

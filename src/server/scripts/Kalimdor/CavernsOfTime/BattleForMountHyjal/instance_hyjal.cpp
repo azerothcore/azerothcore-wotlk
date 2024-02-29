@@ -272,7 +272,7 @@ public:
                             if (instance->GetCreature(guid));
                             {
                                 float x, y, z;
-                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, instance->GetCreature(guid)->GetAngle(jaina));
+                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
                                 instance->GetCreature(guid)->SetWalk(true);
                                 instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
                             }
@@ -280,7 +280,7 @@ public:
                     }
 
                     // Despawn all alliance NPCs
-                    _scheduler.Schedule(11000ms, [this](TaskContext)
+                    _scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
                                 instance->GetCreature(guid)->DespawnOrUnsummon();
@@ -303,7 +303,7 @@ public:
                     for (ObjectGuid const& guid : _ancientGemHorde)
                         instance->GetGameObject(guid)->Respawn();
 
-                    _scheduler.Schedule(11000ms, [this](TaskContext)
+                    _scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)
                                 instance->GetCreature(guid)->DespawnOrUnsummon();

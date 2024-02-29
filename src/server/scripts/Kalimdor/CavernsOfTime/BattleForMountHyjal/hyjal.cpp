@@ -24,19 +24,22 @@
 enum Spells
 {
     // Jaina
-    SPELL_MASS_TELEPORT     = 16807,
-    SPELL_BRILLIANCE_AURA   = 31260,
-    SPELL_BLIZZARD          = 31266,
-    SPELL_PYROBLAST         = 31263,
-    SPELL_SUMMON_ELEMENTALS = 31264,
-
-    // Thrall spells
-    SPELL_CHAIN_LIGHTNING   = 31330,
-    SPELL_FERAL_SPIRIT      = 31331,
-
-    // Tyrande spells
-    SPELL_STARFALL          = 20687,
-    SPELL_TRUESHOT_AURA     = 31519
+    SPELL_MASS_TELEPORT               = 16807,
+    SPELL_SIMPLE_TELEPORT             = 12980,
+    SPELL_SALVATION                   = 31745,
+    SPELL_BRILLIANCE_AURA             = 31260,
+    SPELL_BLIZZARD                    = 31266,
+    SPELL_PYROBLAST                   = 31263,
+    SPELL_SUMMON_ELEMENTALS           = 31264,
+                                      
+    // Thrall spells                  
+    SPELL_CHAIN_LIGHTNING             = 31330,
+    SPELL_FERAL_SPIRIT                = 31331,
+                                      
+    // Tyrande spells                 
+    SPELL_STARFALL                    = 20687,
+    SPELL_TRUESHOT_AURA               = 31519,
+    SPELL_SUMMON_TEARS_OF_THE_GODDESS = 39118
 };
 
 enum Talk
@@ -50,10 +53,10 @@ enum Talk
     SAY_DEATH    = 6
 };
 
-class npc_lady_jaina_proudmoore : public CreatureScript
+class npc_hyjal_jaina : public CreatureScript
 {
 public:
-    npc_lady_jaina_proudmoore() : CreatureScript("npc_lady_jaina_proudmoore") { }
+    npc_hyjal_jaina() : CreatureScript("npc_hyjal_jaina") { }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -91,6 +94,21 @@ public:
                         });
         }
 
+        void JustSummoned(Creature* /*creature*/) override
+        {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
+            DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
+            DoCastSelf(SPELL_SALVATION, true);
+
+            scheduler.Schedule(2400ms, [this](TaskContext context)
+                {
+                    me->SetFacingTo(1.082104f);
+                    DoCastSelf(SPELL_MASS_TELEPORT);
+                    if (InstanceScript* hyjal = me->GetInstanceScript())
+                        hyjal->SetData(DATA_HORDE_RETREAT, 0);
+                });
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
@@ -110,6 +128,7 @@ public:
             if (!UpdateVictim())
                 return;
 
+            DoMeleeAttackIfReady();
             scheduler.Update(diff);
         }
     };
@@ -127,7 +146,7 @@ public:
             }
             else
             {
-                creature->Say(SAY_SUCCESS);
+                creature->AI()->Talk(SAY_SUCCESS);
                 creature->GetMotionMaster()->MovePath(JAINA_RETREAT_PATH, false);
             }
         }
@@ -136,8 +155,143 @@ public:
 
 };
 
+class npc_hyjal_thrall : public CreatureScript
+{
+public:
+    npc_hyjal_thrall() : CreatureScript("npc_hyjal_thrall") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new hyjalThrallAI(creature);
+    }
+    struct hyjalThrallAI : public ScriptedAI
+    {
+        hyjalThrallAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            scheduler.CancelAll();
+            if (InstanceScript* hyjal = me->GetInstanceScript())
+                if (!hyjal->GetData(DATA_WAVE_STATUS))
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            Talk(SAY_ATTACKED);
+
+            scheduler.Schedule(13s, 19s, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        DoCast(target, SPELL_CHAIN_LIGHTNING);
+                    context.Repeat();
+                }).Schedule(15s, 45s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_FERAL_SPIRIT);
+                        context.Repeat();
+                    });
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            if (InstanceScript* hyjal = me->GetInstanceScript())
+                hyjal->SetData(DATA_RESET_HORDE, 0);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+            scheduler.Update(diff);
+        }
+    };
+
+    bool OnGossipSelect(Player* /*player*/, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+        if (InstanceScript* hyjal = creature->GetInstanceScript())
+        {
+            if (hyjal->GetBossState(DATA_KAZROGAL) != DONE || hyjal->GetBossState(DATA_AZGALOR) != DONE)
+            {
+                hyjal->SetData(DATA_RESET_WAVES, 0);
+                hyjal->SetData(DATA_SPAWN_WAVES, 0);
+            }
+            else
+            {
+                creature->AI()->Talk(SAY_SUCCESS);
+                creature->SummonCreatureGroup(0);
+            }
+        }
+        return true;
+    }
+
+};
+
+class npc_hyjal_tyrande : public CreatureScript
+{
+public:
+    npc_hyjal_tyrande() : CreatureScript("npc_hyjal_tyrande") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new hyjalTyrandeAI(creature);
+    }
+    struct hyjalTyrandeAI : public ScriptedAI
+    {
+        hyjalTyrandeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            scheduler.CancelAll();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            Talk(SAY_ATTACKED);
+
+            scheduler.Schedule(60s, 70s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_STARFALL);
+                    context.Repeat();
+                }).Schedule(4s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_TRUESHOT_AURA);
+                        context.Repeat();
+                    });
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            if (InstanceScript* hyjal = me->GetInstanceScript())
+                hyjal->SetData(DATA_RESET_NIGHT_ELF, 0);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+            scheduler.Update(diff);
+        }
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        creature->AI()->DoCast(player, SPELL_SUMMON_TEARS_OF_THE_GODDESS, true);
+        return true;
+    }
+
+};
 
 void AddSC_hyjal()
 {
-    new npc_lady_jaina_proudmoore();
+    new npc_hyjal_jaina();
+    new npc_hyjal_thrall();
+    new npc_hyjal_tyrande();
 }
