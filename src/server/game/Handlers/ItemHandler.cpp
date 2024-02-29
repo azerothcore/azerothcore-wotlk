@@ -205,7 +205,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
 
     BAG_RESULT msg = m_player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         // Restore enchantments
         if (pDstItem)
@@ -232,7 +232,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         uint8 dstslot = pDstItem->GetSlot();
 
         msg = m_player->CanUnequipItem(dest, !pSrcItem->IsBag());
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
         {
             m_player->SendEquipError(msg, pDstItem, nullptr);
             return;
@@ -244,27 +244,27 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         if (m_player->IsInventoryPos(src))
         {
             msg = m_player->CanStoreItem(srcbag, srcslot, sSrc, pDstItem, true);
-            if (msg != EQUIP_ERR_OK)
+            if (msg != BAG_OK)
                 msg = m_player->CanStoreItem(srcbag, NULL_SLOT, sSrc, pDstItem, true);
-            if (msg != EQUIP_ERR_OK)
+            if (msg != BAG_OK)
                 msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, sSrc, pDstItem, true);
         }
         else if (m_player->IsBankPos(src))
         {
             msg = m_player->CanBankItem(srcbag, srcslot, sSrc, pDstItem, true);
-            if (msg != EQUIP_ERR_OK)
+            if (msg != BAG_OK)
                 msg = m_player->CanBankItem(srcbag, NULL_SLOT, sSrc, pDstItem, true);
-            if (msg != EQUIP_ERR_OK)
+            if (msg != BAG_OK)
                 msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, sSrc, pDstItem, true);
         }
         else if (m_player->IsEquipmentPos(src))
         {
             msg = m_player->CanEquipItem(srcslot, eSrc, pDstItem, true);
-            if (msg == EQUIP_ERR_OK)
+            if (msg == BAG_OK)
                 msg = m_player->CanUnequipItem(eSrc, true);
         }
 
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
         {
             m_player->SendEquipError(msg, pDstItem, pSrcItem);
             return;
@@ -305,7 +305,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
     if (m_player->IsEquipmentPos(pos) || m_player->IsBagPos(pos))
     {
         BAG_RESULT msg = m_player->CanUnequipItem(pos, false);
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
         {
             m_player->SendEquipError(msg, m_player->GetItemByPos(pos), nullptr);
             return;
@@ -707,7 +707,7 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
         WorldPacket data;
 
         BAG_RESULT msg = m_player->CanUseItem(pItem);
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
         {
             data.Initialize (SMSG_READ_ITEM_OK, 8);
             LOG_DEBUG("network.opcode", "STORAGE: Item page sent");
@@ -936,7 +936,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 
         ItemPosCountVec dest;
         BAG_RESULT msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
         {
             if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
             {
@@ -1164,7 +1164,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
     if (m_player->IsEquipmentPos (src) || m_player->IsBagPos (src))
     {
         BAG_RESULT msg = m_player->CanUnequipItem(src, !m_player->IsBagPos (src));
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
         {
             m_player->SendEquipError(msg, pItem, nullptr);
             return;
@@ -1173,7 +1173,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
 
     ItemPosCountVec dest;
     BAG_RESULT msg = m_player->CanStoreItem(dstbag, NULL_SLOT, dest, pItem, false);
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         m_player->SendEquipError(msg, pItem, nullptr);
         return;

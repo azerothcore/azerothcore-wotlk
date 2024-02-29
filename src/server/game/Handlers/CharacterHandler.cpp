@@ -1840,7 +1840,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             if (uItem->IsEquipped())
             {
                 msg = m_player->CanUnequipItem(dstpos, true);
-                if (msg != EQUIP_ERR_OK)
+                if (msg != BAG_OK)
                 {
                     m_player->SendEquipError(msg, uItem, nullptr);
                     continue;
@@ -1851,7 +1851,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             {
                 ItemPosCountVec sDest;
                 msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
-                if (msg == EQUIP_ERR_OK)
+                if (msg == BAG_OK)
                 {
                     savedItems.emplace_back(std::make_unique<SavedItem>(uItem, dstpos));
                     m_player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
@@ -1880,7 +1880,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             {
                 uint16 _candidatePos;
                 msg = m_player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
-                if (msg != EQUIP_ERR_OK)
+                if (msg != BAG_OK)
                 {
                     m_player->SendEquipError(msg, item, nullptr);
                     continue;

@@ -109,7 +109,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     BAG_RESULT msg = pUser->CanUseItem(pItem);
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         pUser->SendEquipError(msg, pItem, nullptr);
         return;

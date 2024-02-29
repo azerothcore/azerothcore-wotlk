@@ -101,7 +101,7 @@ public:
     {
         ItemPosCountVec dest;
         uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 39883, 1); // Cracked Egg
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
             player->StoreNewItem(dest, 39883, true);
 
         return true;
@@ -121,7 +121,7 @@ public:
     {
         ItemPosCountVec dest;
         uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 44718, 1); // Ripe Disgusting Jar
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
             player->StoreNewItem(dest, 44718, true);
 
         return true;

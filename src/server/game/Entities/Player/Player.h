@@ -1524,7 +1524,7 @@ public:
 
     void SendQuestComplete(uint32 quest_id);
     void SendQuestReward(Quest const* quest, uint32 XP);
-    void SendQuestFailed(uint32 questId, BAG_RESULT reason = EQUIP_ERR_OK);
+    void SendQuestFailed(uint32 questId, BAG_RESULT reason = BAG_OK);
     void SendQuestTimerFailed(uint32 quest_id);
     void SendCanTakeQuestResponse(uint32 msg) const;
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);

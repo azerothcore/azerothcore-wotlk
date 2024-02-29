@@ -7377,7 +7377,7 @@ SpellCastResult Spell::CheckItems()
                         uint32 createCount = std::clamp<uint32>(m_spellInfo->Effects[i].CalcValue(), 1u, itemTemplate->GetMaxStackSize());
                         ItemPosCountVec dest;
                         BAG_RESULT msg = target->ToPlayer()->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, createCount);
-                        if (msg != EQUIP_ERR_OK)
+                        if (msg != BAG_OK)
                         {
                             /// @todo Needs review
                             if (!itemTemplate->ItemLimitCategory)
@@ -7426,7 +7426,7 @@ SpellCastResult Spell::CheckItems()
                         return SPELL_FAILED_TOTEM_CATEGORY;
                     ItemPosCountVec dest;
                     BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, 1);
-                    if (msg != EQUIP_ERR_OK)
+                    if (msg != BAG_OK)
                     {
                         player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                         return SPELL_FAILED_DONT_REPORT;

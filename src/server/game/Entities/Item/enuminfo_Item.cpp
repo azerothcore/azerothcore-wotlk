@@ -31,7 +31,7 @@ AC_API_EXPORT EnumText EnumUtils<BAG_RESULT>::ToString(BAG_RESULT value)
 {
     switch (value)
     {
-        case EQUIP_ERR_OK: return { "EQUIP_ERR_OK", "EQUIP_ERR_OK", "" };
+        case BAG_OK: return { "BAG_OK", "BAG_OK", "" };
         case EQUIP_ERR_CANT_EQUIP_LEVEL_I: return { "EQUIP_ERR_CANT_EQUIP_LEVEL_I", "EQUIP_ERR_CANT_EQUIP_LEVEL_I", "" };
         case EQUIP_ERR_CANT_EQUIP_SKILL: return { "EQUIP_ERR_CANT_EQUIP_SKILL", "EQUIP_ERR_CANT_EQUIP_SKILL", "" };
         case EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT: return { "EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT", "EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT", "" };
@@ -131,7 +131,7 @@ AC_API_EXPORT BAG_RESULT EnumUtils<BAG_RESULT>::FromIndex(std::size_t index)
 {
     switch (index)
     {
-        case 0: return EQUIP_ERR_OK;
+        case 0: return BAG_OK;
         case 1: return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
         case 2: return EQUIP_ERR_CANT_EQUIP_SKILL;
         case 3: return EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT;
@@ -228,7 +228,7 @@ AC_API_EXPORT std::size_t EnumUtils<BAG_RESULT>::ToIndex(BAG_RESULT value)
 {
     switch (value)
     {
-        case EQUIP_ERR_OK: return 0;
+        case BAG_OK: return 0;
         case EQUIP_ERR_CANT_EQUIP_LEVEL_I: return 1;
         case EQUIP_ERR_CANT_EQUIP_SKILL: return 2;
         case EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT: return 3;

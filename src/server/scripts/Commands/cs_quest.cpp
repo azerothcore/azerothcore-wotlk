@@ -259,7 +259,7 @@ public:
 
                 ItemPosCountVec dest;
                 uint8           msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
-                if (msg == EQUIP_ERR_OK)
+                if (msg == BAG_OK)
                 {
                     Item* item = player->StoreNewItem(dest, id, true);
                     player->SendItemPush(item, count - curItemCount, true, false);

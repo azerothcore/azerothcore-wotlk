@@ -140,8 +140,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
     {
         ItemPosCountVec traderDst;
         ItemPosCountVec playerDst;
-        bool traderCanTrade = (!myItems[i] || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
-        bool playerCanTrade = (!hisItems[i] || m_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
+        bool traderCanTrade = (!myItems[i] || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == BAG_OK);
+        bool playerCanTrade = (!hisItems[i] || m_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == BAG_OK);
         if (traderCanTrade && playerCanTrade)
         {
             // Ok, if trade item exists and can be stored
@@ -178,7 +178,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 if (!traderCanTrade)
                     LOG_ERROR("network.opcode", "trader can't store item: {}", myItems[i]->GetGUID().ToString());
-                if (m_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
+                if (m_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == BAG_OK)
                     m_player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
                     LOG_ERROR("network.opcode", "player can't take item back: {}", myItems[i]->GetGUID().ToString());
@@ -188,7 +188,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 if (!playerCanTrade)
                     LOG_ERROR("network.opcode", "player can't store item: {}", hisItems[i]->GetGUID().ToString());
-                if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
+                if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == BAG_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
                     LOG_ERROR("network.opcode", "trader can't take item back: {}", hisItems[i]->GetGUID().ToString());
@@ -412,8 +412,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
 
         // test if item will fit in each inventory
-        hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
-        myCanCompleteTrade = (m_player->CanStoreItems(hisItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
+        hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == BAG_OK);
+        myCanCompleteTrade = (m_player->CanStoreItems(hisItems, TRADE_SLOT_TRADED_COUNT) == BAG_OK);
 
         clearAcceptTradeMode(myItems, hisItems);
 

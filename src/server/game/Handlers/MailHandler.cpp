@@ -524,7 +524,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
     ItemPosCountVec dest;
     uint8 msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
-    if (msg == EQUIP_ERR_OK)
+    if (msg == BAG_OK)
     {
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         m->RemoveItem(itemLowGuid);
@@ -803,7 +803,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
 
     ItemPosCountVec dest;
     uint8 msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);
-    if (msg == EQUIP_ERR_OK)
+    if (msg == BAG_OK)
     {
         m->checked = m->checked | MAIL_CHECK_MASK_COPIED;
         m->state = MAIL_STATE_CHANGED;

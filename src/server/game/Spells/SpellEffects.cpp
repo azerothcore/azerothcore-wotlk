@@ -1720,7 +1720,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     ItemPosCountVec dest;
     uint32 no_space = 0;
     BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, addNumber, &no_space);
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         // convert to possible store amount
         if (msg == EQUIP_ERR_INVENTORY_FULL || msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
@@ -2221,7 +2221,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     {
         ItemPosCountVec dest;
         BAG_RESULT msg = player->CanStoreItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
         {
             player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
 
@@ -2241,7 +2241,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     {
         ItemPosCountVec dest;
         uint8 msg = player->CanBankItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
-        if (msg == EQUIP_ERR_OK)
+        if (msg == BAG_OK)
         {
             player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
 
@@ -2264,7 +2264,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
 
         uint8 msg = player->CanEquipItem(m_CastItem->GetSlot(), dest, pNewItem, true);
 
-        if (msg == EQUIP_ERR_OK || msg == EQUIP_ERR_CANT_DO_RIGHT_NOW)
+        if (msg == BAG_OK || msg == EQUIP_ERR_CANT_DO_RIGHT_NOW)
         {
             if (msg == EQUIP_ERR_CANT_DO_RIGHT_NOW) dest = EQUIPMENT_SLOT_MAINHAND;
 

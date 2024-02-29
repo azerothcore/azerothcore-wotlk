@@ -657,7 +657,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
             uint16 eDest;
             // equip offhand weapon/shield if it attempt equipped before main-hand weapon
             BAG_RESULT msg = CanEquipItem(NULL_SLOT, eDest, pItem, false);
-            if (msg == EQUIP_ERR_OK)
+            if (msg == BAG_OK)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                 EquipItem(eDest, pItem, true);
@@ -667,7 +667,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
             {
                 ItemPosCountVec sDest;
                 msg = CanStoreItem(NULL_BAG, NULL_SLOT, sDest, pItem, false);
-                if (msg == EQUIP_ERR_OK)
+                if (msg == BAG_OK)
                 {
                     RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                     pItem = StoreItem(sDest, pItem, true);
@@ -675,7 +675,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
 
                 // if  this is ammo then use it
                 msg = CanUseAmmo(pItem->GetEntry());
-                if (msg == EQUIP_ERR_OK)
+                if (msg == BAG_OK)
                     SetAmmo(pItem->GetEntry());
             }
         }
@@ -700,7 +700,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     {
         uint16 eDest;
         BAG_RESULT msg = CanEquipNewItem(NULL_SLOT, eDest, titem_id, false);
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
             break;
 
         EquipNewItem(eDest, titem_id, true);
@@ -715,7 +715,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     ItemPosCountVec sDest;
     // store in main bag to simplify second pass (special bags can be not equipped yet at this moment)
     BAG_RESULT msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
-    if (msg == EQUIP_ERR_OK)
+    if (msg == BAG_OK)
     {
         StoreNewItem(sDest, titem_id, true);
         return true;                                        // stored
@@ -8148,7 +8148,7 @@ BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
     uint32 excessItems = 0;
     ItemPosCountVec dest;
     BAG_RESULT result = CanStoreNewItem(bag, slot, dest, itemId, quantity, &excessItems);
-    if (result != EQUIP_ERR_OK) {
+    if (result != BAG_OK) {
         quantity -= excessItems;
     }
     Item* item = StoreNewItem(dest, itemId, true);
@@ -9063,7 +9063,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                 {
                     ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
                     BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i]);
-                    if (msg == EQUIP_ERR_OK)
+                    if (msg == BAG_OK)
                     {
                         Item* item = StoreNewItem(dest, spellInfo->Reagent[i], true);
                         if (IsInWorld())
@@ -10622,7 +10622,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     BAG_RESULT msg = bStore ?
                           CanStoreNewItem(bag, slot, vDest, item, pProto->BuyCount * count) :
                           CanEquipNewItem(slot, uiDest, item, false);
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         SendEquipError(msg, nullptr, nullptr, item);
         return false;
@@ -12454,7 +12454,7 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
 
     ItemPosCountVec off_dest;
     uint8 off_msg = CanStoreItem(NULL_BAG, NULL_SLOT, off_dest, offItem, false);
-    if (off_msg == EQUIP_ERR_OK)
+    if (off_msg == BAG_OK)
     {
         RemoveItem(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
         StoreItem(off_dest, offItem, true);
@@ -13465,11 +13465,11 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
 
         ItemPosCountVec dest;
         BAG_RESULT msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);
-        if (msg != EQUIP_ERR_OK && slot != NULL_SLOT)
+        if (msg != BAG_OK && slot != NULL_SLOT)
             msg = CanStoreNewItem(bag, NULL_SLOT, dest, lootItem->itemid, lootItem->count);
-        if (msg != EQUIP_ERR_OK && bag != NULL_BAG)
+        if (msg != BAG_OK && bag != NULL_BAG)
             msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, lootItem->itemid, lootItem->count);
-        if (msg != EQUIP_ERR_OK)
+        if (msg != BAG_OK)
         {
             SendEquipError(msg, nullptr, nullptr, lootItem->itemid);
             continue;
@@ -13486,7 +13486,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg)
     QuestItem* ffaitem = nullptr;
     QuestItem* conditem = nullptr;
 
-    msg = EQUIP_ERR_OK;
+    msg = BAG_OK;
 
     LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
     if (!item || item->is_looted)
@@ -13529,7 +13529,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg)
 
     ItemPosCountVec dest;
     msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
-    if (msg == EQUIP_ERR_OK)
+    if (msg == BAG_OK)
     {
         AllowedLooterSet looters = item->GetAllowedLooters();
         Item* newitem = StoreNewItem(dest, item->itemid, true, item->randomPropertyId, looters);
@@ -13778,7 +13778,7 @@ BAG_RESULT Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_cou
             return res;
     }
 
-    return EQUIP_ERR_OK;
+    return BAG_OK;
 }
 
 BAG_RESULT Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
@@ -13808,7 +13808,7 @@ BAG_RESULT Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 excep
             return EQUIP_ERR_ITEM_MAX_COUNT_EQUIPPED_SOCKETED;
     }
 
-    return EQUIP_ERR_OK;
+    return BAG_OK;
 }
 
 void Player::HandleFall(MovementInfo const& movementInfo)
@@ -15531,7 +15531,7 @@ bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
     if (!quantity || !itemId) {
         return false;
     }
-    return StoreItemInBag(itemId,quantity) == EQUIP_ERR_OK;
+    return StoreItemInBag(itemId,quantity) == BAG_OK;
 }
 
 PetStable& Player::GetOrInitPetStable()
@@ -15584,7 +15584,7 @@ void Player::RefundItem(Item* item)
         {
             ItemPosCountVec dest;
             BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
-            if (msg != EQUIP_ERR_OK)
+            if (msg != BAG_OK)
             {
                 store_error = true;
                 break;
@@ -15634,7 +15634,7 @@ void Player::RefundItem(Item* item)
         {
             ItemPosCountVec dest;
             BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
-            ASSERT(msg == EQUIP_ERR_OK); /// Already checked before
+            ASSERT(msg == BAG_OK); /// Already checked before
             Item* it = StoreNewItem(dest, itemid, true);
             SendItemPush(it, count, true, false, true);
         }

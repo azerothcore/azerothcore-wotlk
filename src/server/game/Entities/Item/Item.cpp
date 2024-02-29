@@ -802,7 +802,7 @@ bool Item::CanBeTraded(bool mail, bool trade) const
 
     if (Player* owner = GetOwner())
     {
-        if (owner->CanUnequipItem(GetPos(), false) != EQUIP_ERR_OK)
+        if (owner->CanUnequipItem(GetPos(), false) != BAG_OK)
             return false;
 
         // Xinef: check if item is looted now
@@ -879,7 +879,7 @@ BAG_RESULT Item::CanBeMergedPartlyWith(ItemTemplate const* proto) const
     if (GetCount() >= proto->GetMaxStackSize())
         return EQUIP_ERR_ITEM_CANT_STACK;
 
-    return EQUIP_ERR_OK;
+    return BAG_OK;
 }
 
 bool Item::IsFitToSpellRequirements(SpellInfo const* spellInfo) const

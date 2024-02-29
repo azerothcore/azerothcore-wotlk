@@ -725,9 +725,9 @@ bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
 {
     m_vec.clear();
     BAG_RESULT msg = CanStore(pItem, swap);
-    if (sendError && msg != EQUIP_ERR_OK)
+    if (sendError && msg != BAG_OK)
         m_pPlayer->SendEquipError(msg, pItem);
-    return (msg == EQUIP_ERR_OK);
+    return (msg == BAG_OK);
 }
 
 bool Guild::MoveItemData::CloneItem(uint32 count)
@@ -1010,7 +1010,7 @@ BAG_RESULT Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
             return EQUIP_ERR_ITEM_CANT_STACK;
 
         if (count == 0)
-            return EQUIP_ERR_OK;
+            return BAG_OK;
     }
 
     // Slot was not specified or it has not enough space for all the items in stack
@@ -1019,13 +1019,13 @@ BAG_RESULT Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
     {
         CanStoreItemInTab(pItem, m_slotId, true, count);
         if (count == 0)
-            return EQUIP_ERR_OK;
+            return BAG_OK;
     }
 
     // Search free slot for item
     CanStoreItemInTab(pItem, m_slotId, false, count);
     if (count == 0)
-        return EQUIP_ERR_OK;
+        return BAG_OK;
 
     return EQUIP_ERR_BANK_FULL;
 }

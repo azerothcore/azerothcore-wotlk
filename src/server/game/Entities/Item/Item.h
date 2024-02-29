@@ -37,7 +37,7 @@ struct ItemSetEffect
 
 enum BAG_RESULT : uint8
 {
-    EQUIP_ERR_OK                                 = 0,
+    BAG_OK  = 0,
     EQUIP_ERR_CANT_EQUIP_LEVEL_I                 = 1,
     EQUIP_ERR_CANT_EQUIP_SKILL                   = 2,
     EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT             = 3,

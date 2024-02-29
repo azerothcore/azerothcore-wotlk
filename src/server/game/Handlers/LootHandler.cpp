@@ -97,7 +97,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
     BAG_RESULT msg;
     LootItem* lootItem = player->StoreLootItem(lootSlot, loot, msg);
-    if (msg != EQUIP_ERR_OK && lguid.IsItem() && loot->loot_type != LOOT_CORPSE)
+    if (msg != BAG_OK && lguid.IsItem() && loot->loot_type != LOOT_CORPSE)
     {
         lootItem->is_looted = true;
         loot->NotifyItemRemoved(lootItem->itemIndex);
@@ -487,7 +487,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     BAG_RESULT msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);
     if (!item.AllowedForPlayer(target, loot->sourceWorldObjectGUID))
         msg = EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
-    if (msg != EQUIP_ERR_OK)
+    if (msg != BAG_OK)
     {
         if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
             m_player->SendLootError(lootguid, LOOT_ERROR_MASTER_UNIQUE_ITEM);
