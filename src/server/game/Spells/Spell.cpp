@@ -4699,7 +4699,7 @@ void Spell::SendSpellStart()
 
     uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
 
-    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !(m_spellInfo->IsChanneled() || m_spellInfo->CastTimeEntry->CastTime > 0))
+    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !(m_spellInfo->IsChanneled() || (m_spellInfo->CastTimeEntry && m_spellInfo->CastTimeEntry->CastTime > 0)))
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
@@ -4781,7 +4781,7 @@ void Spell::SendSpellGo()
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
     // triggered spells with spell visual != 0
-    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !(m_spellInfo->IsChanneled() || m_spellInfo->CastTimeEntry->CastTime > 0))
+    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !(m_spellInfo->IsChanneled() || (m_spellInfo->CastTimeEntry && m_spellInfo->CastTimeEntry->CastTime > 0)))
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
@@ -4807,7 +4807,7 @@ void Spell::SendSpellGo()
     }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
-            && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
+            && (m_caster->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
             && m_spellInfo->RuneCostID
             && m_spellInfo->PowerType == POWER_RUNE)
     {
@@ -5396,7 +5396,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
         return SPELL_CAST_OK;
     }
 
-    if (player->getClass() != CLASS_DEATH_KNIGHT)
+    if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
         return SPELL_CAST_OK;
 
     SpellRuneCostEntry const* src = sSpellRuneCostStore.LookupEntry(RuneCostID);
@@ -5437,7 +5437,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
 
 void Spell::TakeRunePower(bool didHit)
 {
-    if (m_caster->GetTypeId() != TYPEID_PLAYER || m_caster->getClass() != CLASS_DEATH_KNIGHT)
+    if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_caster->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
         return;
 
     SpellRuneCostEntry const* runeCostData = sSpellRuneCostStore.LookupEntry(m_spellInfo->RuneCostID);
@@ -6173,7 +6173,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // Can be area effect, Check only for players and not check if target - caster (spell can have multiply drain/burn effects)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         if (Unit* target = m_targets.GetUnitTarget())
-                            if (target != m_caster && target->getPowerType() != Powers(m_spellInfo->Effects[i].MiscValue))
+                            if (target != m_caster && !target->HasActivePowerType(Powers(m_spellInfo->Effects[i].MiscValue)))
                                 return SPELL_FAILED_BAD_TARGETS;
                     break;
                 }
@@ -6408,7 +6408,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_ALREADY_HAVE_CHARM;
                     }
 
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && strict)
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET) && strict)
                         if (Pet* pet = m_caster->ToPlayer()->GetPet())
                             pet->CastSpell(pet, 32752, true, nullptr, nullptr, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
 
@@ -6702,7 +6702,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!m_targets.GetUnitTarget())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                    if (m_targets.GetUnitTarget()->getPowerType() != POWER_MANA)
+                    if (!m_targets.GetUnitTarget()->HasActivePowerType(POWER_MANA))
                         return SPELL_FAILED_BAD_TARGETS;
 
                     break;

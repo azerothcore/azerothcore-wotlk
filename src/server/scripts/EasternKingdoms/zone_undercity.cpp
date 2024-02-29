@@ -2168,7 +2168,7 @@ public:
     {
         boss_blight_wormAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void Reset() override
