@@ -2220,6 +2220,12 @@ public:
     void SendNotifyLootItemRemoved(uint8 lootSlot);
     void SendNotifyLootMoneyRemoved();
 
+    BAG_RESULT StoreItemInBag(uint32_t  itemId,
+                              uint32_t  quantity,
+                              uint8_t   bag = NULL_BAG,
+                              uint8_t   slot = NULL_SLOT);
+
+
     /*********************************************************/
     /***               BATTLEGROUND SYSTEM                 ***/
     /*********************************************************/

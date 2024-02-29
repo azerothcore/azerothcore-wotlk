@@ -8138,6 +8138,27 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
     GetSession()->SendPacket(&data);
 }
 
+//===========================================================================
+BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
+                                  uint32_t  quantity,
+                                  uint8_t   bag /* = NULL_BAG*/,
+                                  uint8_t   slot/* = NULL_SLOT*/)
+{
+    // TODO: Clean this mess up eventually...
+    uint32 excessItems = 0;
+    ItemPosCountVec dest;
+    BAG_RESULT result = CanStoreNewItem(bag, slot, dest, itemId, quantity, &excessItems);
+    if (result != EQUIP_ERR_OK) {
+        quantity -= excessItems;
+    }
+    Item* item = StoreNewItem(dest, itemId, true);
+    if (item) {
+        SendItemPush(item, quantity, true, false);
+    }
+    return result;
+}
+
+
 void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 {
     // data depends on zoneid/mapid...
