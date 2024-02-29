@@ -222,6 +222,8 @@ public:
             }
 
             me->CastSpell(me, SPELL_EMPYREAL_BALANCE, true);
+            if (!UpdateVictim())
+                return;
         }
     };
 };
@@ -330,7 +332,7 @@ public:
             {
                 case EVENT_SPELL_BLESSING:
                     if (Unit* member = SelectCouncilMember())
-                        me->CastSpell(member, RAND(SPELL_BLESSING_OF_SPELL_WARDING, SPELL_BLESSING_OF_PROTECTION), false);
+                        me->CastSpell(member, SPELL_BLESSING_OF_PROTECTION, false);
                     events.ScheduleEvent(EVENT_SPELL_BLESSING, 15000);
                     break;
                 case EVENT_SPELL_AURA:
@@ -341,7 +343,7 @@ public:
                     if (roll_chance_i(50))
                         Talk(SAY_COUNCIL_SPECIAL);
                     me->CastSpell(me, SPELL_CONSECRATION, false);
-                    events.ScheduleEvent(EVENT_SPELL_AURA, 30000);
+                    events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 30000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, HammerOfJusticeSelector(me)))
@@ -410,7 +412,7 @@ public:
             {
                 case EVENT_SPELL_DAMPEN_MAGIC:
                     me->CastSpell(me, SPELL_DAMPEN_MAGIC, false);
-                    events.ScheduleEvent(EVENT_SPELL_DAMPEN_MAGIC, 120000);
+                    events.ScheduleEvent(EVENT_SPELL_DAMPEN_MAGIC, 110000);
                     break;
                 case EVENT_SPELL_ARCANE_BOLT:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BOLT, false);
