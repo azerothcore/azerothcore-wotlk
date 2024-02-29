@@ -331,21 +331,19 @@ public:
             if (t_list.empty())
                 return;
 
-            ThreatContainer::StorageType::const_iterator itr = t_list.begin();
+            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                    if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        spellEffectTargets.push_back(target);
+                        target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
 
-            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                    spellEffectTargets.push_back(target);
-
-            for (auto iter = spellEffectTargets.begin(); iter != spellEffectTargets.end(); ++iter)
-                if (Unit* target = *iter)
-                {
-                    target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
-
-                    // Immunity against Hand of death
-                    target->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-                    target->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-                }
+                        // Immunity against Hand of death
+                        target->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+                        target->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+                    }
+            }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
