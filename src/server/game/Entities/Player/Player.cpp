@@ -15532,7 +15532,17 @@ bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
     if (!quantity || !itemId) {
         return false;
     }
+<<<<<<< HEAD
     return StoreItemInBag(itemId,quantity) == BAG_OK;
+=======
+
+    Item* item = StoreNewItem(dest, itemId, true);
+    if (item)
+        SendItemPush(item, count, true, false);
+    else
+        return false;
+    return true;
+>>>>>>> f3d30171e (style(Player): rename SendNewItem to SendItemPush)
 }
 
 PetStable& Player::GetOrInitPetStable()

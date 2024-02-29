@@ -285,7 +285,17 @@ public:
 
         void Reset() override
         {
+<<<<<<< HEAD
             scheduler.CancelAll();
+=======
+            ItemPosCountVec dest;
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
+            if (msg == EQUIP_ERR_OK)
+                if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
+                    player->SendItemPush(item, 1, true, false, true);
+
+            SendGossipMenuFor(player, 907, creature->GetGUID());
+>>>>>>> f3d30171e (style(Player): rename SendNewItem to SendItemPush)
         }
 
         void JustEngagedWith(Unit* /*who*/) override
