@@ -96,13 +96,13 @@ public:
 
         void JustSummoned(Creature* /*creature*/) override
         {
-            me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
+            // me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
             DoCastSelf(SPELL_SALVATION, true);
 
             scheduler.Schedule(2400ms, [this](TaskContext context)
                 {
-                    me->SetFacingTo(1.082104f);
+                    // me->SetFacingTo(1.082104f);
                     DoCastSelf(SPELL_MASS_TELEPORT);
                     if (InstanceScript* hyjal = me->GetInstanceScript())
                         hyjal->SetData(DATA_HORDE_RETREAT, 0);
@@ -283,6 +283,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
+        CloseGossipMenuFor(player);
         creature->AI()->DoCast(player, SPELL_SUMMON_TEARS_OF_THE_GODDESS, true);
         return true;
     }
