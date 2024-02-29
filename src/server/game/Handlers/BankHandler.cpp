@@ -77,7 +77,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& pa
         return;
 
     ItemPosCountVec dest;
-    InventoryResult msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
+    BAG_RESULT msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
     if (msg != EQUIP_ERR_OK)
     {
         m_player->SendEquipError(msg, item, nullptr);
@@ -113,7 +113,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
     if (m_player->IsBankPos(packet.Bag, packet.Slot))                    // moving from bank to inventory
     {
         ItemPosCountVec dest;
-        InventoryResult msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item, false);
+        BAG_RESULT msg = m_player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item, false);
         if (msg != EQUIP_ERR_OK)
         {
             m_player->SendEquipError(msg, item, nullptr);
@@ -127,7 +127,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
     else                                                    // moving from inventory to bank
     {
         ItemPosCountVec dest;
-        InventoryResult msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
+        BAG_RESULT msg = m_player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
         if (msg != EQUIP_ERR_OK)
         {
             m_player->SendEquipError(msg, item, nullptr);

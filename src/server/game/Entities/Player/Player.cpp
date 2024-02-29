@@ -656,7 +656,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
         {
             uint16 eDest;
             // equip offhand weapon/shield if it attempt equipped before main-hand weapon
-            InventoryResult msg = CanEquipItem(NULL_SLOT, eDest, pItem, false);
+            BAG_RESULT msg = CanEquipItem(NULL_SLOT, eDest, pItem, false);
             if (msg == EQUIP_ERR_OK)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
@@ -699,7 +699,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     while (titem_amount > 0)
     {
         uint16 eDest;
-        InventoryResult msg = CanEquipNewItem(NULL_SLOT, eDest, titem_id, false);
+        BAG_RESULT msg = CanEquipNewItem(NULL_SLOT, eDest, titem_id, false);
         if (msg != EQUIP_ERR_OK)
             break;
 
@@ -714,7 +714,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     // attempt store
     ItemPosCountVec sDest;
     // store in main bag to simplify second pass (special bags can be not equipped yet at this moment)
-    InventoryResult msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
+    BAG_RESULT msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
     if (msg == EQUIP_ERR_OK)
     {
         StoreNewItem(sDest, titem_id, true);
@@ -9041,7 +9041,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                 if (spellInfo->Reagent[i] > 0)
                 {
                     ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
-                    InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i]);
+                    BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i]);
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = StoreNewItem(dest, spellInfo->Reagent[i], true);
@@ -10598,7 +10598,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 {
     ItemPosCountVec vDest;
     uint16 uiDest = 0;
-    InventoryResult msg = bStore ?
+    BAG_RESULT msg = bStore ?
                           CanStoreNewItem(bag, slot, vDest, item, pProto->BuyCount * count) :
                           CanEquipNewItem(slot, uiDest, item, false);
     if (msg != EQUIP_ERR_OK)
@@ -13443,7 +13443,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
         LootItem* lootItem = loot.LootItemInSlot(i, this);
 
         ItemPosCountVec dest;
-        InventoryResult msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);
+        BAG_RESULT msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);
         if (msg != EQUIP_ERR_OK && slot != NULL_SLOT)
             msg = CanStoreNewItem(bag, NULL_SLOT, dest, lootItem->itemid, lootItem->count);
         if (msg != EQUIP_ERR_OK && bag != NULL_BAG)
@@ -13459,7 +13459,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     }
 }
 
-LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg)
+LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg)
 {
     QuestItem* qitem = nullptr;
     QuestItem* ffaitem = nullptr;
@@ -13727,12 +13727,12 @@ uint32 Player::GetPhaseMaskForSpawn() const
     return phase;
 }
 
-InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
+BAG_RESULT Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
 {
     ItemTemplate const* pProto = pItem->GetTemplate();
 
     // proto based limitations
-    if (InventoryResult res = CanEquipUniqueItem(pProto, eslot, limit_count))
+    if (BAG_RESULT res = CanEquipUniqueItem(pProto, eslot, limit_count))
         return res;
 
     // check unique-equipped on gems
@@ -13753,14 +13753,14 @@ InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limi
         uint32 gem_limit_count = !pItem->IsEquipped() && pGem->ItemLimitCategory
                                  ? pItem->GetGemCountWithLimitCategory(pGem->ItemLimitCategory) : 1;
 
-        if (InventoryResult res = CanEquipUniqueItem(pGem, eslot, gem_limit_count))
+        if (BAG_RESULT res = CanEquipUniqueItem(pGem, eslot, gem_limit_count))
             return res;
     }
 
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
+BAG_RESULT Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
 {
     // check unique-equipped on item
     if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
@@ -15508,7 +15508,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
 {
     uint32 noSpaceForCount = 0;
     ItemPosCountVec dest;
-    InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
+    BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
     if (msg != EQUIP_ERR_OK)
         count -= noSpaceForCount;
 
@@ -15576,7 +15576,7 @@ void Player::RefundItem(Item* item)
         if (count && itemid)
         {
             ItemPosCountVec dest;
-            InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
+            BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
             if (msg != EQUIP_ERR_OK)
             {
                 store_error = true;
@@ -15626,7 +15626,7 @@ void Player::RefundItem(Item* item)
         if (count && itemid)
         {
             ItemPosCountVec dest;
-            InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
+            BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
             ASSERT(msg == EQUIP_ERR_OK); /// Already checked before
             Item* it = StoreNewItem(dest, itemid, true);
             SendItemPush(it, count, true, false, true);

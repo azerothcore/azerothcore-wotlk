@@ -447,7 +447,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
 
         int32 count = 10;
         // bomb id count
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, NA_HALAA_BOMB, count, &noSpaceForCount);
+        BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, NA_HALAA_BOMB, count, &noSpaceForCount);
         if (msg != EQUIP_ERR_OK)                               // convert to possible store amount
             count -= noSpaceForCount;
 

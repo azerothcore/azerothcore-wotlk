@@ -271,7 +271,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
     {
         uint32 count = quest->GetSrcItemCount();
         ItemPosCountVec dest;
-        InventoryResult msg2 = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, srcitem, count);
+        BAG_RESULT msg2 = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, srcitem, count);
 
         // player already have max number (in most case 1) source item, no additional item needed and quest can be added.
         if (msg2 == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
@@ -475,7 +475,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
     {
         if (quest->RewardChoiceItemId[reward])
         {
-            InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardChoiceItemId[reward], quest->RewardChoiceItemCount[reward]);
+            BAG_RESULT res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardChoiceItemId[reward], quest->RewardChoiceItemCount[reward]);
             if (res != EQUIP_ERR_OK)
             {
                 SendEquipError(res, nullptr, nullptr, quest->RewardChoiceItemId[reward]);
@@ -490,7 +490,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
         {
             if (quest->RewardItemId[i])
             {
-                InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
+                BAG_RESULT res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
                 {
                     SendEquipError(res, nullptr, nullptr, quest->RewardItemId[i]);
@@ -1336,7 +1336,7 @@ bool Player::GiveQuestSourceItem(Quest const* quest)
             count = 1;
 
         ItemPosCountVec dest;
-        InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, srcitem, count);
+        BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, srcitem, count);
         if (msg == EQUIP_ERR_OK)
         {
             Item* item = StoreNewItem(dest, srcitem, true);
@@ -1372,7 +1372,7 @@ bool Player::TakeQuestSourceItem(uint32 questId, bool msg)
             // a) non un-equippable item (equipped non-empty bag, for example)
             // b) when quest is started from an item and item also is needed in
             // the end as RequiredItemId
-            InventoryResult res = CanUnequipItems(srcItemId, count);
+            BAG_RESULT res = CanUnequipItems(srcItemId, count);
             if (res != EQUIP_ERR_OK)
             {
                 if (msg)
@@ -2373,7 +2373,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
+void Player::SendQuestFailed(uint32 questId, BAG_RESULT reason)
 {
     if (questId)
     {

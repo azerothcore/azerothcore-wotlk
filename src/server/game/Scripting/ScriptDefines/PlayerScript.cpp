@@ -699,7 +699,7 @@ bool ScriptMgr::CanUnequipItem(Player* player, uint16 pos, bool swap)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_UNEQUIP_ITEM, !script->CanUnequipItem(player, pos, swap));
 }
 
-bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result)
+bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, BAG_RESULT& result)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_USE_ITEM, !script->CanUseItem(player, proto, result));
 }

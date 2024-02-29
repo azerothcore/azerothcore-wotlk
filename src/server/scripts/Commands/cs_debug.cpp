@@ -240,9 +240,9 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendEquipErrorCommand(ChatHandler* handler, InventoryResult error)
+    static bool HandleDebugSendEquipErrorCommand(ChatHandler* handler, BAG_RESULT error)
     {
-        handler->GetPlayer()->SendEquipError(InventoryResult(error), nullptr, nullptr);
+        handler->GetPlayer()->SendEquipError(BAG_RESULT(error), nullptr, nullptr);
         return true;
     }
 

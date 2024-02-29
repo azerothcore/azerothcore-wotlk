@@ -85,7 +85,7 @@ enum DamageEffectType : uint8;
 enum EnchantmentSlot : uint8;
 enum EncounterCreditType : uint8;
 enum EncounterState : uint8;
-enum InventoryResult : uint8;
+enum BAG_RESULT : uint8;
 enum MailCheckMask : uint8;
 enum PetType : uint8;
 enum RollVote : uint8;

@@ -424,7 +424,7 @@ public: /* PlayerScript */
     void OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS);
     bool CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading);
     bool CanUnequipItem(Player* player, uint16 pos, bool swap);
-    bool CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result);
+    bool CanUseItem(Player* player, ItemTemplate const* proto, BAG_RESULT& result);
     bool CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
     bool CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
     void OnGetQuestRate(Player* player, float& result);

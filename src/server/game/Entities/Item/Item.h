@@ -35,8 +35,7 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
-// EnumUtils: DESCRIBE THIS
-enum InventoryResult : uint8
+enum BAG_RESULT : uint8
 {
     EQUIP_ERR_OK                                 = 0,
     EQUIP_ERR_CANT_EQUIP_LEVEL_I                 = 1,
@@ -267,7 +266,7 @@ public:
     [[nodiscard]] bool HasSocket() const;
     [[nodiscard]] uint8 GetGemCountWithID(uint32 GemID) const;
     [[nodiscard]] uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
-    InventoryResult CanBeMergedPartlyWith(ItemTemplate const* proto) const;
+    BAG_RESULT CanBeMergedPartlyWith(ItemTemplate const* proto) const;
 
     [[nodiscard]] uint8 GetSlot() const {return m_slot;}
     Bag* GetContainer() { return m_container; }

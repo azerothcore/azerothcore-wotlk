@@ -865,7 +865,7 @@ bool Item::IsBoundByTempEnchant() const
     return false;
 }
 
-InventoryResult Item::CanBeMergedPartlyWith(ItemTemplate const* proto) const
+BAG_RESULT Item::CanBeMergedPartlyWith(ItemTemplate const* proto) const
 {
     // not allow merge looting currently items
     if (m_lootGenerated)

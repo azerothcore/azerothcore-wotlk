@@ -585,7 +585,7 @@ class spell_warl_create_healthstone : public SpellScript
         {
             uint8 spellRank = GetSpellInfo()->GetRank();
             ItemPosCountVec dest;
-            InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, iTypes[spellRank - 1][0], 1, nullptr);
+            BAG_RESULT msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, iTypes[spellRank - 1][0], 1, nullptr);
             if (msg != EQUIP_ERR_OK)
                 return SPELL_FAILED_TOO_MANY_OF_ITEM;
         }

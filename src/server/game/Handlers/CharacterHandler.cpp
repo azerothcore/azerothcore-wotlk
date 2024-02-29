@@ -1833,7 +1833,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
 
-        InventoryResult msg;
+        BAG_RESULT msg;
         Item* uItem = m_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (uItem)
         {

@@ -1719,7 +1719,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     // can the player store the new item?
     ItemPosCountVec dest;
     uint32 no_space = 0;
-    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, addNumber, &no_space);
+    BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, addNumber, &no_space);
     if (msg != EQUIP_ERR_OK)
     {
         // convert to possible store amount
@@ -2220,7 +2220,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     if (player->IsInventoryPos(pos))
     {
         ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
+        BAG_RESULT msg = player->CanStoreItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true);
         if (msg == EQUIP_ERR_OK)
         {
             player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);

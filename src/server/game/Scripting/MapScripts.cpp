@@ -743,7 +743,7 @@ void Map::ScriptsProcess()
                 if (Player* pReceiver = _GetScriptPlayerSourceOrTarget(source, target, step.script))
                 {
                     ItemPosCountVec dest;
-                    InventoryResult msg = pReceiver->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, step.script->CreateItem.ItemEntry, step.script->CreateItem.Amount);
+                    BAG_RESULT msg = pReceiver->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, step.script->CreateItem.ItemEntry, step.script->CreateItem.Amount);
                     if (msg == EQUIP_ERR_OK)
                     {
                         if (Item* item = pReceiver->StoreNewItem(dest, step.script->CreateItem.ItemEntry, true))

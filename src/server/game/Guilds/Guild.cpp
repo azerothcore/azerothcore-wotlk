@@ -724,7 +724,7 @@ bool Guild::MoveItemData::CheckItem(uint32& splitedAmount)
 bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
 {
     m_vec.clear();
-    InventoryResult msg = CanStore(pItem, swap);
+    BAG_RESULT msg = CanStore(pItem, swap);
     if (sendError && msg != EQUIP_ERR_OK)
         m_pPlayer->SendEquipError(msg, pItem);
     return (msg == EQUIP_ERR_OK);
@@ -811,7 +811,7 @@ void Guild::PlayerMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans,
                             pFrom->GetItem()->GetEntry(), count);
 }
 
-inline InventoryResult Guild::PlayerMoveItemData::CanStore(Item* pItem, bool swap)
+inline BAG_RESULT Guild::PlayerMoveItemData::CanStore(Item* pItem, bool swap)
 {
     return m_pPlayer->CanStoreItem(m_container, m_slotId, m_vec, pItem, swap);
 }
@@ -981,7 +981,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
     }
 }
 
-InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
+BAG_RESULT Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
 {
     LOG_DEBUG("guild", "GUILD STORAGE: CanStore() tab = {}, slot = {}, item = {}, count = {}",
                    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());

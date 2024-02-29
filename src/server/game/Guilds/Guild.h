@@ -625,7 +625,7 @@ private:
         uint8 GetSlotId() const { return m_slotId; }
 
     protected:
-        virtual InventoryResult CanStore(Item* pItem, bool swap) = 0;
+        virtual BAG_RESULT CanStore(Item* pItem, bool swap) = 0;
 
         Guild* m_pGuild;
         Player* m_pPlayer;
@@ -648,7 +648,7 @@ private:
         Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) override;
         void LogBankEvent(CharacterDatabaseTransaction trans, MoveItemData* pFrom, uint32 count) const override;
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap) override;
+        BAG_RESULT CanStore(Item* pItem, bool swap) override;
     };
 
     class BankMoveItemData : public MoveItemData
@@ -667,7 +667,7 @@ private:
         void LogAction(MoveItemData* pFrom) const override;
 
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap) override;
+        BAG_RESULT CanStore(Item* pItem, bool swap) override;
 
     private:
         Item* _StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const;

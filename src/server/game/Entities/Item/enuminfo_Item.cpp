@@ -24,10 +24,10 @@ namespace Acore::Impl::EnumUtilsImpl
 {
 
 /**************************************************************\
-|* data for enum 'InventoryResult' in 'Item.h' auto-generated *|
+|* data for enum 'BAG_RESULT' in 'Item.h' auto-generated *|
 \**************************************************************/
 template <>
-AC_API_EXPORT EnumText EnumUtils<InventoryResult>::ToString(InventoryResult value)
+AC_API_EXPORT EnumText EnumUtils<BAG_RESULT>::ToString(BAG_RESULT value)
 {
     switch (value)
     {
@@ -124,10 +124,10 @@ AC_API_EXPORT EnumText EnumUtils<InventoryResult>::ToString(InventoryResult valu
 }
 
 template <>
-AC_API_EXPORT std::size_t EnumUtils<InventoryResult>::Count() { return 88; }
+AC_API_EXPORT std::size_t EnumUtils<BAG_RESULT>::Count() { return 88; }
 
 template <>
-AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(std::size_t index)
+AC_API_EXPORT BAG_RESULT EnumUtils<BAG_RESULT>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -224,7 +224,7 @@ AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(std::size_t 
 }
 
 template <>
-AC_API_EXPORT std::size_t EnumUtils<InventoryResult>::ToIndex(InventoryResult value)
+AC_API_EXPORT std::size_t EnumUtils<BAG_RESULT>::ToIndex(BAG_RESULT value)
 {
     switch (value)
     {

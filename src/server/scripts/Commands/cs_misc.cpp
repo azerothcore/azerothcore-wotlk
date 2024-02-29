@@ -1697,7 +1697,7 @@ public:
 
         // check space and find places
         ItemPosCountVec dest;
-        InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
+        BAG_RESULT msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
 
         if (msg != EQUIP_ERR_OK) // convert to possible store amount
             count -= noSpaceForCount;
@@ -1764,7 +1764,7 @@ public:
             {
                 found = true;
                 ItemPosCountVec dest;
-                InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemTemplate.ItemId, 1);
+                BAG_RESULT msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemTemplate.ItemId, 1);
 
                 if (msg == EQUIP_ERR_OK)
                 {

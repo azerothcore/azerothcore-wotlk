@@ -1265,34 +1265,34 @@ public:
     bool CanNoReagentCast(SpellInfo const* spellInfo) const;
     [[nodiscard]] bool HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_slot = NULL_SLOT) const;
     [[nodiscard]] bool HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 count, uint8 except_slot = NULL_SLOT) const;
-    InventoryResult CanTakeMoreSimilarItems(Item* pItem) const { return CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
-    [[nodiscard]] InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return CanTakeMoreSimilarItems(entry, count, nullptr); }
-    InventoryResult CanStoreNewItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = nullptr) const
+    BAG_RESULT CanTakeMoreSimilarItems(Item* pItem) const { return CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
+    [[nodiscard]] BAG_RESULT CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return CanTakeMoreSimilarItems(entry, count, nullptr); }
+    BAG_RESULT CanStoreNewItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = nullptr) const
     {
         return CanStoreItem(bag, slot, dest, item, count, nullptr, false, no_space_count);
     }
-    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap = false) const
+    BAG_RESULT CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap = false) const
     {
         if (!pItem)
             return EQUIP_ERR_ITEM_NOT_FOUND;
         uint32 count = pItem->GetCount();
         return CanStoreItem(bag, slot, dest, pItem->GetEntry(), count, pItem, swap, nullptr);
     }
-    InventoryResult CanStoreItems(Item** pItem, int32 count) const;
-    InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
-    InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
+    BAG_RESULT CanStoreItems(Item** pItem, int32 count) const;
+    BAG_RESULT CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
+    BAG_RESULT CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
 
-    InventoryResult CanEquipUniqueItem(Item* pItem, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
-    InventoryResult CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
-    [[nodiscard]] InventoryResult CanUnequipItems(uint32 item, uint32 count) const;
-    [[nodiscard]] InventoryResult CanUnequipItem(uint16 src, bool swap) const;
-    InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
-    InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
+    BAG_RESULT CanEquipUniqueItem(Item* pItem, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
+    BAG_RESULT CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
+    [[nodiscard]] BAG_RESULT CanUnequipItems(uint32 item, uint32 count) const;
+    [[nodiscard]] BAG_RESULT CanUnequipItem(uint16 src, bool swap) const;
+    BAG_RESULT CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
+    BAG_RESULT CanUseItem(Item* pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
     bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
-    InventoryResult CanUseItem(ItemTemplate const* pItem) const;
-    [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
-    InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
+    BAG_RESULT CanUseItem(ItemTemplate const* pItem) const;
+    [[nodiscard]] BAG_RESULT CanUseAmmo(uint32 item) const;
+    BAG_RESULT CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
     Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
     Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters);
     Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
@@ -1302,12 +1302,12 @@ public:
     bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
     void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
     void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
-    LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg);
+    LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg);
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
-    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
-    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
+    BAG_RESULT CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
+    BAG_RESULT CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
     void AddRefundReference(ObjectGuid itemGUID);
     void DeleteRefundReference(ObjectGuid itemGUID);
@@ -1342,7 +1342,7 @@ public:
     Item* GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
-    void SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2 = nullptr, uint32 itemid = 0);
+    void SendEquipError(BAG_RESULT msg, Item* pItem, Item* pItem2 = nullptr, uint32 itemid = 0);
     void SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param);
     void SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param);
     void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
@@ -1524,7 +1524,7 @@ public:
 
     void SendQuestComplete(uint32 quest_id);
     void SendQuestReward(Quest const* quest, uint32 XP);
-    void SendQuestFailed(uint32 questId, InventoryResult reason = EQUIP_ERR_OK);
+    void SendQuestFailed(uint32 questId, BAG_RESULT reason = EQUIP_ERR_OK);
     void SendQuestTimerFailed(uint32 quest_id);
     void SendCanTakeQuestResponse(uint32 msg) const;
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
@@ -2885,9 +2885,9 @@ public:
 
 private:
     // internal common parts for CanStore/StoreItem functions
-    InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
-    InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
-    InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
+    BAG_RESULT CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
+    BAG_RESULT CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
+    BAG_RESULT CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 

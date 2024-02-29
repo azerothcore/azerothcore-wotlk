@@ -1473,7 +1473,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
 
                     ItemPosCountVec dest;
                     LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                    BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
                     if (msg == EQUIP_ERR_OK)
                     {
                         item->is_looted = true;
@@ -1543,7 +1543,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     if (rollvote == GREED)
                     {
                         ItemPosCountVec dest;
-                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                        BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
                         if (msg == EQUIP_ERR_OK)
                         {
                             item->is_looted = true;
@@ -1571,7 +1571,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, 13262); // Disenchant
 
                         ItemPosCountVec dest;
-                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                        BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
 
                         if(msg == EQUIP_ERR_OK)
                         {

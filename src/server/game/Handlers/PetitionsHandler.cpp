@@ -171,7 +171,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     }
 
     ItemPosCountVec dest;
-    InventoryResult msg = m_player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount);
+    BAG_RESULT msg = m_player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount);
     if (msg != EQUIP_ERR_OK)
     {
         m_player->SendEquipError(msg, nullptr, nullptr, charterid);
