@@ -668,28 +668,6 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 
 UPDATE `creature_text` SET `Emote` = 396 WHERE  `CreatureID` = 17772 AND `GroupID` = 5 AND `ID` = 0;
 
-/*
-Call New Waves:
-Remove npcflag
-Reset trash counter
-Reset wave counter
-Start waves
-
-Boss Spawned:
-Remove worldstates
-
-Boss Killed:
-Restore npcflag
-
-NPC Reset:
-Remove worldstates
-Reset trash counter
-Reset wave counter
-Restore npcflag
-
-Debug: Call Waves, Reset, Retreat
-*/
-
 SET @OGUID := 81488;
 DELETE FROM `gameobject` WHERE `map` = 534;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
