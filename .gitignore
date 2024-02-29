@@ -92,3 +92,5 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+/.vs
+/out
