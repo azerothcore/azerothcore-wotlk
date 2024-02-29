@@ -696,7 +696,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
                 Item* item = StoreNewItem(dest, itemId, true);
-                SendNewItem(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
+                SendItemPush(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
 
                 sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
             }
@@ -717,7 +717,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]) == EQUIP_ERR_OK)
                 {
                     Item* item = StoreNewItem(dest, itemId, true);
-                    SendNewItem(item, quest->RewardItemIdCount[i], true, false, false, false);
+                    SendItemPush(item, quest->RewardItemIdCount[i], true, false, false, false);
 
                     sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
                 }
@@ -1340,7 +1340,7 @@ bool Player::GiveQuestSourceItem(Quest const* quest)
         if (msg == EQUIP_ERR_OK)
         {
             Item* item = StoreNewItem(dest, srcitem, true);
-            SendNewItem(item, count, true, false);
+            SendItemPush(item, count, true, false);
             return true;
         }
             // player already have max amount required item, just report success

@@ -460,7 +460,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
 
         if (count > 0 && item)
         {
-            player->SendNewItem(item, count, true, false);
+            player->SendItemPush(item, count, true, false);
         }
 
         return true;

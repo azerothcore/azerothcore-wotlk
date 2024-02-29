@@ -1725,11 +1725,11 @@ public:
 
         if (p && count && item)
         {
-            p->SendNewItem(item, count, false, true);
+            p->SendItemPush(item, count, false, true);
 
             if (p != playerTarget)
             {
-                playerTarget->SendNewItem(item, count, true, false);
+                playerTarget->SendItemPush(item, count, true, false);
             }
         }
 
@@ -1776,11 +1776,11 @@ public:
                         item->SetBinding(false);
                     }
 
-                    player->SendNewItem(item, 1, false, true);
+                    player->SendItemPush(item, 1, false, true);
 
                     if (player != playerTarget)
                     {
-                        playerTarget->SendNewItem(item, 1, true, false);
+                        playerTarget->SendItemPush(item, 1, true, false);
                     }
                 }
                 else

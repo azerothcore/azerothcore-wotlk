@@ -9046,7 +9046,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                     {
                         Item* item = StoreNewItem(dest, spellInfo->Reagent[i], true);
                         if (IsInWorld())
-                            SendNewItem(item, spellInfo->ReagentCount[i], true, false);
+                            SendItemPush(item, spellInfo->ReagentCount[i], true, false);
                     }
                 }
             }
@@ -10638,7 +10638,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         data << int32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
         data << uint32(count);
         GetSession()->SendPacket(&data);
-        SendNewItem(it, pProto->BuyCount * count, true, false, false);
+        SendItemPush(it, pProto->BuyCount * count, true, false, false);
 
         if (!bStore)
             AutoUnequipOffhandIfNeed();
@@ -13455,7 +13455,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
         }
 
         Item* pItem = StoreNewItem(dest, lootItem->itemid, true, lootItem->randomPropertyId);
-        SendNewItem(pItem, lootItem->count, false, false, broadcast);
+        SendItemPush(pItem, lootItem->count, false, false, broadcast);
     }
 }
 
@@ -13545,7 +13545,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
 
         --loot->unlootedCount;
 
-        SendNewItem(newitem, uint32(item->count), false, false, true);
+        SendItemPush(newitem, uint32(item->count), false, false, true);
         UpdateLootAchievements(item, loot);
 
         // LootItem is being removed (looted) from the container, delete it from the DB.
@@ -15521,7 +15521,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
 
     Item* item = StoreNewItem(dest, itemId, true);
     if (item)
-        SendNewItem(item, count, true, false);
+        SendItemPush(item, count, true, false);
     else
         return false;
     return true;
@@ -15629,7 +15629,7 @@ void Player::RefundItem(Item* item)
             InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
             ASSERT(msg == EQUIP_ERR_OK); /// Already checked before
             Item* it = StoreNewItem(dest, itemid, true);
-            SendNewItem(it, count, true, false, true);
+            SendItemPush(it, count, true, false, true);
         }
     }
 

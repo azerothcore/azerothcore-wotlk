@@ -262,7 +262,7 @@ public:
                 if (msg == EQUIP_ERR_OK)
                 {
                     Item* item = player->StoreNewItem(dest, id, true);
-                    player->SendNewItem(item, count - curItemCount, true, false);
+                    player->SendItemPush(item, count - curItemCount, true, false);
                 }
             }
 

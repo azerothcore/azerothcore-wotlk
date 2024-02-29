@@ -238,7 +238,7 @@ public:
         {
             if (Item* item = player->StoreNewItem(dest, itemId, true))
             {
-                player->SendNewItem(item, 1, true, true);
+                player->SendItemPush(item, 1, true, true);
             }
         }
     }

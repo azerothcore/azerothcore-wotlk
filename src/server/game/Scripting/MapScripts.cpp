@@ -747,7 +747,7 @@ void Map::ScriptsProcess()
                     if (msg == EQUIP_ERR_OK)
                     {
                         if (Item* item = pReceiver->StoreNewItem(dest, step.script->CreateItem.ItemEntry, true))
-                            pReceiver->SendNewItem(item, step.script->CreateItem.Amount, false, true);
+                            pReceiver->SendItemPush(item, step.script->CreateItem.Amount, false, true);
                     }
                     else
                         pReceiver->SendEquipError(msg, nullptr, nullptr, step.script->CreateItem.ItemEntry);

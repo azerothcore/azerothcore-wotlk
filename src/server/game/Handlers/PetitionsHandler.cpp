@@ -187,7 +187,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     // ITEM_FIELD_ENCHANTMENT_1_1 is guild/arenateam id
     // ITEM_FIELD_ENCHANTMENT_1_1+1 is current signatures count (showed on item)
     charter->SetState(ITEM_CHANGED, m_player);
-    m_player->SendNewItem(charter, 1, true, false);
+    m_player->SendItemPush(charter, 1, true, false);
 
     // a petition is invalid, if both the owner and the type matches
     // we checked above, if this player is in an arenateam, so this must be

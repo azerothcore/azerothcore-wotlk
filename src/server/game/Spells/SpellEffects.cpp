@@ -1750,7 +1750,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
             pItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
 
         // send info to the client
-        player->SendNewItem(pItem, addNumber, true, SelfCast);
+        player->SendItemPush(pItem, addNumber, true, SelfCast);
 
         sScriptMgr->OnCreateItem(player, pItem, addNumber);
 

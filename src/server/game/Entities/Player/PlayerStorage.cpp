@@ -4762,12 +4762,10 @@ void Player::SendItemDurations()
     }
 }
 
-void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, bool broadcast, bool sendChatMessage)
+void Player::SendItemPush(Item* item, uint32 count, bool received, bool created, bool broadcast, bool sendChatMessage)
 {
-    if (!item)                                               // prevent crash
-        return;
+    ASSERT(item);
 
-    // last check 2.0.10
     WorldPacket data(SMSG_ITEM_PUSH_RESULT, (8 + 4 + 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4));
     data << GetGUID();                                      // player GUID
     data << uint32(received);                               // 0=looted, 1=from npc
