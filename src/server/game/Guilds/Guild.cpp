@@ -726,7 +726,11 @@ bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
     m_vec.clear();
     BAG_RESULT msg = CanStore(pItem, swap);
     if (sendError && msg != BAG_OK)
+<<<<<<< HEAD
         m_pPlayer->SendInventoryChangeFailure(msg, pItem);
+=======
+        m_pPlayer->SendEquipError(msg, pItem);
+>>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
     return (msg == BAG_OK);
 }
 

@@ -8148,7 +8148,11 @@ BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
     uint32 excessItems = 0;
     ItemPosCountVec dest;
     BAG_RESULT result = CanStoreNewItem(bag, slot, dest, itemId, quantity, &excessItems);
+<<<<<<< HEAD
     if (result == EQUIP_ERR_INVENTORY_FULL) {
+=======
+    if (result != BAG_OK) {
+>>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
         quantity -= excessItems;
         SendInventoryChangeFailure(result);
     }
@@ -15533,6 +15537,7 @@ bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
         return false;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     return StoreItemInBag(itemId,quantity) == BAG_OK;
 =======
 
@@ -15543,6 +15548,9 @@ bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
         return false;
     return true;
 >>>>>>> f3d30171e (style(Player): rename SendNewItem to SendItemPush)
+=======
+    return StoreItemInBag(itemId,quantity) == BAG_OK;
+>>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
 }
 
 PetStable& Player::GetOrInitPetStable()

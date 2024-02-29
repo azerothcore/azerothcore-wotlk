@@ -290,7 +290,7 @@ public:
 =======
             ItemPosCountVec dest;
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
-            if (msg == EQUIP_ERR_OK)
+            if (msg == BAG_OK)
                 if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
                     player->SendItemPush(item, 1, true, false, true);
 
