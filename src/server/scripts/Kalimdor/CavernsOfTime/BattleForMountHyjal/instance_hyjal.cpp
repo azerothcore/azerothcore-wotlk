@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Instance_Mount_Hyjal
-SD%Complete: 100
-SDComment: Instance Data Scripts and functions to acquire mobs and set encounter status for use in various Hyjal Scripts
-SDCategory: Caverns of Time, Mount Hyjal
-EndScriptData */
-
 #include "Chat.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -104,8 +97,8 @@ public:
         {
             SetHeaders(DataHeader);
 
-            trash              = 0;
-
+            _bossWave = false;
+            trash = 0;
             _currentWave = 0;
             _encounterNPCs.clear();
             _baseAlliance.clear();
@@ -186,6 +179,7 @@ public:
                 case NPC_ANETHERON:
                 case NPC_KAZROGAL:
                 case NPC_AZGALOR:
+                /*
                 {
                     switch (creature->GetEntry())
                     {
@@ -196,6 +190,7 @@ public:
                     }
                     // no break
                 }
+                */
                 case NPC_NECRO:
                 case NPC_ABOMI:
                 case NPC_GHOUL:
@@ -207,8 +202,12 @@ public:
                 case NPC_STALK:
                     if (creature->IsSummon())
                     {
-                        DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
-                        _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
+                        if (_bossWave)
+                        {
+                            DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
+                            DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
+                            _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
+                        }
                     }
             }
             InstanceScript::OnCreatureCreate(creature);
@@ -231,12 +230,26 @@ public:
             case NPC_STALK:
                 if (unit->ToCreature()->IsSummon())
                 {
-                    DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
-                    _encounterNPCs.erase(unit->ToCreature()->GetGUID());             // Used for despawning on wipe
+                    if (_bossWave)
+                    {
+                        DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
+                        DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
+                        _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
 
-                    if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
-                        SetData(DATA_SPAWN_WAVES, 0);
+                        if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
+                            SetData(DATA_SPAWN_WAVES, 1);
+                    }
                 }
+                break;
+            case NPC_WINTERCHILL:
+            case NPC_ANETHERON:
+            case NPC_KAZROGAL:
+            case NPC_AZGALOR:
+                if (Creature* jaina = GetCreature(DATA_JAINA))
+                    jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                if (Creature* thrall = GetCreature(DATA_THRALL))
+                    thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                SetData(DATA_RESET_WAVES, 1);
                 break;
             }
         }
@@ -246,6 +259,7 @@ public:
             switch (type)
             {
                 case DATA_ALLIANCE_RETREAT:
+                    _bossWave = false;
                     // Spawn Ancient Gems
                     for (ObjectGuid const& guid : _ancientGemAlliance)
                         instance->GetGameObject(guid)->Respawn();
@@ -258,7 +272,7 @@ public:
                             if (instance->GetCreature(guid));
                             {
                                 float x, y, z;
-                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(jaina));
+                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, instance->GetCreature(guid)->GetAngle(jaina));
                                 instance->GetCreature(guid)->SetWalk(true);
                                 instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
                             }
@@ -285,6 +299,7 @@ public:
                     SaveToDB();
                     break;
                 case DATA_HORDE_RETREAT:
+                    _bossWave = false;
                     for (ObjectGuid const& guid : _ancientGemHorde)
                         instance->GetGameObject(guid)->Respawn();
 
@@ -305,6 +320,7 @@ public:
                     SaveToDB();
                     break;
                 case DATA_SPAWN_WAVES:
+                    _bossWave = true;
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
                         ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
                     else if (GetBossState(DATA_ANETHERON) != DONE)
@@ -333,8 +349,7 @@ public:
                                 instance->GetCreature(guid)->Respawn();
                         });
 
-                    _currentWave = 0;
-                    trash = 0;
+                    SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_HORDE:
                     for (ObjectGuid const& guid : _baseHorde)
@@ -349,8 +364,7 @@ public:
                                 instance->GetCreature(guid)->Respawn();
                         });
 
-                    _currentWave = 0;
-                    trash = 0;
+                    SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_NIGHT_ELF:
                     for (ObjectGuid const& guid : _baseNightElf)
@@ -369,8 +383,19 @@ public:
                             GetCreature(DATA_ARCHIMONDE)->Respawn();
                         });
 
+                    SetData(DATA_RESET_WAVES, 0);
+                    break;
+                case DATA_RESET_WAVES:
+                    _encounterNPCs.clear();
                     _currentWave = 0;
                     trash = 0;
+                    _bossWave = false;
+                    DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
+                    DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
+                    DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, trash);
+                    break;
+                case DATA_BOSS_WAVE:
+                    data ? _bossWave = true : _bossWave = false;    // Used to check if WorldState will be updated. Set by Jaina and Thrall
                     break;
             }
 
@@ -380,6 +405,19 @@ public:
             {
                 SaveToDB();
             }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            switch (type)
+            {
+            case DATA_WAVE_STATUS:
+                return _currentWave;
+                break;
+            case DATA_BOSS_WAVE:
+                return _bossWave;
+            }
+            return 0;
         }
 
         void ScheduleWaves(Milliseconds time, uint8 startWaves, uint8 maxWaves, Milliseconds timerptr[])
@@ -412,7 +450,8 @@ public:
                     }
 
                     context.Repeat(timerptr[_currentWave]);
-                    DoUpdateWorldState(WORLD_STATE_WAVES, ++_currentWave);
+                    if (++_currentWave < maxWaves && _bossWave)
+                        DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
 
                     context.SetGroup(CONTEXT_GROUP_WAVES);
                 });
@@ -424,6 +463,7 @@ public:
         }
 
     protected:
+        bool _bossWave;
         uint32 trash;
         uint8 _currentWave;
         TaskScheduler _scheduler;
