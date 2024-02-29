@@ -1632,7 +1632,7 @@ class spell_q9452_cast_net : public SpellScript
     {
         Player* caster = GetCaster()->ToPlayer();
         if (roll_chance_i(66))
-            caster->AddItem(ITEM_RED_SNAPPER, 1);
+            caster->CreateItem(ITEM_RED_SNAPPER, 1);
         else
             caster->CastSpell(caster, SPELL_NEW_SUMMON_TEST, true);
     }
@@ -2395,7 +2395,7 @@ class spell_q4735_collect_rookery_egg : public SpellScript
     void HandleActiveObject(SpellEffIndex /*effIndex*/)
     {
         if (Player* playerCaster = GetCaster()->ToPlayer())
-            playerCaster->AddItem(ITEM_COLLECTED_DRAGON_EGG, 1);
+            playerCaster->CreateItem(ITEM_COLLECTED_DRAGON_EGG, 1);
     }
 
     void Register() override

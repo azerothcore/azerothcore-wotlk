@@ -1051,7 +1051,7 @@ class spell_catch_the_wild_wolpertinger : public AuraScript
             if (wild->GetEntry() == NPC_WILD_WOLPERTINGER)
             {
                 wild->ToCreature()->DespawnOrUnsummon(1s, 0s);
-                GetCaster()->ToPlayer()->AddItem(ITEM_STUNNED_WOLPERTINGER, 1);
+                GetCaster()->ToPlayer()->CreateItem(ITEM_STUNNED_WOLPERTINGER, 1);
             }
         }
     }
@@ -1095,7 +1095,7 @@ class spell_brewfest_fill_keg : public SpellScript
                         break;
                 }
 
-                if (item && player->AddItem(item, 1)) // ensure filled keg is stored
+                if (item && player->CreateItem(item, 1)) // ensure filled keg is stored
                 {
                     player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
                     GetSpell()->m_CastItem = nullptr;
@@ -1151,7 +1151,7 @@ class spell_brewfest_unfill_keg : public SpellScript
                 uint32 item = GetEmptyEntry(itemCaster->GetEntry());
                 Player* player = GetCaster()->ToPlayer();
 
-                if (item && player->AddItem(item, 1)) // ensure filled keg is stored
+                if (item && player->CreateItem(item, 1)) // ensure filled keg is stored
                 {
                     player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
                     GetSpell()->m_CastItem = nullptr;

@@ -1584,7 +1584,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!IsPlayer(target))
                     continue;
 
-                target->ToPlayer()->AddItem(e.action.item.entry, e.action.item.count);
+                target->ToPlayer()->CreateItem(e.action.item.entry, e.action.item.count);
             }
             break;
         }

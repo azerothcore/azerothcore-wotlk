@@ -6185,7 +6185,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             uint32 itemID = sWorld->getIntConfig(CONFIG_PVP_TOKEN_ID);
             int32 count = sWorld->getIntConfig(CONFIG_PVP_TOKEN_COUNT);
 
-            if (AddItem(itemID, count))
+            if (CreateItem(itemID, count))
                 ChatHandler(GetSession()).PSendSysMessage("You have been awarded a token for slaying another player.");
         }
     }
@@ -15525,27 +15525,13 @@ void Player::SendRefundInfo(Item* item)
     GetSession()->SendPacket(&data);
 }
 
-bool Player::AddItem(uint32 itemId, uint32 count)
+//===========================================================================
+bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
 {
-    uint32 noSpaceForCount = 0;
-    ItemPosCountVec dest;
-    BAG_RESULT msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
-    if (msg != EQUIP_ERR_OK)
-        count -= noSpaceForCount;
-
-    if (count == 0 || dest.empty())
-    {
-        // -- TODO: Send to mailbox if no space
-        ChatHandler(GetSession()).PSendSysMessage("You don't have any space in your bags.");
+    if (!quantity || !itemId) {
         return false;
     }
-
-    Item* item = StoreNewItem(dest, itemId, true);
-    if (item)
-        SendItemPush(item, count, true, false);
-    else
-        return false;
-    return true;
+    return StoreItemInBag(itemId,quantity) == EQUIP_ERR_OK;
 }
 
 PetStable& Player::GetOrInitPetStable()

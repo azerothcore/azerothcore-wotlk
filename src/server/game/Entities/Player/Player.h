@@ -1390,7 +1390,7 @@ public:
     void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
 
-    bool AddItem(uint32 itemId, uint32 count);
+    bool CreateItem(uint32_t itemId, uint32_t quantity);
 
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/

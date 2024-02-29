@@ -562,7 +562,7 @@ public:
             if (gossipListId == 1)
             {
                 CloseGossipMenuFor(player);
-                player->AddItem(ITEM_THARNARIUMS_HOPE, 1);
+                player->CreateItem(ITEM_THARNARIUMS_HOPE, 1);
             }
         }
 

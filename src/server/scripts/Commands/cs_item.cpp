@@ -240,7 +240,7 @@ public:
             {
                 if (reqItem)
                 {
-                    target->AddItem(reqItem, iece->reqitemcount[count]);
+                    target->CreateItem(reqItem, iece->reqitemcount[count]);
                 }
 
                 ++count;
