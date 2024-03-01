@@ -180,18 +180,6 @@ public:
                 case NPC_ANETHERON:
                 case NPC_KAZROGAL:
                 case NPC_AZGALOR:
-                /*
-                {
-                    switch (creature->GetEntry())
-                    {
-                    case NPC_WINTERCHILL: SetData(DATA_WINTERCHILL, IN_PROGRESS); break;
-                    case NPC_ANETHERON: SetData(DATA_ANETHERON, IN_PROGRESS); break;
-                    case NPC_KAZROGAL: SetData(DATA_KAZROGAL, IN_PROGRESS); break;
-                    case NPC_AZGALOR: SetData(DATA_AZGALOR, IN_PROGRESS); break;
-                    }
-                    // no break
-                }
-                */
                 case NPC_NECRO:
                 case NPC_ABOMI:
                 case NPC_GHOUL:
@@ -331,21 +319,29 @@ public:
                     _retreat = 0;
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
                     {
+                        for (ObjectGuid const& guid : _baseAlliance)
+                            instance->GetCreature(guid)->Respawn();
                         _bossWave = DATA_WINTERCHILL;
                         ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
                     }
                     else if (GetBossState(DATA_ANETHERON) != DONE)
                     {
+                        for (ObjectGuid const& guid : _baseAlliance)
+                            instance->GetCreature(guid)->Respawn();
                         _bossWave = DATA_ANETHERON;
                         ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON - 1]);
                     }
                     else if (GetBossState(DATA_KAZROGAL) != DONE)
                     {
+                        for (ObjectGuid const& guid : _baseHorde)
+                            instance->GetCreature(guid)->Respawn();
                         _bossWave = DATA_KAZROGAL;
                         ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL - 1]);
                     }
                     else if (GetBossState(DATA_AZGALOR) != DONE)
                     {
+                        for (ObjectGuid const& guid : _baseHorde)
+                            instance->GetCreature(guid)->Respawn();
                         _bossWave = DATA_AZGALOR;
                         ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR - 1]);
                     }

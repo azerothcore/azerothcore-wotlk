@@ -448,7 +448,8 @@ struct npc_hyjal_ground_trash : public ScriptedAI
     }
 
     void DoAction(int32 action) override
-    {            
+    {
+        me->setActive(true);
         switch (action)
         {
         case DATA_WINTERCHILL:
@@ -535,6 +536,7 @@ struct npc_hyjal_gargoyle : public ScriptedAI
 
     void DoAction(int32 action) override
     {
+        me->setActive(true);
         switch (action)
         {
         case DATA_ALLIANCE_RETREAT:
@@ -605,6 +607,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
 
     void DoAction(int32 action) override
     {
+        me->setActive(true);
         switch (action)
         {
         case DATA_KAZROGAL:

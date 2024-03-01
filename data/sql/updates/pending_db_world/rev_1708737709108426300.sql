@@ -564,6 +564,33 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_ground_trash' WHERE (`e
 UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_gargoyle' WHERE (`entry` = 17906);
 UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_frost_wyrm' WHERE (`entry` = 17907);
 
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '31317' WHERE (`entry` = 17808);
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '8278' WHERE (`entry` IN (17895, 17906));
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '31260 31745' WHERE (`entry` = 17772);
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '31745' WHERE (`entry` = 17852);
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '31607' WHERE (`entry` = 17898);
+UPDATE `creature_template_addon` SET `auras` = '31304' WHERE (`entry` = 17818);
+UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 17818);
+
+UPDATE `creature_template` SET `detection_range` = 50 WHERE (`entry` IN (17906, 17907));
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 17902);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17902, 0, 0, 0, 1, 0, 0, '19818');
+DELETE FROM `creature_template_addon` WHERE (`entry` = 17933);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17933, 0, 0, 0, 1, 0, 3, '31757');
+DELETE FROM `creature_template_addon` WHERE (`entry` = 18036);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(18036, 0, 0, 0, 0, 0, 0, '31761');
+DELETE FROM `creature_template_addon` WHERE (`entry` = 17854);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17854, 0, 0, 0, 1, 0, 3, '31332');
+
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 18304);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(18304, 0, 0, 1, 1, 0, 0, 0);
+
 DELETE FROM `npc_text` WHERE `ID` IN (9224, 9409, 9415, 9169, 9228, 9381, 9397, 10675);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`) VALUES
 (9224, 'Stranger, make haste and contact Lady Jaina Proudmoore. Her small Alliance force is bravely attempting to blunt the Burning Legion\'s initial assault and delay the approach of Archimonde.', NULL, 14867),
