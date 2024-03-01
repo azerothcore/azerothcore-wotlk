@@ -24,6 +24,7 @@
 #include "Log.h"
 #include "InstanceSaveMgr.h"
 #include "UpdateTime.h"
+#include "World.h"
 
 #define AVAILABLE_MAPS_ALL_MAPS ""
 
