@@ -5,7 +5,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (12138, 0, 5, 0, 101, 0, 100, 0, 1, 10, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 10, 0, 0, 0, 0, 0, 0, 0, 'Lunaclaw - On Respawn - Attack Start Player');
 
 -- Update Quest Flag
-UPDATE `quest_template` SET `Flags` = 4 WHERE (`ID` = 6002);
+UPDATE `quest_template` SET `Flags` = 2 WHERE (`ID` = 6002);
 
 -- Update Quest Request itens
 DELETE FROM `quest_request_items` WHERE (`ID` = 6002);
