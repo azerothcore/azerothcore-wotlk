@@ -8148,8 +8148,9 @@ BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
     uint32 excessItems = 0;
     ItemPosCountVec dest;
     BAG_RESULT result = CanStoreNewItem(bag, slot, dest, itemId, quantity, &excessItems);
-    if (result != BAG_OK) {
+    if (result == EQUIP_ERR_INVENTORY_FULL) {
         quantity -= excessItems;
+        SendInventoryChangeFailure(result);
     }
     Item* item = StoreNewItem(dest, itemId, true);
     if (item) {
