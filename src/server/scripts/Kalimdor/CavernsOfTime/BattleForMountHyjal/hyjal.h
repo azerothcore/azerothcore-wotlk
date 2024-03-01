@@ -67,11 +67,11 @@ enum HyjalWorldStateIds
 enum HyjalCreaturesIds
 {
     // Trash Mobs summoned in waves
-    NPC_NECRO                   = 17899,
-    NPC_ABOMI                   = 17898,
     NPC_GHOUL                   = 17895,
-    NPC_BANSH                   = 17905,
     NPC_CRYPT                   = 17897,
+    NPC_ABOMI                   = 17898,
+    NPC_NECRO                   = 17899,
+    NPC_BANSH                   = 17905,
     NPC_GARGO                   = 17906,
     NPC_FROST                   = 17907,
     NPC_INFER                   = 17908,
@@ -177,7 +177,7 @@ enum HyjalPaths
     GARGOYLE_PATH_FORTRESS_3    = 179066,
 
     FROST_WYRM_TROLL_CAMP       = 179071,
-    FROST_WYRM_FORTRESS_CHARGE  = 179072,
+    FROST_WYRM_FORTRESS         = 179072,
     FROST_WYRM_FORTRESS_PATROL  = 179073
 };
 

@@ -97,7 +97,8 @@ public:
         {
             SetHeaders(DataHeader);
 
-            _bossWave = false;
+            _bossWave = 0;
+            _retreat = 0;
             trash = 0;
             _currentWave = 0;
             _encounterNPCs.clear();
@@ -196,10 +197,15 @@ public:
                 case NPC_GHOUL:
                 case NPC_BANSH:
                 case NPC_CRYPT:
+                case NPC_STALK:
                 case NPC_GARGO:
                 case NPC_FROST:
+                    if (_bossWave)
+                        creature->AI()->DoAction(_bossWave);
+                    else if (_retreat)
+                        creature->AI()->DoAction(_retreat);
+                    // no break
                 case NPC_INFER:
-                case NPC_STALK:
                     if (creature->IsSummon())
                     {
                         if (_bossWave)
@@ -259,7 +265,8 @@ public:
             switch (type)
             {
                 case DATA_ALLIANCE_RETREAT:
-                    _bossWave = false;
+                    _bossWave = 0;
+                    _retreat = DATA_ALLIANCE_RETREAT;
                     // Spawn Ancient Gems
                     for (ObjectGuid const& guid : _ancientGemAlliance)
                         instance->GetGameObject(guid)->Respawn();
@@ -269,7 +276,7 @@ public:
                     {
                         for (ObjectGuid const& guid : _baseAlliance)
                         {
-                            if (instance->GetCreature(guid));
+                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive());
                             {
                                 float x, y, z;
                                 jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
@@ -299,7 +306,8 @@ public:
                     SaveToDB();
                     break;
                 case DATA_HORDE_RETREAT:
-                    _bossWave = false;
+                    _bossWave = 0;
+                    _retreat = DATA_HORDE_RETREAT;
                     for (ObjectGuid const& guid : _ancientGemHorde)
                         instance->GetGameObject(guid)->Respawn();
 
@@ -320,15 +328,32 @@ public:
                     SaveToDB();
                     break;
                 case DATA_SPAWN_WAVES:
-                    _bossWave = true;
+                    _retreat = 0;
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
+                    {
+                        _bossWave = DATA_WINTERCHILL;
                         ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
+                    }
                     else if (GetBossState(DATA_ANETHERON) != DONE)
+                    {
+                        _bossWave = DATA_ANETHERON;
                         ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON - 1]);
+                    }
                     else if (GetBossState(DATA_KAZROGAL) != DONE)
+                    {
+                        _bossWave = DATA_KAZROGAL;
                         ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL - 1]);
+                    }
                     else if (GetBossState(DATA_AZGALOR) != DONE)
+                    {
+                        _bossWave = DATA_AZGALOR;
                         ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR - 1]);
+                    }
+                    else if (GetBossState(DATA_ARCHIMONDE) != DONE)
+                    {
+                        _bossWave = DATA_ARCHIMONDE;
+                        ScheduleWaves(1ms, START_WAVE_NIGHT_ELF, MAX_WAVES_NIGHT_ELF, hyjalNightElfWaveTimers[0]);
+                    }
                     break;
                 case DATA_SPAWN_INFERNALS:
                     for (ObjectGuid const& guid : _infernalTargets)
@@ -389,13 +414,11 @@ public:
                     _encounterNPCs.clear();
                     _currentWave = 0;
                     trash = 0;
-                    _bossWave = false;
+                    _bossWave = 0;
+                    _retreat = 0;
                     DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
                     DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
                     DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, trash);
-                    break;
-                case DATA_BOSS_WAVE:
-                    data ? _bossWave = true : _bossWave = false;    // Used to check if WorldState will be updated. Set by Jaina and Thrall
                     break;
             }
 
@@ -463,9 +486,10 @@ public:
         }
 
     protected:
-        bool _bossWave;
         uint32 trash;
         uint8 _currentWave;
+        uint8 _bossWave;
+        uint8 _retreat;
         TaskScheduler _scheduler;
         GuidSet _encounterNPCs;
         GuidSet _baseAlliance;

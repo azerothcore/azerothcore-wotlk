@@ -560,6 +560,10 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_jaina' WHERE (`entry` =
 UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_thrall' WHERE (`entry` = 17852);
 UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_tyrande' WHERE (`entry` = 17948);
 
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_ground_trash' WHERE (`entry` IN (17895, 17897, 17898, 17899, 17905, 17916));
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_gargoyle' WHERE (`entry` = 17906);
+UPDATE `creature_template` SET `ScriptName` = 'npc_hyjal_frost_wyrm' WHERE (`entry` = 17907);
+
 DELETE FROM `npc_text` WHERE `ID` IN (9224, 9409, 9415, 9169, 9228, 9381, 9397, 10675);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`) VALUES
 (9224, 'Stranger, make haste and contact Lady Jaina Proudmoore. Her small Alliance force is bravely attempting to blunt the Burning Legion\'s initial assault and delay the approach of Archimonde.', NULL, 14867),

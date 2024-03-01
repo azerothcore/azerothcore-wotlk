@@ -32,14 +32,44 @@ enum Spells
     SPELL_PYROBLAST                   = 31263,
     SPELL_SUMMON_ELEMENTALS           = 31264,
                                       
-    // Thrall spells                  
+    // Thrall
     SPELL_CHAIN_LIGHTNING             = 31330,
     SPELL_FERAL_SPIRIT                = 31331,
                                       
-    // Tyrande spells                 
+    // Tyrande
     SPELL_STARFALL                    = 20687,
     SPELL_TRUESHOT_AURA               = 31519,
-    SPELL_SUMMON_TEARS_OF_THE_GODDESS = 39118
+    SPELL_SUMMON_TEARS_OF_THE_GODDESS = 39118,
+
+    // Ghoul
+    SPELL_FRENZY                      = 31540,
+    SPELL_CANNIBALIZE                 = 31537,
+
+    // Crypt Fiend
+    SPELL_CRYPT_SCARABS               = 31592,
+
+    // Abomination
+    SPELL_KNOCKDOWN                   = 31610,
+
+    // Necromancer (Ranged)
+    SPELL_RAISE_DEAD_1                = 31617,
+    SPELL_RAISE_DEAD_2                = 31624,
+    SPELL_RAISE_DEAD_3                = 31625,
+    SPELL_SHADOW_BOLT                 = 31627,
+
+    // Banshee (Ranged)
+    SPELL_BANSHEE_CURSE               = 31651,
+    SPELL_ANTI_MAGIC_SHELL            = 31662,
+    SPELL_BANSHEE_WAIL                = 38183,
+
+    // Gargoyle (Ranged)
+    SPELL_GARGOYLE_STRIKE             = 31664,
+
+    // Frost Wyrm (Ranged)
+    SPELL_FROST_BREATH                = 31688,
+
+    // Fel Stalker
+    SPELL_MANA_BURN                   = 31729
 };
 
 enum Talk
@@ -94,7 +124,7 @@ public:
                         });
         }
 
-        void JustSummoned(Creature* /*creature*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             // me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
@@ -152,7 +182,6 @@ public:
         }
         return true;
     }
-
 };
 
 class npc_hyjal_thrall : public CreatureScript
@@ -228,7 +257,6 @@ public:
         }
         return true;
     }
-
 };
 
 class npc_hyjal_tyrande : public CreatureScript
@@ -290,9 +318,331 @@ public:
 
 };
 
+struct npc_hyjal_ground_trash : public ScriptedAI
+{
+    npc_hyjal_ground_trash(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        switch (me->GetEntry())
+        {
+        case NPC_NECRO:
+        case NPC_BANSH:
+            if (!who)
+                return;
+
+            if (me->Attack(who, true))
+                me->GetMotionMaster()->MoveChase(who, 30.0f);
+            break;
+        default:
+            ScriptedAI::AttackStart(who);
+            break;
+        }
+        
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        switch (me->GetEntry())
+        {
+        case NPC_GHOUL:
+        {
+            scheduler.Schedule(3s, 7s, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_FRENZY);
+                    context.Repeat(15s, 30s);
+                }).Schedule(1200ms, [this](TaskContext context)
+                    {
+                        if (me->GetHealthPct() <= 7)
+                            DoCastSelf(SPELL_CANNIBALIZE);
+                        else
+                            context.Repeat();
+                    });
+                break;
+        }
+        case NPC_CRYPT:
+        {
+            scheduler.Schedule(0s, 2400ms, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_CRYPT_SCARABS);
+                    context.Repeat(2400ms, 8s);
+                });
+            break;
+        }
+        case NPC_ABOMI:
+        {
+            scheduler.Schedule(13s, 17s, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_KNOCKDOWN);
+                    context.Repeat(16s, 25s);
+                });
+            break;
+        }
+        case NPC_NECRO:
+        {
+            scheduler.Schedule(0s, 2400ms, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_SHADOW_BOLT);
+                    context.Repeat(2400ms, 4800ms);
+                }).Schedule(5s, 10s, [this](TaskContext context)
+                    {
+                        // TODO: Should target corpse, and skeletons should spawn at the target
+                        switch (urand(1, 3))
+                        {
+                        case 1:
+                            DoCastSelf(SPELL_RAISE_DEAD_1);
+                            break;
+                        case 2:
+                            DoCastSelf(SPELL_RAISE_DEAD_2);
+                            break;
+                        case 3:
+                            DoCastSelf(SPELL_RAISE_DEAD_3);
+                            break;
+                        }
+                        context.Repeat(10s, 20s);
+                    });
+            break;
+        }
+        case NPC_BANSH:
+        {
+            scheduler.Schedule(10s, 15s, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        DoCast(target, SPELL_BANSHEE_CURSE);
+                    context.Repeat(18s, 24s);
+                }).Schedule(5s, 15s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_ANTI_MAGIC_SHELL);
+                        context.Repeat(18s, 24s);
+                    }).Schedule(0s, 1s, [this](TaskContext context)
+                        {
+                            DoCastVictim(SPELL_BANSHEE_WAIL);
+                            context.Repeat(1800ms, 2200ms);
+                        });
+            
+            break;
+        }
+        case NPC_STALK:
+        {
+            scheduler.Schedule(3s, 6s, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(POWER_MANA), 30.f, true)))
+                        DoCast(target, SPELL_MANA_BURN);
+                    context.Repeat(6s, 9s);
+                });
+            break;
+        }
+        }
+        
+    }
+
+    void DoAction(int32 action) override
+    {            
+        switch (action)
+        {
+        case DATA_WINTERCHILL:
+        case DATA_ANETHERON:
+        case DATA_ALLIANCE_RETREAT:
+            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+            break;
+        case DATA_KAZROGAL:
+        case DATA_AZGALOR:
+        case DATA_HORDE_RETREAT:
+            me->GetMotionMaster()->MovePath(urand(HORDE_BASE_CHARGE_1, HORDE_BASE_CHARGE_3), false);
+            break;
+        case DATA_ARCHIMONDE:
+            me->GetMotionMaster()->MovePath(urand(NIGHT_ELF_BASE_CHARGE_1, NIGHT_ELF_BASE_CHARGE_3), false);
+            break;
+        }
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        switch (pathId)
+        {
+        case ALLIANCE_BASE_CHARGE_1:
+        case ALLIANCE_BASE_CHARGE_2:
+        case ALLIANCE_BASE_CHARGE_3:
+            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+            break;
+        case HORDE_BASE_CHARGE_1:
+        case HORDE_BASE_CHARGE_2:
+        case HORDE_BASE_CHARGE_3:
+            me->GetMotionMaster()->MovePath(urand(HORDE_BASE_PATROL_1, HORDE_BASE_PATROL_3), true);
+            break;
+        case NIGHT_ELF_BASE_CHARGE_1:
+        case NIGHT_ELF_BASE_CHARGE_2:
+        case NIGHT_ELF_BASE_CHARGE_3:
+            me->GetMotionMaster()->MoveRandom(5.f);
+            break;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+        scheduler.Update(diff);
+    }
+
+};
+
+struct npc_hyjal_gargoyle : public ScriptedAI
+{
+    npc_hyjal_gargoyle(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        if (me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 25.0f);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(0s, 2s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                context.Repeat(2s, 3s);
+            });
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+        case DATA_ALLIANCE_RETREAT:
+            // TODO: Set up to attack NPC_BUILD
+            break;
+        case DATA_KAZROGAL:
+        case DATA_AZGALOR:
+        case DATA_HORDE_RETREAT:
+            if (me->GetPositionX() < 5500.f)
+                me->GetMotionMaster()->MovePath(urand(GARGOYLE_PATH_FORTRESS_1, GARGOYLE_PATH_FORTRESS_3), false);
+            else
+                me->GetMotionMaster()->MovePath(urand(GARGOYLE_PATH_TROLL_CAMP_1, GARGOYLE_PATH_TROLL_CAMP_3), false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        // TODO: Do they do something special after finishing the path?
+        me->GetMotionMaster()->MoveRandom(30.f);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+        scheduler.Update(diff);
+    }
+
+};
+
+struct npc_hyjal_frost_wyrm : public ScriptedAI
+{
+    npc_hyjal_frost_wyrm(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        if (me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 25.0f);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(0s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                context.Repeat(3500ms, 4s);
+            });
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+        case DATA_KAZROGAL:
+        case DATA_AZGALOR:
+        case DATA_HORDE_RETREAT:
+            if (me->GetPositionX() < 5500.f)
+                me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS, false);
+            else
+                me->GetMotionMaster()->MovePath(FROST_WYRM_TROLL_CAMP, false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        if (pathId == FROST_WYRM_FORTRESS)
+            me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS_PATROL, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+        scheduler.Update(diff);
+    }
+
+};
+
 void AddSC_hyjal()
 {
     new npc_hyjal_jaina();
     new npc_hyjal_thrall();
     new npc_hyjal_tyrande();
+    RegisterHyjalAI(npc_hyjal_ground_trash);
+    RegisterHyjalAI(npc_hyjal_gargoyle);
+    RegisterHyjalAI(npc_hyjal_frost_wyrm);
 }
