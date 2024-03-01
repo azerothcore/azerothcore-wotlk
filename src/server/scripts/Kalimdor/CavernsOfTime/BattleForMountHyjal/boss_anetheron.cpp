@@ -94,6 +94,7 @@ public:
             summon->AI()->DoCast(SPELL_INFERNAL_STUN);
             summon->SetInCombatWithZone();
         }
+        BossAI::JustSummoned(summon);
     }
 
     void DoAction(int32 action) override

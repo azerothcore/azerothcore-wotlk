@@ -299,6 +299,20 @@ public:
                     for (ObjectGuid const& guid : _ancientGemHorde)
                         instance->GetGameObject(guid)->Respawn();
 
+                    if (Creature* jaina = GetCreature(DATA_JAINA))
+                    {
+                        for (ObjectGuid const& guid : _baseHorde)
+                        {
+                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive());
+                            {
+                                float x, y, z;
+                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
+                                instance->GetCreature(guid)->SetWalk(true);
+                                instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
+                            }
+                        }
+                    }
+
                     _scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)

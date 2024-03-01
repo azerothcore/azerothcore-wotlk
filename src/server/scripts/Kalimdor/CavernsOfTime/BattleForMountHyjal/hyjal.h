@@ -178,7 +178,9 @@ enum HyjalPaths
 
     FROST_WYRM_TROLL_CAMP       = 179071,
     FROST_WYRM_FORTRESS         = 179072,
-    FROST_WYRM_FORTRESS_PATROL  = 179073
+    FROST_WYRM_FORTRESS_PATROL  = 179073,
+
+    HORDE_BOSS_PATH             = 178527
 };
 
 template <class AI, class T>

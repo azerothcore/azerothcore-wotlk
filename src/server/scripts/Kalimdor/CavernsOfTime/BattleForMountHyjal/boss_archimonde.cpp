@@ -22,12 +22,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
-/* ScriptData
-SDName: Boss_Archimonde
-SD%Complete: 85
-SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
-SDCategory: Caverns of Time, Mount Hyjal
-EndScriptData */
 
 enum Texts
 {

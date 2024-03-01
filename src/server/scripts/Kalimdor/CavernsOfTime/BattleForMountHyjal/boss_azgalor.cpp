@@ -25,11 +25,7 @@ enum Spells
     SPELL_DOOM                  = 31347,
     SPELL_HOWL_OF_AZGALOR       = 31344,
     SPELL_CLEAVE                = 31345,
-    SPELL_BERSERK               = 26662,
-
-    SPELL_THRASH                = 12787,
-    SPELL_CRIPPLE               = 31406,
-    SPELL_WARSTOMP              = 31408,
+    SPELL_BERSERK               = 26662
 };
 
 enum Texts
@@ -37,13 +33,92 @@ enum Texts
     SAY_ONDEATH             = 0,
     SAY_ONSLAY              = 1,
     SAY_DOOM                = 2, // Not used?
-    SAY_ONAGGRO             = 3,
+    SAY_ONSPAWN             = 3
 };
 
 struct boss_azgalor : public BossAI
 {
 public:
-    boss_azgalor(Creature* creature) : BossAI(creature, DATA_AZGALOR) { }
+    boss_azgalor(Creature* creature) : BossAI(creature, DATA_AZGALOR)
+    {
+        _recentlySpoken = false;
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+    }
+
+    void JustEngagedWith(Unit * who) override
+    {
+        BossAI::JustEngagedWith(who);
+
+        scheduler.Schedule(10s, 16s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(8s, 16s);
+        }).Schedule(25s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.f))
+                DoCast(target, SPELL_RAIN_OF_FIRE);
+
+            context.Repeat(15s);
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_HOWL_OF_AZGALOR);
+            context.Repeat(18s, 20s);
+        }).Schedule(45s, 55s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.f))
+                DoCast(target, SPELL_DOOM);
+            Talk(SAY_DOOM);
+            context.Repeat();
+        }).Schedule(600s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_BERSERK);
+                context.Repeat(300s);
+            });
+    }
+
+    void DoAction(int32 action) override
+    {
+        Talk(SAY_ONSPAWN, 1200ms);
+
+        if (action == DATA_AZGALOR)
+            me->GetMotionMaster()->MovePath(HORDE_BOSS_PATH, false);
+    }
+
+    void KilledUnit(Unit * victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
+        {
+            Talk(SAY_ONSLAY);
+            _recentlySpoken = true;
+
+            scheduler.Schedule(6s, [this](TaskContext)
+                {
+                    _recentlySpoken = false;
+                });
+        }
+    }
+
+    void JustDied(Unit * killer) override
+    {
+        Talk(SAY_ONDEATH);
+        instance->GetCreature(DATA_ARCHIMONDE)->AI()->DoAction(DATA_ARCHIMONDE);
+        BossAI::JustDied(killer);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    bool _recentlySpoken;
 
 };
 

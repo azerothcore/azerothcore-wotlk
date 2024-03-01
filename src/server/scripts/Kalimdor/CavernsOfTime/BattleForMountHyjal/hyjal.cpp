@@ -80,7 +80,8 @@ enum Talk
     SAY_RALLY    = 3,
     SAY_FAILURE  = 4,
     SAY_SUCCESS  = 5,
-    SAY_DEATH    = 6
+    SAY_DEATH    = 6,
+    SAY_TELEPORT = 7
 };
 
 class npc_hyjal_jaina : public CreatureScript
@@ -126,17 +127,14 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            // me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
-            DoCastSelf(SPELL_SALVATION, true);
 
-            scheduler.Schedule(2400ms, [this](TaskContext context)
-                {
-                    // me->SetFacingTo(1.082104f);
-                    DoCastSelf(SPELL_MASS_TELEPORT);
-                    if (InstanceScript* hyjal = me->GetInstanceScript())
-                        hyjal->SetData(DATA_HORDE_RETREAT, 0);
-                });
+            // Should wait 2400ms
+            me->SetFacingTo(1.082104f);
+            DoCastSelf(SPELL_MASS_TELEPORT);
+            Talk(SAY_TELEPORT);
+            if (InstanceScript* hyjal = me->GetInstanceScript())
+                hyjal->SetData(DATA_HORDE_RETREAT, 0);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -149,6 +147,7 @@ public:
         void PathEndReached(uint32 /*pathId*/) override
         {
             DoCastSelf(SPELL_MASS_TELEPORT);
+            Talk(SAY_TELEPORT);
             if (InstanceScript* hyjal = me->GetInstanceScript())
                 hyjal->SetData(DATA_ALLIANCE_RETREAT, 0);
         }

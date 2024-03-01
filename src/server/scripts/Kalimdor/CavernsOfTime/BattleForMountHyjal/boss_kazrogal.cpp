@@ -24,17 +24,18 @@
 
 enum Spells
 {
-    SPELL_CLEAVE        = 31436,
-    SPELL_WARSTOMP      = 31480,
-    SPELL_MARK          = 31447,
-    SPELL_MARK_DAMAGE   = 31463
+    SPELL_MALEVOLENT_CLEAVE = 31436,
+    SPELL_WAR_STOMP         = 31480,
+    SPELL_CRIPPLE           = 31477,
+    SPELL_MARK              = 31447,
+    SPELL_MARK_DAMAGE       = 31463
 };
 
 enum Texts
 {
     SAY_ONSLAY          = 0,
     SAY_MARK            = 1,
-    SAY_ONAGGRO         = 2,
+    SAY_ONSPAWN         = 2,
 };
 
 enum Sounds
@@ -42,17 +43,99 @@ enum Sounds
     SOUND_ONDEATH       = 11018,
 };
 
-enum Misc
-{
-    PATH_KAZROGAL       = 178880,
-    POINT_COMBAT_START  = 7
-};
-
 struct boss_kazrogal : public BossAI
 {
 public:
-    boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL) { }
+    boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL)
+    {
+        _recentlySpoken = false;
+        _markCounter = 0;
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+    }
 
+    void JustEngagedWith(Unit * who) override
+    {
+        BossAI::JustEngagedWith(who);
+
+        scheduler.Schedule(6s, 21s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_MALEVOLENT_CLEAVE);
+            context.Repeat();
+        }).Schedule(12s, 18s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 12.f))
+            {
+                DoCastAOE(SPELL_WAR_STOMP);
+                context.Repeat(15s, 30s);
+            }
+            else
+                context.Repeat(1200ms);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.f))
+                DoCast(target, SPELL_CRIPPLE);
+
+            context.Repeat(12s, 20s);
+        }).Schedule(45s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_MARK);
+            Talk(SAY_MARK);
+            context.Repeat(GetMarkRepeatTimer());
+        });
+    }
+
+    Milliseconds GetMarkRepeatTimer()
+    {
+        Milliseconds timer = 45000ms - (5000ms * _markCounter);
+        if (timer <= 10000ms)
+            return 10000ms;
+        else
+            return timer;
+    }
+
+    void DoAction(int32 action) override
+    {
+        Talk(SAY_ONSPAWN, 1200ms);
+
+        if (action == DATA_KAZROGAL)
+            me->GetMotionMaster()->MovePath(HORDE_BOSS_PATH, false);
+    }
+
+    void KilledUnit(Unit * victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
+        {
+            Talk(SAY_ONSLAY);
+            _recentlySpoken = true;
+
+            scheduler.Schedule(6s, [this](TaskContext)
+                {
+                    _recentlySpoken = false;
+                });
+        }
+    }
+
+    void JustDied(Unit * killer) override
+    {
+        me->PlayDirectSound(SOUND_ONDEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    bool _recentlySpoken;
+    uint8 _markCounter;
 };
 
 class spell_mark_of_kazrogal : public SpellScriptLoader
