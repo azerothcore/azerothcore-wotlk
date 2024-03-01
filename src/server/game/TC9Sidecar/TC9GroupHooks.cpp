@@ -67,7 +67,6 @@ void ToCloud9GroupHooks::OnGroupLootTypeChanged(uint32 group, uint8 lootType, ui
     }
 }
 
-
 void ToCloud9GroupHooks::OnGroupConvertedToRaid(uint32 group)
 {
     LOG_INFO("server", "Group converted to raid. ID: {}.", group);

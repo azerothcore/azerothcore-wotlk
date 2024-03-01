@@ -26,5 +26,4 @@ public:
     static void OnGroupDungeonDifficultyChanged(uint32 group, uint8 difficulty);
 };
 
-
 #endif /* TC9GroupHooks_h */
