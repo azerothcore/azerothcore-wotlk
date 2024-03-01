@@ -147,7 +147,7 @@ void OpcodeTable::Initialize()
     /*0x010*/ DEFINE_HANDLER(CMSG_LEARN_SPELL, STATUS_LOGGEDIN, PROCESS_INPLACE, &WorldSession::LearnSpellHandler);
     /*0x011*/ DEFINE_HANDLER(CMSG_CREATEMONSTER,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x012*/ DEFINE_HANDLER(CMSG_DESTROYMONSTER,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x013*/ DEFINE_HANDLER(CMSG_CREATEITEM,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    DEFINE_HANDLER(CMSG_CREATEITEM,STATUS_LOGGEDIN,PROCESS_INPLACE,&WorldSession::CreateItemCheatHandler);
     /*0x014*/ DEFINE_HANDLER(CMSG_CREATEGAMEOBJECT,                                                 STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x015*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_CHECK_FOR_BOTS,                                     STATUS_NEVER);
     /*0x016*/ DEFINE_HANDLER(CMSG_MAKEMONSTERATTACKGUID,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
