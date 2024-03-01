@@ -8,6 +8,7 @@
 #ifndef _TC9_GROUP_HOOKS_H
 #define _TC9_GROUP_HOOKS_H
 
+#include "Common.h"
 #include "libsidecar.h"
 
 class ToCloud9GroupHooks
