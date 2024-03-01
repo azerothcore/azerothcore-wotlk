@@ -8154,7 +8154,7 @@ BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
     }
     Item* item = StoreNewItem(dest, itemId, true);
     if (item) {
-        SendItemPush(item, quantity, true, false);
+        SendItemPush(item, quantity, true, true);
     }
     return result;
 }
