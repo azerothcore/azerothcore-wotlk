@@ -39,10 +39,15 @@ typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 
 
 
-
-#line 14 "lib.go"
+#line 16 "lib.go"
 
 #include <stdint.h>
+
+#line 1 "cgo-generated-wrapper"
+
+#line 3 "monitoring.go"
+
+#include "monitoring.h"
 
 #line 1 "cgo-generated-wrapper"
 
@@ -171,10 +176,6 @@ extern void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h);
 //
 extern void TC9ProcessEventsHooks();
 
-// TC9ProcessGRPCRequests calls all grpc handlers in queue.
-//
-extern void TC9ProcessGRPCRequests();
-
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
 //
 extern GoUint64 TC9GetNextAvailableCharacterGuid();
@@ -196,10 +197,18 @@ extern void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps, uin
 //
 extern void TC9GracefulShutdown();
 
+// TC9ProcessGRPCOrHTTPRequests calls all grpc or http handlers in queue.
+//
+extern void TC9ProcessGRPCOrHTTPRequests();
+
 // TC9ReadyToAcceptPlayersFromMaps notifies servers registry that this server
 // loaded maps related data and ready to accept players from those maps.
 //
 extern void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen);
+
+// TC9SetMonitoringDataCollectorHandler sets handler for getting data to handle monitoring request.
+//
+extern void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h);
 
 // TC9SetCanPlayerInteractWithNPCAndFlagsHandler sets handler for can player interact with NPC and with given NPC flags request.
 //

@@ -893,10 +893,8 @@ void Group::ForcedDisband(bool hideDestroy /* = false */)
 void Group::Disband(bool hideDestroy /* = false */)
 {
     if (sToCloud9Sidecar->ClusterModeEnabled() && !this->isBFGroup() && !this->isBGGroup())
-    {
         return;
-    }
-    
+
     ForcedDisband(hideDestroy);
 }
 
@@ -1691,7 +1689,7 @@ void Group::SendUpdate()
         // Group service responsible for sending these updates.
         return;
     }
-    
+
     for (member_witerator witr = m_memberSlots.begin(); witr != m_memberSlots.end(); ++witr)
         SendUpdateToPlayer(witr->guid, &(*witr));
 }

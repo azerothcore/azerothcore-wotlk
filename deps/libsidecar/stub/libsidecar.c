@@ -48,9 +48,9 @@ void TC9SetOnGuildMemberLeftHook(OnGuildMemberLeftHook h) { panicWithTC9Unavaila
 // TC9ProcessEventsHooks calls all events hooks.
 void TC9ProcessEventsHooks() { panicWithTC9Unavailable("TC9ProcessEventsHooks"); }
 
-// TC9ProcessGRPCRequests calls all grpc handlers in queue.
+// TC9ProcessGRPCOrHTTPRequests calls all grpc or http handlers in queue.
 //
-void TC9ProcessGRPCRequests() { panicWithTC9Unavailable("TC9ProcessGRPCRequests"); }
+void TC9ProcessGRPCOrHTTPRequests() { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
 
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
 GoUint64 TC9GetNextAvailableCharacterGuid() { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
@@ -99,3 +99,8 @@ void TC9SetGetMoneyForPlayerHandler(GetMoneyForPlayerHandler h) { panicWithTC9Un
 // TC9SetModifyMoneyForPlayerHandler sets handler for modify money for given player request.
 //
 void TC9SetModifyMoneyForPlayerHandler(ModifyMoneyForPlayerHandler h) { panicWithTC9Unavailable("TC9SetModifyMoneyForPlayerHandler"); }
+
+
+// TC9SetOnMapsReassignedHook sets hook for maps reassigning by servers registry event.
+//
+void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }

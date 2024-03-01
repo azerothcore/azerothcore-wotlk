@@ -41,7 +41,7 @@ void ToCloud9GroupHooks::OnGroupDisbanded(uint32 group)
 void ToCloud9GroupHooks::OnGroupMemberAdded(uint32 group, uint64 member)
 {
     LOG_INFO("server", "Group member added. ID: {}; Member: {}.", group, member);
-    
+
     if (Group* g = sGroupMgr->GetGroupByGUID(group))
         g->AddMemberWithGuid(ObjectGuid(member));
 }

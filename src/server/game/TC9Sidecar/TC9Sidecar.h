@@ -44,7 +44,7 @@ public:
     void SetupGrpcHandlers();
 
     void ProcessHooks();
-    void ProcessGrpcRequests();
+    void ProcessGrpcOrHttpRequests();
     void ProcessAsyncTasks();
 
     uint32 GenerateCharacterGuid();
@@ -57,7 +57,7 @@ private:
     bool _clusterModeEnabled;
 
     bool _assignedMapsByID[MAX_MAP_ID];
-    
+
     AsyncCallbackProcessor<AsyncTask<bool>> _asyncTasksProcessor;
 };
 

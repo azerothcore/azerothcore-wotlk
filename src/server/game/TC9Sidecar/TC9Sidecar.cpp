@@ -23,8 +23,11 @@
 #include "Config.h"
 #include "Log.h"
 #include "InstanceSaveMgr.h"
+#include "UpdateTime.h"
 
 #define AVAILABLE_MAPS_ALL_MAPS ""
+
+MonitoringDataCollectorResponse HandleMonitoringRequest();
 
 ToCloud9Sidecar* ToCloud9Sidecar::instance()
 {
@@ -96,6 +99,8 @@ void ToCloud9Sidecar::SetupGrpcHandlers()
 
     TC9SetCanPlayerInteractWithGOAndTypeHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithGOAndType);
     TC9SetCanPlayerInteractWithNPCAndFlagsHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithNPCAndFlags);
+
+    TC9SetMonitoringDataCollectorHandler(&HandleMonitoringRequest);
 }
 
 void ToCloud9Sidecar::ProcessHooks()
@@ -103,9 +108,9 @@ void ToCloud9Sidecar::ProcessHooks()
     TC9ProcessEventsHooks();
 }
 
-void ToCloud9Sidecar::ProcessGrpcRequests()
+void ToCloud9Sidecar::ProcessGrpcOrHttpRequests()
 {
-    TC9ProcessGRPCRequests();
+    TC9ProcessGRPCOrHTTPRequests();
 }
 
 void ToCloud9Sidecar::ProcessAsyncTasks()
@@ -166,4 +171,17 @@ void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uin
         task.ExecuteAsync();
         sToCloud9Sidecar->_asyncTasksProcessor.AddCallback(std::move(task));
     }
+}
+
+MonitoringDataCollectorResponse HandleMonitoringRequest()
+{
+    MonitoringDataCollectorResponse res;
+    res.errorCode         = MonitoringErrorCodeNoError;
+    res.diffMean          = sWorldUpdateTime.GetAverageUpdateTime();
+    res.diffMedian        = sWorldUpdateTime.GetPercentile(50);
+    res.diff95Percentile  = sWorldUpdateTime.GetPercentile(95);
+    res.diff99Percentile  = sWorldUpdateTime.GetPercentile(99);
+    res.diffMaxPercentile = sWorldUpdateTime.GetPercentile(100);
+    res.connectedPlayers  = sWorld->GetActiveSessionCount();
+    return res;
 }

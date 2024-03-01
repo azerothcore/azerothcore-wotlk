@@ -2490,8 +2490,8 @@ void World::Update(uint32 diff)
         }
 
         {
-            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 gRPC requests"));
-            sToCloud9Sidecar->ProcessGrpcRequests();
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 gRPC and HTTP requests"));
+            sToCloud9Sidecar->ProcessGrpcOrHttpRequests();
         }
     }
 
