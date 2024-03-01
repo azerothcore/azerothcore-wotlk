@@ -104,3 +104,8 @@ void TC9SetModifyMoneyForPlayerHandler(ModifyMoneyForPlayerHandler h) { panicWit
 // TC9SetOnMapsReassignedHook sets hook for maps reassigning by servers registry event.
 //
 void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }
+
+// TC9SetMonitoringDataCollectorHandler sets handler for getting data to handle monitoring request.
+//
+void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }
+
