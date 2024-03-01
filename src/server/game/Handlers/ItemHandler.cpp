@@ -48,13 +48,13 @@ void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 
     if (!m_player->IsValidPos(srcbag, srcslot, true))
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     if (!m_player->IsValidPos(dstbag, dstslot, false))       // can be autostore pos
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
         return;
     }
 
@@ -74,13 +74,13 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
     if (!m_player->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot, true))
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     if (!m_player->IsValidPos(INVENTORY_SLOT_BAG_0, dstslot, true))
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
         return;
     }
 
@@ -137,13 +137,13 @@ void WorldSession::HandleSwapItem(WorldPacket& recvData)
 
     if (!m_player->IsValidPos(srcbag, srcslot, true))
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     if (!m_player->IsValidPos(dstbag, dstslot, true))
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
         return;
     }
 
@@ -176,14 +176,14 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     ItemTemplate const* pProto = pSrcItem->GetTemplate();
     if (!pProto)
     {
-        m_player->SendEquipError(pSrcItem->IsBag() ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem);
+        m_player->SendInventoryChangeFailure(pSrcItem->IsBag() ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem);
         return;
     }
 
     uint8 eslot = m_player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
     if (eslot == NULL_SLOT)
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
@@ -191,7 +191,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
     if (dest == src) // prevent equip in same slot, only at cheat
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
@@ -213,7 +213,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
             m_player->ApplyEnchantment(pDstItem, true);
         }
 
-        m_player->SendEquipError(msg, pSrcItem, nullptr);
+        m_player->SendInventoryChangeFailure(msg, pSrcItem, nullptr);
         return;
     }
 
@@ -234,7 +234,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         msg = m_player->CanUnequipItem(dest, !pSrcItem->IsBag());
         if (msg != BAG_OK)
         {
-            m_player->SendEquipError(msg, pDstItem, nullptr);
+            m_player->SendInventoryChangeFailure(msg, pDstItem, nullptr);
             return;
         }
 
@@ -266,7 +266,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
 
         if (msg != BAG_OK)
         {
-            m_player->SendEquipError(msg, pDstItem, pSrcItem);
+            m_player->SendInventoryChangeFailure(msg, pDstItem, pSrcItem);
             return;
         }
 
@@ -307,7 +307,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         BAG_RESULT msg = m_player->CanUnequipItem(pos, false);
         if (msg != BAG_OK)
         {
-            m_player->SendEquipError(msg, m_player->GetItemByPos(pos), nullptr);
+            m_player->SendInventoryChangeFailure(msg, m_player->GetItemByPos(pos), nullptr);
             return;
         }
     }
@@ -315,13 +315,13 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
     Item* pItem  = m_player->GetItemByPos(bag, slot);
     if (!pItem)
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     if (pItem->GetTemplate()->Flags & ITEM_FLAG_NO_USER_DESTROY)
     {
-        m_player->SendEquipError(EQUIP_ERR_CANT_DROP_SOULBOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_CANT_DROP_SOULBOUND, nullptr, nullptr);
         return;
     }
 
@@ -716,13 +716,13 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
         {
             data.Initialize(SMSG_READ_ITEM_FAILED, 8);
             LOG_DEBUG("network.opcode", "STORAGE: Unable to read item");
-            m_player->SendEquipError(msg, pItem, nullptr);
+            m_player->SendInventoryChangeFailure(msg, pItem, nullptr);
         }
         data << pItem->GetGUID();
         SendPacket(&data);
     }
     else
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
 }
 
 void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
@@ -809,7 +809,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
                 uint32 money = pProto->SellPrice * count;
                 if (m_player->GetMoney() >= MAX_MONEY_AMOUNT - money)               // prevent exceeding gold limit
                 {
-                    m_player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+                    m_player->SendInventoryChangeFailure(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
                     m_player->SendSellError(SELL_ERR_UNK, creature, itemguid, 0);
                     return;
                 }
@@ -953,7 +953,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
             m_player->StoreItem(dest, pItem, true);
         }
         else
-            m_player->SendEquipError(msg, pItem, nullptr);
+            m_player->SendInventoryChangeFailure(msg, pItem, nullptr);
         return;
     }
     else
@@ -1154,7 +1154,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
 
     if (!m_player->IsValidPos(dstbag, NULL_SLOT, false))      // can be autostore pos
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
         return;
     }
 
@@ -1166,7 +1166,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
         BAG_RESULT msg = m_player->CanUnequipItem(src, !m_player->IsBagPos (src));
         if (msg != BAG_OK)
         {
-            m_player->SendEquipError(msg, pItem, nullptr);
+            m_player->SendInventoryChangeFailure(msg, pItem, nullptr);
             return;
         }
     }
@@ -1175,7 +1175,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
     BAG_RESULT msg = m_player->CanStoreItem(dstbag, NULL_SLOT, dest, pItem, false);
     if (msg != BAG_OK)
     {
-        m_player->SendEquipError(msg, pItem, nullptr);
+        m_player->SendInventoryChangeFailure(msg, pItem, nullptr);
         return;
     }
 
@@ -1183,7 +1183,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
     if (dest.size() == 1 && dest[0].pos == src)
     {
         // just remove grey item state
-        m_player->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_NONE, pItem, nullptr);
         return;
     }
 
@@ -1196,7 +1196,7 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
 {
     if (!m_player->IsAlive())
     {
-        m_player->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
         return;
     }
 
@@ -1209,7 +1209,7 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
     {
         if (!m_player->GetItemCount(item))
         {
-            m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+            m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
             return;
         }
 
@@ -1278,13 +1278,13 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     Item* gift = m_player->GetItemByPos(gift_bag, gift_slot);
     if (!gift)
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
         return;
     }
 
     if (!(gift->GetTemplate()->Flags & ITEM_FLAG_IS_WRAPPER)) // cheating: non-wrapper wrapper
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
         return;
     }
 
@@ -1292,63 +1292,63 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 
     if (!item)
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
         return;
     }
 
     // xinef: do not allow to wrap removed items, just in case
     if (item->GetState() == ITEM_REMOVED)
     {
-        m_player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
         return;
     }
 
     if (item == gift)                                          // not possable with pacjket from real client
     {
-        m_player->SendEquipError(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->IsEquipped())
     {
-        m_player->SendEquipError(EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->GetGuidValue(ITEM_FIELD_GIFTCREATOR))        // HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
     {
-        m_player->SendEquipError(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->IsBag())
     {
-        m_player->SendEquipError(EQUIP_ERR_BAGS_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_BAGS_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->IsSoulBound())
     {
-        m_player->SendEquipError(EQUIP_ERR_BOUND_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_BOUND_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->GetMaxStackCount() != 1)
     {
-        m_player->SendEquipError(EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     // maybe not correct check  (it is better than nothing)
     if (item->GetTemplate()->MaxCount > 0)
     {
-        m_player->SendEquipError(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
     if (item->GetTemplate()->Duration > 0)
     {
-        m_player->SendEquipError(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, nullptr);
         return;
     }
 
@@ -1494,7 +1494,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 {
                     if (iGemProto->ItemId == Gems[j]->GetEntry())
                     {
-                        m_player->SendEquipError(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
+                        m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
                         return;
                     }
                 }
@@ -1504,7 +1504,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                     {
                         if (iGemProto->ItemId == enchantEntry->GemID)
                         {
-                            m_player->SendEquipError(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
+                            m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
                             return;
                         }
                     }
@@ -1539,7 +1539,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
                 if (limit_newcount > 0 && uint32(limit_newcount) > limitEntry->maxCount)
                 {
-                    m_player->SendEquipError(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
+                    m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED, itemTarget, nullptr);
                     return;
                 }
             }
@@ -1550,7 +1550,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         {
             if (BAG_RESULT res = m_player->CanEquipUniqueItem(Gems[i], slot, std::max(limit_newcount, 0)))
             {
-                m_player->SendEquipError(res, itemTarget, nullptr);
+                m_player->SendInventoryChangeFailure(res, itemTarget, nullptr);
                 return;
             }
         }

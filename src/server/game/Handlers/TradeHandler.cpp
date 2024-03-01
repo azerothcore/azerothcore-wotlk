@@ -279,14 +279,14 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
     if (m_player->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - his_trade->GetMoney())
     {
-        m_player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+        m_player->SendInventoryChangeFailure(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
         my_trade->SetAccepted(false, true);
         return;
     }
 
     if (trader->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - my_trade->GetMoney())
     {
-        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+        trader->SendInventoryChangeFailure(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
         his_trade->SetAccepted(false, true);
         return;
     }

@@ -2517,7 +2517,7 @@ void Player::SetAmmo(uint32 item)
     BAG_RESULT msg = CanUseAmmo(item);
     if (msg != BAG_OK)
     {
-        SendEquipError(msg, nullptr, nullptr, item);
+        SendInventoryChangeFailure(msg, nullptr, nullptr, item);
         return;
     }
 
@@ -3444,28 +3444,28 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
     Item* pSrcItem = GetItemByPos(srcbag, srcslot);
     if (!pSrcItem)
     {
-        SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, nullptr);
         return;
     }
 
     if (pSrcItem->m_lootGenerated)                           // prevent split looting item (item
     {
         //best error message found for attempting to split while looting
-        SendEquipError(EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, nullptr);
         return;
     }
 
     // not let split all items (can be only at cheating)
     if (pSrcItem->GetCount() == count)
     {
-        SendEquipError(EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, nullptr);
         return;
     }
 
     // not let split more existed items (can be only at cheating)
     if (pSrcItem->GetCount() < count)
     {
-        SendEquipError(EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, nullptr);
         return;
     }
 
@@ -3481,7 +3481,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
     Item* pNewItem = pSrcItem->CloneItem(count, this);
     if (!pNewItem)
     {
-        SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, nullptr);
         return;
     }
 
@@ -3496,7 +3496,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
         {
             delete pNewItem;
             pSrcItem->SetCount(pSrcItem->GetCount() + count);
-            SendEquipError(msg, pSrcItem, nullptr);
+            SendInventoryChangeFailure(msg, pSrcItem, nullptr);
             return;
         }
 
@@ -3516,7 +3516,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
         {
             delete pNewItem;
             pSrcItem->SetCount(pSrcItem->GetCount() + count);
-            SendEquipError(msg, pSrcItem, nullptr);
+            SendInventoryChangeFailure(msg, pSrcItem, nullptr);
             return;
         }
 
@@ -3536,7 +3536,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
         {
             delete pNewItem;
             pSrcItem->SetCount(pSrcItem->GetCount() + count);
-            SendEquipError(msg, pSrcItem, nullptr);
+            SendInventoryChangeFailure(msg, pSrcItem, nullptr);
             return;
         }
 
@@ -3566,7 +3566,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (!IsAlive())
     {
-        SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem);
+        SendInventoryChangeFailure(EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem);
         return;
     }
 
@@ -3575,7 +3575,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
     if (GetLootGUID() == pSrcItem->GetGUID())                           // prevent swap looting item
     {
         //best error message found for attempting to swap while looting
-        SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, nullptr);
         return;
     }
 
@@ -3586,7 +3586,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
         BAG_RESULT msg = CanUnequipItem(src, !IsBagPos(src) || IsBagPos(dst) || (pDstItem && pDstItem->ToBag() && pDstItem->ToBag()->IsEmpty()));
         if (msg != BAG_OK)
         {
-            SendEquipError(msg, pSrcItem, pDstItem);
+            SendInventoryChangeFailure(msg, pSrcItem, pDstItem);
             return;
         }
     }
@@ -3594,21 +3594,21 @@ void Player::SwapItem(uint16 src, uint16 dst)
     // anti-wpe
     if (pSrcItem->IsBag() && pSrcItem->IsNotEmptyBag() && !IsBagPos(dst))
     {
-        SendEquipError(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, pSrcItem, pDstItem);
+        SendInventoryChangeFailure(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, pSrcItem, pDstItem);
         return;
     }
 
     // prevent put equipped/bank bag in self
     if (IsBagPos(src) && srcslot == dstbag)
     {
-        SendEquipError(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem);
+        SendInventoryChangeFailure(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem);
         return;
     }
 
     // prevent equipping bag in the same slot from its inside
     if (IsBagPos(dst) && srcbag == dstslot)
     {
-        SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem, pDstItem);
+        SendInventoryChangeFailure(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem, pDstItem);
         return;
     }
 
@@ -3620,7 +3620,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
         if (pDstItem->GetGUID() == GetLootGUID())                       // prevent swap looting item
         {
             //best error message found for attempting to swap while looting
-            SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pDstItem, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_CANT_DO_RIGHT_NOW, pDstItem, nullptr);
             return;
         }
 
@@ -3631,7 +3631,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             BAG_RESULT msg = CanUnequipItem(dst, !IsBagPos(dst) || IsBagPos(src) || (pSrcItem->ToBag() && pSrcItem->ToBag()->IsEmpty()));
             if (msg != BAG_OK)
             {
-                SendEquipError(msg, pSrcItem, pDstItem);
+                SendInventoryChangeFailure(msg, pSrcItem, pDstItem);
                 return;
             }
         }
@@ -3649,7 +3649,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             BAG_RESULT msg = CanStoreItem(dstbag, dstslot, dest, pSrcItem, false);
             if (msg != BAG_OK)
             {
-                SendEquipError(msg, pSrcItem, nullptr);
+                SendInventoryChangeFailure(msg, pSrcItem, nullptr);
                 return;
             }
 
@@ -3665,7 +3665,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             BAG_RESULT msg = CanBankItem(dstbag, dstslot, dest, pSrcItem, false);
             if (msg != BAG_OK)
             {
-                SendEquipError(msg, pSrcItem, nullptr);
+                SendInventoryChangeFailure(msg, pSrcItem, nullptr);
                 return;
             }
 
@@ -3680,7 +3680,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             BAG_RESULT msg = CanEquipItem(dstslot, dest, pSrcItem, false);
             if (msg != BAG_OK)
             {
-                SendEquipError(msg, pSrcItem, nullptr);
+                SendInventoryChangeFailure(msg, pSrcItem, nullptr);
                 return;
             }
 
@@ -3775,7 +3775,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             ApplyEnchantment(pDstItem, true);
         }
 
-        SendEquipError(msg, pSrcItem, pDstItem);
+        SendInventoryChangeFailure(msg, pSrcItem, pDstItem);
         return;
     }
 
@@ -3802,7 +3802,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             ApplyEnchantment(pDstItem, true);
         }
 
-        SendEquipError(msg, pDstItem, pSrcItem);
+        SendInventoryChangeFailure(msg, pDstItem, pSrcItem);
         return;
     }
 
@@ -3848,7 +3848,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
                     if (!bagItemProto || !ItemCanGoIntoBag(bagItemProto, emptyProto))
                     {
                         // one from items not go to empty target bag
-                        SendEquipError(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem);
+                        SendInventoryChangeFailure(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem);
                         return;
                     }
 
@@ -3858,7 +3858,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 if (count > emptyBag->GetBagSize())
                 {
                     // too small targeted bag
-                    SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem, pDstItem);
+                    SendInventoryChangeFailure(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem, pDstItem);
                     return;
                 }
 
@@ -4033,7 +4033,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
     }
 }
 
-void Player::SendEquipError(BAG_RESULT msg, Item* pItem, Item* pItem2, uint32 itemid)
+void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*/, Item* pItem2 /*= nullptr*/, uint32 itemid /*= 0*/)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE ({})", msg);
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : 18));

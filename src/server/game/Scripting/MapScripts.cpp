@@ -750,7 +750,7 @@ void Map::ScriptsProcess()
                             pReceiver->SendItemPush(item, step.script->CreateItem.Amount, false, true);
                     }
                     else
-                        pReceiver->SendEquipError(msg, nullptr, nullptr, step.script->CreateItem.ItemEntry);
+                        pReceiver->SendInventoryChangeFailure(msg, nullptr, nullptr, step.script->CreateItem.ItemEntry);
                 }
                 break;
 

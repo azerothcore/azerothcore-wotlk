@@ -726,7 +726,7 @@ bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
     m_vec.clear();
     BAG_RESULT msg = CanStore(pItem, swap);
     if (sendError && msg != BAG_OK)
-        m_pPlayer->SendEquipError(msg, pItem);
+        m_pPlayer->SendInventoryChangeFailure(msg, pItem);
     return (msg == BAG_OK);
 }
 
@@ -736,7 +736,7 @@ bool Guild::MoveItemData::CloneItem(uint32 count)
     m_pClonedItem = m_pItem->CloneItem(count);
     if (!m_pClonedItem)
     {
-        m_pPlayer->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, m_pItem);
+        m_pPlayer->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, m_pItem);
         return false;
     }
     return true;
@@ -766,13 +766,13 @@ bool Guild::PlayerMoveItemData::InitItem()
         // Anti-WPE protection. Do not move non-empty bags to bank.
         if (m_pItem->IsNotEmptyBag())
         {
-            m_pPlayer->SendEquipError(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, m_pItem);
+            m_pPlayer->SendInventoryChangeFailure(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, m_pItem);
             m_pItem = nullptr;
         }
         // Bound items cannot be put into bank.
         else if (!m_pItem->CanBeTraded())
         {
-            m_pPlayer->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, m_pItem);
+            m_pPlayer->SendInventoryChangeFailure(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, m_pItem);
             m_pItem = nullptr;
         }
     }

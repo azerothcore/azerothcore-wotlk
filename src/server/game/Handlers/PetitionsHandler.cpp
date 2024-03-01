@@ -174,7 +174,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     BAG_RESULT msg = m_player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount);
     if (msg != BAG_OK)
     {
-        m_player->SendEquipError(msg, nullptr, nullptr, charterid);
+        m_player->SendInventoryChangeFailure(msg, nullptr, nullptr, charterid);
         return;
     }
 

@@ -278,7 +278,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
             return true;
         else if (msg2 != BAG_OK)
         {
-            SendEquipError(msg2, nullptr, nullptr, srcitem);
+            SendInventoryChangeFailure(msg2, nullptr, nullptr, srcitem);
             return false;
         }
     }
@@ -404,7 +404,7 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
                 GetItemCount(quest->RequiredItemId[i]) < quest->RequiredItemCount[i])
             {
                 if (msg)
-                    SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr, quest->RequiredItemId[i]);
+                    SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr, quest->RequiredItemId[i]);
                 return false;
             }
         }
@@ -478,7 +478,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
             BAG_RESULT res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardChoiceItemId[reward], quest->RewardChoiceItemCount[reward]);
             if (res != BAG_OK)
             {
-                SendEquipError(res, nullptr, nullptr, quest->RewardChoiceItemId[reward]);
+                SendInventoryChangeFailure(res, nullptr, nullptr, quest->RewardChoiceItemId[reward]);
                 return false;
             }
         }
@@ -493,7 +493,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
                 BAG_RESULT res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != BAG_OK)
                 {
-                    SendEquipError(res, nullptr, nullptr, quest->RewardItemId[i]);
+                    SendInventoryChangeFailure(res, nullptr, nullptr, quest->RewardItemId[i]);
                     return false;
                 }
             }
@@ -1347,7 +1347,7 @@ bool Player::GiveQuestSourceItem(Quest const* quest)
         else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
             return true;
         else
-            SendEquipError(msg, nullptr, nullptr, srcitem);
+            SendInventoryChangeFailure(msg, nullptr, nullptr, srcitem);
         return false;
     }
 
@@ -1376,7 +1376,7 @@ bool Player::TakeQuestSourceItem(uint32 questId, bool msg)
             if (res != BAG_OK)
             {
                 if (msg)
-                    SendEquipError(res, nullptr, nullptr, srcItemId);
+                    SendInventoryChangeFailure(res, nullptr, nullptr, srcItemId);
                 return false;
             }
 

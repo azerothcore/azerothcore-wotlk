@@ -1342,7 +1342,7 @@ public:
     Item* GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
-    void SendEquipError(BAG_RESULT msg, Item* pItem, Item* pItem2 = nullptr, uint32 itemid = 0);
+    void SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem = nullptr, Item* pItem2 = nullptr, uint32 itemid = 0);
     void SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param);
     void SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param);
     void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }

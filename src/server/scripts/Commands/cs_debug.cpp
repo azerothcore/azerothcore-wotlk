@@ -242,7 +242,7 @@ public:
 
     static bool HandleDebugSendEquipErrorCommand(ChatHandler* handler, BAG_RESULT error)
     {
-        handler->GetPlayer()->SendEquipError(BAG_RESULT(error), nullptr, nullptr);
+        handler->GetPlayer()->SendInventoryChangeFailure(BAG_RESULT(error), nullptr, nullptr);
         return true;
     }
 

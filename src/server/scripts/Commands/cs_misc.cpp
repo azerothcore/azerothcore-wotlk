@@ -1785,7 +1785,7 @@ public:
                 }
                 else
                 {
-                    player->SendEquipError(msg, nullptr, nullptr, itemTemplate.ItemId);
+                    player->SendInventoryChangeFailure(msg, nullptr, nullptr, itemTemplate.ItemId);
                     handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemTemplate.ItemId, 1);
                 }
             }

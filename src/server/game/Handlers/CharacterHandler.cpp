@@ -1842,7 +1842,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
                 msg = m_player->CanUnequipItem(dstpos, true);
                 if (msg != BAG_OK)
                 {
-                    m_player->SendEquipError(msg, uItem, nullptr);
+                    m_player->SendInventoryChangeFailure(msg, uItem, nullptr);
                     continue;
                 }
             }
@@ -1882,7 +1882,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
                 msg = m_player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
                 if (msg != BAG_OK)
                 {
-                    m_player->SendEquipError(msg, item, nullptr);
+                    m_player->SendInventoryChangeFailure(msg, item, nullptr);
                     continue;
                 }
             }

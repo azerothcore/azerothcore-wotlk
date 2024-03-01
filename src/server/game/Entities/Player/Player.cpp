@@ -7345,7 +7345,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         if (!spellInfo)
         {
             LOG_ERROR("entities.player", "Player::CastItemUseSpell: Item (Entry: {}) in have wrong spell id {}, ignoring ", proto->ItemId, learn_spell_id);
-            SendEquipError(EQUIP_ERR_NONE, item, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_NONE, item, nullptr);
             return;
         }
 
@@ -10624,7 +10624,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
                           CanEquipNewItem(slot, uiDest, item, false);
     if (msg != BAG_OK)
     {
-        SendEquipError(msg, nullptr, nullptr, item);
+        SendInventoryChangeFailure(msg, nullptr, nullptr, item);
         return false;
     }
 
@@ -10782,14 +10782,14 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         // honor points price
         if (GetHonorPoints() < (iece->reqhonorpoints * count))
         {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, nullptr, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, nullptr, nullptr);
             return false;
         }
 
         // arena points price
         if (GetArenaPoints() < (iece->reqarenapoints * count))
         {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, nullptr, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, nullptr, nullptr);
             return false;
         }
 
@@ -10798,7 +10798,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         {
             if (iece->reqitem[i] && !HasItemCount(iece->reqitem[i], (iece->reqitemcount[i] * count)))
             {
-                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr);
+                SendInventoryChangeFailure(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr);
                 return false;
             }
         }
@@ -10807,7 +10807,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         if (GetMaxPersonalArenaRatingRequirement(iece->reqarenaslot) < iece->reqpersonalarenarating)
         {
             // probably not the proper equip err
-            SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, nullptr, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_CANT_EQUIP_RANK, nullptr, nullptr);
             return false;
         }
     }
@@ -10842,7 +10842,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
     {
         if (pProto->BuyCount * count != 1)
         {
-            SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, nullptr, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, nullptr, nullptr);
             return false;
         }
         if (!_StoreOrEquipNewItem(vendorslot, item, count, bag, slot, price, pProto, creature, crItem, false))
@@ -10850,7 +10850,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
     }
     else
     {
-        SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        SendInventoryChangeFailure(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
         return false;
     }
 
@@ -11500,7 +11500,7 @@ bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
         else
         {
             if (sendError)
-                SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+                SendInventoryChangeFailure(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
             return false;
         }
     }
@@ -13471,7 +13471,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
             msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, lootItem->itemid, lootItem->count);
         if (msg != BAG_OK)
         {
-            SendEquipError(msg, nullptr, nullptr, lootItem->itemid);
+            SendInventoryChangeFailure(msg, nullptr, nullptr, lootItem->itemid);
             continue;
         }
 
@@ -13493,7 +13493,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg)
     {
         if (!sScriptMgr->CanSendErrorAlreadyLooted(this))
         {
-            SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
+            SendInventoryChangeFailure(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
         }
         return nullptr;
     }
@@ -13577,7 +13577,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, BAG_RESULT& msg)
     }
     else
     {
-        SendEquipError(msg, nullptr, nullptr, item->itemid);
+        SendInventoryChangeFailure(msg, nullptr, nullptr, item->itemid);
     }
 
     return item;

@@ -7364,7 +7364,7 @@ SpellCastResult Spell::CheckItems()
                     if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM_2)
                         if (target->ToPlayer()->GetFreeInventorySpace() == 0)
                         {
-                            player->SendEquipError(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                            player->SendInventoryChangeFailure(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                             return SPELL_FAILED_DONT_REPORT;
                         }
 
@@ -7382,7 +7382,7 @@ SpellCastResult Spell::CheckItems()
                             /// @todo Needs review
                             if (!itemTemplate->ItemLimitCategory)
                             {
-                                player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                                player->SendInventoryChangeFailure(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                                 return SPELL_FAILED_DONT_REPORT;
                             }
                             else
@@ -7392,7 +7392,7 @@ SpellCastResult Spell::CheckItems()
                                     return SPELL_FAILED_TOO_MANY_OF_ITEM;
                                 else if (!(target->ToPlayer()->HasItemCount(m_spellInfo->Effects[i].ItemType)))
                                 {
-                                    player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                                    player->SendInventoryChangeFailure(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                                     return SPELL_FAILED_DONT_REPORT;
                                 }
                                 else
@@ -7409,7 +7409,7 @@ SpellCastResult Spell::CheckItems()
             {
                 if (player->GetFreeInventorySpace() == 0)
                 {
-                    player->SendEquipError(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                    player->SendInventoryChangeFailure(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                     return SPELL_FAILED_DONT_REPORT;
                 }
                 break;
@@ -7428,7 +7428,7 @@ SpellCastResult Spell::CheckItems()
                     BAG_RESULT msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, 1);
                     if (msg != BAG_OK)
                     {
-                        player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                        player->SendInventoryChangeFailure(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
