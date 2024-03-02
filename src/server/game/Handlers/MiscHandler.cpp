@@ -1821,11 +1821,10 @@ void WorldSession::LearnSpellHandler(WorldPacket& msg)
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
-    if (!ActivePlayer()) {
-        return;
-    }
     // READ THE MESSAGE DATA
     int spellId = msg.read<int>();
     // LEARN THE SPELL
-    ActivePlayer()->LearnSpell(spellId);
+    if (ActivePlayer()) {
+        ActivePlayer()->LearnSpell(spellId);
+    }
 }
