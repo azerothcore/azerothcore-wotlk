@@ -1090,6 +1090,7 @@ public:                                                 // opcodes handlers
     void LearnSpellHandler(WorldPacket& msg);
     void SendGmResurrectFailure();
     void SendGmResurrectSuccess();
+    void SendPlayerNotFoundFailure();
     void SendWhoIsResponse(char const* response);
     void WhoIsHandler(WorldPacket& msg);
 

@@ -1761,6 +1761,12 @@ void WorldSession::SendGmResurrectSuccess()
 }
 
 //===========================================================================
+void WorldSession::SendPlayerNotFoundFailure()
+{
+    SendNotification("Player not found");
+}
+
+//===========================================================================
 void WorldSession::SendWhoIsResponse(const char* response)
 {
     WorldPacket outbound(SMSG_WHOIS, strlen(response)+1);
