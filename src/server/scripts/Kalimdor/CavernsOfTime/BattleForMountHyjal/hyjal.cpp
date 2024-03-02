@@ -469,22 +469,33 @@ struct npc_hyjal_ground_trash : public ScriptedAI
 
     void PathEndReached(uint32 pathId) override
     {
+        // Delay is required because we are calling the movement generator from inside the pathing hook.
+        // If we issue another call here, it will be flushed before it is executed.
         switch (pathId)
         {
         case ALLIANCE_BASE_CHARGE_1:
         case ALLIANCE_BASE_CHARGE_2:
         case ALLIANCE_BASE_CHARGE_3:
-            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+            me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                }, 1s);
             break;
         case HORDE_BASE_CHARGE_1:
         case HORDE_BASE_CHARGE_2:
         case HORDE_BASE_CHARGE_3:
-            me->GetMotionMaster()->MovePath(urand(HORDE_BASE_PATROL_1, HORDE_BASE_PATROL_3), true);
+            me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->GetMotionMaster()->MovePath(urand(HORDE_BASE_PATROL_1, HORDE_BASE_PATROL_3), true);
+                }, 1s);
             break;
         case NIGHT_ELF_BASE_CHARGE_1:
         case NIGHT_ELF_BASE_CHARGE_2:
         case NIGHT_ELF_BASE_CHARGE_3:
-            me->GetMotionMaster()->MoveRandom(5.f);
+            me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->GetMotionMaster()->MoveRandom(5.f);
+                }, 1s);
             break;
         }
     }
@@ -557,7 +568,10 @@ struct npc_hyjal_gargoyle : public ScriptedAI
     void PathEndReached(uint32 pathId) override
     {
         // TODO: Do they do something special after finishing the path?
-        me->GetMotionMaster()->MoveRandom(30.f);
+        me->m_Events.AddEventAtOffset([this]()
+            {
+                me->GetMotionMaster()->MoveRandom(30.f);
+            }, 1s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -625,7 +639,12 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
     void PathEndReached(uint32 pathId) override
     {
         if (pathId == FROST_WYRM_FORTRESS)
-            me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS_PATROL, true);
+        {
+            me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS_PATROL, true);
+                }, 1s);
+        }
     }
 
     void UpdateAI(uint32 diff) override

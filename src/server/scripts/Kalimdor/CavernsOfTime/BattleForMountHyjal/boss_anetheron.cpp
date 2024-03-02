@@ -112,7 +112,10 @@ public:
         case ALLIANCE_BASE_CHARGE_1:
         case ALLIANCE_BASE_CHARGE_2:
         case ALLIANCE_BASE_CHARGE_3:
-            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+            me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                }, 1s);
             break;
         }
     }
