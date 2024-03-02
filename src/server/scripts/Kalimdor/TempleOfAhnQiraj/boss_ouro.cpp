@@ -106,7 +106,7 @@ struct boss_ouro : public BossAI
 {
     boss_ouro(Creature* creature) : BossAI(creature, DATA_OURO)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetControlled(true, UNIT_STATE_ROOT);
     }
 

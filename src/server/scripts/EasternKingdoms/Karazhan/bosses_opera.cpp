@@ -159,7 +159,7 @@ struct boss_dorothee : public ScriptedAI
 {
     boss_dorothee(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
 
         instance = creature->GetInstanceScript();

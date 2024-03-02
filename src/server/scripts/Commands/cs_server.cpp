@@ -271,7 +271,13 @@ public:
 
         handler->PSendSysMessage("Connection peak: %u.", connPeak);
         handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
-        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("Update time diff: %ums. Last %d diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
+        handler->PSendSysMessage("- Mean: %ums", sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("- Median: %ums", sWorldUpdateTime.GetPercentile(50));
+        handler->PSendSysMessage("- Percentiles (95, 99, max): %ums, %ums, %ums",
+                                 sWorldUpdateTime.GetPercentile(95),
+                                 sWorldUpdateTime.GetPercentile(99),
+                                 sWorldUpdateTime.GetPercentile(100));
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
