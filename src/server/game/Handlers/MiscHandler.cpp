@@ -1805,8 +1805,13 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     }
 
     // RESURRECT THE PLAYER
-    playerPtr->Resurrect(100.0f);
-    SendGmResurrectSuccess();
+    if (playerPtr->IsAlive()) {
+        SendGmResurrectFailure();
+    }
+    else {
+        playerPtr->Resurrect(100.0f);
+        SendGmResurrectSuccess();
+    }
 }
 
 //===========================================================================
