@@ -1800,7 +1800,7 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME
     Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
     if (!playerPtr) {
-        SendGmResurrectFailure();
+        SendPlayerNotFoundFailure();
         return;
     }
 
