@@ -23,12 +23,10 @@
 enum Yells
 {
     SAY_AGGRO                           = 0,
-    SAY_SUMMON1                         = 1,
-    SAY_SUMMON2                         = 2,
-    SAY_KILL                            = 3,
-    SAY_DEATH                           = 4,
-    SAY_VOIDA                           = 5,
-    SAY_VOIDB                           = 6
+    SAY_SUMMON                          = 1,
+    SAY_KILL                            = 2,
+    SAY_DEATH                           = 3,
+    SAY_VOID                            = 4
 };
 
 enum Spells
@@ -74,7 +72,7 @@ struct boss_high_astromancer_solarian : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
-            Talk(SAY_VOIDB);
+            Talk(SAY_VOID);
             me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
             me->ResumeChasingVictim();
@@ -146,7 +144,7 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
-            Talk(SAY_SUMMON1);
+            Talk(SAY_SUMMON);
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
@@ -182,7 +180,6 @@ struct boss_high_astromancer_solarian : public BossAI
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
                                 me->SetModelVisible(true);
-                                Talk(SAY_SUMMON2);
                             }
                             else
                             {
