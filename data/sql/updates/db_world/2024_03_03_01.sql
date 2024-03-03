@@ -1,3 +1,4 @@
+-- DB update 2024_03_03_00 -> 2024_03_03_01
 -- Update gameobject 'Barber Chair' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (191817))
