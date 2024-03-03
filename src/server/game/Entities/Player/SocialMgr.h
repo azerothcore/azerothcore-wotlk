@@ -135,7 +135,6 @@ class SocialMgr
         // Packet management
         void MakeFriendStatusPacket(FRIEND_RESULT result, ObjectGuid friend_guid, WorldPacket* data);
         void SendFriendStatus(Player* player, FRIEND_RESULT result, ObjectGuid friend_guid, bool broadcast);
-        void BroadcastToFriendListers(Player* player, WorldPacket* packet);
         // Loading
         PlayerSocial* LoadFromDB(PreparedQueryResult result, ObjectGuid guid);
     private:
