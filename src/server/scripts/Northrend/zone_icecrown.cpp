@@ -1532,7 +1532,7 @@ public:
     {
         npc_guardian_pavilionAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -1596,7 +1596,7 @@ public:
     {
         npc_tournament_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         }
 
@@ -1816,7 +1816,7 @@ public:
             PhaseCount = 0;
             Summons.DespawnAll();
 
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         EventMap events;

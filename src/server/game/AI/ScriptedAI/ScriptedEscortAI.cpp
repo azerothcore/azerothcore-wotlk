@@ -64,7 +64,7 @@ void npc_escortAI::AttackStart(Unit* who)
             me->StopMoving();
         }
 
-        if (IsCombatMovementAllowed())
+        if (me->IsCombatMovementAllowed())
             me->GetMotionMaster()->MoveChase(who);
     }
 }
@@ -178,8 +178,8 @@ void npc_escortAI::JustRespawned()
 {
     RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
 
-    if (!IsCombatMovementAllowed())
-        SetCombatMovement(true);
+    if (!me->IsCombatMovementAllowed())
+        me->SetCombatMovement(true);
 
     //add a small delay before going to first waypoint, normal in near all cases
     m_uiWPWaitTimer = 1000;

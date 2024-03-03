@@ -2772,15 +2772,6 @@ Rate.RewardBonusMoney = 1
 MonsterSight = 50.000000
 
 #
-#    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the combat
-#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
-#                     radius will be used.
-#        Default:     60
-
-ThreatRadius = 60
-
-#
 #    Rate.Creature.Aggro
 #        Description: Aggro radius percentage.
 #        Default:     1   - (Enabled, 100%)

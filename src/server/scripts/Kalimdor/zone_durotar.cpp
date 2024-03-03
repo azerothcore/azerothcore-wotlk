@@ -99,7 +99,7 @@ public:
     {
         npc_tiger_matriarch_creditAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 2s);
         }
 
