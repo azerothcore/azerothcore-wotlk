@@ -146,11 +146,11 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
+            Talk(SAY_SUMMON1);
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
             {
-                Talk(SAY_SUMMON1);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -172,7 +172,6 @@ struct boss_high_astromancer_solarian : public BossAI
             }).Schedule(20s, [this](TaskContext)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
-                Talk(SAY_SUMMON2);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -183,6 +182,7 @@ struct boss_high_astromancer_solarian : public BossAI
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
                                 me->SetModelVisible(true);
+                                Talk(SAY_SUMMON2);
                             }
                             else
                             {
