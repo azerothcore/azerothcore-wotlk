@@ -3456,6 +3456,8 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 for (WorldObject* unit : units)
                     if (IsPlayer(unit) && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
                         targets.push_back(unit);
+            if (e.target.playerRange.maxCount)
+                Acore::Containers::RandomResize(targets, e.target.playerRange.maxCount);
             break;
         }
         case SMART_TARGET_PLAYER_DISTANCE:

@@ -69,7 +69,7 @@ public:
 class AC_SHARED_API ByteBuffer
 {
 public:
-    constexpr static size_t DEFAULT_SIZE = 0x1000;
+    constexpr static std::size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
     ByteBuffer()
@@ -77,7 +77,7 @@ public:
         _storage.reserve(DEFAULT_SIZE);
     }
 
-    ByteBuffer(size_t reserve) : _rpos(0), _wpos(0)
+    explicit ByteBuffer(std::size_t reserve) : _rpos(0), _wpos(0)
     {
         _storage.reserve(reserve);
     }
@@ -90,7 +90,7 @@ public:
     }
 
     ByteBuffer(ByteBuffer const& right) = default;
-    ByteBuffer(MessageBuffer&& buffer);
+    explicit ByteBuffer(MessageBuffer&& buffer);
     virtual ~ByteBuffer() = default;
 
     ByteBuffer& operator=(ByteBuffer const& right)

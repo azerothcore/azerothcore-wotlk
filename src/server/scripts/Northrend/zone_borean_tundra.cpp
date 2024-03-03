@@ -1049,7 +1049,7 @@ public:
     {
         npc_warmage_coldarraAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         uint32 m_uiTimer;                 //Timer until recast

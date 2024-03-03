@@ -359,7 +359,7 @@ public:
             Talk(SAY_GAMESBEGIN_2);
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->SetImmuneToPC(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500ms);

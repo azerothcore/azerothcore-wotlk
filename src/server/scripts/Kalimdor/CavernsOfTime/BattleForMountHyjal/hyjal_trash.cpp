@@ -1411,7 +1411,7 @@ public:
     {
         alliance_riflemanAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         uint32 ExplodeTimer;

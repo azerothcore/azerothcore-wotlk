@@ -147,7 +147,7 @@ struct boss_eye_of_cthun : public BossAI
 {
     boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->m_SightDistance = 90.f;
     }
 
@@ -377,7 +377,7 @@ struct boss_cthun : public BossAI
 {
     boss_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     void Reset() override
@@ -597,7 +597,7 @@ struct npc_eye_tentacle : public ScriptedAI
             }
         }
 
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -651,7 +651,7 @@ struct npc_claw_tentacle : public ScriptedAI
 {
     npc_claw_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
@@ -720,7 +720,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
 {
     npc_giant_claw_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
@@ -870,7 +870,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
 {
     npc_giant_eye_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
