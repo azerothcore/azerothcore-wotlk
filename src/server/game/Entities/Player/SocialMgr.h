@@ -60,8 +60,7 @@ struct FriendInfo
     { }
 };
 
-/// Results of friend related commands
-enum FriendsResult : uint8
+enum FRIEND_RESULT : uint8
 {
     FRIEND_DB_ERROR         = 0x00,
     FRIEND_LIST_FULL        = 0x01,
@@ -80,18 +79,18 @@ enum FriendsResult : uint8
     FRIEND_IGNORE_ALREADY   = 0x0E,
     FRIEND_IGNORE_ADDED     = 0x0F,
     FRIEND_IGNORE_REMOVED   = 0x10,
-    FRIEND_IGNORE_AMBIGUOUS = 0x11,                         // That name is ambiguous, type more of the player's server name
+    FRIEND_IGNORE_AMBIGUOUS = 0x11,
     FRIEND_MUTE_FULL        = 0x12,
     FRIEND_MUTE_SELF        = 0x13,
     FRIEND_MUTE_NOT_FOUND   = 0x14,
     FRIEND_MUTE_ALREADY     = 0x15,
     FRIEND_MUTE_ADDED       = 0x16,
     FRIEND_MUTE_REMOVED     = 0x17,
-    FRIEND_MUTE_AMBIGUOUS   = 0x18,                         // That name is ambiguous, type more of the player's server name
-    FRIEND_UNK1             = 0x19,                         // no message at client
+    FRIEND_MUTE_AMBIGUOUS   = 0x18,
+    FRIEND_UNK1             = 0x19,
     FRIEND_UNK2             = 0x1A,
     FRIEND_UNK3             = 0x1B,
-    FRIEND_UNKNOWN          = 0x1C                          // Unknown friend response from server
+    FRIEND_UNKNOWN          = 0x1C
 };
 
 #define SOCIALMGR_FRIEND_LIMIT  50u
@@ -134,8 +133,8 @@ class SocialMgr
         void RemovePlayerSocial(ObjectGuid guid) { m_socialMap.erase(guid); }
         static void GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo& friendInfo);
         // Packet management
-        void MakeFriendStatusPacket(FriendsResult result, ObjectGuid friend_guid, WorldPacket* data);
-        void SendFriendStatus(Player* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
+        void MakeFriendStatusPacket(FRIEND_RESULT result, ObjectGuid friend_guid, WorldPacket* data);
+        void SendFriendStatus(Player* player, FRIEND_RESULT result, ObjectGuid friend_guid, bool broadcast);
         void BroadcastToFriendListers(Player* player, WorldPacket* packet);
         // Loading
         PlayerSocial* LoadFromDB(PreparedQueryResult result, ObjectGuid guid);

@@ -247,14 +247,14 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo&
     }
 }
 
-void SocialMgr::MakeFriendStatusPacket(FriendsResult result, ObjectGuid guid, WorldPacket* data)
+void SocialMgr::MakeFriendStatusPacket(FRIEND_RESULT result, ObjectGuid guid, WorldPacket* data)
 {
     data->Initialize(SMSG_FRIEND_STATUS, 9);
     *data << uint8(result);
     *data << guid;
 }
 
-void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGuid friendGuid, bool broadcast)
+void SocialMgr::SendFriendStatus(Player* player, FRIEND_RESULT result, ObjectGuid friendGuid, bool broadcast)
 {
     FriendInfo fi;
     GetFriendInfo(player, friendGuid, fi);

@@ -55,7 +55,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 
     uint32 friendAccountId = playerData->AccountId;
     TeamId teamId = Player::TeamIdForRace(playerData->Race);
-    FriendsResult friendResult = FRIEND_NOT_FOUND;
+    FRIEND_RESULT friendResult = FRIEND_NOT_FOUND;
 
     if (!AccountMgr::IsPlayerAccount(GetSecurity()) || sWorld->getBoolConfig(CONFIG_ALLOW_GM_FRIEND)|| AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id.Realm)))
     {
@@ -115,7 +115,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     if (!ignoreGuid)
         return;
 
-    FriendsResult ignoreResult;
+    FRIEND_RESULT ignoreResult;
 
     if (ignoreGuid == GetPlayer()->GetGUID())              //not add yourself
         ignoreResult = FRIEND_IGNORE_SELF;
