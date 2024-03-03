@@ -58,7 +58,7 @@ public:
      */
     [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
 
-    virtual void OnPacketReceived(WorldSession* session, WorldPacket& packet) { }
+    virtual void OnPacketReceived(WorldSession* session, WorldPacket const& packet) { }
 };
 
 #endif
