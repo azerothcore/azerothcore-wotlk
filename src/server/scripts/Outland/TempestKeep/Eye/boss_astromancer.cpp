@@ -59,7 +59,13 @@ enum Misc
 
 struct boss_high_astromancer_solarian : public BossAI
 {
-    boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER) { }
+    boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
@@ -68,6 +74,7 @@ struct boss_high_astromancer_solarian : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
+            me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
             me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
