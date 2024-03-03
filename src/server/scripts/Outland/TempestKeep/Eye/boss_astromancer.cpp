@@ -74,6 +74,7 @@ struct boss_high_astromancer_solarian : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
+            Talk(SAY_VOIDB);
             me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
             me->ResumeChasingVictim();
