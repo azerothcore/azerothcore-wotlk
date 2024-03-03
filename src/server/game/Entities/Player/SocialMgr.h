@@ -44,7 +44,7 @@ enum SocialFlag
     SOCIAL_FLAG_ALL         = SOCIAL_FLAG_FRIEND | SOCIAL_FLAG_IGNORED | SOCIAL_FLAG_MUTED
 };
 
-struct FriendInfo
+struct Friend
 {
     FriendStatus Status;
     uint8 Flags;
@@ -53,10 +53,10 @@ struct FriendInfo
     uint8 Class;
     std::string Note;
 
-    FriendInfo() : Status(FRIEND_STATUS_OFFLINE), Flags(0), Area(0), Level(0), Class(0), Note()
+    Friend() : Status(FRIEND_STATUS_OFFLINE), Flags(0), Area(0), Level(0), Class(0), Note()
     { }
 
-    FriendInfo(uint8 flags, std::string const& note) : Status(FRIEND_STATUS_OFFLINE), Flags(flags), Area(0), Level(0), Class(0), Note(note)
+    Friend(uint8 flags, std::string const& note) : Status(FRIEND_STATUS_OFFLINE), Flags(flags), Area(0), Level(0), Class(0), Note(note)
     { }
 };
 
@@ -116,7 +116,7 @@ class PlayerSocial
         uint32 GetNumberOfSocialsWithFlag(SocialFlag flag) const;
     private:
         bool _checkContact(ObjectGuid guid, SocialFlag flags) const;
-        typedef std::map<ObjectGuid, FriendInfo> PlayerSocialMap;
+        typedef std::map<ObjectGuid, Friend> PlayerSocialMap;
         PlayerSocialMap m_playerSocialMap;
         ObjectGuid m_playerGUID;
 };
@@ -131,7 +131,7 @@ class SocialMgr
         static SocialMgr* instance();
         // Misc
         void RemovePlayerSocial(ObjectGuid guid) { m_socialMap.erase(guid); }
-        static void GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo& friendInfo);
+        static void GetFriendInfo(Player* player, ObjectGuid friendGUID, Friend& friendInfo);
         // Packet management
         void MakeFriendStatusPacket(FRIEND_RESULT result, ObjectGuid friend_guid, WorldPacket* data);
         void SendFriendStatus(Player* player, FRIEND_RESULT result, ObjectGuid friend_guid, bool broadcast);

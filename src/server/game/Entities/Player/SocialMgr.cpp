@@ -137,7 +137,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
 
     for (auto& itr : m_playerSocialMap)
     {
-        FriendInfo& friendInfo = itr.second;
+        Friend& friendInfo = itr.second;
         uint8 contactFlags = friendInfo.Flags;
         if (!(contactFlags & flags))
             continue;
@@ -209,7 +209,7 @@ SocialMgr* SocialMgr::instance()
     return &instance;
 }
 
-void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo& friendInfo)
+void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, Friend& friendInfo)
 {
     if (!player)
         return;
@@ -256,7 +256,7 @@ void SocialMgr::MakeFriendStatusPacket(FRIEND_RESULT result, ObjectGuid guid, Wo
 
 void SocialMgr::SendFriendStatus(Player* player, FRIEND_RESULT result, ObjectGuid friendGuid, bool broadcast)
 {
-    FriendInfo fi;
+    Friend fi;
     GetFriendInfo(player, friendGuid, fi);
 
     WorldPacket data(SMSG_FRIEND_STATUS, 9);
@@ -332,7 +332,7 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, ObjectGuid guid)
         auto flags = fields[1].Get<uint8>();
         auto note = fields[2].Get<std::string>();
 
-        social->m_playerSocialMap[friendGuid] = FriendInfo(flags, note);
+        social->m_playerSocialMap[friendGuid] = Friend(flags, note);
     } while (result->NextRow());
 
     return social;
