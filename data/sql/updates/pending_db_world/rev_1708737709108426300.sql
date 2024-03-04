@@ -2246,3 +2246,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Doors
 UPDATE `gameobject_template_addon` SET `flags` = 34 WHERE (`entry` = 182060);
 UPDATE `gameobject_template_addon` SET `flags` = 34 WHERE (`entry` = 182061);
+
+-- From CMangos
+DELETE FROM `areatrigger_teleport` WHERE `id` IN (4311, 4312, 4313);
+INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
+(4311, 'Battle Of Mount Hyjal, Alliance Base (Entrance)', 534, 5066.79, -1791.9, 1321.65, 2.35619),
+(4312, 'Battle Of Mount Hyjal, Horde Base (Entrance)', 534, 5499.96, -2756.8, 1488.96, 1.39626),
+(4313, 'Battle Of Mount Hyjal, Night Elf Base (Entrance)', 534, 5163.02, -3428.31, 1627.61, 0.785398);
