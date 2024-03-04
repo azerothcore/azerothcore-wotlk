@@ -211,40 +211,43 @@ public:
         {
             InstanceScript::OnUnitDeath(unit);
 
-            switch (unit->ToCreature()->GetEntry())
+            if (Creature* creature = unit->ToCreature())
             {
-            case NPC_NECRO:
-            case NPC_ABOMI:
-            case NPC_GHOUL:
-            case NPC_BANSH:
-            case NPC_CRYPT:
-            case NPC_GARGO:
-            case NPC_FROST:
-            case NPC_INFER:
-            case NPC_STALK:
-                if (unit->ToCreature()->IsSummon())
+                switch (creature->GetEntry())
                 {
-                    if (_bossWave)
+                case NPC_NECRO:
+                case NPC_ABOMI:
+                case NPC_GHOUL:
+                case NPC_BANSH:
+                case NPC_CRYPT:
+                case NPC_GARGO:
+                case NPC_FROST:
+                case NPC_INFER:
+                case NPC_STALK:
+                    if (unit->ToCreature()->IsSummon())
                     {
-                        DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
-                        DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
-                        _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
+                        if (_bossWave)
+                        {
+                            DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
+                            DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
+                            _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
 
-                        if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
-                            SetData(DATA_SPAWN_WAVES, 1);
+                            if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
+                                SetData(DATA_SPAWN_WAVES, 1);
+                        }
                     }
+                    break;
+                case NPC_WINTERCHILL:
+                case NPC_ANETHERON:
+                case NPC_KAZROGAL:
+                case NPC_AZGALOR:
+                    if (Creature* jaina = GetCreature(DATA_JAINA))
+                        jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    if (Creature* thrall = GetCreature(DATA_THRALL))
+                        thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    SetData(DATA_RESET_WAVES, 1);
+                    break;
                 }
-                break;
-            case NPC_WINTERCHILL:
-            case NPC_ANETHERON:
-            case NPC_KAZROGAL:
-            case NPC_AZGALOR:
-                if (Creature* jaina = GetCreature(DATA_JAINA))
-                    jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                if (Creature* thrall = GetCreature(DATA_THRALL))
-                    thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                SetData(DATA_RESET_WAVES, 1);
-                break;
             }
         }
 
