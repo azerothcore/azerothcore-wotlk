@@ -116,7 +116,7 @@ struct boss_high_astromancer_solarian : public BossAI
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
             me->GetMotionMaster()->Clear();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true, true, -SPELL_WRATH_OF_THE_ASTROMANCER))
             {
                 DoCast(target, SPELL_ARCANE_MISSILES);
             }
