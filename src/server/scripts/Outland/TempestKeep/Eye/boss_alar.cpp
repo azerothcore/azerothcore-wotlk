@@ -85,6 +85,8 @@ enum qruseoftheAshtongue
     QUEST_RUSE_OF_THE_ASHTONGUE = 10946,
 };
 
+const float INNER_CIRCLE_RADIUS = 0.0f;
+
 struct boss_alar : public BossAI
 {
 
