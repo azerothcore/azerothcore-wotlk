@@ -129,7 +129,7 @@ struct boss_high_astromancer_solarian : public BossAI
             context.Repeat(800ms, 7300ms);
         }).Schedule(21800ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_WRATH_OF_THE_ASTROMANCER);
+            DoCastRandomTarget(SPELL_WRATH_OF_THE_ASTROMANCER, 0, 100.0f);
             context.Repeat(21800ms, 23350ms);
         }).Schedule(33900ms, [this](TaskContext context)
         {
