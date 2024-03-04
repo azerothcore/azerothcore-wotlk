@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
@@ -85,7 +86,7 @@ enum qruseoftheAshtongue
     QUEST_RUSE_OF_THE_ASHTONGUE = 10946,
 };
 
-const float INNER_CIRCLE_RADIUS = 0.0f;
+const float INNER_CIRCLE_RADIUS = 60.0f;
 
 struct boss_alar : public BossAI
 {
@@ -138,7 +139,7 @@ struct boss_alar : public BossAI
                 if (_noQuillTimes++ > 0)
                 {
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
-                    SpawnPhoenixes(1, me);
+                    SpawnPhoenixes(1, me, false);
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
                 _platform = (_platform+1)%4;
@@ -246,13 +247,21 @@ struct boss_alar : public BossAI
         ScheduleMainSpellAttack(0s);
     }
 
-    void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt)
+    void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt, bool onPosition)
     {
         if (targetToSpawnAt)
         {
             for (uint8 i = 0; i < count; ++i)
             {
-                me->SummonCreature(NPC_EMBER_OF_ALAR, *targetToSpawnAt, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                if (onPosition)
+                {
+                    Position spawnPosition = DeterminePhoenixPosition(targetToSpawnAt->GetPosition());
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, spawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                }
+                else
+                {
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, *targetToSpawnAt, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                }
             }
         }
     }
@@ -264,7 +273,7 @@ struct boss_alar : public BossAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
             {
-                SpawnPhoenixes(2, target);
+                SpawnPhoenixes(2, target, true);
             }
         }).Schedule(6s, [this](TaskContext)
         {
@@ -366,6 +375,36 @@ struct boss_alar : public BossAI
         {
             DoMeleeAttackIfReady();
         }
+    }
+
+    Position DeterminePhoenixPosition(Position playerPosition)
+    {
+        Position finalPosition = playerPosition;
+        float playerXPosition = playerPosition.GetPositionX();
+        float playerYPosition = playerPosition.GetPositionY();
+        float centreXPosition = alarPoints[POINT_MIDDLE].GetPositionX();
+        float centreYPosition = alarPoints[POINT_MIDDLE].GetPositionY();
+        float deltaX = playerXPosition-centreXPosition;
+        float deltaY = playerYPosition-centreYPosition;
+        // if fraction has x position 0.0f we get nan as a result
+        if (float playerFraction = (deltaX/deltaY))
+        {
+            // player angle based on delta X and delta Y
+            float playerAngle = std::atan(playerFraction);
+            float phoenixDeltaYPosition = std::cos(playerAngle)*INNER_CIRCLE_RADIUS;
+            float phoenixDeltaXPosition = std::sin(playerAngle)*INNER_CIRCLE_RADIUS;
+            if (phoenixDeltaYPosition < 0 && deltaY < 0)
+                phoenixDeltaYPosition = -phoenixDeltaYPosition
+            // phoenix position based on set distance
+            finalPosition = {centreXPosition+phoenixDeltaXPosition, centreYPosition+phoenixDeltaYPosition, 0.0f, 0.0f};
+            LOG_ERROR("server", "Player fraction {}, playerAngle {}", std::to_string(playerFraction), std::to_string(playerAngle));
+            LOG_ERROR("server", "Playerposis x: {} y: {}", std::to_string(playerXPosition), std::to_string(playerYPosition));
+            LOG_ERROR("server", "Centre x: {} y: {}", std::to_string(centreXPosition), std::to_string(centreYPosition));
+            LOG_ERROR("server", "Delta x: {} y: {}", std::to_string(deltaX), std::to_string(deltaY));
+            LOG_ERROR("server", "Phoenixposis x: {} y: {}", std::to_string(finalPosition.GetPositionX()), std::to_string(finalPosition.GetPositionY()));
+            LOG_ERROR("server", "Phoenixdelta x: {} y: {}", std::to_string(phoenixDeltaXPosition), std::to_string(phoenixDeltaYPosition));
+        }
+        return finalPosition;
     }
 
 private:
