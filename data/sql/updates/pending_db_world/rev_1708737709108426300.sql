@@ -2167,7 +2167,7 @@ DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+206;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+206, @CGUID+206, 0, 0, 515),
 (@CGUID+206, @CGUID+212, 3, 90, 515),
-(@CGUID+206, @CGUID+221, 0, 180, 515),
+(@CGUID+206, @CGUID+221, 3, 180, 515),
 (@CGUID+206, @CGUID+203, 3, 270, 515),
 (@CGUID+206, @CGUID+225, 3, 360, 515);
 
@@ -2203,7 +2203,7 @@ DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+228;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (@CGUID+228, @CGUID+228, 0, 0, 515),
 (@CGUID+228, @CGUID+230, 3, 90, 515),
-(@CGUID+228, @CGUID+227, 0, 180, 515),
+(@CGUID+228, @CGUID+227, 3, 180, 515),
 (@CGUID+228, @CGUID+216, 3, 270, 515),
 (@CGUID+228, @CGUID+210, 3, 360, 515);
 
