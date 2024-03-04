@@ -104,7 +104,8 @@ public:
     void JustDied(Unit * killer) override
     {
         Talk(SAY_ONDEATH);
-        instance->GetCreature(DATA_ARCHIMONDE)->AI()->DoAction(DATA_ARCHIMONDE);
+        if (Creature* archi = instance->GetCreature(DATA_ARCHIMONDE))
+            archi->AI()->DoAction(DATA_ARCHIMONDE);
         BossAI::JustDied(killer);
     }
 
