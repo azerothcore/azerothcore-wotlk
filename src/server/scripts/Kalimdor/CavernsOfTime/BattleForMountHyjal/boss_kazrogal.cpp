@@ -199,6 +199,6 @@ public:
 void AddSC_boss_kazrogal()
 {
     RegisterHyjalAI(boss_kazrogal);
-    RegisterSpellScript(spell_mark_of_kazrogal);
+    new spell_mark_of_kazrogal();
 }
 
