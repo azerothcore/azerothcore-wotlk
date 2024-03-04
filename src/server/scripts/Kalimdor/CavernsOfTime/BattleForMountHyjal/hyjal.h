@@ -127,11 +127,6 @@ enum HyjalGameobjectIds
     GO_FLAME                    = 182260
 };
 
-enum HyjalSpells
-{
-    SPELL_INFERNAL              = 32148
-};
-
 enum HyjalMisc
 {
     MAX_WAVES_STANDARD          = 9,
@@ -145,8 +140,7 @@ enum HyjalMisc
     START_WAVE_HORDE_RETREAT    = 39,
     START_WAVE_NIGHT_ELF        = 42,
 
-    CONTEXT_GROUP_WAVES         = 1,
-    INFERNAL_COUNT_MAX          = 8
+    CONTEXT_GROUP_WAVES         = 1
 };
 
 enum HyjalPaths
