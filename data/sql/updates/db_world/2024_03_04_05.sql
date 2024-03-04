@@ -1,3 +1,4 @@
+-- DB update 2024_03_04_04 -> 2024_03_04_05
 -- Update Quest 6002
 -- Update SAI NPC Lunaclaw
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 12138) AND (`source_type` = 0) AND (`id` IN (5));
