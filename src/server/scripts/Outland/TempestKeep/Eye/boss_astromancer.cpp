@@ -66,6 +66,7 @@ struct boss_high_astromancer_solarian : public BossAI
         BossAI::Reset();
         me->SetModelVisible(true);
         me->SetReactState(REACT_AGGRESSIVE);
+        _currentWrathTarget = nullptr;
 
         ScheduleHealthCheckEvent(20, [&]{
             scheduler.CancelAll();
@@ -118,7 +119,10 @@ struct boss_high_astromancer_solarian : public BossAI
             me->GetMotionMaster()->Clear();
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
             {
-                DoCast(target, SPELL_ARCANE_MISSILES);
+                if (target != _currentWrathTarget)
+                {
+                    DoCast(target, SPELL_ARCANE_MISSILES);
+                }
             }
             else
             {
@@ -129,7 +133,11 @@ struct boss_high_astromancer_solarian : public BossAI
             context.Repeat(800ms, 7300ms);
         }).Schedule(21800ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_WRATH_OF_THE_ASTROMANCER, 0, 100.0f);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+            {
+                _currentWrathTarget = target;
+                DoCast(target, SPELL_WRATH_OF_THE_ASTROMANCER);
+            }
             context.Repeat(21800ms, 23350ms);
         }).Schedule(33900ms, [this](TaskContext context)
         {
@@ -227,6 +235,8 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
+private:
+    Unit* _currentWrathTarget;
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public AuraScript
