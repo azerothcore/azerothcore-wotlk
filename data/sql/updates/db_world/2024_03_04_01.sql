@@ -1,3 +1,4 @@
+-- DB update 2024_03_04_00 -> 2024_03_04_01
 --
 DELETE FROM `spell_target_position` WHERE `ID` IN (34269, 34270, 34271, 34272, 34273, 34274, 34275, 34276, 34277, 34278, 34279, 34280, 34281, 34282, 34283, 34284, 34285, 34286, 34287, 34288, 34289, 34314, 34315, 34316);
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
