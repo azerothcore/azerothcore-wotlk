@@ -354,6 +354,8 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FEAR, 42000);
             events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, 2000);
             events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 1000);
+
+            instance->SetData(DATA_SPAWN_WAVES, 1);
         }
 
         void KilledUnit(Unit* victim) override
@@ -410,6 +412,12 @@ public:
             spellEffectTargets.clear();
             fingerOfDeathTargets.clear();
             summons.DespawnAll();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            instance->SetData(DATA_RESET_NIGHT_ELF, 1);
+            BossAI::EnterEvadeMode(why);
         }
 
         bool CanUseFingerOfDeath()
@@ -547,13 +555,13 @@ public:
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
-                if ((instance->GetData(DATA_AZGALOR) < DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
+                if ((instance->GetBossState(DATA_AZGALOR) != DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
                 {
                     me->SetVisible(false);
                     me->SetFaction(FACTION_FRIENDLY);
                 }
 
-                if ((instance->GetData(DATA_AZGALOR) >= DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
+                if ((instance->GetBossState(DATA_AZGALOR) == DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
                 {
                     me->SetFaction(FACTION_DRAGONKIN);
                     me->SetVisible(true);

@@ -33,7 +33,9 @@ enum Texts
     SAY_ONDEATH             = 0,
     SAY_ONSLAY              = 1,
     SAY_DOOM                = 2, // Not used?
-    SAY_ONSPAWN             = 3
+    SAY_ONSPAWN             = 3,
+
+    SAY_ARCHIMONDE_INTRO    = 8
 };
 
 struct boss_azgalor : public BossAI
@@ -104,8 +106,9 @@ public:
     void JustDied(Unit * killer) override
     {
         Talk(SAY_ONDEATH);
+        // If Archimonde has not yet been initialized, this won't trigger
         if (Creature* archi = instance->GetCreature(DATA_ARCHIMONDE))
-            archi->AI()->DoAction(DATA_ARCHIMONDE);
+            archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25000ms);
         BossAI::JustDied(killer);
     }
 
