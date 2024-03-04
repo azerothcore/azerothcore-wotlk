@@ -706,7 +706,7 @@ class spell_mage_ignite : public AuraScript
         PreventDefaultAction();
 
         SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_MAGE_IGNITE);
-        int32 pct = 8 * GetSpellInfo()->GetRank();
+        int32 pct = 9 * GetSpellInfo()->GetRank(); //点燃天赋基础值调整为9；根据等级向上累积；
 
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
 
