@@ -2272,3 +2272,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Fix Archimonde
 UPDATE `creature_template` SET `speed_walk` = 3.2, `speed_run` = 2.285714, `scale` = 1, `BaseAttackTime` = 1500 WHERE (`entry` = 17968);
 UPDATE `creature_model_info` SET `BoundingRadius` = 9.894683837890625, `CombatReach` = 12 WHERE  `DisplayID`=20939;
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 17937);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(17937, 0, 0, 0, 1, 234, 0, '');
