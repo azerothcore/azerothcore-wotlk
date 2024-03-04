@@ -1,3 +1,4 @@
+-- DB update 2024_03_04_03 -> 2024_03_04_04
 -- Add some missing gameobject 'Anvil, Forge, Alchemy Lab' based on sniffed values
 DELETE FROM `gameobject` WHERE (`id` IN (194466, 194467, 194468))
 AND (`guid` IN (465, 466, 467));
