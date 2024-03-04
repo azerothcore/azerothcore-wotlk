@@ -1,3 +1,4 @@
+-- DB update 2024_03_03_01 -> 2024_03_04_00
 
 -- npc_test_locale translation fix for deputy Willem
 -- First quest encounter for Human characters in Nortshire (Elwynn Forest)
