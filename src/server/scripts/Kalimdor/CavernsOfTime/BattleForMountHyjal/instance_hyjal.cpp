@@ -434,6 +434,7 @@ public:
                     SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_WAVES:
+                    _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
                     _encounterNPCs.clear();
                     _currentWave = 0;
                     trash = 0;
