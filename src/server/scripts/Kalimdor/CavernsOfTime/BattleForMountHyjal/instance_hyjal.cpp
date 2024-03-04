@@ -281,7 +281,8 @@ public:
                     _scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
-                                instance->GetCreature(guid)->DespawnOrUnsummon();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->DespawnOrUnsummon();
 
                             // Spawn Roaring Flame after a delay
                             _scheduler.Schedule(30s, [this](TaskContext)
@@ -319,7 +320,8 @@ public:
                     _scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)
-                                instance->GetCreature(guid)->DespawnOrUnsummon();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->DespawnOrUnsummon();
 
                             _scheduler.Schedule(30s, [this](TaskContext)
                                 {
@@ -389,49 +391,59 @@ public:
                     break;
                 case DATA_RESET_ALLIANCE:
                     for (ObjectGuid const& guid : _baseAlliance)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     for (ObjectGuid const& guid : _encounterNPCs)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         });
 
                     SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_HORDE:
                     for (ObjectGuid const& guid : _baseHorde)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     for (ObjectGuid const& guid : _encounterNPCs)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         });
 
                     SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_NIGHT_ELF:
                     for (ObjectGuid const& guid : _baseNightElf)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     for (ObjectGuid const& guid : _encounterNPCs)
-                        instance->GetCreature(guid)->DespawnOrUnsummon();
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
 
                     GetCreature(DATA_ARCHIMONDE)->DespawnOrUnsummon();
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseNightElf)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
 
-                            GetCreature(DATA_ARCHIMONDE)->Respawn();
+                            if (Creature* archi = GetCreature(DATA_ARCHIMONDE))
+                                archi->Respawn();
                         });
 
                     SetData(DATA_RESET_WAVES, 0);
