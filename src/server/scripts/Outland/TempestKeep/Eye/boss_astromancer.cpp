@@ -138,6 +138,10 @@ struct boss_high_astromancer_solarian : public BossAI
                 _currentWrathTarget = target;
                 DoCast(target, SPELL_WRATH_OF_THE_ASTROMANCER);
             }
+            scheduler.Schedule(6s, [this](TaskContext)
+            {
+                _currentWrathTarget = nullptr;
+            });
             context.Repeat(21800ms, 23350ms);
         }).Schedule(33900ms, [this](TaskContext context)
         {
