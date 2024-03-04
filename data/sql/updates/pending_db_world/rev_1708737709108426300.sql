@@ -2206,3 +2206,39 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@CGUID+228, @CGUID+227, 0, 180, 515),
 (@CGUID+228, @CGUID+216, 3, 270, 515),
 (@CGUID+228, @CGUID+210, 3, 360, 515);
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21075;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21075);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(21075, 0, 0, 0, 38, 0, 100, 0, 21, 1, 0, 0, 0, 0, 88, 2107500, 2107505, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - On Data Set 21 Single - Run Random Script'),
+(21075, 0, 1, 0, 38, 0, 100, 0, 21, 2, 0, 0, 0, 0, 88, 2107506, 2107511, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - On Data Set 21 Double - Run Random Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2107500 AND 2107511);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2107500, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+117, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107501, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+147, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107502, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+159, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107503, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+163, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107504, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+184, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107505, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+190, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+
+(2107506, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+117, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107506, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+117, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107507, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+147, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107507, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+147, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107508, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+159, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107508, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+159, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107509, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+163, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107509, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+163, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107510, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+184, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107510, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+184, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107511, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+190, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\''),
+(2107511, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 86, 32148, 2, 10, @CGUID+190, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infernal Target (Hyjal) - Actionlist - Cross Cast \'Infernal\'');
+
+UPDATE `creature_template_movement` SET `Ground` = 1, `Flight` = 0 WHERE (`CreatureId` = 21075); -- Prevent Infernals from floating
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 17908);
+UPDATE `creature_template_addon` SET `auras` = '22707 31722' WHERE (`entry` = 17908);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17908);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(17908, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Giant Infernal - On Respawn - Start Random Movement 10y');

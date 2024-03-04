@@ -173,7 +173,7 @@ public:
                     break;
 
                 case NPC_INFERNAL_TARGET:
-                    _infernalTargets.insert(creature->GetGUID());
+                    _infernalTargets.push_back(creature->GetGUID());
                     break;
 
                 case NPC_WINTERCHILL:
@@ -366,10 +366,23 @@ public:
                     }
                     break;
                 case DATA_SPAWN_INFERNALS:
+                {
+                    uint8 doubleInfernalCount = 2;
+                    // Uses SmartAI
                     for (ObjectGuid const& guid : _infernalTargets)
-                        if (Creature* infernal = instance->GetCreature(guid))
-                            infernal->GetAI()->DoCastSelf(SPELL_INFERNAL);
-
+                    {
+                        if (Creature* target = instance->GetCreature(guid))
+                        {
+                            if (doubleInfernalCount > 0)
+                            {
+                                target->AI()->SetData(DATA_SPAWN_INFERNALS, 2); // Spawns 2 infernals, as there are only 6 spawns, some summon 2
+                                doubleInfernalCount--;
+                            }
+                            else
+                                target->AI()->SetData(DATA_SPAWN_INFERNALS, 1);
+                        }
+                    }
+                }
                     break;
                 case DATA_RESET_ALLIANCE:
                     for (ObjectGuid const& guid : _baseAlliance)
@@ -504,7 +517,7 @@ public:
         GuidSet _encounterNPCs;
         GuidSet _baseAlliance;
         GuidSet _baseHorde;
-        GuidSet _infernalTargets;
+        GuidVector _infernalTargets;
         GuidSet _baseNightElf;
         GuidSet _ancientGemAlliance;
         GuidSet _ancientGemHorde;

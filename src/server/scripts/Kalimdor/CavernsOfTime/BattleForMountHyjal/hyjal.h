@@ -145,7 +145,8 @@ enum HyjalMisc
     START_WAVE_HORDE_RETREAT    = 39,
     START_WAVE_NIGHT_ELF        = 42,
 
-    CONTEXT_GROUP_WAVES         = 1
+    CONTEXT_GROUP_WAVES         = 1,
+    INFERNAL_COUNT_MAX          = 8
 };
 
 enum HyjalPaths
