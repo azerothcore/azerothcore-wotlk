@@ -109,6 +109,7 @@ struct boss_alar : public BossAI
         _baseAttackOverride = false;
         _spawnPhoenixes = false;
         _platform = 0;
+        _noMelee = false;
         _platformRoll = 0;
         _noQuillTimes = 0;
         _platformMoveRepeatTimer = 16s;
@@ -191,6 +192,7 @@ struct boss_alar : public BossAI
             ScheduleUniqueTimedEvent(16001ms, [&]{
                 me->SetHealth(me->GetMaxHealth());
                 me->SetReactState(REACT_AGGRESSIVE);
+                _noMelee = false;
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 _platform = POINT_MIDDLE;
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -201,6 +203,7 @@ struct boss_alar : public BossAI
 
     void PretendToDie(Creature* creature)
     {
+        _noMelee = true;
         scheduler.CancelAll();
         creature->InterruptNonMeleeSpells(true);
         creature->RemoveAllAuras();
@@ -229,11 +232,11 @@ struct boss_alar : public BossAI
                 me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }, 30s);
-        ScheduleTimedEvent(30s, [&]
+        ScheduleTimedEvent(50s, [&]
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
-        }, 30s);
+        }, 50s);
         ScheduleUniqueTimedEvent(10min, [&]
         {
             DoCastSelf(SPELL_BERSERK);
@@ -254,6 +257,7 @@ struct boss_alar : public BossAI
 
     void DoDiveBomb()
     {
+        _noMelee = true;
         scheduler.Schedule(2s, [this](TaskContext)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
@@ -267,6 +271,7 @@ struct boss_alar : public BossAI
         }).Schedule(10s, [this](TaskContext)
         {
             me->GetMotionMaster()->MoveChase(me->GetVictim());
+            _noMelee = false;
         });
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
         {
@@ -341,10 +346,31 @@ struct boss_alar : public BossAI
         }
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return;
+        }
+
+        if (!_noMelee)
+        {
+            DoMeleeAttackIfReady();
+        }
+    }
+
 private:
     bool _canAttackCooldown;
     bool _baseAttackOverride;
     bool _spawnPhoenixes;
+    bool _noMelee;
     uint8 _platform;
     uint8 _platformRoll;
     uint8 _noQuillTimes;
