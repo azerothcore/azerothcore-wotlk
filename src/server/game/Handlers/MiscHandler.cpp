@@ -1774,13 +1774,14 @@ void WorldSession::CreateItemCheatHandler(WorldPacket& msg)
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
+    if (!ActivePlayer()) {
+        return;
+    }
     // READ THE MESSAGE DATA
     auto itemId = msg.read<uint32_t>();
     auto quantity = msg.read<uint32_t>();
     // CREATE THE ITEM(S)
-    if (ActivePlayer()) {
-        ActivePlayer()->CreateItem(itemId, quantity);
-    }
+    ActivePlayer()->CreateItem(itemId, quantity);
 }
 
 //===========================================================================
@@ -1821,10 +1822,11 @@ void WorldSession::LearnSpellHandler(WorldPacket& msg)
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
+    if (!ActivePlayer()) {
+        return;
+    }
     // READ THE MESSAGE DATA
     int spellId = msg.read<int>();
     // LEARN THE SPELL
-    if (ActivePlayer()) {
-        ActivePlayer()->LearnSpell(spellId);
-    }
+    ActivePlayer()->LearnSpell(spellId);
 }
