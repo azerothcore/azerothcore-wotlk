@@ -793,3 +793,31 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
 
     return true;
 }
+
+std::map<Opcodes, MSGHANDLER> WorldSocket::m_handlers;
+
+int WorldSocket::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
+    if (msgId >= NUM_MSG_TYPES) {
+        // TODO: handle error
+        return 0;
+    }
+    if (!handler) {
+        // TODO: handle error
+        return 0;
+    }
+    if (m_handlers.contains(static_cast<Opcodes>(msgId))) {
+        // TODO: handle error
+        return 0;
+    }
+    m_handlers[msgId] = handler;
+    return 1;
+}
+
+int WorldSocket::ClearMessageHandler(Opcodes msgId) {
+    if (msgId >= NUM_MSG_TYPES) {
+        // TODO: handle error
+        return 0;
+    }
+    m_handlers[msgId] = nullptr;
+    return 1;
+}

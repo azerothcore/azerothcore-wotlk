@@ -30,6 +30,11 @@
 
 using boost::asio::ip::tcp;
 
+typedef int(*MSGHANDLER)(WorldSession*  ses,
+                         Opcodes        msgId,
+                         uint32_t       eventTime,
+                         WorldPacket*   msg);
+
 class EncryptableAndCompressiblePacket : public WorldPacket
 {
 public:
@@ -85,6 +90,11 @@ public:
     void SendPacket(WorldPacket const& packet);
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
+
+    static int SetMessageHandler(Opcodes msgId, MSGHANDLER handler);
+    static int ClearMessageHandler(Opcodes msgId);
+
+    static std::map<Opcodes, MSGHANDLER> m_handlers;
 
 protected:
     void OnClose() override;

@@ -331,32 +331,94 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && _recvQueue.next(packet, updater))
     {
-        OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
-        ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        // New msg system:
+        if (WorldSocket::m_handlers.contains(static_cast<Opcodes>(packet->GetOpcode()))) {
+            WorldSocket::m_handlers[static_cast<Opcodes>(packet->GetOpcode())](this, static_cast<Opcodes>(packet->GetOpcode()), currentTime, packet);
+        }
+        else {  // TODO: NUKE ALL THIS GARBAGE
+            OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
+            ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
 
-        METRIC_DETAILED_TIMER("worldsession_update_opcode_time", METRIC_TAG("opcode", opHandle->Name));
-        LOG_DEBUG("network", "message id {} ({}) under READ", opcode, opHandle->Name);
+            METRIC_DETAILED_TIMER("worldsession_update_opcode_time", METRIC_TAG("opcode", opHandle->Name));
+            LOG_DEBUG("network", "message id {} ({}) under READ", opcode, opHandle->Name);
 
-        try
-        {
-            switch (opHandle->Status)
+            try
             {
-            case STATUS_LOGGEDIN:
-                if (!m_player)
+                switch (opHandle->Status)
                 {
-                    // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
-                    //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
-                    //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
-                    if (!m_playerRecentlyLogout)
+                case STATUS_LOGGEDIN:
+                    if (!m_player)
                     {
-                        requeuePackets.push_back(packet);
-                        deletePacket = false;
+                        // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
+                        //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
+                        //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
+                        if (!m_playerRecentlyLogout)
+                        {
+                            requeuePackets.push_back(packet);
+                            deletePacket = false;
 
-                        LOG_DEBUG("network", "Delaying processing of message with status STATUS_LOGGEDIN: No players in the world for account id {}", GetAccountId());
+                            LOG_DEBUG("network", "Delaying processing of message with status STATUS_LOGGEDIN: No players in the world for account id {}", GetAccountId());
+                        }
                     }
-                }
-                else if (m_player->IsInWorld())
-                {
+                    else if (m_player->IsInWorld())
+                    {
+                        if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                        {
+                            if (!sScriptMgr->CanPacketReceive(this, *packet))
+                            {
+                                break;
+                            }
+
+                            opHandle->Call(this, *packet);
+                            LogUnprocessedTail(packet);
+                        }
+                        else
+                            processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                    }
+
+                    // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
+                    break;
+                case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
+                    if (!m_player && !m_playerRecentlyLogout) // There's a short delay between m_player = null and m_playerRecentlyLogout = true during logout
+                    {
+                        LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
+                                "the player has not logged in yet and not recently logout");
+                    }
+                    else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                    {
+                        // not expected m_player or must checked in packet hanlder
+                        if (!sScriptMgr->CanPacketReceive(this, *packet))
+                            break;
+
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
+                    }
+                    else
+                        processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                    break;
+                case STATUS_TRANSFER:
+                    if (m_player && !m_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                    {
+                        if (!sScriptMgr->CanPacketReceive(this, *packet))
+                        {
+                            break;
+                        }
+
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
+                    }
+                    else
+                        processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
+                    break;
+                case STATUS_AUTHED:
+                    if (m_inQueue) // prevent cheating
+                        break;
+
+                    // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
+                    // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
+                    if (packet->GetOpcode() == CMSG_CHAR_ENUM)
+                        m_playerRecentlyLogout = false;
+
                     if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                     {
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
@@ -369,106 +431,50 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     }
                     else
                         processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
-                }
-
-                // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
-                break;
-            case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
-                if (!m_player && !m_playerRecentlyLogout) // There's a short delay between m_player = null and m_playerRecentlyLogout = true during logout
-                {
-                    LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
-                            "the player has not logged in yet and not recently logout");
-                }
-                else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                {
-                    // not expected m_player or must checked in packet hanlder
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
-                        break;
-
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                else
-                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
-                break;
-            case STATUS_TRANSFER:
-                if (m_player && !m_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                {
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
-                    {
-                        break;
-                    }
-
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                else
-                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
-                break;
-            case STATUS_AUTHED:
-                if (m_inQueue) // prevent cheating
                     break;
-
-                // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
-                // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
-                if (packet->GetOpcode() == CMSG_CHAR_ENUM)
-                    m_playerRecentlyLogout = false;
-
-                if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                {
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
-                    {
-                        break;
-                    }
-
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
+                case STATUS_NEVER:
+                    LOG_ERROR("network.opcode", "Received not allowed opcode {} from {}",
+                        GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
+                    break;
+                case STATUS_UNHANDLED:
+                    LOG_DEBUG("network.opcode", "Received not handled opcode {} from {}",
+                        GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
+                    break;
                 }
-                else
-                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
-                break;
-            case STATUS_NEVER:
-                LOG_ERROR("network.opcode", "Received not allowed opcode {} from {}",
-                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
-                break;
-            case STATUS_UNHANDLED:
-                LOG_DEBUG("network.opcode", "Received not handled opcode {} from {}",
-                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
-                break;
             }
-        }
-        catch (WorldPackets::InvalidHyperlinkException const& ihe)
-        {
-            LOG_ERROR("network", "{} sent {} with an invalid link:\n{}", GetPlayerInfo(),
-                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), ihe.GetInvalidValue());
+            catch (WorldPackets::InvalidHyperlinkException const& ihe)
+            {
+                LOG_ERROR("network", "{} sent {} with an invalid link:\n{}", GetPlayerInfo(),
+                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), ihe.GetInvalidValue());
 
-            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-            {
-                KickPlayer("WorldSession::Update Invalid chat link");
+                if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+                {
+                    KickPlayer("WorldSession::Update Invalid chat link");
+                }
             }
-        }
-        catch (WorldPackets::IllegalHyperlinkException const& ihe)
-        {
-            LOG_ERROR("network", "{} sent {} which illegally contained a hyperlink:\n{}", GetPlayerInfo(),
-                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), ihe.GetInvalidValue());
+            catch (WorldPackets::IllegalHyperlinkException const& ihe)
+            {
+                LOG_ERROR("network", "{} sent {} which illegally contained a hyperlink:\n{}", GetPlayerInfo(),
+                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), ihe.GetInvalidValue());
 
-            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-            {
-                KickPlayer("WorldSession::Update Illegal chat link");
+                if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+                {
+                    KickPlayer("WorldSession::Update Illegal chat link");
+                }
             }
-        }
-        catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
-        {
-            LOG_ERROR("network", "PacketArrayMaxCapacityException: {} while parsing {} from {}.",
-                pamce.what(), GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
-        }
-        catch (ByteBufferException const&)
-        {
-            LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: {}) from client {}, accountid={}. Skipped packet.", packet->GetOpcode(), GetRemoteAddress(), GetAccountId());
-            if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
+            catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
             {
-                LOG_DEBUG("network", "Dumping error causing packet:");
-                packet->hexlike();
+                LOG_ERROR("network", "PacketArrayMaxCapacityException: {} while parsing {} from {}.",
+                    pamce.what(), GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), GetPlayerInfo());
+            }
+            catch (ByteBufferException const&)
+            {
+                LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: {}) from client {}, accountid={}. Skipped packet.", packet->GetOpcode(), GetRemoteAddress(), GetAccountId());
+                if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
+                {
+                    LOG_DEBUG("network", "Dumping error causing packet:");
+                    packet->hexlike();
+                }
             }
         }
 
