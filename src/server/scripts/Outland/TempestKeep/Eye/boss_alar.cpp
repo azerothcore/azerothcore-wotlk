@@ -379,30 +379,30 @@ struct boss_alar : public BossAI
 
     Position DeterminePhoenixPosition(Position playerPosition)
     {
+        // set finalPosition to playerPosition in case the fraction fails
         Position finalPosition = playerPosition;
         float playerXPosition = playerPosition.GetPositionX();
         float playerYPosition = playerPosition.GetPositionY();
         float centreXPosition = alarPoints[POINT_MIDDLE].GetPositionX();
         float centreYPosition = alarPoints[POINT_MIDDLE].GetPositionY();
-        float deltaX = playerXPosition-centreXPosition;
-        float deltaY = playerYPosition-centreYPosition;
+        float deltaX = std::abs(playerXPosition-centreXPosition);
+        float deltaY = std::abs(playerYPosition-centreYPosition);
+        int8 signMultiplier[2] = {1, 1};
         // if fraction has x position 0.0f we get nan as a result
-        if (float playerFraction = (deltaX/deltaY))
+        if (float playerFraction = deltaX/deltaY)
         {
             // player angle based on delta X and delta Y
             float playerAngle = std::atan(playerFraction);
             float phoenixDeltaYPosition = std::cos(playerAngle)*INNER_CIRCLE_RADIUS;
             float phoenixDeltaXPosition = std::sin(playerAngle)*INNER_CIRCLE_RADIUS;
-            if (phoenixDeltaYPosition < 0 && deltaY < 0)
-                phoenixDeltaYPosition = -phoenixDeltaYPosition
+            // as calculations are absolute values we have to multiply in the end
+            // should be negative if player position was further down than centre
+            if (playerXPosition < centreXPosition)
+                signMultiplier[0] = -1;
+            if (playerYPosition < centreYPosition)
+                signMultiplier[1] = -1;
             // phoenix position based on set distance
-            finalPosition = {centreXPosition+phoenixDeltaXPosition, centreYPosition+phoenixDeltaYPosition, 0.0f, 0.0f};
-            LOG_ERROR("server", "Player fraction {}, playerAngle {}", std::to_string(playerFraction), std::to_string(playerAngle));
-            LOG_ERROR("server", "Playerposis x: {} y: {}", std::to_string(playerXPosition), std::to_string(playerYPosition));
-            LOG_ERROR("server", "Centre x: {} y: {}", std::to_string(centreXPosition), std::to_string(centreYPosition));
-            LOG_ERROR("server", "Delta x: {} y: {}", std::to_string(deltaX), std::to_string(deltaY));
-            LOG_ERROR("server", "Phoenixposis x: {} y: {}", std::to_string(finalPosition.GetPositionX()), std::to_string(finalPosition.GetPositionY()));
-            LOG_ERROR("server", "Phoenixdelta x: {} y: {}", std::to_string(phoenixDeltaXPosition), std::to_string(phoenixDeltaYPosition));
+            finalPosition = {centreXPosition+signMultiplier[0]*phoenixDeltaXPosition, centreYPosition+signMultiplier[1]*phoenixDeltaYPosition, 0.0f, 0.0f};
         }
         return finalPosition;
     }
