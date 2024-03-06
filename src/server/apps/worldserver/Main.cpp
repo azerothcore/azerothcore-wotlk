@@ -60,6 +60,8 @@
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
+#include "FriendList.h"
+
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
@@ -381,6 +383,8 @@ int main(int argc, char** argv)
         FreezeDetector::Start(freezeDetector);
         LOG_INFO("server.worldserver", "Starting up anti-freeze thread ({} seconds max stuck time)...", coreStuckTime);
     }
+
+    FriendList::Initialize();
 
     LOG_INFO("server.worldserver", "{} (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
