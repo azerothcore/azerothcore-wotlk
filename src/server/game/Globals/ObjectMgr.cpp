@@ -1782,7 +1782,7 @@ void ObjectMgr::LoadCreatureModelInfo()
     _creatureModelStore.rehash(result->GetRowCount());
     uint32 count = 0;
 
-    // List of ModelDataIDs that the client treats as invisible stalker
+    // List of ModelDataIDs that use Invisible models
     uint32 triggerCreatureModelDataID[14] = { 1731, 1752, 2206, 2296, 2372, 2382, 2481, 2512, 2513, 2611, 2636, 2790, 3230, 3274 };
 
     do
