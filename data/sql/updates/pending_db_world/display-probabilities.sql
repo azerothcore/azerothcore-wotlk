@@ -6,7 +6,7 @@ CREATE TABLE `creature_template_model`(
   `DisplayScale` float NOT NULL DEFAULT '1',
   `Probability` float NOT NULL DEFAULT '0',
   `VerifiedBuild` smallint(5) unsigned NOT NULL,
-  PRIMARY KEY (`CreatureID`,`CreatureDisplayID`)
+  PRIMARY KEY (`CreatureID`,`Idx`)
 ) ENGINE=MYISAM CHARSET=utf8mb4;
 
 INSERT IGNORE INTO `creature_template_model` (`CreatureID`,`Idx`,`CreatureDisplayID`,`DisplayScale`,`Probability`,`VerifiedBuild`) SELECT `entry`,0,`modelid1`,`scale`,1,`VerifiedBuild` FROM `creature_template` WHERE `modelid1`!=0;

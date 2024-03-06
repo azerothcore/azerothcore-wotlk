@@ -1,4 +1,3 @@
-TRUNCATE TABLE `creature_template_model`;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
 (3, 0, 987, 1, 1, 51831), -- 3
 (6, 0, 10913, 1, 1, 51831), -- 6
