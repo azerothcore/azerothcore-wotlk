@@ -81,6 +81,9 @@ ByteBuffer& ByteBuffer::GetString(char* string, uint32_t maxChars)
     ASSERT(_storage.size());
     while (_rpos <= _storage.size()-1) {
         string[_rpos] = _storage.at(_rpos);
+        if (string[_rpos] == '\0') {
+            break;
+        }
         _rpos++;
     }
     return *this;
