@@ -18,7 +18,7 @@
 #ifndef __AUTHSESSION_H__
 #define __AUTHSESSION_H__
 
-#include <WowServices/AccountInfo.h>
+#include "../../../game/WowServices/AccountInfo.h"
 #include "AsyncCallbackProcessor.h"
 #include "BigNumber.h"
 #include "ByteBuffer.h"
