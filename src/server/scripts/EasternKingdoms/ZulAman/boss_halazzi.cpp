@@ -272,6 +272,7 @@ struct boss_halazzi : public BossAI
     {
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
+        instance->SetData(DATA_HALAZZIEVENT, DONE);
     }
 private:
     uint32 _lynxFormHealth;
