@@ -871,7 +871,7 @@ struct npc_capernian : public ScriptedAI
         {
             if (me->Attack(who, false))
             {
-                me->GetMotionMaster()->MoveChase(who, 45.0f, 0);
+                me->GetMotionMaster()->MoveChase(who, 30.0f, 0);
                 me->AddThreat(who, 0.0f);
             }
         }
@@ -891,7 +891,7 @@ struct npc_capernian : public ScriptedAI
             }
             else
             {
-                me->GetMotionMaster()->MoveChase(me->GetVictim(), 45.0f);
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 30.0f);
                 DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
             }
 
@@ -963,7 +963,7 @@ struct npc_telonicus : public ScriptedAI
             DoCastVictim(SPELL_BOMB);
         }, 3600ms, 7100ms);
         ScheduleTimedEvent(13250ms, [&]{
-            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 100.0f);
+            DoCastRandomTarget(SPELL_REMOTE_TOY, 0, 100.0f);
         }, 15750ms);
     }
 

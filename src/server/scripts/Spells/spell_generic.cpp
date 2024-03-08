@@ -768,13 +768,12 @@ class spell_gen_proc_not_self : public AuraScript
         if (Unit* caster = GetCaster())
             if (Unit* target = eventInfo.GetActionTarget())
             {
+                ObjectGuid targetGUID = target->GetGUID();
                 uint32 spellID = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-                caster->m_Events.AddEventAtOffset([caster, target, spellID]()
+                caster->m_Events.AddEventAtOffset([caster, targetGUID, spellID]()
                 {
-                    if (target)
-                    {
+                    if (Unit *target = ObjectAccessor::GetUnit(*caster, targetGUID))
                         caster->CastSpell(target, spellID, true);
-                    }
                 }, 100ms);
             }
     }
