@@ -66,7 +66,7 @@ public:
             context.Repeat();
         }).Schedule(12s, 18s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 12.f))
+            if (SelectTarget(SelectTargetMethod::Random, 0, 12.f))
             {
                 DoCastAOE(SPELL_WAR_STOMP);
                 context.Repeat(15s, 30s);

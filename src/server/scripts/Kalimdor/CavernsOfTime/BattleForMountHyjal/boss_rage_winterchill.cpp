@@ -70,7 +70,7 @@ public:
             context.Repeat(9s, 15s);
         }).Schedule(12s, 17s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.f))
+            if (SelectTarget(SelectTargetMethod::Random, 0, 20.f))
             {
                 DoCastAOE(SPELL_FROST_NOVA);
                 Talk(SAY_NOVA);
