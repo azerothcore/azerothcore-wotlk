@@ -188,21 +188,19 @@ public:
                 case NPC_STALK:
                 case NPC_GARGO:
                 case NPC_FROST:
+                case NPC_INFER:
                     if (_bossWave)
                         creature->AI()->DoAction(_bossWave);
                     else if (_retreat)
                         creature->AI()->DoAction(_retreat);
-                    // no break
-                case NPC_INFER:
-                    if (creature->IsSummon())
+
+                    if (creature->IsSummon() && _bossWave)
                     {
-                        if (_bossWave)
-                        {
-                            DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
-                            DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
-                            _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
-                        }
+                        DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
+                        DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
+                        _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
+                    break;
             }
             InstanceScript::OnCreatureCreate(creature);
         }
