@@ -1944,13 +1944,13 @@ struct npc_chesspiece : public ScriptedAI
     void sGossipHello(Player* player) override
     {
         uint32 chessPhase = _instance->GetData(DATA_CHESS_GAME_PHASE);
-        if (_instance->GetData(DATA_CHESS_EVENT) == TEAM_ALLIANCE && me->GetFaction() != CHESS_FACTION_ALLIANCE && chessPhase < CHESS_PHASE_PVE_FINISHED)
+        if (_instance->GetData(CHESS_EVENT_TEAM) == TEAM_ALLIANCE && me->GetFaction() != CHESS_FACTION_ALLIANCE && chessPhase < CHESS_PHASE_PVE_FINISHED)
         {
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return;
         }
 
-        if (_instance->GetData(DATA_CHESS_EVENT) == TEAM_HORDE && me->GetFaction() != CHESS_FACTION_HORDE && chessPhase < CHESS_PHASE_PVE_FINISHED)
+        if (_instance->GetData(CHESS_EVENT_TEAM) == TEAM_HORDE && me->GetFaction() != CHESS_FACTION_HORDE && chessPhase < CHESS_PHASE_PVE_FINISHED)
         {
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return;
