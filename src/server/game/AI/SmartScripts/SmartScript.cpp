@@ -4398,10 +4398,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 {
                     if (IsPlayer(target))
                         playerCount++;
-
+                }
                     if (playerCount >= e.event.nearPlayer.minCount)
                         ProcessAction(e, target->ToUnit());
-                }
             }
             RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
