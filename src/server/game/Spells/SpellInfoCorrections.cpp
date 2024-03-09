@@ -4644,6 +4644,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    // Magic Disruption (KT dagger)
+    ApplySpellFix({ 36478 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcChance = 100;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

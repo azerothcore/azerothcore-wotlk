@@ -963,7 +963,7 @@ struct npc_telonicus : public ScriptedAI
             DoCastVictim(SPELL_BOMB);
         }, 3600ms, 7100ms);
         ScheduleTimedEvent(13250ms, [&]{
-            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 100.0f);
+            DoCastRandomTarget(SPELL_REMOTE_TOY, 0, 100.0f);
         }, 15750ms);
     }
 
