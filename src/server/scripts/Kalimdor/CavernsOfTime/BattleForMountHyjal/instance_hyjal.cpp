@@ -482,12 +482,12 @@ public:
             return 0;
         }
 
-        void ScheduleWaves(Milliseconds time, uint8 startWaves, uint8 maxWaves, Milliseconds timerptr[])
+        void ScheduleWaves(Milliseconds /* time */, uint8 startWaves, uint8 maxWaves, Milliseconds timerptr[])
         {
             // No overlapping!
             _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
 
-            _scheduler.Schedule(1ms, [this, time, startWaves, maxWaves, timerptr](TaskContext context)
+            _scheduler.Schedule(1ms, [this, startWaves, maxWaves, timerptr](TaskContext context)
                 {
                     // If all waves reached, cancel scheduling new ones
                     if (_currentWave >= maxWaves)
