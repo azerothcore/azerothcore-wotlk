@@ -31,11 +31,11 @@ enum Spells
     SPELL_BLIZZARD                    = 31266,
     SPELL_PYROBLAST                   = 31263,
     SPELL_SUMMON_ELEMENTALS           = 31264,
-                                      
+
     // Thrall
     SPELL_CHAIN_LIGHTNING             = 31330,
     SPELL_FERAL_SPIRIT                = 31331,
-                                      
+
     // Tyrande
     SPELL_STARFALL                    = 20687,
     SPELL_TRUESHOT_AURA               = 31519,
@@ -348,7 +348,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
             ScriptedAI::AttackStart(who);
             break;
         }
-        
+
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -429,7 +429,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
                             DoCastVictim(SPELL_BANSHEE_WAIL);
                             context.Repeat(1800ms, 2200ms);
                         });
-            
+
             break;
         }
         case NPC_STALK:
@@ -443,7 +443,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
             break;
         }
         }
-        
+
     }
 
     void DoAction(int32 action) override
@@ -565,7 +565,7 @@ struct npc_hyjal_gargoyle : public ScriptedAI
         }
     }
 
-    void PathEndReached(uint32 pathId) override
+    void PathEndReached(uint32 /* pathId */) override
     {
         // TODO: Do they do something special after finishing the path?
         me->m_Events.AddEventAtOffset([this]()

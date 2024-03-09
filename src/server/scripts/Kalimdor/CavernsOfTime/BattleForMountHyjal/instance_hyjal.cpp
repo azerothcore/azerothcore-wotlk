@@ -267,7 +267,7 @@ public:
                     {
                         for (ObjectGuid const& guid : _baseAlliance)
                         {
-                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive());
+                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive())
                             {
                                 float x, y, z;
                                 jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
@@ -307,7 +307,7 @@ public:
                     {
                         for (ObjectGuid const& guid : _baseHorde)
                         {
-                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive());
+                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive())
                             {
                                 float x, y, z;
                                 jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));

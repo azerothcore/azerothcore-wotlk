@@ -96,7 +96,7 @@ public:
     void DoAction(int32 action) override
     {
         Talk(SAY_ONSPAWN, 1200ms);
-        
+
         if (action == DATA_WINTERCHILL)
             me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
     }
