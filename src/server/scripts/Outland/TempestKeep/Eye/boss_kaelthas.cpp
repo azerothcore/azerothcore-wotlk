@@ -291,7 +291,6 @@ struct boss_kaelthas : public BossAI
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
-        HandleDoors(false);
         SetRoomState(GO_STATE_READY);
         me->SetDisableGravity(false);
         me->SetWalk(false);
@@ -318,7 +317,6 @@ struct boss_kaelthas : public BossAI
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
-            HandleDoors(true);
             Talk(SAY_INTRO);
             ScheduleUniqueTimedEvent(23s, [&]
             {
@@ -341,26 +339,6 @@ struct boss_kaelthas : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-    }
-
-    void HandleDoors(bool close)
-    {
-        if (GameObject* firstDoor = instance->GetGameObject(DATA_KAEL_DOOR_1))
-        {
-            if (GameObject* secondDoor = instance->GetGameObject(DATA_KAEL_DOOR_2))
-            {
-                if (close)
-                {
-                    firstDoor->SetGoState(GO_STATE_READY);
-                    secondDoor->SetGoState(GO_STATE_READY);
-                }
-                else
-                {
-                    firstDoor->SetGoState(GO_STATE_ACTIVE);
-                    secondDoor->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
-        }
     }
 
     void KilledUnit(Unit* victim) override
