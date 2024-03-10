@@ -343,13 +343,13 @@ struct boss_kaelthas : public BossAI
         BossAI::JustEngagedWith(who);
     }
 
-    void HandleDoors(bool open)
+    void HandleDoors(bool close)
     {
         if (GameObject* firstDoor = instance->GetGameObject(DATA_KAEL_DOOR_1))
         {
             if (GameObject* secondDoor = instance->GetGameObject(DATA_KAEL_DOOR_2))
             {
-                if (open)
+                if (close)
                 {
                     firstDoor->SetGoState(GO_STATE_READY);
                     secondDoor->SetGoState(GO_STATE_READY);
