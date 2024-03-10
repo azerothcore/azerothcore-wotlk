@@ -1,7 +1,4 @@
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (9610, 9611, 9612, 11277) AND `OptionID`=1;
-DELETE FROM `gossip_menu_option` WHERE `MenuID`=9611 AND `OptionID`=1;
-DELETE FROM `gossip_menu_option` WHERE `MenuID`=9612 AND `OptionID`=1;
-DELETE FROM `gossip_menu_option` WHERE `MenuID`=11277 AND `OptionID`=1;
 
 DELETE FROM `creature_text` WHERE `CreatureID`=26499 AND `GroupID`=39 AND `ID`=0 ;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
