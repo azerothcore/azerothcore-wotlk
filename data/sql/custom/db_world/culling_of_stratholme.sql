@@ -1,5 +1,4 @@
-﻿--duplicates of gossip_menu_option
-DELETE FROM `gossip_menu_option` WHERE (`MenuID`='9610') AND (`OptionID`='1');
+﻿DELETE FROM `gossip_menu_option` WHERE (`MenuID`='9610') AND (`OptionID`='1');
 DELETE FROM `gossip_menu_option` WHERE (`MenuID`='9611') AND (`OptionID`='1');
 DELETE FROM `gossip_menu_option` WHERE (`MenuID`='9612') AND (`OptionID`='1');
 DELETE FROM `gossip_menu_option` WHERE (`MenuID`='11277') AND (`OptionID`='1');
