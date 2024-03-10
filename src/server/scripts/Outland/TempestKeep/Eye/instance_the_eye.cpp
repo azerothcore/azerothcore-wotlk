@@ -55,9 +55,9 @@ public:
         instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
             LoadObjectData(creatureData, gameObjectData);
             LoadBossBoundaries(boundaries);
-            SetBossNumber(MAX_ENCOUNTER);
         }
 
         ObjectGuid ThaladredTheDarkenerGUID;
@@ -110,6 +110,7 @@ public:
                     KaelStateLeftGUID = gobject->GetGUID();
                     break;
             }
+            InstanceScript::OnGameObjectCreate(gobject);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override
