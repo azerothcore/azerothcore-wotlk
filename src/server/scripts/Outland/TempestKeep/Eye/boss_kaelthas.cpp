@@ -1014,7 +1014,7 @@ struct npc_thaladred : public ScriptedAI
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
         _hasDied = false;
-        me->SetWalk(true);
+        me->SetWalk(false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1023,6 +1023,7 @@ struct npc_thaladred : public ScriptedAI
         {
             Talk(SAY_THALADRED_AGGRO);
         }
+        me->SetWalk(true);
         ScheduleTimedEvent(100ms, [&]
         {
             DoResetThreatList();
@@ -1046,7 +1047,7 @@ struct npc_thaladred : public ScriptedAI
             {
                 if (victim->IsNonMeleeSpellCast(false, false, true))
                 {
-                    DoCastVictim(SPELL_SILENCE);
+                    DoCastSelf(SPELL_SILENCE);
                 }
             }
         }, 3600ms, 15200ms);
