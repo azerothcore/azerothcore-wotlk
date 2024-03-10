@@ -33,7 +33,16 @@ ObjectData const creatureData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { 0,               0                 }
+    { GO_KAEL_DOOR_1, DATA_KAEL_DOOR_1 },
+    { GO_KAEL_DOOR_2, DATA_KAEL_DOOR_2 },
+    { 0,              0,               }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_REAVER,      new CircleBoundary(Position(432.741809f, 371.859589f), 105.052554f) },
+    { DATA_ALAR,        new CircleBoundary(Position(331.000000f, -2.38000000f), 108.29246f) },
+    { DATA_ASTROMANCER, new CircleBoundary(Position(432.869202f, -374.213806f), 103.74374f) }
 };
 
 class instance_the_eye : public InstanceMapScript
@@ -47,6 +56,7 @@ public:
         {
             SetHeaders(DataHeader);
             LoadObjectData(creatureData, gameObjectData);
+            LoadBossBoundaries(boundaries);
             SetBossNumber(MAX_ENCOUNTER);
         }
 

@@ -39,7 +39,10 @@ enum EyeData
     DATA_THALADRED          = 10,
     DATA_LORD_SANGUINAR     = 11,
     DATA_CAPERNIAN          = 12,
-    DATA_TELONICUS          = 13
+    DATA_TELONICUS          = 13,
+
+    DATA_KAEL_DOOR_1        = 14,
+    DATA_KAEL_DOOR_2        = 15
 };
 
 enum EyeNPCs
@@ -56,7 +59,9 @@ enum EyeGOs
 {
     GO_BRIDGE_WINDOW        = 184069,
     GO_KAEL_STATUE_RIGHT    = 184596,
-    GO_KAEL_STATUE_LEFT     = 184597
+    GO_KAEL_STATUE_LEFT     = 184597,
+    GO_KAEL_DOOR_1          = 184324,
+    GO_KAEL_DOOR_2          = 184325
 };
 
 template <class AI, class T>
