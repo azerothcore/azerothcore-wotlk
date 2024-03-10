@@ -39,7 +39,7 @@ enum Yells
     SAY_KILL_PLAYER_1       = 6,
     SAY_BERSERK             = 7,
     SAY_DEATH               = 8,
-    SAY_KILL_PLAYER_2       = 9,
+  //SAY_KILL_PLAYER_2       = 9,
 };
 
 enum Equipment
@@ -502,10 +502,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         if( who->GetTypeId() == TYPEID_PLAYER )
         {
-            int32 id = urand(0, 1) ? SAY_KILL_PLAYER_1 : SAY_KILL_PLAYER_2;
-            Talk(id);
+            Talk(SAY_KILL_PLAYER_1);
             if( Creature* twin = GetSister() )
-                twin->AI()->Talk(id);
+                twin->AI()->Talk(SAY_KILL_PLAYER_1);
         }
     }
 
