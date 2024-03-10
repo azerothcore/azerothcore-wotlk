@@ -2871,6 +2871,9 @@ void ObjectMgr::LoadItemTemplates()
         // Checks
         ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
+        if (!dbcitem)
+            continue;
+
         if (dbcitem)
         {
             if (enforceDBCAttributes)
