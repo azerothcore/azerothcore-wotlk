@@ -33,9 +33,14 @@ ObjectData const creatureData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { GO_KAEL_DOOR_1, DATA_KAEL_DOOR_1 },
-    { GO_KAEL_DOOR_2, DATA_KAEL_DOOR_2 },
     { 0,              0,               }
+};
+
+DoorData const doorData[] =
+{
+    { GO_KAEL_DOOR_1, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { GO_KAEL_DOOR_2, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { 0,              0,             DOOR_TYPE_ROOM }
 };
 
 BossBoundaryData const boundaries =
@@ -57,6 +62,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
             LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
         }
 
