@@ -271,7 +271,13 @@ public:
 
         handler->PSendSysMessage("Connection peak: %u.", connPeak);
         handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
-        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("Update time diff: %ums. Last %d diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
+        handler->PSendSysMessage("- Mean: %ums", sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("- Median: %ums", sWorldUpdateTime.GetPercentile(50));
+        handler->PSendSysMessage("- Percentiles (95, 99, max): %ums, %ums, %ums",
+                                 sWorldUpdateTime.GetPercentile(95),
+                                 sWorldUpdateTime.GetPercentile(99),
+                                 sWorldUpdateTime.GetPercentile(100));
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
@@ -514,40 +520,32 @@ public:
     }
 
     // Define the 'Message of the day' for the realm
-    static bool HandleServerSetMotdCommand(ChatHandler* handler, std::string realmId, Tail motd)
+    static bool HandleServerSetMotdCommand(ChatHandler* handler, Optional<int32> realmId, Tail motd)
     {
         std::wstring wMotd   = std::wstring();
         std::string  strMotd = std::string();
 
-        if (realmId.empty())
-        {
-            return false;
-        }
+        if (!realmId)
+            realmId = static_cast<int32>(realm.Id.Realm);
 
         if (motd.empty())
-        {
             return false;
-        }
 
         if (!Utf8toWStr(motd, wMotd))
-        {
             return false;
-        }
 
         if (!WStrToUtf8(wMotd, strMotd))
-        {
             return false;
-        }
 
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
-        stmt->SetData(0, Acore::StringTo<int32>(realmId).value());
+        stmt->SetData(0, realmId.value());
         stmt->SetData(1, strMotd);
         trans->Append(stmt);
         LoginDatabase.CommitTransaction(trans);
 
         sMotdMgr->LoadMotd();
-        handler->PSendSysMessage(LANG_MOTD_NEW, Acore::StringTo<int32>(realmId).value(), strMotd);
+        handler->PSendSysMessage(LANG_MOTD_NEW, realmId.value(), strMotd);
         return true;
     }
 

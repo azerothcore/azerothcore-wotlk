@@ -220,7 +220,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTimer(0),
-    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false)
+    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -877,7 +877,7 @@ bool Creature::IsFreeToMove()
 {
     uint32 moveFlags = m_movementInfo.GetMovementFlags();
     // Do not reposition ourself when we are not allowed to move
-    if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove()) &&
+    if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove() || !IsCombatMovementAllowed()) &&
         (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE ||
         moveFlags & MOVEMENTFLAG_SPLINE_ENABLED))
     {
@@ -1196,8 +1196,8 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
     return player->GetLevel() >= 10
-           && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-           && player->getClass() == GetCreatureTemplate()->trainer_class;
+        && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
+        && player->IsClass((Classes)GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER);
 }
 
 bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
@@ -1211,7 +1211,7 @@ bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= null
     {
         case TRAINER_TYPE_CLASS:
         case TRAINER_TYPE_PETS:
-            if (m_creatureInfo->trainer_class && m_creatureInfo->trainer_class != player->getClass())
+            if (m_creatureInfo->trainer_class && !player->IsClass((Classes)m_creatureInfo->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
             {
                 if (npcFlags)
                     *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
@@ -1627,7 +1627,7 @@ bool Creature::isVendorWithIconSpeak() const
     return m_creatureInfo->IconName == "Speak" && m_creatureData->npcflag & UNIT_NPC_FLAG_VENDOR;
 }
 
-bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool gridLoad, bool allowDuplicate /*= false*/)
+bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate /*= false*/)
 {
     if (!allowDuplicate)
     {
@@ -1664,16 +1664,6 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     {
         LOG_ERROR("sql.sql", "Creature (SpawnId: {}) not found in table `creature`, can't load. ", spawnId);
         return false;
-    }
-
-    // xinef: fix from db
-    if ((addToMap || gridLoad) && !data->overwrittenZ)
-    {
-        float tz = map->GetHeight(data->posX, data->posY, data->posZ + 0.42f, true);
-        if (tz >= data->posZ && tz - data->posZ <= 0.42f)
-            const_cast<CreatureData*>(data)->posZ = tz + 0.1f;
-
-        const_cast<CreatureData*>(data)->overwrittenZ = true;
     }
 
     // xinef: this has to be assigned before Create function, properly loads equipment id from DB
@@ -3746,6 +3736,11 @@ bool Creature::CanCastSpell(uint32 spellID) const
     }
 
     return true;
+}
+
+void Creature::SetCombatMovement(bool allowMovement)
+{
+    _isCombatMovementAllowed = allowMovement;
 }
 
 ObjectGuid Creature::GetSummonerGUID() const

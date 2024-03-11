@@ -771,6 +771,14 @@ struct ItemPosCount
 };
 typedef std::vector<ItemPosCount> ItemPosCountVec;
 
+struct SavedItem
+{
+    Item* item;
+    uint16 dstpos;
+
+    SavedItem(Item* _item, uint16 dstpos) : item(_item), dstpos(dstpos) {}
+};
+
 enum TransferAbortReason
 {
     TRANSFER_ABORT_NONE                     = 0x00,
@@ -1104,6 +1112,8 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
+    [[nodiscard]] bool IsClass(Classes playerClass, ClassContext context = CLASS_CONTEXT_NONE) const override;
+
     void SetInWater(bool apply);
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
@@ -1161,6 +1171,8 @@ public:
     void GiveLevel(uint8 level);
 
     void InitStatsForLevel(bool reapplyMods = false);
+
+    [[nodiscard]] bool HasActivePowerType(Powers power) override;
 
     // .cheat command related
     [[nodiscard]] bool GetCommandStatus(uint32 command) const { return _activeCheats & command; }

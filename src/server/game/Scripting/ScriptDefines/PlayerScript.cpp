@@ -361,6 +361,14 @@ void ScriptMgr::OnPlayerLoadFromDB(Player* player)
     });
 }
 
+void ScriptMgr::OnBeforePlayerLogout(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnBeforeLogout(player);
+        });
+}
+
 void ScriptMgr::OnPlayerLogout(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -984,11 +992,11 @@ void ScriptMgr::PetitionShowList(Player* player, Creature* creature, uint32& Cha
     });
 }
 
-void ScriptMgr::OnRewardKillRewarder(Player* player, bool isDungeon, float& rate)
+void ScriptMgr::OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnRewardKillRewarder(player, isDungeon, rate);
+        script->OnRewardKillRewarder(player, rewarder, isDungeon, rate);
     });
 }
 
@@ -1030,12 +1038,40 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
     return true;
 }
 
+Optional<bool> ScriptMgr::OnPlayerIsClass(Player const* player, Classes unitClass, ClassContext context)
+{
+    if (ScriptRegistry<PlayerScript>::ScriptPointerList.empty())
+        return {};
+    for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
+    {
+        Optional<bool> scriptResult = script->OnPlayerIsClass(player, unitClass, context);
+        if (scriptResult)
+            return scriptResult;
+    }
+    return {};
+}
+
 void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnGetMaxSkillValue(player, skill, result, IsPure);
     });
+}
+
+bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return script->OnPlayerHasActivePowerType(player, power);
+        });
+
+    if (ret && *ret)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {

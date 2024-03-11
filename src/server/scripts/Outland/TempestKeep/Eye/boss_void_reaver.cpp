@@ -107,11 +107,6 @@ struct boss_void_reaver : public BossAI
         });
     }
 
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
-    }
-
     private:
         bool _recentlySpoken;
 };

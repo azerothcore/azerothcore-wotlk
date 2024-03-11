@@ -23,12 +23,10 @@
 enum Yells
 {
     SAY_AGGRO                           = 0,
-    SAY_SUMMON1                         = 1,
-    SAY_SUMMON2                         = 2,
-    SAY_KILL                            = 3,
-    SAY_DEATH                           = 4,
-    SAY_VOIDA                           = 5,
-    SAY_VOIDB                           = 6
+    SAY_SUMMON                          = 1,
+    SAY_KILL                            = 2,
+    SAY_DEATH                           = 3,
+    SAY_VOID                            = 4
 };
 
 enum Spells
@@ -59,15 +57,25 @@ enum Misc
 
 struct boss_high_astromancer_solarian : public BossAI
 {
-    boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER) { }
+    boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
         BossAI::Reset();
         me->SetModelVisible(true);
+        me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
+            Talk(SAY_VOID);
+            me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
+            me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_VOID_BOLT);
@@ -109,10 +117,21 @@ struct boss_high_astromancer_solarian : public BossAI
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
         me->CallForHelp(105.0f);
+        me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
+            me->GetMotionMaster()->Clear();
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true, true, -SPELL_WRATH_OF_THE_ASTROMANCER))
+            {
+                DoCast(target, SPELL_ARCANE_MISSILES);
+            }
+            else
+            {
+                //no targets in required range
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 30.0f);
+                me->CastStop();
+            }
             context.Repeat(800ms, 7300ms);
         }).Schedule(21800ms, [this](TaskContext context)
         {
@@ -125,11 +144,11 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
+            Talk(SAY_SUMMON);
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
             {
-                Talk(SAY_SUMMON1);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -151,7 +170,6 @@ struct boss_high_astromancer_solarian : public BossAI
             }).Schedule(20s, [this](TaskContext)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
-                Talk(SAY_SUMMON2);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -208,11 +226,6 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             summon->SetInCombatWithZone();
         }
-    }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
 };
 

@@ -20,6 +20,36 @@
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_ALAR,             DATA_ALAR           },
+    { NPC_KAELTHAS,         DATA_KAELTHAS       },
+    { NPC_THALADRED,        DATA_THALADRED      },
+    { NPC_LORD_SANGUINAR,   DATA_LORD_SANGUINAR },
+    { NPC_CAPERNIAN,        DATA_CAPERNIAN      },
+    { NPC_TELONICUS,        DATA_TELONICUS      },
+    { 0,                    0                   }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,              0,               }
+};
+
+DoorData const doorData[] =
+{
+    { GO_KAEL_DOOR_1, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { GO_KAEL_DOOR_2, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { 0,              0,             DOOR_TYPE_ROOM }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_REAVER,      new CircleBoundary(Position(432.741809f, 371.859589f), 105.052554f) },
+    { DATA_ALAR,        new CircleBoundary(Position(331.000000f, -2.38000000f), 108.29246f) },
+    { DATA_ASTROMANCER, new CircleBoundary(Position(432.869202f, -374.213806f), 103.74374f) }
+};
+
 class instance_the_eye : public InstanceMapScript
 {
 public:
@@ -31,6 +61,9 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
+            LoadBossBoundaries(boundaries);
         }
 
         ObjectGuid ThaladredTheDarkenerGUID;
@@ -66,6 +99,7 @@ public:
                     LordSanguinarGUID = creature->GetGUID();
                     break;
             }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* gobject) override
@@ -82,6 +116,7 @@ public:
                     KaelStateLeftGUID = gobject->GetGUID();
                     break;
             }
+            InstanceScript::OnGameObjectCreate(gobject);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override
@@ -98,14 +133,6 @@ public:
                     return AlarGUID;
                 case NPC_KAELTHAS:
                     return KaelthasGUID;
-                case DATA_KAEL_ADVISOR1:
-                    return ThaladredTheDarkenerGUID;
-                case DATA_KAEL_ADVISOR2:
-                    return LordSanguinarGUID;
-                case DATA_KAEL_ADVISOR3:
-                    return GrandAstromancerCapernianGUID;
-                case DATA_KAEL_ADVISOR4:
-                    return MasterEngineerTelonicusGUID;
             }
 
             return ObjectGuid::Empty;
