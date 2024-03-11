@@ -15,7 +15,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 SET @ENTRY := 26828;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` IN (2682800);
+DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY * 100;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 0, 0, 100, 0, 5000, 9000, 9000, 15000, 11, 51830, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Every 9 - 15 seconds (5 - 9s initially) (IC) - Self: Cast spell  Arcane Blast (51830) on Random hostile'),
 (@ENTRY, 0, 1, 0, 106, 0, 100, 0, 24000, 28000, 24000, 28000, 11, 51806, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Event 106 has invalid Readable format in events.json - Self: Cast spell  Power Flux (51806) with flags interrupt previous on Self'),
