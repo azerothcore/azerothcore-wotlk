@@ -253,11 +253,14 @@ struct boss_alar : public BossAI
 
     void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt)
     {
+        LOG_ERROR("server", "spawning phoenix");
         if (targetToSpawnAt)
         {
+            LOG_ERROR("server", "found target to spawn at");
             Position spawnPosition = DeterminePhoenixPosition(targetToSpawnAt->GetPosition());
             for (uint8 i = 0; i < count; ++i)
             {
+                LOG_ERROR("server", "spawning at x: {} y: {} z: {}", std::to_string(spawnPosition.GetPositionX()), std::to_string(spawnPosition.GetPositionY()), std::to_string(spawnPosition.GetPositionZ()));
                 me->SummonCreature(NPC_EMBER_OF_ALAR, spawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
             }
         }
@@ -268,7 +271,7 @@ struct boss_alar : public BossAI
         _noMelee = true;
         scheduler.Schedule(2s, [this](TaskContext)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 110.0f, true))
             {
                 SpawnPhoenixes(2, target);
             }
