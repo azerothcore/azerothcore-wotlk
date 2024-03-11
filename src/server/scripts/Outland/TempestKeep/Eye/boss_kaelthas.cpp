@@ -1303,6 +1303,25 @@ class spell_kaelthas_summon_nether_vapor : public SpellScript
     }
 };
 
+class spell_kael_pyroblast : public SpellScript
+{
+    PrepareSpellScript(spell_kael_pyroblast);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (GetCaster()->GetVictim())
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), false));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kael_pyroblast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1320,5 +1339,6 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_gravity_lapse);
     RegisterSpellScript(spell_kaelthas_nether_beam);
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
+    RegisterSpellScript(spell_kael_pyroblast);
 }
 
