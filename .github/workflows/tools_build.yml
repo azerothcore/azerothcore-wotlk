@@ -2,7 +2,7 @@ name: tools
 on:
   push:
     branches:
-      - 'Playerbot'
+      - 'master'
   pull_request:
 
 concurrency:

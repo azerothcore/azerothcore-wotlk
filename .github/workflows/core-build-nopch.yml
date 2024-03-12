@@ -2,7 +2,7 @@ name: nopch-build
 on:
   push:
     branches:
-      - 'Playerbot'
+      - 'master'
   pull_request:
     types: ['opened', 'synchronize', 'reopened']
 
