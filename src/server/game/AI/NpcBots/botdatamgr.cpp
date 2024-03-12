@@ -2316,7 +2316,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER);
             //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE entry = ?", CONNECTION_ASYNC
             bstmt->SetData(0, itr->second->owner);
-            bstmt->SetData(1, itr->second->hire_time);
+            bstmt->SetData(1, int64(itr->second->hire_time));
             bstmt->SetData(2, entry);
             CharacterDatabase.Execute(bstmt);
             //break; //no break: erase transmogs
@@ -2472,7 +2472,7 @@ void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType upd
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER_ALL);
             //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE owner = ?", CONNECTION_ASYNC
             bstmt->SetData(0, *(uint32*)(data));
-            bstmt->SetData(1, *(uint32*)(data) ? uint64(time(0)) : 1ULL);
+            bstmt->SetData(1, *(uint32*)(data) ? int64(time(0)) : 1LL);
             bstmt->SetData(2, playerGuid);
             CharacterDatabase.Execute(bstmt);
             //break; //no break: erase transmogs
