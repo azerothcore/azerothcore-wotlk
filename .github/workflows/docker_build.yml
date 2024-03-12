@@ -2,7 +2,7 @@ name: docker-build
 on:
   push:
     branches:
-      - 'master'
+      - 'Playerbot'
   pull_request:
     types:
       - labeled

@@ -2,7 +2,7 @@ name: pch-build
 on:
   push:
     branches:
-      - 'master'
+      - 'Playerbot'
   pull_request:
     types: ['opened', 'synchronize', 'reopened']
 
