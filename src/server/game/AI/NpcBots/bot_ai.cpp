@@ -484,7 +484,7 @@ void bot_ai::CheckOwnerExpiry()
     if (BotMgr::GetOwnershipExpireMode() == BOT_OWNERSHIP_EXPIRE_OFFLINE)
     {
         uint32 accId = sCharacterCache->GetCharacterAccountIdByGuid(ownerGuid);
-        QueryResult result = accId ? LoginDatabase.Query("SELECT MAX(logout_time) FROM characters WHERE account = {}", accId) : nullptr;
+        QueryResult result = accId ? CharacterDatabase.Query("SELECT MAX(logout_time) FROM characters WHERE account = {}", accId) : nullptr;
 
         Field* fields = result ? result->Fetch() : nullptr;
         time_t lastLoginTime = fields ? time_t(fields[0].Get<uint32>()) : timeNow;
