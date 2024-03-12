@@ -4,9 +4,9 @@ name: ubuntu-build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "Playerbot" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "Playerbot" ]
 
 jobs:
   build:
@@ -35,8 +35,6 @@ jobs:
     steps:
     - name: Checkout AzerothCore
       uses: actions/checkout@v3
-      with:
-        repository: 'liyunfan1223/azerothcore-wotlk'
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
