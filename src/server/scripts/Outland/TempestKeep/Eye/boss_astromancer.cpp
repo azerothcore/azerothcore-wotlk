@@ -182,6 +182,7 @@ struct boss_high_astromancer_solarian : public BossAI
                             light->RemoveAllAuras();
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                me->RemoveAurasDueToSpell(SPELL_TRUE_BEAM);
                                 me->SetModelVisible(true);
                             }
                             else
