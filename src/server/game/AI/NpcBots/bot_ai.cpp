@@ -192,6 +192,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     _evadeMode = false;
     _atHome = true;
     _roleMask = 0;
+    _healHpPctThreshold = 95;
     _primaryIconTank = -1;
     _primaryIconDamage = -1;
     haste = 0;
@@ -1389,6 +1390,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
 
     BotMap const* map;
     Group const* pGroup = master->GetGroup();
+    uint8 hppctthreshold = GetHealHpPctThreshold();
     if (!pGroup)
     {
         //heals
@@ -1396,11 +1398,11 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         if (HasRole(BOT_ROLE_HEAL))
         {
             std::list<Unit*> targets3;
-            if (master->IsAlive() && !master->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(master) < 95 && me->GetDistance(master) < 40)
+            if (master->IsAlive() && !master->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(master) <= hppctthreshold && me->GetDistance(master) < 40)
                 targets3.push_back(master);
             if (master->GetVehicleBase() && !(master->GetVehicleBase()->GetTypeId() == TYPEID_UNIT &&
                 master->GetVehicleCreatureBase()->GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL) &&
-                !master->GetVehicleBase()->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(master->GetVehicleBase()) < 95 &&
+                !master->GetVehicleBase()->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(master->GetVehicleBase()) <= hppctthreshold &&
                 me->GetDistance(master->GetVehicleBase()) < 40)
                 targets3.push_back(master->GetVehicleBase());
             for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
@@ -1408,17 +1410,17 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
                 Unit* u = itr->second;
                 if (!(!u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) ||
                     u->ToCreature()->IsTempBot() || me->GetDistance(u) > 40 ||
-                    (GetHealthPCT(u) > 95 && !IsTank(u))))
+                    (GetHealthPCT(u) > hppctthreshold && !IsTank(u))))
                     targets3.push_back(u);
 
                 u = itr->second->GetBotsPet();
 
-                if (!(!u || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) || me->GetDistance(u) > 40 || GetHealthPCT(u) > 95))
+                if (!(!u || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) || me->GetDistance(u) > 40 || GetHealthPCT(u) > hppctthreshold))
                     targets3.push_back(u);
 
                 u = itr->second->GetVehicleBase();
                 if (u && !(u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL) &&
-                    !u->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(u) < 95 && me->GetDistance(u) < 40)
+                    !u->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(u) <= hppctthreshold && me->GetDistance(u) < 40)
                     targets3.push_back(u);
             }
             for (Unit::ControlSet::const_iterator itr = master->m_Controlled.begin(); itr != master->m_Controlled.end(); ++itr)
@@ -1426,7 +1428,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
                 Unit* u = *itr;
                 if (!u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) ||
                     u->IsTotem() || u->GetEntry() == SHAMAN_EARTH_ELEMENTAL || me->GetDistance(u) > 40 ||
-                    (GetHealthPCT(u) > 95 && !IsTank(u)))
+                    (GetHealthPCT(u) > hppctthreshold && !IsTank(u)))
                     continue;
 
                 targets3.push_back(u);
@@ -1479,11 +1481,11 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
                 Bots = true;
             if (!tPlayer->IsAlive() || tPlayer->HasUnitState(UNIT_STATE_ISOLATED)) continue;
             if (me->GetDistance(tPlayer) > 40) continue;
-            if (GetHealthPCT(tPlayer) < 95 || IsTank(tPlayer))
+            if (GetHealthPCT(tPlayer) <= hppctthreshold || IsTank(tPlayer))
                 targets5.push_back(tPlayer);
             if (tPlayer->GetVehicleBase() && !(tPlayer->GetVehicleBase()->GetTypeId() == TYPEID_UNIT &&
                 tPlayer->GetVehicleCreatureBase()->GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL) &&
-                !tPlayer->GetVehicleBase()->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(tPlayer->GetVehicleBase()) < 95 &&
+                !tPlayer->GetVehicleBase()->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(tPlayer->GetVehicleBase()) <= hppctthreshold &&
                 me->GetDistance(tPlayer->GetVehicleBase()) < 40)
                 targets5.push_back(tPlayer->GetVehicleBase());
         }
@@ -1503,17 +1505,17 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
                         Unit* u = bitr->second;
                         if (!(!u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) ||
                             u->ToCreature()->IsTempBot() || me->GetDistance(u) > 40 ||
-                            (GetHealthPCT(u) > 95 && !IsTank(u))))
+                            (GetHealthPCT(u) > hppctthreshold && !IsTank(u))))
                             targets5.push_back(u);
 
                         u = bitr->second->GetBotsPet();
 
-                        if (!(!u || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) || me->GetDistance(u) > 40 || GetHealthPCT(u) > 95))
+                        if (!(!u || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) || me->GetDistance(u) > 40 || GetHealthPCT(u) > hppctthreshold))
                             targets5.push_back(u);
 
                         u = bitr->second->GetVehicleBase();
                         if (u && !(u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL) &&
-                            !u->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(u) < 95 && me->GetDistance(u) < 40)
+                            !u->HasUnitState(UNIT_STATE_ISOLATED) && GetHealthPCT(u) <= hppctthreshold && me->GetDistance(u) < 40)
                             targets5.push_back(u);
                     }
                 }
@@ -1522,7 +1524,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
                     Unit* u = *bitr;
                     if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive() || u->HasUnitState(UNIT_STATE_ISOLATED) ||
                         u->IsTotem() || u->GetEntry() == SHAMAN_EARTH_ELEMENTAL || me->GetDistance(u) > 40 ||
-                        (GetHealthPCT(u) > 95 && !IsTank(u)))
+                        (GetHealthPCT(u) > hppctthreshold && !IsTank(u)))
                         continue;
 
                     targets5.push_back(u);
@@ -10264,11 +10266,16 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 delaystr.setf(std::ios_base::fixed);
                 delaystr.precision(2);
                 delaystr << LocalizedNpcText(player, BOT_TEXT_DELAY_HEALING_BY) << ": " << float(player->GetBotMgr()->GetEngageDelayHeal() / 1000.f) << LocalizedNpcText(player, BOT_TEXT_SECOND_SHORT);
-                player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, delaystr.str(),
-                    GOSSIP_SENDER_ENGAGE_DELAY_SET_HEALING, GOSSIP_ACTION_INFO_DEF + 2, "", 0, true);
+                player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, delaystr.str(), GOSSIP_SENDER_ENGAGE_DELAY_SET_HEALING, GOSSIP_ACTION_INFO_DEF + 2, "", 0, true);
+                if (GetBotClass() != BOT_CLASS_SPHYNX)
+                {
+                    std::ostringstream thresholdstr;
+                    thresholdstr << LocalizedNpcText(player, BOT_TEXT_HEAL_TARGET_HEALTH_THRESHOLD) << ": " << uint32(GetHealHpPctThreshold()) << "%";
+                    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, thresholdstr.str(), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET, GOSSIP_ACTION_INFO_DEF + 3, "", 0, true);
+                }
             }
 
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 4);
             break;
         }
         case GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK:
@@ -10760,6 +10767,16 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
             float delay = std::min<float>(std::max<float>(atof(dist), 0.f), 10.f);
 
             player->GetBotMgr()->SetEngageDelayHeal(uint32(delay * 1000));
+
+            player->PlayerTalkClass->SendCloseGossip();
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
+        }
+        case GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET:
+        {
+            char* dist = strtok((char*)code, "");
+            float threshold = std::min<float>(std::max<float>(atof(dist), 0.f), 99.f);
+
+            SetHealHpPctThreshold(uint8(threshold));
 
             player->PlayerTalkClass->SendCloseGossip();
             return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
