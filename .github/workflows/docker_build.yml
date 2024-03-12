@@ -18,13 +18,13 @@ env:
   COMPOSE_DOCKER_CLI_BUILD: 1
   DOCKER_BUILDKIT: 1
   RUNNING_ON_PRIMARY_BRANCH: |
-    ${{ (github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master') && 'true' || 'false' }}
+    ${{ (github.repository == 'liyunfan1223/azerothcore-wotlk' && github.ref_name == 'master') && 'true' || 'false' }}
 
 jobs:
   build-containers:
     runs-on: "ubuntu-latest"
     if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
+      github.repository == 'liyunfan1223/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (github.ref_name == 'master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:

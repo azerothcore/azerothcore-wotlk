@@ -24,7 +24,7 @@ jobs:
     env:
       COMPILER: ${{ matrix.compiler }}
     if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
+      github.repository == 'liyunfan1223/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (
         github.ref == 'refs/heads/master'

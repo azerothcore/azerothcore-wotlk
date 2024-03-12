@@ -21,7 +21,7 @@ jobs:
     env:
       BOOST_ROOT: C:\local\boost_1_82_0
     if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
+      github.repository == 'liyunfan1223/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
