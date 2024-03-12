@@ -94,6 +94,10 @@ struct boss_alar : public BossAI
     boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
         me->SetCombatMovement(false);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void JustReachedHome() override
@@ -264,7 +268,7 @@ struct boss_alar : public BossAI
         _noMelee = true;
         scheduler.Schedule(2s, [this](TaskContext)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 110.0f, true))
             {
                 SpawnPhoenixes(2, target);
             }
