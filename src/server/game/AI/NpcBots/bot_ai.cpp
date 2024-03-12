@@ -17037,6 +17037,8 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
             if (info->Id == SHOOT_WAND && me->isMoving())
                 interrupt = true;
+            else if (info->Id == 32783) //Arcane Channeling, not interrupted automatically
+                interrupt = true;
             else
             {
                 // not interrupted yet, next checks require target, ensure validity
@@ -17270,6 +17272,21 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
             if (_wmoAreaUpdateTimer <= diff)
                 _UpdateWMOArea();
+        }
+
+        //Meeting Stone
+        if (me->IsInWorld() && !IAmFree() && !me->IsInCombat() && !master->IsInCombat() && IsChanneling(master) && !CCed(me) && !IsCasting() && !me->GetVehicle())
+        {
+            if (Spell const* curMasterSpell = master->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            {
+                if (curMasterSpell->m_spellInfo->Id == SUMMONING_STONE_EFFECT)
+                {
+                    if (GameObject* portal = master->GetGameObject(SUMMONING_STONE_EFFECT))
+                    {
+                        portal->Use(me);
+                    }
+                }
+            }
         }
 
         //Gathering

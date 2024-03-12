@@ -1817,6 +1817,39 @@ void GameObject::Use(Unit* user)
 
         case GAMEOBJECT_TYPE_SUMMONING_RITUAL:              //18
             {
+                //npcbot
+                if (user->IsNPCBot())
+                {
+                    GameObjectTemplate const* info = GetGOInfo();
+                    Player* botOwner = user->ToCreature()->GetBotOwner();
+                    spellCaster = botOwner;
+
+                    if (info->summoningRitual.animSpell)
+                    {
+                        user->CastSpell(user, info->summoningRitual.animSpell, true);
+                        triggered = true;
+                    }
+
+                    spellId = info->summoningRitual.spellId;
+                    if (spellId == 62330)
+                    {
+                        spellId = 61993;
+                        triggered = true;
+                    }
+                    if (!info->summoningRitual.ritualPersistent)
+                        SetLootState(GO_JUST_DEACTIVATED);
+                    else
+                    {
+                        // reset ritual for this GO
+                        m_ritualOwnerGUID.Clear();
+                        m_unique_users.clear();
+                        m_usetimes = 0;
+                    }
+
+                    break;
+                }
+                //end npcbot
+
                 if (user->GetTypeId() != TYPEID_PLAYER)
                     return;
 

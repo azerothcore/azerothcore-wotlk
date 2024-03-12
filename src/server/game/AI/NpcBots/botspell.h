@@ -20,6 +20,7 @@ enum BotSpells : uint32
     SUMMONING_DISORIENTATION            = 32752,
     ACTIVATE_SPEC                       = 63645,//Activate Primary Spec
     WANDERER_HEARTHSTONE                = 54318,//"Hearthsone" no CD
+    SUMMONING_STONE_EFFECT              = 59782,//Cast time 5s + Channeled 2m
     SHOOT_WAND                          = 5019,
 ///Passives
     DAMAGE_REDUCTION                    = 68066,//Vigilance, Blessing of Sanctuary, etc.
