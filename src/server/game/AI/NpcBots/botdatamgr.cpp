@@ -799,9 +799,11 @@ void BotDataMgr::LoadNpcBots(bool spawn)
     else
         LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `characters_npcbot_transmog` is empty!");
 
-    //                                       0      1      2      3     4        5          6          7          8          9               10          11          12         13
-    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet,"
-    //   14          15          16         17         18            19            20             21             22         23
+    //                                       0      1      2      3     4        5
+    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, UNIX_TIMESTAMP(hire_time),"
+    //   6          7          8          9               10          11          12         13         14
+        "equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet,"
+    //   15          16          17         18         19            20            21             22             23         24
         "equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck, spells_disabled FROM characters_npcbot");
 
     if (result)
@@ -832,6 +834,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
             botData->roles =        field[++index].Get<uint32>();
             botData->spec =         field[++index].Get<uint8>();
             botData->faction =      field[++index].Get<uint32>();
+            botData->hire_time =    field[++index].Get<uint64>();
 
             for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
                 botData->equips[i] = field[++index].Get<uint32>();
@@ -2305,15 +2308,19 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
     switch (updateType)
     {
         case NPCBOT_UPDATE_OWNER:
+        {
             if (itr->second->owner == *(uint32*)(data))
                 break;
             itr->second->owner = *(uint32*)(data);
+            itr->second->hire_time = itr->second->owner ? uint64(time(0)) : 1ULL;
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER);
-            //"UPDATE characters_npcbot SET owner = ? WHERE entry = ?", CONNECTION_ASYNC
+            //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE entry = ?", CONNECTION_ASYNC
             bstmt->SetData(0, itr->second->owner);
-            bstmt->SetData(1, entry);
+            bstmt->SetData(1, itr->second->hire_time);
+            bstmt->SetData(2, entry);
             CharacterDatabase.Execute(bstmt);
             //break; //no break: erase transmogs
+        }
         [[fallthrough]];
         case NPCBOT_UPDATE_TRANSMOG_ERASE:
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT_TRANSMOG);
@@ -2463,9 +2470,10 @@ void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType upd
     {
         case NPCBOT_UPDATE_OWNER:
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER_ALL);
-            //"UPDATE characters_npcbot SET owner = ? WHERE owner = ?", CONNECTION_ASYNC
+            //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE owner = ?", CONNECTION_ASYNC
             bstmt->SetData(0, *(uint32*)(data));
-            bstmt->SetData(1, playerGuid);
+            bstmt->SetData(1, *(uint32*)(data) ? uint64(time(0)) : 1ULL);
+            bstmt->SetData(2, playerGuid);
             CharacterDatabase.Execute(bstmt);
             //break; //no break: erase transmogs
         [[fallthrough]];

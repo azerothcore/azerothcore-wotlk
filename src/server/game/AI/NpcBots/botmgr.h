@@ -60,6 +60,12 @@ enum BotRemoveType
     BOT_REMOVE_BY_DEFAULT               = BOT_REMOVE_LOGOUT
 };
 
+enum BotOwnershipExpireMode
+{
+    BOT_OWNERSHIP_EXPIRE_OFFLINE        = 0,
+    BOT_OWNERSHIP_EXPIRE_HIRE           = 1
+};
+
 enum BotAttackRange
 {
     BOT_ATTACK_RANGE_SHORT              = 1,
@@ -124,6 +130,7 @@ class AC_GAME_API BotMgr
         static uint8 GetNoDPSTargetIconFlags();
         static uint32 GetBaseUpdateDelay();
         static uint32 GetOwnershipExpireTime();
+        static uint8 GetOwnershipExpireMode();
         static uint32 GetDesiredWanderingBotsCount();
         static uint32 GetBGTargetTeamPlayersCount(BattlegroundTypeId bgTypeId);
         static float GetBotHKHonorRate();

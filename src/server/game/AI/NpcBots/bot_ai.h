@@ -561,6 +561,7 @@ class bot_ai : public CreatureAI
 
     private:
         void FindMaster();
+        uint32 CalculateOwnershipCheckTime();
 
         void _OnHealthUpdate() const;
         void _OnManaUpdate() const;
@@ -676,6 +677,7 @@ class bot_ai : public CreatureAI
         //timers
         uint32 _reviveTimer, _powersTimer, _chaseTimer, _engageTimer, _potionTimer;
         uint32 lastdiff, checkAurasTimer, checkMasterTimer, roleTimer, ordersTimer, regenTimer, _updateTimerMedium, _updateTimerEx1;
+        uint32 _checkOwershipTimer;
         uint32 _moveBehindTimer;
         uint32 _wmoAreaUpdateTimer;
         uint32 waitTimer;

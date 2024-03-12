@@ -4769,13 +4769,21 @@ NpcBot.InfoPacketsLimit = -1
 
 #
 #    NpcBot.OwnershipExpireTime
-#        Description: Maxmum time since last account login (in seconds) before bot ownership
-#                     is automatically cancelled (at server loading).
-#        Note:        All items will be refund and mailed back to player.
+#        Description: Time (in seconds) before bot ownership is automatically cancelled.
+#        Note:        NPCBot ownership may only expire after player goes offline.
+#        Note2:       All items will be mailed back to player as usual.
 #        Default:     0 - (Disabled)
 #                     604800 - (7 Days)
 
 NpcBot.OwnershipExpireTime = 0
+
+#
+#    NpcBot.OwnershipExpireMode
+#        Description: Ownership expiration mode. Determines when the timer starts.
+#        Default:     0 - (Player goes offline, timer resets if player logs back in)
+#                     1 - (Player hires the bot, timer never resets)
+
+NpcBot.OwnershipExpireMode = 0
 
 #
 #    NpcBot.EnrageOnDismiss

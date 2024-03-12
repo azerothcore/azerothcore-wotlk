@@ -52,6 +52,7 @@ struct NpcBotData
     friend struct WanderingBotsGenerator;
 public:
     uint32 owner;
+    uint64 hire_time;
     uint32 roles;
     uint32 faction;
     uint8 spec;
@@ -59,7 +60,7 @@ public:
     DisabledSpellsContainer disabled_spells;
 
 private:
-    explicit NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), roles(iroles), faction(ifaction), spec(ispec)
+    explicit NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)
     {
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
             equips[i] = 0;
