@@ -33,7 +33,21 @@ ObjectData const creatureData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { 0,               0                 }
+    { 0,              0,               }
+};
+
+DoorData const doorData[] =
+{
+    { GO_KAEL_DOOR_1, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { GO_KAEL_DOOR_2, DATA_KAELTHAS, DOOR_TYPE_ROOM },
+    { 0,              0,             DOOR_TYPE_ROOM }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_REAVER,      new CircleBoundary(Position(432.741809f, 371.859589f), 105.052554f) },
+    { DATA_ALAR,        new CircleBoundary(Position(331.000000f, -2.38000000f), 108.29246f) },
+    { DATA_ASTROMANCER, new CircleBoundary(Position(432.869202f, -374.213806f), 103.74374f) }
 };
 
 class instance_the_eye : public InstanceMapScript
@@ -46,8 +60,10 @@ public:
         instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
-            LoadObjectData(creatureData, gameObjectData);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
+            LoadBossBoundaries(boundaries);
         }
 
         ObjectGuid ThaladredTheDarkenerGUID;
@@ -100,6 +116,7 @@ public:
                     KaelStateLeftGUID = gobject->GetGUID();
                     break;
             }
+            InstanceScript::OnGameObjectCreate(gobject);
         }
 
         ObjectGuid GetGuidData(uint32 identifier) const override

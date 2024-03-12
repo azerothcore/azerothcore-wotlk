@@ -227,11 +227,6 @@ struct boss_high_astromancer_solarian : public BossAI
             summon->SetInCombatWithZone();
         }
     }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
-    }
 };
 
 class spell_astromancer_wrath_of_the_astromancer : public AuraScript
