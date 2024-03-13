@@ -94,6 +94,10 @@ struct boss_alar : public BossAI
     boss_alar(Creature* creature) : BossAI(creature, DATA_ALAR)
     {
         me->SetCombatMovement(false);
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void JustReachedHome() override
@@ -139,7 +143,7 @@ struct boss_alar : public BossAI
                 if (_noQuillTimes++ > 0)
                 {
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
-                    SpawnPhoenixes(1, me, false);
+                    SpawnPhoenixes(1, me);
                 }
                 me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
                 _platform = (_platform+1)%4;
@@ -247,21 +251,14 @@ struct boss_alar : public BossAI
         ScheduleMainSpellAttack(0s);
     }
 
-    void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt, bool onPosition)
+    void SpawnPhoenixes(uint8 count, Unit* targetToSpawnAt)
     {
         if (targetToSpawnAt)
         {
+            Position spawnPosition = DeterminePhoenixPosition(targetToSpawnAt->GetPosition());
             for (uint8 i = 0; i < count; ++i)
             {
-                if (onPosition)
-                {
-                    Position spawnPosition = DeterminePhoenixPosition(targetToSpawnAt->GetPosition());
-                    me->SummonCreature(NPC_EMBER_OF_ALAR, spawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                }
-                else
-                {
-                    me->SummonCreature(NPC_EMBER_OF_ALAR, *targetToSpawnAt, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                }
+                me->SummonCreature(NPC_EMBER_OF_ALAR, spawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
             }
         }
     }
@@ -271,9 +268,9 @@ struct boss_alar : public BossAI
         _noMelee = true;
         scheduler.Schedule(2s, [this](TaskContext)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 110.0f, true))
             {
-                SpawnPhoenixes(2, target, true);
+                SpawnPhoenixes(2, target);
             }
         }).Schedule(6s, [this](TaskContext)
         {
