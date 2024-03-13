@@ -294,38 +294,35 @@ public:
             //BUG: players cannot accept this buff if they are below lvl 20 (should be 8)
             if (!IAmFree() && hasSoulstone && soulstoneTimer <= diff && GetSpell(CREATE_SOULSTONE_1))
             {
-                Group const* gr = master->GetGroup();
-                std::set<Unit*> targets;
-                if (!gr)
+                std::vector<Unit*> targets;
+
+                for (uint8 i = 0; i < 2; ++i)
                 {
-                    if (master->IsAlive() && !master->isPossessed() && !master->IsCharmed() &&
-                        me->GetDistance(master) < 30 && !master->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
-                        targets.insert(master);
-                }
-                else
-                {
-                    for (uint8 i = 0; i < 2 && !targets.empty(); ++i)
+                    if (i > 0 && !targets.empty())
+                        break;
+                    for (Unit* member : BotMgr::GetAllGroupMembers(master->GetGroup()))
                     {
-                        for (Unit* member : BotMgr::GetAllGroupMembers(gr))
+                        if ((i == 0 ? member->IsPlayer() : member->IsNPCBot()) && me->GetMap() == member->FindMap() &&
+                            member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
+                            !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
+                            me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                         {
-                            if ((i == 0 ? member->IsPlayer() : member->IsNPCBot()) && me->GetMap() == member->FindMap() &&
-                                member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
-                                !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
-                                me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                            if (i > 0 || member->GetClass() == CLASS_PRIEST || member->GetClass() == CLASS_PALADIN ||
+                                member->GetClass() == CLASS_DRUID || member->GetClass() == CLASS_SHAMAN)
                             {
-                                if (i > 0 || member->GetClass() == CLASS_PRIEST || member->GetClass() == CLASS_PALADIN ||
-                                    member->GetClass() == CLASS_DRUID || member->GetClass() == CLASS_SHAMAN)
-                                {
-                                    targets.insert(member);
-                                }
+                                targets.push_back(member);
                             }
                         }
                     }
                 }
 
+                if (targets.empty() && master->IsAlive() && !master->isPossessed() && !master->IsCharmed() &&
+                    me->GetDistance(master) < 30 && !master->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                    targets.push_back(master);
+
                 if (!targets.empty())
                 {
-                    Unit* target = targets.size() == 1 ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                    Unit* target = targets.size() == 1 ? targets.front() : Acore::Containers::SelectRandomContainerElement(targets);
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(CREATE_SOULSTONE_1);
                     uint32 rank = spellInfo->GetRank();
 
