@@ -2255,6 +2255,7 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 (4313, 'Battle Of Mount Hyjal, Night Elf Base (Entrance)', 534, 5163.02, -3428.31, 1627.61, 0.785398);
 
 DELETE FROM `creature_addon` WHERE `guid` IN (6747, 51475, 52070, 52074);
+DELETE FROM `waypoint_data` WHERE `id` IN (67470, 514750, 520700, 520740);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 17864);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17864);
