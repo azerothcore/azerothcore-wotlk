@@ -712,7 +712,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 
 UPDATE `creature_text` SET `Emote` = 396 WHERE  `CreatureID` = 17772 AND `GroupID` = 5 AND `ID` = 0;
 
-SET @OGUID := 81623;
+SET @OGUID := 139500;
 DELETE FROM `gameobject` WHERE `map` = 534;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 (@OGUID+0  , 182061, 534, 3606, 3606, 1, 1, 4204.478515625, -4112.27734375, 877.912841796875, 4.985381603240966796, 0, 0, -0.60431194305419921, 0.796747803688049316, 604800, 255, 1, 53162), -- 182061 (Area: 3606 - Difficulty: 0) CreateObject1
