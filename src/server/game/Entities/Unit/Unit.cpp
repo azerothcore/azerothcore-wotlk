@@ -19208,6 +19208,11 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         player->RewardPlayerAndGroupAtKill(victim, false);
     }
 
+    //npcbot: spawn wandering bot kill reward
+    if (creature && creature->IsNPCBot())
+        BotMgr::OnBotKilled(creature, killer);
+    //end npcbot
+
     // Do KILL and KILLED procs. KILL proc is called only for the unit who landed the killing blow (and its owner - for pets and totems) regardless of who tapped the victim
     if (killer && (killer->IsPet() || killer->IsTotem()))
         if (Unit* owner = killer->GetOwner())

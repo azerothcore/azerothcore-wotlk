@@ -66,6 +66,7 @@ class bot_ai : public CreatureAI
         //void LeavingWorld() override { }
         void OnSpellStart(SpellInfo const* spellInfo) override { OnBotSpellStart(spellInfo); }
         bool CanRespawn() override { return IAmFree(); }
+        void OnDeath(Unit* attacker = nullptr);
 
         virtual void OnBotSummon(Creature* /*summon*/) {}
         virtual void OnBotDespawn(Creature* /*summon*/) {}
@@ -691,6 +692,7 @@ class bot_ai : public CreatureAI
         uint32 _saveDisabledSpellsTimer;
 
         uint32 _lastZoneId, _lastAreaId, _lastWMOAreaId;
+        uint32 _selfrez_spell_id;
 
         uint8 _unreachableCount, _jumpCount, _evadeCount;
         uint8 _healHpPctThreshold;

@@ -277,7 +277,7 @@ public:
                     return;
             }
 
-            if (!hasSoulstone && !IAmFree() && GetSpell(CREATE_SOULSTONE_1))
+            if (!hasSoulstone && GetSpell(CREATE_SOULSTONE_1))
             {
                 if (doCast(me, GetSpell(CREATE_SOULSTONE_1)))
                     return;
@@ -292,25 +292,29 @@ public:
 
             //TODO: soulstone on self/bots
             //BUG: players cannot accept this buff if they are below lvl 20 (should be 8)
-            if (!IAmFree() && hasSoulstone && soulstoneTimer <= diff && GetSpell(CREATE_SOULSTONE_1))
+            if (hasSoulstone && soulstoneTimer <= diff && GetSpell(CREATE_SOULSTONE_1))
             {
                 std::vector<Unit*> targets;
 
-                for (uint8 i = 0; i < 2; ++i)
+                if (!IAmFree())
                 {
-                    if (i > 0 && !targets.empty())
-                        break;
-                    for (Unit* member : BotMgr::GetAllGroupMembers(master->GetGroup()))
+                    std::vector<Unit*> all_members = BotMgr::GetAllGroupMembers(master->GetGroup());
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                        if ((i == 0 ? member->IsPlayer() : member->IsNPCBot()) && me->GetMap() == member->FindMap() &&
-                            member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
-                            !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
-                            me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+                        if (i > 0 && !targets.empty())
+                            break;
+                        for (Unit* member : all_members)
                         {
-                            if (i > 0 || member->GetClass() == CLASS_PRIEST || member->GetClass() == CLASS_PALADIN ||
-                                member->GetClass() == CLASS_DRUID || member->GetClass() == CLASS_SHAMAN)
+                            if ((i >= 2 || (i == 0 ? member->IsPlayer() : member->IsNPCBot())) && me->GetMap() == member->FindMap() &&
+                                member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
+                                !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
+                                me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                             {
-                                targets.push_back(member);
+                                if (i >= 2 || member->GetClass() == CLASS_PRIEST || member->GetClass() == CLASS_PALADIN ||
+                                    member->GetClass() == CLASS_DRUID || member->GetClass() == CLASS_SHAMAN)
+                                {
+                                    targets.push_back(member);
+                                }
                             }
                         }
                     }

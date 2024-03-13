@@ -158,6 +158,7 @@ class AC_GAME_API BotMgr
         //onEvent hooks
         static void OnBotWandererKilled(Creature const* bot, Player* looter);
         static void OnBotWandererKilled(GameObject* go);
+        static void OnBotKilled(Creature const* bot, Unit* attacker = nullptr);
         static void OnBotSpellInterrupt(Unit const* caster, CurrentSpellTypes spellType);
         static void OnBotSpellGo(Unit const* caster, Spell const* spell, bool ok = true);
         static void OnBotOwnerSpellGo(Unit const* caster, Spell const* spell, bool ok = true);

@@ -260,6 +260,8 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
     _lastAreaId = 0;
     _lastWMOAreaId = 0;
 
+    _selfrez_spell_id = 0;
+
     _wmoAreaUpdateTimer = 0;
 
     _contestedPvPTimer = 0;
@@ -15454,6 +15456,29 @@ void bot_ai::JustDied(Unit* u)
 
     ++_deathsCount;
 }
+//This is triggered before SetDeathState(JUST_DIED) call
+//attacker may be NULL
+void bot_ai::OnDeath([[maybe_unused]] Unit* attacker/* = nullptr*/)
+{
+    if (AuraEffect const* sstone = me->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
+    {
+        uint32 spell_id;
+        switch (sstone->GetBase()->GetId())
+        {
+            case 20707: spell_id = 3026;  break;        // rank 1
+            case 20762: spell_id = 20758; break;        // rank 2
+            case 20763: spell_id = 20759; break;        // rank 3
+            case 20764: spell_id = 20760; break;        // rank 4
+            case 20765: spell_id = 20761; break;        // rank 5
+            case 27239: spell_id = 27240; break;        // rank 6
+            case 47883: spell_id = 47882; break;        // rank 7
+            default:    spell_id = 0;     break;
+        }
+        _selfrez_spell_id = spell_id;
+    }
+    else
+        _selfrez_spell_id = 0;
+}
 
 void bot_ai::KilledUnit(Unit* u)
 {
@@ -15582,6 +15607,8 @@ void bot_ai::OnBotSpellGo(Spell const* spell, bool ok)
                 StartPotionTimer();
             if (curInfo->Id == ACTIVATE_SPEC)
                 SetSpec(_newspec);
+            if (curInfo->Id == _selfrez_spell_id)
+                OnSpellHit(me, curInfo);
 
             OnClassSpellGo(curInfo);
         }
@@ -16891,6 +16918,10 @@ void bot_ai::UpdateDeadAI(uint32 diff)
     // group update
     if (_groupUpdateTimer <= diff)
         SendUpdateToOutOfRangeBotGroupMembers();
+
+    // soulstone
+    if (_selfrez_spell_id && (IAmFree() || !master->GetBotMgr()->IsPartyInCombat()) && Rand() < 15)
+        me->CastSpell(me, _selfrez_spell_id);
 }
 //opponent unsafe
 bool bot_ai::GlobalUpdate(uint32 diff)
