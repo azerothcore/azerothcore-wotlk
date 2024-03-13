@@ -36,7 +36,8 @@ enum Spells
     SPELL_WRATH_OF_THE_ASTROMANCER      = 42783,
     SPELL_BLINDING_LIGHT                = 33009,
     SPELL_PSYCHIC_SCREAM                = 34322,
-    SPELL_VOID_BOLT                     = 39329
+    SPELL_VOID_BOLT                     = 39329,
+    SPELL_TRUE_BEAM                     = 33365,
 };
 
 enum Misc
@@ -145,6 +146,7 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             me->SetReactState(REACT_PASSIVE);
             Talk(SAY_SUMMON);
+            me->RemoveAllAuras();
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
@@ -157,6 +159,7 @@ struct boss_high_astromancer_solarian : public BossAI
                         {
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                DoCast(light, SPELL_TRUE_BEAM);
                                 me->SetPosition(*light);
                                 me->StopMovingOnCurrentPos();
                             }
@@ -179,6 +182,7 @@ struct boss_high_astromancer_solarian : public BossAI
                             light->RemoveAllAuras();
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                me->RemoveAllAuras();
                                 me->SetModelVisible(true);
                             }
                             else
