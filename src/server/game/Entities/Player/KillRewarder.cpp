@@ -175,7 +175,17 @@ void KillRewarder::_RewardXP(Player* player, float rate)
             AddPct(xp, (*i)->GetAmount());
 
         //npcbot 4.2.2.1. Apply NpcBot XP reduction
-        uint8 bots_count = player->GetNpcBotsCount();
+        uint8 bots_count = 0;
+        if (_group)
+        {
+            for (GroupReference const* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player const* gPlayer = itr->GetSource())
+                    bots_count = std::max<uint8>(bots_count, gPlayer->GetNpcBotsCount());
+            }
+        }
+        else
+            bots_count = player->GetNpcBotsCount();
         uint8 xp_reduction = BotMgr::GetNpcBotXpReduction();
         uint8 xp_reduction_start = BotMgr::GetNpcBotXpReductionStartingNumber();
         if (xp_reduction_start > 0 && xp_reduction > 0 && bots_count >= xp_reduction_start)
