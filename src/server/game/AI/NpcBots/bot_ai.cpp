@@ -7123,6 +7123,14 @@ void bot_ai::_OnAreaUpdate(uint32 areaId)
                     botPet->CastSpell(botPet, itr->second->spellId, true);
             }
         }
+
+        for (uint8 slot = BOT_SLOT_MAINHAND; slot != BOT_SLOT_RANGED; ++slot)
+        {
+            if (Item const* item = _equips[slot])
+                if (item->IsLimitedToAnotherMapOrZone(me->GetMapId(), areaId))
+                    if (_resetEquipment(slot, ObjectGuid::Empty))
+                        continue;
+        }
     }
 
     AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
