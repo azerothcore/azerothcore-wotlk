@@ -872,7 +872,7 @@ bool BotMgr::CanBotParryWhileCasting(Creature const* bot)
 
 bool BotMgr::IsWanderingWorldBot(Creature const* bot)
 {
-    return (bot->IsWandererBot() && !(bot->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP));
+    return bot->IsWandererBot() && (!bot->FindMap() || !bot->GetMap()->GetEntry() || bot->GetMap()->GetEntry()->IsWorldMap());
 }
 
 void BotMgr::Update(uint32 diff)

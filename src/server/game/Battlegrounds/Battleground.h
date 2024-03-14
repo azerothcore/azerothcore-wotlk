@@ -545,6 +545,9 @@ public:
     virtual void RemoveBotAtLeave(ObjectGuid guid);
     virtual bool UpdateBotScore(Creature const* bot, uint32 type, uint32 value);
     void AddOrSetBotToCorrectBgGroup(Creature* bot, TeamId teamId);
+    void RewardXPAtKill(Player* killer, Creature* victim);
+    void RewardXPAtKill(Creature* killer, Player* victim);
+    void RewardXPAtKill(Creature* killer, Creature* victim);
     virtual void HandleBotKillPlayer(Creature* killer, Player* victim);
     virtual void HandleBotKillBot(Creature* killer, Creature* victim);
     virtual void HandlePlayerKillBot(Creature* victim, Player* killer);
