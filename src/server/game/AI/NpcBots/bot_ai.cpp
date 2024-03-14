@@ -12680,13 +12680,10 @@ void bot_ai::ApplyItemEnchantment(Item* item, EnchantmentSlot eslot, uint8 slot)
                         }
                     }
                     // Cast custom spell vs all equal basepoints got from enchant_amount
-                    //CastSpellExtraArgs args(item);
-                    //if (basepoints)
-                    //{
-                    //    args.AddSpellBP0(basepoints);
-                    //}
-                    //me->CastSpell(me, enchant_spell_id, args);
-                    me->CastCustomSpell(me, enchant_spell_id, &basepoints, nullptr, nullptr, false, item);
+                    if (basepoints)
+                        me->CastCustomSpell(me, enchant_spell_id, &basepoints, &basepoints, &basepoints, false, item);
+                    else
+                        me->CastSpell(me, enchant_spell_id, false, item);
                 }
                 break;
             case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
@@ -12948,13 +12945,10 @@ void bot_ai::ApplyItemEquipEnchantmentSpells(Item* item)
                         }
                     }
                     // Cast custom spell vs all equal basepoints got from enchant_amount
-                    //CastSpellExtraArgs args(item);
-                    //if (basepoints)
-                    //{
-                    //    args.AddSpellBP0(basepoints);
-                    //}
-                    //me->CastSpell(me, enchant_spell_id, args);
-                    me->CastCustomSpell(me, enchant_spell_id, &basepoints, nullptr, nullptr, false, item);
+                    if (basepoints)
+                        me->CastCustomSpell(me, enchant_spell_id, &basepoints, &basepoints, &basepoints, false, item);
+                    else
+                        me->CastSpell(me, enchant_spell_id, false, item);
                     break;
                 }
                 default:
