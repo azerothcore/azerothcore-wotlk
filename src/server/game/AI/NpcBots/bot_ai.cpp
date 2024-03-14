@@ -9501,6 +9501,21 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 ++counter;
                 std::ostringstream name;
                 _AddItemLink(player, item, name);
+                ItemTemplate const* proto = item->GetTemplate();
+                uint8 slot = BOT_SLOT_BODY;
+                if (GetBotClass() == BOT_CLASS_HUNTER)
+                {
+                    if (_canEquip(proto, BOT_SLOT_RANGED, true))
+                        slot = BOT_SLOT_RANGED;
+                    else if (_canEquip(proto, BOT_SLOT_MAINHAND, true))
+                        slot = BOT_SLOT_MAINHAND;
+                    else if (_canEquip(proto, BOT_SLOT_OFFHAND, true))
+                        slot = BOT_SLOT_OFFHAND;
+                }
+                else if (GetBotClass() == BOT_CLASS_WARRIOR && _canEquip(proto, BOT_SLOT_MAINHAND, true))
+                    slot = BOT_SLOT_MAINHAND;
+
+                name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, proto));
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW_ITEM, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
             }
 
