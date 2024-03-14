@@ -115,6 +115,7 @@ struct boss_alar : public BossAI
         _canAttackCooldown = true;
         _baseAttackOverride = false;
         _spawnPhoenixes = false;
+        _hasPretendedToDie = false;
         _transitionScheduler.CancelAll();
         _platform = 0;
         _noMelee = false;
@@ -179,8 +180,9 @@ struct boss_alar : public BossAI
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
+        if (damage >= me->GetHealth() && _platform < POINT_MIDDLE && !_hasPretendedToDie)
         {
+            _hasPretendedToDie = true;
             damage = 0;
             DoCastSelf(SPELL_EMBER_BLAST, true);
             PretendToDie(me);
@@ -224,6 +226,7 @@ struct boss_alar : public BossAI
 
     void ScheduleAbilities()
     {
+        _transitionScheduler.CancelAll();
         ScheduleTimedEvent(57s, [&]
         {
             DoCastVictim(SPELL_MELT_ARMOR);
@@ -408,6 +411,7 @@ struct boss_alar : public BossAI
     }
 
 private:
+    bool _hasPretendedToDie;
     bool _canAttackCooldown;
     bool _baseAttackOverride;
     bool _spawnPhoenixes;
