@@ -814,8 +814,10 @@ public:
                     return;
             }
             //SUNDER ARMOR
-            if (IsSpellReady(SUNDER_ARMOR_1, diff) && can_do_normal && IsTank() && Rand() < 55 && mytar->GetHealth() > me->GetMaxHealth() &&
-                dist < 5 && (!HasRole(BOT_ROLE_DPS) || !GetSpell(DEVASTATE_1)) && rage >= rcost(SUNDER_ARMOR_1))
+            if (IsSpellReady(SUNDER_ARMOR_1, diff) && can_do_normal && dist < 5 && Rand() < 45 &&
+                (IsTank() ? (mytar->GetHealth() > me->GetMaxHealth()) : (Rand() < 25 && mytar->GetHealth() > me->GetMaxHealth() * 2)) &&
+                (!HasRole(BOT_ROLE_DPS) || !CanBlock() || !GetSpell(DEVASTATE_1)) &&
+                (IsTank() || master->GetBotMgr()->HasBotWithSpec(BOT_SPEC_WARRIOR_PROTECTION, false)) && rage >= rcost(SUNDER_ARMOR_1))
             {
                 AuraEffect const* sunder = mytar->GetAuraEffect(SUNDER_ARMOR_DEBUFF, 0);
                 if ((!sunder || sunder->GetBase()->GetStackAmount() < 5 || sunder->GetBase()->GetDuration() < 20000) &&
