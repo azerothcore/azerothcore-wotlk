@@ -898,7 +898,7 @@ void BotMgr::Update(uint32 diff)
     Creature* bot;
     bot_ai* ai;
     bool partyCombat = IsPartyInCombat();
-    bool restrictBots = RestrictBots(nullptr, false);
+    bool restrictBots = RestrictBots(_bots.begin()->second, false);
 
     _aoespots.clear();
     if (partyCombat)
@@ -982,8 +982,40 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
     {
         //if bot is not in instance group - deny (only if trying to teleport to instance)
         if (add)
-            if (!_owner->GetGroup() || !_owner->GetGroup()->IsMember(bot->GetGUID()))
+        {
+            Group const* gr = _owner->GetGroup();
+            if (!gr || !gr->IsMember(bot->GetGUID()))
                 return true;
+
+            //teleporting raid member bot to non-rain dungeon: prioritize owner sub-group members
+            if (gr->isRaidGroup() && currMap->IsNonRaidDungeon())
+            {
+                uint32 max_members = currMap->ToInstanceMap()->GetMaxPlayers();
+                if (gr->GetMembersCount() > max_members)
+                {
+                    uint8 owner_subgroup = gr->GetMemberGroup(_owner->GetGUID());
+                    if (owner_subgroup != gr->GetMemberGroup(bot->GetGUID()))
+                    {
+                        const std::vector<Unit*> members = GetAllGroupMembers(gr);
+                        uint32 sub_members = 0;
+                        uint32 sub_members_inside = 0;
+                        for (auto const& mslot : gr->GetMemberSlots())
+                        {
+                            if (mslot.group == owner_subgroup)
+                            {
+                                decltype(members)::const_iterator it = std::find_if(members.cbegin(), members.cend(), [&](Unit const* unit) { return mslot.guid == unit->GetGUID(); });
+                                if (it != members.cend() && (*it)->IsInMap(_owner))
+                                    ++sub_members_inside;
+                                if (++sub_members >= max_members)
+                                    break;
+                            }
+                        }
+                        if (sub_members >= max_members || sub_members_inside < sub_members)
+                            return true;
+                    }
+                }
+            }
+        }
 
         uint32 max_players = 0;
         if (currMap->IsDungeon())
