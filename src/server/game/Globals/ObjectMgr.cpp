@@ -2873,7 +2873,7 @@ void ObjectMgr::LoadItemTemplates()
 
         if (!dbcitem)
         {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
+            LOG_DEBUG("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
             continue;
         }
 
