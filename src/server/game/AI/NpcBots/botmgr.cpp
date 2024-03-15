@@ -134,6 +134,7 @@ float _mult_dmg_wanderer;
 float _mult_healing_wanderer;
 float _mult_hp_wanderer;
 float _mult_speed_wanderer;
+float _mult_xpgain_wanderer;
 float _mult_dmg_warrior;
 float _mult_dmg_paladin;
 float _mult_dmg_hunter;
@@ -372,6 +373,7 @@ void BotMgr::LoadConfig(bool reload)
     _botStatLimits_block            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Block", 95.0f);
     _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
     _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
+    _mult_xpgain_wanderer           = sConfigMgr->GetFloatDefault("NpcBot.WanderingBots.Continents.XPGain", 1.0f);
     _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
     _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
     _enableConfigLevelCapBGFirst    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevelByFirstPlayer", false);
@@ -451,6 +453,7 @@ void BotMgr::LoadConfig(bool reload)
     RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
     RoundToInterval(_mult_speed_wanderer, 0.1f, 10.f);
+    RoundToInterval(_mult_xpgain_wanderer, 0.0f, 100.f);
     RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
     RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
@@ -2728,6 +2731,10 @@ float BotMgr::GetBotWandererHPMod()
 float BotMgr::GetBotWandererSpeedMod()
 {
     return _mult_speed_wanderer;
+}
+float BotMgr::GetBotWandererXPGainMod()
+{
+    return _mult_xpgain_wanderer;
 }
 BotBrackets BotMgr::GetBotWandererLevelBrackets()
 {

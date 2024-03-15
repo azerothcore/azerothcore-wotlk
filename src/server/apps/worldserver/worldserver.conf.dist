@@ -4823,6 +4823,16 @@ NpcBot.WanderingBots.Continents.Levels = 25,15,15,10,5,10,20,0,0
 NpcBot.WanderingBots.Continents.Maps = 0,1,530,571
 
 #
+#    NpcBot.WanderingBots.Continents.XPGain
+#        Description: XP gained by wandering bots mutiplier. Directly affects bot leveling rate.
+#        Default:     1.0 - (100% XP gained)
+#                     0.1 - (10% XP gained)
+#        Minimum:     0.0
+#        Maximum:   100.0
+
+NpcBot.WanderingBots.Continents.XPGain = 1.0
+
+#
 #    NpcBot.WanderingBots.BG.Enable
 #        Description: Allow wandering bots generation for Battlegrounds.
 #        Note:        Bots are temporarily borrowed from non-spawned bots pool.
