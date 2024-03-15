@@ -180,34 +180,37 @@ struct boss_alar : public BossAI
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (damage >= me->GetHealth() && _platform < POINT_MIDDLE && !_hasPretendedToDie)
+        if (damage >= me->GetHealth() && _platform < POINT_MIDDLE)
         {
-            _hasPretendedToDie = true;
             damage = 0;
-            DoCastSelf(SPELL_EMBER_BLAST, true);
-            PretendToDie(me);
-            _transitionScheduler.Schedule(1s, [this](TaskContext)
+            if (!_hasPretendedToDie)
             {
-                me->SetVisible(false);
-            }).Schedule(8s, [this](TaskContext)
-            {
-                me->SetPosition(alarPoints[POINT_MIDDLE]);
-            }).Schedule(12s, [this](TaskContext)
-            {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetVisible(true);
-                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                DoCastSelf(SPELL_REBIRTH_PHASE2);
-            }).Schedule(16001ms, [this](TaskContext)
-            {
-                me->SetHealth(me->GetMaxHealth());
-                me->SetReactState(REACT_AGGRESSIVE);
-                _noMelee = false;
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                _platform = POINT_MIDDLE;
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-                ScheduleAbilities();
-            });
+                _hasPretendedToDie = true;
+                DoCastSelf(SPELL_EMBER_BLAST, true);
+                PretendToDie(me);
+                _transitionScheduler.Schedule(1s, [this](TaskContext)
+                {
+                    me->SetVisible(false);
+                }).Schedule(8s, [this](TaskContext)
+                {
+                    me->SetPosition(alarPoints[POINT_MIDDLE]);
+                }).Schedule(12s, [this](TaskContext)
+                {
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetVisible(true);
+                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
+                    DoCastSelf(SPELL_REBIRTH_PHASE2);
+                }).Schedule(16001ms, [this](TaskContext)
+                {
+                    me->SetHealth(me->GetMaxHealth());
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    _noMelee = false;
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    _platform = POINT_MIDDLE;
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    ScheduleAbilities();
+                });
+            }
         }
     }
 
