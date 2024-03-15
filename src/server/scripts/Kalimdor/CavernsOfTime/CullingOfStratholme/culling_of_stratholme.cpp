@@ -97,10 +97,10 @@ enum Says
 
     //Cityman
     SAY_PHASE202                                = 0,
-    SAY_PHASE204_1                              = 1,
+    SAY_PHASE204_1                              = 0,
 
     //Crazyman
-    SAY_PHASE204                                = 0,
+    SAY_PHASE204                                = 1,
 
     //Drakonian
     SAY_PHASE302                                = 0,
