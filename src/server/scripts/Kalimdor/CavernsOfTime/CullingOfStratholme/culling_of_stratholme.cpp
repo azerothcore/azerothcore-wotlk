@@ -97,7 +97,7 @@ enum Says
 
     //Cityman
     SAY_PHASE202                                = 0,
-    SAY_PHASE211                                = 1,
+    SAY_PHASE204_1                              = 1,
 
     //Crazyman
     SAY_PHASE204                                = 0,
@@ -105,7 +105,7 @@ enum Says
     //Drakonian
     SAY_PHASE302                                = 0,
     SAY_PHASE305                                = 1,
-    SAY_PHASE316                                = 39,
+    SAY_PHASE305_1                              = 39,
 };
 
 enum NPCs
@@ -561,7 +561,7 @@ public:
                 case 11:
                     if (Creature* cityman = GetEventNpc(NPC_CITY_MAN2))
                     {
-                        cityman->AI()->Talk(SAY_PHASE211); // missing script_text
+                        cityman->AI()->Talk(SAY_PHASE204_1);
                         me->CastSpell(cityman, SPELL_ARTHAS_CRUSADER_STRIKE, true);
                     }
                     me->SetReactState(REACT_DEFENSIVE);
@@ -1021,7 +1021,7 @@ public:
                         }
 
                         summons.DespawnAll();
-                        Talk(SAY_PHASE316);
+                        Talk(SAY_PHASE305_1);
                         me->SetFacingTo(0.0f);
                         ScheduleNextEvent(currentEvent, 5000);
                         break;

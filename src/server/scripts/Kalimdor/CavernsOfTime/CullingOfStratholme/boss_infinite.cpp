@@ -38,7 +38,7 @@ enum Yells
     SAY_AGGRO                                   = 0,
     SAY_DEATH                                   = 1,
     SAY_FAIL                                    = 2,
-    SAY_DEATH_2                                 = 0
+    SAY_THANKS                                  = 0
 };
 
 class boss_infinite_corruptor : public CreatureScript
@@ -99,7 +99,7 @@ public:
                     {
                         cr->DespawnOrUnsummon(5000);
                         cr->RemoveAllAuras();
-                        cr->AI()->Talk(SAY_DEATH_2);
+                        cr->AI()->Talk(SAY_THANKS);
                     }
                 }
             }
