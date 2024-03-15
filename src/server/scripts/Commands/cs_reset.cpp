@@ -36,10 +36,22 @@ using namespace Acore::ChatCommands;
 class reset_commandscript : public CommandScript
 {
 public:
+
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable resetItemsCommandTable =
+        {
+            { "equipped",       HandleResetItemsEquippedCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "bags",           HandleResetItemsInBagsCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "bank",           HandleResetItemsInBankCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "keyring",        HandleResetItemsKeyringCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "currency",       HandleResetItemsInCurrenciesListCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "vendor_buyback", HandleResetItemsInVendorBuyBackTabCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "all",            HandleResetItemsAllCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    SEC_ADMINISTRATOR, Console::Yes },
+        };
         static ChatCommandTable resetCommandTable =
         {
             { "achievements",   HandleResetAchievementsCommand, SEC_CONSOLE,       Console::Yes },
@@ -48,6 +60,7 @@ public:
             { "spells",         HandleResetSpellsCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "stats",          HandleResetStatsCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "talents",        HandleResetTalentsCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "items",          resetItemsCommandTable                                          },
             { "all",            HandleResetAllCommand,          SEC_CONSOLE,       Console::Yes }
         };
         static ChatCommandTable commandTable =
@@ -295,6 +308,418 @@ public:
         });
 
         return true;
+    }
+
+    static bool HandleResetItemsEquippedCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsEquipped(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_EQUIPPED, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsInBagsCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsInBags(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BAGS, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsKeyringCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsInKeyring(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_KEYRING, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsInCurrenciesListCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsInCurrenciesList(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_CURRENCY, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsInBankCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsInBank(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BANK, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsInVendorBuyBackTabCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+            int16 deletedItemsCount = ResetItemsInVendorBuyBackTab(targetPlayer);
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BUYBACK, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsAllCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+            return false;
+        }
+        else
+        {
+
+            // Delete all items destinations
+            int16 deletedItemsEquippedCount            = ResetItemsEquipped(targetPlayer);
+            int16 deletedItemsInBagsCount             = ResetItemsInBags(targetPlayer);
+            int16 deletedItemsInBankCount             = ResetItemsInBank(targetPlayer);
+            int16 deletedItemsInKeyringCount          = ResetItemsInKeyring(targetPlayer);
+            int16 deletedItemsInCurrenciesListCount   = ResetItemsInCurrenciesList(targetPlayer);
+            int16 deletedItemsInVendorBuyBackTabCount = ResetItemsInVendorBuyBackTab(targetPlayer);
+
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL, handler->GetNameLink(targetPlayer).c_str(),
+                deletedItemsEquippedCount,
+                deletedItemsInBagsCount,
+                deletedItemsInBankCount,
+                deletedItemsInKeyringCount,
+                deletedItemsInCurrenciesListCount,
+                deletedItemsInVendorBuyBackTabCount);
+        }
+
+        return true;
+    }
+
+    static bool HandleResetItemsAllAndDeleteBagsCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = GetPlayerFromIdentifierOrSelectedTarget(handler, target);
+
+        if (!targetPlayer)
+        {
+           return false;
+        }
+        else
+        {
+
+            // Delete all items destinations
+            int16 deletedItemsEquippedCount = ResetItemsEquipped(targetPlayer);
+            int16 deletedItemsInBagsCount = ResetItemsInBags(targetPlayer);
+            int16 deletedItemsInBankCount = ResetItemsInBank(targetPlayer);
+            int16 deletedItemsInKeyringCount = ResetItemsInKeyring(targetPlayer);
+            int16 deletedItemsInCurrenciesListCount = ResetItemsInCurrenciesList(targetPlayer);
+            int16 deletedItemsInVendorBuyBackTabCount = ResetItemsInVendorBuyBackTab(targetPlayer);
+            int16 deletedItemsStandardBagsCount = ResetItemsDeleteStandardBags(targetPlayer);
+            int16 deletedItemsBankBagsCount = ResetItemsDeleteBankBags(targetPlayer);
+
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL_BAGS, handler->GetNameLink(targetPlayer).c_str(),
+                deletedItemsEquippedCount,
+                deletedItemsInBagsCount,
+                deletedItemsInBankCount,
+                deletedItemsInKeyringCount,
+                deletedItemsInCurrenciesListCount,
+                deletedItemsInVendorBuyBackTabCount,
+                deletedItemsStandardBagsCount,
+                deletedItemsBankBagsCount);
+        }
+
+        return true;
+    }
+
+private:
+    static Player* GetPlayerFromIdentifierOrSelectedTarget(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        Player* targetPlayer = nullptr;
+
+        // Check if there is an optional target player name
+        // Do not use TargetOrSelf, we must be sure to select ourself
+        if (!target)
+        {
+            // No optional target, so try to get selected target
+            target = PlayerIdentifier::FromTarget(handler);
+
+            if (!target)
+            {
+                // No character selected
+                handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+                return targetPlayer;
+            }
+
+            targetPlayer = target->GetConnectedPlayer();
+        }
+        else
+        {
+            targetPlayer = target->GetConnectedPlayer();
+
+            if (!targetPlayer || !target->IsConnected())
+            {
+                // No character selected
+                handler->SendSysMessage(LANG_PLAYER_NOT_EXIST_OR_OFFLINE);
+            }
+        }
+
+        return targetPlayer;
+    }
+
+    static int16 ResetItemsEquipped(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pItem)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsInBags(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        // Default bagpack :
+        for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pItem)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        // Bag slots
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        {
+            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pBag)
+            {
+                for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    Item* pItem = pBag->GetItemByPos(j);
+                    if (pItem)
+                    {
+                        playerTarget->DestroyItem(i, j, true);
+                        ++count;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsInBank(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        // Normal bank slot
+        for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pItem)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        // Bank bagslots
+        for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        {
+            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pBag)
+            {
+                for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    Item* pItem = pBag->GetItemByPos(j);
+                    if (pItem)
+                    {
+                        playerTarget->DestroyItem(i, j, true);
+                        ++count;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsInKeyring(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        for (uint8 i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pItem)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsInCurrenciesList(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        for (uint8 i = CURRENCYTOKEN_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pItem)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsInVendorBuyBackTab(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        for (uint8 i = BUYBACK_SLOT_START; i < BUYBACK_SLOT_END; ++i)
+        {
+            Item* pItem = playerTarget->GetItemFromBuyBackSlot(i);
+            if (pItem)
+            {
+                playerTarget->RemoveItemFromBuyBackSlot(i, true);
+                ++count;
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsDeleteStandardBags(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        // Standard bag slots
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        {
+            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pBag)
+            {
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        return count;
+    }
+
+    static int16 ResetItemsDeleteBankBags(Player* playerTarget)
+    {
+        if (!playerTarget)
+        {
+            return -1;
+        }
+
+        int16 count = 0;
+        // Bank bags
+        for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        {
+            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (pBag)
+            {
+                // prevent no empty ?
+                playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++count;
+            }
+        }
+
+        return count;
     }
 };
 
