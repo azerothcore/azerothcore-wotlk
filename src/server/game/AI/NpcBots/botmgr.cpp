@@ -118,6 +118,7 @@ bool _enrageOnDismiss;
 bool _botStatLimits;
 bool _enableWanderingBotsBG;
 bool _enableConfigLevelCapBG;
+bool _enableConfigLevelCapBGFirst;
 bool _bothk_enable;
 bool _bothk_message_enable;
 bool _bothk_achievements_enable;
@@ -373,6 +374,7 @@ void BotMgr::LoadConfig(bool reload)
     _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
     _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
     _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
+    _enableConfigLevelCapBGFirst    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevelByFirstPlayer", false);
     _targetBGPlayersPerTeamCount_AV = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV", 0);
     _targetBGPlayersPerTeamCount_WS = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS", 8);
     _targetBGPlayersPerTeamCount_AB = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB", 12);
@@ -715,6 +717,10 @@ bool BotMgr::IsBotGenerationEnabledBGs()
 bool BotMgr::IsBotLevelCappedByConfigBG()
 {
     return _enableConfigLevelCapBG;
+}
+bool BotMgr::IsBotLevelCappedByConfigBGFirstPlayer()
+{
+    return _enableConfigLevelCapBGFirst;
 }
 bool BotMgr::IsBotGenerationEnabledWorldMapId(uint32 mapId)
 {

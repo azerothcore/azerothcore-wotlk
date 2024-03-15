@@ -4841,6 +4841,14 @@ NpcBot.WanderingBots.BG.Enable = 0
 NpcBot.WanderingBots.BG.CapLevel = 0
 
 #
+#    NpcBot.WanderingBots.BG.CapLevelByFirstPlayer
+#        Description: Prevent setting BG bot level higher than player triggering its generation
+#        Default:     0 - (Disabled)
+#                     1 - (Enable)
+
+NpcBot.WanderingBots.BG.CapLevelByFirstPlayer = 0
+
+#
 #    NpcBot.WanderingBots.BG.TargetTeamPlayersCount.<BGTYPE>
 #        Description: Target BG players count per team to aim for when generating BG bots.
 #        Note:        These values can't go beyond BG minimum / maximum players per team bounds.

@@ -117,6 +117,7 @@ class AC_GAME_API BotMgr
         static bool FilterRaces();
         static bool IsBotGenerationEnabledBGs();
         static bool IsBotLevelCappedByConfigBG();
+        static bool IsBotLevelCappedByConfigBGFirstPlayer();
         static bool IsBotGenerationEnabledWorldMapId(uint32 mapId);
         static bool IsBotHKEnabled();
         static bool IsBotHKMessageEnabled();

@@ -1498,6 +1498,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
         sBattlegroundMgr->ScheduleQueueUpdate(ammr, atype, bgqTypeId, bgTypeId, bracketId);
     }, Seconds(2));
 
+    uint8 maxlevel = BotMgr::IsBotLevelCappedByConfigBGFirstPlayer() ? groupLeader->GetLevel() : 0;
     for (NpcBotRegistry const* registry3 : { &spawned_bots_a, &spawned_bots_h })
     {
         uint32 seconds_delay = 5;
@@ -1507,6 +1508,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             bot->GetBotAI()->canUpdate = false;
 
             const_cast<Creature*>(bot)->SetPvP(true);
+            if (maxlevel && bot->GetLevel() > maxlevel)
+                const_cast<Creature*>(bot)->SetLevel(maxlevel);
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()),
                 bgTypeId, bracketEntry, atype, false, gqinfo->ArenaTeamRating, ammr);
 
