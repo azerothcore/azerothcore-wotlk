@@ -3233,7 +3233,7 @@ public:
                 ss << "\n" << counter << ") " << bot->GetEntry() << ": "
                     << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
                     << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << "\" - "
-                    << (bot->IsFreeBot() ? (bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : "free") : "active");
+                    << (bot->IsFreeBot() ? bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : bot->GetBotAI()->IsWanderer() ? "wandering" : "free" : "active");
             }
         }
 
