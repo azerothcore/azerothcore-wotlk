@@ -1161,16 +1161,18 @@ class spell_kaelthas_mind_control : public SpellScript
         if (Unit* victim = GetCaster()->GetVictim())
         {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-            if (!victim->IsPlayer())
-            {
-                targets.remove(victim);
-            }
+        }
+        for (WorldObject* target : targets)
+        {
+            if (!target->ToCreature()->IsPlayer())
+                targets.remove(target);
         }
     }
 
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kael_pyroblast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
