@@ -1159,7 +1159,10 @@ class spell_kaelthas_mind_control : public SpellScript
     void SelectTarget(std::list<WorldObject*>& targets)
     {
         if (Unit* victim = GetCaster()->GetVictim())
+        {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+            targets.remove_if(!victim->IsPlayer());
+        }
     }
 
     void Register() override
