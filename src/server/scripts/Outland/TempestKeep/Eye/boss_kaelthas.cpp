@@ -1164,8 +1164,9 @@ class spell_kaelthas_mind_control : public SpellScript
         }
         for (WorldObject* target : targets)
         {
-            if (!target->ToCreature()->IsPlayer())
-                targets.remove(target);
+            if (Creature* creatureTarget = target->ToCreature())
+                if (!creatureTarget->IsPlayer())
+                    targets.remove(creatureTarget);
         }
     }
 
