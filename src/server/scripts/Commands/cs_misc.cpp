@@ -1692,7 +1692,7 @@ public:
 
         Item* item = playerTarget->StoreNewItem(dest, itemId, true);
 
-        Player* p = handler->GetSession()->GetPlayer();
+        Player* p = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         // remove binding (let GM give it to another player later)
         if (p && p == playerTarget)
         {
