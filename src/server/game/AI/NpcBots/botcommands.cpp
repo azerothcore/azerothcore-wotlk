@@ -1744,7 +1744,7 @@ public:
         }
         else
         {
-            auto class_name = *bot_name;
+            auto const& class_name = *bot_name;
             for (auto const c : class_name)
             {
                 if (!std::islower(c))
@@ -1826,10 +1826,40 @@ public:
             target_guid = bot->GetTarget();
         else if (target_token == "mytarget")
             target_guid = owner->GetTarget();
+        else if (target_token == "star")
+            target_guid = owner->GetGroup()->GetTargetIcons()[0];
+        else if (target_token == "circle")
+            target_guid = owner->GetGroup()->GetTargetIcons()[1];
+        else if (target_token == "diamond")
+            target_guid = owner->GetGroup()->GetTargetIcons()[2];
+        else if (target_token == "triangle")
+            target_guid = owner->GetGroup()->GetTargetIcons()[3];
+        else if (target_token == "moon")
+            target_guid = owner->GetGroup()->GetTargetIcons()[4];
+        else if (target_token == "square")
+            target_guid = owner->GetGroup()->GetTargetIcons()[5];
+        else if (target_token == "cross")
+            target_guid = owner->GetGroup()->GetTargetIcons()[6];
+        else if (target_token == "skull")
+            target_guid = owner->GetGroup()->GetTargetIcons()[7];
+        else if (target_token->size() == 1u && owner->GetGroup() && std::isdigit(target_token->front()))
+        {
+            uint8 digit = static_cast<uint8>(std::stoi(std::string(*target_token)));
+            switch (digit)
+            {
+                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                    target_guid = owner->GetGroup()->GetTargetIcons()[digit - 1];
+                    break;
+                default:
+                    target_guid = ObjectGuid::Empty;
+                    break;
+            }
+        }
         else
         {
             handler->PSendSysMessage("Invalid target token '%s'!", *target_token);
-            handler->SendSysMessage("Valid target tokens:\n    '','bot','self', 'me','master', 'mypet', 'myvehicle', 'target', 'mytarget'");
+            handler->SendSysMessage("Valid target tokens:\n    '','bot','self', 'me','master', 'mypet', 'myvehicle', 'target', 'mytarget', "
+                "'star','1', 'circle','2', 'diamond','3', 'triangle','4', 'moon','5', 'square','6', 'cross','7', 'skull','8'");
             return true;
         }
 
