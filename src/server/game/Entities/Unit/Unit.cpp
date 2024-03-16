@@ -15311,7 +15311,10 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         && !IsPet()
         && !(IsControlledByPlayer() && IsVehicle())
         && !(creature->HasMechanicTemplateImmunity(MECHANIC_SNARE))
-        && !(creature->IsDungeonBoss()))
+        && !(creature->IsDungeonBoss())
+        //npcbots: prevent slowing due to health percentage
+        && !creature->IsNPCBot())
+        //end npcbot
     {
         // 1.6% for each % under 30.
         // use min(0, health-30) so that we don't boost mobs above 30.
