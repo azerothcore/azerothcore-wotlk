@@ -1162,13 +1162,7 @@ class spell_kaelthas_mind_control : public SpellScript
         {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
-        for (WorldObject* target : targets)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-            {
-                targets.remove(target);
-            }
-        }
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
     }
 
     void Register() override
