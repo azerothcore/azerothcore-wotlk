@@ -963,7 +963,7 @@ struct npc_telonicus : public ScriptedAI
             DoCastVictim(SPELL_BOMB);
         }, 3600ms, 7100ms);
         ScheduleTimedEvent(13250ms, [&]{
-            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 100.0f);
+            DoCastRandomTarget(SPELL_REMOTE_TOY, 0, 100.0f);
         }, 15750ms);
     }
 
@@ -1014,7 +1014,7 @@ struct npc_thaladred : public ScriptedAI
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
         _hasDied = false;
-        me->SetWalk(true);
+        me->SetWalk(false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1023,6 +1023,7 @@ struct npc_thaladred : public ScriptedAI
         {
             Talk(SAY_THALADRED_AGGRO);
         }
+        me->SetWalk(true);
         ScheduleTimedEvent(100ms, [&]
         {
             DoResetThreatList();
@@ -1046,7 +1047,7 @@ struct npc_thaladred : public ScriptedAI
             {
                 if (victim->IsNonMeleeSpellCast(false, false, true))
                 {
-                    DoCastVictim(SPELL_SILENCE);
+                    DoCastSelf(SPELL_SILENCE);
                 }
             }
         }, 3600ms, 15200ms);
@@ -1302,6 +1303,25 @@ class spell_kaelthas_summon_nether_vapor : public SpellScript
     }
 };
 
+class spell_kael_pyroblast : public SpellScript
+{
+    PrepareSpellScript(spell_kael_pyroblast);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (GetCaster()->GetVictim())
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), false));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kael_pyroblast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1319,5 +1339,6 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_gravity_lapse);
     RegisterSpellScript(spell_kaelthas_nether_beam);
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
+    RegisterSpellScript(spell_kael_pyroblast);
 }
 

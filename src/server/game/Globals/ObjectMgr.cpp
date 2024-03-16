@@ -2490,8 +2490,6 @@ void ObjectMgr::LoadGameobjects()
 {
     uint32 oldMSTime = getMSTime();
 
-    uint32 count = 0;
-
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
                          //   7          8          9          10         11             12            13     14         15         16          17
@@ -2651,7 +2649,6 @@ void ObjectMgr::LoadGameobjects()
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);
-        ++count;
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Gameobjects in {} ms", (unsigned long)_gameObjectDataStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -2880,49 +2877,50 @@ void ObjectMgr::LoadItemTemplates()
         // Checks
         ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
-        if (dbcitem)
+        if (!dbcitem)
         {
-            if (enforceDBCAttributes)
+            LOG_DEBUG("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
+            continue;
+        }
+
+        if (enforceDBCAttributes)
+        {
+            if (itemTemplate.Class != dbcitem->ClassID)
             {
-                if (itemTemplate.Class != dbcitem->ClassID)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Class value ({}), must be ({}).", entry, itemTemplate.Class, dbcitem->ClassID);
-                    itemTemplate.Class = dbcitem->ClassID;
-                }
-                if (itemTemplate.SubClass != dbcitem->SubclassID)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Subclass value ({}) for class {}, must be ({}).", entry, itemTemplate.SubClass, itemTemplate.Class, dbcitem->SubclassID);
-                    itemTemplate.SubClass = dbcitem->SubclassID;
-                }
-                if (itemTemplate.SoundOverrideSubclass != dbcitem->SoundOverrideSubclassID)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct SoundOverrideSubclass ({}), must be {}.", entry, itemTemplate.SoundOverrideSubclass, dbcitem->SoundOverrideSubclassID);
-                    itemTemplate.SoundOverrideSubclass = dbcitem->SoundOverrideSubclassID;
-                }
-                if (itemTemplate.Material != dbcitem->Material)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
-                    itemTemplate.Material = dbcitem->Material;
-                }
-                if (itemTemplate.InventoryType != dbcitem->InventoryType)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong InventoryType value ({}), must be {}.", entry, itemTemplate.InventoryType, dbcitem->InventoryType);
-                    itemTemplate.InventoryType = dbcitem->InventoryType;
-                }
-                if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
-                    itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
-                }
-                if (itemTemplate.Sheath != dbcitem->SheatheType)
-                {
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Sheath ({}), must be {}.", entry, itemTemplate.Sheath, dbcitem->SheatheType);
-                    itemTemplate.Sheath = dbcitem->SheatheType;
-                }
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Class value ({}), must be ({}).", entry, itemTemplate.Class, dbcitem->ClassID);
+                itemTemplate.Class = dbcitem->ClassID;
+            }
+            if (itemTemplate.SubClass != dbcitem->SubclassID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Subclass value ({}) for class {}, must be ({}).", entry, itemTemplate.SubClass, itemTemplate.Class, dbcitem->SubclassID);
+                itemTemplate.SubClass = dbcitem->SubclassID;
+            }
+            if (itemTemplate.SoundOverrideSubclass != dbcitem->SoundOverrideSubclassID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct SoundOverrideSubclass ({}), must be {}.", entry, itemTemplate.SoundOverrideSubclass, dbcitem->SoundOverrideSubclassID);
+                itemTemplate.SoundOverrideSubclass = dbcitem->SoundOverrideSubclassID;
+            }
+            if (itemTemplate.Material != dbcitem->Material)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct material ({}), must be {}.", entry, itemTemplate.Material, dbcitem->Material);
+                itemTemplate.Material = dbcitem->Material;
+            }
+            if (itemTemplate.InventoryType != dbcitem->InventoryType)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong InventoryType value ({}), must be {}.", entry, itemTemplate.InventoryType, dbcitem->InventoryType);
+                itemTemplate.InventoryType = dbcitem->InventoryType;
+            }
+            if (itemTemplate.DisplayInfoID != dbcitem->DisplayInfoID)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) does not have a correct display id ({}), must be {}.", entry, itemTemplate.DisplayInfoID, dbcitem->DisplayInfoID);
+                itemTemplate.DisplayInfoID = dbcitem->DisplayInfoID;
+            }
+            if (itemTemplate.Sheath != dbcitem->SheatheType)
+            {
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong Sheath ({}), must be {}.", entry, itemTemplate.Sheath, dbcitem->SheatheType);
+                itemTemplate.Sheath = dbcitem->SheatheType;
             }
         }
-        else
-            LOG_ERROR("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
 
         if (itemTemplate.Quality >= MAX_ITEM_QUALITY)
         {
@@ -6352,8 +6350,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         return;
     }
 
-    uint32 count = 0;
-
     do
     {
         Field* fields = result->Fetch();
@@ -6388,8 +6384,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
 
         QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(type, id)];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
-
-        ++count;
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} quest greeting Locale Strings in {} ms", (uint32)_questGreetingLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
