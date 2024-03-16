@@ -1161,7 +1161,10 @@ class spell_kaelthas_mind_control : public SpellScript
         if (Unit* victim = GetCaster()->GetVictim())
         {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-            targets.remove_if(!victim->IsPlayer());
+            if (!victim->IsPlayer())
+            {
+                targets.remove(victim);
+            }
         }
     }
 
