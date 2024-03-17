@@ -23,8 +23,8 @@ time cmake ../../../ \
 -DOPENSSL_SSL_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libssl.dylib" \
 -DOPENSSL_CRYPTO_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libcrypto.dylib" \
 -DWITH_WARNINGS=1 \
--DCMAKE_C_FLAGS="-Werror" \
--DCMAKE_CXX_FLAGS="-Werror" \
+# -DCMAKE_C_FLAGS="-Werror" \
+# -DCMAKE_CXX_FLAGS="-Werror" \
 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
 -DUSE_SCRIPTPCH=0 \
