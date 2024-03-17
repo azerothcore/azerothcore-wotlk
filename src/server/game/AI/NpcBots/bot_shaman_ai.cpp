@@ -687,8 +687,7 @@ public:
             {
                 //WATERmain : manaspring
                 uint32 MSpring = GetSpell(MANA_SPRING_TOTEM_1); //tripple check
-                if (MSpring && (me->IsInCombat() || !master->isMoving()) &&
-                    (!(mask & BOT_TOTEM_MASK_MANA_SPRING) || idMap[MANA_SPRING_TOTEM_1] < MSpring))
+                if (MSpring && (me->IsInCombat() || !master->isMoving()) && !(mask & BOT_TOTEM_MASK_MANA_SPRING))
                 {
                     //no cd
                     bool cast = false;
@@ -2754,6 +2753,10 @@ public:
         uint32 _getTotemsMask(std::map<uint32 /*type*/, uint32 /*curId*/>& idMap) const
         {
             uint32 mask = 0;
+
+            //Blessing of Wisdom doesn't stack with Mana Spring Totem
+            if (me->GetAuraEffect(SPELL_AURA_MOD_POWER_REGEN, SPELLFAMILY_PALADIN, 0x10000, 0x0, 0x0))
+                mask |= BOT_TOTEM_MASK_MANA_SPRING;
 
             Unit* cre;
             uint32 sumonSpell;
