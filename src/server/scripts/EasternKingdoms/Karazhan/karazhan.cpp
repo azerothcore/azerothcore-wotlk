@@ -15,6 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "karazhan.h"
 /* ScriptData
 SDName: Karazhan
 SD%Complete: 100
@@ -27,13 +38,6 @@ npc_barnes
 npc_berthold
 npc_image_of_medivh
 EndContentData */
-
-#include "karazhan.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 
 enum Spells
 {
@@ -135,7 +139,6 @@ public:
     {
         npc_barnesAI(Creature* creature) : npc_escortAI(creature)
         {
-            RaidWiped = false;
             m_uiEventId = 0;
             instance = creature->GetInstanceScript();
         }
@@ -146,11 +149,9 @@ public:
 
         uint32 TalkCount;
         uint32 TalkTimer;
-        uint32 WipeTimer;
         uint32 m_uiEventId;
 
         bool PerformanceReady;
-        bool RaidWiped;
 
         void Reset() override
         {
@@ -158,7 +159,6 @@ public:
 
             TalkCount = 0;
             TalkTimer = 2000;
-            WipeTimer = 5000;
 
             PerformanceReady = false;
 
@@ -183,8 +183,8 @@ public:
             switch (waypointId)
             {
                 case 0:
-                    DoCast(me, SPELL_TUXEDO, false);
-                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+                    DoCastSelf(SPELL_TUXEDO);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GO_STAGEDOORLEFT), true);
                     break;
                 case 4:
                     TalkCount = 0;
@@ -276,8 +276,6 @@ public:
                     creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            RaidWiped = false;
-
             instance->SetData(DATA_SPAWN_OPERA_DECORATIONS, m_uiEventId);
         }
 
@@ -302,43 +300,6 @@ public:
                     ++TalkCount;
                 }
                 else TalkTimer -= diff;
-            }
-
-            if (PerformanceReady)
-            {
-                if (!RaidWiped)
-                {
-                    if (WipeTimer <= diff)
-                    {
-                        Map* map = me->GetMap();
-                        if (!map->IsDungeon())
-                            return;
-
-                        Map::PlayerList const& PlayerList = map->GetPlayers();
-                        if (PlayerList.IsEmpty())
-                            return;
-
-                        RaidWiped = true;
-                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        {
-                            if (i->GetSource()->IsAlive() && !i->GetSource()->IsGameMaster())
-                            {
-                                RaidWiped = false;
-                                break;
-                            }
-                        }
-
-                        if (RaidWiped)
-                        {
-                            RaidWiped = true;
-                            EnterEvadeMode();
-                            return;
-                        }
-
-                        WipeTimer = 15000;
-                    }
-                    else WipeTimer -= diff;
-                }
             }
         }
     };
@@ -391,15 +352,16 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 }
 
-                if (npc_barnesAI* pBarnesAI = CAST_AI(npc_barnes::npc_barnesAI, creature->AI()))
+                if (instance->GetBossState(DATA_OPERA_PERFORMANCE) != FAIL)
                 {
-                    if (!pBarnesAI->RaidWiped)
-                        SendGossipMenuFor(player, BARNES_TEXT_IS_READY, creature->GetGUID());
-                    else
-                        SendGossipMenuFor(player, BARNES_TEXT_WIPED, creature->GetGUID());
-
-                    return true;
+                    SendGossipMenuFor(player, BARNES_TEXT_IS_READY, creature->GetGUID());
                 }
+                else
+                {
+                    SendGossipMenuFor(player, BARNES_TEXT_WIPED, creature->GetGUID());
+                }
+
+                return true;
             }
         }
 
@@ -604,8 +566,53 @@ public:
     };
 };
 
+class at_karazhan_side_entrance : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_karazhan_side_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_side_entrance") { }
+
+    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (instance->GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
+            {
+                if (GameObject* door = instance->GetGameObject(DATA_GO_SIDE_ENTRANCE_DOOR))
+                {
+                    instance->HandleGameObject(ObjectGuid::Empty, true, door);
+                    door->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class spell_karazhan_temptation : public AuraScript
+{
+    PrepareAuraScript(spell_karazhan_temptation);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (eventInfo.GetActionTarget())
+        {
+            GetTarget()->CastSpell(eventInfo.GetActionTarget(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_karazhan_temptation::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_karazhan()
 {
     new npc_barnes();
     new npc_image_of_medivh();
+    new at_karazhan_side_entrance();
+    RegisterSpellScript(spell_karazhan_temptation);
 }

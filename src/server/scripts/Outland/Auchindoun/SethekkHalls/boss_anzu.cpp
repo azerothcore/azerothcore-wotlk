@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Unit.h"
@@ -83,13 +83,13 @@ struct boss_anzu : public BossAI
 
     uint32 talkTimer;
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         if (summon->GetEntry() == NPC_BROOD_OF_ANZU)
         {
             summons.Despawn(summon);
             summons.RemoveNotExisting();
-            if (summons.empty())
+            if (!summons.HasEntry(NPC_BROOD_OF_ANZU))
             {
                 me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
             }

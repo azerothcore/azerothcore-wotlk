@@ -105,4 +105,6 @@ inline AI* GetBlackTempleAI(T* obj)
     return GetInstanceAI<AI>(obj, BlackTempleScriptName);
 }
 
+#define RegisterBlackTempleCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackTempleAI)
+
 #endif // BLACK_TEMPLE_H_

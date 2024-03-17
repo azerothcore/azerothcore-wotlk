@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,13 +20,13 @@ CREATE TABLE IF NOT EXISTS `pool_creature` (
   `guid` int unsigned NOT NULL DEFAULT '0',
   `pool_entry` int unsigned NOT NULL DEFAULT '0',
   `chance` float NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`),
   CONSTRAINT `pool_creature_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_creature: ~1,501 rows (approximately)
+-- Dumping data for table acore_world.pool_creature: ~1 501 rows (approximately)
 DELETE FROM `pool_creature`;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 	(910, 1020, 0, 'High Priestess Hai\'watna (11383) - Spawn 1'),

@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gruuls_lair.h"
-#include "PassiveAI.h"
 
 enum Yells
 {
@@ -313,3 +314,4 @@ void AddSC_boss_gruul()
     RegisterSpellScript(spell_gruul_shatter);
     RegisterSpellScript(spell_gruul_shatter_effect);
 }
+

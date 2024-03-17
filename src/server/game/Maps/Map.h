@@ -32,6 +32,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "TaskScheduler.h"
 #include "Timer.h"
 #include <bitset>
 #include <list>
@@ -302,7 +303,7 @@ typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHol
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
 
-enum EncounterCreditType
+enum EncounterCreditType : uint8
 {
     ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
@@ -593,6 +594,10 @@ public:
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+
+    TaskScheduler _creatureRespawnScheduler;
+
+    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
 
     void LoadCorpseData();
     void DeleteCorpseData();

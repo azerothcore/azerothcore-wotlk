@@ -16,18 +16,20 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "GameObjectScript.h"
+#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "MoveSplineInit.h"
 
  /*######
  ## npc_eye_of_acherus
@@ -1255,3 +1257,4 @@ void AddSC_the_scarlet_enclave_c1()
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
 }
+

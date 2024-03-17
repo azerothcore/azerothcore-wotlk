@@ -4,177 +4,119 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    types:
+      - labeled
+      - opened
+      - synchronize
+      - reopened
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
+env:
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_BUILDKIT: 1
+  RUNNING_ON_PRIMARY_BRANCH: |
+    ${{ (github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master') && 'true' || 'false' }}
+
 jobs:
-  docker-build-n-deploy-dev:
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+  build-containers:
+    runs-on: "ubuntu-latest"
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
-    env:
-      COMPOSE_DOCKER_CLI_BUILD: 1
-      DOCKER_BUILDKIT: 1
-
+      && (github.ref_name == 'master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
-      - name: Configure
+      - name: Free up disk space
         run: |
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          docker --version
-          docker compose version
 
       - uses: actions/checkout@v4
-        # we need the entire history for the ac-dev-server
-        # with:
-        #   fetch-depth: 2
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
+      # The containers created in this workflow are used by
+      # acore-docker, which has a dependency on mod-eluna.
+      #
+      # If you're wanting containers without mod-eluna, the best solution is to
+      # build them locally (such as with `docker compose build`)
+      - name: Download Eluna
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
+        uses: actions/checkout@v4
+        with:
+          repository: azerothcore/mod-eluna
+          path: modules/mod-eluna
 
       - name: Login to Docker Hub
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Dev
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
-        env:
-          #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-          DOCKER_CLIENT_TIMEOUT: 400
-          COMPOSE_HTTP_TIMEOUT: 400
+      - name: Get version
+        id: version
         run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          # pull the images first to load the docker cache layers
-          #./acore.sh docker pull
-          ./acore.sh docker build
-          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
-          DOCKER_IMAGE_TAG=$version docker compose --profile dev --profile local build
+          version="$(jq -r '.version' acore.json)"
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Deploy Dev
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
-        run: |
-          docker compose --profile dev --profile local push
-          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
-          DOCKER_IMAGE_TAG=$version docker compose --profile dev --profile local push
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-  docker-build-n-deploy-prod:
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
-    env:
-      COMPOSE_DOCKER_CLI_BUILD: 1
-      DOCKER_BUILDKIT: 1
-
-    steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
-      - name: Configure
-        run: |
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          docker --version
-          docker compose version
-
-      - uses: actions/checkout@v4
-        # we need the entire history for the ac-dev-server
-        # with:
-        #   fetch-depth: 2
-
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
-
-      - name: Login to Docker Hub
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
-        uses: docker/login-action@v1
+      - name: build worldserver
+        uses: ./.github/actions/docker-tag-and-build
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          component-name: worldserver
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
 
-      - name: Cache
-        uses: actions/cache@v3
+      - name: build authserver
+        uses: ./.github/actions/docker-tag-and-build
         with:
-          path: var/docker/ccache
-          key: ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}
-            ccache:${{ matrix.os }}:clang:without-modules
+          component-name: authserver
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
 
-      - name: Build Production images
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
-        env:
-          #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-          DOCKER_CLIENT_TIMEOUT: 220
-          COMPOSE_HTTP_TIMEOUT: 220
-        run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          # pull the images first to load the docker cache layers
-          #./acore.sh docker prod:pull
-          ./acore.sh docker prod:build
-          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
-          DOCKER_IMAGE_TAG=$version ./acore.sh docker prod:build
-          # create the container to allow the copy right after
-          docker compose create ac-build-prod
-          docker compose cp ac-build-prod:/azerothcore/var/ccache var/docker/
-          echo "ccache exported"
+      - name: build db-import
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: db-import
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
 
-      - name: Deploy Production images
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
-        run: |
-          docker compose --profile prod push
-          output=$(./acore.sh version | grep "AzerothCore Rev. ") && version=${output#"AzerothCore Rev. "}
-          DOCKER_IMAGE_TAG=$version docker compose --profile prod push
+      - name: build client-data
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: client-data
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
 
+      - name: build tools
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: tools
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
 
-  dispatch-acore-docker:
-    needs: [ docker-build-n-deploy-prod , docker-build-n-deploy-dev]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      - name: build dev-server
+        uses: ./.github/actions/docker-tag-and-build
+        with:
+          component-name: dev
+          version: ${{ steps.version.outputs.version }}
+          push: ${{ env.RUNNING_ON_PRIMARY_BRANCH }}
+          dockerfile: apps/docker/Dockerfile.dev-server
 
-      - name: Repository Dispatch
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
+      - name: Trigger acore-docker CI
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.ACORE_DOCKER_REPO_ACCESS_TOKEN }}
           repository: azerothcore/acore-docker
           event-type: azerothcore-new-images
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          client-payload: >
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}"
+            }

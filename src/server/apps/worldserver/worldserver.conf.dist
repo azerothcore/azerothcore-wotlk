@@ -740,6 +740,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.scripts.ai.sai=4,Console Server
 #Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts.midsummer=4,Console Server
 #Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server
@@ -780,11 +781,13 @@ Metric.Enable = 0
 
 #
 #    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
+#        Description: Interval between every batch of data sent in seconds.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
+#        Default:     1 second
 #
 
-Metric.Interval = 10
+Metric.Interval = 1
 
 #
 #    Metric.ConnectionInfo
@@ -1364,17 +1367,6 @@ DetectPosCollision = 1
 #                     0 - (Disabled, may break some boss encounters)
 
 CheckGameObjectLoS = 1
-
-#
-#    TargetPosRecalculateRange
-#        Description: Max distance from movement target point (+moving unit size) and targeted
-#                     object (+size) after that new target movement point calculated.
-#        Range:       0.5-5.0
-#        Default:     1.5
-#                     0.5 - (Minimum, Contact Range, More sensitive reaction to target movement)
-#                     5.0 - (Maximum, Melee attack range, Less CPU usage)
-
-TargetPosRecalculateRange = 1.5
 
 #
 #    PreloadAllNonInstancedMapGrids
@@ -2055,6 +2047,13 @@ Rate.Damage.Fall = 1
 #        Default:     1
 
 Rate.Talent = 1
+
+#
+#    Rate.Talent.Pet
+#        Description: Pet Talent point rate.
+#        Default:     1
+
+Rate.Talent.Pet = 1
 
 #
 #    Rate.Health
@@ -2742,10 +2741,16 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Rate.RewardQuestMoney
+#        Description: Allows to tweak the amount of money rewarded by quests (does not affect RewardBonusMoney).
+#        Default:     1
+
+Rate.RewardQuestMoney = 1
+
+#
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
-#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
-#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#                     is at MaxPlayerLevel.
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
@@ -2763,15 +2768,6 @@ Rate.RewardBonusMoney = 1
 #        Default:     50.000000
 
 MonsterSight = 50.000000
-
-#
-#    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the combat
-#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
-#                     radius will be used.
-#        Default:     60
-
-ThreatRadius = 60
 
 #
 #    Rate.Creature.Aggro
@@ -3064,9 +3060,9 @@ Rate.RepairCost = 1
 #        Description: Should the player leave their group when they log out?
 #                     (It does not affect raids or dungeon finder groups)
 #
-#        Default:     1 - (Enabled)
+#        Default:     0 - (Disabled)
 
-LeaveGroupOnLogout.Enabled = 1
+LeaveGroupOnLogout.Enabled = 0
 
 #
 #    Group.Raid.LevelRestriction
@@ -3356,7 +3352,14 @@ Guild.BankTabCost1 = 2500000
 Guild.BankTabCost2 = 5000000
 Guild.BankTabCost3 = 10000000
 Guild.BankTabCost4 = 25000000
-Guild.BankTabCost5 = 50000000#
+Guild.BankTabCost5 = 50000000
+
+#
+#     Guild.MemberLimit
+#        Description: Do not allow inviting new players to the guild if the member limit is met or exceeded.
+#        Default:     0 - Disabled
+
+Guild.MemberLimit = 0
 
 #
 ###################################################################################################
@@ -4349,6 +4352,13 @@ TeleportTimeoutNear = 25
 #       Default:  45
 
 TeleportTimeoutFar = 45
+
+#
+#    DailyRBGArenaPoints.MinLevel
+#        Description: Allows gaining arena points on the first RBG win at level 70.
+#        Default: 71 - (Blizzlike)
+
+DailyRBGArenaPoints.MinLevel = 71
 
 #
 ###################################################################################################

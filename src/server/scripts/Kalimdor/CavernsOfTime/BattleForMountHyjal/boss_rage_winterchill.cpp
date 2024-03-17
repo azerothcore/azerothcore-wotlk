@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
@@ -35,6 +35,12 @@ enum Texts
     SAY_DECAY                   = 2,
     SAY_NOVA                    = 3,
     SAY_ONAGGRO                 = 4
+};
+
+enum Misc
+{
+    PATH_RAGE_WINTERCHILL       = 177670,
+    POINT_COMBAT_START          = 7
 };
 
 class boss_rage_winterchill : public CreatureScript
@@ -87,7 +93,7 @@ public:
 
         void WaypointReached(uint32 waypointId) override
         {
-            if (waypointId == 7 && instance)
+            if (waypointId == POINT_COMBAT_START && instance)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JAINAPROUDMOORE));
                 if (target && target->IsAlive())
@@ -112,16 +118,7 @@ public:
                 if (!go)
                 {
                     go = true;
-                    AddWaypoint(0, 4896.08f,    -1576.35f,    1333.65f);
-                    AddWaypoint(1, 4898.68f,    -1615.02f,    1329.48f);
-                    AddWaypoint(2, 4907.12f,    -1667.08f,    1321.00f);
-                    AddWaypoint(3, 4963.18f,    -1699.35f,    1340.51f);
-                    AddWaypoint(4, 4989.16f,    -1716.67f,    1335.74f);
-                    AddWaypoint(5, 5026.27f,    -1736.89f,    1323.02f);
-                    AddWaypoint(6, 5037.77f,    -1770.56f,    1324.36f);
-                    AddWaypoint(7, 5067.23f,    -1789.95f,    1321.17f);
-                    Start(false, true);
-                    SetDespawnAtEnd(false);
+                    me->GetMotionMaster()->MovePath(PATH_RAGE_WINTERCHILL, false);
                 }
             }
 

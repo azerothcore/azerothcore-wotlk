@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -49,11 +50,11 @@ bool ScriptMgr::CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell)
     return true;
 }
 
-bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry)
+bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellInfo)
 {
     auto ret = IsValidBoolScript<PetScript>([&](PetScript* script)
     {
-        return !script->CanUnlearnSpellDefault(pet, spellEntry);
+        return !script->CanUnlearnSpellDefault(pet, spellInfo);
     });
 
     if (ret && *ret)
@@ -88,3 +89,11 @@ void ScriptMgr::OnPetAddToWorld(Pet* pet)
         script->OnPetAddToWorld(pet);
     });
 }
+
+PetScript::PetScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PetScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<PetScript>;

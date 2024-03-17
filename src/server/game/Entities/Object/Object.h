@@ -487,7 +487,9 @@ public:
 
     void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
+    void PlayRadiusSound(uint32 sound_id, float radius);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
+    void PlayRadiusMusic(uint32 music_id, float radius);
 
     void SendObjectDeSpawnAnim(ObjectGuid guid);
 

@@ -19,8 +19,8 @@
 #define AZEROTHCORE_WORLDMOCK_H
 
 #include "ArenaSpectator.h"
-#include "IWorld.h"
 #include "Duration.h"
+#include "IWorld.h"
 #include "gmock/gmock.h"
 
 #pragma GCC diagnostic push
@@ -120,6 +120,7 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
+    MOCK_METHOD(void, DoForAllOnlinePlayers, (std::function<void(Player*)> exec));
 };
 #pragma GCC diagnostic pop
 

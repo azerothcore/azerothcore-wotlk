@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "blackrock_spire.h"
@@ -45,7 +45,7 @@ struct boss_quartermaster_zigris : public BossAI
     void Reset() override
     {
         _Reset();
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         _hasDrunkPotion = false;
     }
 
@@ -120,11 +120,11 @@ struct boss_quartermaster_zigris : public BossAI
                     {
                         DoCastVictim(SPELL_SHOOT);
                         me->GetMotionMaster()->Clear();
-                        SetCombatMovement(false);
+                        me->SetCombatMovement(false);
                     }
                     else if (!me->IsWithinLOSInMap(me->GetVictim()))
                     {
-                        SetCombatMovement(true);
+                        me->SetCombatMovement(true);
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     }

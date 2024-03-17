@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,13 +18,13 @@
 DROP TABLE IF EXISTS `item_set_names_locale`;
 CREATE TABLE IF NOT EXISTS `item_set_names_locale` (
   `ID` int unsigned NOT NULL DEFAULT '0',
-  `locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Name` text COLLATE utf8mb4_unicode_ci,
+  `locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`,`locale`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.item_set_names_locale: ~14,596 rows (approximately)
+-- Dumping data for table acore_world.item_set_names_locale: ~14 855 rows (approximately)
 DELETE FROM `item_set_names_locale`;
 INSERT INTO `item_set_names_locale` (`ID`, `locale`, `Name`, `VerifiedBuild`) VALUES
 	(6473, 'deDE', 'Rüstung des Giftzahns', 15050),

@@ -990,6 +990,10 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
     if (pItem->IsSoulBound())
         return EQUIP_ERR_CANT_DROP_SOULBOUND;
 
+    // Prevent swapping limited duration items into guild bank
+    if (pItem->GetTemplate()->Duration > 0)
+        return EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
+
     // Make sure destination bank tab exists
     if (m_container >= m_pGuild->_GetPurchasedTabsSize())
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
@@ -1439,6 +1443,14 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     // Do not show invitations from ignored players
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;
+
+    uint32 memberLimit = sConfigMgr->GetOption<uint32>("Guild.MemberLimit", 0);
+    if (memberLimit > 0 && player->GetGuild()->GetMemberCount() >= memberLimit)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Your guild has reached the maximum amount of members (%u). You cannot send another invite until the guild member count is lower.", memberLimit);
+        SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_INTERNAL, name);
+        return;
+    }
 
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeamId(true) != player->GetTeamId(true))
     {

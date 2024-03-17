@@ -18,8 +18,8 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
-#include "EventProcessor.h"
 #include "EnumFlag.h"
+#include "EventProcessor.h"
 #include "FollowerRefMgr.h"
 #include "FollowerReference.h"
 #include "HostileRefMgr.h"
@@ -311,13 +311,13 @@ enum BaseModType
 
 #define MOD_END (PCT_MOD+1)
 
-enum DeathState
+enum class DeathState : uint8
 {
-    ALIVE       = 0,
-    JUST_DIED   = 1,
-    CORPSE      = 2,
-    DEAD        = 3,
-    JUST_RESPAWNED = 4,
+    Alive         = 0,
+    JustDied      = 1,
+    Corpse        = 2,
+    Dead          = 3,
+    JustRespawned = 4,
 };
 
 enum UnitState
@@ -391,7 +391,7 @@ enum UnitMoveType
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
-enum WeaponAttackType
+enum WeaponAttackType : uint8
 {
     BASE_ATTACK   = 0,
     OFF_ATTACK    = 1,
@@ -430,7 +430,7 @@ enum CombatRating
 
 #define MAX_COMBAT_RATING         25
 
-enum DamageEffectType
+enum DamageEffectType : uint8
 {
     DIRECT_DAMAGE           = 0,                            // used for normal weapon damage (not for class abilities or spells)
     SPELL_DIRECT_DAMAGE     = 1,                            // spell/class abilities damage
@@ -438,6 +438,29 @@ enum DamageEffectType
     HEAL                    = 3,
     NODAMAGE                = 4,                            // used also in case when damage applied to health but not applied to spell channelInterruptFlags/etc
     SELF_DAMAGE             = 5
+};
+
+// Used for IsClass hook
+enum ClassContext : uint8
+{
+    CLASS_CONTEXT_NONE              = 0, // Default
+    CLASS_CONTEXT_INIT              = 1,
+    CLASS_CONTEXT_TELEPORT          = 2,
+    CLASS_CONTEXT_QUEST             = 3,
+    CLASS_CONTEXT_STATS             = 4,
+    CLASS_CONTEXT_TAXI              = 5,
+    CLASS_CONTEXT_SKILL             = 6,
+    CLASS_CONTEXT_TALENT_POINT_CALC = 7,
+    CLASS_CONTEXT_ABILITY           = 8,
+    CLASS_CONTEXT_ABILITY_REACTIVE  = 9,
+    CLASS_CONTEXT_PET               = 10,
+    CLASS_CONTEXT_PET_CHARM         = 11,
+    CLASS_CONTEXT_EQUIP_RELIC       = 12,
+    CLASS_CONTEXT_EQUIP_SHIELDS     = 13,
+    CLASS_CONTEXT_EQUIP_ARMOR_CLASS = 14,
+    CLASS_CONTEXT_WEAPON_SWAP       = 15,
+    CLASS_CONTEXT_GRAVEYARD         = 16,
+    CLASS_CONTEXT_CLASS_TRAINER     = 17
 };
 
 // Value masks for UNIT_FIELD_FLAGS
@@ -1436,8 +1459,11 @@ public:
     void setRace(uint8 race);
     [[nodiscard]] uint32 getRaceMask() const { return 1 << (getRace(true) - 1); }
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
+    [[nodiscard]] virtual bool IsClass(Classes unitClass, [[maybe_unused]] ClassContext context = CLASS_CONTEXT_NONE) const { return (getClass() == unitClass); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+    [[nodiscard]] DisplayRace GetDisplayRaceFromModelId(uint32 modelId) const;
+    [[nodiscard]] DisplayRace GetDisplayRace() const { return GetDisplayRaceFromModelId(GetDisplayId()); };
 
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
@@ -1470,6 +1496,7 @@ public:
 
     [[nodiscard]] Powers getPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
     void setPowerType(Powers power);
+    [[nodiscard]] virtual bool HasActivePowerType(Powers power) { return getPowerType() == power; }
     [[nodiscard]] uint32 GetPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power); }
     [[nodiscard]] uint32 GetMaxPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_MAXPOWER1) + power); }
     void SetPower(Powers power, uint32 val, bool withPowerUpdate = true, bool fromRegenerate = false);
@@ -1817,9 +1844,9 @@ public:
 
     void BuildHeartBeatMsg(WorldPacket* data) const;
 
-    [[nodiscard]] bool IsAlive() const { return (m_deathState == ALIVE); };
-    [[nodiscard]] bool isDying() const { return (m_deathState == JUST_DIED); };
-    [[nodiscard]] bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); };
+    [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
+    [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
+    [[nodiscard]] bool isDead() const { return (m_deathState == DeathState::Dead || m_deathState == DeathState::Corpse); };
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 
@@ -1993,7 +2020,7 @@ public:
     AuraApplication* GetAuraApplicationOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
     [[nodiscard]] Aura* GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
 
-    void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList);
+    void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList, SpellInfo const* dispelSpell);
 
     [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster = ObjectGuid::Empty) const;
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
@@ -2665,17 +2692,6 @@ namespace Acore
         bool const _ascending;
     };
 }
-
-class ConflagrateAuraStateDelayEvent : public BasicEvent
-{
-public:
-    ConflagrateAuraStateDelayEvent(Unit* owner, ObjectGuid casterGUID) : BasicEvent(), m_owner(owner), m_casterGUID(casterGUID) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-private:
-    Unit* m_owner;
-    ObjectGuid m_casterGUID;
-};
 
 class RedirectSpellEvent : public BasicEvent
 {

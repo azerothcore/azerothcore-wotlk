@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 enum Texts
@@ -98,7 +99,7 @@ public:
     {
         npc_tiger_matriarch_creditAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 2s);
         }
 
@@ -510,3 +511,4 @@ void AddSC_durotar()
     new spell_voljin_war_drums();
     new spell_voodoo();
 }
+

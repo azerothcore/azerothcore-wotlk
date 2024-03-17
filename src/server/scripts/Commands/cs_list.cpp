@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -33,7 +34,6 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Random.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;
@@ -71,8 +71,7 @@ public:
         CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(creatureId);
         if (!cInfo)
         {
-            handler->PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, uint32(creatureId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_INVALIDCREATUREID, uint32(creatureId));
             return false;
         }
 
@@ -126,7 +125,7 @@ public:
                         for (std::unordered_multimap<uint32, Creature*>::const_iterator itr = creBounds.first; itr != creBounds.second;)
                         {
                             if (handler->GetSession())
-                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, cInfo->Entry, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
                             else
                                 handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
                             ++itr;
@@ -138,7 +137,7 @@ public:
                 if (!liveFound)
                 {
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, cInfo->Entry, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
                     else
                         handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
                 }
@@ -343,8 +342,7 @@ public:
 
         if (inventoryCount + mailCount + auctionCount + guildCount == 0)
         {
-            handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOITEMFOUND);
             return false;
         }
 
@@ -358,8 +356,7 @@ public:
         GameObjectTemplate const* gInfo = sObjectMgr->GetGameObjectTemplate(gameObjectId);
         if (!gInfo)
         {
-            handler->PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, uint32(gameObjectId));
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_LISTOBJINVALIDID, uint32(gameObjectId));
             return false;
         }
 
@@ -459,8 +456,7 @@ public:
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 

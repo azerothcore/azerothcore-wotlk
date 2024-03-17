@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Vehicle.h"
 #include "trial_of_the_crusader.h"
@@ -606,14 +606,14 @@ struct boss_jormungarAI : public ScriptedAI
                     if( bIsStationary )
                     {
                         me->SetNativeDisplayId(_MODEL_MOBILE);
-                        SetCombatMovement(true);
+                        me->SetCombatMovement(true);
                         if( Unit* victim = me->GetVictim() )
                             me->GetMotionMaster()->MoveChase(victim);
                     }
                     else
                     {
                         me->SetNativeDisplayId(_MODEL_STATIONARY);
-                        SetCombatMovement(false);
+                        me->SetCombatMovement(false);
                     }
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
@@ -692,7 +692,7 @@ public:
             _MODEL_STATIONARY = MODEL_ACIDMAW_STATIONARY;
             _MODEL_MOBILE = MODEL_ACIDMAW_MOBILE;
             _TYPE_OTHER = TYPE_DREADSCALE;
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
     };
 

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "QuestDef.h"
 #include "Define.h"
+#include "QuestDef.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 

@@ -824,7 +824,7 @@ void Map::ScriptsProcess()
                         LOG_ERROR("maps.script", "{} creature is already dead ({})", step.script->GetDebugInfo(), cSource->GetGUID().ToString());
                     else
                     {
-                        cSource->setDeathState(JUST_DIED);
+                        cSource->setDeathState(DeathState::JustDied);
                         if (step.script->Kill.RemoveCorpse == 1)
                             cSource->RemoveCorpse();
                     }

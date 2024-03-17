@@ -27,8 +27,8 @@
 #include "Timer.h"
 #include "Tokenize.h"
 #include "Transaction.h"
-#include "Util.h"
 #include <errmsg.h>
+#include <mysql.h>
 #include <mysqld_error.h>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
@@ -227,7 +227,11 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
     uint32 _s = getMSTime();
 
+#if !defined(MARIADB_VERSION_ID) && (MYSQL_VERSION_ID >= 80300)
+    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
+#else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+#endif
     {
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
@@ -275,7 +279,11 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
 
     uint32 _s = getMSTime();
 
+#if !defined(MARIADB_VERSION_ID) && (MYSQL_VERSION_ID >= 80300)
+    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
+#else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+#endif
     {
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
@@ -486,6 +494,11 @@ uint32 MySQLConnection::GetServerVersion() const
     return mysql_get_server_version(m_Mysql);
 }
 
+std::string MySQLConnection::GetServerInfo() const
+{
+    return mysql_get_server_info(m_Mysql);
+}
+
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)
 {
     ASSERT(index < m_stmts.size(), "Tried to access invalid prepared statement index {} (max index {}) on database `{}`, connection type: {}",
@@ -581,7 +594,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
                 {
                     LOG_FATAL("sql.sql", "Could not re-prepare statements!");
                     std::this_thread::sleep_for(10s);
-                    std::abort();
+                    ABORT();
                 }
 
                 LOG_INFO("sql.sql", "Successfully reconnected to {} @{}:{} ({}).",
@@ -600,7 +613,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
 
                 // We could also initiate a shutdown through using std::raise(SIGTERM)
                 std::this_thread::sleep_for(10s);
-                std::abort();
+                ABORT();
             }
             else
             {
@@ -624,12 +637,12 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
         case ER_NO_SUCH_TABLE:
             LOG_ERROR("sql.sql", "Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         case ER_PARSE_ERROR:
             LOG_ERROR("sql.sql", "Error while parsing SQL. Core fix required.");
             std::this_thread::sleep_for(10s);
-            std::abort();
+            ABORT();
             return false;
         default:
             LOG_ERROR("sql.sql", "Unhandled MySQL errno {}. Unexpected behaviour possible.", errNo);

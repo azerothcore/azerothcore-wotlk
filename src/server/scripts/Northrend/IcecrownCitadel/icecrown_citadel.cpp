@@ -15,20 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "icecrown_citadel.h"
 #include "AccountMgr.h"
+#include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
+#include "SpellScriptLoader.h"
+#include "icecrown_citadel.h"
+#include "GridNotifiersImpl.h"
 
 enum Texts
 {
@@ -1257,7 +1259,7 @@ public:
     {
         if (spell->Id == SPELL_REVIVE_CHAMPION && !IsUndead)
         {
-            me->setDeathState(JUST_RESPAWNED);
+            me->setDeathState(DeathState::JustRespawned);
             uint32 newEntry = 0;
             switch (me->GetEntry())
             {
@@ -2854,8 +2856,7 @@ public:
                 {
                     c->AI()->AttackStart(target);
                     DoZoneInCombat(c);
-                    uint8 Class = target->getClass();
-                    if (Class != CLASS_DRUID)
+                    if (!target->IsClass(CLASS_DRUID))
                         if (Player* p = target->ToPlayer())
                         {
                             if (Item* i = p->GetWeaponForAttack(BASE_ATTACK))
@@ -2867,7 +2868,7 @@ public:
 
                             target->CastSpell(c, 60352, true); // Mirror Image, clone visual appearance
                         }
-                    c->AI()->DoAction(Class);
+                    c->AI()->DoAction(target->getClass());
                 }
             }
         }

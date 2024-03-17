@@ -301,7 +301,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 GetPlayer()->RemovePet(pet->ToPet(), PET_SAVE_AS_DELETED);
                             else
                                 //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
-                                pet->setDeathState(CORPSE);
+                                pet->setDeathState(DeathState::Corpse);
                         }
                         else if (pet->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN))
                         {

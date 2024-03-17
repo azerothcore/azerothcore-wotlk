@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "Containers.h"
+#include "CreatureScript.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "ahnkahet.h"
 
@@ -293,7 +295,7 @@ struct boss_jedoga_shadowseeker : public BossAI
     {
         if (!ritualTriggered && me->HealthBelowPctDamaged(55, damage) && events.IsInPhase(PHASE_NORMAL))
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
             me->SetReactState(REACT_PASSIVE);
@@ -366,7 +368,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
                 me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
                 me->RemoveAurasDueToSpell(SPELL_HOVER_FALL);
-                SetCombatMovement(true);
+                me->SetCombatMovement(true);
 
                 me->SetDisableGravity(false);
                 me->SetHover(false);
@@ -733,3 +735,4 @@ void AddSC_boss_jedoga_shadowseeker()
     // Achievements
     new achievement_volunteer_work();
 }
+

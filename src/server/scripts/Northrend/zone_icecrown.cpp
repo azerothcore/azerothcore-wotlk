@@ -16,16 +16,17 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SmartScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 // Ours
@@ -1531,7 +1532,7 @@ public:
     {
         npc_guardian_pavilionAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -1595,7 +1596,7 @@ public:
     {
         npc_tournament_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         }
 
@@ -1815,7 +1816,7 @@ public:
             PhaseCount = 0;
             Summons.DespawnAll();
 
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         EventMap events;
@@ -2203,3 +2204,4 @@ void AddSC_icecrown()
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
 }
+

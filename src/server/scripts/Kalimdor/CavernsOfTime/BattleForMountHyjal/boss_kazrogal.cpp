@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -40,6 +41,12 @@ enum Texts
 enum Sounds
 {
     SOUND_ONDEATH       = 11018,
+};
+
+enum Misc
+{
+    PATH_KAZROGAL       = 178880,
+    POINT_COMBAT_START  = 7
 };
 
 class boss_kazrogal : public CreatureScript
@@ -92,7 +99,7 @@ public:
 
         void WaypointReached(uint32 waypointId) override
         {
-            if (waypointId == 7 && instance)
+            if (waypointId == POINT_COMBAT_START && instance)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THRALL));
                 if (target && target->IsAlive())
@@ -117,16 +124,7 @@ public:
                 if (!go)
                 {
                     go = true;
-                    AddWaypoint(0, 5492.91f,    -2404.61f,    1462.63f);
-                    AddWaypoint(1, 5531.76f,    -2460.87f,    1469.55f);
-                    AddWaypoint(2, 5554.58f,    -2514.66f,    1476.12f);
-                    AddWaypoint(3, 5554.16f,    -2567.23f,    1479.90f);
-                    AddWaypoint(4, 5540.67f,    -2625.99f,    1480.89f);
-                    AddWaypoint(5, 5508.16f,    -2659.2f,    1480.15f);
-                    AddWaypoint(6, 5489.62f,    -2704.05f,    1482.18f);
-                    AddWaypoint(7, 5457.04f,    -2726.26f,    1485.10f);
-                    Start(false, true);
-                    SetDespawnAtEnd(false);
+                    me->GetMotionMaster()->MovePath(PATH_KAZROGAL, false);
                 }
             }
 
@@ -228,3 +226,4 @@ void AddSC_boss_kazrogal()
     new boss_kazrogal();
     new spell_mark_of_kazrogal();
 }
+

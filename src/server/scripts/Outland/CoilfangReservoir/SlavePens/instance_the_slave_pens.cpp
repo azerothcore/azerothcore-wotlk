@@ -23,9 +23,9 @@
 */
 
 #include "Creature.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 ObjectData const creatureData[] =
