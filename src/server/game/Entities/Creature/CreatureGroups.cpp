@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "WaypointMgr.h"
 
 FormationMgr::~FormationMgr()
 {
@@ -360,7 +361,7 @@ void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
     m_Formed = !dismiss;
 }
 
-void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
+void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
 {
     //! To do: This should probably get its own movement generator or use WaypointMovementGenerator.
     //! If the leader's path is known, member's path can be plotted as well using formation offsets.
@@ -410,13 +411,17 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
 
         member->SetUnitMovementFlags(m_leader->GetUnitMovementFlags());
         // pussywizard: setting the same movementflags is not enough, spline decides whether leader walks/runs, so spline param is now passed as "run" parameter to this function
-        if (run && member->IsWalking())
+        switch (move_type)
         {
-            member->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-        }
-        else if (!run && !member->IsWalking())
-        {
+        case WAYPOINT_MOVE_TYPE_WALK:
             member->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            break;
+        case WAYPOINT_MOVE_TYPE_RUN:
+            member->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            break;
+        case WAYPOINT_MOVE_TYPE_LAND:
+            member->AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+            break;
         }
 
         // xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
