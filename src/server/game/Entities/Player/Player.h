@@ -721,7 +721,7 @@ enum BankBagSlots                                           // 7 slots
 
 enum BuyBackSlots                                           // 12 slots
 {
-    // stored in m_buybackitems
+    // stored in m_items, there is no more m_buybackitems
     BUYBACK_SLOT_START          = 74,
     BUYBACK_SLOT_END            = 86
 };
