@@ -447,20 +447,20 @@ void BotMgr::LoadConfig(bool reload)
 
     _disabled_instance_maps.clear();
     std::string disabled_instance_maps = sConfigMgr->GetStringDefault("NpcBot.DisableInstances", "");
-    std::vector<std::string_view> toks4 = Trinity::Tokenize(disabled_instance_maps, ',', false);
+    std::vector<std::string_view> toks4 = Acore::Tokenize(disabled_instance_maps, ',', false);
     for (decltype(toks4)::size_type i = 0; i != toks4.size(); ++i)
     {
-        Optional<uint32> val = Trinity::StringTo<uint32>(toks4[i]);
+        Optional<uint32> val = Acore::StringTo<uint32>(toks4[i]);
         if (val == std::nullopt)
         {
-            TC_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid uint32 value '{}', skipped", toks4[i]);
+            LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid uint32 value '{}', skipped", toks4[i]);
             continue;
         }
         uint32 uval = val.value_or(uint32(0));
         MapEntry const* mapEntry = sMapStore.LookupEntry(uval);
         if (!mapEntry || !mapEntry->IsDungeon())
         {
-            TC_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid instance map id '{}', skipped", uval);
+            LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid instance map id '{}', skipped", uval);
             continue;
         }
         _disabled_instance_maps.push_back(uval);
