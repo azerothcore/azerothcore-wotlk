@@ -205,6 +205,7 @@ class AC_GAME_API BotMgr
         static bool IsWanderingWorldBot(Creature const* bot);
         static bool IsBotContestedPvP(Creature const* bot);
         static void SetBotContestedPvP(Creature const* bot);
+        bool IsMapAllowedForBots(Map const* map) const;
         bool RestrictBots(Creature const* bot, bool add) const;
         bool IsPartyInCombat() const;
         bool HasBotClass(uint8 botclass) const;

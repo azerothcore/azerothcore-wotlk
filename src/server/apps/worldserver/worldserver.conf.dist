@@ -4561,6 +4561,15 @@ NpcBot.Enable.Arena         = 0
 NpcBot.Enable.DungeonFinder = 1
 
 #
+#    NpcBot.DisableInstances
+#        Description: When NpcBot.Enable.Dungeon or/and NpcBot.Enable.Raid options are set to 1
+#                     excludes certain instance map ids, preventing bots from entering those maps
+#        Default:     "" - (None)
+#                     "509,531" - (Disable AQ20 and AQ40)
+
+NpcBot.DisableInstances = ""
+
+#
 #    NpcBot.Limit.Dungeon
 #    NpcBot.Limit.Raid
 #        Description: Enable/Disable instance players limitation rules for bots.
