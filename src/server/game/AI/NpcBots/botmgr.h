@@ -80,7 +80,8 @@ enum BotAttackAngle
 };
 
 typedef std::unordered_map<ObjectGuid /*guid*/, Creature* /*bot*/> BotMap;
-typedef std::array<uint32, BracketsCount> BotBrackets;
+template<typename U = uint32>
+using BotBrackets = std::array<U, BracketsCount>;
 
 class AC_GAME_API BotMgr
 {
@@ -148,7 +149,7 @@ class AC_GAME_API BotMgr
         static float GetBotWandererHPMod();
         static float GetBotWandererSpeedMod();
         static float GetBotWandererXPGainMod();
-        static BotBrackets GetBotWandererLevelBrackets();
+        static BotBrackets<uint32> GetBotWandererLevelBrackets();
         static float GetBotDamageModByClass(uint8 botclass);
         static float GetBotDamageModByLevel(uint8 botlevel);
 
@@ -196,7 +197,7 @@ class AC_GAME_API BotMgr
         uint8 GetNpcBotSlot(Creature const* bot) const;
         uint8 GetNpcBotSlotByRole(uint32 roles, Creature const* bot) const;
         uint32 GetAllNpcBotsClassMask() const;
-        static uint8 GetMaxNpcBots();
+        static uint8 GetMaxNpcBots(uint8 level);
         static uint8 GetNpcBotXpReduction();
         static uint8 GetNpcBotXpReductionStartingNumber();
         static int32 GetBotInfoPacketsLimit();
