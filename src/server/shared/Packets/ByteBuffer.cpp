@@ -78,13 +78,20 @@ ByteBuffer& ByteBuffer::operator>>(double& value)
 ByteBuffer& ByteBuffer::GetString(char* string, uint32_t maxChars)
 {
     ASSERT(string);
-    ASSERT(_storage.size());
-    while (_rpos <= _storage.size()-1) {
-        string[_rpos] = _storage.at(_rpos);
-        if (string[_rpos] == '\0') {
-            break;
+    if (_rpos == size()) {
+        *string = '\0';
+    }
+    else {
+        for (uint32_t i = 0; i < maxChars; ++i) {
+            string[i] = read<char>();
+            if (string[i] == '\0') {
+                break;
+            }
+            if (_rpos == size()) {
+                string[i + 1] = '\0';
+                break;
+            }
         }
-        _rpos++;
     }
     return *this;
 }
