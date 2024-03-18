@@ -34,6 +34,7 @@ public:
     virtual void OnTypeIDToQueueID(const BattlegroundTypeId /*bgTypeId*/, const uint8 /*arenaType*/, uint32& /*queueTypeID*/) {}
     virtual void OnQueueIdToArenaType(const BattlegroundQueueTypeId /*bgQueueTypeId*/, uint8& /*ArenaType*/) {}
     virtual void OnSetArenaMaxPlayersPerTeam(const uint8 /*arenaType*/, uint32& /*maxPlayerPerTeam*/) {}
+    virtual void OnSetArenaMinPlayersPerTeam(const uint8 /*arenaType*/, uint32& /*minPlayerPerTeam*/) {}
 };
 
 #endif
