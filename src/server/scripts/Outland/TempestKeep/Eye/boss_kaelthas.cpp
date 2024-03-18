@@ -353,6 +353,8 @@ struct boss_kaelthas : public BossAI
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_NETHER_VAPOR)
             summon->GetMotionMaster()->MoveRandom(20.0f);
+        if (summon->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summon->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
+            summon->SetReactState(REACT_PASSIVE);
     }
 
     void DoAction(int32 action) override
@@ -381,7 +383,7 @@ struct boss_kaelthas : public BossAI
                         {
                             if (!summonedCreature->GetSpawnId())
                             {
-                                summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                                summonedCreature->SetReactState(REACT_AGGRESSIVE);
                                 summonedCreature->SetInCombatWithZone();
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
