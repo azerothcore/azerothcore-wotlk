@@ -11,7 +11,7 @@ ccache -s
 cd var/build/obj
 
 time cmake ../../../ \
--DTOOLS_BUILD=1 \
+-DTOOLS_BUILD=all \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
 -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
