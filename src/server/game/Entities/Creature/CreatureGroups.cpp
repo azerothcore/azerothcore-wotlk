@@ -291,41 +291,27 @@ void CreatureGroup::MemberEvaded(Creature* member)
         Creature* pMember = itr.first;
         // This should never happen
         if (!pMember)
-        {
             continue;
-        }
 
         if (pMember == member || pMember->IsInEvadeMode() || !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
-        {
             continue;
-        }
 
         if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
         {
             if (!pMember->IsAlive() || !pMember->IsInCombat())
-            {
                 continue;
-            }
 
             if (pMember->IsAIEnabled)
-            {
                 if (CreatureAI* pMemberAI = pMember->AI())
-                {
                     pMemberAI->EnterEvadeMode();
-                }
-            }
         }
         else
         {
             if (pMember->IsAlive())
-            {
                 continue;
-            }
 
             if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE)) && pMember == m_leader)
-            {
                 continue;
-            }
 
             pMember->Respawn();
         }
@@ -335,9 +321,7 @@ void CreatureGroup::MemberEvaded(Creature* member)
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
     if (m_members.size() && !(m_members.begin()->second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))))
-    {
         return;
-    }
 
     for (auto const& itr : m_members)
     {
@@ -347,13 +331,10 @@ void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
             if (initMotionMaster)
             {
                 if (dismiss)
-                {
                     member->GetMotionMaster()->Initialize();
-                }
                 else
-                {
                     member->GetMotionMaster()->MoveIdle();
-                }
+
                 LOG_DEBUG("entities.unit", "Set {} movement for member {}", dismiss ? "default" : "idle", member->GetGUID().ToString());
             }
         }
@@ -366,9 +347,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
     //! To do: This should probably get its own movement generator or use WaypointMovementGenerator.
     //! If the leader's path is known, member's path can be plotted as well using formation offsets.
     if (!m_leader)
-    {
         return;
-    }
 
     float pathDist = m_leader->GetExactDist(x, y, z);
     float pathAngle = std::atan2(m_leader->GetPositionY() - y, m_leader->GetPositionX() - x);
@@ -378,15 +357,11 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
         Creature* member = itr.first;
         FormationInfo const& pFormationInfo = itr.second;
         if (member == m_leader || !member->IsAlive() || member->GetVictim() || !pFormationInfo.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
-        {
             continue;
-        }
 
         // Xinef: If member is stunned / rooted etc don't allow to move him
         if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
-        {
             continue;
-        }
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
         float followAngle = pFormationInfo.follow_angle;
@@ -407,10 +382,11 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
 
         Acore::NormalizeMapCoord(dx);
         Acore::NormalizeMapCoord(dy);
-        member->UpdateGroundPositionZ(dx, dy, dz);
+        if (move_type < 2)
+            member->UpdateGroundPositionZ(dx, dy, dz);
 
-        member->SetUnitMovementFlags(m_leader->GetUnitMovementFlags());
         // pussywizard: setting the same movementflags is not enough, spline decides whether leader walks/runs, so spline param is now passed as "run" parameter to this function
+        member->SetUnitMovementFlags(m_leader->GetUnitMovementFlags());
         switch (move_type)
         {
         case WAYPOINT_MOVE_TYPE_WALK:
