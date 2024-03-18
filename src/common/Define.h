@@ -38,6 +38,17 @@
 #  define _USE_MATH_DEFINES
 #else //AC_PLATFORM != AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX PATH_MAX
+#ifndef BOOL
+#define BOOL int
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 #endif //AC_PLATFORM
 
 #if !defined(COREDEBUG)
