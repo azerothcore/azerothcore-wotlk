@@ -1,3 +1,4 @@
+-- DB update 2024_03_18_01 -> 2024_03_18_02
 -- Update gameobject 'Warm Fire' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (49485, 49486, 24763, 24764, 3303, 3816, 3815, 24761, 24762, 24760))
