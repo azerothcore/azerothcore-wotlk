@@ -79,7 +79,7 @@ public:
                 context.Repeat(1200ms);
         }).Schedule(21s, 28s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_DEATH_AND_DECAY, 40.f))
+            if (DoCastRandomTarget(SPELL_DEATH_AND_DECAY, 0, 40.f))
                 Talk(SAY_DECAY);
 
             context.Repeat(45s);
