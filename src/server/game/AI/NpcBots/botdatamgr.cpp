@@ -479,8 +479,8 @@ public:
         }
 
         decltype (_spareBotIdsPerClassMap) teamSpareBotIdsPerClass;
-        BotBrackets bracketPcts{};
-        BotBrackets bots_per_bracket{};
+        PctBrackets bracketPcts{};
+        PctBrackets bots_per_bracket{};
 
         if (team == -1)
         {

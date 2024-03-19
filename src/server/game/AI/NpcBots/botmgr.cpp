@@ -157,8 +157,8 @@ float _mult_dmg_seawitch;
 float _mult_dmg_cryptlord;
 float _bothk_rate_honor;
 std::vector<float> _mult_dmg_levels;
-BotBrackets<uint8> _max_npcbots;
-BotBrackets<> _botwanderer_pct_level_brackets;
+LvlBrackets _max_npcbots;
+PctBrackets _botwanderer_pct_level_brackets;
 std::vector<uint32> _disabled_instance_maps;
 std::vector<uint32> _enabled_wander_node_maps;
 
@@ -2808,7 +2808,7 @@ float BotMgr::GetBotWandererXPGainMod()
 {
     return _mult_xpgain_wanderer;
 }
-BotBrackets<uint32> BotMgr::GetBotWandererLevelBrackets()
+PctBrackets BotMgr::GetBotWandererLevelBrackets()
 {
     return _botwanderer_pct_level_brackets;
 }
