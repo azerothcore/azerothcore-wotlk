@@ -228,7 +228,7 @@ public:
                             DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
                             _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
 
-                            if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
+                            if (trash == 0) // It can reach negatives if trash spawned after a retreat are killed, it shouldn't affect anything. Also happens on retail
                                 SetData(DATA_SPAWN_WAVES, 1);
                         }
                     }
@@ -336,7 +336,8 @@ public:
                     {
                         if (!_bossWave)
                             for (ObjectGuid const& guid : _baseAlliance)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         _bossWave = DATA_WINTERCHILL;
                         ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
                     }
@@ -344,7 +345,8 @@ public:
                     {
                         if (!_bossWave)
                             for (ObjectGuid const& guid : _baseAlliance)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         _bossWave = DATA_ANETHERON;
                         ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON - 1]);
                     }
@@ -352,7 +354,8 @@ public:
                     {
                         if (!_bossWave)
                             for (ObjectGuid const& guid : _baseHorde)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         _bossWave = DATA_KAZROGAL;
                         ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL - 1]);
                     }
@@ -360,7 +363,8 @@ public:
                     {
                         if (!_bossWave)
                             for (ObjectGuid const& guid : _baseHorde)
-                                instance->GetCreature(guid)->Respawn();
+                                if (Creature* creature = instance->GetCreature(guid))
+                                    creature->Respawn();
                         _bossWave = DATA_AZGALOR;
                         ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR - 1]);
                     }
@@ -528,7 +532,7 @@ public:
         }
 
     protected:
-        uint32 trash;
+        int32 trash;
         uint8 _currentWave;
         uint8 _bossWave;
         uint8 _retreat;
