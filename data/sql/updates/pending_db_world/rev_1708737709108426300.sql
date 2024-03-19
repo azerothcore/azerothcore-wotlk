@@ -2277,3 +2277,6 @@ UPDATE `creature_model_info` SET `BoundingRadius` = 9.894683837890625, `CombatRe
 DELETE FROM `creature_template_addon` WHERE (`entry` = 17937);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (17937, 0, 0, 0, 1, 234, 0, '');
+
+-- Hide Building from players
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|130 WHERE (`entry` = 18304);

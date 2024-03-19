@@ -127,6 +127,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
 
             // Should wait 2400ms
