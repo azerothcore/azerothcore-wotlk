@@ -408,7 +408,18 @@ enum BotTexts : uint32
     BOT_TEXT_REFLECT                        = 70671, //"Reflect"
     BOT_TEXT_LOCUSTS                        = 70672, //"Locusts"
     BOT_TEXT_HEAL_TARGET_HEALTH_THRESHOLD   = 70673, //"Heal target health threshold"
-    //70674-70799 reserved for custom localization strings
+    BOT_TEXT_I_NEED_A_PORTAL                = 70674, //"I need a portal"
+    BOT_TEXT_STORMWIND                      = 70675, //"Stormwind"
+    BOT_TEXT_IRONFORGE                      = 70676, //"Ironforge"
+    BOT_TEXT_DARNASSUS                      = 70677, //"Darnassus"
+    BOT_TEXT_EXORDAR                        = 70678, //"Exordar"
+    BOT_TEXT_ORGRIMMAR                      = 70679, //"Orgrimmar"
+    BOT_TEXT_UNDERCITY                      = 70680, //"Undercity"
+    BOT_TEXT_THUNDER_BLUFF                  = 70681, //"Thunder Bluff"
+    BOT_TEXT_SILVERMOON                     = 70682, //"Silvermoon"
+    BOT_TEXT_SHATTRATH                      = 70683, //"Shattrath"
+    BOT_TEXT_DALARAN                        = 70684, //"Dalaran"
+    //70685-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

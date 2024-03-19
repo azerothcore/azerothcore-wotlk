@@ -39,6 +39,10 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
@@ -1919,6 +1923,28 @@ void GameObject::Use(Unit* user)
                 if (info->spellcaster.partyOnly)
                 {
                     Player const* caster = ObjectAccessor::FindConnectedPlayer(GetOwnerGUID());
+                    //npcbot
+                    if (!caster && GetOwnerGUID().IsCreature() && user->IsPlayer())
+                    {
+                        if (Creature const* bot = user->ToPlayer()->GetBotMgr()->GetBot(GetOwnerGUID()))
+                            caster = user->ToPlayer();
+                        else if (Group const* group = user->ToPlayer()->GetGroup())
+                        {
+                            for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            {
+                                if (Player const* player = itr->GetSource())
+                                {
+                                    bot = player->GetBotMgr()->GetBot(GetOwnerGUID());
+                                    if (bot)
+                                    {
+                                        caster = player;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //end npcbot
                     if (!caster || user->GetTypeId() != TYPEID_PLAYER || !user->ToPlayer()->IsInSameRaidWith(caster))
                         return;
                 }

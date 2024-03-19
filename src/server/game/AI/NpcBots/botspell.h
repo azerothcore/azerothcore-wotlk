@@ -22,6 +22,20 @@ enum BotSpells : uint32
     WANDERER_HEARTHSTONE                = 54318,//"Hearthsone" no CD
     SUMMONING_STONE_EFFECT              = 59782,//Cast time 5s + Channeled 2m
     SHOOT_WAND                          = 5019,
+///Portals
+    PORTAL_STORMWIND                    = 10059,
+    PORTAL_IRONFORGE                    = 11416,
+    PORTAL_DARNASSUS                    = 11419,
+    PORTAL_EXODAR                       = 32266,
+    PORTAL_SHATTRATH_A                  = 33691,
+    PORTAL_THERAMORE                    = 49360,
+    PORTAL_ORGRIMMAR                    = 11417,
+    PORTAL_UNDERCITY                    = 11418,
+    PORTAL_THUNDERBLUFF                 = 11420,
+    PORTAL_SILVERMOON                   = 32267,
+    PORTAL_SHATTRATH_H                  = 35717,
+    PORTAL_STONARD                      = 49361,
+    PORTAL_DALARAN                      = 53142,
 ///Passives
     DAMAGE_REDUCTION                    = 68066,//Vigilance, Blessing of Sanctuary, etc.
 ///Passives for Pets
