@@ -85,6 +85,11 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 bool WorldSessionFilter::Process(WorldPacket* packet)
 {
     ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
+    if (!opHandle) {
+      // New msg processing code does not care about this bullshit!
+      // Nuke this code at some point in the future...
+      return true;
+    }
 
     //check if packet handler is supposed to be safe
     if (opHandle->ProcessingPlace == PROCESS_INPLACE)

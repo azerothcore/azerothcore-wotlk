@@ -475,14 +475,6 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
         return ReadDataHandlerResult::Error;
     }
 
-    OpcodeHandler const* handler = opcodeTable[opcode];
-    if (!handler)
-    {
-        LOG_ERROR("network.opcode", "No defined handler for opcode {} sent by {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet.GetOpcode())), _worldSession->GetPlayerInfo());
-        delete packetToQueue;
-        return ReadDataHandlerResult::Error;
-    }
-
     // Our Idle timer will reset on any non PING opcodes on login screen, allowing us to catch people idling.
     if (packetToQueue->GetOpcode() != CMSG_WARDEN_DATA)
     {
