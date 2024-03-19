@@ -33,7 +33,8 @@
 DoorData const doorData[] =
 {
     { GO_HORDE_ENCAMPMENT_PORTAL,  DATA_ANETHERON,  DOOR_TYPE_PASSAGE },
-    { GO_NIGHT_ELF_VILLAGE_PORTAL, DATA_AZGALOR,    DOOR_TYPE_PASSAGE }
+    { GO_NIGHT_ELF_VILLAGE_PORTAL, DATA_AZGALOR,    DOOR_TYPE_PASSAGE },
+    { 0,                           0,               DOOR_TYPE_PASSAGE }
 };
 
 ObjectData const creatureData[] =
