@@ -4443,6 +4443,16 @@ NpcBot.XpReduction.Amount         = 0
 NpcBot.XpReduction.StartingNumber = 2
 
 #
+#    NpcBot.MountLevel.60
+#    NpcBot.MountLevel.100
+#        Description: Minimum level for bots to be able to use ground mounts
+#        Default:     20 - (NpcBot.MountLevel.60)
+#                     40 - (NpcBot.MountLevel.100)
+
+NpcBot.MountLevel.60  = 20
+NpcBot.MountLevel.100 = 40
+
+#
 #    NpcBot.HealTargetIconMask
 #    NpcBot.TankTargetIconMask
 #    NpcBot.OffTankTargetIconMask

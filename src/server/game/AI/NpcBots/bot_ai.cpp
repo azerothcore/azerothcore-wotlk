@@ -5569,6 +5569,12 @@ void bot_ai::MoveBehind(Unit const* target) const
 //MOUNT SUPPORT
 uint32 bot_ai::_selectMountSpell() const
 {
+    uint8 minLevel60 = BotMgr::GetNpcBotMountLevel60();
+    uint8 minLevel100 = BotMgr::GetNpcBotMountLevel100();
+
+    if (me->GetLevel() < minLevel60)
+        return 0;
+
     uint32 myMountSpellId = 0;
     uint32 masterMountSpellId = 0;
 
@@ -5619,7 +5625,7 @@ uint32 bot_ai::_selectMountSpell() const
         using MountArray = std::array<uint32, NUM_MOUNTS_PER_SPEED>;
 
         bool can_fly = !IAmFree() ? master->CanFly() : false; //(!instt && me->GetMap()->GetEntry()->addon > 0);
-        bool useSlowMount = can_fly ? (me->GetLevel() < 70 || maxMountSpeed < 220) : (me->GetLevel() < 40 || maxMountSpeed < 80);
+        bool useSlowMount = can_fly ? (me->GetLevel() < 70 || maxMountSpeed < 220) : (me->GetLevel() < minLevel100 || maxMountSpeed < 80);
 
         if (!can_fly)
         {
@@ -5744,7 +5750,7 @@ void bot_ai::_updateMountedState()
 
     if (IAmFree())
     {
-        if (!IsWanderer() || me->GetLevel() < 20 || me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) ||
+        if (!IsWanderer() || me->GetLevel() < BotMgr::GetNpcBotMountLevel60() || me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) ||
             Feasting() || GetHealthPCT(me) < 80 || (CanDrink() && me->GetMaxPower(POWER_MANA) > 1 && GetManaPCT(me) < 70))
             return;
     }
