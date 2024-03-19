@@ -192,7 +192,47 @@ struct npc_doomfire_targetting : public ScriptedAI
 private:
     Unit* _chaseTarget;
 };
+struct boss_archimonde : public BossAI
+{
+    boss_archimonde(Creature* creature) : BossAI(creature, DATA_ARCHIMONDE)
+    {
+        scheduler.SetValidator([&]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
+    void Reset() override
+    {
+        BossAI::Reset();
+        _wispCount = 0;
+        _isChanneling = false;
+
+        if (Map* map = me->GetMap())
+        {
+            map->DoForAllPlayers([&](Player* player)
+            {
+                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
+                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
+            });
+        }
+
+        if (!_isChanneling)
+        {
+            if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 1200000))
+            {
+                nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                nordrassil->SetDisplayId(11686); //TODO: make enum
+                DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
+                _isChanneling = true;
+                nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
+            }
+        }
+    }
+private:
+    uint8 _wispCount;
+    bool _isChanneling;
+};
 class spell_red_sky_effect : public SpellScript
 {
     PrepareSpellScript(spell_red_sky_effect);
