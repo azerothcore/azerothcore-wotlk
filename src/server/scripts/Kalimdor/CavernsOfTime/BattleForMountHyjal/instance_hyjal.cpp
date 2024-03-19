@@ -197,7 +197,6 @@ public:
                     if (creature->IsSummon() && _bossWave)
                     {
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
-                        DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
                     break;
@@ -227,7 +226,6 @@ public:
                         if (_bossWave)
                         {
                             DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
-                            DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
                             _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
 
                             if (trash == 0) // It can reach negatives if Overrun trash are killed, it shouldn't affect anything
@@ -515,7 +513,10 @@ public:
 
                     context.Repeat(timerptr[_currentWave]);
                     if (++_currentWave < maxWaves && _bossWave)
+                    {
                         DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
+                        DoUpdateWorldState(WORLD_STATE_ENEMY, 1);
+                    }
 
                     context.SetGroup(CONTEXT_GROUP_WAVES);
                 });
