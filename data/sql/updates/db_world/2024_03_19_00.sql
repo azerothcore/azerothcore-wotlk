@@ -1,3 +1,4 @@
+-- DB update 2024_03_18_03 -> 2024_03_19_00
 --
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 534 AND `summonerType` = 2;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
