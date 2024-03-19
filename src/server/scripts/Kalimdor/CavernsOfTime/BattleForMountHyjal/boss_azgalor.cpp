@@ -60,9 +60,7 @@ public:
             context.Repeat(8s, 16s);
         }).Schedule(25s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.f))
-                DoCast(target, SPELL_RAIN_OF_FIRE);
-
+            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f);
             context.Repeat(15s);
         }).Schedule(30s, [this](TaskContext context)
         {
@@ -70,15 +68,14 @@ public:
             context.Repeat(18s, 20s);
         }).Schedule(45s, 55s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.f))
-                DoCast(target, SPELL_DOOM);
+            DoCastRandomTarget(SPELL_DOOM, 0, 100.f);
             Talk(SAY_DOOM);
             context.Repeat();
-        }).Schedule(600s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_BERSERK);
-                context.Repeat(300s);
-            });
+        }).Schedule(10min, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_BERSERK);
+            context.Repeat(5min);
+        });
     }
 
     void DoAction(int32 action) override
@@ -97,9 +94,9 @@ public:
             _recentlySpoken = true;
 
             scheduler.Schedule(6s, [this](TaskContext)
-                {
-                    _recentlySpoken = false;
-                });
+            {
+                _recentlySpoken = false;
+            });
         }
     }
 
@@ -110,15 +107,6 @@ public:
         if (Creature* archi = instance->GetCreature(DATA_ARCHIMONDE))
             archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25000ms);
         BossAI::JustDied(killer);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 
 private:

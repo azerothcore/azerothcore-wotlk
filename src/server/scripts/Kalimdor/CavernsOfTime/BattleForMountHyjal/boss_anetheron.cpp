@@ -58,32 +58,25 @@ public:
 
         scheduler.Schedule(20s, 28s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.f))
-            {
-                DoCast(target, SPELL_CARRION_SWARM);
+            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f))
                 Talk(SAY_SWARM);
-            }
             context.Repeat(10s, 15s);
         }).Schedule(25s, 32s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-            {
-                DoCast(target, SPELL_SLEEP);
+            if (DoCastRandomTarget(SPELL_SLEEP))
                 Talk(SAY_SLEEP);
-            }
+
             context.Repeat(35s, 48s);
         }).Schedule(30s, 48s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-            {
-                DoCast(target, SPELL_INFERNO);
+            if (DoCastRandomTarget(SPELL_INFERNO))
                 Talk(SAY_INFERNO);
-                context.Repeat(50s, 55s);
-            }
-        }).Schedule(600s, [this](TaskContext context)
+
+            context.Repeat(50s, 55s);
+        }).Schedule(10min, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_ENRAGE);
-                context.Repeat(300s);
+                context.Repeat(5min);
             });
     }
 
@@ -138,15 +131,6 @@ public:
     {
         Talk(SAY_ONDEATH);
         BossAI::JustDied(killer);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 
 private:

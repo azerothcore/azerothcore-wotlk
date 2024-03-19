@@ -75,9 +75,7 @@ public:
                 context.Repeat(1200ms);
         }).Schedule(15s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.f))
-                DoCast(target, SPELL_CRIPPLE);
-
+            DoCastRandomTarget(SPELL_CRIPPLE, 0, 20.f);
             context.Repeat(12s, 20s);
         }).Schedule(45s, [this](TaskContext context)
         {
@@ -122,15 +120,6 @@ public:
     {
         me->PlayDirectSound(SOUND_ONDEATH);
         BossAI::JustDied(killer);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 
 private:

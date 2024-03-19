@@ -65,8 +65,7 @@ public:
             context.Repeat(30s, 45s);
         }).Schedule(5s, 9s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                DoCast(target, SPELL_ICEBOLT);
+            DoCastRandomTarget(SPELL_ICEBOLT);
             context.Repeat(9s, 15s);
         }).Schedule(12s, 17s, [this](TaskContext context)
         {
@@ -80,17 +79,15 @@ public:
                 context.Repeat(1200ms);
         }).Schedule(21s, 28s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.f))
-            {
-                DoCast(target, SPELL_DEATH_AND_DECAY);
+            if (DoCastRandomTarget(SPELL_DEATH_AND_DECAY, 40.f))
                 Talk(SAY_DECAY);
-            }
+
             context.Repeat(45s);
-        }).Schedule(600s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_ENRAGE);
-                context.Repeat(300s);
-            });
+        }).Schedule(10min, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_ENRAGE);
+            context.Repeat(5min);
+        });
     }
 
     void DoAction(int32 action) override
@@ -134,15 +131,6 @@ public:
     {
         Talk(SAY_ONDEATH);
         BossAI::JustDied(killer);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
     }
 
 private:
