@@ -543,6 +543,8 @@ class bot_ai : public CreatureAI
         uint32 GetItemSpellCooldown(uint32 spellid) const;
         void CheckUsableItems(uint32 diff);
 
+        uint32 GetLastWMOArea() const { return _lastWMOAreaId; }
+
         Player* master;
         Player* _prevRRobin;
         Unit* opponent;
