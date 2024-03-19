@@ -43,7 +43,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "Spell.h"
 #include "UpdateData.h"
 #include "Vehicle.h"
@@ -1124,31 +1123,6 @@ void WorldSession::HandleWorldTeleport(WorldPacket& msg)
            playerPtr->GetName(), continentID, position.x, position.y, position.z, facing);
 
     playerPtr->TeleportTo(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
-}
-
-//===========================================================================
-void WorldSession::WhoIsHandler(WorldPacket& msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-
-    // READ THE MESSAGE DATA
-    char name[MAX_PLAYER_NAME] = "\0";
-    msg.GetString(name, MAX_PLAYER_NAME);
-
-    FormatCharacterName(name);
-
-    // FIND A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME PROVIDED
-    Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
-    if (!playerPtr) {
-        SendWhoIsResponse("Character not found");
-        return;
-    }
-
-    // RESPOND WITH THE ACCOUNT NAME FOR THE NAMED PLAYER
-    SendWhoIsResponse(playerPtr->GetSession()->GetAccountName());
 }
 
 void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)

@@ -32,7 +32,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 #include <boost/iterator/counting_iterator.hpp>
@@ -726,11 +725,7 @@ bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
     m_vec.clear();
     BAG_RESULT msg = CanStore(pItem, swap);
     if (sendError && msg != BAG_OK)
-<<<<<<< HEAD
         m_pPlayer->SendInventoryChangeFailure(msg, pItem);
-=======
-        m_pPlayer->SendEquipError(msg, pItem);
->>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
     return (msg == BAG_OK);
 }
 
@@ -1445,7 +1440,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
 
     Player* player = session->GetPlayer();
     // Do not show invitations from ignored players
-    if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
+    if (pInvitee->FriendListPtr()->IsIgnored(player->GetGUID()))
         return;
 
     uint32 memberLimit = sConfigMgr->GetOption<uint32>("Guild.MemberLimit", 0);
@@ -2120,7 +2115,7 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
         ChatHandler::BuildChatPacket(data, officerOnly ? CHAT_MSG_OFFICER : CHAT_MSG_GUILD, Language(language), session->GetPlayer(), nullptr, msg);
         for (auto const& [guid, member] : m_members)
             if (Player* player = member.FindPlayer())
-                if (_HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) && !player->GetSocial()->HasIgnore(session->GetPlayer()->GetGUID()))
+                if (_HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) && !player->FriendListPtr()->IsIgnored(session->GetPlayer()->GetGUID()))
                     player->GetSession()->SendPacket(&data);
     }
 }

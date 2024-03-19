@@ -66,7 +66,6 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -146,7 +145,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 #ifdef _MSC_VER
 #pragma warning(default:4355)
 #endif
-
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
 
@@ -403,6 +401,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_isInstantFlightOn = true;
 
     _wasOutdoor = true;
+
     sScriptMgr->OnConstructPlayer(this);
 }
 
@@ -453,6 +452,8 @@ Player::~Player()
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
     }
+
+    delete m_friendListPtr;
 }
 
 void Player::CleanupsBeforeDelete(bool finalCleanup)
@@ -461,6 +462,12 @@ void Player::CleanupsBeforeDelete(bool finalCleanup)
     DuelComplete(DUEL_INTERRUPTED);
 
     Unit::CleanupsBeforeDelete(finalCleanup);
+}
+
+//===========================================================================
+FriendList* Player::FriendListPtr()
+{
+    return m_friendListPtr;
 }
 
 bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo)
@@ -1703,6 +1710,8 @@ void Player::AddToWorld()
     for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
         if (m_items[i])
             m_items[i]->AddToWorld();
+
+    m_friendListPtr = new FriendList(this);
 }
 
 void Player::RemoveFromWorld()
@@ -4090,23 +4099,6 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                         ObjectGuid::LowType petguidlow = (*resultPets)[0].Get<uint32>();
                         Pet::DeleteFromDB(petguidlow);
                     } while (resultPets->NextRow());
-                }
-
-                // Delete char from social list of online chars
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SOCIAL);
-                stmt->SetData(0, lowGuid);
-                PreparedQueryResult resultFriends = CharacterDatabase.Query(stmt);
-
-                if (resultFriends)
-                {
-                    do
-                    {
-                        if (Player* pFriend = ObjectAccessor::FindPlayerByLowGUID((*resultFriends)[0].Get<uint32>()))
-                        {
-                            pFriend->GetSocial()->RemoveFromSocialList(playerGuid, SOCIAL_FLAG_ALL);
-                            sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, playerGuid, false);
-                        }
-                    } while (resultFriends->NextRow());
                 }
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER);
@@ -8148,11 +8140,7 @@ BAG_RESULT Player::StoreItemInBag(uint32_t  itemId,
     uint32 excessItems = 0;
     ItemPosCountVec dest;
     BAG_RESULT result = CanStoreNewItem(bag, slot, dest, itemId, quantity, &excessItems);
-<<<<<<< HEAD
-    if (result == EQUIP_ERR_INVENTORY_FULL) {
-=======
     if (result != BAG_OK) {
->>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
         quantity -= excessItems;
         SendInventoryChangeFailure(result);
     }
@@ -11554,9 +11542,6 @@ void Player::SetGroup(Group* group, int8 subgroup)
 
 void Player::SendInitialPacketsBeforeAddToMap()
 {
-    /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
-    GetSocial()->SendSocialList(this, SOCIAL_FLAG_ALL);
-
     // guild bank list?
 
     // Homebind
@@ -15536,21 +15521,7 @@ bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
     if (!quantity || !itemId) {
         return false;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
     return StoreItemInBag(itemId,quantity) == BAG_OK;
-=======
-
-    Item* item = StoreNewItem(dest, itemId, true);
-    if (item)
-        SendItemPush(item, count, true, false);
-    else
-        return false;
-    return true;
->>>>>>> f3d30171e (style(Player): rename SendNewItem to SendItemPush)
-=======
-    return StoreItemInBag(itemId,quantity) == BAG_OK;
->>>>>>> f6631d1eb (chore: rename BAG_RESULT EQUIP_ERR_OK to BAG_OK)
 }
 
 PetStable& Player::GetOrInitPetStable()

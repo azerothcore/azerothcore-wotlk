@@ -27,7 +27,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -112,13 +111,13 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (invitedPlayer->GetSocial()->HasIgnore(invitingPlayer->GetGUID()))
+    if (invitedPlayer->FriendListPtr()->IsIgnored(invitingPlayer->GetGUID()))
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
         return;
     }
 
-    if (!invitedPlayer->GetSocial()->HasFriend(invitingPlayer->GetGUID()) && invitingPlayer->GetLevel() < sWorld->getIntConfig(CONFIG_PARTY_LEVEL_REQ))
+    if (!invitedPlayer->FriendListPtr()->GetFriend(invitingPlayer->GetGUID()) && invitingPlayer->GetLevel() < sWorld->getIntConfig(CONFIG_PARTY_LEVEL_REQ))
     {
         SendPartyResult(PARTY_OP_INVITE, invitedPlayer->GetName(), ERR_INVITE_RESTRICTED);
         return;

@@ -621,12 +621,6 @@ public:                                                 // opcodes handlers
     void HandleSetSelectionOpcode(WorldPacket& recvPacket);
     void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
     void HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet);
-    void HandleContactListOpcode(WorldPacket& recvPacket);
-    void HandleAddFriendOpcode(WorldPacket& recvPacket);
-    void HandleDelFriendOpcode(WorldPacket& recvPacket);
-    void HandleAddIgnoreOpcode(WorldPacket& recvPacket);
-    void HandleDelIgnoreOpcode(WorldPacket& recvPacket);
-    void HandleSetContactNotesOpcode(WorldPacket& recvPacket);
     void HandleBugOpcode(WorldPacket& recvPacket);
     void HandleSetAmmoOpcode(WorldPacket& recvPacket);
     void HandleItemNameQueryOpcode(WorldPacket& recvPacket);
@@ -1091,8 +1085,6 @@ public:                                                 // opcodes handlers
     void SendGmResurrectFailure();
     void SendGmResurrectSuccess();
     void SendPlayerNotFoundFailure();
-    void SendWhoIsResponse(char const* response);
-    void WhoIsHandler(WorldPacket& msg);
 
 private:
     void ProcessQueryCallbacks();

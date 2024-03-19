@@ -47,7 +47,6 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SkillExtraItems.h"
-#include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -4091,7 +4090,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     Player* target = unitTarget->ToPlayer();
 
     // caster or target already have requested duel
-    if (caster->duel || target->duel || !target->GetSocial() || target->GetSocial()->HasIgnore(caster->GetGUID()))
+    if (caster->duel || target->duel || !target->GetSocial() || target->FriendListPtr()->IsIgnored(caster->GetGUID()))
         return;
 
     // Players can only fight a duel in zones with this flag

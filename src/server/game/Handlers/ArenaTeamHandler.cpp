@@ -21,7 +21,6 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "SocialMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -126,7 +125,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
     }
 
     // OK result but don't send invite
-    if (player->GetSocial()->HasIgnore(GetPlayer()->GetGUID()))
+    if (player->FriendListPtr()->IsIgnored(GetPlayer()->GetGUID()))
         return;
 
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && player->GetTeamId() != GetPlayer()->GetTeamId())

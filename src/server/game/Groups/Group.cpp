@@ -33,7 +33,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
@@ -994,7 +993,7 @@ bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
         return false;
 
     uint32 itemCount = player->GetItemCount(item.itemid);
-    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount) || (player->CanEquipUniqueItem(proto) != EQUIP_ERR_OK))
+    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount) || (player->CanEquipUniqueItem(proto) != BAG_OK))
         return false;
 
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))

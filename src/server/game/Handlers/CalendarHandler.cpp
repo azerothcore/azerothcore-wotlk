@@ -45,7 +45,6 @@ Copied events should probably have a new owner
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "SocialMgr.h"
 #include "WorldSession.h"
 #include <utf8.h>
 
@@ -569,15 +568,9 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    // xinef: sync query
-    if (QueryResult result = CharacterDatabase.Query("SELECT flags FROM character_social WHERE guid = {} AND friend = {}", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
-    {
-        Field* fields = result->Fetch();
-        if (fields[0].Get<uint8>() & SOCIAL_FLAG_IGNORED)
-        {
-            sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_IGNORING_YOU_S, name.c_str());
-            return;
-        }
+    if (ActivePlayer()->FriendListPtr()->IsIgnored(playerGuid)) {
+        sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_IGNORING_YOU_S, name.c_str());
+        return;
     }
 
     if (!isPreInvite)

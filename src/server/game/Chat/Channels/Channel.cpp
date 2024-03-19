@@ -23,7 +23,6 @@
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "SocialMgr.h"
 #include "World.h"
 
 Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
@@ -850,7 +849,7 @@ void Channel::Invite(Player const* player, std::string const& newname)
         return;
     }
 
-    if (!newp->GetSocial()->HasIgnore(guid))
+    if (!newp->FriendListPtr()->IsIgnored(guid))
     {
         WorldPacket data;
         MakeInvite(&data, guid);
@@ -910,7 +909,7 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
 void Channel::SendToAll(WorldPacket* data, ObjectGuid guid)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-        if (!guid || !i->second.plrPtr->GetSocial()->HasIgnore(guid))
+        if (!guid || !i->second.plrPtr->FriendListPtr()->IsIgnored(guid))
             i->second.plrPtr->GetSession()->SendPacket(data);
 }
 

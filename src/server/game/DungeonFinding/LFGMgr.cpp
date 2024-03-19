@@ -36,7 +36,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "WorldSession.h"
 
@@ -2624,7 +2623,7 @@ namespace lfg
     {
         Player* plr1 = ObjectAccessor::FindConnectedPlayer(guid1);
         Player* plr2 = ObjectAccessor::FindConnectedPlayer(guid2);
-        return plr1 && plr2 && (plr1->GetSocial()->HasIgnore(guid2) || plr2->GetSocial()->HasIgnore(guid1));
+        return plr1 && plr2 && (plr1->FriendListPtr()->IsIgnored(guid2) || plr2->FriendListPtr()->IsIgnored(guid1));
     }
 
     void LFGMgr::SendLfgRoleChosen(ObjectGuid guid, ObjectGuid pguid, uint8 roles)

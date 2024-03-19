@@ -47,7 +47,6 @@
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "StringConvert.h"
@@ -132,10 +131,6 @@ bool LoginQueryHolder::Initialize()
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
     stmt->SetData(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_SOCIALLIST);
-    stmt->SetData(0, lowGuid);
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_HOMEBIND);
     stmt->SetData(0, lowGuid);
@@ -936,9 +931,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             pCurrChar->m_movementInfo.transport.Reset();
             pCurrChar->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
-
-    // friend status
-    sSocialMgr->SendFriendStatus(pCurrChar, FRIEND_ONLINE, pCurrChar->GetGUID(), true);
 
     // Place character in world (and load zone) before some object loading
     pCurrChar->LoadCorpse(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));

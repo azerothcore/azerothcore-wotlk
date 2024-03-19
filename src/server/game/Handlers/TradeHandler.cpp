@@ -22,7 +22,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "World.h"
@@ -619,7 +618,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSocial()->HasIgnore(GetPlayer()->GetGUID()))
+    if (pOther->FriendListPtr()->IsIgnored(GetPlayer()->GetGUID()))
     {
         SendTradeStatus(TRADE_STATUS_IGNORE_YOU);
         return;

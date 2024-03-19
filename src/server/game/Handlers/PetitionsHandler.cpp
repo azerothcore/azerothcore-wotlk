@@ -24,7 +24,6 @@
 #include "Opcodes.h"
 #include "PetitionMgr.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

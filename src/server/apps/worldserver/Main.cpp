@@ -384,7 +384,7 @@ int main(int argc, char** argv)
         LOG_INFO("server.worldserver", "Starting up anti-freeze thread ({} seconds max stuck time)...", coreStuckTime);
     }
 
-    FriendList::Initialize();
+    FriendListInitialize();
 
     LOG_INFO("server.worldserver", "{} (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 

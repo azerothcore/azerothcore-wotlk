@@ -40,6 +40,8 @@
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
+#include "FriendList.h"
+
 #include <string>
 #include <vector>
 
@@ -1069,6 +1071,8 @@ public:
     ~Player() override;
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
+
+    FriendList* FriendListPtr();
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -2898,6 +2902,8 @@ private:
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
     CinematicMgr* _cinematicMgr;
+
+    FriendList* m_friendListPtr = nullptr;
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;

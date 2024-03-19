@@ -228,16 +228,6 @@ void OpcodeTable::Initialize()
     /*0x061*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_CREATURE_QUERY_RESPONSE,                            STATUS_NEVER);
     /*0x062*/ DEFINE_HANDLER(CMSG_WHO,                                                              STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleWhoOpcode                          );
     /*0x063*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_WHO,                                                STATUS_NEVER);
-    /*0x064*/ DEFINE_HANDLER(CMSG_WHOIS, STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::WhoIsHandler);
-    /*0x065*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_WHOIS,                                              STATUS_NEVER);
-    /*0x066*/ DEFINE_HANDLER(CMSG_CONTACT_LIST,                                                     STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleContactListOpcode                  );
-    /*0x067*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_CONTACT_LIST,                                       STATUS_NEVER);
-    /*0x068*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FRIEND_STATUS,                                      STATUS_NEVER);
-    /*0x069*/ DEFINE_HANDLER(CMSG_ADD_FRIEND,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleAddFriendOpcode                    );
-    /*0x06A*/ DEFINE_HANDLER(CMSG_DEL_FRIEND,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleDelFriendOpcode                    );
-    /*0x06B*/ DEFINE_HANDLER(CMSG_SET_CONTACT_NOTES,                                                STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleSetContactNotesOpcode              );
-    /*0x06C*/ DEFINE_HANDLER(CMSG_ADD_IGNORE,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleAddIgnoreOpcode                    );
-    /*0x06D*/ DEFINE_HANDLER(CMSG_DEL_IGNORE,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleDelIgnoreOpcode                    );
     /*0x06E*/ DEFINE_HANDLER(CMSG_GROUP_INVITE,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGroupInviteOpcode                  );
     /*0x06F*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GROUP_INVITE,                                       STATUS_NEVER);
     /*0x070*/ DEFINE_HANDLER(CMSG_GROUP_CANCEL,                                                     STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

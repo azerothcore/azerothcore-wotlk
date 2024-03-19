@@ -44,7 +44,6 @@
 #include "Player.h"
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
-#include "SocialMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WardenWin.h"
@@ -730,11 +729,7 @@ void WorldSession::PlayerLogout(bool save)
                     m_player->TeleportToEntryPoint();
             }
         }
-
-        //! Broadcast a logout message to the player's friends
-        sSocialMgr->SendFriendStatus(m_player, FRIEND_OFFLINE, m_player->GetGUID(), true);
-        sSocialMgr->RemovePlayerSocial(m_player->GetGUID());
-
+            
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(m_player);
 
@@ -1775,12 +1770,4 @@ void WorldSession::SendGmResurrectSuccess()
 void WorldSession::SendPlayerNotFoundFailure()
 {
     SendNotification("Player not found");
-}
-
-//===========================================================================
-void WorldSession::SendWhoIsResponse(const char* response)
-{
-    WorldPacket outbound(SMSG_WHOIS, strlen(response)+1);
-    outbound << response;
-    SendPacket(&outbound);
 }
