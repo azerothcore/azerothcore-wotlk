@@ -270,6 +270,7 @@ struct boss_archimonde : public BossAI
                 Position wispPosition = { me->GetPositionX() + float(rand() % WISP_OFFSET), me->GetPositionY() + float(rand() % WISP_OFFSET), me->GetPositionZ(), 0.0f };
                 if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
                 {
+                    wisp->AI()->DoCast(me, SPELL_ANCIENT_SPARK);
                     ++_wispCount;
                 }
             }, 1500ms);
