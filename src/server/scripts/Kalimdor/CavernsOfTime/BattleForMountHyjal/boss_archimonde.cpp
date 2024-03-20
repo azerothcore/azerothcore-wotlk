@@ -97,6 +97,7 @@ uint32 const availableChargeAurasAndSpells[3][2] = {
 Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
 float const DOOMFIRE_OFFSET = 15.0f;
+uint8 const WISP_OFFSET = 40;
 
 struct npc_ancient_wisp : public ScriptedAI
 {
@@ -214,6 +215,7 @@ struct npc_doomfire_targetting : public ScriptedAI
 private:
     Unit* _chaseTarget;
 };
+
 struct boss_archimonde : public BossAI
 {
     boss_archimonde(Creature* creature) : BossAI(creature, DATA_ARCHIMONDE)
@@ -228,7 +230,6 @@ struct boss_archimonde : public BossAI
     {
         BossAI::Reset();
         _wispCount = 0;
-        _soulChargeCount = 0;
         _isChanneling = false;
         _enraged = false;
         _availableAuras.clear();
@@ -246,7 +247,7 @@ struct boss_archimonde : public BossAI
         if (instance->GetBossState(DATA_AZGALOR) != DONE)
         {
             me->SetVisible(false);
-            me->SetFaction(FACTION_FRIENDLY);
+            me->SetReactState(REACT_PASSIVE);
         }
         else
         {
@@ -266,7 +267,7 @@ struct boss_archimonde : public BossAI
                 {
                     Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 }
-                Position wispPosition = { me->GetPositionX() + float(rand() % 40), me->GetPositionY() + float(rand() % 40), me->GetPositionZ(), 0.0f };
+                Position wispPosition = { me->GetPositionX() + float(rand() % WISP_OFFSET), me->GetPositionY() + float(rand() % WISP_OFFSET), me->GetPositionZ(), 0.0f };
                 if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
                 {
                     ++_wispCount;
@@ -292,7 +293,7 @@ struct boss_archimonde : public BossAI
         switch (action)
         {
             case ACTION_BECOME_ACTIVE_AND_CHANNEL:
-                me->SetFaction(FACTION_DRAGONKIN);
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetVisible(true);
                 if (!_isChanneling)
                 {
@@ -405,7 +406,6 @@ struct boss_archimonde : public BossAI
         {
             UnleashSoulCharge();
         });
-        ++_soulChargeCount;
     }
 
     void JustDied(Unit* killer) override
@@ -459,7 +459,7 @@ struct boss_archimonde : public BossAI
     void UnleashSoulCharge()
     {
         me->InterruptNonMeleeSpells(false);
-
+        //add all auras to spells
         for (uint8 n = 0; n < 3; ++n)
         {
             if (me->HasAura(availableChargeAurasAndSpells[n][0]))
@@ -468,9 +468,10 @@ struct boss_archimonde : public BossAI
                 _availableSpells.push_back(availableChargeAurasAndSpells[n][1]);
             }
         }
-
+        //only unleash when we found spells and auras
         if (!_availableAuras.empty() && !_availableSpells.empty())
         {
+            //coin flip to swap front and back item
             if (urand(0, 1))
             {
                 _availableAuras.insert(_availableAuras.begin(), _availableAuras.back());
@@ -478,16 +479,16 @@ struct boss_archimonde : public BossAI
                 _availableSpells.insert(_availableSpells.begin(), _availableSpells.back());
                 _availableSpells.pop_back();
             }
+            //remove aura and cast spell
             me->RemoveAuraFromStack(_availableAuras.front());
             DoCastVictim(_availableSpells.front());
-            --_soulChargeCount;
+            //clear to clean vectors
             _availableAuras.clear();
             _availableSpells.clear();
         }
     }
 private:
     uint8 _wispCount;
-    uint8 _soulChargeCount;
     bool _isChanneling;
     bool _enraged;
     std::vector<uint32> _availableAuras;
