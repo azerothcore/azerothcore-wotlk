@@ -237,13 +237,13 @@ public:
         {
             BossAI::EnterEvadeMode(why);
 
-            if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA)))
+            if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
                 akama->AI()->EnterEvadeMode(why);
         }
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return target->GetEntry() != NPC_AKAMA && target->GetEntry() != NPC_MAIEV_SHADOWSONG;
+            return target->GetEntry() != NPC_AKAMA_ILLIDAN && target->GetEntry() != NPC_MAIEV_SHADOWSONG;
         }
 
         void DoAction(int32 param) override
@@ -408,7 +408,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_SUMMON_MINIONS2:
-                    if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA)))
+                    if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
                         akama->AI()->DoAction(ACTION_FIGHT_MINIONS);
                     break;
                 case EVENT_PHASE_2_EYE_BEAM_START:
@@ -445,7 +445,7 @@ public:
                         maiev->AI()->Talk(SAY_MAIEV_SHADOWSONG_ILLIDAN3);
                     }
 
-                    if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA)))
+                    if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
                     {
                         akama->AI()->DoAction(ACTION_ILLIDAN_DEAD);
                         akama->SetTarget(me->GetGUID());
@@ -754,6 +754,8 @@ enum Akama
     EVENT_AKAMA_HEALTH          = 102
 };
 
+Position AkamaTeleport = { 609.772f, 308.456f, 271.826f, 6.1972566f };
+
 class npc_akama_illidan : public CreatureScript
 {
 public:
@@ -764,7 +766,7 @@ public:
         npc_akama_illidanAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            if (instance->GetBossState(DATA_AKAMA_FINISHED) == DONE)
+            if (instance->GetBossState(DATA_AKAMA_ILLIDAN) == DONE)
             {
                 me->GetMap()->LoadGrid(751.664f, 238.933f);
                 me->SetHomePosition(751.664f, 238.933f, 353.106f, 2.18f);
@@ -789,6 +791,10 @@ public:
                 summons.DespawnAll();
                 me->CombatStop(true);
             }
+            else if (param == DATA_AKAMA_ILLIDAN)
+            {
+                me->NearTeleportTo(AkamaTeleport);
+            }
         }
 
         void Reset() override
@@ -796,7 +802,6 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->setActive(false);
-            me->SetVisible(instance->GetBossState(DATA_ILLIDARI_COUNCIL) == DONE && instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE);
             events.Reset();
             summons.DespawnAll();
         }
@@ -807,7 +812,7 @@ public:
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->setActive(true);
 
-            if (instance->GetBossState(DATA_AKAMA_FINISHED) != DONE)
+            if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
             {
                 me->SetReactState(REACT_PASSIVE);
                 Start(false, true);
@@ -913,8 +918,8 @@ public:
                         udalo->CastSpell(udalo, SPELL_AKAMA_DOOR_OPEN, false);
                     break;
                 case EVENT_AKAMA_SCENE_9:
-                    instance->SetBossState(DATA_AKAMA_FINISHED, NOT_STARTED);
-                    instance->SetBossState(DATA_AKAMA_FINISHED, DONE);
+                    instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
+                    instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
                     break;
                 case EVENT_AKAMA_SCENE_10:
                     Talk(SAY_AKAMA_BEWARE);
