@@ -150,7 +150,7 @@ private:
 //TODO: move to db?
 struct npc_doomfire : public ScriptedAI
 {
-    npc_doomfire(Creature* creature) : ScriptedAI(creature) { }
+    npc_doomfire(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
     void Reset() override
     {
@@ -537,7 +537,6 @@ class spell_hand_of_death : public SpellScript
         OnEffectHitTarget += SpellEffectFn(spell_hand_of_death::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
-
 
 void AddSC_boss_archimonde()
 {
