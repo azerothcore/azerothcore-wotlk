@@ -467,9 +467,8 @@ class spell_alar_ember_blast : public SpellScript
 {
     PrepareSpellScript(spell_alar_ember_blast);
 
-    void HandleForceCast(SpellEffIndex effIndex)
+    void HandleCast()
     {
-        PreventHitEffect(effIndex);
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
         {
             if (Creature* alar = instance->GetCreature(DATA_ALAR))
@@ -481,7 +480,7 @@ class spell_alar_ember_blast : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast::HandleForceCast, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
+        AfterCast += SpellCastFn(spell_alar_ember_blast::HandleCast);
     }
 };
 
