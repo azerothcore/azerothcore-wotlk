@@ -5004,6 +5004,23 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
 
     //Additional: aoe coming from spawned npcs
 
+    //Aucheai Crypts
+    else if (unit->GetMapId() == 558)
+    {
+        Creature* creature = nullptr;
+        static const auto focus_fire_check = [](Creature const* c) {
+            return (c->GetEntry() == CREATURE_FOCUS_FIRE_N || c->GetEntry() == CREATURE_FOCUS_FIRE_H);
+        };
+        Acore::CreatureSearcher searcher2(unit, creature, focus_fire_check);
+        Cell::VisitAllObjects(unit, searcher2, 50.f);
+
+        if (creature)
+        {
+            spellInfo = sSpellMgr->GetSpellInfo(32302); //Fiery Blast
+            float radius = spellInfo->Effects[0].CalcRadius() + DEFAULT_COMBAT_REACH * 2.0f;
+            spots.push_back(AoeSpotsVec::value_type(*creature, radius));
+        }
+    }
     //The Eye of Eternity
     if (unit->GetMapId() == 616 && unit->GetVehicle())
     {
