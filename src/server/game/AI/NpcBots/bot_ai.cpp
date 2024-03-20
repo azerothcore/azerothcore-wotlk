@@ -12525,8 +12525,9 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         if (CanChangeEquip(slot))
         {
             NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
-            if (einfo->ItemEntry[slot] != newItemId && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[slot].first == newItemId || BotMgr::TransmogUseEquipmentSlots()))
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, uint32(std::max<int32>(transmogData->transmogs[slot].second, 0)));
+            if (einfo->ItemEntry[slot] != newItemId && transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[slot].first == newItemId || BotMgr::TransmogUseEquipmentSlots()) &&
+                transmogData->transmogs[slot].second >= 0)
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, uint32(transmogData->transmogs[slot].second));
             else
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, newItemId);
         }
@@ -17397,8 +17398,9 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 {
                     NpcBotTransmogData const* transmogData = BotDataMgr::SelectNpcBotTransmogs(me->GetEntry());
                     if (einfo->ItemEntry[BOT_SLOT_OFFHAND] != _equips[BOT_SLOT_OFFHAND]->GetEntry() &&
-                        transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[BOT_SLOT_OFFHAND].first == _equips[BOT_SLOT_OFFHAND]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()))
-                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + uint32(BOT_SLOT_OFFHAND), uint32(std::max<int32>(transmogData->transmogs[BOT_SLOT_OFFHAND].second, 0)));
+                        transmogData && BotMgr::IsTransmogEnabled() && (transmogData->transmogs[BOT_SLOT_OFFHAND].first == _equips[BOT_SLOT_OFFHAND]->GetEntry() || BotMgr::TransmogUseEquipmentSlots()) &&
+                        transmogData->transmogs[BOT_SLOT_OFFHAND].second >= 0)
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + uint32(BOT_SLOT_OFFHAND), uint32(transmogData->transmogs[BOT_SLOT_OFFHAND].second));
                     else
                         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + uint32(BOT_SLOT_OFFHAND), _equips[BOT_SLOT_OFFHAND]->GetEntry());
                 }
