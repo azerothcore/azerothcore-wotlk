@@ -230,6 +230,7 @@ struct boss_archimonde : public BossAI
         _wispCount = 0;
         _soulChargeCount = 0;
         _isChanneling = false;
+        _enraged = false;
 
         if (Map* map = me->GetMap())
         {
@@ -248,7 +249,36 @@ struct boss_archimonde : public BossAI
         }
 
         ScheduleHealthCheckEvent(10, [&]{
-            ScheduleTimedEvent(25s, 35s, [&]{/*fingerofdeath*/}, 1s);
+            me->SetReactState(REACT_PASSIVE);
+            DoCastProtection();
+            Talk(SAY_ENRAGE);
+            _enraged = true;
+            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->MoveIdle();
+            ScheduleTimedEvent(1s, [&]
+            {
+                if (_wispCount >= 30)
+                {
+                    Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                }
+                Position wispPosition = { float(rand() % 40), float(rand() % 40), 0, 0 };
+                if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
+                {
+                    ++_wispCount;
+                }
+            }, 1500ms);
+            ScheduleTimedEvent(1500ms, [&]
+            {
+                DoCastVictim(SPELL_RED_SKY_EFFECT);
+                DoCastVictim(SPELL_HAND_OF_DEATH);
+            }, 3s);
+            ScheduleTimedEvent(2500ms, [&]
+            {
+                if (!(me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim())))
+                {
+                    DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
+                }
+            }, 3500ms);
         });
     }
 
@@ -292,13 +322,41 @@ struct boss_archimonde : public BossAI
         BossAI::JustEngagedWith(who);
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
-        ScheduleTimedEvent(25s, 35s, [&]{/*airburst*/}, 1s);
-        ScheduleTimedEvent(25s, 35s, [&]{/*doomfire*/}, 1s);
-        ScheduleTimedEvent(25s, 35s, [&]{/*fear*/}, 1s);
-        ScheduleTimedEvent(25s, 35s, [&]{/*gripofthelegion*/}, 1s);
+        ScheduleTimedEvent(25s, 35s, [&]
+        {
+            Talk(SAY_AIR_BURST);
+            DoCastRandomTarget(SPELL_AIR_BURST);
+        }, 25s, 40s);
+        ScheduleTimedEvent(25s, 35s, [&]
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                DoCastDoomFire(target);
+            }
+        }, 20s);
+        ScheduleTimedEvent(25s, 35s, [&]
+        {
+            DoCastVictim(SPELL_FEAR);
+        }, 42s);
+        ScheduleTimedEvent(25s, 35s, [&]
+        {
+            DoCastRandomTarget(SPELL_GRIP_OF_THE_LEGION);
+        }, 5s, 25s);
         ScheduleTimedEvent(5s, [&]
         {
-            if (me->GetExactDist2d())
+            if (me->GetExactDist2d(nordrassilPosition) > 75.0f)
+            {
+                if (!_enraged)
+                {
+                    _enraged = true;
+                    Talk(SAY_ENRAGE);
+                    ScheduleTimedEvent(1s, [&]
+                    {
+                        DoCastVictim(SPELL_RED_SKY_EFFECT);
+                        DoCastVictim(SPELL_HAND_OF_DEATH);
+                    }, 3s);
+                }
+            }
         }, 5s);
 
         instance->SetData(DATA_SPAWN_WAVES, 1);
@@ -426,6 +484,7 @@ private:
     uint8 _wispCount;
     uint8 _soulChargeCount;
     bool _isChanneling;
+    bool _enraged;
 };
 class spell_red_sky_effect : public SpellScript
 {
