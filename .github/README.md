@@ -61,7 +61,7 @@ Click on the "⭐ Star" button to help us gain more visibility on Github!
 
 ## Authors & Contributors
 
-The project was born in 2016 based on Sunwellcore. Unfortunately Sunwellcore was published without any git history, so on git there are no credits for all the contributors before 2016.
+The project was born in 2016 based on SunwellCore. Unfortunately, SunwellCore was published without any git history, so on git there are no credits for all the contributors before 2016.
 
 You can check the [authors](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS) file for more details.
 
