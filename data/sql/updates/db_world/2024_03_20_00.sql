@@ -1,3 +1,4 @@
+-- DB update 2024_03_19_00 -> 2024_03_20_00
 -- Update gameobject 'Wooden Bench' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (151953, 151954, 151955, 151958, 151965, 151966, 151968, 151969, 151970, 151972))
