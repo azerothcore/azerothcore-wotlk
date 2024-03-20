@@ -178,6 +178,11 @@ enum HyjalPaths
     HORDE_BOSS_PATH             = 178527
 };
 
+enum BossActions
+{
+    ACTION_BECOME_ACTIVE_AND_CHANNEL = 0
+};
+
 template <class AI, class T>
 inline AI* GetHyjalAI(T* obj)
 {

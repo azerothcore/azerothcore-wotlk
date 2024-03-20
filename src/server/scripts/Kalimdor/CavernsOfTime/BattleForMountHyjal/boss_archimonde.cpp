@@ -88,8 +88,6 @@ enum Events
     EVENT_SPELL_FINGER_OF_DEATH_PHASE_4 = 16
 };
 
-availableChargeAuras[3] = { SPELL_SOUL_CHARGE_RED, SPELL_SOUL_CHARGE_YELLOW, SPELL_SOUL_CHARGE_GREEN };
-
 uint32 const availableChargeAurasAndSpells[3][2] = {
     {SPELL_SOUL_CHARGE_RED,     SPELL_UNLEASH_SOUL_RED      },
     {SPELL_SOUL_CHARGE_YELLOW,  SPELL_UNLEASH_SOUL_YELLOW   },
@@ -242,21 +240,38 @@ struct boss_archimonde : public BossAI
             });
         }
 
-        if (!_isChanneling)
+        
+        if (instance->GetBossState(DATA_AZGALOR != DONE))
         {
-            if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
-            {
-                nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                nordrassil->SetDisplayId(11686); //TODO: make enum
-                DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
-                _isChanneling = true;
-                nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
-            }
+            me->SetVisible(false);
+            me->SetFaction(FACTION_FRIENDLY);
         }
 
         ScheduleHealthCheckEvent(10, [&]{
             ScheduleTimedEvent(25s, 35s, [&]{/*fingerofdeath*/}, 1s);
         });
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_BECOME_ACTIVE_AND_CHANNEL:
+                me->SetFaction(FACTION_DRAGONKIN);
+                me->SetVisible(true);
+                if (!_isChanneling)
+                {
+                    if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
+                    {
+                        nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        nordrassil->SetDisplayId(11686); //TODO: make enum
+                        DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
+                        _isChanneling = true;
+                        nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
+                    }
+                }
+                break;
+        }
     }
 
     void DoCastProtection()
@@ -281,6 +296,10 @@ struct boss_archimonde : public BossAI
         ScheduleTimedEvent(25s, 35s, [&]{/*doomfire*/}, 1s);
         ScheduleTimedEvent(25s, 35s, [&]{/*fear*/}, 1s);
         ScheduleTimedEvent(25s, 35s, [&]{/*gripofthelegion*/}, 1s);
+        ScheduleTimedEvent(5s, [&]
+        {
+            if (me->GetExactDist2d())
+        }, 5s);
 
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
@@ -389,16 +408,19 @@ struct boss_archimonde : public BossAI
             }
         }
 
-        if (urand(0, 1))
+        if (availableAuras)
         {
-            availableAuras.insert(availableAuras.begin(), availableAuras.back());
-            availableAuras.pop_back();
-            availableSpells.insert(availableSpells.begin(), availableSpells.back());
-            availableSpells.pop_back();
+            if (urand(0, 1))
+            {
+                availableAuras.insert(availableAuras.begin(), availableAuras.back());
+                availableAuras.pop_back();
+                availableSpells.insert(availableSpells.begin(), availableSpells.back());
+                availableSpells.pop_back();
+            }
+            me->RemoveAuraFromStack(availableAuras.front());
+            DoCastVictim(availableSpells.front());
+            --_soulChargeCount;
         }
-        me->RemoveAuraFromStack(availableAuras.front());
-        DoCastVictim(availableSpells.front());
-        --_soulChargeCount;
     }
 private:
     uint8 _wispCount;
