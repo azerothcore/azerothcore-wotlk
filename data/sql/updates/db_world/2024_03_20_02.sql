@@ -1,3 +1,4 @@
+-- DB update 2024_03_20_01 -> 2024_03_20_02
 -- Lord Alexei Barov (10504) creature formation with adds + respawn
 DELETE FROM `creature_formations` WHERE (`leaderGUID` = 48863);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
