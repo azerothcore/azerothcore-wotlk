@@ -231,6 +231,8 @@ struct boss_archimonde : public BossAI
         _soulChargeCount = 0;
         _isChanneling = false;
         _enraged = false;
+        _availableAuras.clear();
+        _availableSpells.clear();
 
         if (Map* map = me->GetMap())
         {
@@ -246,6 +248,10 @@ struct boss_archimonde : public BossAI
             me->SetVisible(false);
             me->SetFaction(FACTION_FRIENDLY);
         }
+        else
+        {
+            DoAction(ACTION_BECOME_ACTIVE_AND_CHANNEL);
+        }
 
         ScheduleHealthCheckEvent(10, [&]{
             me->SetReactState(REACT_PASSIVE);
@@ -260,7 +266,7 @@ struct boss_archimonde : public BossAI
                 {
                     Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 }
-                Position wispPosition = { float(rand() % 40), float(rand() % 40), 0, 0 };
+                Position wispPosition = { me->GetPositionX() + float(rand() % 40), me->GetPositionY() + float(rand() % 40), me->GetPositionZ(), 0.0f };
                 if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
                 {
                     ++_wispCount;
@@ -343,7 +349,7 @@ struct boss_archimonde : public BossAI
         }, 5s, 25s);
         ScheduleTimedEvent(5s, [&]
         {
-            if (me->GetExactDist2d(nordrassilPosition) > 75.0f)
+            if (me->GetExactDist2d(nordrassilPosition) < 75.0f)
             {
                 if (!_enraged)
                 {
@@ -395,10 +401,10 @@ struct boss_archimonde : public BossAI
             default:
                 break;
         }
-        ScheduleTimedEvent(2s, 10s, [&]
+        scheduler.Schedule(2s, 10s, [this](TaskContext)
         {
-            //EVENT_SPELL_UNLEASH_SOUL_CHARGES
-        }, 1s);
+            UnleashSoulCharge();
+        });
         ++_soulChargeCount;
     }
 
@@ -453,30 +459,30 @@ struct boss_archimonde : public BossAI
     void UnleashSoulCharge()
     {
         me->InterruptNonMeleeSpells(false);
-        std::vector<uint32> availableAuras;
-        std::vector<uint32> availableSpells;
 
         for (uint8 n = 0; n < 3; ++n)
         {
             if (me->HasAura(availableChargeAurasAndSpells[n][0]))
             {
-                availableAuras.push_back(availableChargeAurasAndSpells[n][0]);
-                availableSpells.push_back(availableChargeAurasAndSpells[n][1]);
+                _availableAuras.push_back(availableChargeAurasAndSpells[n][0]);
+                _availableSpells.push_back(availableChargeAurasAndSpells[n][1]);
             }
         }
 
-        if (!availableAuras.empty())
+        if (!_availableAuras.empty() && !_availableSpells.empty())
         {
             if (urand(0, 1))
             {
-                availableAuras.insert(availableAuras.begin(), availableAuras.back());
-                availableAuras.pop_back();
-                availableSpells.insert(availableSpells.begin(), availableSpells.back());
-                availableSpells.pop_back();
+                _availableAuras.insert(_availableAuras.begin(), _availableAuras.back());
+                _availableAuras.pop_back();
+                _availableSpells.insert(_availableSpells.begin(), _availableSpells.back());
+                _availableSpells.pop_back();
             }
-            me->RemoveAuraFromStack(availableAuras.front());
-            DoCastVictim(availableSpells.front());
+            me->RemoveAuraFromStack(_availableAuras.front());
+            DoCastVictim(_availableSpells.front());
             --_soulChargeCount;
+            _availableAuras.clear();
+            _availableSpells.clear();
         }
     }
 private:
@@ -484,6 +490,8 @@ private:
     uint8 _soulChargeCount;
     bool _isChanneling;
     bool _enraged;
+    std::vector<uint32> _availableAuras;
+    std::vector<uint32> _availableSpells;
 };
 class spell_red_sky_effect : public SpellScript
 {
