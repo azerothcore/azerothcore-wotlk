@@ -466,7 +466,7 @@ struct boss_archimonde : public BossAI
             }
         }
 
-        if (availableAuras)
+        if (!availableAuras.empty())
         {
             if (urand(0, 1))
             {
