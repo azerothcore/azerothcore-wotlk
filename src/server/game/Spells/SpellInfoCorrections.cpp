@@ -4799,10 +4799,15 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Mount Speed
-    // Mithril Spurs
-    ApplySpellFix({ 48777, 7215 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 48777 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK;
+    });
+
+    // Mithril Spurs
+    ApplySpellFix({ 7215 }, [](SpellInfo* spellInfo)
+    {
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK;
     });
 
