@@ -88,7 +88,17 @@ enum Events
     EVENT_SPELL_FINGER_OF_DEATH_PHASE_4 = 16
 };
 
-Position const NordrassilLoc = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
+availableChargeAuras[3] = { SPELL_SOUL_CHARGE_RED, SPELL_SOUL_CHARGE_YELLOW, SPELL_SOUL_CHARGE_GREEN };
+
+uint32 const availableChargeAurasAndSpells[3][2] = {
+    {SPELL_SOUL_CHARGE_RED,     SPELL_UNLEASH_SOUL_RED      },
+    {SPELL_SOUL_CHARGE_YELLOW,  SPELL_UNLEASH_SOUL_YELLOW   },
+    {SPELL_SOUL_CHARGE_GREEN,   SPELL_UNLEASH_SOUL_GREEN    }
+};
+
+Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
+
+float const DOOMFIRE_OFFSET = 15.0f;
 
 struct npc_ancient_wisp : public ScriptedAI
 {
@@ -144,7 +154,10 @@ struct npc_doomfire : public ScriptedAI
 {
     npc_doomfire(Creature* creature) : ScriptedAI(creature) { }
 
-    void Reset() override { }
+    void Reset() override
+    {
+        _summons.DespawnAll();
+    }
 
     void MoveInLineOfSight(Unit* /*who*/) override { }
 
@@ -154,6 +167,17 @@ struct npc_doomfire : public ScriptedAI
     {
         damage = 0;
     }
+
+    void JustSummoned(Creature* summoned) override
+    {
+        _summons.Summon(summoned);
+        if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
+        {
+            me->GetMotionMaster()->MoveFollow(summoned, 0.0f, 0.0f);
+        }
+    }
+private:
+    SummonList _summons;
 };
 
 struct npc_doomfire_targetting : public ScriptedAI
@@ -206,6 +230,7 @@ struct boss_archimonde : public BossAI
     {
         BossAI::Reset();
         _wispCount = 0;
+        _soulChargeCount = 0;
         _isChanneling = false;
 
         if (Map* map = me->GetMap())
@@ -219,7 +244,7 @@ struct boss_archimonde : public BossAI
 
         if (!_isChanneling)
         {
-            if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 1200000))
+            if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
             {
                 nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 nordrassil->SetDisplayId(11686); //TODO: make enum
@@ -228,9 +253,156 @@ struct boss_archimonde : public BossAI
                 nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
             }
         }
+
+        ScheduleHealthCheckEvent(10, [&]{
+            ScheduleTimedEvent(25s, 35s, [&]{/*fingerofdeath*/}, 1s);
+        });
+    }
+
+    void DoCastProtection()
+    {
+        if (Map* map = me->GetMap())
+        {
+            map->DoForAllPlayers([&](Player* player)
+            {
+                player->AddAura(SPELL_PROTECTION_OF_ELUNE, player);
+                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+            });
+        }
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        me->InterruptNonMeleeSpells(false);
+        Talk(SAY_AGGRO);
+        ScheduleTimedEvent(25s, 35s, [&]{/*airburst*/}, 1s);
+        ScheduleTimedEvent(25s, 35s, [&]{/*doomfire*/}, 1s);
+        ScheduleTimedEvent(25s, 35s, [&]{/*fear*/}, 1s);
+        ScheduleTimedEvent(25s, 35s, [&]{/*gripofthelegion*/}, 1s);
+
+        instance->SetData(DATA_SPAWN_WAVES, 1);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        Talk(SAY_SLAY);
+
+        if (victim->IsPlayer())
+        {
+            GainSoulCharge(victim->ToPlayer());
+        }
+    }
+
+    void GainSoulCharge(Player* player)
+    {
+        switch (player->getClass())
+        {
+            case CLASS_PRIEST:
+            case CLASS_PALADIN:
+            case CLASS_WARLOCK:
+                player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
+                break;
+            case CLASS_MAGE:
+            case CLASS_ROGUE:
+            case CLASS_WARRIOR:
+                player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
+                break;
+            case CLASS_DRUID:
+            case CLASS_SHAMAN:
+            case CLASS_HUNTER:
+                player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
+                break;
+            case CLASS_DEATH_KNIGHT:
+            case CLASS_NONE:
+            default:
+                break;
+        }
+        ScheduleTimedEvent(2s, 10s, [&]
+        {
+            //EVENT_SPELL_UNLEASH_SOUL_CHARGES
+        }, 1s);
+        ++_soulChargeCount;
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        instance->SetData(DATA_RESET_NIGHT_ELF, 1);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void JustSummoned(Creature* summoned) override
+    {
+        BossAI::JustSummoned(summoned);
+        if (summoned->GetEntry() == CREATURE_ANCIENT_WISP)
+        {
+            summoned->AI()->AttackStart(me);
+        }
+        else
+        {
+            summoned->SetFaction(me->GetFaction()); //remove?
+            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
+
+        if (summoned->GetEntry() == CREATURE_DOOMFIRE)
+        {
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
+        }
+    }
+
+    void DoCastDoomFire(Unit* target)
+    {
+        // hack because spell doesn't work?
+        Talk(SAY_DOOMFIRE);
+        Position spiritPosition = { target->GetPositionX() + DOOMFIRE_OFFSET,  target->GetPositionY() + DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
+        Position doomfirePosition = { target->GetPositionX() - DOOMFIRE_OFFSET,  target->GetPositionY() - DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
+        if (Unit* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+        {
+            if (Unit* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+            {
+                doomfireSpirit->SetVisible(false);
+                doomfire->SetVisible(false);
+            }
+        }
+    }
+
+    void UnleashSoulCharge()
+    {
+        me->InterruptNonMeleeSpells(false);
+        std::vector<uint32> availableAuras;
+        std::vector<uint32> availableSpells;
+
+        for (uint8 n = 0; n < 3; ++n)
+        {
+            if (me->HasAura(availableChargeAurasAndSpells[n][0]))
+            {
+                availableAuras.push_back(availableChargeAurasAndSpells[n][0]);
+                availableSpells.push_back(availableChargeAurasAndSpells[n][1]);
+            }
+        }
+
+        if (urand(0, 1))
+        {
+            availableAuras.insert(availableAuras.begin(), availableAuras.back());
+            availableAuras.pop_back();
+            availableSpells.insert(availableSpells.begin(), availableSpells.back());
+            availableSpells.pop_back();
+        }
+        me->RemoveAuraFromStack(availableAuras.front());
+        DoCastVictim(availableSpells.front());
+        --_soulChargeCount;
     }
 private:
     uint8 _wispCount;
+    uint8 _soulChargeCount;
     bool _isChanneling;
 };
 class spell_red_sky_effect : public SpellScript
