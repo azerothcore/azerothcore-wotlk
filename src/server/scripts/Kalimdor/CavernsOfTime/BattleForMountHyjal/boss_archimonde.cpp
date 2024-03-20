@@ -241,8 +241,7 @@ struct boss_archimonde : public BossAI
             });
         }
 
-        
-        if (instance->GetBossState(DATA_AZGALOR != DONE))
+        if (instance->GetBossState(DATA_AZGALOR) != DONE)
         {
             me->SetVisible(false);
             me->SetFaction(FACTION_FRIENDLY);
