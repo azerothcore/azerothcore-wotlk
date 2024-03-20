@@ -21,21 +21,21 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
-#include "hyjal_trash.h"
 
 enum Spells
 {
-    SPELL_CLEAVE        = 31436,
-    SPELL_WARSTOMP      = 31480,
-    SPELL_MARK          = 31447,
-    SPELL_MARK_DAMAGE   = 31463
+    SPELL_MALEVOLENT_CLEAVE = 31436,
+    SPELL_WAR_STOMP         = 31480,
+    SPELL_CRIPPLE           = 31477,
+    SPELL_MARK              = 31447,
+    SPELL_MARK_DAMAGE       = 31463
 };
 
 enum Texts
 {
     SAY_ONSLAY          = 0,
     SAY_MARK            = 1,
-    SAY_ONAGGRO         = 2,
+    SAY_ONSPAWN         = 2,
 };
 
 enum Sounds
@@ -43,124 +43,88 @@ enum Sounds
     SOUND_ONDEATH       = 11018,
 };
 
-enum Misc
-{
-    PATH_KAZROGAL       = 178880,
-    POINT_COMBAT_START  = 7
-};
-
-class boss_kazrogal : public CreatureScript
+struct boss_kazrogal : public BossAI
 {
 public:
-    boss_kazrogal() : CreatureScript("boss_kazrogal") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL)
     {
-        return GetHyjalAI<boss_kazrogalAI>(creature);
+        _recentlySpoken = false;
+        _markCounter = 0;
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
-    struct boss_kazrogalAI : public hyjal_trashAI
+    void JustEngagedWith(Unit * who) override
     {
-        boss_kazrogalAI(Creature* creature) : hyjal_trashAI(creature)
+        BossAI::JustEngagedWith(who);
+
+        scheduler.Schedule(6s, 21s, [this](TaskContext context)
         {
-            instance = creature->GetInstanceScript();
-            go = false;
-        }
-
-        uint32 CleaveTimer;
-        uint32 WarStompTimer;
-        uint32 MarkTimer;
-        uint32 MarkTimerBase;
-        bool go;
-
-        void Reset() override
+            DoCastVictim(SPELL_MALEVOLENT_CLEAVE);
+            context.Repeat();
+        }).Schedule(12s, 18s, [this](TaskContext context)
         {
-            damageTaken = 0;
-            CleaveTimer = 5000;
-            WarStompTimer = 15000;
-            MarkTimer = 45000;
-            MarkTimerBase = 45000;
-
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
+            if (SelectTarget(SelectTargetMethod::Random, 0, 12.f))
+            {
+                DoCastAOE(SPELL_WAR_STOMP);
+                context.Repeat(15s, 30s);
+            }
+            else
+                context.Repeat(1200ms);
+        }).Schedule(15s, [this](TaskContext context)
         {
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, IN_PROGRESS);
-            Talk(SAY_ONAGGRO);
-        }
+            DoCastRandomTarget(SPELL_CRIPPLE, 0, 20.f);
+            context.Repeat(12s, 20s);
+        }).Schedule(45s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_MARK);
+            Talk(SAY_MARK);
+            context.Repeat(GetMarkRepeatTimer());
+        });
+    }
 
-        void KilledUnit(Unit* /*victim*/) override
+    Milliseconds GetMarkRepeatTimer()
+    {
+        Milliseconds timer = 45000ms - (5000ms * _markCounter);
+        if (timer <= 10000ms)
+            return 10000ms;
+        else
+            return timer;
+    }
+
+    void DoAction(int32 action) override
+    {
+        Talk(SAY_ONSPAWN, 1200ms);
+
+        if (action == DATA_KAZROGAL)
+            me->GetMotionMaster()->MovePath(HORDE_BOSS_PATH, false);
+    }
+
+    void KilledUnit(Unit * victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
         {
             Talk(SAY_ONSLAY);
-        }
+            _recentlySpoken = true;
 
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (waypointId == POINT_COMBAT_START && instance)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THRALL));
-                if (target && target->IsAlive())
-                    me->AddThreat(target, 0.0f);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            hyjal_trashAI::JustDied(killer);
-            if (IsEvent)
-                instance->SetData(DATA_KAZROGALEVENT, DONE);
-            DoPlaySoundToSet(me, SOUND_ONDEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (IsEvent)
-            {
-                //Must update npc_escortAI
-                npc_escortAI::UpdateAI(diff);
-                if (!go)
+            scheduler.Schedule(6s, [this](TaskContext)
                 {
-                    go = true;
-                    me->GetMotionMaster()->MovePath(PATH_KAZROGAL, false);
-                }
-            }
-
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            if (CleaveTimer <= diff)
-            {
-                DoCast(me, SPELL_CLEAVE);
-                CleaveTimer = 6000 + rand() % 15000;
-            }
-            else CleaveTimer -= diff;
-
-            if (WarStompTimer <= diff)
-            {
-                DoCast(me, SPELL_WARSTOMP);
-                WarStompTimer = 60000;
-            }
-            else WarStompTimer -= diff;
-
-            if (MarkTimer <= diff)
-            {
-                DoCastAOE(SPELL_MARK);
-
-                MarkTimerBase -= 5000;
-                if (MarkTimerBase < 5500)
-                    MarkTimerBase = 5500;
-                MarkTimer = MarkTimerBase;
-                Talk(SAY_MARK);
-            }
-            else MarkTimer -= diff;
-
-            DoMeleeAttackIfReady();
+                    _recentlySpoken = false;
+                });
         }
-    };
+    }
+
+    void JustDied(Unit * killer) override
+    {
+        me->PlayDirectSound(SOUND_ONDEATH);
+        BossAI::JustDied(killer);
+    }
+
+private:
+    bool _recentlySpoken;
+    uint8 _markCounter;
 };
 
 class spell_mark_of_kazrogal : public SpellScriptLoader
@@ -223,7 +187,7 @@ public:
 
 void AddSC_boss_kazrogal()
 {
-    new boss_kazrogal();
+    RegisterHyjalAI(boss_kazrogal);
     new spell_mark_of_kazrogal();
 }
 
