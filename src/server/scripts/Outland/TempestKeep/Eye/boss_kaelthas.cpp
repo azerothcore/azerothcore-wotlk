@@ -821,6 +821,7 @@ struct npc_lord_sanguinar : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -909,6 +910,7 @@ struct npc_capernian : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -972,6 +974,7 @@ struct npc_telonicus : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -1058,6 +1061,7 @@ struct npc_thaladred : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
