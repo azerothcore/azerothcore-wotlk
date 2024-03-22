@@ -152,7 +152,7 @@ public:
         {
         }
 
-        Creature* councilGUIDs[4];
+        Creature* councilGUIDs[4] = { nullptr };
 
         void Reset() override
         {
