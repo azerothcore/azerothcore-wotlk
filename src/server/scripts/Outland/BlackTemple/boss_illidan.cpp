@@ -952,40 +952,40 @@ public:
                     SetEscortPaused(false);
                     break;
                 case EVENT_AKAMA_SCENE_20:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
                 case EVENT_AKAMA_SCENE_21:
                     me->SetFacingTo(M_PI);
                     break;
                 case EVENT_AKAMA_SCENE_22:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->Talk(SAY_ILLIDAN_AKAMA1);
                     break;
                 case EVENT_AKAMA_SCENE_23:
                     Talk(SAY_AKAMA_ILLIDAN1);
                     break;
                 case EVENT_AKAMA_SCENE_24:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->Talk(SAY_ILLIDAN_AKAMA2);
                     break;
                 case EVENT_AKAMA_SCENE_25:
                     Talk(SAY_AKAMA_ILLIDAN2);
                     break;
                 case EVENT_AKAMA_SCENE_26:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->Talk(SAY_ILLIDAN_AKAMA3);
                     break;
                 case EVENT_AKAMA_SCENE_27:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->LoadEquipment(1, true);
                     break;
                 case EVENT_AKAMA_SCENE_28:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
                     break;
                 case EVENT_AKAMA_SCENE_29:
-                    if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                     {
                         illidan->SetImmuneToAll(false);
                         illidan->SetInCombatWithZone();
