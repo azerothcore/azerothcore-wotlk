@@ -109,8 +109,7 @@ struct boss_shade_of_akama : public BossAI
     {
         BossAI::JustDied(killer);
         me->CastSpell(me, SPELL_SHADE_OF_AKAMA_TRIGGER, true);
-        // if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
-        if (Creature* akama = GetClosestCreatureWithEntry(me, NPC_AKAMA_SHADE, 100.0f))
+        if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
             akama->AI()->DoAction(ACTION_AKAMA_START_OUTRO);
     }
 
@@ -144,8 +143,8 @@ struct boss_shade_of_akama : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_AKAMA_SOUL_CHANNEL);
             scheduler.CancelAll();
-            // if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
-            if (Creature* akama = GetClosestCreatureWithEntry(me, NPC_AKAMA_SHADE, 100.0f))
+
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
             {
                 akama->SetReactState(REACT_AGGRESSIVE);
                 akama->InterruptSpell(CURRENT_CHANNELED_SPELL);
@@ -257,8 +256,7 @@ struct npc_akama_shade : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        // if (Creature* akama = instance->GetCreature(DATA_SHADE_OF_AKAMA))
-        if (Creature* shade = GetClosestCreatureWithEntry(me, NPC_SHADE_OF_AKAMA, 20.0f))
+        if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
         {
             shade->SetHomePosition(shade->GetHomePosition());
             shade->AI()->EnterEvadeMode();

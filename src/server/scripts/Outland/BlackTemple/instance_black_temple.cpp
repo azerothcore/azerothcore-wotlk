@@ -62,6 +62,11 @@ ObjectData const creatureData[] =
     { 0,                             0                              }
 };
 
+ObjectData const objectData[] =
+{
+    { 0, 0 }
+};
+
 BossBoundaryData const boundaries =
 {
     { DATA_HIGH_WARLORD_NAJENTUS, new RectangleBoundary(394.0f, 479.4f, 707.8f, 859.1f)      },
@@ -90,6 +95,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
+            LoadObjectData(creatureData, objectData);
 
             ashtongueGUIDs.clear();
         }
