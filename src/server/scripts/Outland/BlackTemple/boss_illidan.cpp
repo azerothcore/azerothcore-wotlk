@@ -801,7 +801,6 @@ public:
                 me->NearTeleportTo(AkamaTeleport);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_1, false);
-                
             }
         }
 
