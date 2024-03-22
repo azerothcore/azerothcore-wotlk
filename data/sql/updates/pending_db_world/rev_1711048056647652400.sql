@@ -38,3 +38,6 @@ DELETE FROM `waypoint_data` WHERE `id` = 230891;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `move_type`) VALUES
 (230891, 1, 642.5905, 305.6287, 271.6885, 1),
 (230891, 2, 660.76465, 305.76627, 271.70413, 1);
+
+UPDATE `creature` SET `phaseMask` = 3, WHERE guid = 148734;
+UPDATE `creature` SET `phaseMask` = 5, WHERE guid = 148733;
