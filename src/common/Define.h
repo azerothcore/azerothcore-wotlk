@@ -21,6 +21,8 @@
 #include "CompilerDefs.h"
 #include <cinttypes>
 #include <climits>
+#include <cstddef>
+#include <stdlib.h>
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1
@@ -109,6 +111,10 @@
 #define SI64LIT(N) INT64_C(N)
 
 #define STRING_VIEW_FMT_ARG(str) static_cast<int>((str).length()), (str).data()
+
+#define ALLOC(bytes) malloc(bytes);
+#define ALLOCZERO(bytes) calloc(1, bytes)
+#define FREE(ptr) free(ptr)
 
 typedef std::int64_t int64;
 typedef std::int32_t int32;
