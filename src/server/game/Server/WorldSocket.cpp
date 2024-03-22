@@ -35,7 +35,7 @@
 
 using boost::asio::ip::tcp;
 
-void сompressBuff(void* dst, uint32* dst_size, void* src, int src_size)
+void compressBuff(void* dst, uint32* dst_size, void* src, int src_size)
 {
     z_stream c_stream;
 
@@ -103,7 +103,7 @@ void EncryptableAndCompressiblePacket::CompressIfNeeded()
     buf.resize(destsize + sizeof(uint32));
 
     buf.put<uint32>(0, pSize);
-    сompressBuff(const_cast<uint8*>(buf.contents()) + sizeof(uint32), &destsize, (void*)contents(), pSize);
+    compressBuff(const_cast<uint8*>(buf.contents()) + sizeof(uint32), &destsize, (void*)contents(), pSize);
     if (destsize == 0)
         return;
 
