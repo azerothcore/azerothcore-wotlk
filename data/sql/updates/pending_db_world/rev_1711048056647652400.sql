@@ -1,5 +1,7 @@
 --
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ashtongue_channeler', `faction` = 1692 WHERE (`entry` = 23421);
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ashtongue_sorcerer' WHERE (`entry` = 23215);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23215) AND (`source_type` = 0);
 UPDATE `creature_template_addon` SET `auras` = '39833' WHERE (`entry` = 22841);
 UPDATE `creature_template` SET `faction` = 1847 WHERE (`entry` = 23210);
 UPDATE `creature_template` SET `faction` = 1813 WHERE (`entry` = 23319);

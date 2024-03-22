@@ -335,20 +335,10 @@ struct npc_creature_generator_akama : public ScriptedAI
         switch (summon->GetEntry())
         {
         case NPC_ASHTONGUE_SORCERER:
-            summon->SetReactState(REACT_PASSIVE);
             if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
             {
                 float x, y, z;
                 shade->GetNearPoint(shade, x, y, z, 20.f, 0, shade->GetAngle(summon));
-                summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
-            }
-            break;
-        case NPC_ASHTONGUE_DEFENDER:
-            summon->SetReactState(REACT_PASSIVE);
-            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
-            {
-                float x, y, z;
-                akama->GetNearPoint(akama, x, y, z, 5.0f, 0, akama->GetAngle(summon));
                 summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
             }
             break;
@@ -418,6 +408,23 @@ struct npc_creature_generator_akama : public ScriptedAI
 
 private:
     SummonList summons;
+    InstanceScript* instance;
+};
+
+struct npc_ashtongue_sorcerer : public NullCreatureAI
+{
+    npc_ashtongue_sorcerer(Creature* creature) : NullCreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type == POINT_MOTION_TYPE && point == POINT_ENGAGE)
+            me->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
+    }
+
+private:
     InstanceScript* instance;
 };
 
@@ -495,6 +502,7 @@ void AddSC_boss_shade_of_akama()
     RegisterBlackTempleCreatureAI(npc_akama_shade);
     RegisterBlackTempleCreatureAI(npc_creature_generator_akama);
     RegisterBlackTempleCreatureAI(npc_ashtongue_channeler);
+    RegisterBlackTempleCreatureAI(npc_ashtongue_sorcerer);
     RegisterSpellScript(spell_shade_of_akama_shade_soul_channel);
     RegisterSpellScript(spell_shade_of_akama_akama_soul_expel);
 }
