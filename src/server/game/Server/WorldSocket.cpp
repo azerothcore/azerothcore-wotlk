@@ -170,7 +170,6 @@ bool WorldSocket::Update()
         if (queued->NeedsEncryption())
             _authCrypt.EncryptSend(header.header, header.getHeaderLength());
 
-
         if (buffer.GetRemainingSpace() < queued->size() + header.getHeaderLength())
         {
             QueuePacket(std::move(buffer));
