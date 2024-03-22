@@ -108,6 +108,9 @@ struct boss_shade_of_akama : public BossAI
         for (Creature* generator : generators)
             generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
 
+        for (Creature* channeler : channelers)
+            channeler->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
         BossAI::EnterEvadeMode(why);
     }
 
@@ -396,7 +399,8 @@ struct npc_creature_generator_akama : public ScriptedAI
             }
             break;
         case ACTION_GENERATOR_DESPAWN_ALL:
-            Reset();
+            summons.DespawnAll();
+            scheduler.CancelAll();
             break;
         }
     }
