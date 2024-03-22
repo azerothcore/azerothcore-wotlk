@@ -286,6 +286,8 @@ struct npc_akama_shade : public ScriptedAI
             shade->SetHomePosition(shade->GetHomePosition());
             shade->AI()->EnterEvadeMode();
         }
+
+        me->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
