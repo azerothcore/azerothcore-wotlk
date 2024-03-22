@@ -245,6 +245,7 @@ struct npc_akama_shade : public ScriptedAI
 
     void JustSummoned(Creature* summon) override
     {
+        // In Retail they seem to me like they should move in formations of 3 to set points, this is simpler for now
         ScriptedAI::JustSummoned(summon);
         float x, y, z;
         me->GetNearPoint(summon, x, y, z, 25.f, 0, me->GetAngle(summon));
@@ -276,7 +277,7 @@ struct npc_akama_shade : public ScriptedAI
             }, 4s, 15s);
     }
 
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
         CloseGossipMenuFor(player);
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);

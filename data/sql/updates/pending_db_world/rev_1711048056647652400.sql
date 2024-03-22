@@ -23,3 +23,6 @@ INSERT INTO `creature_formations` (`memberGUID`, `leaderGUID`, `groupAI`) VALUES
 (148240, 148236, 24),
 (148241, 148236, 24),
 (148242, 148236, 24);
+
+-- Delete leftover gobs
+DELETE FROM `gameobject` WHERE `guid` IN (20523,20558,20559,20561,20563,20567) AND `map` = 564;
