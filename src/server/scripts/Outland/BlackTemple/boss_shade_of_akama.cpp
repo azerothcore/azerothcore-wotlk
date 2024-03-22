@@ -74,6 +74,9 @@ enum Misc
 
     ACTION_GENERATOR_START          = 1,
     ACTION_GENERATOR_STOP           = 2,
+    ACTION_GENERATOR_DESPAWN_ALL    = 3,
+
+    COUNTER_SPAWNS_MAX              = 20,   // Max number of spawns for each generator, number chosen at random
 
     ACTION_AKAMA_START_OUTRO        = 1,
 
@@ -102,6 +105,9 @@ struct boss_shade_of_akama : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        for (Creature* generator : generators)
+            generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
+
         BossAI::EnterEvadeMode(why);
     }
 
@@ -109,6 +115,10 @@ struct boss_shade_of_akama : public BossAI
     {
         BossAI::JustDied(killer);
         me->CastSpell(me, SPELL_SHADE_OF_AKAMA_TRIGGER, true);
+
+        for (Creature* generator : generators)
+            generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
+
         if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
             akama->AI()->DoAction(ACTION_AKAMA_START_OUTRO);
     }
@@ -124,6 +134,9 @@ struct boss_shade_of_akama : public BossAI
 
             for (Creature* channeler : channelers)
                 channeler->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            for (Creature* generator : generators)
+                generator->AI()->DoAction(ACTION_GENERATOR_START);
 
             ScheduleTimedEvent(1200ms, [&]
             {
@@ -144,6 +157,9 @@ struct boss_shade_of_akama : public BossAI
             me->RemoveAurasDueToSpell(SPELL_AKAMA_SOUL_CHANNEL);
             scheduler.CancelAll();
 
+            for (Creature* generator : generators)
+                generator->AI()->DoAction(ACTION_GENERATOR_STOP);
+
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
             {
                 akama->SetReactState(REACT_AGGRESSIVE);
@@ -153,6 +169,12 @@ struct boss_shade_of_akama : public BossAI
                 akama->AI()->DoCast(me, SPELL_FIXATE, true);
                 AttackStart(akama);
             }
+
+            ScheduleTimedEvent(3500ms, [&]
+            {
+                if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+                    me->AddThreat(akama, 900000.0f);
+            }, 3500ms);
         }
     }
 
@@ -297,21 +319,50 @@ struct npc_creature_generator_akama : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
-    // If Y > 400 : right
-    // If Y < 400 : left
+    uint8 spawnCounter = 0;
 
     void Reset() override
     {
         summons.DespawnAll();
+        scheduler.CancelAll();
     }
 
     void JustSummoned(Creature* summon) override
     {
+        spawnCounter++;
         ScriptedAI::JustSummoned(summon);
+
+        switch (summon->GetEntry())
+        {
+        case NPC_ASHTONGUE_SORCERER:
+            summon->SetReactState(REACT_PASSIVE);
+            if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
+            {
+                float x, y, z;
+                shade->GetNearPoint(shade, x, y, z, 20.f, 0, shade->GetAngle(summon));
+                summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
+            }
+            break;
+        case NPC_ASHTONGUE_DEFENDER:
+            summon->SetReactState(REACT_PASSIVE);
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+            {
+                float x, y, z;
+                akama->GetNearPoint(akama, x, y, z, 5.0f, 0, akama->GetAngle(summon));
+                summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
+            }
+            break;
+        default:
+            summon->SetInCombatWithZone();
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+                summon->AI()->AttackStart(akama);
+            break;
+        }
     }
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
+        spawnCounter--;
         summon->DespawnOrUnsummon(10000);
         summons.Despawn(summon);
     }
@@ -322,9 +373,40 @@ struct npc_creature_generator_akama : public ScriptedAI
         {
         case ACTION_GENERATOR_STOP:
             scheduler.CancelAll();
-            Reset();
             break;
         case ACTION_GENERATOR_START:
+            if (me->GetPositionY() > 400.0f)    // Right Side
+            {
+                ScheduleTimedEvent(10s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_ASHTONGUE_WAVE_B);
+                }, 50s, 60s);
+
+                ScheduleTimedEvent(2s, 5s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_SUMMON_ASHTONGUE_DEFENDER);
+                }, 30s, 40s);
+            }
+
+            if (me->GetPositionY() < 400.0f)    // Left Side
+            {
+                ScheduleTimedEvent(3s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_ASHTONGUE_WAVE_B);
+                }, 50s, 60s);
+
+                ScheduleTimedEvent(2s, 5s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_SUMMON_ASHTONGUE_SORCERER);
+                }, 30s, 35s);
+            }
+            break;
+        case ACTION_GENERATOR_DESPAWN_ALL:
+            Reset();
             break;
         }
     }
