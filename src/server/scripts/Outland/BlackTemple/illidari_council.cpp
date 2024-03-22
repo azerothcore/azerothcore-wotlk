@@ -159,7 +159,8 @@ public:
             BossAI::Reset();
             for (uint8 i = 0; i < 4; ++i)
                 if (Creature* member = councilGUIDs[i])
-                    member->AI()->EnterEvadeMode();
+                    if (member->AI())
+                        member->AI()->EnterEvadeMode();
         }
 
         void AttackStart(Unit*) override { }
