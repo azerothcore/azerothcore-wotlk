@@ -139,7 +139,7 @@ struct boss_shade_of_akama : public BossAI
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type == POINT_MOTION_TYPE)
+        if (type == POINT_MOTION_TYPE && point == POINT_ENGAGE)
         {
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_AKAMA_SOUL_CHANNEL);
