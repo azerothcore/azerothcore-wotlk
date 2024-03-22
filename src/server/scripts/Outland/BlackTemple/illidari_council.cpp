@@ -157,10 +157,9 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            Creature* member = nullptr;
-         //   for (uint8 i = 0; i < 4; ++i)
-         //       if (member = councilGUIDs[i])
-         //           member->AI()->EnterEvadeMode();
+            for (uint8 i = 0; i < 4; ++i)
+                if (Creature* member = councilGUIDs[i])
+                    member->AI()->EnterEvadeMode();
         }
 
         void AttackStart(Unit*) override { }

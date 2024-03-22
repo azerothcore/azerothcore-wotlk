@@ -28,3 +28,13 @@ INSERT INTO `creature_formations` (`memberGUID`, `leaderGUID`, `groupAI`) VALUES
 
 -- Delete leftover gobs
 DELETE FROM `gameobject` WHERE `guid` IN (20523,20558,20559,20561,20563,20567) AND `map` = 564;
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 23089 AND `GroupID` IN (9, 10);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23089, 9, 0, 'Those who\'ve defiled this temple have all been defeated.  All but one!', 12, 0, 100, 1, 0, 0, 21518, 0, 'SAY_AKAMA_COUNCIL_1'),
+(23089, 10, 0, 'Let us finish what we\'ve started.  I will lead you to Illidan\'s abode once you\'ve recovered your strength.', 12, 0, 100, 1, 0, 0, 21520, 0, 'SAY_AKAMA_COUNCIL_2');
+
+DELETE FROM `waypoint_data` WHERE `id` = 230891;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `move_type`) VALUES
+(230891, 1, 642.5905, 305.6287, 271.6885, 1),
+(230891, 2, 660.76465, 305.76627, 271.70413, 1);

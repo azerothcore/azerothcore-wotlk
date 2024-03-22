@@ -170,7 +170,7 @@ public:
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
             {
                 if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
-                    akama->AI()->DoAction(DATA_AKAMA_ILLIDAN);
+                    akama->AI()->DoAction(0);
             }
 
             return true;

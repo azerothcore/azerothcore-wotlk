@@ -48,6 +48,8 @@ enum Says
     SAY_AKAMA_ILLIDAN1                  = 4,
     SAY_AKAMA_ILLIDAN2                  = 5,
     SAY_AKAMA_ILLIDAN3                  = 6,
+    SAY_AKAMA_COUNCIL_1                 = 9,
+    SAY_AKAMA_COUNCIL_2                 = 10,
 
     SAY_MAIEV_SHADOWSONG_TAUNT          = 0,
     SAY_MAIEV_SHADOWSONG_ILLIDAN1       = 1,
@@ -117,6 +119,7 @@ enum Spells
 
 enum Misc
 {
+    ACTION_ILLIDARI_COUNCIL_DONE    = 0,
     ACTION_FIGHT_MINIONS            = 1,
     ACTION_RETURN_BLADE             = 2,
     ACTION_ILLIDAN_CAGED            = 3,
@@ -133,7 +136,9 @@ enum Misc
     NPC_ILLIDAN_DB_TARGET           = 23070,
     NPC_MAIEV_SHADOWSONG            = 23197,
 
-    GO_CAGE_TRAP                    = 185916
+    GO_CAGE_TRAP                    = 185916,
+
+    PATH_AKAMA_ILLIDARI_COUNCIL_1   = 230891
 };
 
 enum Events
@@ -791,9 +796,12 @@ public:
                 summons.DespawnAll();
                 me->CombatStop(true);
             }
-            else if (param == DATA_AKAMA_ILLIDAN)
+            else if (param == ACTION_ILLIDARI_COUNCIL_DONE)
             {
                 me->NearTeleportTo(AkamaTeleport);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_1, false);
+                
             }
         }
 
@@ -832,6 +840,22 @@ public:
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_27, 49000);
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_28, 49200);
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_29, 52000);
+            }
+        }
+
+        void PathEndReached(uint32 pathId) override
+        {
+            if (pathId == PATH_AKAMA_ILLIDARI_COUNCIL_1)
+            {
+                ScheduleUniqueTimedEvent(200ms, [&]
+                {
+                    Talk(SAY_AKAMA_COUNCIL_1);
+                }, 1);
+                ScheduleUniqueTimedEvent(7800ms, [&]
+                {
+                    Talk(SAY_AKAMA_COUNCIL_2);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                }, 2);
             }
         }
 
@@ -883,6 +907,7 @@ public:
 
         void UpdateEscortAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
