@@ -47,6 +47,7 @@ ObjectData const creatureData[] =
     { NPC_HIGH_WARLORD_NAJENTUS,     DATA_HIGH_WARLORD_NAJENTUS     },
     { NPC_SUPREMUS,                  DATA_SUPREMUS                  },
     { NPC_SHADE_OF_AKAMA,            DATA_SHADE_OF_AKAMA            },
+    { NPC_AKAMA_SHADE,               DATA_AKAMA_SHADE               },
     { NPC_TERON_GOREFIEND,           DATA_TERON_GOREFIEND           },
     { NPC_GURTOGG_BLOODBOIL,         DATA_GURTOGG_BLOODBOIL         },
     { NPC_RELIQUARY_OF_THE_LOST,     DATA_RELIQUARY_OF_SOULS        },
@@ -126,8 +127,12 @@ public:
                 case NPC_STORM_FURY:
                     if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
                         creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
+                    else
+                        ashtongueGUIDs.insert(creature->GetGUID());
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -166,7 +171,7 @@ public:
         }
 
     protected:
-        GuidList ashtongueGUIDs;
+        GuidSet ashtongueGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

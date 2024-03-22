@@ -152,15 +152,15 @@ public:
         {
         }
 
-        ObjectGuid councilGUIDs[4];
+        Creature* councilGUIDs[4];
 
         void Reset() override
         {
             BossAI::Reset();
             Creature* member = nullptr;
-            for (uint8 i = 0; i < 4; ++i)
-                if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
-                    member->AI()->EnterEvadeMode();
+         //   for (uint8 i = 0; i < 4; ++i)
+         //       if (member = councilGUIDs[i])
+         //           member->AI()->EnterEvadeMode();
         }
 
         void AttackStart(Unit*) override { }
@@ -171,15 +171,15 @@ public:
             if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
             {
                 me->setActive(true);
-                councilGUIDs[0] = instance->GetGuidData(NPC_GATHIOS_THE_SHATTERER);
-                councilGUIDs[1] = instance->GetGuidData(NPC_HIGH_NETHERMANCER_ZEREVOR);
-                councilGUIDs[2] = instance->GetGuidData(NPC_LADY_MALANDE);
-                councilGUIDs[3] = instance->GetGuidData(NPC_VERAS_DARKSHADOW);
+                councilGUIDs[0] = instance->GetCreature(DATA_GATHIOS_THE_SHATTERER);
+                councilGUIDs[1] = instance->GetCreature(DATA_HIGH_NETHERMANCER_ZEREVOR);
+                councilGUIDs[2] = instance->GetCreature(DATA_LADY_MALANDE);
+                councilGUIDs[3] = instance->GetCreature(DATA_VERAS_DARKSHADOW);
 
                 bool spoken = false;
                 for (uint8 i = 0; i < 4; ++i)
                 {
-                    if (Creature* member = ObjectAccessor::GetCreature(*me, councilGUIDs[i]))
+                    if (Creature* member = councilGUIDs[i])
                     {
                         if (!spoken && (roll_chance_i(33) || i == 3))
                         {
@@ -195,7 +195,7 @@ public:
             {
                 Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
-                    if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
+                    if (member = councilGUIDs[i])
                         member->AI()->DoAction(ACTION_ENRAGE);
             }
             else if (param == ACTION_END_ENCOUNTER)
@@ -203,7 +203,7 @@ public:
                 me->setActive(false);
                 Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
-                    if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
+                    if (member = councilGUIDs[i])
                         if (member->IsAlive())
                             Unit::Kill(me, member);
                 me->KillSelf();
@@ -268,13 +268,13 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     void JustDied(Unit*) override
     {
         Talk(SAY_COUNCIL_DEATH);
-        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
+        if (Creature* council = instance->GetCreature(DATA_ILLIDARI_COUNCIL))
             council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
     {
-        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
+        if (Creature* council = instance->GetCreature(DATA_ILLIDARI_COUNCIL))
             council->GetAI()->DoAction(ACTION_START_ENCOUNTER);
     }
 };
@@ -296,14 +296,14 @@ public:
         Creature* SelectCouncilMember()
         {
             if (roll_chance_i(50))
-                return ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_MALANDE));
+                instance->GetCreature(DATA_LADY_MALANDE);
 
             if (roll_chance_i(20))
-                if (Creature* veras = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VERAS_DARKSHADOW)))
+                if (Creature* veras = instance->GetCreature(DATA_VERAS_DARKSHADOW))
                     if (!veras->HasAura(SPELL_VANISH))
                         return veras;
 
-            return ObjectAccessor::GetCreature(*me, instance->GetGuidData(RAND(NPC_GATHIOS_THE_SHATTERER, NPC_HIGH_NETHERMANCER_ZEREVOR)));
+            return instance->GetCreature(RAND(DATA_GATHIOS_THE_SHATTERER, DATA_HIGH_NETHERMANCER_ZEREVOR));
         }
 
         void JustEngagedWith(Unit* who) override
@@ -555,7 +555,7 @@ public:
                     break;
                 case EVENT_SPELL_ENRAGE:
                     DoResetThreatList();
-                    if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
+                    if (Creature* council = instance->GetCreature(DATA_ILLIDARI_COUNCIL))
                         council->GetAI()->DoAction(ACTION_ENRAGE);
                     break;
             }

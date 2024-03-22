@@ -44,10 +44,11 @@ enum DataTypes
     DATA_ILLIDAN_STORMRAGE          = 9,
     MAX_ENCOUNTERS                  = 10,
 
-    DATA_GATHIOS_THE_SHATTERER      = 11,
-    DATA_HIGH_NETHERMANCER_ZEREVOR  = 12,
-    DATA_LADY_MALANDE               = 13,
-    DATA_VERAS_DARKSHADOW           = 14,
+    DATA_AKAMA_SHADE                = 11,
+    DATA_GATHIOS_THE_SHATTERER      = 12,
+    DATA_HIGH_NETHERMANCER_ZEREVOR  = 13,
+    DATA_LADY_MALANDE               = 14,
+    DATA_VERAS_DARKSHADOW           = 15
 };
 
 enum CreatureIds
@@ -57,6 +58,7 @@ enum CreatureIds
     NPC_SHADE_OF_AKAMA              = 22841,
     NPC_AKAMA_SHADE                 = 23191,
     NPC_ASHTONGUE_CHANNELER         = 23421,
+    NPC_CREATURE_GENERATOR_AKAMA    = 23210,
     NPC_TERON_GOREFIEND             = 22871,
     NPC_GURTOGG_BLOODBOIL           = 22948,
     NPC_VENGEFUL_SPIRIT             = 23109,
