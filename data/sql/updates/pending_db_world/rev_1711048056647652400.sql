@@ -39,8 +39,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (230891, 1, 642.5905, 305.6287, 271.6885, 1),
 (230891, 2, 660.76465, 305.76627, 271.70413, 1);
 
-UPDATE `creature` SET `phaseMask` = 3, WHERE `guid` = 148734;
-UPDATE `creature` SET `phaseMask` = 5, WHERE `guid` = 148733;
+UPDATE `creature` SET `phaseMask` = 3 WHERE `guid` = 148734;
+UPDATE `creature` SET `phaseMask` = 5 WHERE `guid` = 148733;
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 2 AND `entryorguid` = 4665;
 INSERT INTO `smart_scripts` VALUES (4665, 2, 0, 0, 46, 0, 100, 1, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 148358, 22871, 0, 0, 0, 0, 0, 0, 'Area Trigger - On Trigger - Teron Gorefiend Talk');
