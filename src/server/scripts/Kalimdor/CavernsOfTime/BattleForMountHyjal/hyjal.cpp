@@ -614,7 +614,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
     {
         scheduler.Schedule(0s, [this](TaskContext context)
             {
-                DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                DoCastVictim(SPELL_FROST_BREATH);
                 context.Repeat(3500ms, 4s);
             });
     }
