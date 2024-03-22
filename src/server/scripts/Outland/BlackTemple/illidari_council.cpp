@@ -192,17 +192,15 @@ public:
             }
             else if (param == ACTION_ENRAGE)
             {
-                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (member = councilGUIDs[i])
+                    if (Creature* member = councilGUIDs[i])
                         member->AI()->DoAction(ACTION_ENRAGE);
             }
             else if (param == ACTION_END_ENCOUNTER)
             {
                 me->setActive(false);
-                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (member = councilGUIDs[i])
+                    if (Creature* member = councilGUIDs[i])
                         if (member->IsAlive())
                             Unit::Kill(me, member);
                 me->KillSelf();
