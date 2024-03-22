@@ -293,7 +293,7 @@ public:
         Creature* SelectCouncilMember()
         {
             if (roll_chance_i(50))
-                instance->GetCreature(DATA_LADY_MALANDE);
+                return instance->GetCreature(DATA_LADY_MALANDE);
 
             if (roll_chance_i(20))
                 if (Creature* veras = instance->GetCreature(DATA_VERAS_DARKSHADOW))
