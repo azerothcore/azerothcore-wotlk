@@ -221,7 +221,7 @@ struct npc_akama_shade : public ScriptedAI
                     me->GetCreatureListWithEntryInGrid(brokens, NPC_ASHTONGUE_BROKEN, 40.0f);
                     if (Creature* broken = GetClosestCreatureWithEntry(me, NPC_ASHTONGUE_BROKEN, 40.0f))
                         broken->AI()->Talk(SAY_BROKEN_S1);
-                    
+
                     for (Creature* broken : brokens)
                     {
                         broken->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -328,7 +328,6 @@ struct npc_creature_generator_akama : public ScriptedAI
         case ACTION_GENERATOR_START:
             break;
         }
-        
     }
 
     void UpdateAI(uint32 diff) override
