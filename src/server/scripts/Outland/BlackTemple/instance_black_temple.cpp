@@ -136,6 +136,8 @@ public:
                     else
                         ashtongueGUIDs.insert(creature->GetGUID());
                     break;
+                default:
+                    break;
             }
 
             InstanceScript::OnCreatureCreate(creature);
