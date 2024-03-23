@@ -22,12 +22,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
-/* ScriptData
-SDName: Boss_Archimonde
-SD%Complete: 85
-SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
-SDCategory: Caverns of Time, Mount Hyjal
-EndScriptData */
 
 enum Texts
 {
@@ -40,7 +34,7 @@ enum Texts
     SAY_SOUL_CHARGE = 7,
 };
 
-enum Spells
+enum ArchiSpells
 {
     SPELL_DENOUEMENT_WISP       = 32124,
     SPELL_ANCIENT_SPARK         = 39349,
@@ -290,7 +284,7 @@ public:
 
         void Reset() override
         {
-            instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
+            instance->SetData(DATA_ARCHIMONDE, NOT_STARTED);
 
             me->SetReactState(REACT_AGGRESSIVE);
             DoomfireSpiritGUID.Clear();
@@ -354,12 +348,14 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
 
-            instance->SetData(DATA_ARCHIMONDEEVENT, IN_PROGRESS);
+            instance->SetData(DATA_ARCHIMONDE, IN_PROGRESS);
             events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 35000));
             events.ScheduleEvent(EVENT_SPELL_DOOMFIRE, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SPELL_FEAR, 42000);
             events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, 2000);
             events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 1000);
+
+            instance->SetData(DATA_SPAWN_WAVES, 1);
         }
 
         void KilledUnit(Unit* victim) override
@@ -399,7 +395,7 @@ public:
         {
             Talk(SAY_DEATH);
 
-            instance->SetData(DATA_ARCHIMONDEEVENT, DONE);
+            instance->SetData(DATA_ARCHIMONDE, DONE);
             instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, me->GetEntry(), 1, me);
 
             // Reset scheduled events
@@ -416,6 +412,12 @@ public:
             spellEffectTargets.clear();
             fingerOfDeathTargets.clear();
             summons.DespawnAll();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            instance->SetData(DATA_RESET_NIGHT_ELF, 1);
+            BossAI::EnterEvadeMode(why);
         }
 
         bool CanUseFingerOfDeath()
@@ -553,13 +555,13 @@ public:
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
-                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
+                if ((instance->GetBossState(DATA_AZGALOR) != DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
                 {
                     me->SetVisible(false);
                     me->SetFaction(FACTION_FRIENDLY);
                 }
 
-                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
+                if ((instance->GetBossState(DATA_AZGALOR) == DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
                 {
                     me->SetFaction(FACTION_DRAGONKIN);
                     me->SetVisible(true);

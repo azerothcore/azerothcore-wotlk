@@ -76,6 +76,7 @@ struct boss_high_astromancer_solarian : public BossAI
             Talk(SAY_VOID);
             me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
+            me->SetModelVisible(true);
             me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
