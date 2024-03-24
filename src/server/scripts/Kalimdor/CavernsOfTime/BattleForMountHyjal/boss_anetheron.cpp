@@ -18,16 +18,16 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
-#include "hyjal_trash.h"
 
 enum Spells
 {
-    SPELL_CARRION_SWARM     = 31306,
-    SPELL_SLEEP             = 31298,
-    SPELL_VAMPIRIC_AURA     = 38196,
-    SPELL_INFERNO           = 31299,
-    SPELL_IMMOLATION        = 31303,
-    SPELL_INFERNO_EFFECT    = 31302,
+    SPELL_CARRION_SWARM       = 31306,
+    SPELL_SLEEP               = 31298,
+    SPELL_INFERNO             = 31299,
+    SPELL_VAMPIRIC_AURA       = 31317,
+    SPELL_ENRAGE              = 26662,
+    SPELL_INFERNAL_STUN       = 31302,
+    SPELL_INFERNAL_IMMOLATION = 31304
 };
 
 enum Texts
@@ -37,232 +37,108 @@ enum Texts
     SAY_SWARM           = 2,
     SAY_SLEEP           = 3,
     SAY_INFERNO         = 4,
-    SAY_ONAGGRO         = 5,
+    SAY_ONSPAWN         = 5,
 };
 
-enum Misc
-{
-    PATH_ANETHERON      = 178080,
-    POINT_COMBAT_START  = 7
-};
-class boss_anetheron : public CreatureScript
+struct boss_anetheron : public BossAI
 {
 public:
-    boss_anetheron() : CreatureScript("boss_anetheron") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_anetheron(Creature* creature) : BossAI(creature, DATA_ANETHERON)
     {
-        return GetHyjalAI<boss_anetheronAI>(creature);
+        _recentlySpoken = false;
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
-    struct boss_anetheronAI : public hyjal_trashAI
+    void JustEngagedWith(Unit * who) override
     {
-        boss_anetheronAI(Creature* creature) : hyjal_trashAI(creature)
+        BossAI::JustEngagedWith(who);
+
+        scheduler.Schedule(20s, 28s, [this](TaskContext context)
         {
-            instance = creature->GetInstanceScript();
-            go = false;
-        }
-
-        uint32 SwarmTimer;
-        uint32 SleepTimer;
-        uint32 AuraTimer;
-        uint32 InfernoTimer;
-        bool go;
-
-        void Reset() override
-        {
-            damageTaken = 0;
-            SwarmTimer = 45000;
-            SleepTimer = 60000;
-            AuraTimer = 5000;
-            InfernoTimer = 45000;
-
-            if (IsEvent)
-                instance->SetData(DATA_ANETHERONEVENT, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            if (IsEvent)
-                instance->SetData(DATA_ANETHERONEVENT, IN_PROGRESS);
-
-            Talk(SAY_ONAGGRO);
-        }
-
-        void KilledUnit(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_ONSLAY);
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (waypointId == POINT_COMBAT_START)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JAINAPROUDMOORE));
-                if (target && target->IsAlive())
-                    me->AddThreat(target, 0.0f);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            hyjal_trashAI::JustDied(killer);
-            if (IsEvent)
-                instance->SetData(DATA_ANETHERONEVENT, DONE);
-            Talk(SAY_ONDEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (IsEvent)
-            {
-                //Must update npc_escortAI
-                npc_escortAI::UpdateAI(diff);
-                if (!go)
-                {
-                    go = true;
-                    me->GetMotionMaster()->MovePath(PATH_ANETHERON, false);
-                }
-            }
-
-            //Return since we have no target
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            if (SwarmTimer <= diff)
-            {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                {
-                    DoCast(target, SPELL_CARRION_SWARM);
-                }
-
-                SwarmTimer = urand(45000, 60000);
+            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f))
                 Talk(SAY_SWARM);
-            }
-            else SwarmTimer -= diff;
-
-            if (SleepTimer <= diff)
-            {
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                        target->CastSpell(target, SPELL_SLEEP, true);
-                }
-                SleepTimer = 60000;
+            context.Repeat(10s, 15s);
+        }).Schedule(25s, 32s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_SLEEP))
                 Talk(SAY_SLEEP);
-            }
-            else SleepTimer -= diff;
-            if (AuraTimer <= diff)
-            {
-                DoCast(me, SPELL_VAMPIRIC_AURA, true);
-                AuraTimer = urand(10000, 20000);
-            }
-            else AuraTimer -= diff;
-            if (InfernoTimer <= diff)
-            {
-                DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_INFERNO);
-                InfernoTimer = 45000;
+
+            context.Repeat(35s, 48s);
+        }).Schedule(30s, 48s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_INFERNO))
                 Talk(SAY_INFERNO);
-            }
-            else InfernoTimer -= diff;
 
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class npc_towering_infernal : public CreatureScript
-{
-public:
-    npc_towering_infernal() : CreatureScript("npc_towering_infernal") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHyjalAI<npc_towering_infernalAI>(creature);
+            context.Repeat(50s, 55s);
+        }).Schedule(10min, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_ENRAGE);
+                context.Repeat(5min);
+            });
     }
 
-    struct npc_towering_infernalAI : public ScriptedAI
+    void JustSummoned(Creature* summon) override
     {
-        npc_towering_infernalAI(Creature* creature) : ScriptedAI(creature)
+        if (summon)
         {
-            instance = creature->GetInstanceScript();
-            AnetheronGUID = instance->GetGuidData(DATA_ANETHERON);
+            summon->AI()->DoCast(SPELL_INFERNAL_STUN);
+            summon->SetInCombatWithZone();
         }
+        BossAI::JustSummoned(summon);
+    }
 
-        uint32 ImmolationTimer;
-        uint32 CheckTimer;
-        ObjectGuid AnetheronGUID;
-        InstanceScript* instance;
+    void DoAction(int32 action) override
+    {
+        Talk(SAY_ONSPAWN, 1200ms);
 
-        void Reset() override
+        if (action == DATA_ANETHERON)
+            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        switch (pathId)
         {
-            DoCast(me, SPELL_INFERNO_EFFECT);
-            ImmolationTimer = 5000;
-            CheckTimer = 5000;
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-
-        {
-            if (me->IsWithinDist(who, 50) && !me->IsInCombat() && me->IsValidAttackTarget(who))
-            {
-                AttackStart(who);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (CheckTimer <= diff)
-            {
-                if (AnetheronGUID)
+        case ALLIANCE_BASE_CHARGE_1:
+        case ALLIANCE_BASE_CHARGE_2:
+        case ALLIANCE_BASE_CHARGE_3:
+            me->m_Events.AddEventAtOffset([this]()
                 {
-                    Creature* boss = ObjectAccessor::GetCreature(*me, AnetheronGUID);
-                    if (!boss || boss->isDead())
-                    {
-                        me->setDeathState(DeathState::JustDied);
-                        me->RemoveCorpse();
-                        return;
-                    }
-                }
-                CheckTimer = 5000;
-            }
-            else CheckTimer -= diff;
-
-            //Return since we have no target
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            if (ImmolationTimer <= diff)
-            {
-                DoCast(me, SPELL_IMMOLATION);
-                ImmolationTimer = 5000;
-            }
-            else ImmolationTimer -= diff;
-
-            DoMeleeAttackIfReady();
+                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                }, 1s);
+            break;
         }
-    };
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
+        {
+            Talk(SAY_ONSLAY);
+            _recentlySpoken = true;
+
+            scheduler.Schedule(6s, [this](TaskContext)
+                {
+                    _recentlySpoken = false;
+                });
+        }
+    }
+
+    void JustDied(Unit * killer) override
+    {
+        Talk(SAY_ONDEATH);
+        BossAI::JustDied(killer);
+    }
+
+private:
+    bool _recentlySpoken;
+
 };
 
 void AddSC_boss_anetheron()
 {
-    new boss_anetheron();
-    new npc_towering_infernal();
+    RegisterHyjalAI(boss_anetheron);
 }
