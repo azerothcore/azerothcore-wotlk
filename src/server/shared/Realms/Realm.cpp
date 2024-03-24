@@ -24,7 +24,7 @@ boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::addres
 {
     boost::asio::ip::address realmIp;
 
-    // Attempt to send best address for client
+    // Attempt to send best address for a client
     if (clientAddr.is_loopback())
     {
         // Try guessing if realm is also connected locally
@@ -52,5 +52,5 @@ boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::addres
     }
 
     // Return external IP
-    return boost::asio::ip::tcp_endpoint(realmIp, Port);
+    return { realmIp, Port };
 }

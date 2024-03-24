@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,9 +18,9 @@
 DROP TABLE IF EXISTS `player_factionchange_titles`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_titles` (
   `alliance_id` int NOT NULL,
-  `alliance_comment` text COLLATE utf8mb4_unicode_ci,
+  `alliance_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `horde_id` int NOT NULL,
-  `horde_comment` text COLLATE utf8mb4_unicode_ci,
+  `horde_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

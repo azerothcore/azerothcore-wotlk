@@ -98,7 +98,7 @@ struct boss_ahune : public ScriptedAI
 {
     boss_ahune(Creature* c) : ScriptedAI(c), summons(me)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         InvokerGUID.Clear();

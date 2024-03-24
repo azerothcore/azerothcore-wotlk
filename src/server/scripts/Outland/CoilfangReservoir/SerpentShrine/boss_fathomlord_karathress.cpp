@@ -66,20 +66,14 @@ enum Spells
 
 enum Misc
 {
-    MAX_ADVISORS                    = 2,
-    NPC_SEER_OLUM                   = 22820,
-    GO_CAGE                         = 185952,
+    GO_CAGE                         = 185474
 };
 
-const Position advisorsPosition[MAX_ADVISORS] =
-{
-    { 448.37f, -544.71f, -7.54f, 0.00f },
-    { 457.37f, -544.71f, -7.54f, 0.00f }
-};
+const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
 
 struct boss_fathomlord_karathress : public BossAI
 {
-    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS) { }
+    boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS){ }
 
     void Reset() override
     {
@@ -103,16 +97,8 @@ struct boss_fathomlord_karathress : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        if (summon->GetEntry() == NPC_SEER_OLUM)
-        {
-            summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS - 1], false);
-        }
-        else
-        {
-            summon->Attack(me->GetVictim(), false);
-            summon->SetInCombatWithZone();
-        }
+        summon->Attack(me->GetVictim(), false);
+        summon->SetInCombatWithZone();
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -132,10 +118,16 @@ struct boss_fathomlord_karathress : public BossAI
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
-        me->SummonCreature(NPC_SEER_OLUM, advisorsPosition[MAX_ADVISORS-2], TEMPSUMMON_TIMED_DESPAWN, 3600000);
-        if (GameObject* gobject = me->FindNearestGameObject(GO_CAGE, 100.0f))
+        if (GameObject* cage = me->FindNearestGameObject(GO_CAGE, 100.0f))
         {
-            gobject->SetGoState(GO_STATE_ACTIVE);
+            cage->SetGoState(GO_STATE_ACTIVE);
+        }
+        if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
+        {
+            olum->SetWalk(true);
+            olum->GetMotionMaster()->MovePoint(0, olumWalk, false);
+            olum->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            olum->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 

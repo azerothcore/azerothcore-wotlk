@@ -17,6 +17,7 @@
 
 #include "CreatureScript.h"
 #include "Player.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "World.h"
@@ -795,6 +796,61 @@ public:
     };
 };
 
+enum ToyPlane
+{
+    NPC_DND_DALARAN_TOY_STORE_PLANE_STRING_HOOK = 29807,
+
+    SPELL_TOY_PLANE_CABLE   = 55281,
+};
+
+struct npc_cosmetic_toy_plane : public ScriptedAI
+{
+    npc_cosmetic_toy_plane(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        Movement::MoveSplineInit init(me);
+        init.MovebyPath(_movementArray);
+        init.SetFly();
+        init.SetCyclic();
+        // one full loop is 10.76 seconds (sniffed value)
+        // loop diameter is approx. 9.225f (calculated from waypoints below)
+        // with a circumference of approx. 28.98f
+        // this results in flying speed of approx. 2.7f
+        init.SetVelocity(2.7f);
+        init.Launch();
+
+        scheduler.Schedule(420ms, [this](TaskContext context)
+            {
+                if (Creature* cr = me->FindNearestCreature(NPC_DND_DALARAN_TOY_STORE_PLANE_STRING_HOOK, 42.0f))
+                    DoCast(cr, SPELL_TOY_PLANE_CABLE, true);
+                else
+                    context.Repeat();
+            });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+private:
+    Movement::PointsArray const _movementArray = {
+        // cyclic movementspine unfortunately includes spawn into loop
+        // which results in an imperfect loop right now
+        // CO1 SPAWN(5809.888,  683.5779,  653.6859)
+        G3D::Vector3(5813.709,  682.51855, 653.6033),
+        G3D::Vector3(5816.815,  684.8459,  653.5755),
+        G3D::Vector3(5817.1997, 688.83527, 653.631),
+        G3D::Vector3(5814.235,  691.6307,  653.6587),
+        G3D::Vector3(5809.9287, 690.98224, 653.7697),
+        G3D::Vector3(5808.225,  687.1498,  653.6322),
+        G3D::Vector3(5809.8423, 683.6158,  653.6862),
+    };
+};
+
 void AddSC_dalaran()
 {
     // our
@@ -804,6 +860,7 @@ void AddSC_dalaran()
     new npc_archmage_landalock();
     new npc_dalaran_mage();
     new npc_dalaran_warrior();
+    RegisterCreatureAI(npc_cosmetic_toy_plane);
 
     // theirs
     new npc_mageguard_dalaran();

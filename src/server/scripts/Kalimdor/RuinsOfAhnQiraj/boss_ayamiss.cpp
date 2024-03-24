@@ -84,7 +84,7 @@ struct boss_ayamiss : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(70, [&] {
@@ -127,7 +127,7 @@ struct boss_ayamiss : public BossAI
         }
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
-            SetCombatMovement(true);
+            me->SetCombatMovement(true);
             me->SetDisableGravity(false);
 
             me->m_Events.AddEventAtOffset([this]()

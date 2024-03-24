@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
   CONSTRAINT `creature_template_resistance_chk_1` CHECK (((`School` >= 1) and (`School` <= 6)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_template_resistance: ~2,225 rows (approximately)
+-- Dumping data for table acore_world.creature_template_resistance: ~2 209 rows (approximately)
 DELETE FROM `creature_template_resistance`;
 INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES
 	(40, 2, 21, 12340),
@@ -552,18 +552,6 @@ INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`
 	(4535, 5, 150, 12340),
 	(4535, 6, 20, 12340),
 	(4619, 6, 128, 12340),
-	(4632, 2, 70, 12340),
-	(4632, 5, 30, 12340),
-	(4633, 2, 70, 12340),
-	(4633, 5, 30, 12340),
-	(4634, 2, 70, 12340),
-	(4634, 5, 30, 12340),
-	(4635, 2, 70, 12340),
-	(4635, 5, 30, 12340),
-	(4636, 2, 70, 12340),
-	(4636, 5, 30, 12340),
-	(4637, 2, 70, 12340),
-	(4637, 5, 30, 12340),
 	(4661, 2, 30, 12340),
 	(4661, 3, 30, 12340),
 	(4661, 4, 30, 12340),
@@ -2164,10 +2152,6 @@ INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`
 	(16525, 5, 105, 12340),
 	(16540, 5, 50, 12340),
 	(16807, 5, 5, 12340),
-	(17034, 6, 8311, 12340),
-	(17035, 6, 8311, 12340),
-	(17039, 6, 8311, 12340),
-	(17053, 6, 8311, 12340),
 	(17283, 6, 100, 12340),
 	(17300, 5, 102, 12340),
 	(17308, 5, 93, 12340),
