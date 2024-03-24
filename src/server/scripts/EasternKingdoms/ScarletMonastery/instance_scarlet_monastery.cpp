@@ -28,7 +28,7 @@ enum AshbringerEventMisc
     AURA_OF_ASHBRINGER             = 28282,
 
     NPC_COMMANDER_MOGRAINE         = 3976,
-    NPC_INQUISITOR_WHITEMANE       = 3977,   
+    NPC_INQUISITOR_WHITEMANE       = 3977,
     NPC_SCARLET_SORCERER           = 4294,
     NPC_SCARLET_MYRIDON            = 4295,
     NPC_SCARLET_DEFENDER           = 4298,
@@ -653,7 +653,7 @@ public:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             if (Whitemane->IsAlive())
-                                me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);                            
+                                me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS);
                         }
                         _events.ScheduleEvent(EVENT_MOGRAINE_SAY, 200ms);
                         break;
@@ -661,12 +661,12 @@ public:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
                         {
                             Talk(SAY_MO_RESURRECTED, Whitemane);
-                        }                        
+                        }
                         _events.ScheduleEvent(EVENT_MOVE, 3000ms);
                         break;
                     case EVENT_MOVE:
                         if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(DATA_WHITEMANE)))
-                        {                            
+                        {
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             float fx, fy, fz;
                             Whitemane->GetContactPoint(me, fx, fy, fz, 0.0f);
