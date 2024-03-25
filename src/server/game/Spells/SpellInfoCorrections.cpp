@@ -4648,12 +4648,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Arcane Orb
-    ApplySpellFix({ 34172 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Commanding Shout
     ApplySpellFix({ 469, 47439, 47440 }, [](SpellInfo* spellInfo)
     {
