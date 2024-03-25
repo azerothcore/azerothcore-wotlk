@@ -709,7 +709,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     }
 
     // PlayerScript Hook for checking traded items if we want to filter them in a custom module
-    if (!sScriptMgr->CanSetTradeItem(_player, item))
+    if (!sScriptMgr->CanSetTradeItem(_player, item, tradeSlot))
     {
         // Do not send TRADE_STATUS_TRADE_CANCELED because it will cause double display of "Transaction canceled" notification
         // On the trade initiator screen

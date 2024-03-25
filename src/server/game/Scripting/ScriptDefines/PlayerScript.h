@@ -429,7 +429,7 @@ public:
      *
      * @return True if you want to continue setting the item in the trade slot, false if you want to cancel the trade
      */
-    [[nodiscard]] virtual bool CanSetTradeItem(Player* /*player*/, Item* /*tradedItem*/) { return true; }
+    [[nodiscard]] virtual bool CanSetTradeItem(Player* /*player*/, Item* /*tradedItem*/, uint8 /*tradeSlot*/) { return true; }
 
     virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
