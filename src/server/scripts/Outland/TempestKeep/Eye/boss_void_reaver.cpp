@@ -96,9 +96,13 @@ struct boss_void_reaver : public BossAI
         }).Schedule(3450ms, GROUP_ARCANE_ORB, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
+            {
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
-            else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
+            }
+            else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 18.0f, true))
+            {
                 me->CastSpell(target, SPELL_ARCANE_ORB, false);
+            }
             context.Repeat(2400ms, 6300ms);
         }).Schedule(14350ms, [this](TaskContext context)
         {
