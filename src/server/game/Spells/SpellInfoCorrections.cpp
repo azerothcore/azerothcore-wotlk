@@ -4648,12 +4648,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Pounding (effect)
-    ApplySpellFix({ 34164 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Arcane Orb
     ApplySpellFix({ 34172 }, [](SpellInfo* spellInfo)
     {
