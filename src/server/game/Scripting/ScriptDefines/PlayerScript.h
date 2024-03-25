@@ -422,7 +422,7 @@ public:
     [[nodiscard]] virtual bool CanInitTrade(Player* /*player*/, Player* /*target*/) { return true; }
 
     /**
-     * @brief This hook called just before finishing the handling of the action of a player seting an item in a trade slot
+     * @brief This hook called just before finishing the handling of the action of a player setting an item in a trade slot
      *
      * @param player Contains information about the trade initiator Player
      * @param tradedItem Contains information about the item set in the trade slot

@@ -1516,9 +1516,7 @@ bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlo
         });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
     return true;
 }
