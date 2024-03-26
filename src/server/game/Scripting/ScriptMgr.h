@@ -469,6 +469,7 @@ public: /* PlayerScript */
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
+    void OnBeforeAccountDelete(uint32 accountId);
     void OnLastIpUpdate(uint32 accountId, std::string ip);
     void OnFailedAccountLogin(uint32 accountId);
     void OnEmailChange(uint32 accountId);
