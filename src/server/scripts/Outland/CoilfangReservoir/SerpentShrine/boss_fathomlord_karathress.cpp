@@ -560,7 +560,6 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-
     void EnterEvadeMode(EvadeReason why) override
     {
         if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
