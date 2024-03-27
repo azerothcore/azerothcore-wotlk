@@ -675,6 +675,29 @@ public:
             }
         }
 
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            {
+                return;
+            }
+
+            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            {
+                if (Player* p = itr->GetSource())
+                {
+                    if (!p->GetVehicle())
+                    {
+                        // At least one player is outside a cannon, return without resetting event.
+                        return;
+                    }
+                }
+            }
+            // All players are inside cannons. Reset.
+            JustDied(nullptr);
+        }
+
         void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
