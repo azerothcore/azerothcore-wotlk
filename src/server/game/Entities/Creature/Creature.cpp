@@ -2369,7 +2369,17 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
     {
         SetNoCallAssistance(true);
 
-        float radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS);
+        // Workaround: Quest Dark Storms - ID 806, pull one by one creatures in area 369, it's not an aggro range issue
+        float radius;
+
+        if (sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS) >= 8 && (uint32)GetAreaId() == 369)
+        {
+            radius = 7;
+        }
+        else
+        {
+            radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS);
+        }
 
         if (radius > 0)
         {
