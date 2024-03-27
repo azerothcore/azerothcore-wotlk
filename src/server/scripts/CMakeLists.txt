@@ -232,7 +232,8 @@ target_link_libraries(scripts
   PRIVATE
     acore-core-interface
   PUBLIC
-    game-interface)
+    game-interface
+    libsidecar)
 
 target_include_directories(scripts
   PUBLIC

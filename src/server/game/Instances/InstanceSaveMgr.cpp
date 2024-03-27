@@ -163,6 +163,9 @@ InstanceSave::~InstanceSave()
 
 void InstanceSave::InsertToDB()
 {
+    if (sToCloud9Sidecar->ClusterModeEnabled() && !sToCloud9Sidecar->IsMapAssigned(GetMapId()))
+        return;
+
     std::string data;
     uint32 completedEncounters = 0;
 
@@ -451,6 +454,122 @@ void InstanceSaveMgr::LoadCharacterBinds()
     }
 
     lock_instLists = false;
+}
+
+void InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs(std::vector<uint32> mapIDs, InstanceSaveHashMap &instanceSaveStorage, PlayerBindStorage &localPlayerBindStorage)
+{
+    std::stringstream mapIDsStr;
+    for (size_t i = 0; i < mapIDs.size(); ++i) {
+        mapIDsStr << mapIDs[i];
+        if (i < mapIDs.size() - 1) {
+            mapIDsStr << ",";
+        }
+    }
+
+    QueryResult result = CharacterDatabase.Query("SELECT id, map, resettime, difficulty, completedEncounters, data FROM instance WHERE map IN ({}) ORDER BY id ASC", mapIDsStr.str());
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 instanceId = fields[0].Get<uint32>();
+            uint32 mapId = fields[1].Get<uint16>();
+            time_t resettime = time_t(fields[2].Get<uint32>());
+            uint8 difficulty = fields[3].Get<uint8>();
+            uint32 completedEncounters = fields[4].Get<uint32>();
+            std::string instanceData = fields[5].Get<std::string>();
+
+            time_t extendedResetTime = 0;
+
+            MapEntry const* entry = sMapStore.LookupEntry(mapId);
+            if (entry->IsRaid() || difficulty > DUNGEON_DIFFICULTY_NORMAL)
+                extendedResetTime = GetExtendedResetTimeFor(mapId, Difficulty(difficulty));
+
+            InstanceSave* save = new InstanceSave(mapId, instanceId, Difficulty(difficulty), resettime, extendedResetTime);
+
+            save->SetCompletedEncounterMask(completedEncounters);
+            save->SetInstanceData(instanceData);
+            if (resettime > 0)
+                save->SetResetTime(resettime);
+            instanceSaveStorage[instanceId] = save;
+        } while (result->NextRow());
+    }
+
+    result = CharacterDatabase.Query("SELECT guid, instance, permanent, extended FROM character_instance WHERE instance IN (SELECT id FROM instance WHERE map IN ({}))", mapIDsStr.str());
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+            uint32 instanceId = fields[1].Get<uint32>();
+            bool perm = fields[2].Get<bool>();
+            bool extended = fields[3].Get<bool>();
+
+            InstanceSaveHashMap::iterator itr = instanceSaveStorage.find(instanceId);
+            InstanceSave* save = itr != instanceSaveStorage.end() ? itr->second : nullptr;
+            if (!save)
+                continue;
+
+            if (localPlayerBindStorage.find(guid) == localPlayerBindStorage.end())
+                localPlayerBindStorage[guid] = new BoundInstancesMapWrapper;
+
+            InstancePlayerBind& bind = localPlayerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
+            if (bind.save) // pussywizard: another bind for the same map and difficulty! may happen because of mysql thread races
+            {
+                if (bind.perm) // already loaded perm -> delete currently checked one from db
+                {
+                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                    stmt->SetData(0, guid.GetCounter());
+                    stmt->SetData(1, instanceId);
+                    CharacterDatabase.Execute(stmt);
+                    continue;
+                }
+                else // override temp bind by newest one
+                {
+                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                    stmt->SetData(0, guid.GetCounter());
+                    stmt->SetData(1, bind.save->GetInstanceId());
+                    CharacterDatabase.Execute(stmt);
+                    bind.save->RemovePlayer(guid, this);
+                }
+            }
+            bind.save = save;
+            bind.perm = perm;
+            bind.extended = extended;
+            save->AddPlayer(guid);
+            if (perm)
+                save->SetCanReset(false);
+        } while (result->NextRow());
+    }
+}
+
+void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceSaveHashMap newInstanceSaves, PlayerBindStorage newPlayerBindStorage)
+{
+    for (InstanceSaveHashMap::iterator itr = newInstanceSaves.begin(); itr != newInstanceSaves.end(); ++itr)
+    {
+        InstanceSaveHashMap::iterator currentSave = m_instanceSaveById.find(itr->first);
+        if (currentSave != m_instanceSaveById.end())
+        {
+            currentSave->second->m_playerList.clear();
+            delete currentSave->second;
+        }
+
+        m_instanceSaveById[itr->first] = itr->second;
+    }
+
+    for (PlayerBindStorage::iterator itr = newPlayerBindStorage.begin(); itr != newPlayerBindStorage.end(); ++itr)
+    {
+        PlayerBindStorage::iterator currentBind = playerBindStorage.find(itr->first);
+        if (currentBind != playerBindStorage.end())
+        {
+            delete currentBind->second;
+        }
+
+        playerBindStorage[itr->first] = itr->second;
+    }
 }
 
 void InstanceSaveMgr::ScheduleReset(time_t time, InstResetEvent event)

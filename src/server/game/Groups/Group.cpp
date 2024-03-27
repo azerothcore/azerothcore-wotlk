@@ -295,7 +295,7 @@ void Group::ConvertToRaid()
 
     _initRaidSubGroupsCounter();
 
-    if (!isBGGroup() && !isBFGroup())
+    if (!sToCloud9Sidecar->ClusterModeEnabled() && !isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_TYPE);
 
@@ -543,6 +543,47 @@ bool Group::AddMember(Player* player)
     return true;
 }
 
+void Group::AddMemberWithGuid(ObjectGuid guid)
+{
+    if (Player* player = ObjectAccessor::FindPlayer(guid))
+    {
+        AddMember(player);
+        return;
+    }
+
+    // Get first not-full group
+    uint8 subGroup = 0;
+    if (m_subGroupsCounts)
+    {
+        bool groupFound = false;
+        for (; subGroup < MAX_RAID_SUBGROUPS; ++subGroup)
+        {
+            if (m_subGroupsCounts[subGroup] < MAXGROUPSIZE)
+            {
+                groupFound = true;
+                break;
+            }
+        }
+        // We are raid group and no one slot is free
+        if (!groupFound)
+            return;
+    }
+
+    MemberSlot member;
+    member.guid      = guid;
+    member.group     = subGroup;
+    member.flags     = 0;
+    member.roles     = 0;
+    m_memberSlots.push_back(member);
+
+    if (!isBGGroup() && !isBFGroup())
+    {
+        sCharacterCache->UpdateCharacterGroup(guid, GetGUID());
+    }
+
+    SubGroupCounterIncrease(subGroup);
+}
+
 bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /*= ObjectGuid::Empty*/, const char* reason /*= nullptr*/)
 {
     BroadcastGroupUpdate();
@@ -575,19 +616,22 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
                 player->UpdateForQuestWorldObjects();
             }
 
-            WorldPacket data;
-
-            if (method == GROUP_REMOVEMETHOD_KICK || method == GROUP_REMOVEMETHOD_KICK_LFG)
+            if (!sToCloud9Sidecar->ClusterModeEnabled())
             {
-                data.Initialize(SMSG_GROUP_UNINVITE, 0);
+                WorldPacket data;
+
+                if (method == GROUP_REMOVEMETHOD_KICK || method == GROUP_REMOVEMETHOD_KICK_LFG)
+                {
+                    data.Initialize(SMSG_GROUP_UNINVITE, 0);
+                    player->GetSession()->SendPacket(&data);
+                }
+
+                // Do we really need to send this opcode?
+                data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
+                data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
+                data << m_guid << uint32(m_counter) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
             }
-
-            // Do we really need to send this opcode?
-            data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
-            data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
-            data << m_guid << uint32(m_counter) << uint32(0) << uint64(0);
-            player->GetSession()->SendPacket(&data);
         }
 
         // Remove player from group in DB
@@ -750,7 +794,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, m_leaderGuid); // This hook should be executed at the end - Not used anywhere in the original core
 }
 
-void Group::Disband(bool hideDestroy /* = false */)
+void Group::ForcedDisband(bool hideDestroy /* = false */)
 {
     sScriptMgr->OnGroupDisband(this);
 
@@ -844,6 +888,14 @@ void Group::Disband(bool hideDestroy /* = false */)
 
     sGroupMgr->RemoveGroup(this);
     delete this;
+}
+
+void Group::Disband(bool hideDestroy /* = false */)
+{
+    if (sToCloud9Sidecar->ClusterModeEnabled() && !this->isBFGroup() && !this->isBGGroup())
+        return;
+
+    ForcedDisband(hideDestroy);
 }
 
 /*********************************************************/
@@ -1632,6 +1684,12 @@ void Group::SendTargetIconList(WorldSession* session)
 
 void Group::SendUpdate()
 {
+    if (sToCloud9Sidecar->ClusterModeEnabled() && !this->isBFGroup() && !this->isBGGroup())
+    {
+        // Group service responsible for sending these updates.
+        return;
+    }
+
     for (member_witerator witr = m_memberSlots.begin(); witr != m_memberSlots.end(); ++witr)
         SendUpdateToPlayer(witr->guid, &(*witr));
 }
@@ -2012,7 +2070,7 @@ void Roll::targetObjectBuildLink()
 void Group::SetDungeonDifficulty(Difficulty difficulty)
 {
     m_dungeonDifficulty = difficulty;
-    if (!isBGGroup() && !isBFGroup())
+    if (!sToCloud9Sidecar->ClusterModeEnabled() && !isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DIFFICULTY);
 
@@ -2033,7 +2091,7 @@ void Group::SetDungeonDifficulty(Difficulty difficulty)
 void Group::SetRaidDifficulty(Difficulty difficulty)
 {
     m_raidDifficulty = difficulty;
-    if (!isBGGroup() && !isBFGroup())
+    if (!sToCloud9Sidecar->ClusterModeEnabled() && !isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_RAID_DIFFICULTY);
 

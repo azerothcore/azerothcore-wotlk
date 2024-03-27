@@ -87,6 +87,8 @@ private:
     void UpdatePassengerPositions(PassengerSet& passengers);
     void DoEventIfAny(KeyFrame const& node, bool departure);
 
+    uint32 HandleFirstDepartureSync(uint32 diff);
+
     //! Helpers to know if stop frame was reached
     bool IsMoving() const { return _isMoving; }
     void SetMoving(bool val) { _isMoving = val; }
@@ -106,6 +108,9 @@ private:
     mutable std::mutex Lock;
     bool _passengersLoaded;
     bool _delayedTeleport;
+
+    bool _requiresFirstDepartureSync;
+    std::chrono::system_clock::time_point _firstDepartureTime;
 };
 
 class StaticTransport : public Transport
