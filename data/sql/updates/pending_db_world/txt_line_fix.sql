@@ -34,6 +34,3 @@ UPDATE `creature_text` SET `comment` = 'Sylvanas SAY_SYLVANAS_KRICK_2' WHERE `Cr
 UPDATE `creature_text` SET `comment` = 'Sylvanas SAY_SYLVANAS_KRICK_3' WHERE `CreatureID` = 36990 AND `GroupID`=2 AND `ID`=0;
 UPDATE `creature_text` SET `comment` = 'Jaina SAY_JAINA_KRICK_2' WHERE `CreatureID` = 36993 AND `GroupID`=1 AND `ID`=0;
 UPDATE `creature_text` SET `comment` = 'Jaina SAY_JAINA_KRICK_1' WHERE `CreatureID` = 36993 AND `GroupID`=0 AND `ID`=0;
-
-
-
