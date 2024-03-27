@@ -295,7 +295,7 @@ struct boss_jedoga_shadowseeker : public BossAI
     {
         if (!ritualTriggered && me->HealthBelowPctDamaged(55, damage) && events.IsInPhase(PHASE_NORMAL))
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
             me->SetReactState(REACT_PASSIVE);
@@ -368,7 +368,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
                 me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
                 me->RemoveAurasDueToSpell(SPELL_HOVER_FALL);
-                SetCombatMovement(true);
+                me->SetCombatMovement(true);
 
                 me->SetDisableGravity(false);
                 me->SetHover(false);

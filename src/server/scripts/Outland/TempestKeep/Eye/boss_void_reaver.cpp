@@ -95,21 +95,16 @@ struct boss_void_reaver : public BossAI
             context.Repeat(12100ms, 15800ms);
         }).Schedule(3450ms, GROUP_ARCANE_ORB, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
-                me->CastSpell(target, SPELL_ARCANE_ORB, false);
-            else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
-                me->CastSpell(target, SPELL_ARCANE_ORB, false);
+            if (!DoCastRandomTarget(SPELL_ARCANE_ORB, 0, -18.0f))
+            {
+                DoCastRandomTarget(SPELL_ARCANE_ORB, 0, 18.0f);
+            }
             context.Repeat(2400ms, 6300ms);
         }).Schedule(14350ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_KNOCK_AWAY);
             context.Repeat(20550ms, 22550ms);
         });
-    }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
     }
 
     private:

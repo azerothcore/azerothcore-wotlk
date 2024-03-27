@@ -992,11 +992,11 @@ void ScriptMgr::PetitionShowList(Player* player, Creature* creature, uint32& Cha
     });
 }
 
-void ScriptMgr::OnRewardKillRewarder(Player* player, bool isDungeon, float& rate)
+void ScriptMgr::OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
-        script->OnRewardKillRewarder(player, isDungeon, rate);
+        script->OnRewardKillRewarder(player, rewarder, isDungeon, rate);
     });
 }
 
@@ -1504,6 +1504,19 @@ bool ScriptMgr::CanInitTrade(Player* player, Player* target)
     {
         return false;
     }
+
+    return true;
+}
+
+bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->CanSetTradeItem(player, tradedItem, tradeSlot);
+        });
+
+    if (ret && *ret)
+        return false;
 
     return true;
 }
