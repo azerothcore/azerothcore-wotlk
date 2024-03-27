@@ -404,8 +404,11 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
     if (bg->isArena())
     {
         uint32 maxPlayersPerTeam = ArenaTeam::GetReqPlayersForType(arenaType) / 2;
+        uint32 minPlayersFerTeam = ArenaTeam::GetReqPlayersForType(arenaType);
         sScriptMgr->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayersPerTeam);
+        sScriptMgr->OnSetArenaMinPlayersPerTeam(arenaType, minPlayersFerTeam);
         bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
+        bg->SetMinPlayersPerTeam(minPlayersFerTeam);
     }
 
     return bg;
