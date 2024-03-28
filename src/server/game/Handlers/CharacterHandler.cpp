@@ -2122,6 +2122,53 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
     if (oldRace != factionChangeInfo->Race)
     {
+        // Delete Racial Skill
+        uint32 racialSkillId;
+        switch (oldRace)
+        {
+            case RACE_HUMAN:
+                racialSkillId = SKILL_RACIAL_HUMAN;
+                break;
+            case RACE_ORC:
+                racialSkillId = SKILL_ORC_RACIAL;
+                break;
+            case RACE_DWARF:
+                racialSkillId = SKILL_RACIAL_DWARVEN;
+                break;
+            case RACE_NIGHTELF:
+                racialSkillId = SKILL_RACIAL_NIGHT_ELF;
+                break;
+            case RACE_UNDEAD_PLAYER:
+                racialSkillId = SKILL_RACIAL_UNDED;
+                break;
+            case RACE_TAUREN:
+                racialSkillId = SKILL_RACIAL_TAUREN;
+                break;
+            case RACE_GNOME:
+                racialSkillId = SKILL_RACIAL_GNOME;
+                break;
+            case RACE_TROLL:
+                racialSkillId = SKILL_RACIAL_TROLL;
+                break;
+            case RACE_BLOODELF:
+                racialSkillId = SKILL_RACIAL_BLOODELF;
+                break;
+            case RACE_DRAENEI:
+                racialSkillId = SKILL_RACIAL_DRAENEI;
+                break;
+            default:
+                racialSkillId = 0;
+                break;
+        }
+
+        if (racialSkillId)
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILL_BY_SKILL);
+            stmt->SetData(0, lowGuid);
+            stmt->SetData(1, racialSkillId);
+            trans->Append(stmt);
+        }
+
         // Switch Languages
         // delete all languages first
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILL_LANGUAGES);
