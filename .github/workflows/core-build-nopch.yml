@@ -4,7 +4,10 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['opened', 'synchronize', 'reopened']
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -15,42 +18,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
           - os: ubuntu-20.04
-            compiler: clang12
+            compiler:
+              CC: gcc-10
+              CXX: g++-10
           - os: ubuntu-20.04
-            compiler: gcc10
+            compiler:
+              CC: clang-12
+              CXX: clang++-12
+          - os: ubuntu-22.04
+            compiler:
+              CC: clang-15
+              CXX: clang++-15
+          - os: ubuntu-22.04
+            compiler:
+              CC: gcc-13
+              CXX: g++-13
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-nopch
-    env:
-      COMPILER: ${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/linux-build
         with:
-          path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-        env:
-          CONTINUOUS_INTEGRATION: true
-      - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core.sh
-      - name: Process pending sql
-        run: bash bin/acore-db-pendings
-      - name: Build
-        run: source ./apps/ci/ci-compile.sh
-      - name: Dry run authserver
-        run: source ./apps/ci/ci-dry-run.sh authserver
-      - name: Dry run worldserver
-        run: source ./apps/ci/ci-dry-run.sh worldserver
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          pch: false

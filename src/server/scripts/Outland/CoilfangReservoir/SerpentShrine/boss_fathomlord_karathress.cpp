@@ -66,7 +66,8 @@ enum Spells
 
 enum Misc
 {
-    GO_CAGE                         = 185474
+    GO_CAGE                         = 185474,
+    ACTION_RESET_ADDS               = 1
 };
 
 const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
@@ -74,6 +75,17 @@ const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
 struct boss_fathomlord_karathress : public BossAI
 {
     boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS){ }
+
+    void JustReachedHome() override
+    {
+        instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard)
+        {
+            if (!fathomguard->IsAlive())
+            {
+                fathomguard->Respawn(true);
+            }
+        });
+    }
 
     void Reset() override
     {
@@ -155,6 +167,18 @@ struct boss_fathomlord_karathress : public BossAI
         {
             DoCastSelf(SPELL_ENRAGE, true);
         });
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RESET_ADDS)
+        {
+            EnterEvadeMode();
+            instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard)
+            {
+                fathomguard->DespawnOrUnsummon();
+            });
+        }
     }
 private:
     bool _recentlySpoken;
@@ -257,6 +281,15 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
     }
 
 private:
@@ -434,6 +467,15 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
 private:
     TaskScheduler _scheduler;
     TaskScheduler _totemScheduler;
@@ -516,6 +558,15 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         _scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
     }
 
 private:

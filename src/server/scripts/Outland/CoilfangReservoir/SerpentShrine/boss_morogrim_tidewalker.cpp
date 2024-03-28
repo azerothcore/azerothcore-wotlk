@@ -149,6 +149,23 @@ class spell_morogrim_tidewalker_watery_grave : public SpellScript
         return true;
     }
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint8 maxSize = 4;
+        Unit* caster = GetCaster();
+
+        targets.remove_if([caster](WorldObject const* target) -> bool
+            {
+                // Should not target current victim.
+                return caster->GetVictim() == target;
+            });
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
+    }
+
     void HandleDummy(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
@@ -159,6 +176,7 @@ class spell_morogrim_tidewalker_watery_grave : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_morogrim_tidewalker_watery_grave::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_watery_grave::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 

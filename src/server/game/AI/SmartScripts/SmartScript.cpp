@@ -634,6 +634,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
                     // To prevent running back and forth when OOM, we must have more than 10% mana.
                     bool canCastSpell = me->GetPowerPct(POWER_MANA) > 10.0f && spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) < (int32)me->GetPower(POWER_MANA) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+                    bool isSpellIgnoreLOS = spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
                     // If target is rooted we move out of melee range before casting, but not further than spell max range.
                     if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell)
@@ -651,7 +652,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
-                    else if (distanceToTarget < spellMinRange || !isWithinLOSInMap)
+                    else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
                     {
                         failedSpellCast = true;
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
@@ -4397,10 +4398,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 {
                     if (IsPlayer(target))
                         playerCount++;
-
-                    if (playerCount >= e.event.nearPlayer.minCount)
-                        ProcessAction(e, target->ToUnit());
                 }
+                    if (playerCount >= e.event.nearPlayer.minCount)
+                        ProcessAction(e, unit);
             }
             RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;

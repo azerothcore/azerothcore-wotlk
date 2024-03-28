@@ -12,22 +12,13 @@ concurrency:
 
 jobs:
   build-modules:
-    strategy:
-      fail-fast: false
-      matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
-        os: [ubuntu-20.04]
-        compiler: [clang]
-        modules: [with]
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
-    env:
-      COMPILER: ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
+    name: modules build on latest ubuntu
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (
-        github.ref == 'refs/heads/master'
+        github.ref_name == 'master'
         || contains(github.event.pull_request.labels.*.name, 'file-cpp'
         || github.event.label.name == 'file-cpp'
         || contains(github.event.pull_request.labels.*.name, 'run-build')
@@ -35,24 +26,9 @@ jobs:
       )
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout modules
-        run: ./apps/ci/ci-install-modules.sh
-        if: matrix.modules == 'with'
-      - name: Cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/linux-build
         with:
-          path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-        env:
-          CONTINUOUS_INTEGRATION: true
-      - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core.sh
-      - name: Process pending sql
-        run: bash bin/acore-db-pendings
-      - name: Build
-        run: source ./apps/ci/ci-compile.sh
+          CC: clang-15
+          CXX: clang++-15
+          modules: true
+          pch: false
