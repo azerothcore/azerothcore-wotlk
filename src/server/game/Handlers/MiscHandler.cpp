@@ -1091,34 +1091,34 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
+void WorldSession::HandleWorldTeleport(WorldPacket& msg)
 {
-    uint32 time;
-    uint32 mapid;
-    float PositionX;
-    float PositionY;
-    float PositionZ;
-    float Orientation;
-
-    recv_data >> time;                                      // time in m.sec.
-    recv_data >> mapid;
-    recv_data >> PositionX;
-    recv_data >> PositionY;
-    recv_data >> PositionZ;
-    recv_data >> Orientation;                               // o (3.141593 = 180 degrees)
-
-    if (GetPlayer()->IsInFlight())
-    {
-        LOG_DEBUG("network", "Player '{}' ({}) in flight, ignore worldport command.", GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
+    if (!IsGMAccount()) {
+        SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
 
-    LOG_DEBUG("network", "CMSG_WORLD_TELEPORT: Player = {}, Time = {}, map = {}, x = {}, y = {}, z = {}, o = {}", GetPlayer()->GetName(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
+    // READ THE MESSAGE DATA
+    auto eventTime      = msg.read<uint32>();
+    auto continentID    = msg.read<uint32>();
+    auto player         = msg.read<ObjectGuid>();
+    auto position       = msg.read<G3D::Vector3>();
+    auto facing         = msg.read<float>();
 
-    if (AccountMgr::IsAdminAccount(GetSecurity()))
-        GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
-    else
-        SendNotification(LANG_PERMISSION_DENIED);
+    // LOOK FOR A PLAYER OBJECT IN WORLD
+    // THAT MATCHES THE PROVIDED GUID
+    // OR USE THE ACTIVE PLAYER
+    Player* playerPtr = player ? ObjectAccessor::FindPlayer(player) : GetPlayer();
+    if (!playerPtr) {
+        return;
+    }
+
+    LOG_GM(GetAccountId(),
+           "Player {} sent command: worldport {} {} {} {} {}",
+           playerPtr->GetName(), continentID, position.x, position.y, position.z, facing);
+
+    // TODO: WorldTeleport(eventTime, continentID, playerPtr, position, facing);
+    playerPtr->TeleportTo(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
 }
 
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
