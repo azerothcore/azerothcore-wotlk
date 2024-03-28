@@ -36,10 +36,35 @@ DoorData const doorData[] =
     { GO_MOTHER_SHAHRAZ_DOOR,   DATA_MOTHER_SHAHRAZ,        DOOR_TYPE_PASSAGE  },
     { GO_COUNCIL_DOOR_1,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
     { GO_COUNCIL_DOOR_2,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
-    { GO_ILLIDAN_GATE,          DATA_AKAMA_FINISHED,        DOOR_TYPE_PASSAGE  },
+    { GO_ILLIDAN_GATE,          DATA_AKAMA_ILLIDAN,         DOOR_TYPE_PASSAGE  },
     { GO_ILLIDAN_DOOR_L,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { GO_ILLIDAN_DOOR_R,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { 0,                        0,                          DOOR_TYPE_ROOM     }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_HIGH_WARLORD_NAJENTUS,     DATA_HIGH_WARLORD_NAJENTUS     },
+    { NPC_SUPREMUS,                  DATA_SUPREMUS                  },
+    { NPC_SHADE_OF_AKAMA,            DATA_SHADE_OF_AKAMA            },
+    { NPC_AKAMA_SHADE,               DATA_AKAMA_SHADE               },
+    { NPC_TERON_GOREFIEND,           DATA_TERON_GOREFIEND           },
+    { NPC_GURTOGG_BLOODBOIL,         DATA_GURTOGG_BLOODBOIL         },
+    { NPC_RELIQUARY_OF_THE_LOST,     DATA_RELIQUARY_OF_SOULS        },
+    { NPC_MOTHER_SHAHRAZ,            DATA_MOTHER_SHAHRAZ            },
+    { NPC_ILLIDARI_COUNCIL,          DATA_ILLIDARI_COUNCIL          },
+    { NPC_GATHIOS_THE_SHATTERER,     DATA_GATHIOS_THE_SHATTERER     },
+    { NPC_HIGH_NETHERMANCER_ZEREVOR, DATA_HIGH_NETHERMANCER_ZEREVOR },
+    { NPC_LADY_MALANDE,              DATA_LADY_MALANDE              },
+    { NPC_VERAS_DARKSHADOW,          DATA_VERAS_DARKSHADOW          },
+    { NPC_AKAMA_ILLIDAN,             DATA_AKAMA_ILLIDAN             },
+    { NPC_ILLIDAN_STORMRAGE,         DATA_ILLIDAN_STORMRAGE         },
+    { 0,                             0                              }
+};
+
+ObjectData const objectData[] =
+{
+    { 0, 0 }
 };
 
 BossBoundaryData const boundaries =
@@ -70,6 +95,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
+            LoadObjectData(creatureData, objectData);
 
             ashtongueGUIDs.clear();
         }
@@ -78,52 +104,19 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SHADE_OF_AKAMA:
-                    ShadeOfAkamaGUID = creature->GetGUID();
-                    break;
-                case NPC_AKAMA_SHADE:
-                    AkamaShadeGUID = creature->GetGUID();
-                    break;
-                case NPC_TERON_GOREFIEND:
-                    TeronGorefiendGUID = creature->GetGUID();
-                    break;
-                case NPC_RELIQUARY_OF_THE_LOST:
-                    ReliquaryGUID = creature->GetGUID();
-                    break;
-                case NPC_GATHIOS_THE_SHATTERER:
-                    GathiosTheShattererGUID = creature->GetGUID();
-                    break;
-                case NPC_HIGH_NETHERMANCER_ZEREVOR:
-                    HighNethermancerZerevorGUID = creature->GetGUID();
-                    break;
-                case NPC_LADY_MALANDE:
-                    LadyMalandeGUID = creature->GetGUID();
-                    break;
-                case NPC_VERAS_DARKSHADOW:
-                    VerasDarkshadowGUID = creature->GetGUID();
-                    break;
-                case NPC_ILLIDARI_COUNCIL:
-                    IllidariCouncilGUID = creature->GetGUID();
-                    break;
-                case NPC_AKAMA:
-                    AkamaGUID = creature->GetGUID();
-                    break;
-                case NPC_ILLIDAN_STORMRAGE:
-                    IllidanStormrageGUID = creature->GetGUID();
-                    break;
                 case NPC_VENGEFUL_SPIRIT:
                 case NPC_SHADOWY_CONSTRUCT:
-                    if (Creature* teron = instance->GetCreature(TeronGorefiendGUID))
+                    if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
                         teron->AI()->JustSummoned(creature);
                     break;
                 case NPC_ENSLAVED_SOUL:
-                    if (Creature* reliquary = instance->GetCreature(ReliquaryGUID))
+                    if (Creature* reliquary = GetCreature(DATA_RELIQUARY_OF_SOULS))
                         reliquary->AI()->JustSummoned(creature);
                     break;
                 case NPC_PARASITIC_SHADOWFIEND:
                 case NPC_BLADE_OF_AZZINOTH:
                 case NPC_FLAME_OF_AZZINOTH:
-                    if (Creature* illidan = instance->GetCreature(IllidanStormrageGUID))
+                    if (Creature* illidan = GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->JustSummoned(creature);
                     break;
                 case NPC_ANGERED_SOUL_FRAGMENT:
@@ -131,85 +124,38 @@ public:
                 case NPC_SUFFERING_SOUL_FRAGMENT:
                     creature->SetCorpseDelay(5);
                     break;
+                case NPC_ASHTONGUE_BATTLELORD:
+                case NPC_ASHTONGUE_MYSTIC:
+                case NPC_ASHTONGUE_STORMCALLER:
+                case NPC_ASHTONGUE_PRIMALIST:
+                case NPC_ASHTONGUE_FERAL_SPIRIT:
+                case NPC_ASHTONGUE_STALKER:
+                case NPC_STORM_FURY:
+                    if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
+                        creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
+                    else
+                        ashtongueGUIDs.insert(creature->GetGUID());
+                    break;
+                default:
+                    break;
             }
 
-            if (creature->GetName().find("Ashtongue") != std::string::npos || creature->GetEntry() == NPC_STORM_FURY)
-            {
-                ashtongueGUIDs.push_back(creature->GetGUID());
-                if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
-                    creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
-            }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch (go->GetEntry())
+            // If created after Illidari Council is done, then skip Akama's event. Used for crashes/reset
+            if (go->GetEntry() == GO_ILLIDAN_GATE)
             {
-                case GO_NAJENTUS_GATE:
-                case GO_SUPREMUS_GATE:
-                case GO_SHADE_OF_AKAMA_DOOR:
-                case GO_TERON_DOOR_1:
-                case GO_TERON_DOOR_2:
-                case GO_GURTOGG_DOOR:
-                case GO_TEMPLE_DOOR:
-                case GO_MOTHER_SHAHRAZ_DOOR:
-                case GO_COUNCIL_DOOR_1:
-                case GO_COUNCIL_DOOR_2:
-                case GO_ILLIDAN_GATE:
-                case GO_ILLIDAN_DOOR_R:
-                case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_NAJENTUS_GATE:
-                case GO_SUPREMUS_GATE:
-                case GO_SHADE_OF_AKAMA_DOOR:
-                case GO_TERON_DOOR_1:
-                case GO_TERON_DOOR_2:
-                case GO_GURTOGG_DOOR:
-                case GO_TEMPLE_DOOR:
-                case GO_MOTHER_SHAHRAZ_DOOR:
-                case GO_COUNCIL_DOOR_1:
-                case GO_COUNCIL_DOOR_2:
-                case GO_ILLIDAN_GATE:
-                case GO_ILLIDAN_DOOR_R:
-                case GO_ILLIDAN_DOOR_L:
-                    RemoveDoor(go);
-                    break;
-            }
-        }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case NPC_SHADE_OF_AKAMA:
-                    return ShadeOfAkamaGUID;
-                case NPC_AKAMA_SHADE:
-                    return AkamaShadeGUID;
-                case NPC_GATHIOS_THE_SHATTERER:
-                    return GathiosTheShattererGUID;
-                case NPC_HIGH_NETHERMANCER_ZEREVOR:
-                    return HighNethermancerZerevorGUID;
-                case NPC_LADY_MALANDE:
-                    return LadyMalandeGUID;
-                case NPC_VERAS_DARKSHADOW:
-                    return VerasDarkshadowGUID;
-                case NPC_ILLIDARI_COUNCIL:
-                    return IllidariCouncilGUID;
-                case NPC_AKAMA:
-                    return AkamaGUID;
-                case NPC_ILLIDAN_STORMRAGE:
-                    return IllidanStormrageGUID;
+                if (GetBossState(DATA_ILLIDARI_COUNCIL) == DONE)
+                {
+                    SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                    HandleGameObject(ObjectGuid::Empty, true, go);
+                }
             }
 
-            return ObjectGuid::Empty;
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -225,26 +171,15 @@ public:
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
             {
-                if (Creature* akama = instance->GetCreature(AkamaGUID))
-                    akama->SetVisible(true);
+                if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
+                    akama->AI()->DoAction(0);
             }
 
             return true;
         }
 
     protected:
-        ObjectGuid ShadeOfAkamaGUID;
-        ObjectGuid AkamaShadeGUID;
-        ObjectGuid TeronGorefiendGUID;
-        ObjectGuid ReliquaryGUID;
-        GuidList ashtongueGUIDs;
-        ObjectGuid GathiosTheShattererGUID;
-        ObjectGuid HighNethermancerZerevorGUID;
-        ObjectGuid LadyMalandeGUID;
-        ObjectGuid VerasDarkshadowGUID;
-        ObjectGuid IllidariCouncilGUID;
-        ObjectGuid AkamaGUID;
-        ObjectGuid IllidanStormrageGUID;
+        GuidSet ashtongueGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
