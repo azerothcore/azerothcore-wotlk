@@ -491,6 +491,7 @@ public:
         {
             // No overlapping!
             _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
+            trash = 0;    // Reset counter here to avoid resetting the counter from scheduled waves. Required because creatures killed for RP events counts towards the kill counter as well, confirmed in Retail.
 
             _scheduler.Schedule(1ms, [this, startWaves, maxWaves, timerptr](TaskContext context)
                 {
@@ -498,7 +499,6 @@ public:
                     if (_currentWave >= maxWaves)
                         return;
 
-                    trash = 0;    // Overrun event trash can modify the counter, so we set it to 0 at the start of every wave. World Update is sent in the first spawn
                     instance->SummonCreatureGroup(startWaves + _currentWave);   // _currentWave should be 0 when this function is first called
 
                     // Check if it's time to summon Infernals

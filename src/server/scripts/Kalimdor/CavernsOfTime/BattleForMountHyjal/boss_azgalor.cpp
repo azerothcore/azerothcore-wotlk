@@ -105,7 +105,10 @@ public:
         Talk(SAY_ONDEATH);
         // If Archimonde has not yet been initialized, this won't trigger
         if (Creature* archi = instance->GetCreature(DATA_ARCHIMONDE))
+        {
+            archi->AI()->DoAction(ACTION_BECOME_ACTIVE_AND_CHANNEL);
             archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25000ms);
+        }
         BossAI::JustDied(killer);
     }
 
