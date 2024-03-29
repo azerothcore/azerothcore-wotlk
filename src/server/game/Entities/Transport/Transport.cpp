@@ -172,7 +172,7 @@ uint32 MotionTransport::HandleFirstDepartureSync(uint32 diff)
                 this->BuildCreateUpdateBlockForPlayer(&transData, player);
 
                 WorldPacket packet;
-                transData.BuildPacket(&packet);
+                transData.BuildPacket(packet);
                 player->GetSession()->SendPacket(&packet);
             }
         }
