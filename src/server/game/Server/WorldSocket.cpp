@@ -31,8 +31,87 @@
 #include "World.h"
 #include "WorldSession.h"
 #include <memory>
+#include "zlib.h"
 
 using boost::asio::ip::tcp;
+
+void compressBuff(void* dst, uint32* dst_size, void* src, int src_size)
+{
+    z_stream c_stream;
+
+    c_stream.zalloc = (alloc_func)0;
+    c_stream.zfree = (free_func)0;
+    c_stream.opaque = (voidpf)0;
+
+    // default Z_BEST_SPEED (1)
+    int z_res = deflateInit(&c_stream, sWorld->getIntConfig(CONFIG_COMPRESSION));
+    if (z_res != Z_OK)
+    {
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflateInit) Error code: {} ({})", z_res, zError(z_res));
+        *dst_size = 0;
+        return;
+    }
+
+    c_stream.next_out = (Bytef*)dst;
+    c_stream.avail_out = *dst_size;
+    c_stream.next_in = (Bytef*)src;
+    c_stream.avail_in = (uInt)src_size;
+
+    z_res = deflate(&c_stream, Z_NO_FLUSH);
+    if (z_res != Z_OK)
+    {
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate) Error code: {} ({})", z_res, zError(z_res));
+        *dst_size = 0;
+        return;
+    }
+
+    if (c_stream.avail_in != 0)
+    {
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate not greedy)");
+        *dst_size = 0;
+        return;
+    }
+
+    z_res = deflate(&c_stream, Z_FINISH);
+    if (z_res != Z_STREAM_END)
+    {
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate should report Z_STREAM_END instead {} ({})", z_res, zError(z_res));
+        *dst_size = 0;
+        return;
+    }
+
+    z_res = deflateEnd(&c_stream);
+    if (z_res != Z_OK)
+    {
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflateEnd) Error code: {} ({})", z_res, zError(z_res));
+        *dst_size = 0;
+        return;
+    }
+
+    *dst_size = c_stream.total_out;
+}
+
+void EncryptableAndCompressiblePacket::CompressIfNeeded()
+{
+    if (!NeedsCompression())
+        return;
+
+    uint32 pSize = size();
+
+    uint32 destsize = compressBound(pSize);
+    ByteBuffer buf(destsize + sizeof(uint32));
+    buf.resize(destsize + sizeof(uint32));
+
+    buf.put<uint32>(0, pSize);
+    compressBuff(const_cast<uint8*>(buf.contents()) + sizeof(uint32), &destsize, (void*)contents(), pSize);
+    if (destsize == 0)
+        return;
+
+    buf.resize(destsize + sizeof(uint32));
+
+    ByteBuffer::operator=(std::move(buf));
+    SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
+}
 
 WorldSocket::WorldSocket(tcp::socket&& socket)
     : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096)
@@ -81,10 +160,12 @@ void WorldSocket::CheckIpCallback(PreparedQueryResult result)
 
 bool WorldSocket::Update()
 {
-    EncryptablePacket* queued;
+    EncryptableAndCompressiblePacket* queued;
     MessageBuffer buffer(_sendBufferSize);
     while (_bufferQueue.Dequeue(queued))
     {
+        queued->CompressIfNeeded();
+
         ServerPktHeader header(queued->size() + 2, queued->GetOpcode());
         if (queued->NeedsEncryption())
             _authCrypt.EncryptSend(header.header, header.getHeaderLength());
@@ -427,7 +508,7 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
     if (sPacketLog->CanLogPacket())
         sPacketLog->LogPacket(packet, SERVER_TO_CLIENT, GetRemoteIpAddress(), GetRemotePort());
 
-    _bufferQueue.Enqueue(new EncryptablePacket(packet, _authCrypt.IsInitialized()));
+    _bufferQueue.Enqueue(new EncryptableAndCompressiblePacket(packet, _authCrypt.IsInitialized()));
 }
 
 void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)

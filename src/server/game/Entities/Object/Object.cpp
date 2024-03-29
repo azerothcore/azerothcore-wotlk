@@ -250,7 +250,7 @@ void Object::SendUpdateToPlayer(Player* player)
     WorldPacket packet;
 
     BuildCreateUpdateBlockForPlayer(&upd, player);
-    upd.BuildPacket(&packet);
+    upd.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
