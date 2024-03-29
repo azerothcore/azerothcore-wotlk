@@ -161,11 +161,11 @@ void WorldSocket::CheckIpCallback(PreparedQueryResult result)
 bool WorldSocket::Update()
 {
     EncryptableAndCompressiblePacket* queued;
-    if (_bufferQueue.Dequeue(queued)) 
+    if (_bufferQueue.Dequeue(queued))
     {
         // Allocate buffer only when it's needed but not on every Update() call.
         MessageBuffer buffer(_sendBufferSize);
-        do 
+        do
         {
             queued->CompressIfNeeded();
             ServerPktHeader header(queued->size() + 2, queued->GetOpcode());
