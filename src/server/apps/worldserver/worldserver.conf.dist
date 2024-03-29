@@ -2029,10 +2029,17 @@ EnableLowLevelRegenBoost = 1
 
 #
 #    Rate.MoveSpeed
-#        Description: Movement speed rate.
+#        Description: Player movement speed rate.
 #        Default:     1
 
 Rate.MoveSpeed = 1
+
+#
+#    Rate.MoveSpeedOther
+#        Description: Npc and mob movement speed rate.
+#        Default:     1
+
+Rate.MoveSpeedOther = 1
 
 #
 #    Rate.Damage.Fall
