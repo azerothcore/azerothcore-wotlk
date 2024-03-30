@@ -21059,7 +21059,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
         visibleFlag |= UF_FLAG_PARTY_MEMBER;
 
     auto cacheIt = _valuesUpdateCache.find(visibleFlag);
-    if (cacheIt != _valuesUpdateCache.end()) 
+    if (cacheIt != _valuesUpdateCache.end())
     {
         int32 cachePos = static_cast<int32>(data->wpos());
         data->append(cacheIt->second.buffer);
@@ -21095,7 +21095,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                 fieldBuffer << m_uint32Values[UNIT_NPC_FLAGS];
             }
             else if (index == UNIT_FIELD_AURASTATE)
-            {                
+            {
                 cacheValue.posPointers.UnitFieldAuraStatePos = int32(fieldBuffer.wpos());
                 fieldBuffer << uint32(0); // Fill in later.
             }
@@ -21135,7 +21135,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             {
                 cacheValue.posPointers.UnitFieldBytes2Pos = int32(fieldBuffer.wpos());
                 fieldBuffer << m_uint32Values[index];
-            } 
+            }
             else if (index == UNIT_FIELD_FACTIONTEMPLATE)
             {
                 cacheValue.posPointers.UnitFieldFactionTemplatePos = int32(fieldBuffer.wpos());
@@ -21200,7 +21200,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
     if (posPointers.UnitFieldAuraStatePos >= 0)
         valuesUpdateBuf.put(posPointers.UnitFieldAuraStatePos, uint32(BuildAuraStateUpdateForTarget(target)));
 
-    // UNIT_FIELD_FLAGS 
+    // UNIT_FIELD_FLAGS
     if (posPointers.UnitFieldFlagsPos >= 0)
     {
         uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
@@ -21277,7 +21277,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
 
         valuesUpdateBuf.put(posPointers.UnitDynamicFlagsPos, dynamicFlags);
     }
-    
+
     // UNIT_FIELD_BYTES_2
     if (posPointers.UnitFieldBytes2Pos >= 0)
     {
