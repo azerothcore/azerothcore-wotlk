@@ -41,6 +41,7 @@ struct boss_void_reaver : public BossAI
 {
     boss_void_reaver(Creature* creature) : BossAI(creature, DATA_REAVER)
     {
+        callForHelpRange = 105.0f;
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -82,7 +83,6 @@ struct boss_void_reaver : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        me->CallForHelp(105.0f);
 
         scheduler.Schedule(10min, [this](TaskContext)
         {
