@@ -33,7 +33,7 @@ jobs:
               CC: gcc-13
               CXX: g++-13
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
