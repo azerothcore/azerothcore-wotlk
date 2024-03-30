@@ -102,7 +102,7 @@ runs:
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
-          ${{ !inputs.pch && '-DNOPCH=true' || '' }}
+          ${{ inputs.pch == 'true' && '' || '-DNOPCH=true' }}
 
     - name: build
       shell: bash
