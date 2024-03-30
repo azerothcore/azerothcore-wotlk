@@ -30,11 +30,11 @@ runs:
         path: ${{ github.workspace }}/var/ccache
           # format
           # ccache:OS:CC_CXX:MODULES:GITHUB_REF:GITHUB_SHA
-        key: ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
+        key: ccache:ubuntu:${{ inputs.pch == 'true' && 'pch' || 'no-pch' }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
         restore-keys: |
-          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}
-          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
-          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}
+          ccache:ubuntu:${{ inputs.pch == 'true' && 'pch' || 'no-pch' }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}
+          ccache:ubuntu:${{ inputs.pch == 'true' && 'pch' || 'no-pch' }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
+          ccache:ubuntu:${{ inputs.pch == 'true' && 'pch' || 'no-pch' }}:${{ inputs.CC }}_${{ inputs.CXX }}
 
     # This script moves sql files from "data/sql/updates/pending_$DB" to the
     # proper folder for the db
