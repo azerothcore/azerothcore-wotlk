@@ -29,6 +29,9 @@ public:
     // Called when an account logged in successfully
     virtual void OnAccountLogin(uint32 /*accountId*/) { }
 
+    // Called when an account is about to be deleted
+    virtual void OnBeforeAccountDelete(uint32 /*accountId*/) { }
+
     // Called when an ip logged in successfully
     virtual void OnLastIpUpdate(uint32 /*accountId*/, std::string /*ip*/) { }
 

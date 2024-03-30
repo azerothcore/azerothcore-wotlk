@@ -44,6 +44,8 @@ prevent duplicates.
 C++ fixes are submitted as [pull requests](https://github.com/trickerer/Azerothcore-wotlk-with-NPCBots/pulls).
 
 
+You can check the [authors](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS) file for more details.
+
 ## Important Links
 
 - [NPCBots Readme](https://github.com/trickerer/Trinity-Bots/)

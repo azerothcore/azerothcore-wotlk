@@ -442,6 +442,7 @@ public: /* PlayerScript */
     bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
     bool CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
     bool CanInitTrade(Player* player, Player* target);
+    bool CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
@@ -471,6 +472,7 @@ public: /* PlayerScript */
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
+    void OnBeforeAccountDelete(uint32 accountId);
     void OnLastIpUpdate(uint32 accountId, std::string ip);
     void OnFailedAccountLogin(uint32 accountId);
     void OnEmailChange(uint32 accountId);
