@@ -24,8 +24,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Cache
-      uses: actions/cache@v3
+    - name: Restore Cache
+      uses: actions/cache/restore@v3
       with:
         path: ${{ github.workspace }}/var/ccache
           # format
@@ -113,6 +113,13 @@ runs:
       shell: bash
       working-directory: "${{ github.workspace }}/build"
       run: cmake --install . --config "Release"
+
+    - name: Save cache
+      uses: actions/cache/save@v3
+      if: github.ref_name == github.event.repository.default_branch
+      with:
+        path: ${{ github.workspace }}/var/ccache
+        key: ccache:ubuntu:${{ inputs.pch == 'true' && 'pch' || 'no-pch' }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
 
     - name: Setup config
       shell: bash
