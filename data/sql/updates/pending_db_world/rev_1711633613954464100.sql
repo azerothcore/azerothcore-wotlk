@@ -156,7 +156,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -- remaining spawns (no sniffed values available)
 -- (`guid` IN (66383, 66616, 31085, 42510, 76879, 44720))
 
--- two remaining spawns actually show in sniffs but with non-existend gameobject IDs (?)
+-- two remaining spawns actually show in sniffs but with non-existend gameobject IDs
 -- guid 31085, id 1745:
 -- (, 405870, 0, 40, 20, 1, 1, -11042.3994140625, 1452.140625, 45.19609832763671875, 4.860743999481201171, 0.002847671508789062, 0.003304481506347656, -0.65275287628173828, 0.757558345794677734, 120, 255, 1, 53622), -- 405870 (Area: 20 - Difficulty: 0) CreateObject1
 -- guid 42510, id 2015:
