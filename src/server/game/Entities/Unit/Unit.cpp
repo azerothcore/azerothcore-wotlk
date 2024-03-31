@@ -21143,10 +21143,8 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             }
             else
             {
-                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
-                {
-                    continue;
-                }
+                if (sScriptMgr->ShouldTrackValuesUpdatePosByIndex(this, updateType, index))
+                    cacheValue.posPointers.other[index] = static_cast<uint32>(fieldBuffer.wpos());
 
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
@@ -21313,6 +21311,8 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             valuesUpdateBuf.put(posPointers.UnitFieldFactionTemplatePos, uint32(target->GetFaction()));
         }
     }
+
+    sScriptMgr->OnPatchValuesUpdate(this, valuesUpdateBuf, posPointers, target);
 }
 
 void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown)

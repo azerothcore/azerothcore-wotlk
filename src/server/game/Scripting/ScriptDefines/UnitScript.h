@@ -69,7 +69,9 @@ public:
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
 
-    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
+    [[nodiscard]] virtual bool ShouldTrackValuesUpdatePosByIndex(Unit const* /*unit*/, uint8 /*updateType*/, uint16 /*index*/) { return false; }
+
+    virtual void OnPatchValuesUpdate(Unit const* /*unit*/, ByteBuffer& /*valuesUpdateBuf*/, BuildValuesCachePosPointers& /*posPointers*/, Player* /*target*/) { }
 
     /**
      * @brief This hook runs in Unit::Update
