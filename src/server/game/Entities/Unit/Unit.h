@@ -214,9 +214,6 @@ enum InventorySlot
 struct FactionTemplateEntry;
 struct SpellValue;
 
-struct BuildValuesCachePosPointers;
-struct BuildValuesCachedBuffer;
-
 class AuraApplication;
 class Aura;
 class UnitAura;
@@ -1323,6 +1320,63 @@ private:
     Unit* ptr;
     Unit* defaultValue;
 };
+
+// BuildValuesCachePosPointers is marks of the position of some data inside of BuildValue cache.
+struct BuildValuesCachePosPointers
+{
+    BuildValuesCachePosPointers() :
+        UnitNPCFlagsPos(-1), UnitFieldAuraStatePos(-1), UnitFieldFlagsPos(-1), UnitFieldDisplayPos(-1),
+        UnitDynamicFlagsPos(-1), UnitFieldBytes2Pos(-1), UnitFieldFactionTemplatePos(-1) {}
+
+    void ApplyOffset(uint32 offset)
+    {
+        if (UnitNPCFlagsPos >= 0)
+            UnitNPCFlagsPos += offset;
+
+        if (UnitFieldAuraStatePos >= 0)
+            UnitFieldAuraStatePos += offset;
+
+        if (UnitFieldFlagsPos >= 0)
+            UnitFieldFlagsPos += offset;
+
+        if (UnitFieldDisplayPos >= 0)
+            UnitFieldDisplayPos += offset;
+
+        if (UnitDynamicFlagsPos >= 0)
+            UnitDynamicFlagsPos += offset;
+
+        if (UnitFieldBytes2Pos >= 0)
+            UnitFieldBytes2Pos += offset;
+
+        if (UnitFieldFactionTemplatePos >= 0)
+            UnitFieldFactionTemplatePos += offset;
+
+        for (auto it = other.begin(); it != other.end(); ++it)
+            it->second += offset;
+    }
+
+    int32 UnitNPCFlagsPos;
+    int32 UnitFieldAuraStatePos;
+    int32 UnitFieldFlagsPos;
+    int32 UnitFieldDisplayPos;
+    int32 UnitDynamicFlagsPos;
+    int32 UnitFieldBytes2Pos;
+    int32 UnitFieldFactionTemplatePos;
+
+    std::unordered_map<uint16 /*index*/, uint32 /*pos*/> other;
+};
+
+// BuildValuesCachedBuffer cache for calculated BuildValue.
+struct BuildValuesCachedBuffer
+{
+    BuildValuesCachedBuffer(uint32 bufferSize) :
+        buffer(bufferSize), posPointers() {}
+
+    ByteBuffer buffer;
+
+    BuildValuesCachePosPointers posPointers;
+};
+
 
 class Unit : public WorldObject
 {
@@ -2723,62 +2777,6 @@ public:
 protected:
     Unit& _self;
     uint32 _duration;
-};
-
-// BuildValuesCachePosPointers is marks of the position of some data inside of BuildValue cache.
-struct BuildValuesCachePosPointers
-{
-    BuildValuesCachePosPointers() :
-        UnitNPCFlagsPos(-1), UnitFieldAuraStatePos(-1), UnitFieldFlagsPos(-1), UnitFieldDisplayPos(-1),
-        UnitDynamicFlagsPos(-1), UnitFieldBytes2Pos(-1), UnitFieldFactionTemplatePos(-1) {}
-
-    void ApplyOffset(uint32 offset)
-    {
-        if (UnitNPCFlagsPos >= 0)
-            UnitNPCFlagsPos += offset;
-
-        if (UnitFieldAuraStatePos >= 0)
-            UnitFieldAuraStatePos += offset;
-
-        if (UnitFieldFlagsPos >= 0)
-            UnitFieldFlagsPos += offset;
-
-        if (UnitFieldDisplayPos >= 0)
-            UnitFieldDisplayPos += offset;
-
-        if (UnitDynamicFlagsPos >= 0)
-            UnitDynamicFlagsPos += offset;
-
-        if (UnitFieldBytes2Pos >= 0)
-            UnitFieldBytes2Pos += offset;
-
-        if (UnitFieldFactionTemplatePos >= 0)
-            UnitFieldFactionTemplatePos += offset;
-
-        for (auto it = other.begin(); it != other.end(); ++it)
-            it->second += offset;
-    }
-
-    int32 UnitNPCFlagsPos;
-    int32 UnitFieldAuraStatePos;
-    int32 UnitFieldFlagsPos;
-    int32 UnitFieldDisplayPos;
-    int32 UnitDynamicFlagsPos;
-    int32 UnitFieldBytes2Pos;
-    int32 UnitFieldFactionTemplatePos;
-
-    std::unordered_map<uint16 /*index*/, uint32 /*pos*/> other;
-};
-
-// BuildValuesCachedBuffer cache for calculated BuildValue.
-struct BuildValuesCachedBuffer
-{
-    BuildValuesCachedBuffer(uint32 bufferSize) :
-        buffer(bufferSize), posPointers() {}
-
-    ByteBuffer buffer;
-
-    BuildValuesCachePosPointers posPointers;
 };
 
 #endif
