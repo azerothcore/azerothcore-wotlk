@@ -223,9 +223,9 @@ public:
             {
                 me->SetTarget();
                 me->SetFacingTo(1.57f);
-                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 10000);
-                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 13000);
-                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER2, 13000);
+                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
+                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
+                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER2, 5000);
             }
             else if (point == POINT_AIR_BREATH_END2)
             {
@@ -330,8 +330,8 @@ public:
                     events.ScheduleEvent(EVENT_FLIGHT_VAPOR, 8000);
                     events.ScheduleEvent(EVENT_FLIGHT_VAPOR, 21000);
                     events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 35000);
-                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 77000);
-                    events.ScheduleEvent(EVENT_LAND_FIGHT, 96000);
+                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 72000);
+                    events.ScheduleEvent(EVENT_LAND_FIGHT, 86000);
                     break;
                 case EVENT_FLIGHT_MOVE_UP:
                     me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
@@ -341,13 +341,13 @@ public:
                     break;
                 case EVENT_FLIGHT_BREATH1:
                     {
-                        Position pos = {1447.0f + urand(0, 2) * 29.0f, 670.0f, 50.0f, 4.71f};
+                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 705.0f, 50.0f, 4.71f};
                         me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
                         break;
                     }
                 case EVENT_FLIGHT_BREATH2:
                     {
-                        Position pos = {1447.0f + urand(0, 2) * 29.0f, 550.0f, 50.0f, 1.57f};
+                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 515.0f, 50.0f, 1.57f};
                         me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
                         break;
                     }
@@ -368,17 +368,14 @@ public:
                     break;
                 case EVENT_FLIGHT_FLYOVER1:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX(), me->GetPositionY() - 140.0f, me->GetPositionZ() + 5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX(), me->GetPositionY() - 200.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_FLIGHT_FLYOVER2:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX(), me->GetPositionY() + 140.0f, me->GetPositionZ() + 5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX(), me->GetPositionY() + 200.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_LAND_FIGHT:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 40.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
                     break;
             }
 
