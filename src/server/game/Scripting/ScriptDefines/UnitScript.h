@@ -22,6 +22,7 @@
 
 enum ReputationRank : uint8;
 class ByteBuffer;
+struct BuildValuesCachePosPointers;
 
 class UnitScript : public ScriptObject
 {
