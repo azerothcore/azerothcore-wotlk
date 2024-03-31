@@ -430,7 +430,7 @@ public:
                             UpdateData data;
                             WorldPacket pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                            data.BuildPacket(&pkt);
+                            data.BuildPacket(pkt);
                             i->GetSource()->GetSession()->SendPacket(&pkt);
                         }
                 }
@@ -473,7 +473,7 @@ public:
                             UpdateData data;
                             WorldPacket pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                            data.BuildPacket(&pkt);
+                            data.BuildPacket(pkt);
                             i->GetSource()->GetSession()->SendPacket(&pkt);
                         }
                 }
