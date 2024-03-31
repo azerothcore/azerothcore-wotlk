@@ -26,6 +26,11 @@ jobs:
       )
     steps:
       - uses: actions/checkout@v4
+        # This script installs a general list of modules to compile with
+        # azerothcore. This is useful for ensuring that module compilation
+        # functionality works.
+      - name: Checkout modules
+        run: bash -x ./apps/ci/ci-install-modules.sh
       - uses: ./.github/actions/linux-build
         with:
           CC: clang-15
