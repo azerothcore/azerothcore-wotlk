@@ -1377,7 +1377,6 @@ struct BuildValuesCachedBuffer
     BuildValuesCachePosPointers posPointers;
 };
 
-
 class Unit : public WorldObject
 {
 public:
