@@ -2107,6 +2107,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 9806:  // Phantom Strike
         case 35325: // Glowing Blood
         case 35328: // Lambent Blood
+        case 35329: // Vibrant Blood
         case 16498: // Faerie Fire
         case 6950:
         case 20656:
@@ -2164,7 +2165,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                     else if (drink)
                         return SPELL_SPECIFIC_DRINK;
                 }
-                // scrolls effects
+              /*// scrolls effects
                 else
                 {
                     SpellInfo const* firstRankSpellInfo = GetFirstRankSpell();
@@ -2178,7 +2179,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                         case 8091: // Armor
                             return SPELL_SPECIFIC_SCROLL;
                     }
-                }
+                }*/
                 break;
             }
         case SPELLFAMILY_MAGE:

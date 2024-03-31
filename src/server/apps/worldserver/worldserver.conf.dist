@@ -667,7 +667,7 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
-Logger.commands.gm=4,Console GM
+#Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server

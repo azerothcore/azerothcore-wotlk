@@ -7899,11 +7899,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
                             }
 
-                            uint32 effectiveHeal = healInfo->GetEffectiveHeal();
+                            uint32 effectiveHeal = healInfo->GetHeal();
                             if (effectiveHeal)
                             {
                                 // heal amount
-                                basepoints0 = int32(CalculatePct(effectiveHeal, triggerAmount));
+                                basepoints0 = int32(CalculatePct(effectiveHeal * 0.5, triggerAmount));
                                 target = this;
 
                                 if (basepoints0)
@@ -10595,7 +10595,7 @@ void Unit::SetOwnerGUID(ObjectGuid owner)
     UpdateData udata;
     WorldPacket packet;
     BuildValuesUpdateBlockForPlayer(&udata, player);
-    udata.BuildPacket(&packet);
+    udata.BuildPacket(packet);
     player->SendDirectMessage(&packet);
 
     RemoveFieldNotifyFlag(UF_FLAG_OWNER);
