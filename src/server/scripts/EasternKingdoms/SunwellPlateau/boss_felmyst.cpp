@@ -146,8 +146,8 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 me->SetVisible(true);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                events2.ScheduleEvent(EVENT_INTRO_1, 3000);
+                //me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                //events2.ScheduleEvent(EVENT_INTRO_1, 3000);
             }
         }
 
@@ -155,6 +155,7 @@ public:
         {
             BossAI::Reset();
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->SetReactState(REACT_PASSIVE);
             me->SetDisableGravity(false);
             events2.Reset();
@@ -164,7 +165,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            //me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if (events.Empty() && events2.Empty())
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
@@ -208,24 +209,24 @@ public:
             {
                 me->SetTarget();
                 me->SetFacingTo(4.71f);
-                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
-                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
-                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER1, 5000);
+                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 5000);
+                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 8000);
+                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER1, 8000);
             }
             else if (point == POINT_AIR_BREATH_END1)
             {
                 me->RemoveAurasDueToSpell(SPELL_FELMYST_SPEED_BURST);
                 me->SetFacingTo(1.57f);
                 if (events.GetNextEventTime(EVENT_FLIGHT_BREATH1) != 0)
-                    events.ScheduleEvent(EVENT_FLIGHT_BREATH2, 2000);
+                    events.ScheduleEvent(EVENT_FLIGHT_BREATH2, 7000);
             }
             else if (point == POINT_AIR_BREATH_START2)
             {
                 me->SetTarget();
                 me->SetFacingTo(1.57f);
-                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
-                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
-                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER2, 5000);
+                events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 5000);
+                events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 8000);
+                events.ScheduleEvent(EVENT_FLIGHT_FLYOVER2, 8000);
             }
             else if (point == POINT_AIR_BREATH_END2)
             {
@@ -245,19 +246,19 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INTRO_1:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    events2.ScheduleEvent(EVENT_INTRO_2, 4000);
+                    //me->SetStandState(UNIT_STAND_STATE_STAND);
+                    events2.ScheduleEvent(EVENT_INTRO_2, 500);
                     break;
                 case EVENT_INTRO_2:
                     Talk(YELL_BIRTH);
                     me->SetDisableGravity(true);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SendMovementFlagUpdate();
-                    events2.ScheduleEvent(EVENT_INTRO_3, 1500);
+                    events2.ScheduleEvent(EVENT_INTRO_3, 500);
                     break;
                 case EVENT_INTRO_3:
-                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
-                    events2.ScheduleEvent(EVENT_INTRO_4, 2000);
+                    //me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
+                    events2.ScheduleEvent(EVENT_INTRO_4, 500);
                     break;
                 case EVENT_INTRO_4:
                     events.ScheduleEvent(EVENT_LAND, 3000, 1);
@@ -265,7 +266,7 @@ public:
                     me->SetInCombatWithZone();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
-                    me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
+                    //me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
                     break;
             }
 
@@ -329,29 +330,35 @@ public:
                     events.ScheduleEvent(EVENT_FLIGHT_MOVE_UP, 2000);
                     events.ScheduleEvent(EVENT_FLIGHT_VAPOR, 8000);
                     events.ScheduleEvent(EVENT_FLIGHT_VAPOR, 21000);
-                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 35000);
-                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 72000);
-                    events.ScheduleEvent(EVENT_LAND_FIGHT, 86000);
+                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 33000);
+                    events.ScheduleEvent(EVENT_FLIGHT_BREATH1, 78000);
+                    events.ScheduleEvent(EVENT_LAND_FIGHT, 100000);
                     break;
                 case EVENT_FLIGHT_MOVE_UP:
-                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 55.0f, false, true);
                     break;
                 case EVENT_FLIGHT_VAPOR:
                     me->CastCustomSpell(SPELL_SUMMON_DEMONIC_VAPOR, SPELLVALUE_MAX_TARGETS, 1, me, true);
                     break;
                 case EVENT_FLIGHT_BREATH1:
                     {
-                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 705.0f, 50.0f, 4.71f};
+                        me->SetDisableGravity(true);
+                        me->SendMovementFlagUpdate();
+                        Position pos = {1447.0f + urand(0, 2) * 36.0f, 695.0f, 50.0f, 4.71f};
                         me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
                         break;
                     }
                 case EVENT_FLIGHT_BREATH2:
                     {
-                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 515.0f, 50.0f, 1.57f};
+                        me->SetDisableGravity(true);
+                        me->SendMovementFlagUpdate();
+                        Position pos = {1472.0f + urand(0, 2) * 36.0f, 515.0f, 50.0f, 1.57f};
                         me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
                         break;
                     }
                 case EVENT_FLIGHT_EMOTE:
+                    me->SetDisableGravity(true);
+                    me->SendMovementFlagUpdate();
                     Talk(EMOTE_BREATH);
                     break;
                 case EVENT_CORRUPT_TRIGGERS:
@@ -368,14 +375,16 @@ public:
                     break;
                 case EVENT_FLIGHT_FLYOVER1:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX(), me->GetPositionY() - 200.0f, me->GetPositionZ() + 5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX() + 25, me->GetPositionY() - 180.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_FLIGHT_FLYOVER2:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX(), me->GetPositionY() + 200.0f, me->GetPositionZ() + 5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX() - 25, me->GetPositionY() + 180.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_LAND_FIGHT:
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
+                    me->SetDisableGravity(true);
+                    me->SendMovementFlagUpdate();
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 55.0f, false, true);
                     break;
             }
 
@@ -449,9 +458,9 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
+            if (spellInfo->Id == SPELL_DEMONIC_VAPOR && target->IsAlive())
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
         }
 
