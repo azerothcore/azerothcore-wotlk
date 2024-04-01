@@ -390,16 +390,8 @@ public:
     {
         uint32 classmask = player->getClassMask();
 
-        for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+        for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(skillId))
         {
-            SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
-            if (!skillLine)
-                continue;
-
-            // wrong skill
-            if (skillLine->SkillLine != skillId)
-                continue;
-
             // not high rank
             if (skillLine->SupercededBySpell)
                 continue;
