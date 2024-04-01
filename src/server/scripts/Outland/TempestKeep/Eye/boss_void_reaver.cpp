@@ -95,8 +95,7 @@ struct boss_void_reaver : public BossAI
             context.Repeat(12100ms, 15800ms);
         }).Schedule(3450ms, GROUP_ARCANE_ORB, [this](TaskContext context)
         {
-            SpellCastResult orbResult = DoCastRandomTarget(SPELL_ARCANE_ORB, 0, -20.0f);
-            if (orbResult != SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_ARCANE_ORB, 0, -20.0f) != SPELL_CAST_OK)
             {
                 DoCastRandomTarget(SPELL_ARCANE_ORB, 0, 18.0f);
             }
