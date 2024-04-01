@@ -165,6 +165,7 @@ bool WorldSocket::Update()
     {
         // Allocate buffer only when it's needed but not on every Update() call.
         MessageBuffer buffer(_sendBufferSize);
+        std::size_t currentPacketSize;
         do
         {
             queued->CompressIfNeeded();
@@ -172,13 +173,15 @@ bool WorldSocket::Update()
             if (queued->NeedsEncryption())
                 _authCrypt.EncryptSend(header.header, header.getHeaderLength());
 
-            if (buffer.GetRemainingSpace() < queued->size() + header.getHeaderLength())
+            currentPacketSize = queued->size() + header.getHeaderLength();
+
+            if (buffer.GetRemainingSpace() < currentPacketSize)
             {
                 QueuePacket(std::move(buffer));
                 buffer.Resize(_sendBufferSize);
             }
 
-            if (buffer.GetRemainingSpace() >= queued->size() + header.getHeaderLength())
+            if (buffer.GetRemainingSpace() >= currentPacketSize)
             {
                 buffer.Write(header.header, header.getHeaderLength());
                 if (!queued->empty())
@@ -186,7 +189,7 @@ bool WorldSocket::Update()
             }
             else    // single packet larger than standard buffer size (Network.OutUBuff)
             {
-                MessageBuffer packetBuffer(queued->size() + header.getHeaderLength());
+                MessageBuffer packetBuffer(currentPacketSize);
                 packetBuffer.Write(header.header, header.getHeaderLength());
                 if (!queued->empty())
                     packetBuffer.Write(queued->contents(), queued->size());
