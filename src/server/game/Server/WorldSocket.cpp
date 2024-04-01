@@ -184,7 +184,7 @@ bool WorldSocket::Update()
                 if (!queued->empty())
                     buffer.Write(queued->contents(), queued->size());
             }
-            else    // single packet larger than 4096 bytes
+            else    // single packet larger than standard buffer size (Network.OutUBuff)
             {
                 MessageBuffer packetBuffer(queued->size() + header.getHeaderLength());
                 packetBuffer.Write(header.header, header.getHeaderLength());
