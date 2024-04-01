@@ -187,14 +187,18 @@ bool WorldSocket::Update()
                 if (!queued->empty())
                     buffer.Write(queued->contents(), queued->size());
             }
-            else    // single packet larger than standard buffer size (Network.OutUBuff)
+            else    // Single packet larger than current buffer size
             {
-                MessageBuffer packetBuffer(currentPacketSize);
-                packetBuffer.Write(header.header, header.getHeaderLength());
-                if (!queued->empty())
-                    packetBuffer.Write(queued->contents(), queued->size());
+                // Resize buffer to fit current packet
+                buffer.Resize(currentPacketSize);
 
-                QueuePacket(std::move(packetBuffer));
+                // Grow future buffers to current packet size if still below limit
+                if (currentPacketSize <= 65536)
+                    _sendBufferSize = currentPacketSize;
+
+                buffer.Write(header.header, header.getHeaderLength());
+                if (!queued->empty())
+                    buffer.Write(queued->contents(), queued->size());
             }
 
             delete queued;
