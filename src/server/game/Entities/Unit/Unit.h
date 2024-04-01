@@ -2695,7 +2695,7 @@ private:
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
     ObjectGuid _lastDamagedTargetGuid;
 
-    typedef std::unordered_map<uint32 /*visibleFlag*/, BuildValuesCachedBuffer>  ValuesUpdateCache;
+    typedef std::unordered_map<uint64 /*visibleFlag(uint32) + updateType(uint8)*/, BuildValuesCachedBuffer>  ValuesUpdateCache;
     ValuesUpdateCache _valuesUpdateCache;
 };
 

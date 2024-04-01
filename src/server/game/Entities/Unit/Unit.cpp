@@ -21058,7 +21058,9 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
     if (plr && plr->IsInSameRaidWith(target))
         visibleFlag |= UF_FLAG_PARTY_MEMBER;
 
-    auto cacheIt = _valuesUpdateCache.find(visibleFlag);
+    uint64 cacheKey = static_cast<uint64>(visibleFlag) << 8 | updateType;
+
+    auto cacheIt = _valuesUpdateCache.find(cacheKey);
     if (cacheIt != _valuesUpdateCache.end())
     {
         int32 cachePos = static_cast<int32>(data->wpos());
@@ -21167,7 +21169,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
     PatchValuesUpdate(*data, dataAdjustedPos, target);
 
-    _valuesUpdateCache.insert(std::pair<uint32, BuildValuesCachedBuffer>(visibleFlag, std::move(cacheValue)));
+    _valuesUpdateCache.insert(std::pair<uint64, BuildValuesCachedBuffer>(cacheKey, std::move(cacheValue)));
 }
 
 void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player* target)
