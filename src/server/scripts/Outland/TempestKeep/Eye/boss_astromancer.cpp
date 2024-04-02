@@ -150,7 +150,7 @@ struct boss_high_astromancer_solarian : public BossAI
             me->RemoveAllAuras();
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
-            scheduler.Schedule(6s, [this](TaskContext)
+            scheduler.Schedule(4s, [this](TaskContext)
             {
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -207,7 +207,7 @@ struct boss_high_astromancer_solarian : public BossAI
                     me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
                 }
             }
-            context.Repeat(67500ms, 71200ms);
+            context.Repeat(87500ms, 91200ms);
         });
     }
 
