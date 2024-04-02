@@ -97,6 +97,9 @@ struct boss_shade_of_akama : public BossAI
 
     void Reset() override
     {
+        channelers.clear();
+        generators.clear();
+
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
         me->SetReactState(REACT_DEFENSIVE);
