@@ -688,6 +688,91 @@ public:
     };
 };
 
+class npc_gothik_trigger : public CreatureScript
+{
+public:
+    npc_gothik_trigger() : CreatureScript("npc_gothik_trigger") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gothik_triggerAI(creature);
+    }
+
+    struct npc_gothik_triggerAI : public ScriptedAI
+    {
+        npc_gothik_triggerAI(Creature* creature) : ScriptedAI(creature) { creature->SetDisableGravity(true); }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
+        void UpdateAI(uint32 /*diff*/) override { }
+        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
+
+        Creature* SelectRandomSkullPile()
+        {
+            std::list<Creature*> triggers;
+            me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
+            uint32 targetDBGuid = CGUID_TRIGGER + urand(8, 12); // CGUID+8 to CGUID+12 are the triggers for the skull piles on dead side
+            for (Creature* trigger : triggers)
+                if (trigger && trigger->GetSpawnId() == targetDBGuid)
+                    return trigger;
+
+            return nullptr;
+        }
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        {
+            if (!spell)
+                return;
+
+            switch (spell->Id)
+            {
+                case SPELL_ANCHOR_1_TRAINEE:
+                    DoCastAOE(SPELL_ANCHOR_2_TRAINEE, true);
+                    break;
+                case SPELL_ANCHOR_1_DK:
+                    DoCastAOE(SPELL_ANCHOR_2_DK, true);
+                    break;
+                case SPELL_ANCHOR_1_RIDER:
+                    DoCastAOE(SPELL_ANCHOR_2_RIDER, true);
+                    break;
+                case SPELL_ANCHOR_2_TRAINEE:
+                    if (Creature* target = SelectRandomSkullPile())
+                        DoCast(target, SPELL_SKULLS_TRAINEE, true);
+                    break;
+                case SPELL_ANCHOR_2_DK:
+                    if (Creature* target = SelectRandomSkullPile())
+                        DoCast(target, SPELL_SKULLS_DK, true);
+                    break;
+                case SPELL_ANCHOR_2_RIDER:
+                    if (Creature* target = SelectRandomSkullPile())
+                        DoCast(target, SPELL_SKULLS_RIDER, true);
+                    break;
+                case SPELL_SKULLS_TRAINEE:
+                    DoSummon(NPC_DEAD_TRAINEE, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                    break;
+                case SPELL_SKULLS_DK:
+                    DoSummon(NPC_DEAD_KNIGHT, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                    break;
+                case SPELL_SKULLS_RIDER:
+                    DoSummon(NPC_DEAD_RIDER, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                    DoSummon(NPC_DEAD_HORSE, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                    break;
+            }
+        }
+
+        // dead side summons are "owned" by gothik
+        void JustSummoned(Creature* summon) override
+        {
+            if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
+                gothik->AI()->JustSummoned(summon);
+        }
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
+                gothik->AI()->SummonedCreatureDespawn(summon);
+        }
+    };
+};
+
 class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
 {
 public:
