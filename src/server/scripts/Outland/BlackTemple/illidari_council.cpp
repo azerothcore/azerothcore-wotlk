@@ -152,15 +152,13 @@ public:
         {
         }
 
-        Creature* councilGUIDs[4] = { nullptr };
-
-        void Reset() override
+        void EnterEvadeMode(EvadeReason why)
         {
-            BossAI::Reset();
-            for (uint8 i = 0; i < 4; ++i)
-                if (Creature* member = councilGUIDs[i])
-                    if (member->AI())
-                        member->AI()->EnterEvadeMode();
+            for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
+                if (Creature* member = instance->GetCreature(i))
+                    member->AI()->EnterEvadeMode();
+
+            BossAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit*) override { }
@@ -171,15 +169,11 @@ public:
             if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
             {
                 me->setActive(true);
-                councilGUIDs[0] = instance->GetCreature(DATA_GATHIOS_THE_SHATTERER);
-                councilGUIDs[1] = instance->GetCreature(DATA_HIGH_NETHERMANCER_ZEREVOR);
-                councilGUIDs[2] = instance->GetCreature(DATA_LADY_MALANDE);
-                councilGUIDs[3] = instance->GetCreature(DATA_VERAS_DARKSHADOW);
 
                 bool spoken = false;
-                for (uint8 i = 0; i < 4; ++i)
+                for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
                 {
-                    if (Creature* member = councilGUIDs[i])
+                    if (Creature* member = instance->GetCreature(i))
                     {
                         if (!spoken && (roll_chance_i(33) || i == 3))
                         {
@@ -193,15 +187,15 @@ public:
             }
             else if (param == ACTION_ENRAGE)
             {
-                for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* member = councilGUIDs[i])
+                for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
+                    if (Creature* member = instance->GetCreature(i))
                         member->AI()->DoAction(ACTION_ENRAGE);
             }
             else if (param == ACTION_END_ENCOUNTER)
             {
                 me->setActive(false);
-                for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* member = councilGUIDs[i])
+                for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
+                    if (Creature* member = instance->GetCreature(i))
                         if (member->IsAlive())
                             Unit::Kill(me, member);
                 me->KillSelf();
@@ -215,7 +209,7 @@ public:
 
             if (!SelectTargetFromPlayerList(115.0f))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                 return;
             }
 
