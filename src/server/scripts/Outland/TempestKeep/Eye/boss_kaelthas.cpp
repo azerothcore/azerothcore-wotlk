@@ -498,7 +498,7 @@ struct boss_kaelthas : public BossAI
                 {
                     summons.DespawnEntry(NPC_NETHER_VAPOR);
                     scheduler.CancelGroup(GROUP_NETHER_BEAM);
-                    
+
                     if (Unit* victim = me->GetVictim())
                     {
                         me->SetTarget(victim->GetGUID());
