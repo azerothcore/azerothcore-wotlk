@@ -82,7 +82,7 @@ enum Misc
     NPC_DEAD_KNIGHT                 = 16148,
     NPC_DEAD_HORSE                  = 16149,
     NPC_DEAD_RIDER                  = 16150,
-    //NPC_TRIGGER                     = 16137, fix me
+    NPC_TRIGGER                     = 16137
 };
 
 enum Events
