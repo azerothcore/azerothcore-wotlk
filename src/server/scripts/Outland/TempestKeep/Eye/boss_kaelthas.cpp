@@ -803,9 +803,9 @@ struct npc_lord_sanguinar : public ScriptedAI
         {
             Talk(SAY_SANGUINAR_AGGRO);
         }
-        ScheduleTimedEvent(0s, [&]{
+        ScheduleTimedEvent(6s, 20s, [&]{
             DoCastSelf(SPELL_BELLOWING_ROAR);
-        }, 15s);
+        }, 30s, 40s);
     }
 
     void JustDied(Unit* /*killer*/) override
