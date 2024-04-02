@@ -462,6 +462,8 @@ public:
     BossAI(Creature* creature, uint32 bossId);
     ~BossAI() override {}
 
+    float callForHelpRange;
+
     InstanceScript* const instance;
 
     bool CanRespawn() override;

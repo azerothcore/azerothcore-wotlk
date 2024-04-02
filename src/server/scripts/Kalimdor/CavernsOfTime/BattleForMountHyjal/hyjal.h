@@ -78,6 +78,10 @@ enum HyjalCreaturesIds
     NPC_STALK                   = 17916,
     NPC_BUILD                   = 18304,    // Serverside creature? Not found in CreateObject packets, but seen as targets
 
+    // Summoned necromancer mobs
+    NPC_SKELETON_INVADER        = 17902,
+    NPC_SKELETON_MAGE           = 17903,
+
     // Alliance Base
     NPC_JAINA                   = 17772,
     NPC_ALLIANCE_PEASANT        = 17931,

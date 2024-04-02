@@ -803,9 +803,9 @@ struct npc_lord_sanguinar : public ScriptedAI
         {
             Talk(SAY_SANGUINAR_AGGRO);
         }
-        ScheduleTimedEvent(0s, [&]{
+        ScheduleTimedEvent(6s, 20s, [&]{
             DoCastSelf(SPELL_BELLOWING_ROAR);
-        }, 15s);
+        }, 30s, 40s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -1009,7 +1009,6 @@ struct npc_thaladred : public ScriptedAI
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
         _hasDied = false;
-        me->SetWalk(false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1018,7 +1017,6 @@ struct npc_thaladred : public ScriptedAI
         {
             Talk(SAY_THALADRED_AGGRO);
         }
-        me->SetWalk(true);
         ScheduleTimedEvent(100ms, [&]
         {
             DoResetThreatList();

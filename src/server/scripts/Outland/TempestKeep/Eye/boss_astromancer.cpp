@@ -60,6 +60,7 @@ struct boss_high_astromancer_solarian : public BossAI
 {
     boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
     {
+        callForHelpRange = 105.0f;
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -118,7 +119,6 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
-        me->CallForHelp(105.0f);
         me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
