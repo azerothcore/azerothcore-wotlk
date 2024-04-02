@@ -1,3 +1,4 @@
+-- DB update 2024_04_02_02 -> 2024_04_02_03
 --
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ashtongue_channeler', `faction` = 1692 WHERE (`entry` = 23421);
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ashtongue_sorcerer' WHERE (`entry` = 23215);

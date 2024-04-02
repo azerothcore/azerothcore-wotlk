@@ -1,3 +1,4 @@
+-- DB update 2024_04_02_03 -> 2024_04_02_04
 
 DELETE FROM pool_gameobject WHERE guid BETWEEN 75600 AND 75761;
 DELETE FROM pool_gameobject WHERE guid BETWEEN 75765 AND 75932;
