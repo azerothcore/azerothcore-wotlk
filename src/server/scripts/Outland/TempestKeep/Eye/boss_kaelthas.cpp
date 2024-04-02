@@ -498,8 +498,12 @@ struct boss_kaelthas : public BossAI
                 {
                     summons.DespawnEntry(NPC_NETHER_VAPOR);
                     scheduler.CancelGroup(GROUP_NETHER_BEAM);
-                    me->SetTarget(me->GetVictim()->GetGUID());
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+                    if (Unit* victim = me->GetVictim())
+                    {
+                        me->SetTarget(victim->GetGUID());
+                        me->GetMotionMaster()->MoveChase(victim);
+                    }
                 });
                 me->SetTarget();
                 me->GetMotionMaster()->Clear();
