@@ -166,7 +166,7 @@ struct boss_high_astromancer_solarian : public BossAI
             {
                 Talk(SAY_SUMMON);
             }).scheduler.Schedule(3s, [this](TaskContext)
-            {   
+            {
                 me->RemoveAllAuras();
                 me->SetModelVisible(false);
             }).scheduler.Schedule(7s, [this](TaskContext)
@@ -286,4 +286,3 @@ void AddSC_boss_high_astromancer_solarian()
     RegisterSpellScript(spell_astromancer_wrath_of_the_astromancer);
     RegisterSpellScript(spell_astromancer_solarian_transform);
 }
-
