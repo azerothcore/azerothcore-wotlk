@@ -788,6 +788,7 @@ void AddSC_boss_gothik()
 {
     new boss_gothik();
     new npc_boss_gothik_minion();
+    new npc_gothik_trigger();
     new spell_gothik_shadow_bolt_volley();
 }
 
