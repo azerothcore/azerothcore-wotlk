@@ -742,7 +742,6 @@ public:
         // dead side summons are "owned" by gothik
         void JustSummoned(Creature* summon) override
         {
-            // if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
             if (Creature* gothik = me->FindNearestCreature(NPC_GOTHIK, 150.0f))
             {
                 gothik->AI()->JustSummoned(summon);
