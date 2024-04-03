@@ -162,6 +162,9 @@ enum NXNPCs
     NPC_LIVING_MONSTROSITY          = 16021,
     NPC_SURGICAL_ASSIST             = 16022,
     NPC_SLUDGE_BELCHER              = 16029,
+
+    // Gothik
+    NPC_GOTHIK                      = 16060
 };
 
 enum NXMisc

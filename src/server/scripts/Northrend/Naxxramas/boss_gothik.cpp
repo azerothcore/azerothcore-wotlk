@@ -47,15 +47,15 @@ enum Spells
     SPELL_TELEPORT_DEAD             = 28025,
     SPELL_TELEPORT_LIVE             = 28026,
     //  Visual spells
-    SPELL_INFORM_LIVING_TRAINEE     = 27892,
-    SPELL_INFORM_LIVING_KNIGHT      = 27928,
-    SPELL_INFORM_LIVING_RIDER       = 27935,
-    SPELL_INFORM_DEAD_TRAINEE       = 27915,
-    SPELL_INFORM_DEAD_KNIGHT        = 27931,
-    SPELL_INFORM_DEAD_RIDER         = 27937,
-    /*SPELL_ANCHOR_2_TRAINEE          = 27893,
+    SPELL_ANCHOR_1_TRAINEE          = 27892,
+    SPELL_ANCHOR_1_DK               = 27928,
+    SPELL_ANCHOR_1_RIDER            = 27935,
+    SPELL_ANCHOR_2_TRAINEE          = 27893,
     SPELL_ANCHOR_2_DK               = 27929,
-    SPELL_ANCHOR_2_RIDER            = 27936, fix me */
+    SPELL_ANCHOR_2_RIDER            = 27936,
+    SPELL_SKULLS_TRAINEE            = 27915,
+    SPELL_SKULLS_DK                 = 27931,
+    SPELL_SKULLS_RIDER              = 27937,
     // Living trainee
     SPELL_DEATH_PLAGUE              = 55604,
     // Dead trainee
@@ -172,6 +172,10 @@ const Position PosSummonDead[5] =
 #define POS_X_NORTH  2750.49f
 #define POS_X_SOUTH  2633.84f
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
+
+// GUID of first trigger NPC (used as offset for guid checks)
+// 0-1 are living side soul triggers, 2-3 are spectral side soul triggers, 4 is living rider spawn trigger, 5-7 are living other spawn trigger, 8-12 are skull pile triggers
+#define CGUID_TRIGGER 127618
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
 struct NotOnSameSide
@@ -404,25 +408,6 @@ public:
             return false;
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
-        {
-            uint8 pos = urand(0, 4);
-            switch (spellInfo->Id)
-            {
-                case SPELL_INFORM_LIVING_TRAINEE:
-                    me->SummonCreature(NPC_DEAD_TRAINEE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
-                    break;
-                case SPELL_INFORM_LIVING_KNIGHT:
-                    me->SummonCreature(NPC_DEAD_KNIGHT, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
-                    break;
-                case SPELL_INFORM_LIVING_RIDER:
-                    me->SummonCreature(NPC_DEAD_RIDER, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
-                    me->SummonCreature(NPC_DEAD_HORSE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
-                    break;
-            }
-            me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
-        }
-
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
@@ -593,13 +578,13 @@ public:
             switch (me->GetEntry())
             {
                 case NPC_LIVING_TRAINEE:
-                    me->CastSpell(me, SPELL_INFORM_LIVING_TRAINEE, true);
+                    DoCastAOE(SPELL_ANCHOR_1_TRAINEE, true);
                     break;
                 case NPC_LIVING_KNIGHT:
-                    me->CastSpell(me, SPELL_INFORM_LIVING_KNIGHT, true);
+                    DoCastAOE(SPELL_ANCHOR_1_DK, true);
                     break;
                 case NPC_LIVING_RIDER:
-                    me->CastSpell(me, SPELL_INFORM_LIVING_RIDER, true);
+                    DoCastAOE(SPELL_ANCHOR_1_RIDER, true);
                     break;
             }
         }
@@ -702,11 +687,6 @@ public:
     {
         npc_gothik_triggerAI(Creature* creature) : ScriptedAI(creature) { creature->SetDisableGravity(true); }
 
-        void EnterEvadeMode(EvadeReason /*why*/) override { }
-        void JustEngagedWith(Unit* /*who*/) override { }
-        void UpdateAI(uint32 /*diff*/) override { }
-        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
-
         Creature* SelectRandomSkullPile()
         {
             std::list<Creature*> triggers;
@@ -762,13 +742,18 @@ public:
         // dead side summons are "owned" by gothik
         void JustSummoned(Creature* summon) override
         {
-            if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
+            // if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
+            if (Creature* gothik = me->FindNearestCreature(NPC_GOTHIK, 150.0f))
+            {
                 gothik->AI()->JustSummoned(summon);
+            }
         }
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK)))
-                gothik->AI()->SummonedCreatureDespawn(summon);
+            if (Creature* gothik = me->FindNearestCreature(NPC_GOTHIK, 150.0f))
+            {
+                gothik->AI()->JustSummoned(summon);
+            }
         }
     };
 };
