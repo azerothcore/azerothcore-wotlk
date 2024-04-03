@@ -460,7 +460,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_DEMONIC_VAPOR && target->IsAlive())
+            if (spellInfo->Id == SPELL_DEMONIC_VAPOR && target && !target->IsPet() && target->IsAlive())
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
         }
 
