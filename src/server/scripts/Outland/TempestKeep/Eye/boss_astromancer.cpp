@@ -38,6 +38,7 @@ enum Spells
     SPELL_PSYCHIC_SCREAM                = 34322,
     SPELL_VOID_BOLT                     = 39329,
     SPELL_TRUE_BEAM                     = 33365,
+    SPELL_TELEPORT_START_POSITION       = 33244,
 };
 
 enum Misc
@@ -55,6 +56,9 @@ enum Misc
 #define CENTER_Z                    17.9608f
 #define CENTER_O                    1.06421f
 #define PORTAL_Z                    17.005f
+#define START_POSITION_X            432.74f
+#define START_POSITION_Y            -373.645f
+#define START_POSITION_Z            18.0138f
 
 struct boss_high_astromancer_solarian : public BossAI
 {
@@ -147,7 +151,7 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             me->SetReactState(REACT_PASSIVE);
             scheduler.DelayAll(22s);
-            // blink to room center in this line
+            // blink to room center in this line using SPELL_TELEPORT_START_POSITION and START_POSITION_X, START_POSITION_Y, START_POSITION_Z
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 for (uint8 i = 0; i < 3; ++i)
