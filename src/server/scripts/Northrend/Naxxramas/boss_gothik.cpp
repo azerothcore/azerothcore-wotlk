@@ -752,7 +752,7 @@ public:
         {
             if (Creature* gothik = me->FindNearestCreature(NPC_GOTHIK, 150.0f))
             {
-                gothik->AI()->JustSummoned(summon);
+                gothik->AI()->SummonedCreatureDespawn(summon);
             }
         }
     };
