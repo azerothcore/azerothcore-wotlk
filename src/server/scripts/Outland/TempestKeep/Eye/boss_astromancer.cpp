@@ -146,11 +146,30 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
-            Talk(SAY_SUMMON);
-            me->RemoveAllAuras();
-            me->SetModelVisible(false);
-            scheduler.DelayAll(21s);
-            scheduler.Schedule(4s, [this](TaskContext)
+            scheduler.DelayAll(22s);
+            // blink to room center in this line
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                for (uint8 i = 0; i < 3; ++i)
+                {
+                    float o = rand_norm() * 2 * M_PI;
+                    if (i == 0)
+                    {
+                        me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000);
+                    }
+                    else
+                    {
+                        me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000);
+                    }
+                }
+            }).scheduler.Schedule(2s, [this](TaskContext)
+            {
+                Talk(SAY_SUMMON);
+            }).scheduler.Schedule(3s, [this](TaskContext)
+            {    
+                me->RemoveAllAuras();
+                me->SetModelVisible(false);
+            }).scheduler.Schedule(7s, [this](TaskContext)
             {
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -171,7 +190,7 @@ struct boss_high_astromancer_solarian : public BossAI
                         }
                     }
                 });
-            }).Schedule(20s, [this](TaskContext)
+            }).Schedule(23s, [this](TaskContext)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 summons.DoForAllSummons([&](WorldObject* summon)
@@ -194,19 +213,6 @@ struct boss_high_astromancer_solarian : public BossAI
                     }
                 });
             });
-
-            for (uint8 i = 0; i < 3; ++i)
-            {
-                float o = rand_norm() * 2 * M_PI;
-                if (i == 0)
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
-                else
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
-            }
             context.Repeat(87500ms, 91200ms);
         });
     }
