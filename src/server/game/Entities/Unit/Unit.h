@@ -2363,17 +2363,17 @@ public:
     virtual void PauseMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
     void ResumeMovement(uint32 timer = 0, uint8 slot = 0);
 
-    void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
-    void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
-    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) == f; }
-    [[nodiscard]] uint32 GetUnitMovementFlags() const { return m_movementInfo.flags; }
-    void SetUnitMovementFlags(uint32 f) { m_movementInfo.flags = f; }
+    void AddUnitMovementFlag(uint32 f) { m_movementInfo.m_moveFlags |= f; }
+    void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.m_moveFlags &= ~f; }
+    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.m_moveFlags & f) == f; }
+    [[nodiscard]] uint32 GetUnitMovementFlags() const { return m_movementInfo.m_moveFlags; }
+    void SetUnitMovementFlags(uint32 f) { m_movementInfo.m_moveFlags = f; }
 
-    void AddExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 |= f; }
-    void RemoveExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 &= ~f; }
-    [[nodiscard]] uint16 HasExtraUnitMovementFlag(uint16 f) const { return m_movementInfo.flags2 & f; }
-    [[nodiscard]] uint16 GetExtraUnitMovementFlags() const { return m_movementInfo.flags2; }
-    void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.flags2 = f; }
+    void AddExtraUnitMovementFlag(uint16 f) { m_movementInfo.m_moveFlags2 |= f; }
+    void RemoveExtraUnitMovementFlag(uint16 f) { m_movementInfo.m_moveFlags2 &= ~f; }
+    [[nodiscard]] uint16 HasExtraUnitMovementFlag(uint16 f) const { return m_movementInfo.m_moveFlags2 & f; }
+    [[nodiscard]] uint16 GetExtraUnitMovementFlags() const { return m_movementInfo.m_moveFlags2; }
+    void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.m_moveFlags2 = f; }
 
     void SetControlled(bool apply, UnitState state, Unit* source = nullptr, bool isFear = false);
     void DisableRotate(bool apply);
@@ -2469,14 +2469,14 @@ public:
     void BuildMovementPacket(ByteBuffer* data) const;
 
     [[nodiscard]] virtual bool CanSwim() const;
-    [[nodiscard]] bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
-    [[nodiscard]] bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
-    [[nodiscard]] bool isMoving() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING); }
-    [[nodiscard]] bool isTurning() const  { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_TURNING); }
-    [[nodiscard]] bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER); }
-    [[nodiscard]] bool isSwimming() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING); }
+    [[nodiscard]] bool IsLevitating() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_DISABLE_GRAVITY) != 0; }
+    [[nodiscard]] bool IsWalking() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_WALKING) != 0; }
+    [[nodiscard]] bool isMoving() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_MASK_MOVING) != 0; }
+    [[nodiscard]] bool isTurning() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_MASK_TURNING) != 0; }
+    [[nodiscard]] bool IsHovering() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_HOVER) != 0; }
+    [[nodiscard]] bool isSwimming() const { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_SWIMMING) != 0; }
     [[nodiscard]] virtual bool CanFly() const = 0;
-    [[nodiscard]] bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
+    [[nodiscard]] bool IsFlying() const { return (m_movementInfo.m_moveFlags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0; }
     [[nodiscard]] bool IsFalling() const;
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
     [[nodiscard]] virtual bool CanEnterWater() const = 0;

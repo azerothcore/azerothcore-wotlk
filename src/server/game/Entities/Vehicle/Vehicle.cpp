@@ -182,7 +182,7 @@ void Vehicle::ApplyAllImmunities()
             //me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
             //me->SetSpeed(MOVE_TURN_RATE, 0.7f);
             //me->SetSpeed(MOVE_PITCH_RATE, 0.7f);
-            //me->m_movementInfo.flags2=59;
+            //me->m_movementInfo.m_moveFlags2=59;
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
             break;
         // Ulduar vehicles, remove immunities used in flame leviathan spells

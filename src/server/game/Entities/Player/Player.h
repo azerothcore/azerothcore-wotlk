@@ -2551,7 +2551,7 @@ public:
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
     bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
-    [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
+    [[nodiscard]] bool CanFly() const override { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0; }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS

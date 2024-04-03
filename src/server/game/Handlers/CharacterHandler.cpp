@@ -929,7 +929,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             t->RemovePassenger(pCurrChar);
             pCurrChar->m_transport = nullptr;
             pCurrChar->m_movementInfo.transport.Reset();
-            pCurrChar->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            pCurrChar->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
         }
 
     // Place character in world (and load zone) before some object loading

@@ -125,7 +125,7 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         return;
 
     // Flying unit, just fill array
-    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)))
+    if ((me->m_movementInfo.m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0)
     {
         // xinef: first point in vector is unit real position
         points->clear();

@@ -351,23 +351,23 @@ static Position const PredictPosition(Unit* target)
     float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
     float orientation = target->GetOrientation();
 
-    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
+    if ((target->m_movementInfo.m_moveFlags & MOVEMENTFLAG_FORWARD) != 0)
     {
         pos.m_positionX += cos(orientation) * speed;
         pos.m_positionY += std::sin(orientation) * speed;
     }
-    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
+    else if ((target->m_movementInfo.m_moveFlags & MOVEMENTFLAG_BACKWARD) != 0)
     {
         pos.m_positionX -= cos(orientation) * speed;
         pos.m_positionY -= std::sin(orientation) * speed;
     }
 
-    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
+    if ((target->m_movementInfo.m_moveFlags & MOVEMENTFLAG_STRAFE_LEFT) != 0)
     {
         pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
         pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
     }
-    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
+    else if ((target->m_movementInfo.m_moveFlags & MOVEMENTFLAG_STRAFE_RIGHT) != 0)
     {
         pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
         pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
@@ -392,7 +392,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
 
     if (isPlayerPet)
     {
-        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+        targetIsMoving = (target->m_movementInfo.m_moveFlags & (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT)) != 0;
     }
 
     if (exactDistSq > distanceTolerance)

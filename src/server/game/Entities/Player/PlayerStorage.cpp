@@ -5208,7 +5208,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
             {
                 m_transport = nullptr;
                 m_movementInfo.transport.Reset();
-                m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+                m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
                 RelocateToHomebind();
             }
             else

@@ -117,7 +117,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
         RemovePassenger(obj);
         obj->SetTransport(nullptr);
         obj->m_movementInfo.transport.Reset();
-        obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        obj->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
     }
 
     GameObject::CleanupsBeforeDelete(finalCleanup);
@@ -279,7 +279,7 @@ void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
             CalculatePassengerOffset(x, y, z, &o);
 
             passenger->SetTransport(this);
-            passenger->m_movementInfo.flags |= MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movementInfo.m_moveFlags |= MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = GetGUID();
             passenger->m_movementInfo.transport.pos.Relocate(x, y, z, o);
             if (passenger->ToUnit())
@@ -304,7 +304,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (withAll)
         {
             passenger->SetTransport(nullptr);
-            passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid.Clear();
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             if (passenger->ToUnit())
@@ -791,7 +791,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
         RemovePassenger(obj);
         obj->SetTransport(nullptr);
         obj->m_movementInfo.transport.Reset();
-        obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        obj->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
     }
 
     GameObject::CleanupsBeforeDelete(finalCleanup);
@@ -979,7 +979,7 @@ void StaticTransport::AddPassenger(WorldObject* passenger, bool withAll)
             CalculatePassengerOffset(x, y, z, &o);
 
             passenger->SetTransport(this);
-            passenger->m_movementInfo.flags |= MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movementInfo.m_moveFlags |= MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = GetGUID();
             passenger->m_movementInfo.transport.pos.Relocate(x, y, z, o);
         }
@@ -999,7 +999,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (withAll)
         {
             passenger->SetTransport(nullptr);
-            passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid.Clear();
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         }

@@ -1374,7 +1374,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
             m_movementInfo.transport.Reset();
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
             RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
         }
 
@@ -1419,7 +1419,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
             m_movementInfo.transport.Reset();
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
         }
     }
 

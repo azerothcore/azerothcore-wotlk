@@ -653,7 +653,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD));
+    m_movementInfo.m_moveFlags &= ~(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
     movespline->_Interrupt();
 }
 
@@ -15707,7 +15707,7 @@ void Unit::CleanupsBeforeDelete(bool finalCleanup)
         GetTransport()->RemovePassenger(this);
         SetTransport(nullptr);
         m_movementInfo.transport.Reset();
-        m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
     }
 
     CleanupBeforeRemoveFromMap(finalCleanup);
@@ -20134,7 +20134,7 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
 
     // 0x02200000
     if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
-            || (m_movementInfo.flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+            || (m_movementInfo.m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
         *data << (float)m_movementInfo.pitch;
 
     *data << (uint32)m_movementInfo.fallTime;
@@ -20155,8 +20155,8 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
 
 bool Unit::IsFalling() const
 {
-    return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) ||
-        (!movespline->Finalized() && movespline->Initialized() && movespline->isFalling());
+    return ((m_movementInfo.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) != 0)
+            || (!movespline->Finalized() && movespline->Initialized() && movespline->isFalling());
 }
 
 /**

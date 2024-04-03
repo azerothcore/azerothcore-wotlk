@@ -368,7 +368,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
               << unit->GetSpeed(MOVE_PITCH_RATE);
 
         // 0x08000000
-        if (unit->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
+        if ((unit->m_movementInfo.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0)
         {
             Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
         }
@@ -1017,12 +1017,12 @@ void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
     LOG_INFO("movement", "guid {}", guid.ToString());
-    LOG_INFO("movement", "flags {}", flags);
-    LOG_INFO("movement", "flags2 {}", flags2);
-    LOG_INFO("movement", "time {} current time {}", flags2, uint64(::GameTime::GetGameTime().count()));
+    LOG_INFO("movement", "m_moveFlags {}", m_moveFlags);
+    LOG_INFO("movement", "m_moveFlags2 {}", m_moveFlags2);
+    LOG_INFO("movement", "time {} current time {}", m_moveFlags2, uint64(::GameTime::GetGameTime().count()));
     LOG_INFO("movement", "position: `{}`", pos.ToString());
 
-    if (flags & MOVEMENTFLAG_ONTRANSPORT)
+    if (m_moveFlags & MOVEMENTFLAG_ONTRANSPORT)
     {
         LOG_INFO("movement", "TRANSPORT:");
         LOG_INFO("movement", "guid: {}", transport.guid.ToString());
@@ -1030,20 +1030,20 @@ void MovementInfo::OutDebug()
         LOG_INFO("movement", "seat: {}", transport.seat);
         LOG_INFO("movement", "time: {}", transport.time);
 
-        if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
+        if (m_moveFlags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
         {
             LOG_INFO("movement", "time2: {}", transport.time2);
         }
     }
 
-    if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+    if ((m_moveFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
         LOG_INFO("movement", "pitch: {}", pitch);
 
     LOG_INFO("movement", "fallTime: {}", fallTime);
-    if (flags & MOVEMENTFLAG_FALLING)
+    if (m_moveFlags & MOVEMENTFLAG_FALLING)
         LOG_INFO("movement", "j_zspeed: {} j_sinAngle: {} j_cosAngle: {} j_xyspeed: {}", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
-    if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
+    if (m_moveFlags & MOVEMENTFLAG_SPLINE_ELEVATION)
         LOG_INFO("movement", "splineElevation: {}", splineElevation);
 }
 

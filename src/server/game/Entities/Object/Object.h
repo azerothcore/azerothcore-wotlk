@@ -267,8 +267,8 @@ struct MovementInfo
 {
     // common
     ObjectGuid guid;
-    uint32 flags{0};
-    uint16 flags2{0};
+    uint32 m_moveFlags{0};
+    uint16 m_moveFlags2{0};
     Position pos;
     uint32 time{0};
 
@@ -317,16 +317,6 @@ struct MovementInfo
         transport.Reset();
         jump.Reset();
     }
-
-    [[nodiscard]] uint32 GetMovementFlags() const { return flags; }
-    void SetMovementFlags(uint32 flag) { flags = flag; }
-    void AddMovementFlag(uint32 flag) { flags |= flag; }
-    void RemoveMovementFlag(uint32 flag) { flags &= ~flag; }
-    [[nodiscard]] bool HasMovementFlag(uint32 flag) const { return flags & flag; }
-
-    [[nodiscard]] uint16 GetExtraMovementFlags() const { return flags2; }
-    void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
-    [[nodiscard]] bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
     void SetFallTime(uint32 newFallTime) { fallTime = newFallTime; }
 
