@@ -698,15 +698,20 @@ public:
             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
             uint32 targetDBGuid = CGUID_TRIGGER + urand(8, 12); // CGUID+8 to CGUID+12 are the triggers for the skull piles on dead side
             for (Creature* trigger : triggers)
+            {
                 if (trigger && trigger->GetSpawnId() == targetDBGuid)
+                {
                     return trigger;
-
+                }
+            }
             return nullptr;
         }
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (!spell)
+            {
                 return;
+            }
 
             switch (spell->Id)
             {
@@ -721,15 +726,21 @@ public:
                     break;
                 case SPELL_ANCHOR_2_TRAINEE:
                     if (Creature* target = SelectRandomSkullPile())
+                    {
                         DoCast(target, SPELL_SKULLS_TRAINEE, true);
+                    }
                     break;
                 case SPELL_ANCHOR_2_DK:
                     if (Creature* target = SelectRandomSkullPile())
+                    {
                         DoCast(target, SPELL_SKULLS_DK, true);
+                    }
                     break;
                 case SPELL_ANCHOR_2_RIDER:
                     if (Creature* target = SelectRandomSkullPile())
+                    {
                         DoCast(target, SPELL_SKULLS_RIDER, true);
+                    }
                     break;
                 case SPELL_SKULLS_TRAINEE:
                     DoSummon(NPC_DEAD_TRAINEE, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
