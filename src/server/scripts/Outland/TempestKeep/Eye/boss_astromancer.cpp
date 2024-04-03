@@ -166,7 +166,7 @@ struct boss_high_astromancer_solarian : public BossAI
             {
                 Talk(SAY_SUMMON);
             }).scheduler.Schedule(3s, [this](TaskContext)
-            {    
+            {   
                 me->RemoveAllAuras();
                 me->SetModelVisible(false);
             }).scheduler.Schedule(7s, [this](TaskContext)
