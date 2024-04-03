@@ -687,6 +687,11 @@ public:
     {
         npc_gothik_triggerAI(Creature* creature) : ScriptedAI(creature) { creature->SetDisableGravity(true); }
 
+        void EnterEvadeMode(EvadeReason /*why*/) override { }
+        void UpdateAI(uint32 /*diff*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
+        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask /*damageSchool*/) override { damage = 0; }
+
         Creature* SelectRandomSkullPile()
         {
             std::list<Creature*> triggers;
