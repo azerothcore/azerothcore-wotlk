@@ -1508,6 +1508,19 @@ bool ScriptMgr::CanInitTrade(Player* player, Player* target)
     return true;
 }
 
+bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->CanSetTradeItem(player, tradedItem, tradeSlot);
+        });
+
+    if (ret && *ret)
+        return false;
+
+    return true;
+}
+
 void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

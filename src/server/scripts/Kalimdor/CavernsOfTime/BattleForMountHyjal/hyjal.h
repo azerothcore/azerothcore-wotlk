@@ -78,6 +78,10 @@ enum HyjalCreaturesIds
     NPC_STALK                   = 17916,
     NPC_BUILD                   = 18304,    // Serverside creature? Not found in CreateObject packets, but seen as targets
 
+    // Summoned necromancer mobs
+    NPC_SKELETON_INVADER        = 17902,
+    NPC_SKELETON_MAGE           = 17903,
+
     // Alliance Base
     NPC_JAINA                   = 17772,
     NPC_ALLIANCE_PEASANT        = 17931,
@@ -176,6 +180,11 @@ enum HyjalPaths
     FROST_WYRM_FORTRESS_PATROL  = 179073,
 
     HORDE_BOSS_PATH             = 178527
+};
+
+enum BossActions
+{
+    ACTION_BECOME_ACTIVE_AND_CHANNEL = 0
 };
 
 template <class AI, class T>

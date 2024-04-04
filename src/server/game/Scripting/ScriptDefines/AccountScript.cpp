@@ -27,6 +27,14 @@ void ScriptMgr::OnAccountLogin(uint32 accountId)
     });
 }
 
+void ScriptMgr::OnBeforeAccountDelete(uint32 accountId)
+{
+    ExecuteScript<AccountScript>([&](AccountScript* script)
+    {
+        script->OnBeforeAccountDelete(accountId);
+    });
+}
+
 //void ScriptMgr::OnAccountLogout(uint32 accountId)
 //{
 //    ExecuteScript<AccountScript>([&](AccountScript* script)
