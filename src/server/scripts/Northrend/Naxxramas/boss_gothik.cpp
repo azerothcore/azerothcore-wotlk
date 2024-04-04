@@ -173,10 +173,6 @@ const Position PosSummonDead[5] =
 #define POS_X_SOUTH  2633.84f
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
-// GUID of first trigger NPC (used as offset for guid checks)
-// 0-1 are living side soul triggers, 2-3 are spectral side soul triggers, 4 is living rider spawn trigger, 5-9 are living other spawn trigger, 10-14 are skull pile triggers
-#define CGUID_TRIGGER 127514
-
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
 struct NotOnSameSide
 {
@@ -687,22 +683,24 @@ public:
     {
         npc_gothik_triggerAI(Creature* creature) : ScriptedAI(creature) { creature->SetDisableGravity(true); }
 
-        void EnterEvadeMode(EvadeReason /*why*/) override { }
-        void UpdateAI(uint32 /*diff*/) override { }
-        void JustEngagedWith(Unit* /*who*/) override { }
-        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask /*damageSchool*/) override { damage = 0; }
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
+        void UpdateAI(uint32 /*diff*/) override {}
+        void JustEngagedWith(Unit* /*who*/) override {}
+        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override { damage = 0; }
 
         Creature* SelectRandomSkullPile()
         {
             std::list<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
-            uint32 targetDBGuid = CGUID_TRIGGER + urand(10, 14); // CGUID+10 to CGUID+14 are the triggers for the skull piles on dead side
-            for (Creature* trigger : triggers)
+            // Remove triggers that are on live side or soul triggers on the platform
+            triggers.remove_if([](Creature *trigger){
+                return ((trigger->GetPositionY() < POS_Y_GATE) || (trigger->GetPositionZ() > 280.0f));
+                });
+            if (!triggers.empty())
             {
-                if (trigger && trigger->GetSpawnId() == targetDBGuid)
-                {
-                    return trigger;
-                }
+                std::list<Creature*>::iterator itr = triggers.begin();
+                std::advance(itr, urand(0, triggers.size() - 1));
+                return *itr;
             }
             return nullptr;
         }
