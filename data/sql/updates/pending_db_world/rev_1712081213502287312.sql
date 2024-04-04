@@ -4,23 +4,23 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_trigger' WHERE `entry`
 
 -- re-do spawn locations for triggers
 DELETE FROM `creature` WHERE `id1`=16137;
-SET @CGUID = 127618; -- PR NOTE: This needs to match the value set in boss_gothik.cpp for the CGUID_TRIGGER const
-SET @AREAID = 3456; -- Naxxramas AreaId
-SET @ZONEID = 3456; -- Naxxramas ZoneId
+SET @CGUID = 127514; -- PR NOTE: This needs to match the value set in boss_gothik.cpp for the CGUID_TRIGGER const
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-(@CGUID+00,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2643.731,-3399.681,284.1829,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side soul trigger (south)'),
-(@CGUID+01,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2739.995,-3399.779,284.2946,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side soul trigger (north)'),
-(@CGUID+02,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2643.731,-3321.727,284.2327,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side soul trigger (south)'),
-(@CGUID+03,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2739.995,-3321.727,284.2316,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side soul trigger (north)'),
-(@CGUID+04,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2692.161,-3430.746,268.6462,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side spawn trigger (center back)'),
-(@CGUID+05,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2714.562,-3430.610,268.6462,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side spawn trigger (north)'),
-(@CGUID+06,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2692.213,-3428.783,268.6462,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side spawn trigger (center front)'),
-(@CGUID+07,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2669.581,-3428.859,268.6462,0,0,0,1710,0,0,0,0,0,0,'',0,0,'living side spawn trigger (south)'),
-(@CGUID+08,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2733.457,-3349.388,267.7677,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side spawn trigger (northeast)'),
-(@CGUID+09,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2725.818,-3309.567,267.7686,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side spawn trigger (northwest)'),
-(@CGUID+10,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2700.269,-3322.354,267.7678,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side spawn trigger (center)'),
-(@CGUID+11,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2664.872,-3340.749,267.7674,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side spawn trigger (southeast)'),
-(@CGUID+12,16137,0,0,533,@ZONEID,@AREAID,3,1,0,2683.886,-3304.213,267.768 ,0,0,0,1710,0,0,0,0,0,0,'',0,0,'spectral side spawn trigger (southwest)');
+(@CGUID+0,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2643.73095703125,  -3399.680908203125, 284.18292236328125,  6.091198921203613281, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (south)'),
+(@CGUID+1,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2739.994873046875, -3399.779296875,    284.294647216796875, 6.108652114868164062, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (north)'),
+(@CGUID+2,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2643.73095703125,  -3321.72705078125,  284.23272705078125,  6.195918560028076171, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side soul trigger (south)'),
+(@CGUID+3,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2739.994873046875, -3321.72705078125,  284.23162841796875,  2.827433347702026367, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side soul trigger (north)'),
+(@CGUID+4,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2692.16064453125,  -3430.745849609375, 268.64617919921875,  1.605702877044677734, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side spawn trigger (center back)'),
+(@CGUID+5,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2714.561767578125, -3430.6103515625,   268.646240234375,    1.413716673851013183, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (north back)'),
+(@CGUID+6,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2669.581298828125, -3428.858642578125, 268.64617919921875,  1.378810048103332519, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side spawn trigger (south front)'),
+(@CGUID+7,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2669.59033203125,  -3431.460205078125, 268.64617919921875,  1.343903541564941406, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side spawn trigger (south back)'),
+(@CGUID+8,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2692.212646484375, -3428.78271484375,  268.64617919921875,  1.48352980613708496,  7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side spawn trigger (center front)'),
+(@CGUID+9,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2733.456787109375, -3349.387939453125, 267.7677001953125,   1.780235767364501953, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (north front)'),
+(@CGUID+10, 16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2714.4619140625,   -3428.727783203125, 268.64617919921875,  1.65806281566619873,  7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side spawn trigger (northwest)'),
+(@CGUID+11, 16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2725.818603515625, -3309.567626953125, 267.89178466796875,  2.827433347702026367, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side spawn trigger (northeast)'),
+(@CGUID+12, 16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2700.268798828125, -3322.3544921875,   267.767791748046875, 3.525565147399902343, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side spawn trigger (center)'),
+(@CGUID+13, 16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2683.885986328125, -3304.212890625,    267.76800537109375,  2.49582076072692871,  7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side spawn trigger (southwest)'),
+(@CGUID+14, 16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2664.871826171875, -3340.7490234375,   267.767364501953125, 5.934119224548339843, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'spectral side spawn trigger (southeast)');
 
 -- make visuals target proper triggers
 -- to anchor 1: 27892 (Trainee), 27928 (DK), 27935 (Rider)

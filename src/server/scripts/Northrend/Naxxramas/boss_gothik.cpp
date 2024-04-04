@@ -174,8 +174,8 @@ const Position PosSummonDead[5] =
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // GUID of first trigger NPC (used as offset for guid checks)
-// 0-1 are living side soul triggers, 2-3 are spectral side soul triggers, 4 is living rider spawn trigger, 5-7 are living other spawn trigger, 8-12 are skull pile triggers
-#define CGUID_TRIGGER 127618
+// 0-1 are living side soul triggers, 2-3 are spectral side soul triggers, 4 is living rider spawn trigger, 5-9 are living other spawn trigger, 10-14 are skull pile triggers
+#define CGUID_TRIGGER 127514
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
 struct NotOnSameSide
@@ -696,7 +696,7 @@ public:
         {
             std::list<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
-            uint32 targetDBGuid = CGUID_TRIGGER + urand(8, 12); // CGUID+8 to CGUID+12 are the triggers for the skull piles on dead side
+            uint32 targetDBGuid = CGUID_TRIGGER + urand(10, 14); // CGUID+10 to CGUID+14 are the triggers for the skull piles on dead side
             for (Creature* trigger : triggers)
             {
                 if (trigger && trigger->GetSpawnId() == targetDBGuid)
