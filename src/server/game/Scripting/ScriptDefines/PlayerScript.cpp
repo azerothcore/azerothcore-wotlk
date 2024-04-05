@@ -500,7 +500,6 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     ));
 }
 
-
 void ScriptMgr::GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_GET_CUSTOM_GET_ARENA_TEAM_ID, (
@@ -892,7 +891,6 @@ void ScriptMgr::OnCustomScalingStatValue(Player* player, ItemTemplate const* pro
     ));
 }
 
-
 bool ScriptMgr::CanArmorDamageModifier(Player* player)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_ARMOR_DAMAGE_MODIFIER, (
@@ -1123,7 +1121,6 @@ void ScriptMgr::OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool near
         script->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride)
     ));
 }
-
 
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg)
 {
