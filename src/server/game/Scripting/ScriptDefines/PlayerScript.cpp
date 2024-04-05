@@ -810,7 +810,7 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
 
 Optional<bool> ScriptMgr::OnPlayerIsClass(Player const* player, Classes unitClass, ClassContext context)
 {
-    if (!ScriptRegistry<PlayerScript>::EnabledHooks[PLAYERHOOK_ON_PLAYER_IS_CLASS].empty())
+    if (ScriptRegistry<PlayerScript>::EnabledHooks[PLAYERHOOK_ON_PLAYER_IS_CLASS].empty())
         return {};
 
     for (auto const& script : ScriptRegistry<PlayerScript>::EnabledHooks[PLAYERHOOK_ON_PLAYER_IS_CLASS])
