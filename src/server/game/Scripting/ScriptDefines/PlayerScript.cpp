@@ -1150,6 +1150,22 @@ void ScriptMgr::OnCustomScalingStatValue(Player* player, ItemTemplate const* pro
     });
 }
 
+void ScriptMgr::OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint32 statType, int32& val)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnApplyItemModsBefore(player, slot, apply, statType, val);
+    });
+}
+
+void ScriptMgr::OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnApplyEnchantmentItemModsBefore(player, item, slot, apply, enchant_spell_id, enchant_amount);
+    });
+}
+
 bool ScriptMgr::CanArmorDamageModifier(Player* player)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
