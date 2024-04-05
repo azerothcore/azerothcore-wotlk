@@ -148,11 +148,9 @@ public:
 
     struct boss_illidari_councilAI : public BossAI
     {
-        boss_illidari_councilAI(Creature* creature) : BossAI(creature, DATA_ILLIDARI_COUNCIL)
-        {
-        }
+        boss_illidari_councilAI(Creature* creature) : BossAI(creature, DATA_ILLIDARI_COUNCIL) { }
 
-        void EnterEvadeMode(EvadeReason why)
+        void EnterEvadeMode(EvadeReason why) override
         {
             for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
                 if (Creature* member = instance->GetCreature(i))
