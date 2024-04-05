@@ -261,7 +261,7 @@ inline bool ReGuidBotEquip(std::string& line, size_t ne_guid_offset)
                 break;
             }
 
-            if (itemReguidMap.count(guidVal) == 0)
+            if (!itemReguidMap.contains(guidVal))
             {
                 LOG_ERROR("scripts", "import: ReGuidBotEquip reguid value not found for {}!", guidVal);
                 break;
@@ -348,7 +348,7 @@ inline bool ReGuidItemInstance(std::string& line, uint32& nextGuid)
                     return false;
                 }
                 //this is not checked at dump save
-                if (itemReguidMap.count(guidVal) == 0)
+                if (!itemReguidMap.contains(guidVal))
                     itemReguidMap[guidVal] = nextGuid;
                 else
                     LOG_ERROR("scripts", "import: ReGuidItemInstance item guid {} was already reguided to {}. Saved dump contains duplicate item guids - you'll have to fix them manually, proceeding anyways...",

@@ -260,7 +260,7 @@ WanderNode::node_ltype_c WanderNode::GetShortestPathLinks(WanderNode const* targ
                 {
                     checked_links.insert(wp); // cut off all ways back (2-ways, circular)
                     std::copy_if(wp->GetLinks().begin(), wp->GetLinks().end(), std::back_inserter(clinks_new), [&checked_links](WanderNode const* cwp) {
-                        return !checked_links.count(cwp);
+                        return !checked_links.contains(cwp);
                     });
                 }
                 clinks = std::move(clinks_new);

@@ -333,7 +333,7 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
     {
         static std::map<uint32, std::string> unk_botstrings;
 
-        if (!unk_botstrings.count(textId))
+        if (!unk_botstrings.contains(textId))
         {
             LOG_ERROR("entities.player", "NPCBots: bot text string #{} is not localized, at least for {}",
                 textId, localeNames[loc]);

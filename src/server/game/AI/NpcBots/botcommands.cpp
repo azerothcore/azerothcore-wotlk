@@ -906,7 +906,7 @@ public:
                 continue;
             }
 
-            if (wps_relinks.count(lwp) != 0)
+            if (wps_relinks.contains(lwp))
                 wps_relinks.erase(lwp);
 
             handler->PSendSysMessage("Adding link %u%s%u...", wp->GetWPId(), oneway ? "->" : "<->", lid);
