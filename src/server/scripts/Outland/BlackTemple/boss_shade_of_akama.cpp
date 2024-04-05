@@ -158,7 +158,6 @@ struct boss_shade_of_akama : public BossAI
     {
         if (param == ACTION_START_ENCOUNTER)
         {
-            me->SetInCombatWithZone();
             summonsGenerator.DoAction(ACTION_START_ENCOUNTER);
             ChannelersAction(ACTION_START_ENCOUNTER);
             events.ScheduleEvent(EVENT_SHADE_CHECK_DISTANCE, 1000);
@@ -233,7 +232,6 @@ struct boss_shade_of_akama : public BossAI
                 {
                     summonsGenerator.DoAction(ACTION_NO_SORCERERS);
                     me->SetWalk(false);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
             }
 
@@ -326,7 +324,6 @@ struct npc_akama_shade : public ScriptedAI
         summon->SetWalk(true);
         summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * std::sin(summon->GetOrientation()), summon->GetPositionZ(), false);
         summons.Summon(summon);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
     }
 
     void UpdateAI(uint32 diff) override
@@ -361,7 +358,6 @@ struct npc_akama_shade : public ScriptedAI
             break;
         case EVENT_AKAMA_SCENE3:
             me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
         case EVENT_AKAMA_SCENE4:
             Talk(SAY_BROKEN_FREE_1);
@@ -441,7 +437,7 @@ struct npc_creature_generator_akama : public NullCreatureAI
                 if ((*itr)->IsAlive() || (*itr)->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     continue;
 
-                //summon->SetInCombatWithZone();
+                summon->SetInCombatWithZone();
                 summon->SetReactState(REACT_PASSIVE);
                 summon->GetMotionMaster()->MovePoint(POINT_START, **itr);
                 (*itr)->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -449,7 +445,7 @@ struct npc_creature_generator_akama : public NullCreatureAI
             }
         }
 
-        //summon->SetInCombatWithZone();
+        summon->SetInCombatWithZone();
         if (Unit* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
         {
             summon->AddThreat(akama, 500.0f);
@@ -476,7 +472,7 @@ struct npc_creature_generator_akama : public NullCreatureAI
                         continue;
                     summon->InterruptNonMeleeSpells(false);
                     summon->GetMotionMaster()->Clear();
-                    //summon->SetInCombatWithZone();
+                    summon->SetInCombatWithZone();
                 }
             }
         }
