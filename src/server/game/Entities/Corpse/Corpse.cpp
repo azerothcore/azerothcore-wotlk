@@ -198,7 +198,7 @@ void Corpse::ResetGhostTime()
     m_time = GameTime::GetGameTime().count();
 }
 
-void Corpse::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void Corpse::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;
