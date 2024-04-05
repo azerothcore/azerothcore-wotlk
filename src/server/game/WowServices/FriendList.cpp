@@ -649,8 +649,8 @@ static BOOL WhoIsHandler (WorldSession* ses,
   }
 
   // Read the message data
-  char name[MAX_PLAYER_NAME];
-  msg->GetString(name, MAX_PLAYER_NAME);
+  char name[256];
+  msg->GetString(name, -1);
 
   FormatCharacterName(name);
 
