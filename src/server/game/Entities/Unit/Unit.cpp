@@ -22690,24 +22690,6 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
                     else
                         displayId = 17519;              // world visible trigger's model
                 }
-                //npcbot
-                else if (IsNPCBotOrPet() && IsInRaidWith(target))
-                {
-                    FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
-                    FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
-                    if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
-                    {
-                        if (index == UNIT_FIELD_BYTES_2)
-                            // Allow targetting opposite faction in party when enabled in config
-                            fieldBuffer << (m_uint32Values[UNIT_FIELD_BYTES_2] & ((UNIT_BYTE2_FLAG_SANCTUARY /*| UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5*/) << 8)); // this flag is at uint8 offset 1 !!
-                        else
-                            // pretend that all other HOSTILE players have own faction, to allow follow, heal, rezz (trade wont work)
-                            fieldBuffer << uint32(target->GetFaction());
-                    }
-                    else
-                        fieldBuffer << m_uint32Values[index];
-                }
-                //end npcbot
                 else
                 {
                     if (cinfo->Modelid2)
@@ -22764,6 +22746,17 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
         {
                 valuesUpdateBuf.put(posPointers.UnitFieldBytes2Pos, (m_uint32Values[UNIT_FIELD_BYTES_2] & 0xFFFFF2FF)); // clear UNIT_BYTE2_FLAG_PVP, UNIT_BYTE2_FLAG_FFA_PVP, UNIT_BYTE2_FLAG_SANCTUARY
         }
+        //npcbot
+        else if (IsNPCBotOrPet() && IsInRaidWith(target))
+        {
+            FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
+            FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
+            if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
+                valuesUpdateBuf.put(posPointers.UnitFieldBytes2Pos, (m_uint32Values[UNIT_FIELD_BYTES_2] & ((UNIT_BYTE2_FLAG_SANCTUARY /*| UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5*/) << 8))); // this flag is at uint8 offset 1 !!
+            else
+                valuesUpdateBuf.put(posPointers.UnitFieldBytes2Pos, m_uint32Values[UNIT_FIELD_BYTES_2]);
+        }
+        //end npcbot
     }
 
     // UNIT_FIELD_FACTIONTEMPLATE
@@ -22782,6 +22775,15 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
         {
             valuesUpdateBuf.put(posPointers.UnitFieldFactionTemplatePos, uint32(target->GetFaction()));
         }
+        //npcbot
+        else if (IsNPCBotOrPet() && IsInRaidWith(target))
+        {
+            FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
+            FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
+            if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
+                valuesUpdateBuf.put(posPointers.UnitFieldBytes2Pos, uint32(target->GetFaction()));
+        }
+        //end npcbot
     }
 
     sScriptMgr->OnPatchValuesUpdate(this, valuesUpdateBuf, posPointers, target);

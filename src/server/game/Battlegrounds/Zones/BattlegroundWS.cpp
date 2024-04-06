@@ -617,7 +617,7 @@ void BattlegroundWS::RemoveBot(ObjectGuid guid)
         if (!bot)
         {
             LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot {} who has the FLAG!!", guid.GetEntry());
-            SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(GetBotTeamId(bot->GetGUID())));
+            SetFlagPicker(ObjectGuid::Empty, TEAM_HORDE);
             RespawnFlagAfterDrop(TEAM_HORDE);
         }
         else
