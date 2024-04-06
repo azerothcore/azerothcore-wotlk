@@ -165,6 +165,7 @@ bool WorldSocket::Update()
     {
         // Allocate buffer only when it's needed but not on every Update() call.
         MessageBuffer buffer(_sendBufferSize);
+        std::size_t currentPacketSize;
         do
         {
             queued->CompressIfNeeded();
@@ -172,26 +173,32 @@ bool WorldSocket::Update()
             if (queued->NeedsEncryption())
                 _authCrypt.EncryptSend(header.header, header.getHeaderLength());
 
-            if (buffer.GetRemainingSpace() < queued->size() + header.getHeaderLength())
+            currentPacketSize = queued->size() + header.getHeaderLength();
+
+            if (buffer.GetRemainingSpace() < currentPacketSize)
             {
                 QueuePacket(std::move(buffer));
                 buffer.Resize(_sendBufferSize);
             }
 
-            if (buffer.GetRemainingSpace() >= queued->size() + header.getHeaderLength())
+            if (buffer.GetRemainingSpace() >= currentPacketSize)
             {
                 buffer.Write(header.header, header.getHeaderLength());
                 if (!queued->empty())
                     buffer.Write(queued->contents(), queued->size());
             }
-            else    // single packet larger than 4096 bytes
+            else    // Single packet larger than current buffer size
             {
-                MessageBuffer packetBuffer(queued->size() + header.getHeaderLength());
-                packetBuffer.Write(header.header, header.getHeaderLength());
-                if (!queued->empty())
-                    packetBuffer.Write(queued->contents(), queued->size());
+                // Resize buffer to fit current packet
+                buffer.Resize(currentPacketSize);
 
-                QueuePacket(std::move(packetBuffer));
+                // Grow future buffers to current packet size if still below limit
+                if (currentPacketSize <= 65536)
+                    _sendBufferSize = currentPacketSize;
+
+                buffer.Write(header.header, header.getHeaderLength());
+                if (!queued->empty())
+                    buffer.Write(queued->contents(), queued->size());
             }
 
             delete queued;
