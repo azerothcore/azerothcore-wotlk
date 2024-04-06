@@ -26,6 +26,7 @@ runs:
   steps:
     - name: Cache
       uses: actions/cache@v3
+      if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache
           # format
@@ -102,7 +103,7 @@ runs:
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
-          ${{ !inputs.pch && '-DNOPCH=true' || '' }}
+          ${{ inputs.pch == 'true' && '' || '-DNOPCH=true' }}
 
     - name: build
       shell: bash
