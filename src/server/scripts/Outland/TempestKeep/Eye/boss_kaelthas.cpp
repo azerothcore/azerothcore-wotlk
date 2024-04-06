@@ -807,7 +807,7 @@ struct npc_lord_sanguinar : public ScriptedAI
         {
             Talk(SAY_SANGUINAR_AGGRO);
         }
-        ScheduleTimedEvent(6s, 20s, [&]{
+        ScheduleTimedEvent(0s, 2s, [&]{
             DoCastSelf(SPELL_BELLOWING_ROAR);
         }, 30s, 40s);
     }
