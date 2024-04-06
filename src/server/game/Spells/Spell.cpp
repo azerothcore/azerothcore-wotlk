@@ -572,7 +572,7 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
 /*
     m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
 */
-    m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)->TryGetSpellInfoOverride(caster)),
+    m_spellInfo((caster->IsNPCBot() ? info : sSpellMgr->GetSpellForDifficultyFromSpell(info, caster))->TryGetSpellInfoOverride(caster)),
 //end npcbot
     m_caster((info->HasAttribute(SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
     , m_spellValue(new SpellValue(m_spellInfo)), _spellEvent(nullptr)
