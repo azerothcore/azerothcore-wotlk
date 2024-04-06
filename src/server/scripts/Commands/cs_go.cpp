@@ -352,7 +352,7 @@ public:
         float x = locationValues[0];
         float y = locationValues[1];
 
-        if (!sMapStore.LookupEntry(mapId))
+        if (!sMapStore.LookupEntry(mapId) || !MapMgr::IsValidMapCoord(mapId, x, y))
         {
             handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
             return false;
