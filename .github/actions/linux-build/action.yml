@@ -26,6 +26,7 @@ runs:
   steps:
     - name: Cache
       uses: actions/cache@v3
+      if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache
           # format
@@ -100,9 +101,9 @@ runs:
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
           -DBUILD_TESTING="ON" \
-          -DUSE_SCRIPTPCH=${{ inputs.pch && 'ON' || '' }} \
-          -DUSE_COREPCH=${{ inputs.pch && 'ON' || '' }} \
-          ${{ !inputs.pch && '-DNOPCH=true' || '' }}
+          -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
+          -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
+          ${{ inputs.pch == 'true' && '' || '-DNOPCH=true' }}
 
     - name: build
       shell: bash
