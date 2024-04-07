@@ -8633,7 +8633,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             triggered_spell_id = 54445;
                             target = this;
                             float addThreat = float(CalculatePct(procSpell->Effects[0].CalcValue(this), triggerAmount));
-                            victim->AddThreat(this, addThreat);
+                            victim->GetThreatManager().AddThreat(this, addThreat);
                             break;
                         }
                     // Silverback
@@ -9312,7 +9312,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
 
                         if (victim && victim->IsAlive())
-                            victim->GetThreatMgr().ModifyThreatByPercent(this, -10);
+                            victim->GetThreatManager().ModifyThreatByPercent(this, -10);
 
                         basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                         trigger_spell_id = 31616;
@@ -14392,7 +14392,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     {
         CombatStop();
         GetThreatManager().ClearAllThreat();
-        ClearComboPointHolders(false);                           // any combo points pointed to unit lost at it death
+        ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCast(false))
             InterruptNonMeleeSpells(false);

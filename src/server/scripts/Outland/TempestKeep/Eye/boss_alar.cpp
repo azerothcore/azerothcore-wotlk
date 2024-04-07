@@ -174,7 +174,7 @@ struct boss_alar : public BossAI
         }
         else
         {
-            if (me->GetThreatMgr().GetThreatList().empty())
+            if (me->GetThreatManager().GetThreatListSize() == 0)
             {
                 BossAI::EnterEvadeMode(why);
             }

@@ -284,7 +284,7 @@ struct npc_tainted_elemental : public ScriptedAI
         me->SetInCombatWithZone();
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
-            me->AddThreat(target, 1000.0f);
+            me->GetThreatManager().AddThreat(target, 1000.0f);
         }
     }
 

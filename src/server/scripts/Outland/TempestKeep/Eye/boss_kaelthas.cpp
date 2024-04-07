@@ -869,7 +869,7 @@ struct npc_capernian : public ScriptedAI
             if (me->Attack(who, false))
             {
                 me->GetMotionMaster()->MoveChase(who, 30.0f, 0);
-                me->AddThreat(who, 0.0f);
+                me->GetThreatManager().AddThreat(who, 0.0f);
             }
         }
     }
@@ -1026,7 +1026,7 @@ struct npc_thaladred : public ScriptedAI
             DoResetThreatList();
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
-                me->AddThreat(target, 10000000.0f);
+                me->GetThreatManager().AddThreat(target, 10000000.0f);
                 Talk(EMOTE_THALADRED_FIXATE, target);
             }
         }, 10000ms);

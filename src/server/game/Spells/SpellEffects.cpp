@@ -334,15 +334,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
         {
-        case SPELLFAMILY_GENERIC:
-        {
-            // Meteor like spells (divided damage to targets)
-            if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_SHARE_DAMAGE))
-            {
-                uint32 count = 0;
-                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-                    if (ihit->effectMask & (1 << effIndex))
-                        ++count;
+            case SPELLFAMILY_GENERIC:
+                {
+                    // Meteor like spells (divided damage to targets)
+                    if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_SHARE_DAMAGE))
+                    {
+                        uint32 count = 0;
+                        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                            if (ihit->effectMask & (1 << effIndex))
+                                ++count;
 
                         damage /= count;                    // divide to all targets
                     }
@@ -509,28 +509,28 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                     bool needConsume = true;
                                     uint32 spellId = aurEff->GetId();
 
-                            uint32 doses = aurEff->GetBase()->GetStackAmount();
-                            if (doses > combo)
-                                doses = combo;
+                                    uint32 doses = aurEff->GetBase()->GetStackAmount();
+                                    if (doses > combo)
+                                        doses = combo;
 
-                            // Master Poisoner
-                            Unit::AuraEffectList const& auraList = player->GetAuraEffectsByType(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK);
-                            for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
-                            {
-                                if ((*iter)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE && (*iter)->GetSpellInfo()->SpellIconID == 1960)
-                                {
-                                    uint32 chance = (*iter)->GetSpellInfo()->Effects[EFFECT_2].CalcValue(m_caster);
+                                    // Master Poisoner
+                                    Unit::AuraEffectList const& auraList = player->GetAuraEffectsByType(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK);
+                                    for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
+                                    {
+                                        if ((*iter)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE && (*iter)->GetSpellInfo()->SpellIconID == 1960)
+                                        {
+                                            uint32 chance = (*iter)->GetSpellInfo()->Effects[EFFECT_2].CalcValue(m_caster);
 
-                                    if (chance && roll_chance_i(chance))
-                                        needConsume = false;
+                                            if (chance && roll_chance_i(chance))
+                                                needConsume = false;
 
-                                    break;
-                                }
-                            }
+                                            break;
+                                        }
+                                    }
 
-                            if (needConsume)
-                                for (uint32 i = 0; i < doses; ++i)
-                                    unitTarget->RemoveAuraFromStack(spellId, m_caster->GetGUID());
+                                    if (needConsume)
+                                        for (uint32 i = 0; i < doses; ++i)
+                                            unitTarget->RemoveAuraFromStack(spellId, m_caster->GetGUID());
 
                                     damage *= doses;
                                     damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * combo);
