@@ -279,13 +279,6 @@ struct boss_archimonde : public BossAI
                 DoCastVictim(SPELL_RED_SKY_EFFECT);
                 DoCastVictim(SPELL_HAND_OF_DEATH);
             }, 3s);
-            ScheduleTimedEvent(2500ms, [&]
-            {
-                if (!(me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim())))
-                {
-                    DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
-                }
-            }, 3500ms);
         });
     }
 
@@ -365,6 +358,27 @@ struct boss_archimonde : public BossAI
                 }
             }
         }, 5s);
+        ScheduleTimedEvent(5000ms, [&]
+        {
+            bool noPlayersInRange = true;
+            if (Map* map = me->GetMap())
+            {
+                map->DoForAllPlayers([&noPlayersInRange, this](Player* player)
+                {
+                    if (me->IsWithinMeleeRange(player))
+                    {
+                        noPlayersInRange = false;
+                        return false;
+                    }
+                    return true;
+                });
+                me->Yell(std::to_string(noPlayersInRange), LANG_UNIVERSAL);
+            }
+            if (noPlayersInRange)
+            {
+                DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
+            }
+        }, 3500ms);
 
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
