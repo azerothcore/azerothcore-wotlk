@@ -498,8 +498,12 @@ struct boss_kaelthas : public BossAI
                 {
                     summons.DespawnEntry(NPC_NETHER_VAPOR);
                     scheduler.CancelGroup(GROUP_NETHER_BEAM);
-                    me->SetTarget(me->GetVictim()->GetGUID());
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+                    if (Unit* victim = me->GetVictim())
+                    {
+                        me->SetTarget(victim->GetGUID());
+                        me->GetMotionMaster()->MoveChase(victim);
+                    }
                 });
                 me->SetTarget();
                 me->GetMotionMaster()->Clear();
@@ -803,9 +807,9 @@ struct npc_lord_sanguinar : public ScriptedAI
         {
             Talk(SAY_SANGUINAR_AGGRO);
         }
-        ScheduleTimedEvent(0s, [&]{
+        ScheduleTimedEvent(6s, 20s, [&]{
             DoCastSelf(SPELL_BELLOWING_ROAR);
-        }, 15s);
+        }, 30s, 40s);
     }
 
     void JustDied(Unit* /*killer*/) override

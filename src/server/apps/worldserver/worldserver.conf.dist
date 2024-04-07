@@ -364,11 +364,11 @@ Network.OutKBuff = -1
 
 #
 #    Network.OutUBuff
-#        Description: Amount of memory (in bytes) reserved in the user space per connection for
-#                     output buffering.
-#         Default:    65536
+#        Description: Amount of memory (in bytes) reserved initially in the user space per
+#                     connection for output buffering.
+#         Default:    4096
 
-Network.OutUBuff = 65536
+Network.OutUBuff = 4096
 
 #
 #    Network.TcpNoDelay:
