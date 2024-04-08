@@ -202,7 +202,7 @@ struct boss_the_lurker_below : public BossAI
 
         scheduler.Update(diff);
 
-        if (me->getStandState() != UNIT_STAND_STATE_STAND || !me->isAttackReady() || me->GetReactState() != REACT_AGGRESSIVE)
+        if (me->GetStandState() != UNIT_STAND_STATE_STAND || !me->isAttackReady() || me->GetReactState() != REACT_AGGRESSIVE)
             return;
 
         Unit* target = nullptr;

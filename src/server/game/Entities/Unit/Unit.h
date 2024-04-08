@@ -1625,7 +1625,7 @@ public:
         return (creatureType >= 1) ? (1 << (creatureType - 1)) : 0;
     }
 
-    [[nodiscard]] uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
+    [[nodiscard]] uint8 GetStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
     [[nodiscard]] bool IsSitState() const;
     [[nodiscard]] bool IsStandState() const;
     void SetStandState(uint8 state);

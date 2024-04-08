@@ -391,7 +391,7 @@ class spell_love_is_in_the_air_romantic_picnic : public AuraScript
         Unit* caster = GetCaster();
 
         // If our player is no longer sit, remove all auras
-        if (target->getStandState() != UNIT_STAND_STATE_SIT)
+        if (target->GetStandState() != UNIT_STAND_STATE_SIT)
         {
             target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);
             target->RemoveAura(GetAura());
@@ -410,7 +410,7 @@ class spell_love_is_in_the_air_romantic_picnic : public AuraScript
         Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
         {
-            if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)
+            if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->GetStandState() == UNIT_STAND_STATE_SIT)
             {
                 if (caster)
                 {

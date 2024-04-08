@@ -520,7 +520,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         {
             if (ConditionValue1 == 0)
             {
-                condMeets = (unit->getStandState() == ConditionValue2);
+                condMeets = (unit->GetStandState() == ConditionValue2);
             }
             else if (ConditionValue2 == 0)
             {

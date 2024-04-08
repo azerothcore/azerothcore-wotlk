@@ -403,7 +403,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
                 return;
 
-            if (me->getStandState() != UNIT_STAND_STATE_STAND)
+            if (me->GetStandState() != UNIT_STAND_STATE_STAND)
                 me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (!bIntro)
