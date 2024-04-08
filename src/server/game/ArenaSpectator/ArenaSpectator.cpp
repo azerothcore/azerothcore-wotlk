@@ -101,7 +101,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (player->m_mover != player)
         errors.push_back("You must control yourself.");
 
-    if (player->IsInFlight())
+    if (player->IsOnTaxi())
         errors.push_back("Can't be in flight.");
 
     if (player->IsMounted())

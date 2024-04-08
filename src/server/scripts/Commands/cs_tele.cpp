@@ -139,7 +139,7 @@ public:
                 ChatHandler(target->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, handler->GetNameLink().c_str());
 
             // stop flight if need
-            if (target->IsInFlight())
+            if (target->IsOnTaxi())
             {
                 target->GetMotionMaster()->MovementExpired();
                 target->CleanupAfterTaxiFlight();
@@ -261,7 +261,7 @@ public:
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
 
             // stop flight if need
-            if (target->IsInFlight())
+            if (target->IsOnTaxi())
             {
                 target->GetMotionMaster()->MovementExpired();
                 target->CleanupAfterTaxiFlight();
@@ -298,7 +298,7 @@ public:
         }
 
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();

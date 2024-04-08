@@ -84,7 +84,7 @@ inline bool IsValidCombatTarget(Creature* source, Player* target)
         return false;
     }
 
-    if (source->HasUnitState(UNIT_STATE_IN_FLIGHT) || target->HasUnitState(UNIT_STATE_IN_FLIGHT))
+    if (source->HasUnitState(UNIT_STATE_ON_TAXI) || target->HasUnitState(UNIT_STATE_ON_TAXI))
     {
         return false;
     }

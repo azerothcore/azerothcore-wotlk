@@ -80,7 +80,7 @@ public:
         }
 
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();
@@ -183,7 +183,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();
@@ -213,7 +213,7 @@ public:
         }
 
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();
@@ -287,7 +287,7 @@ public:
         }
 
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();
@@ -385,7 +385,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
 
         // stop flight if need
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             player->GetMotionMaster()->MovementExpired();
             player->CleanupAfterTaxiFlight();

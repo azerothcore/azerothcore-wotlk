@@ -287,7 +287,7 @@ public:
                 break;
             }
 
-            if (plr->IsInFlight())
+            if (plr->IsOnTaxi())
             {
                 error = 10;
                 break;
@@ -782,7 +782,7 @@ public:
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
             // stop flight if need
-            if (m_player->IsInFlight())
+            if (m_player->IsOnTaxi())
             {
                 m_player->GetMotionMaster()->MovementExpired();
                 m_player->CleanupAfterTaxiFlight();
@@ -818,7 +818,7 @@ public:
             }
 
             // stop flight if need
-            if (m_player->IsInFlight())
+            if (m_player->IsOnTaxi())
             {
                 m_player->GetMotionMaster()->MovementExpired();
                 m_player->CleanupAfterTaxiFlight();
@@ -918,7 +918,7 @@ public:
             }
 
             // stop flight if need
-            if (targetPlayer->IsInFlight())
+            if (targetPlayer->IsOnTaxi())
             {
                 targetPlayer->GetMotionMaster()->MovementExpired();
                 targetPlayer->CleanupAfterTaxiFlight();
@@ -1043,7 +1043,7 @@ public:
             }
 
             // stop flight if need
-            if (player->IsInFlight())
+            if (player->IsOnTaxi())
             {
                 player->GetMotionMaster()->MovementExpired();
                 player->CleanupAfterTaxiFlight();
@@ -1146,7 +1146,7 @@ public:
             return false;
         }
 
-        if (player->IsInFlight())
+        if (player->IsOnTaxi())
         {
             handler->SendErrorMessage(LANG_YOU_IN_FLIGHT);
             return false;
@@ -1270,7 +1270,7 @@ public:
         }
 
         // stop flight if need
-        if (targetPlayer->IsInFlight())
+        if (targetPlayer->IsOnTaxi())
         {
             targetPlayer->GetMotionMaster()->MovementExpired();
             targetPlayer->CleanupAfterTaxiFlight();
@@ -1409,7 +1409,7 @@ public:
 
         Player* player = target->GetConnectedPlayer();
 
-        if (player->IsInFlight() || player->IsInCombat())
+        if (player->IsOnTaxi() || player->IsInCombat())
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)

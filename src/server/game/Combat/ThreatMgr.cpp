@@ -191,7 +191,7 @@ void HostileReference::updateOnlineStatus()
     // target is not in flight
     if (isValid()
             && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
-            && !getTarget()->IsInFlight()
+            && !getTarget()->IsOnTaxi()
             && getTarget()->IsInMap(GetSourceUnit())
             && getTarget()->InSamePhase(GetSourceUnit())
        )

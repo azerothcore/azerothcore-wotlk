@@ -559,7 +559,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         {
             if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                condMeets = player->IsInFlight();
+                condMeets = player->IsOnTaxi();
             }
         }
         break;

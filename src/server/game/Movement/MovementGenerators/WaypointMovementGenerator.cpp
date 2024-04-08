@@ -399,7 +399,7 @@ void FlightPathMovementGenerator::DoInitialize(Player* player)
 void FlightPathMovementGenerator::DoFinalize(Player* player)
 {
     // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
-    player->ClearUnitState(UNIT_STATE_IN_FLIGHT);
+    player->ClearUnitState(UNIT_STATE_ON_TAXI);
 
     player->m_taxi.ClearTaxiDestinations();
     player->Dismount();
@@ -434,7 +434,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     }
 
     player->getHostileRefMgr().setOnlineOfflineState(false);
-    player->AddUnitState(UNIT_STATE_IN_FLIGHT);
+    player->AddUnitState(UNIT_STATE_ON_TAXI);
     player->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
     Movement::MoveSplineInit init(player);

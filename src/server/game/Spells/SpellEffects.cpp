@@ -1073,7 +1073,7 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
 
-    if (m_caster->IsInFlight())
+    if (m_caster->IsOnTaxi())
         return;
 
     if (!unitTarget)
@@ -1094,7 +1094,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
 
-    if (m_caster->IsInFlight())
+    if (m_caster->IsOnTaxi())
         return;
 
     if (!m_targets.HasDst() || m_caster->GetVehicle())
@@ -1168,7 +1168,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->IsInFlight())
+    if (!unitTarget || unitTarget->IsOnTaxi())
         return;
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
@@ -2735,7 +2735,7 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex  /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->IsInFlight())
+    if (!unitTarget || unitTarget->IsOnTaxi())
         return;
 
     if (m_targets.HasDst())
@@ -4163,7 +4163,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
         return;
 
     Player* target = m_caster->ToPlayer();
-    if (target->IsInFlight())
+    if (target->IsOnTaxi())
         return;
 
     // xinef: if player is dead - teleport to graveyard
@@ -4685,7 +4685,7 @@ void Spell::EffectLeap(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->IsInFlight())
+    if (!unitTarget || unitTarget->IsOnTaxi())
         return;
 
     if (!m_targets.HasDst())

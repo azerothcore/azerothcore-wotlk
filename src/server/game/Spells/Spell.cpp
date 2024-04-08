@@ -5996,7 +5996,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (m_caster->IsMounted() && m_caster->GetTypeId() == TYPEID_PLAYER && !HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE) &&
             !m_spellInfo->IsPassive() && !m_spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_WHILE_MOUNTED))
     {
-        if (m_caster->IsInFlight())
+        if (m_caster->IsOnTaxi())
             return SPELL_FAILED_NOT_ON_TAXI;
         else
             return SPELL_FAILED_NOT_MOUNTED;

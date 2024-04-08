@@ -2218,7 +2218,7 @@ void Player::ProcessTerrainStatusUpdate()
         }
 
         // Fatigue bar state (if not on flight path or transport)
-        if ((liquidData.Flags & MAP_LIQUID_TYPE_DARK_WATER) && !IsInFlight() && !GetTransport())
+        if ((liquidData.Flags & MAP_LIQUID_TYPE_DARK_WATER) && !IsOnTaxi() && !GetTransport())
         {
             // Exclude also uncontrollable vehicles
             Vehicle*                vehicle     = GetVehicle();

@@ -81,7 +81,7 @@ Battlefield::~Battlefield()
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
     // Xinef: do not invite players on taxi
-    if (!player->IsInFlight())
+    if (!player->IsOnTaxi())
     {
         // If battle is started,
         // If not full of players > invite player to join the war
@@ -279,7 +279,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
         return;
 
     /// @todo : needed ?
-    if (player->IsInFlight())
+    if (player->IsOnTaxi())
         return;
 
     if (player->InBattleground())

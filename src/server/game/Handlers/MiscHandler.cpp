@@ -421,7 +421,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
         DoLootRelease(lguid);
 
     bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
-                          || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsInFlight();
+                          || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsOnTaxi();
 
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
                                      && GetPlayer()->isAFK() && sAreaTableStore.LookupEntry(GetPlayer()->GetAreaId())->IsSanctuary();
@@ -739,7 +739,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     LOG_DEBUG("network", "CMSG_AREATRIGGER. Trigger ID: {}", triggerId);
 
     Player* player = GetPlayer();
-    if (player->IsInFlight())
+    if (player->IsOnTaxi())
     {
         LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player '{}' ({}) in flight, ignore Area Trigger ID:{}",
                        player->GetName(), player->GetGUID().ToString(), triggerId);
@@ -1490,7 +1490,7 @@ void WorldSession::HandleCancelMountAuraOpcode(WorldPacket& /*recv_data*/)
         return;
     }
 
-    if (m_player->IsInFlight())                               // not blizz like; no any messages on blizz
+    if (m_player->IsOnTaxi())                               // not blizz like; no any messages on blizz
     {
         ChatHandler(this).SendSysMessage(LANG_YOU_IN_FLIGHT);
         return;
@@ -1648,7 +1648,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
 {
-    if (m_player->IsInFlight())
+    if (m_player->IsOnTaxi())
         return;
 
     if(Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(m_player->GetZoneId()))

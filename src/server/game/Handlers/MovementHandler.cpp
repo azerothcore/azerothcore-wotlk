@@ -189,7 +189,7 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
     // flight fast teleport case
-    if (GetPlayer()->IsInFlight())
+    if (GetPlayer()->IsOnTaxi())
     {
         if (!GetPlayer()->InBattleground())
         {
@@ -493,7 +493,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
+    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsOnTaxi())
     {
         plrMover->HandleFall(movementInfo);
 

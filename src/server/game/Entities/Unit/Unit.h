@@ -329,7 +329,7 @@ enum UnitState
     UNIT_STATE_CHASE           = 0x00000020,
     //UNIT_STATE_SEARCHING       = 0x00000040,
     UNIT_STATE_FLEEING         = 0x00000080,
-    UNIT_STATE_IN_FLIGHT       = 0x00000100,                     // player is in flight mode
+    UNIT_STATE_ON_TAXI              = 0x100,
     UNIT_STATE_FOLLOW          = 0x00000200,
     UNIT_STATE_ROOT            = 0x00000400,
     UNIT_STATE_CONFUSED        = 0x00000800,
@@ -352,13 +352,13 @@ enum UnitState
     UNIT_STATE_NO_ENVIRONMENT_UPD = 0x20000000, // pussywizard
 
     UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
-                                     | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
+                                     | UNIT_STATE_FLEEING | UNIT_STATE_ON_TAXI | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
                                      | UNIT_STATE_DISTRACTED | UNIT_STATE_ISOLATED | UNIT_STATE_ATTACK_PLAYER | UNIT_STATE_CASTING
                                      | UNIT_STATE_POSSESSED | UNIT_STATE_CHARGING | UNIT_STATE_JUMPING | UNIT_STATE_MOVE | UNIT_STATE_ROTATING
                                      | UNIT_STATE_EVADE | UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE
                                      | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE | UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD,
 
-    UNIT_STATE_UNATTACKABLE         = UNIT_STATE_IN_FLIGHT,
+    UNIT_STATE_UNATTACKABLE         = UNIT_STATE_ON_TAXI,
     // for real move using movegen check and stop (except unstoppable flight)
     UNIT_STATE_MOVING               = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE,
     UNIT_STATE_CONTROLLED           = (UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING),
@@ -369,7 +369,7 @@ enum UnitState
     // stay by different reasons
     UNIT_STATE_NOT_MOVE             = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
     UNIT_STATE_IGNORE_ANTISPEEDHACK = UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED | UNIT_STATE_CHARGING | UNIT_STATE_DISTRACTED | UNIT_STATE_POSSESSED,
-    UNIT_STATE_ALL_STATE            = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_IN_FLIGHT)
+    UNIT_STATE_ALL_STATE            = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_ON_TAXI)
 };
 
 enum UnitMoveType
@@ -1490,7 +1490,7 @@ public:
     [[nodiscard]] uint32 GetUnitState() const { return m_state; }
     [[nodiscard]] bool CanFreeMove() const
     {
-        return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
+        return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_ON_TAXI |
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
 
@@ -1767,7 +1767,7 @@ public:
     [[nodiscard]] bool IsSpiritService() const { return HasNpcFlag(UNIT_NPC_FLAG_SPIRITHEALER | UNIT_NPC_FLAG_SPIRITGUIDE); }
     [[nodiscard]] bool IsCritter() const { return GetCreatureType() == CREATURE_TYPE_CRITTER; }
 
-    [[nodiscard]] bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
+    bool IsOnTaxi () const { return HasUnitState(UNIT_STATE_ON_TAXI); }
 
     void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
     bool IsImmuneToAll() const { return IsImmuneToPC() && IsImmuneToNPC(); }

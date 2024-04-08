@@ -58,7 +58,7 @@ public:
         }
 
         // allow use in flight only
-        if (player->IsInFlight() && !disabled)
+        if (player->IsOnTaxi() && !disabled)
             return false;
 
         // error

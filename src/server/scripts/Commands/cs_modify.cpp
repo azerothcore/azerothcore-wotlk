@@ -406,7 +406,7 @@ public:
                 return false;
             }
 
-            if (player->IsInFlight() && checkInFlight)
+            if (player->IsOnTaxi() && checkInFlight)
             {
                 handler->SendErrorMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
                 return false;
