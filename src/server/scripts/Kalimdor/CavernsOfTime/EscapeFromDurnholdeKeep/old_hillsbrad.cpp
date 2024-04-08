@@ -592,7 +592,7 @@ public:
                     if (Creature* armorer = me->FindNearestCreature(NPC_DURNHOLDE_ARMORER, 30.0f))
                     {
                         DoCast(armorer, SPELL_KNOCKOUT_ARMORER, true);
-                        armorer->SetStandState(UNIT_STAND_STATE_DEAD);
+                        armorer->SetStandState(UNIT_DEAD);
                     }
                     break;
                 case EVENT_TALK_KILL_ARMORER:
@@ -601,13 +601,13 @@ public:
                 case EVENT_DRESSING_KNEEL:
                     me->SetFacingTo(2.61f);
                     Talk(SAY_ARMORY);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     break;
                 case EVENT_DRESSING_ARMOR:
                     me->SetDisplayId(THRALL_MODEL_EQUIPPED);
                     break;
                 case EVENT_DRESSING_STAND:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     break;
                 case EVENT_DRESSING_AXE:
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, THRALL_WEAPON_ITEM);
@@ -733,7 +733,7 @@ public:
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->CastSpell(Taretha, SPELL_SHADOW_SPIKE);
-                        Taretha->SetStandState(UNIT_STAND_STATE_DEAD);
+                        Taretha->SetStandState(UNIT_DEAD);
                     }
                     break;
                 case EVENT_THRALL_TALK_3:
@@ -963,7 +963,7 @@ public:
                 case ENCOUNTER_PROGRESS_TARETHA_MEET:
                     SetNextWaypoint(95, false);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
-                        Taretha->SetStandState(UNIT_STAND_STATE_STAND);
+                        Taretha->SetStandState(UNIT_STANDING);
                     break;
             }
         }
@@ -1006,7 +1006,7 @@ public:
 
         void DoAction(int32 /*param*/) override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->RemoveAllAuras();
             Start(false, true);
         }

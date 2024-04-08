@@ -141,7 +141,7 @@ public:
             me->SetVisible(false);
             me->SetRegeneratingHealth(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             playerGUID.Clear();
             morlenGUID.Clear();
             summons.DespawnAll();
@@ -387,7 +387,7 @@ public:
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
                 case EVENT_DISAPPEAR:

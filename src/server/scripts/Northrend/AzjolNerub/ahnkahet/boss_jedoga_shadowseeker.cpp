@@ -191,7 +191,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                     summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, false);
                     summon->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
                     summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                    summon->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    summon->SetStandState(UNIT_KNEEL);
                     oocSummons.push_back(summon->GetGUID());
                 }
             }
@@ -602,7 +602,7 @@ struct npc_twilight_volunteer : public ScriptedAI
             me->SetImmuneToAll(false);
 
             Talk(SAY_CHOSEN);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
 
             events.ScheduleEvent(EVENT_RITUAL_BEGIN_MOVE, 1500ms);
         }
@@ -637,7 +637,7 @@ struct npc_twilight_volunteer : public ScriptedAI
             me->SendMovementFlagUpdate();
             DoCastSelf(SPELL_WHITE_SPHERE, false);
             me->SetControlled(true, UNIT_STATE_STUNNED);
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
         }
         else if (id == POINT_RITUAL)
         {
@@ -649,7 +649,7 @@ struct npc_twilight_volunteer : public ScriptedAI
             }
 
             Talk(SAY_SACRIFICED);
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
         }
     }
 

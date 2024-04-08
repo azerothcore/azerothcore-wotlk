@@ -957,7 +957,7 @@ public:
                     break;
                 case EVENT_AKAMA_SCENE_20:
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->SetStandState(UNIT_STAND_STATE_STAND);
+                        illidan->SetStandState(UNIT_STANDING);
                     break;
                 case EVENT_AKAMA_SCENE_21:
                     me->SetFacingTo(M_PI);

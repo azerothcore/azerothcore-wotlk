@@ -251,7 +251,7 @@ public:
             bChangePhase = false;
             _Reset();
             me->SetReactState(REACT_AGGRESSIVE);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -587,14 +587,14 @@ public:
                             case 2:
                                 if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
                                     me->SetFacingToObject(face);
-                                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                                me->SetStandState(UNIT_KNEEL);
                                 Talk(SAY_TRANSFORM_1);
                                 events.ScheduleEvent(EVENT_RESUME_ATTACK, 5500ms);
                                 break;
                             case 3:
                                 if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
                                     me->SetFacingToObject(face);
-                                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                                me->SetStandState(UNIT_KNEEL);
                                 Talk(SAY_TRANSFORM_2);
                                 events.ScheduleEvent(EVENT_RESUME_ATTACK, 8500ms);
                                 break;
@@ -605,7 +605,7 @@ public:
                     break;
                 case EVENT_RESUME_ATTACK:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     AttackStart(me->GetVictim());
                     // remove Tear Gas
                     me->RemoveAurasDueToSpell(SPELL_TEAR_GAS_PERIODIC_TRIGGER);

@@ -886,7 +886,7 @@ void PretendToDie(Creature* creature)
     creature->SetReactState(REACT_PASSIVE);
     creature->GetMotionMaster()->MovementExpired(false);
     creature->GetMotionMaster()->MoveIdle();
-    creature->SetStandState(UNIT_STAND_STATE_DEAD);
+    creature->SetStandState(UNIT_DEAD);
 }
 
 void Resurrect(Creature* target)
@@ -894,7 +894,7 @@ void Resurrect(Creature* target)
     target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     target->SetReactState(REACT_AGGRESSIVE);
     target->SetFullHealth();
-    target->SetStandState(UNIT_STAND_STATE_STAND);
+    target->SetStandState(UNIT_STANDING);
     target->CastSpell(target, SPELL_RES_VISUAL, true);
     target->AI()->DoAction(ACTION_COMBAT_SCHEDULE);
     if (target->GetVictim())

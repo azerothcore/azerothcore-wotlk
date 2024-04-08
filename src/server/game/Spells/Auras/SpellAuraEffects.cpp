@@ -1754,7 +1754,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
 
         // set stand state (expected in this form)
         if (!target->IsStandState())
-            target->SetStandState(UNIT_STAND_STATE_STAND);
+            target->SetStandState(UNIT_STANDING);
 
         target->SetHealth(1);
     }

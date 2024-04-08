@@ -103,7 +103,7 @@ public:
 
             if (!_introDone)
             {
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->SetStandState(UNIT_DEAD);
                 me->SetReactState(REACT_PASSIVE);
                 Initialize();
                 _eventsIntro.Reset();
@@ -158,7 +158,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
-                            me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->SetStandState(UNIT_STANDING);
                             me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_2, 1s);
                             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -168,7 +168,7 @@ public:
                             {
                                 nefarius->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
                                 nefarius->Yell(SAY_NEFARIAN_VAEL_INTRO);
-                                nefarius->SetStandState(UNIT_STAND_STATE_STAND);
+                                nefarius->SetStandState(UNIT_STANDING);
                             }
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_3, 18s);
                             break;

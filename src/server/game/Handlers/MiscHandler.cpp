@@ -461,9 +461,9 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     // not set flags if player can't free move to prevent lost state at logout cancel
     if (GetPlayer()->CanFreeMove())
     {
-        if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND)
+        if (GetPlayer()->GetStandState() == UNIT_STANDING)
         {
-            GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
+            GetPlayer()->SetStandState(UNIT_SITTING);
         }
 
         GetPlayer()->SetRooted(true);
@@ -498,7 +498,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
     {
         GetPlayer()->SetRooted(false);
 
-        GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
+        GetPlayer()->SetStandState(UNIT_STANDING);
         GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);
     }
 }
@@ -570,10 +570,10 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
 
     switch (animstate)
     {
-        case UNIT_STAND_STATE_STAND:
-        case UNIT_STAND_STATE_SIT:
-        case UNIT_STAND_STATE_SLEEP:
-        case UNIT_STAND_STATE_KNEEL:
+        case UNIT_STANDING:
+        case UNIT_SITTING:
+        case UNIT_SLEEPING:
+        case UNIT_KNEEL:
             break;
         default:
             return;

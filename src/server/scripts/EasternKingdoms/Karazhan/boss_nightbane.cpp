@@ -179,7 +179,7 @@ struct boss_nightbane : public BossAI
             Talk(EMOTE_SUMMON);
             scheduler.Schedule(2s, [this](TaskContext /*context*/)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->SetDisableGravity(true);
                 me->GetMotionMaster()->MoveTakeoff(POINT_INTRO_TAKE_OFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, 13.99879f);
             }).Schedule(4s, [this](TaskContext /*context*/)

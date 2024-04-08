@@ -222,7 +222,7 @@ public:
             instance = creature->GetInstanceScript();
             bool appear = instance->GetBossState(DATA_BRUTALLUS) != DONE && instance->GetBossState(DATA_MADRIGOSA) == DONE;
             creature->SetVisible(appear);
-            creature->SetStandState(UNIT_STAND_STATE_DEAD);
+            creature->SetStandState(UNIT_DEAD);
             creature->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
         }
 
@@ -234,7 +234,7 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 me->SetDisableGravity(true);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->NearTeleportTo(1570.97f, 725.51f, 79.77f, 3.82f);
                 events.ScheduleEvent(EVENT_MAD_1, 2000);
@@ -368,7 +368,7 @@ public:
                 case EVENT_MAD_18:
                     Talk(SAY_MAD_5);
                     me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
+                    me->SetStandState(UNIT_DEAD);
                     events.ScheduleEvent(EVENT_MAD_19, 6000);
                     break;
                 case EVENT_MAD_19:

@@ -700,7 +700,7 @@ public:
         void Reset() override
         {
             me->setActive(false);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -828,12 +828,12 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_0, 30s);
                     break;
                 case EVENT_SCENE_0:
-                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_KNEEL);
+                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_KNEEL);
                     me->SummonGameObject(GO_FROZEN_HEART, 6132.38f, 2760.76f, 574.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 180);
                     events.ScheduleEvent(EVENT_SCENE_0 + 1, 10s);
                     break;
                 case EVENT_SCENE_0+1:
-                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_STAND);
+                    DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_STAND_STATE, UNIT_STANDING);
                     events.ScheduleEvent(EVENT_SCENE_0 + 2, 2s);
                     break;
                 case EVENT_SCENE_0+2:
@@ -910,14 +910,14 @@ public:
                 case EVENT_SCENE_0+16:
                     me->CastSpell(me, SPELL_HEART_EXPLOSION, true);
                     me->CastSpell(me, SPELL_HEART_EXPLOSION_EFF, true);
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
+                    me->SetStandState(UNIT_DEAD);
                     DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 5);
                     if (GameObject* go = me->FindNearestGameObject(GO_FROZEN_HEART, 20.0f))
                         go->Delete();
                     events.ScheduleEvent(EVENT_SCENE_0 + 17, 2s);
                     break;
                 case EVENT_SCENE_0+17:
-                    DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_KNEEL);
+                    DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_KNEEL);
                     events.ScheduleEvent(EVENT_SCENE_0 + 170, 3s);
                     break;
                 case EVENT_SCENE_0+170:
@@ -1002,7 +1002,7 @@ public:
                     break;
                 case EVENT_SCENE_0+310:
                     DoSummonAction(NPC_TIRION_MOGRAINE, ACTION_SUMMON_TALK, 0);
-                    DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_STAND_STATE_STAND);
+                    DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_STAND_STATE, UNIT_STANDING);
                     me->SummonGameObject(GO_ESCAPE_PORTAL, 6133.83f, 2757.24f, 573.914f, 1.97f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
                     me->CastSpell(me, SPELL_TIRIONS_GAMBIT_CREDIT, true);
                     events.ScheduleEvent(EVENT_SCENE_0 + 31, 6s);

@@ -420,7 +420,7 @@ public:
             {
                 if (me->FindNearestGameObject(OBJECT_HAUNCH, 2.0f))
                 {
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
+                    me->SetStandState(UNIT_DEAD);
                     me->SetImmuneToPC(true);
                     me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_DEAD);
                 }
@@ -575,7 +575,7 @@ public:
 
             if (!me->IsStandState())
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                 events.ScheduleEvent(EVENT_WOUNDED_MOVE, 3s);
             }

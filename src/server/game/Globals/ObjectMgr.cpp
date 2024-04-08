@@ -7080,11 +7080,11 @@ inline void CheckGOSpellId(GameObjectTemplate const* goInfo, uint32 dataN, uint3
 
 inline void CheckAndFixGOChairHeightId(GameObjectTemplate const* goInfo, uint32 const& dataN, uint32 N)
 {
-    if (dataN <= (UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR))
+    if (dataN <= (UNIT_SITTINGCHAIRHIGH - UNIT_SITTINGCHAIRLOW))
         return;
 
     LOG_ERROR("sql.sql", "Gameobject (Entry: {} GoType: {}) have data{}={} but correct chair height in range 0..{}.",
-                     goInfo->entry, goInfo->type, N, dataN, UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR);
+                     goInfo->entry, goInfo->type, N, dataN, UNIT_SITTINGCHAIRHIGH - UNIT_SITTINGCHAIRLOW);
 
     // prevent client and server unexpected work
     const_cast<uint32&>(dataN) = 0;

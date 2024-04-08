@@ -2562,7 +2562,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         return;
 
     // CombatStart puts the target into stand state, so we need to cache sit state here to know if we should crit later
-    const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->GetStandState() == UNIT_STAND_STATE_SLEEP);
+    const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->GetStandState() == UNIT_SLEEPING);
 
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
@@ -4506,7 +4506,7 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
 
     // Sitdown on apply aura req seated
     if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !IsSitState())
-        SetStandState(UNIT_STAND_STATE_SIT);
+        SetStandState(UNIT_SITTING);
 
     if (aurApp->GetRemoveMode())
         return;
@@ -12162,7 +12162,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
             }
 
             // 100% critical chance against sitting target
-            if (GetTypeId() == TYPEID_PLAYER && (IsSitState() || GetStandState() == UNIT_STAND_STATE_SLEEP))
+            if (GetTypeId() == TYPEID_PLAYER && (IsSitState() || GetStandState() == UNIT_SLEEPING))
             {
                 return 100.0f;
             }
@@ -13572,7 +13572,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
         // Make player victim stand up automatically
         if (victim->GetStandState() && victim->IsPlayer())
         {
-            victim->SetStandState(UNIT_STAND_STATE_STAND);
+            victim->SetStandState(UNIT_STANDING);
         }
 
         if (!victim->IsInCombat() && victim->GetTypeId() != TYPEID_PLAYER && !victim->ToCreature()->HasReactState(REACT_PASSIVE) && victim->ToCreature()->IsAIEnabled)
@@ -13718,7 +13718,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         if (!(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_ALLOW_MOUNTED_COMBAT))
             Dismount();
         if (!IsStandState()) // pussywizard: already done in CombatStart(target, initialAggro) for the target, but when aggro'ing from MoveInLOS CombatStart is not called!
-            SetStandState(UNIT_STAND_STATE_STAND);
+            SetStandState(UNIT_STANDING);
     }
 
     for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end();)
@@ -16925,15 +16925,15 @@ bool Unit::IsSitState() const
 {
     uint8 s = GetStandState();
     return
-        s == UNIT_STAND_STATE_SIT_CHAIR        || s == UNIT_STAND_STATE_SIT_LOW_CHAIR  ||
-        s == UNIT_STAND_STATE_SIT_MEDIUM_CHAIR || s == UNIT_STAND_STATE_SIT_HIGH_CHAIR ||
-        s == UNIT_STAND_STATE_SIT;
+        s == UNIT_SITTINGCHAIR        || s == UNIT_SITTINGCHAIRLOW  ||
+        s == UNIT_SITTINGCHAIRMEDIUM || s == UNIT_SITTINGCHAIRHIGH ||
+        s == UNIT_SITTING;
 }
 
 bool Unit::IsStandState() const
 {
     uint8 s = GetStandState();
-    return !IsSitState() && s != UNIT_STAND_STATE_SLEEP && s != UNIT_STAND_STATE_KNEEL;
+    return !IsSitState() && s != UNIT_SLEEPING && s != UNIT_KNEEL;
 }
 
 void Unit::SetStandState(uint8 state)
@@ -18369,7 +18369,7 @@ void Unit::SetStunned(bool apply)
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            SetStandState(UNIT_STAND_STATE_STAND);
+            SetStandState(UNIT_STANDING);
         }
 
         SetRooted(true, true);

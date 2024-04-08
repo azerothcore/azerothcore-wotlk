@@ -235,14 +235,14 @@ public:
 
             Talk(SAY_KER_SLEEP);
 
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetStandState(UNIT_SLEEPING);
             DoCast(me, SPELL_SLEEP_VISUAL, false);
         }
 
         void ClearSleeping()
         {
             me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
 
             Talk(EMOTE_KER_AWAKEN);
 
@@ -280,7 +280,7 @@ public:
         {
             if (npc_kerlonianAI* pKerlonianAI = CAST_AI(npc_kerlonian::npc_kerlonianAI, creature->AI()))
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
+                creature->SetStandState(UNIT_STANDING);
                 creature->AI()->Talk(SAY_KER_START, player);
                 pKerlonianAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
@@ -457,7 +457,7 @@ public:
 
         void Reset() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override

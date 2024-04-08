@@ -778,7 +778,7 @@ public:
                     break;
                 case EVENT_OUTRO_6:
                     Talk(SAY_ALGALON_OUTRO_1);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     break;
                 case EVENT_OUTRO_7:
                     Talk(SAY_ALGALON_OUTRO_2);
@@ -793,7 +793,7 @@ public:
                     Talk(SAY_ALGALON_OUTRO_5);
                     break;
                 case EVENT_OUTRO_11:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->CastSpell(me, SPELL_TELEPORT, false);
                     me->DespawnOrUnsummon(3000);
                     break;
@@ -810,7 +810,7 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
                     break;
                 case EVENT_DESPAWN_ALGALON_5:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->CastSpell(me, SPELL_TELEPORT, false);
                     me->DespawnOrUnsummon(3000);
                     break;

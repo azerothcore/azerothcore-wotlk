@@ -713,7 +713,7 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
                     break;
                 case 4:
                     Talk(TEXT_ALEXSTRASZA_2);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     me->SetFacingToObject(orphan);
                     timer = 5000;
                     break;
@@ -722,7 +722,7 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
                     timer = 5000;
                     break;
                 case 6:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->SetOrientation(me->GetHomePosition().GetOrientation());
                     player->GroupEventHappens(QUEST_THE_DRAGON_QUEEN_ORACLE, me);
                     orphan->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);

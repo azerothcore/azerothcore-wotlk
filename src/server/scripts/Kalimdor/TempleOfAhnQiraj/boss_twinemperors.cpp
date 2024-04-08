@@ -88,7 +88,7 @@ struct boss_twinemperorsAI : public BossAI
 {
     boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS), _introDone(false)
     {
-        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+        me->SetStandState(UNIT_KNEEL);
     }
 
     Creature* GetTwin()
@@ -173,7 +173,7 @@ struct boss_twinemperorsAI : public BossAI
 
         scheduler.Schedule(5s, [this](TaskContext /*context*/)
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->LoadEquipment(1, true);
         });
 

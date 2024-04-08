@@ -175,7 +175,7 @@ public:
 
         void Reset() override
         {
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+            me->SetStandState(UNIT_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnAll();
             for( uint8 i = 0; i < 10; ++i )
@@ -403,8 +403,8 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
                 return;
 
-            if (me->GetStandState() != UNIT_STAND_STATE_STAND)
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+            if (me->GetStandState() != UNIT_STANDING)
+                me->SetStandState(UNIT_STANDING);
 
             if (!bIntro)
             {

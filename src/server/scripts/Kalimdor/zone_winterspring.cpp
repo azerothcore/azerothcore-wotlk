@@ -534,7 +534,7 @@ public:
                         me->SetFacingToObject(altar);
                         altar->ResetDoorOrButton();
                     }
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     if (Player* player = GetPlayerForEscort())
                     {
                         player->GroupEventHappens(QUEST_GUARDIANS_ALTAR, me);

@@ -220,7 +220,7 @@ public:
                         if (ryga->IsAlive() && !ryga->IsInCombat())
                         {
                             ryga->SetFacingTo(0.2602f);
-                            ryga->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            ryga->SetStandState(UNIT_KNEEL);
                             ryga->AI()->Talk(SAY_WOLF_WELCOME);
                             Reset();
                         }
@@ -231,7 +231,7 @@ public:
                     {
                         if (ryga->IsAlive() && !ryga->IsInCombat())
                         {
-                            ryga->SetStandState(UNIT_STAND_STATE_STAND);
+                            ryga->SetStandState(UNIT_STANDING);
                             ryga->SetWalk(true);
                             ryga->SetSpeed(MOVE_WALK, 1.0f);
                             ryga->GetMotionMaster()->MovePoint(0, 504.59201f, 3882.12988f, 192.156006f, true);

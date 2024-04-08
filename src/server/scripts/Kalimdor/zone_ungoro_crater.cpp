@@ -184,7 +184,7 @@ public:
         {
             if (npc_ringoAI* ringoAI = CAST_AI(npc_ringo::npc_ringoAI, creature->AI()))
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
+                creature->SetStandState(UNIT_STANDING);
                 ringoAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
         }
@@ -252,12 +252,12 @@ public:
             }
 
             //what does actually happen here? Emote? Aura?
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetStandState(UNIT_SLEEPING);
         }
 
         void ClearFaint()
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
 
             if (HasFollowState(STATE_FOLLOW_POSTEVENT))
                 return;

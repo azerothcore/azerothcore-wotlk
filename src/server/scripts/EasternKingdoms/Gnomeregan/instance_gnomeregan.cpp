@@ -114,7 +114,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_A_FINE_MESS)
         {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetStandState(UNIT_STANDING);
             creature->AI()->SetGUID(player->GetGUID(), 0);
             creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI, MOTION_SLOT_CONTROLLED);
         }

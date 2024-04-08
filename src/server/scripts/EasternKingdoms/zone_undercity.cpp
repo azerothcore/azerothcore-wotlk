@@ -1675,7 +1675,7 @@ public:
                             JumpToNextStep(0);
                             break;
                         case 26:
-                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            me->SetStandState(UNIT_KNEEL);
                             me->SetTarget(khanokGUID);
                             JumpToNextStep(1 * IN_MILLISECONDS);
                             break;
@@ -1836,8 +1836,8 @@ public:
                             break;
                         case 56:
                             Talk(WRYNN_SAY_APO_9);
-                            me->RemoveStandFlags(UNIT_STAND_STATE_KNEEL);
-                            me->SetStandFlags(UNIT_STAND_STATE_STAND);
+                            me->RemoveStandFlags(UNIT_KNEEL);
+                            me->SetStandFlags(UNIT_STANDING);
                             SetEscortPaused(false);
                             bStepping = false;
                             JumpToNextStep(0);
@@ -2358,7 +2358,7 @@ public:
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->Mount(MODEL_WHITE_WULF);
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
@@ -3826,7 +3826,7 @@ public:
                             break;
                         case 157:
                             Talk(THRALL_SAY_THRONE_9);
-                            me->SetStandState(UNIT_STAND_STATE_SIT);
+                            me->SetStandState(UNIT_SITTING);
                             JumpToNextStep(3 * IN_MILLISECONDS);
                             break;
                         // Ending
@@ -3843,7 +3843,7 @@ public:
                             if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
                             {
                                 saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_1);
-                                saurfang->SetStandState(UNIT_STAND_STATE_SIT);
+                                saurfang->SetStandState(UNIT_SITTING);
                             }
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;

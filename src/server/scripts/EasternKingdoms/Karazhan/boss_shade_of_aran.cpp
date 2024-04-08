@@ -200,7 +200,7 @@ struct boss_shade_of_aran : public BossAI
         if ((damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE) && _drinking && me->GetReactState() == REACT_PASSIVE)
         {
             me->RemoveAurasDueToSpell(SPELL_DRINK);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
             _drinkScheduler.CancelGroup(GROUP_DRINKING);
@@ -234,11 +234,11 @@ struct boss_shade_of_aran : public BossAI
                 DoCastSelf(SPELL_CONJURE);
             }).Schedule(6s, GROUP_DRINKING, [this](TaskContext)
             {
-                me->SetStandState(UNIT_STAND_STATE_SIT);
+                me->SetStandState(UNIT_SITTING);
                 DoCastSelf(SPELL_DRINK);
             }).Schedule(12s, GROUP_DRINKING, [this](TaskContext)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                 DoCastSelf(SPELL_AOE_PYROBLAST);

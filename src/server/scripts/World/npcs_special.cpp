@@ -1078,7 +1078,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANDAGE, true);
 
             //to make them lay with face down
-            me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_DEAD);
 
             uint32 mobId = me->GetEntry();
 
@@ -1128,7 +1128,7 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
 
             //stand up
-            me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STANDING);
 
             Talk(SAY_DOC);
 
@@ -1290,7 +1290,7 @@ public:
             RunAwayTimer = 5000;
 
             me->SetPvP(true);
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
         }
@@ -1324,7 +1324,7 @@ public:
                                 else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
-                                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                                    me->SetStandState(UNIT_STANDING);
                                     Talk(SAY_HEALED, caster);
                                     IsHealed = true;
                                 }
@@ -1341,7 +1341,7 @@ public:
                                 else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
-                                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                                    me->SetStandState(UNIT_STANDING);
                                     Talk(SAY_HEALED, caster);
                                     IsHealed = true;
                                 }
@@ -1358,7 +1358,7 @@ public:
                                 else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
-                                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                                    me->SetStandState(UNIT_STANDING);
                                     Talk(SAY_HEALED, caster);
                                     IsHealed = true;
                                 }
@@ -1375,7 +1375,7 @@ public:
                                 else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
-                                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                                    me->SetStandState(UNIT_STANDING);
                                     Talk(SAY_HEALED, caster);
                                     IsHealed = true;
                                 }
@@ -1392,7 +1392,7 @@ public:
                                 else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
-                                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                                    me->SetStandState(UNIT_STANDING);
                                     Talk(SAY_HEALED, caster);
                                     IsHealed = true;
                                 }

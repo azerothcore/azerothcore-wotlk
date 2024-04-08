@@ -103,7 +103,7 @@ struct boss_leotheras_the_blind : public BossAI
             scheduler.DelayAll(10s);
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
             me->GetMotionMaster()->Clear();
             me->StopMoving();
             Talk(SAY_FINAL_FORM);
@@ -115,7 +115,7 @@ struct boss_leotheras_the_blind : public BossAI
             {
                 DoResetThreatList();
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->ResumeChasingVictim();
 
@@ -139,7 +139,7 @@ struct boss_leotheras_the_blind : public BossAI
                     me->RemoveAllAuras();
                     me->LoadEquipment();
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->SetInCombatWithZone();
                     Talk(SAY_AGGRO);
 

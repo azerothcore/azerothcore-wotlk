@@ -893,7 +893,7 @@ struct EmotesEntry
     //uint32  AnimationId;                                  // 2, ref to animationData
     uint32  Flags;                                          // 3, bitmask, may be unit_flags
     uint32  EmoteType;                                      // 4, Can be 0, 1 or 2 (determine how emote are shown)
-    uint32  UnitStandState;                                 // 5, uncomfirmed, may be enum UnitStandStateType
+    uint32  UnitStandState;                                 // 5, uncomfirmed, may be enum UNITSTANDSTATE
     //uint32  SoundId;                                      // 6, ref to soundEntries
 };
 

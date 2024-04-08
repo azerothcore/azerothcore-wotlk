@@ -87,7 +87,7 @@ public:
             me->SetPvP(true);
             me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(10));
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetStandState(UNIT_SLEEPING);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
@@ -109,7 +109,7 @@ public:
             if (Spell->SpellFamilyFlags[2] & 0x080000000)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
 
                 DoCast(me, SPELL_STUNNED, true);
 
@@ -190,11 +190,11 @@ public:
             switch (urand(0, 1))
             {
                 case 0:
-                    me->SetStandState(UNIT_STAND_STATE_SIT);
+                    me->SetStandState(UNIT_SITTING);
                     break;
 
                 case 1:
-                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                    me->SetStandState(UNIT_SLEEPING);
                     break;
             }
         }
@@ -310,7 +310,7 @@ public:
                         _events.ScheduleEvent(EVENT_STAND, 2s);
                         break;
                     case EVENT_STAND: // Remove kneel standstate. Using a separate delayed event because it causes unwanted delay before starting waypoint movement.
-                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
+                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STANDING);
                         break;
                     case EVENT_TALK_END:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, m_player))

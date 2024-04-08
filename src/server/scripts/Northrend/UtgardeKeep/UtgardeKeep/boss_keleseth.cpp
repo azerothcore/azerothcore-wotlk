@@ -282,7 +282,7 @@ public:
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->SetStandState(UNIT_DEAD);
                 me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
@@ -324,7 +324,7 @@ public:
                 case EVENT_RESURRECT:
                     events.DelayEvents(3500ms);
                     DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);

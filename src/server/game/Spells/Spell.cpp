@@ -2950,7 +2950,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             {
                 if (!effectUnit->IsStandState())
                 {
-                    effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+                    effectUnit->SetStandState(UNIT_STANDING);
                 }
             }
         }
@@ -3652,7 +3652,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && !m_triggeredByAuraSpell && m_caster->IsSitState())
     {
-        m_caster->SetStandState(UNIT_STAND_STATE_STAND);
+        m_caster->SetStandState(UNIT_STANDING);
     }
 
     //Containers for channeled spells have to be set

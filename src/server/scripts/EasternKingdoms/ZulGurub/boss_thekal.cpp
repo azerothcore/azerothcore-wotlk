@@ -86,7 +86,7 @@ struct boss_thekal : public BossAI
 
         scheduler.CancelAll();
 
-        me->SetStandState(UNIT_STAND_STATE_STAND);
+        me->SetStandState(UNIT_STANDING);
         me->SetReactState(REACT_AGGRESSIVE);
         me->RemoveAurasDueToSpell(SPELL_FRENZY);
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -182,7 +182,7 @@ struct boss_thekal : public BossAI
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_PASSIVE);
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->SetStandState(UNIT_DEAD);
                 me->AttackStop();
                 DoResetThreatList();
                 _wasDead = true;
@@ -252,7 +252,7 @@ struct boss_thekal : public BossAI
         {
             scheduler.Schedule(3s, [this](TaskContext /*context*/)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 DoCastSelf(SPELL_RESURRECTION_IMPACT_VISUAL, true);
 
                 scheduler.Schedule(50ms, [this](TaskContext /*context*/)

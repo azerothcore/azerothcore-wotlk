@@ -207,7 +207,7 @@ public:
                                 Position pos(instancePositions[index]);
                                 orc->MovePosition(pos, frand(1.0f, 3.0f) + 15.0f * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
                                 orc->GetMotionMaster()->MovePoint(1, pos);
-                                orc->SetStandState(UNIT_STAND_STATE_STAND);
+                                orc->SetStandState(UNIT_STANDING);
                             }
 
                         for (ObjectGuid const& guid : _initalFlamesSet)

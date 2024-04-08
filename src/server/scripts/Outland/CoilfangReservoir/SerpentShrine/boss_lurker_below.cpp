@@ -75,7 +75,7 @@ struct boss_the_lurker_below : public BossAI
     {
         BossAI::Reset();
         me->SetReactState(REACT_PASSIVE);
-        me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+        me->SetStandState(UNIT_SUBMERGED);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     }
 
@@ -108,12 +108,12 @@ struct boss_the_lurker_below : public BossAI
     {
         if (action == ACTION_START_EVENT)
         {
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+            me->SetStandState(UNIT_SUBMERGED);
             me->SetReactState(REACT_AGGRESSIVE);
             me->setAttackTimer(BASE_ATTACK, 6000);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetInCombatWithZone();
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
     }
 
@@ -171,7 +171,7 @@ struct boss_the_lurker_below : public BossAI
             scheduler.CancelAll();
             DoCastSelf(SPELL_SUBMERGE_VISUAL);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+            me->SetStandState(UNIT_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < MAX_SUMMONS; ++i)
             {
@@ -187,7 +187,7 @@ struct boss_the_lurker_below : public BossAI
         scheduler.Schedule(timer, [this](TaskContext)
         {
             me->setAttackTimer(BASE_ATTACK, 6000);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             scheduler.CancelAll();
@@ -202,7 +202,7 @@ struct boss_the_lurker_below : public BossAI
 
         scheduler.Update(diff);
 
-        if (me->GetStandState() != UNIT_STAND_STATE_STAND || !me->isAttackReady() || me->GetReactState() != REACT_AGGRESSIVE)
+        if (me->GetStandState() != UNIT_STANDING || !me->isAttackReady() || me->GetReactState() != REACT_AGGRESSIVE)
             return;
 
         Unit* target = nullptr;

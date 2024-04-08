@@ -47,18 +47,21 @@ enum UnitBytes1Offsets : uint8
 };
 
 // byte value (UNIT_FIELD_BYTES_1, 0)
-enum UnitStandStateType
-{
-    UNIT_STAND_STATE_STAND             = 0,
-    UNIT_STAND_STATE_SIT               = 1,
-    UNIT_STAND_STATE_SIT_CHAIR         = 2,
-    UNIT_STAND_STATE_SLEEP             = 3,
-    UNIT_STAND_STATE_SIT_LOW_CHAIR     = 4,
-    UNIT_STAND_STATE_SIT_MEDIUM_CHAIR  = 5,
-    UNIT_STAND_STATE_SIT_HIGH_CHAIR    = 6,
-    UNIT_STAND_STATE_DEAD              = 7,
-    UNIT_STAND_STATE_KNEEL             = 8,
-    UNIT_STAND_STATE_SUBMERGED         = 9
+enum UNITSTANDSTATE {
+  UNIT_STANDING           = 0x0,
+  UNIT_SITTING            = 0x1,
+  UNIT_SITTINGCHAIR       = 0x2,
+  UNIT_SLEEPING           = 0x3,
+  UNIT_NUMCHAIRSTATES     = 0x3,
+  UNIT_FIRSTCHAIRSIT      = 0x4,
+  UNIT_SITTINGCHAIRLOW    = 0x4,
+  UNIT_SITTINGCHAIRMEDIUM = 0x5,
+  UNIT_SITTINGCHAIRHIGH   = 0x6,
+  UNIT_LASTCHAIRSIT       = 0x6,
+  UNIT_DEAD               = 0x7,
+  UNIT_KNEEL              = 0x8,
+  UNIT_SUBMERGED          = 0x9,
+  UNIT_NUMSTANDSTATES
 };
 
 // byte flag value (UNIT_FIELD_BYTES_1, 2)

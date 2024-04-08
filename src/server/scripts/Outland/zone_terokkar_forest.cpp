@@ -259,7 +259,7 @@ public:
             CanDoQuest = false;
             UnkorUnfriendly_Timer = 0;
             Pulverize_Timer = 3000;
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->SetFaction(FACTION_HOSTILE);
         }
 
@@ -269,7 +269,7 @@ public:
         {
             Talk(SAY_SUBMIT);
             me->SetFaction(FACTION_FRIENDLY);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
+            me->SetStandState(UNIT_SITTING);
             me->RemoveAllAuras();
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);

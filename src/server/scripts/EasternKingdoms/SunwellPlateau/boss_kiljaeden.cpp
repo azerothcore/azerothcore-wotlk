@@ -994,7 +994,7 @@ public:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_08);
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
-                        liadrin->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        liadrin->SetStandState(UNIT_KNEEL);
                     events.ScheduleEvent(eventId + 1, 8000);
                     break;
                 case EVENT_SCENE_24:

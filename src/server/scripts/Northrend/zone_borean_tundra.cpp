@@ -719,7 +719,7 @@ public:
 
             // xinef: correct visuals
             me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 150.517f, me->GetOrientation(), true);
-            me->SetStandState(UNIT_STAND_STATE_SIT_MEDIUM_CHAIR);
+            me->SetStandState(UNIT_SITTINGCHAIRMEDIUM);
         }
 
         void UpdateAI(uint32 diff) override
@@ -820,7 +820,7 @@ public:
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetStandState(UNIT_STANDING);
             creature->AI()->Talk(SAY_1, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
@@ -901,7 +901,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
         {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetStandState(UNIT_STANDING);
             creature->AI()->Talk(SAY_BONKER_2, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
         }
@@ -1519,7 +1519,7 @@ public:
         void Reset() override
         {
             me->SetFaction(FACTION_VALIANCE_EXPEDITION_7);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -1614,7 +1614,7 @@ public:
                             talbot->SetFaction(FACTION_UNDEAD_SCOURGE);
                             talbot->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_PASSIVE);
-                            talbot->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            talbot->SetStandState(UNIT_KNEEL);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_5, 7s);
                         break;
@@ -1674,7 +1674,7 @@ public:
                         }
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
-                            talbot->SetStandState(UNIT_STAND_STATE_STAND);
+                            talbot->SetStandState(UNIT_STANDING);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_11, 4s);
                         break;
@@ -1747,7 +1747,7 @@ public:
                         {
                             arlos->AI()->Talk(SAY_ARLOS_1);
                             arlos->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                            arlos->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            arlos->SetStandState(UNIT_KNEEL);
                         }
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
@@ -1773,7 +1773,7 @@ public:
                         {
                             _arlosGUID = arlos->GetGUID();
                             arlos->AI()->Talk(SAY_ARLOS_2);
-                            arlos->SetStandState(UNIT_STAND_STATE_DEAD);
+                            arlos->SetStandState(UNIT_DEAD);
                         }
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
@@ -1783,7 +1783,7 @@ public:
                         break;
                     case EVENT_THASSARIAN_SCRIPT_21:
                         // Thassarian say text 4
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->SetStandState(UNIT_KNEEL);
                         Talk(SAY_THASSARIAN_4);
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_22, 3s);
                         break;
@@ -1801,7 +1801,7 @@ public:
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
                             leryssa->AI()->Talk(SAY_LERYSSA_2);
-                            leryssa->SetStandState(UNIT_STAND_STATE_SIT);
+                            leryssa->SetStandState(UNIT_SITTING);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_24, 5s);
                         break;

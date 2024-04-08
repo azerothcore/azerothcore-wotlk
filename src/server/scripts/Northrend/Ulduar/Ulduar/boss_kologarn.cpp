@@ -157,7 +157,7 @@ public:
             m_pInstance = me->GetInstanceScript();
             eyebeamTarget = nullptr;
             assert(vehicle);
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+            me->SetStandState(UNIT_SUBMERGED);
         }
 
         InstanceScript* m_pInstance;
@@ -174,9 +174,9 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 45.0f && me->GetStandState() == UNIT_STAND_STATE_SUBMERGED)
+            if (who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 45.0f && me->GetStandState() == UNIT_SUBMERGED)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
                     arm->CastSpell(arm, SPELL_ARM_RESPAWN_VISUAL, true);
                 if (Unit* arm = ObjectAccessor::GetCreature(*me, _right))

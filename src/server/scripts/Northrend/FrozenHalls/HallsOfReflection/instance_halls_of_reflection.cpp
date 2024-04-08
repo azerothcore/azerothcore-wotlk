@@ -59,7 +59,7 @@ public:
                 break;
             case 5:
                 _owner.SetFacingTo(2.82f);
-                _owner.SetStandState(UNIT_STAND_STATE_KNEEL);
+                _owner.SetStandState(UNIT_KNEEL);
                 break;
             case 6:
                 if (InstanceScript* instance = _owner.GetInstanceScript())
@@ -739,7 +739,7 @@ public:
             if (unit->GetEntry() == NPC_QUEL_DELAR)
                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
                 {
-                    c->SetStandState(UNIT_STAND_STATE_STAND);
+                    c->SetStandState(UNIT_STANDING);
                     c->SetWalk(false);
                     c->GetMotionMaster()->MovePoint(0, 5313.92f, 1989.36f, 707.70f);
                     c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 9), c->m_Events.CalculateTime(7000));

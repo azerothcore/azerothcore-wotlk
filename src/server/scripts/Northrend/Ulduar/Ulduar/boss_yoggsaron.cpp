@@ -1280,7 +1280,7 @@ public:
                 // Icecrown Illusion
                 else if (cr->GetPositionY() > -150.0f && cr->GetPositionY() < -90.0f)
                 {
-                    cr->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    cr->SetStandState(UNIT_KNEEL);
                     cr->UpdateEntry(NPC_DEATHSWORN_ZEALOT);
                 }
                 // Stormwind Illusion

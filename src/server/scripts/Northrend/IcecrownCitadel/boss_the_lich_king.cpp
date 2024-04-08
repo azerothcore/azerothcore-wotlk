@@ -664,7 +664,7 @@ public:
             DoAction(ACTION_RESTORE_LIGHT);
             SetEquipmentSlots(true);
             if (me->IsImmuneToPC())
-                me->SetStandState(UNIT_STAND_STATE_SIT);
+                me->SetStandState(UNIT_SITTING);
 
             DoAction(ACTION_RESTORE_LIGHT);
 
@@ -676,7 +676,7 @@ public:
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
             me->SetImmuneToPC(true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SIT);
+            me->SetStandState(UNIT_SITTING);
 
             if (!ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                 me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING_LK, TirionSpawn, TEMPSUMMON_MANUAL_DESPAWN);
@@ -1310,7 +1310,7 @@ public:
                         if (!theLichKing->IsAlive() || !theLichKing->IsVisible())
                             break;
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                        theLichKing->SetStandState(UNIT_STAND_STATE_STAND);
+                        theLichKing->SetStandState(UNIT_STANDING);
                         theLichKing->SetSheath(SHEATH_STATE_MELEE);
                         theLichKing->RemoveAurasDueToSpell(SPELL_EMOTE_SIT_NO_SHEATH);
                         theLichKing->AI()->Talk(SAY_LK_INTRO_1);

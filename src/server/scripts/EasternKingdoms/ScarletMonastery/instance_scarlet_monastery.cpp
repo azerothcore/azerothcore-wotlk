@@ -274,7 +274,7 @@ public:
                     return 2 * IN_MILLISECONDS;
                 case 2:
                     me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     return 2 * IN_MILLISECONDS;
                 case 3:
                     Talk(3);
@@ -289,7 +289,7 @@ public:
                     mograine->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     return 4 * IN_MILLISECONDS;
                 case 6:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     return 2 * IN_MILLISECONDS;
                 case 7:
                     Talk(4);
@@ -302,7 +302,7 @@ public:
                     return 4 * IN_MILLISECONDS;
                 case 10:
                     me->SetSheath(SHEATH_STATE_UNARMED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     Talk(5);
                     return 2 * IN_MILLISECONDS;
                 case 11:
@@ -362,7 +362,7 @@ public:
                     {
                         me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->SetStandState(UNIT_KNEEL);
                         me->SetFacingToObject(player);
                         // me->Yell(12389, LANG_UNIVERSAL, player); // Doesn't exist
                         SayAshbringer = true;

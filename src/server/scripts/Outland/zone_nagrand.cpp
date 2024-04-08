@@ -74,7 +74,7 @@ public:
         {
             if (npc_maghar_captiveAI* EscortAI = dynamic_cast<npc_maghar_captiveAI*>(creature->AI()))
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
+                creature->SetStandState(UNIT_STANDING);
                 creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE);
                 EscortAI->Start(true, false, player->GetGUID(), quest);
                 creature->AI()->Talk(SAY_MAG_START);
@@ -316,7 +316,7 @@ public:
 
         void SetGUID(ObjectGuid guid, int32  /*questId*/) override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             Start(true, false, guid);
             Talk(SAY_KUR_START);
 

@@ -381,8 +381,8 @@ public:
             ardonis->SetFacingToObject(pathaleon);
 
             //Set them to kneel
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
-            ardonis->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
+            ardonis->SetStandState(UNIT_KNEEL);
         }
 
         //Set them back to each other
@@ -397,8 +397,8 @@ public:
                 ardonis->SetFacingToObject(me);
 
                 //Set state
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                ardonis->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
+                ardonis->SetStandState(UNIT_STANDING);
             }
         }
 

@@ -2421,7 +2421,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         switch (cond->ConditionValue1)
         {
             case 0:
-                valid = cond->ConditionValue2 <= UNIT_STAND_STATE_SUBMERGED;
+                valid = cond->ConditionValue2 <= UNIT_SUBMERGED;
                 break;
             case 1:
                 valid = cond->ConditionValue2 <= 1;

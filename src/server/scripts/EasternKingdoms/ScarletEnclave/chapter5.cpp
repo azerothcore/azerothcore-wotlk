@@ -549,7 +549,7 @@ public:
 
             me->SetImmuneToAll(true);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->SetVisible(true);
             me->setActive(true);
             me->SetWalk(false);
@@ -747,7 +747,7 @@ public:
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
                     break;
                 case EVENT_OUTRO_SCENE_1:
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     me->SetFacingTo(4.8f);
                     Talk(SAY_LIGHT_OF_DAWN27);
                     break;
@@ -764,7 +764,7 @@ public:
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN30);
                     break;
                 case EVENT_OUTRO_SCENE_5:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     Talk(SAY_LIGHT_OF_DAWN31);
                     break;
                 case EVENT_OUTRO_SCENE_6:
@@ -788,7 +788,7 @@ public:
                     Talk(SAY_LIGHT_OF_DAWN33);
                     break;
                 case EVENT_OUTRO_SCENE_9:
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     Talk(SAY_LIGHT_OF_DAWN34);
                     break;
                 case EVENT_OUTRO_SCENE_10:
@@ -889,7 +889,7 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_SCENE_24:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     Talk(SAY_LIGHT_OF_DAWN44);
                     break;
                 case EVENT_OUTRO_SCENE_25:
@@ -907,7 +907,7 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_SCENE_28:
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN47);
@@ -966,7 +966,7 @@ public:
                     Talk(SAY_LIGHT_OF_DAWN52);
                     break;
                 case EVENT_OUTRO_SCENE_36:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     Talk(SAY_LIGHT_OF_DAWN53);
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         me->SetFacingToObject(tirion);
@@ -1002,7 +1002,7 @@ public:
                         tirion->SummonGameObject(GO_LIGHT_OF_DAWN, tirion->GetPositionX(), tirion->GetPositionY(), tirion->GetPositionZ(), tirion->GetOrientation(), 0, 0, 0, 0, 180);
                         tirion->LoadEquipment(1, true);
                     }
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
+                    me->SetStandState(UNIT_DEAD);
                     break;
                 case EVENT_OUTRO_SCENE_39:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
@@ -1061,7 +1061,7 @@ public:
                 case EVENT_OUTRO_SCENE_48:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->CastSpell(me, SPELL_LAY_ON_HANDS, false);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     break;
                 case EVENT_OUTRO_SCENE_49:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
@@ -1121,7 +1121,7 @@ public:
                     break;
                 case EVENT_OUTRO_SCENE_59:
                     Talk(SAY_LIGHT_OF_DAWN68);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     break;
                 case EVENT_OUTRO_SCENE_60:
                     {

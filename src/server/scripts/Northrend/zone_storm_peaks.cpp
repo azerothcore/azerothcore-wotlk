@@ -444,7 +444,7 @@ public:
                         player->KilledMonsterCredit(30415);
                         player->RemoveAurasDueToSpell(SPELL_JAWS_OF_DEATH);
                     }
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
+                    me->SetStandState(UNIT_DEAD);
                     me->GetMotionMaster()->MoveFall(me->GetEntry());
                 }
                 else

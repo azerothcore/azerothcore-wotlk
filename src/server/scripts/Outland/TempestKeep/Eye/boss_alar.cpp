@@ -224,7 +224,7 @@ struct boss_alar : public BossAI
                     me->SetPosition(alarPoints[POINT_MIDDLE]);
                 }).Schedule(12s, [this](TaskContext)
                 {
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     me->SetVisible(true);
                     DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                     DoCastSelf(SPELL_REBIRTH_PHASE2);
@@ -252,7 +252,7 @@ struct boss_alar : public BossAI
         creature->SetReactState(REACT_PASSIVE);
         creature->GetMotionMaster()->MovementExpired(false);
         creature->GetMotionMaster()->MoveIdle();
-        creature->SetStandState(UNIT_STAND_STATE_DEAD);
+        creature->SetStandState(UNIT_DEAD);
     }
 
     void ScheduleAbilities()

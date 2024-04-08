@@ -294,7 +294,7 @@ public:
                 me->SetPhaseMask(1, true);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetFaction(FACTION_FRIENDLY);
-                me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
+                me->SetStandState(UNIT_SITTINGCHAIRHIGH);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
@@ -512,7 +512,7 @@ public:
                 events.ScheduleEvent(EVENT_START_EVENT, 4s);
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetImmuneToPC(true);
             }

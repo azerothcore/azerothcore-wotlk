@@ -238,7 +238,7 @@ struct boss_ahune : public BossAI
             DoCastSelf(SPELL_STAND, true);
             DoCastSelf(SPELL_AHUNE_SPANKY_HANDS, true);
             DoCastSelf(SPELL_AHUNES_SHIELD, true);
-            me->SetStandState(UNIT_STAND_STATE_STAND); // Likely needs to be moved to SPELL_STAND script, forced temporarily
+            me->SetStandState(UNIT_STANDING); // Likely needs to be moved to SPELL_STAND script, forced temporarily
             break;
         case EVENT_EMERGE:
             Emerge();
@@ -267,7 +267,7 @@ struct boss_ahune : public BossAI
         DoCastSelf(SPELL_STAND, true);
         DoCastSelf(SPELL_RESURFACE, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->SetStandState(UNIT_STAND_STATE_STAND);
+        me->SetStandState(UNIT_STANDING);
         events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3s);
     }
 
@@ -281,7 +281,7 @@ struct boss_ahune : public BossAI
         DoCastSelf(SPELL_STAY_SUBMERGED, true);
         me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+        me->SetStandState(UNIT_SUBMERGED);
         events.Reset();
     }
 };

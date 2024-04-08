@@ -137,7 +137,7 @@ public:
         {
             bool appear = instance->GetBossState(DATA_BRUTALLUS) == DONE;
             creature->SetVisible(appear);
-            creature->SetStandState(UNIT_STAND_STATE_SLEEP);
+            creature->SetStandState(UNIT_SLEEPING);
             creature->SetReactState(REACT_PASSIVE);
         }
 
@@ -247,7 +247,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INTRO_1:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     events2.ScheduleEvent(EVENT_INTRO_2, 4000);
                     break;
                 case EVENT_INTRO_2:

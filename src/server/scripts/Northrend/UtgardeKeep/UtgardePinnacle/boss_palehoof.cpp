@@ -227,7 +227,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void UpdateAI(uint32 diff) override
@@ -400,7 +400,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void UpdateAI(uint32 diff) override
@@ -524,7 +524,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void UpdateAI(uint32 diff) override
@@ -634,7 +634,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void UpdateAI(uint32 diff) override
@@ -742,7 +742,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
         }
 
         void UpdateAI(uint32 diff) override

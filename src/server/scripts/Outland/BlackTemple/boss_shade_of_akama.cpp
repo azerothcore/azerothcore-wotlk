@@ -258,7 +258,7 @@ struct npc_akama_shade : public ScriptedAI
 
                     for (Creature* broken : brokens)
                     {
-                        broken->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        broken->SetStandState(UNIT_KNEEL);
                         broken->SetFaction(FACTION_DEFAULT);
                         broken->AI()->Talk(SAY_BROKEN_S2, 4800ms);
                     }

@@ -108,7 +108,7 @@ public:
                     switch (phase)
                     {
                         case 1:
-                            me->SetStandState(UNIT_STAND_STATE_SIT);
+                            me->SetStandState(UNIT_SITTING);
                             timer = 1000;
                             phase = 2;
                             break;
@@ -119,7 +119,7 @@ public:
                             break;
                         case 3:
                             Talk(SAY_CORPORAL_3);
-                            me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->SetStandState(UNIT_STANDING);
                             SetEscortPaused(false);
                             timer = 0;
                             phase = 0;

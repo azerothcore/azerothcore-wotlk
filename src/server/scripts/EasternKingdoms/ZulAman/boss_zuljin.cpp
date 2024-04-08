@@ -228,7 +228,7 @@ public:
             Summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
 
             if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[3]))
-                Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+                Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_DEAD);
         }
 
         void AttackStart(Unit* who) override
@@ -321,7 +321,7 @@ public:
                     if (Phase > 0)
                     {
                         if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[Phase - 1]))
-                            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+                            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_DEAD);
                     }
                     if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[NextPhase - 1]))
                         Temp->CastSpell(me, SPELL_SIPHON_SOUL, false); // should m cast on temp

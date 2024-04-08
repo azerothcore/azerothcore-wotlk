@@ -200,7 +200,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BREAKOUT)
         {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetStandState(UNIT_STANDING);
             creature->setActive(true);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
@@ -277,17 +277,17 @@ public:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case 1:
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     break;
                 case 2:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     //me->UpdateEntry(NPC_KOLTIRA_ALT); //unclear if we must update or not
                     DoCast(me, SPELL_KOLTIRA_TRANSFORM);
                     me->LoadEquipment();
                     break;
                 case 3:
                     SetEscortPaused(true);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     Talk(SAY_BREAKOUT2);
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE);  // cast again that makes bubble up
                     break;
@@ -705,7 +705,7 @@ public:
                         Talk(SAY_EXEC_START, player);
                         break;
                     case 1:
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
+                        me->SetStandState(UNIT_STANDING);
                         break;
                     case 2:
                         Talk(SAY_EXEC_PROG, player);
@@ -733,7 +733,7 @@ public:
                         break;
                     case 9:
                         Talk(SAY_EXEC_TIME, player);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->SetStandState(UNIT_KNEEL);
                         me->SetImmuneToPC(false);
                         break;
                     case 10:

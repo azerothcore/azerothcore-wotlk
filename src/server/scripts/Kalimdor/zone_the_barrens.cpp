@@ -66,7 +66,7 @@ public:
         if (quest->GetQuestId() == QUEST_FREE_FROM_HOLD)
         {
             creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed, possible not needed for this quest
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetStandState(UNIT_STANDING);
 
             creature->AI()->Talk(SAY_GIL_START, player);
 
@@ -498,8 +498,8 @@ public:
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
-                if (me->GetStandState() == UNIT_STAND_STATE_DEAD)
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                if (me->GetStandState() == UNIT_DEAD)
+                    me->SetStandState(UNIT_STANDING);
 
                 IsPostEvent = false;
                 PostEventTimer = 1000;
@@ -553,7 +553,7 @@ public:
         {
             if (summoned->GetEntry() == NPC_PILOT_WIZZ)
             {
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->SetStandState(UNIT_DEAD);
                 me->RestoreFaction();
             }
 

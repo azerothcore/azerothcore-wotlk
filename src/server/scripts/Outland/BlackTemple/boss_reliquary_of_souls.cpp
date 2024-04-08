@@ -106,7 +106,7 @@ public:
             if (Unit* summoner = _owner.ToTempSummon()->GetSummonerUnit())
             {
                 summoner->GetAI()->DoAction(_action);
-                _owner.SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                _owner.SetStandState(UNIT_SUBMERGED);
                 _owner.DespawnOrUnsummon(200);
             }
         return true;
@@ -136,19 +136,19 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetStandState(UNIT_SLEEPING);
         }
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || me->GetStandState() != UNIT_STAND_STATE_SLEEP || who->GetTypeId() != TYPEID_PLAYER || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
+            if (!who || me->GetStandState() != UNIT_SLEEPING || who->GetTypeId() != TYPEID_PLAYER || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
                 return;
 
             me->SetInCombatWithZone();
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
 
             ScheduleUniqueTimedEvent(5s, [&] { // 15s
-                me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                me->SetStandState(UNIT_SUBMERGED);
                 DoCastSelf(SPELL_SUMMON_ESSENCE_OF_SUFFERING);
             }, EVENT_ESSENCE_OF_SUFFERING);
         }
@@ -161,7 +161,7 @@ public:
 
                 ScheduleUniqueTimedEvent(38s, [&] {
                     summons.DespawnAll();
-                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                    me->SetStandState(UNIT_SUBMERGED);
                     DoCastSelf(SPELL_SUMMON_ESSENCE_OF_DESIRE);
                 }, EVENT_ESSENCE_OF_DESIRE);
             }
@@ -171,7 +171,7 @@ public:
 
                 ScheduleUniqueTimedEvent(38s, [&] {
                     summons.DespawnAll();
-                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                    me->SetStandState(UNIT_SUBMERGED);
                     DoCastSelf(SPELL_SUMMON_ESSENCE_OF_ANGER);
                 }, EVENT_ESSENCE_OF_ANGER);
             }
@@ -182,9 +182,9 @@ public:
 
         void PhaseTransitionSpawns()
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->m_Events.AddEventAtOffset([&] {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetStandState(UNIT_STANDING);
             }, 1s);
 
             me->m_Events.AddEventAtOffset([&] {
@@ -233,7 +233,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetStandState() == UNIT_STAND_STATE_SLEEP)
+            if (me->GetStandState() == UNIT_SLEEPING)
                 return;
 
             scheduler.Update(diff);

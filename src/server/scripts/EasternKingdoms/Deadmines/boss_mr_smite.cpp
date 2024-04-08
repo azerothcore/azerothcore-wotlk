@@ -66,7 +66,7 @@ public:
             health34 = false;
             me->LoadEquipment(EQUIP_SWORD);
             me->SetCanDualWield(false);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
             me->SetReactState(REACT_AGGRESSIVE);
         }
@@ -136,7 +136,7 @@ public:
                 case EVENT_RESTORE_COMBAT:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetStandState(UNIT_STANDING);
                     if (me->GetVictim())
                     {
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -145,7 +145,7 @@ public:
                     break;
                 case EVENT_KNEEL:
                     me->SendMeleeAttackStop(me->GetVictim());
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->SetStandState(UNIT_KNEEL);
                     break;
             }
 
@@ -159,7 +159,7 @@ public:
 
             me->SetTarget();
             me->SetFacingTo(5.558f);
-            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            me->SetStandState(UNIT_KNEEL);
             events.ScheduleEvent(point == EQUIP_TWO_SWORDS ? EVENT_SWAP_WEAPON1 : EVENT_SWAP_WEAPON2, 1500ms);
             events.ScheduleEvent(EVENT_RESTORE_COMBAT, 3s);
             events.ScheduleEvent(EVENT_KNEEL, 0ms);

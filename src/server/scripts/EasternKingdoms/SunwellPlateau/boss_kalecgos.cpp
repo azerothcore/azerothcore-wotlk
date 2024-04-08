@@ -143,7 +143,7 @@ public:
         {
             BossAI::Reset();
             me->SetHealth(me->GetMaxHealth());
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetStandState(UNIT_SLEEPING);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -217,7 +217,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
             events.ScheduleEvent(EVENT_SPAWN_SPECTRALS, 16000);
 
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetStandState(UNIT_STANDING);
             Talk(SAY_EVIL_AGGRO);
         }
 
