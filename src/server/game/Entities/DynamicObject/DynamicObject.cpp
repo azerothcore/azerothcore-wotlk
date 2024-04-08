@@ -50,8 +50,8 @@ void DynamicObject::CleanupsBeforeDelete(bool finalCleanup /* = true */)
     {
         transport->RemovePassenger(this);
         SetTransport(nullptr);
-        m_movementInfo.transport.Reset();
-        m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        m_movement.transport.Reset();
+        m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
     }
 
     WorldObject::CleanupsBeforeDelete(finalCleanup);

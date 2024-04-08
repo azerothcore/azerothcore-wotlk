@@ -35,7 +35,7 @@ protected:
 
 public:
     //Called whenever a player moves
-    virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
+    virtual void OnPlayerMove(Player* /*player*/, CMovement /*movementInfo*/, uint32 /*opcode*/) { }
 };
 
 #endif

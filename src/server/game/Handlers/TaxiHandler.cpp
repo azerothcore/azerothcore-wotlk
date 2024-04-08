@@ -202,7 +202,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     ObjectGuid guid; // used only for proper packet read
     recvData >> guid.ReadAsPacked();
 
-    MovementInfo movementInfo;                              // used only for proper packet read
+    CMovement movementInfo;                              // used only for proper packet read
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 

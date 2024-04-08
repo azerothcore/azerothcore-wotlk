@@ -56,7 +56,7 @@ struct AreaTableEntry;
 struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;
-struct MovementInfo;
+struct CMovement;
 
 namespace lfg
 {
@@ -345,8 +345,8 @@ public:
     void ReadAddonsInfo(ByteBuffer& data);
     void SendAddonsInfo();
 
-    void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
-    void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
+    void ReadMovementInfo(WorldPacket& data, CMovement* mi);
+    void WriteMovementInfo(WorldPacket* data, CMovement* mi);
 
     void SendPacket(WorldPacket const* packet);
     void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);

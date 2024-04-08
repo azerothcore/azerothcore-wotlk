@@ -1373,8 +1373,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         {
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
-            m_movementInfo.transport.Reset();
-            m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_movement.transport.Reset();
+            m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
             RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
         }
 
@@ -1418,8 +1418,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         {
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
-            m_movementInfo.transport.Reset();
-            m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_movement.transport.Reset();
+            m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
         }
     }
 
@@ -1583,7 +1583,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
                 data << uint32(mapid);
                 if (m_transport)
-                    data << m_movementInfo.transport.pos.PositionXYZOStream();
+                    data << m_movement.transport.pos.PositionXYZOStream();
                 else
                     data << teleportStore_dest.PositionXYZOStream();
 
@@ -13801,7 +13801,7 @@ BAG_RESULT Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 excep
     return BAG_OK;
 }
 
-void Player::HandleFall(MovementInfo const& movementInfo)
+void Player::HandleFall(CMovement const& movementInfo)
 {
     // calculate total z distance of the fall
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();

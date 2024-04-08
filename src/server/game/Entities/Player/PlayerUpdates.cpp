@@ -2133,7 +2133,7 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                                                 unit);
 }
 
-void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
+void Player::UpdateFallInformationIfNeed(CMovement const& minfo,
                                          uint16              opcode)
 {
     if (m_lastFallTime >= minfo.fallTime ||

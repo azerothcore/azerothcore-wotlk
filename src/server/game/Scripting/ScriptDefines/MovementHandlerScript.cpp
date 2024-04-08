@@ -19,7 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
+void ScriptMgr::OnPlayerMove(Player* player, CMovement movementInfo, uint32 opcode)
 {
     CALL_ENABLED_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE, script->OnPlayerMove(player, movementInfo, opcode));
 }

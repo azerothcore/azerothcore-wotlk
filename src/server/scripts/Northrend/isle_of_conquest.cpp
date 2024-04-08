@@ -419,12 +419,12 @@ class spell_ioc_parachute_ic_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_PARACHUTE_IC });
     }
 
-    void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
-    {
-        if (Player* target = GetTarget()->ToPlayer())
-            if (target->m_movementInfo.fallTime > 2500 && !target->GetTransport())
-                target->CastSpell(target, SPELL_PARACHUTE_IC, true);
-    }
+        void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
+        {
+            if (Player* target = GetTarget()->ToPlayer())
+                if (target->m_movement.fallTime > 2500 && !target->GetTransport())
+                    target->CastSpell(target, SPELL_PARACHUTE_IC, true);
+        }
 
     void Register() override
     {

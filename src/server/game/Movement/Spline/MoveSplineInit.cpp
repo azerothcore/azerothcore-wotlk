@@ -72,7 +72,7 @@ namespace Movement
             if (!transport)
                 pos = unit;
             else
-                pos = &unit->m_movementInfo.transport.pos;
+                pos = &unit->m_movement.transport.pos;
 
             real_position.x = pos->GetPositionX();
             real_position.y = pos->GetPositionY();
@@ -89,7 +89,7 @@ namespace Movement
         args.initialOrientation = real_position.orientation;
         move_spline.onTransport = transport;
 
-        uint32 moveFlags = unit->m_movementInfo.m_moveFlags;
+        uint32 moveFlags = unit->m_movement.m_moveFlags;
         moveFlags |= MOVEMENTFLAG_SPLINE_ENABLED;
 
         if (!args.flags.orientationInversed)
@@ -123,7 +123,7 @@ namespace Movement
         if (!args.Validate(unit))
             return 0;
 
-        unit->m_movementInfo.m_moveFlags |= moveFlags;
+        unit->m_movement.m_moveFlags |= moveFlags;
         move_spline.Initialize(args);
 
         WorldPacket data(SMSG_MONSTER_MOVE, 64);
@@ -159,7 +159,7 @@ namespace Movement
             if (!transport)
                 pos = unit;
             else
-                pos = &unit->m_movementInfo.transport.pos;
+                pos = &unit->m_movement.transport.pos;
 
             loc.x = pos->GetPositionX();
             loc.y = pos->GetPositionY();
@@ -168,7 +168,7 @@ namespace Movement
         }
 
         args.flags = MoveSplineFlag::Done;
-        unit->m_movementInfo.m_moveFlags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_SPLINE_ENABLED);
+        unit->m_movement.m_moveFlags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_SPLINE_ENABLED);
         move_spline.onTransport = transport;
         move_spline.Initialize(args);
 
@@ -190,8 +190,8 @@ namespace Movement
         args.splineId = splineIdGen.NewId();
         args.TransformForTransport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
         // mix existing state into new
-        args.flags.walkmode = (unit->m_movementInfo.m_moveFlags & MOVEMENTFLAG_WALKING) != 0;
-        args.flags.flying = (unit->m_movementInfo.m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0;
+        args.flags.walkmode = (unit->m_movement.m_moveFlags & MOVEMENTFLAG_WALKING) != 0;
+        args.flags.flying = (unit->m_movement.m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0;
     }
 
     void MoveSplineInit::SetFacing(Unit const* target)

@@ -123,8 +123,8 @@ void WorldSession::HandleMoveWorldportAck()
         {
             t->RemovePassenger(m_player);
             m_player->m_transport = nullptr;
-            m_player->m_movementInfo.transport.Reset();
-            m_player->m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_player->m_movement.transport.Reset();
+            m_player->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
         }
 
     if (!m_player->getHostileRefMgr().IsEmpty())
@@ -366,7 +366,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -412,9 +412,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         if (mover->GetTypeId() == TYPEID_UNIT)
         {
-            movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
-            movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());
-            movementInfo.transport.seat = mover->m_movementInfo.transport.seat;
+            movementInfo.transport.guid = mover->m_movement.transport.guid;
+            movementInfo.transport.pos.Relocate(mover->m_movement.transport.pos.GetPositionX(), mover->m_movement.transport.pos.GetPositionY(), mover->m_movement.transport.pos.GetPositionZ());
+            movementInfo.transport.seat = mover->m_movement.transport.seat;
         }
     }
 
@@ -558,7 +558,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, m_player);
 
-    mover->m_movementInfo = movementInfo;
+    mover->m_movement = movementInfo;
 
     // Some vehicles allow the passenger to turn by himself
     if (Vehicle* vehicle = mover->GetVehicle())
@@ -630,7 +630,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     // continue parse packet
     recvData >> unk1;                                      // counter or moveEvent
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -743,11 +743,11 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
         return;
     }
 
-    MovementInfo mi;
+    CMovement mi;
     mi.guid = old_mover_guid;
     ReadMovementInfo(recvData, &mi);
 
-    m_player->m_mover->m_movementInfo = mi;
+    m_player->m_mover->m_movement = mi;
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
@@ -774,11 +774,11 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     recvData.read_skip<uint32>();                          // unk
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
-    m_player->m_mover->m_movementInfo = movementInfo;
+    m_player->m_mover->m_movement = movementInfo;
 
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
     data << guid.WriteAsPacked();
@@ -802,7 +802,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 
     recvData.read_skip<uint32>();                          // unk
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -818,7 +818,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 
     recvData.read_skip<uint32>();                          // unk
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -873,7 +873,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
         return;
     }
 
-    mover->m_movementInfo.time += timeSkipped;
+    mover->m_movement.time += timeSkipped;
 
     WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
     data << guid.WriteAsPacked();
@@ -966,7 +966,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     uint32 movementCounter;
     recvData >> movementCounter;
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -983,7 +983,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     }
 
     movementInfo.guid = mover->GetGUID();
-    mover->m_movementInfo = movementInfo;
+    mover->m_movement = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
     WorldPacket data(MSG_MOVE_ROOT, 64);
@@ -1006,7 +1006,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     uint32 movementCounter;
     recvData >> movementCounter;
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
@@ -1028,7 +1028,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     }
 
     movementInfo.guid = mover->GetGUID();
-    mover->m_movementInfo = movementInfo;
+    mover->m_movement = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
     WorldPacket data(MSG_MOVE_UNROOT, 64);

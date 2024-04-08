@@ -368,7 +368,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
               << unit->GetSpeed(MOVE_PITCH_RATE);
 
         // 0x08000000
-        if ((unit->m_movementInfo.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0)
+        if ((unit->m_movement.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0)
         {
             Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
         }
@@ -1013,7 +1013,7 @@ std::string Object::GetDebugInfo() const
     return sstr.str();
 }
 
-void MovementInfo::OutDebug()
+void CMovement::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
     LOG_INFO("movement", "guid {}", guid.ToString());
@@ -1210,12 +1210,12 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUID() == m_transport->GetGUID())
     {
-        float dtx = m_movementInfo.transport.pos.m_positionX - obj->m_movementInfo.transport.pos.m_positionX;
-        float dty = m_movementInfo.transport.pos.m_positionY - obj->m_movementInfo.transport.pos.m_positionY;
+        float dtx = m_movement.transport.pos.m_positionX - obj->m_movement.transport.pos.m_positionX;
+        float dty = m_movement.transport.pos.m_positionY - obj->m_movement.transport.pos.m_positionY;
         float disttsq = dtx * dtx + dty * dty;
         if (is3D)
         {
-            float dtz = m_movementInfo.transport.pos.m_positionZ - obj->m_movementInfo.transport.pos.m_positionZ;
+            float dtz = m_movement.transport.pos.m_positionZ - obj->m_movement.transport.pos.m_positionZ;
             disttsq += dtz * dtz;
         }
         return disttsq < (maxdist * maxdist);

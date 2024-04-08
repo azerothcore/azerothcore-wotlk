@@ -932,7 +932,7 @@ bool Creature::IsFreeToMove()
     // Do not reposition ourself when we are not allowed to move
     if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove() || !IsCombatMovementAllowed()) &&
         (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE ||
-        (m_movementInfo.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0))
+        (m_movement.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0))
     {
         return false;
     }

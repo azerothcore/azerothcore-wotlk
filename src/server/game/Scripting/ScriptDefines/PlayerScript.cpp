@@ -880,7 +880,7 @@ void ScriptMgr::AnticheatSetJumpingbyOpcode(Player* player, bool jump)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_SET_JUMPING_BY_OPCODE, script->AnticheatSetJumpingbyOpcode(player, jump));
 }
 
-void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo)
+void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, CMovement const& movementInfo)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_UPDATE_MOVEMENT_INFO, script->AnticheatUpdateMovementInfo(player, movementInfo));
 }
@@ -890,7 +890,7 @@ bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_HANDLE_DOUBLE_JUMP, !script->AnticheatHandleDoubleJump(player, mover));
 }
 
-bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, CMovement const& movementInfo, Unit* mover, bool jump)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_CHECK_MOVEMENT_INFO, !script->AnticheatCheckMovementInfo(player, movementInfo, mover, jump));
 }

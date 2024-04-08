@@ -2314,7 +2314,7 @@ public:
     /*********************************************************/
     /***                 VARIOUS SYSTEMS                   ***/
     /*********************************************************/
-    void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
+    void UpdateFallInformationIfNeed(CMovement const& minfo, uint16 opcode);
     SafeUnitPointer m_mover;
     WorldObject* m_seer;
     std::set<Unit*> m_isInSharedVisionOf;
@@ -2323,7 +2323,7 @@ public:
         m_lastFallTime = time;
         m_lastFallZ = z;
     }
-    void HandleFall(MovementInfo const& movementInfo);
+    void HandleFall(CMovement const& movementInfo);
 
     [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell);
 
@@ -2551,7 +2551,7 @@ public:
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
     bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
-    [[nodiscard]] bool CanFly() const override { return (m_movementInfo.m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0; }
+    [[nodiscard]] bool CanFly() const override { return (m_movement.m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0; }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS

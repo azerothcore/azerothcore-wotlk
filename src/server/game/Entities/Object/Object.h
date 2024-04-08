@@ -263,8 +263,9 @@ private:
     Object& operator=(Object const&);                   // prevent generation assigment operator
 };
 
-struct MovementInfo
+class CMovement
 {
+public:
     // common
     ObjectGuid guid;
     uint32 m_moveFlags{0};
@@ -311,7 +312,7 @@ struct MovementInfo
     // spline
     float splineElevation{0.0f};
 
-    MovementInfo()
+    CMovement()
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();
@@ -578,16 +579,16 @@ public:
 
     // Transports
     [[nodiscard]] Transport* GetTransport() const { return m_transport; }
-    [[nodiscard]] float GetTransOffsetX() const { return m_movementInfo.transport.pos.GetPositionX(); }
-    [[nodiscard]] float GetTransOffsetY() const { return m_movementInfo.transport.pos.GetPositionY(); }
-    [[nodiscard]] float GetTransOffsetZ() const { return m_movementInfo.transport.pos.GetPositionZ(); }
-    [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
-    [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
-    [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
+    [[nodiscard]] float GetTransOffsetX() const { return m_movement.transport.pos.GetPositionX(); }
+    [[nodiscard]] float GetTransOffsetY() const { return m_movement.transport.pos.GetPositionY(); }
+    [[nodiscard]] float GetTransOffsetZ() const { return m_movement.transport.pos.GetPositionZ(); }
+    [[nodiscard]] float GetTransOffsetO() const { return m_movement.transport.pos.GetOrientation(); }
+    [[nodiscard]] uint32 GetTransTime()   const { return m_movement.transport.time; }
+    [[nodiscard]] int8 GetTransSeat()     const { return m_movement.transport.seat; }
     [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;
     void SetTransport(Transport* t) { m_transport = t; }
 
-    MovementInfo m_movementInfo;
+    CMovement m_movement;
 
     [[nodiscard]] virtual float GetStationaryX() const { return GetPositionX(); }
     [[nodiscard]] virtual float GetStationaryY() const { return GetPositionY(); }

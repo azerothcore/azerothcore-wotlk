@@ -435,7 +435,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     uint32 reason = 0;
     if (GetPlayer()->IsInCombat() && !canLogoutInCombat)
         reason = 1;
-    else if (GetPlayer()->m_movementInfo.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR))
+    else if (GetPlayer()->m_movement.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR))
         reason = 3;                                         // is jumping or falling
     else if (preventAfkSanctuaryLogout || preventAfkLogout || GetPlayer()->duel || GetPlayer()->HasAura(9454)) // is dueling or frozen by GM via freeze command
         reason = 2;                                         // FIXME - Need the correct value
@@ -1516,7 +1516,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 
     recv_data.read_skip<uint32>();                          // unk
 
-    MovementInfo movementInfo;
+    CMovement movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
@@ -1524,7 +1524,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 
     sScriptMgr->AnticheatSetCanFlybyServer(m_player, (movementInfo.m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0);
 
-    m_player->m_mover->m_movementInfo.m_moveFlags = movementInfo.m_moveFlags;
+    m_player->m_mover->m_movement.m_moveFlags = movementInfo.m_moveFlags;
 }
 
 void WorldSession::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*packet*/)

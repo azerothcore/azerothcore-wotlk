@@ -631,7 +631,7 @@ void Unit::UpdateSplinePosition()
 
     if (movespline->onTransport)
     {
-        Position& pos = m_movementInfo.transport.pos;
+        Position& pos = m_movement.transport.pos;
         pos.m_positionX = loc.x;
         pos.m_positionY = loc.y;
         pos.m_positionZ = loc.z;
@@ -653,7 +653,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.m_moveFlags &= ~(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
+    m_movement.m_moveFlags &= ~(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
     movespline->_Interrupt();
 }
 
@@ -15706,8 +15706,8 @@ void Unit::CleanupsBeforeDelete(bool finalCleanup)
     {
         GetTransport()->RemovePassenger(this);
         SetTransport(nullptr);
-        m_movementInfo.transport.Reset();
-        m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        m_movement.transport.Reset();
+        m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
     }
 
     CleanupBeforeRemoveFromMap(finalCleanup);
@@ -20129,33 +20129,33 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
         *data << uint8 (GetTransSeat());
 
         if (GetExtraUnitMovementFlags() & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            *data << uint32(m_movementInfo.transport.time2);
+            *data << uint32(m_movement.transport.time2);
     }
 
     // 0x02200000
     if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
-            || (m_movementInfo.m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        *data << (float)m_movementInfo.pitch;
+            || (m_movement.m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+        *data << (float)m_movement.pitch;
 
-    *data << (uint32)m_movementInfo.fallTime;
+    *data << (uint32)m_movement.fallTime;
 
     // 0x00001000
     if (GetUnitMovementFlags() & MOVEMENTFLAG_FALLING)
     {
-        *data << (float)m_movementInfo.jump.zspeed;
-        *data << (float)m_movementInfo.jump.sinAngle;
-        *data << (float)m_movementInfo.jump.cosAngle;
-        *data << (float)m_movementInfo.jump.xyspeed;
+        *data << (float)m_movement.jump.zspeed;
+        *data << (float)m_movement.jump.sinAngle;
+        *data << (float)m_movement.jump.cosAngle;
+        *data << (float)m_movement.jump.xyspeed;
     }
 
     // 0x04000000
     if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)
-        *data << (float)m_movementInfo.splineElevation;
+        *data << (float)m_movement.splineElevation;
 }
 
 bool Unit::IsFalling() const
 {
-    return ((m_movementInfo.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) != 0)
+    return ((m_movement.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) != 0)
             || (!movespline->Finalized() && movespline->Initialized() && movespline->isFalling());
 }
 

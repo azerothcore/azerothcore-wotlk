@@ -182,7 +182,7 @@ void Vehicle::ApplyAllImmunities()
             //me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
             //me->SetSpeed(MOVE_TURN_RATE, 0.7f);
             //me->SetSpeed(MOVE_PITCH_RATE, 0.7f);
-            //me->m_movementInfo.m_moveFlags2=59;
+            //me->m_movement.m_moveFlags2=59;
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
             break;
         // Ulduar vehicles, remove immunities used in flame leviathan spells
@@ -376,10 +376,10 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
 
     unit->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     VehicleSeatEntry const* veSeat = seat->second.SeatInfo;
-    unit->m_movementInfo.transport.pos.Relocate(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
-    unit->m_movementInfo.transport.time = 0;
-    unit->m_movementInfo.transport.seat = seat->first;
-    unit->m_movementInfo.transport.guid = _me->GetGUID();
+    unit->m_movement.transport.pos.Relocate(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
+    unit->m_movement.transport.time = 0;
+    unit->m_movement.transport.seat = seat->first;
+    unit->m_movement.transport.guid = _me->GetGUID();
 
     // xinef: removed seat->first == 0 check...
     if (_me->GetTypeId() == TYPEID_UNIT
@@ -476,10 +476,10 @@ void Vehicle::RemovePassenger(Unit* unit)
         if (!_me->GetTransport())
         {
             unit->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-            unit->m_movementInfo.transport.Reset();
+            unit->m_movement.transport.Reset();
         }
         else
-            unit->m_movementInfo.transport = _me->m_movementInfo.transport;
+            unit->m_movement.transport = _me->m_movement.transport;
     }
 
     // only for flyable vehicles
@@ -508,7 +508,7 @@ void Vehicle::RelocatePassengers()
             ASSERT(passenger->IsInWorld());
 
             float px, py, pz, po;
-            passenger->m_movementInfo.transport.pos.GetPosition(px, py, pz, po);
+            passenger->m_movement.transport.pos.GetPosition(px, py, pz, po);
             CalculatePassengerPosition(px, py, pz, &po);
             seatRelocation.emplace_back(passenger, Position(px, py, pz, po));
         }

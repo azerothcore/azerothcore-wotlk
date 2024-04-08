@@ -5200,15 +5200,15 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         if (m_transport)
         {
             float x = fields[31].Get<float>(), y = fields[32].Get<float>(), z = fields[33].Get<float>(), o = fields[34].Get<float>();
-            m_movementInfo.transport.guid = m_transport->GetGUID();
-            m_movementInfo.transport.pos.Relocate(x, y, z, o);
+            m_movement.transport.guid = m_transport->GetGUID();
+            m_movement.transport.pos.Relocate(x, y, z, o);
             m_transport->CalculatePassengerPosition(x, y, z, &o);
 
-            if (!Acore::IsValidMapCoord(x, y, z, o) || std::fabs(m_movementInfo.transport.pos.GetPositionX()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionY()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionZ()) > 75.0f)
+            if (!Acore::IsValidMapCoord(x, y, z, o) || std::fabs(m_movement.transport.pos.GetPositionX()) > 75.0f || std::fabs(m_movement.transport.pos.GetPositionY()) > 75.0f || std::fabs(m_movement.transport.pos.GetPositionZ()) > 75.0f)
             {
                 m_transport = nullptr;
-                m_movementInfo.transport.Reset();
-                m_movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+                m_movement.transport.Reset();
+                m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
                 RelocateToHomebind();
             }
             else

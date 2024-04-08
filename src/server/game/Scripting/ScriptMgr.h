@@ -465,10 +465,10 @@ public: /* PlayerScript */
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
     void AnticheatSetUnderACKmount(Player* player);
     void AnticheatSetRootACKUpd(Player* player);
-    void AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
+    void AnticheatUpdateMovementInfo(Player* player, CMovement const& movementInfo);
     void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
     bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
-    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
+    bool AnticheatCheckMovementInfo(Player* player, CMovement const& movementInfo, Unit* mover, bool jump);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
@@ -559,7 +559,7 @@ public: /* UnitScript */
     void OnUnitDeath(Unit* unit, Unit* killer);
 
 public: /* MovementHandlerScript */
-    void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
+    void OnPlayerMove(Player* player, CMovement movementInfo, uint32 opcode);
 
 public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate

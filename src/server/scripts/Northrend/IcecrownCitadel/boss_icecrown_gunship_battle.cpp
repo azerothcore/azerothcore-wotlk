@@ -2086,7 +2086,7 @@ public:
             float x, y, z, o;
             dest->GetPosition(x, y, z, o);
             target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
-            target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+            target->m_movement.transport.pos.Relocate(x, y, z, o);
         }
 
         void Register() override

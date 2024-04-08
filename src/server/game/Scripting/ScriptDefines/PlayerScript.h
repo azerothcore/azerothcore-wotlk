@@ -736,9 +736,9 @@ public:
     virtual void AnticheatSetUnderACKmount(Player* /*player*/) { }
     virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
     virtual void AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) { }
-    virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
+    virtual void AnticheatUpdateMovementInfo(Player* /*player*/, CMovement const& /*movementInfo*/) { }
     [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
-    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, CMovement const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 
     /**
      * @brief This hook is called, to avoid displaying the error message that the body has already been stripped

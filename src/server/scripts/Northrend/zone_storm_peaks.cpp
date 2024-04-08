@@ -962,7 +962,7 @@ public:
 
                         bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
                         {
-                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
+                            _owner->m_movement.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
                             return true;
                         }
 

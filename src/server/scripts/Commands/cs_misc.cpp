@@ -621,7 +621,7 @@ public:
 
         if (object->GetTransport())
         {
-            handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
+            handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movement.transport.pos.GetPositionX(), object->m_movement.transport.pos.GetPositionY(), object->m_movement.transport.pos.GetPositionZ(), object->m_movement.transport.pos.GetOrientation());
         }
 
         return true;
