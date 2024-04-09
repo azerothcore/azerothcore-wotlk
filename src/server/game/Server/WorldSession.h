@@ -334,6 +334,7 @@ public:
     ~WorldSession();
 
     bool CharacterLoggingOut () const { return this->m_loggingOut; }
+    void CharacterRemoveFromGame(bool save);
 
     char const* GetAccountName();
 
@@ -394,7 +395,6 @@ public:
         _logoutTime = requestTime;
     }
 
-    void PlayerLogout(bool save);
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
