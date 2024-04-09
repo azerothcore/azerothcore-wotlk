@@ -373,7 +373,6 @@ struct boss_archimonde : public BossAI
                     }
                     return true;
                 });
-                me->Yell(std::to_string(noPlayersInRange), LANG_UNIVERSAL);
             }
             if (noPlayersInRange)
             {
