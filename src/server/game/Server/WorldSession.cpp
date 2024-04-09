@@ -142,7 +142,7 @@ WorldSession::WorldSession(uint32 id, uint32_t accountFlags, std::string&& name,
     _logoutTime(0),
     m_inQueue(false),
     m_playerLoading(false),
-    m_playerLogout(false),
+    m_loggingOut(false),
     m_playerRecentlyLogout(false),
     m_playerSave(false),
     m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
@@ -533,7 +533,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             _warden->Update(diff);
         }
 
-        if (ShouldLogOut(currentTime) && !m_playerLoading)
+        if (currentTime >= (_logoutTime+20) && !m_playerLoading)
         {
             PlayerLogout(true);
         }
@@ -557,7 +557,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
 bool WorldSession::HandleSocketClosed()
 {
-    if (m_Socket && !m_Socket->IsOpen() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
+    if (m_Socket && !m_Socket->IsOpen() && !IsKicked() && GetPlayer() && !CharacterLoggingOut() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
     {
         m_Socket = nullptr;
         GetPlayer()->TradeCancel(false);
@@ -609,7 +609,7 @@ void WorldSession::PlayerLogout(bool save)
     while (m_player && m_player->IsBeingTeleportedFar())
         HandleMoveWorldportAck();
 
-    m_playerLogout = true;
+    m_loggingOut = true;
     m_playerSave = save;
 
     if (m_player)
@@ -767,7 +767,7 @@ void WorldSession::PlayerLogout(bool save)
         CharacterDatabase.Execute(stmt);
     }
 
-    m_playerLogout = false;
+    m_loggingOut = false;
     m_playerSave = false;
     m_playerRecentlyLogout = true;
     SetLogoutStartTime(0);

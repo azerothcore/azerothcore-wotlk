@@ -288,7 +288,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     }
 
     // remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones)
-    if (!player->GetSession()->PlayerLogout())
+    if (!player->GetSession()->CharacterLoggingOut())
     {
         SendRemoveWorldStates(player);
     }

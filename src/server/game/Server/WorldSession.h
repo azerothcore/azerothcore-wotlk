@@ -56,7 +56,7 @@ struct AreaTableEntry;
 struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;
-struct CMovement;
+class CMovement;
 
 namespace lfg
 {
@@ -333,14 +333,15 @@ public:
     WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
+    bool CharacterLoggingOut () const { return this->m_loggingOut; }
+
     char const* GetAccountName();
 
     bool IsGMAccount() const;
 
     bool PlayerLoading() const { return m_playerLoading; }
-    bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }
-    bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
+    bool PlayerLogoutWithSave() const { return m_loggingOut && m_playerSave; }
 
     void ReadAddonsInfo(ByteBuffer& data);
     void SendAddonsInfo();
@@ -386,19 +387,11 @@ public:
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
 
-    /// Is the user engaged in a log out process?
-    bool isLogingOut() const { return _logoutTime || m_playerLogout; }
-
     /// Engage the logout process for the user
     void SetLogoutStartTime(time_t requestTime)
     {
+        m_loggingOut = true;
         _logoutTime = requestTime;
-    }
-
-    /// Is logout cooldown expired?
-    bool ShouldLogOut(time_t currTime) const
-    {
-        return (_logoutTime > 0 && currTime >= _logoutTime + 20);
     }
 
     void PlayerLogout(bool save);
@@ -1166,7 +1159,7 @@ private:
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer
-    bool m_playerLogout;                                // code processed in PlayerLogout
+    bool m_loggingOut;
     bool m_playerRecentlyLogout;
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;

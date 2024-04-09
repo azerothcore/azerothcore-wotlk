@@ -19263,7 +19263,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             return;
 
         // modify hostile references for new phasemask, some special cases deal with hostile references themselves
-        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
+        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->CharacterLoggingOut()))
         {
             HostileRefMgr& refMgr = getHostileRefMgr();
             HostileReference* ref = refMgr.getFirst();

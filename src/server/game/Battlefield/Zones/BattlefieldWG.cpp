@@ -873,7 +873,7 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
 void BattlefieldWG::OnPlayerLeaveWar(Player* player)
 {
     // Remove all aura from WG /// @todo: false we can go out of this zone on retail and keep Rank buff, remove on end of WG
-    if (!player->GetSession()->PlayerLogout())
+    if (!player->GetSession()->CharacterLoggingOut())
     {
         if (player->GetVehicle())                              // Remove vehicle of player if he go out.
             player->GetVehicle()->Dismiss();

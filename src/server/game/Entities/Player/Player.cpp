@@ -409,7 +409,7 @@ Player::~Player()
 {
     sScriptMgr->OnDestructPlayer(this);
 
-    // it must be unloaded already in PlayerLogout and accessed only for loggined player
+    // it must be unloaded already in CharacterLoggingOut and accessed only for loggined player
     //m_social = nullptr;
 
     // Note: buy back item already deleted from DB when player was saved
@@ -1471,7 +1471,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // at client packet MSG_MOVE_TELEPORT_ACK
         SetSemaphoreTeleportNear(GameTime::GetGameTime().count());
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
-        if (!GetSession()->PlayerLogout())
+        if (!GetSession()->CharacterLoggingOut())
         {
             SetCanTeleport(true);
             Position oldPos = GetPosition();
@@ -1546,7 +1546,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
-            if (!GetSession()->PlayerLogout())
+            if (!GetSession()->CharacterLoggingOut())
             {
                 // send transfer packets
                 WorldPacket data(SMSG_TRANSFER_PENDING, 4 + 4 + 4);
@@ -1577,7 +1577,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
-            if (!GetSession()->PlayerLogout())
+            if (!GetSession()->CharacterLoggingOut())
             {
                 SetCanTeleport(true);
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
@@ -4383,7 +4383,7 @@ void Player::BuildPlayerRepop()
     SetHealth(1); // convert player body to ghost
     SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
+    if (!GetSession()->CharacterLoggingOut())
     {
         SetMovement(MOVE_UNROOT);
     }
@@ -9038,7 +9038,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             return;
     }
 
-    if (returnreagent && (pet || (m_temporaryUnsummonedPetNumber && (!m_session || !m_session->PlayerLogout()))) && !InBattleground())
+    if (returnreagent && (pet || (m_temporaryUnsummonedPetNumber && (!m_session || !m_session->CharacterLoggingOut()))) && !InBattleground())
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
@@ -10198,7 +10198,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
 
     // not let cheating with start flight in time of logout process || while in combat || has type state: stunned || has type state: root
-    if (GetSession()->isLogingOut() || IsInCombat() || HasUnitState(UNIT_STATE_STUNNED) || HasUnitState(UNIT_STATE_ROOT))
+    if (GetSession()->CharacterLoggingOut() || IsInCombat() || HasUnitState(UNIT_STATE_STUNNED) || HasUnitState(UNIT_STATE_ROOT))
     {
         GetSession()->SendActivateTaxiReply(ERR_TAXIPLAYERBUSY);
         return false;
@@ -11404,7 +11404,7 @@ bool Player::IsNeverVisible() const
     if (Unit::IsNeverVisible())
         return true;
 
-    if (GetSession()->PlayerLogout() || GetSession()->PlayerLoading())
+    if (GetSession()->CharacterLoggingOut() || GetSession()->PlayerLoading())
         return true;
 
     return false;
@@ -14898,7 +14898,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, _innTriggerId);
         stmt->SetData(index++, m_extraBonusTalentCount);
 
-        stmt->SetData(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
+        stmt->SetData(index++, IsInWorld() && !GetSession()->CharacterLoggingOut() ? 1 : 0);
         // Index
         stmt->SetData(index++, GetGUID().GetCounter());
     }

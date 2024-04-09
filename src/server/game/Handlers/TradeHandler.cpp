@@ -526,7 +526,7 @@ void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::SendCancelTrade()
 {
-    if (PlayerRecentlyLoggedOut() || PlayerLogout())
+    if (PlayerRecentlyLoggedOut() || CharacterLoggingOut())
         return;
 
     SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
@@ -559,7 +559,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (isLogingOut())
+    if (CharacterLoggingOut())
     {
         SendTradeStatus(TRADE_STATUS_YOU_LOGOUT);
         return;
@@ -612,7 +612,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSession()->isLogingOut())
+    if (pOther->GetSession()->CharacterLoggingOut())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_LOGOUT);
         return;
