@@ -8443,21 +8443,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                     || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
                                      return false;
 
-                                uint32 chance = 20;
-                                if (getLevel() >= 30)
-                                    chance += 2;
-
-                                Item const* addWeapon = bot->GetBotEquips(attType == BASE_ATTACK ? 1/*BOT_SLOT_OFFHAND*/ : 0/*BOT_SLOT_MAINHAND*/);
-                                uint32 enchant_id_add = addWeapon ? addWeapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) : 0;
-                                SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id_add);
-                                if (pEnchant && pEnchant->spellid[0] == dummySpell->Id)
-                                    chance += 14;
-
-                                if (!roll_chance_i(chance))
-                                    return false;
-
                                 uint32 spellId;
-                                switch (castItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+                                switch (castItem->GetEnchantmentId(EnchantmentSlot(TEMP_ENCHANTMENT_SLOT)))
                                 {
                                     case 283: spellId =  8232; break;   // 1 Rank
                                     case 284: spellId =  8235; break;   // 2 Rank
@@ -8487,9 +8474,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 triggered_spell_id = (procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK) ? 25504 : 33750;
 
                                 if (cooldown)
-                                    bot->AddBotSpellCooldown(dummySpell->Id, cooldown * IN_MILLISECONDS);
+                                    bot->AddBotSpellCooldown(dummySpell->Id, cooldown);
 
-                                for (uint32 i = 0; i != 2; ++i)
+                                for (uint8 i = 0; i != 2; ++i)
                                     CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
 
                                 return true;
