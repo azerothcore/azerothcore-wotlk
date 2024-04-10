@@ -25,7 +25,7 @@
 class ChatLogScript : public PlayerScript
 {
 public:
-    ChatLogScript() : 
+    ChatLogScript() :
         PlayerScript("ChatLogScript",
         {
             PLAYERHOOK_ON_CHAT,

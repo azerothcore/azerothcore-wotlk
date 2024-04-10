@@ -169,7 +169,7 @@ public:
 class CharacterActionIpLogger : public PlayerScript
 {
 public:
-    CharacterActionIpLogger() : 
+    CharacterActionIpLogger() :
         PlayerScript("CharacterActionIpLogger",
         {
             PLAYERHOOK_ON_CREATE,
@@ -264,7 +264,7 @@ public:
 class CharacterDeleteActionIpLogger : public PlayerScript
 {
 public:
-    CharacterDeleteActionIpLogger() : 
+    CharacterDeleteActionIpLogger() :
         PlayerScript("CharacterDeleteActionIpLogger",
         {
             PLAYERHOOK_ON_DELETE,

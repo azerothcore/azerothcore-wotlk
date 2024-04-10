@@ -37,7 +37,7 @@ namespace lfg
             PLAYERHOOK_ON_LOGIN,
             PLAYERHOOK_ON_BIND_TO_INSTANCE,
             PLAYERHOOK_ON_MAP_CHANGED
-        }) 
+        })
     {
     }
 
