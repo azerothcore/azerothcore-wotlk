@@ -1767,8 +1767,8 @@ void WorldSession::GmResurrectHandler(WorldPacket& msg)
     }
 
     // READ THE MESSAGE DATA
-    char name[MAX_PLAYER_NAME];
-    msg.GetString(name, MAX_PLAYER_NAME);
+    char name[256];
+    msg.GetString(name, -1);
 
     FormatCharacterName(name);
 
