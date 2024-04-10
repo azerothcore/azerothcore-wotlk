@@ -27,7 +27,7 @@ enum ApprenticeAnglerQuestEnum
 class QuestApprenticeAnglerPlayerScript : public PlayerScript
 {
 public:
-    QuestApprenticeAnglerPlayerScript() : PlayerScript("QuestApprenticeAnglerPlayerScript", std::vector<uint16>{PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST})
+    QuestApprenticeAnglerPlayerScript() : PlayerScript("QuestApprenticeAnglerPlayerScript", {PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST})
     {
     }
 

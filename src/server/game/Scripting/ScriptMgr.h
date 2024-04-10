@@ -725,26 +725,26 @@ public:
     // With this approach, we wouldn't call all available hooks in case if we override just one hook.
     static EnabledHooksVector EnabledHooks;
 
-    static void AddScript(TScript* const script, std::vector<uint16> enabledHooks = std::vector<uint16>())
+    static void AddScript(TScript* const script, std::vector<uint16> enabledHooks = {})
     {
         ASSERT(script);
 
         if (!_checkMemory(script))
             return;
 
-        if (EnabledHooks.size() == 0)
+        if (EnabledHooks.empty())
             EnabledHooks.resize(script->GetTotalAvailableHooks());
 
         if (script->isAfterLoadScript())
         {
-            ALScripts.push_back(std::pair<TScript*,std::vector<uint16>>(script, enabledHooks));
+            ALScripts.emplace_back(script, std::move(enabledHooks));
         }
         else
         {
             script->checkValidity();
 
             for (uint16 v : enabledHooks)
-                EnabledHooks[v].push_back(script);
+                EnabledHooks[v].emplace_back(script);
 
             // We're dealing with a code-only script; just add it.
             ScriptPointerList[_scriptIdCounter++] = script;
@@ -788,7 +788,7 @@ public:
                     // If the script is already assigned -> delete it!
                     if (oldScript)
                     {
-                        for (std::vector<TScript*>& vIt : EnabledHooks)
+                        for (auto& vIt : EnabledHooks)
                             for (size_t i = 0; i < vIt.size(); ++i)
                                 if (vIt[i] == oldScript)
                                 {
@@ -819,7 +819,7 @@ public:
             else
             {
                 for (uint16 v : (*it).second)
-                    EnabledHooks[v].push_back(script);
+                    EnabledHooks[v].emplace_back(script);
 
                 // We're dealing with a code-only script; just add it.
                 ScriptPointerList[_scriptIdCounter++] = script;

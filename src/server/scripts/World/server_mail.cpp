@@ -24,7 +24,7 @@
 class ServerMailReward : public PlayerScript
 {
 public:
-    ServerMailReward() : PlayerScript("ServerMailReward", std::vector<uint16>{PLAYERHOOK_ON_LOGIN}) { }
+    ServerMailReward() : PlayerScript("ServerMailReward", {PLAYERHOOK_ON_FIRST_LOGIN}) { }
 
     // CHARACTER_LOGIN = 8
     void OnLogin(Player* player) override

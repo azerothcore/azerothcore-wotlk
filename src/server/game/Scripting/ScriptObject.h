@@ -53,7 +53,7 @@ public:
 
     [[nodiscard]] const std::string& GetName() const { return _name; }
 
-    uint16 GetTotalAvailableHooks() { return _totalAvailableHooks; }
+    [[nodiscard]] uint16 GetTotalAvailableHooks() { return _totalAvailableHooks; }
 
 protected:
     ScriptObject(const char* name, uint16 totalAvailableHooks = 0) : _name(std::string(name)), _totalAvailableHooks(totalAvailableHooks)

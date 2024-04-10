@@ -153,7 +153,7 @@ uint32 const GoBonfireCity[COUNT_GO_BONFIRE_CITY] = { 181332, 181333, 181334, 18
 class MidsummerPlayerScript : public PlayerScript
 {
 public:
-    MidsummerPlayerScript() : PlayerScript("MidsummerPlayerScript", std::vector<uint16>{PLAYERHOOK_ON_UPDATE_ZONE})
+    MidsummerPlayerScript() : PlayerScript("MidsummerPlayerScript", {PLAYERHOOK_ON_UPDATE_ZONE})
     {
     }
 
