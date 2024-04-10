@@ -163,7 +163,15 @@ struct boss_alar : public BossAI
         if (me->isMoving())
             return true;
 
-        return me->IsWithinMeleeRange(victim);
+        if (_hasPretendedToDie)
+        {
+            // prevent getting stuck in p2
+            return true;
+        }
+        else
+        {
+            return me->IsWithinMeleeRange(victim);
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
