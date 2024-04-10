@@ -1074,6 +1074,8 @@ public:
 
     FriendList* FriendListPtr();
 
+    bool IsResting () const { return HasPlayerFlag(PLAYER_FLAGS_RESTING); }
+
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
