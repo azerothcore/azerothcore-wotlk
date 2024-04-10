@@ -70,7 +70,10 @@ enum Spells
     SPELL_FROST_BREATH                = 31688,
 
     // Fel Stalker
-    SPELL_MANA_BURN                   = 31729
+    SPELL_MANA_BURN                   = 31729,
+
+    // Misc
+    SPELL_DEATH_AND_DECAY             = 31258
 };
 
 enum Talk
@@ -98,7 +101,10 @@ public:
     }
     struct hyjalJainaAI : public ScriptedAI
     {
-        hyjalJainaAI(Creature* creature) : ScriptedAI(creature) { }
+        hyjalJainaAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->ApplySpellImmune(SPELL_DEATH_AND_DECAY, IMMUNITY_ID, SPELL_DEATH_AND_DECAY, true);
+        }
 
         void Reset() override
         {
