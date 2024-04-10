@@ -1013,6 +1013,8 @@ void WorldSession::SaveTutorialsData(CharacterDatabaseTransaction trans)
 
 void WorldSession::ReadMovementInfo(WorldPacket& data, CMovement* mi)
 {
+    Unit* mover = ActivePlayer()->m_mover;
+
     data >> mi->m_moveFlags;
     data >> mi->m_moveFlags2;
     data >> mi->time;
@@ -1047,81 +1049,85 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, CMovement* mi)
     if ((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ELEVATION) != 0)
         data >> mi->splineElevation;
 
-    //! Anti-cheat checks. Please keep them in seperate if() blocks to maintain a clear overview.
-    //! Might be subject to latency, so just remove improper flags.
-#ifdef ACORE_DEBUG
-#define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
-    { \
-        if (check) \
-        { \
-            LOG_DEBUG("entities.unit", "WorldSession::ReadMovementInfo: Violation of MovementFlags found ({}). " \
-                "MovementFlags: {}, MovementFlags2: {} for player {}. Mask {} will be removed.", \
-                STRINGIZE(check), mi->GetMovementFlags(), mi->GetExtraMovementFlags(), GetPlayer()->GetGUID().ToString(), maskToRemove); \
-            mi->RemoveMovementFlag((maskToRemove)); \
-        } \
+    // MOVEMENTFLAG_ROOT sent from the client is not valid
+    // in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
+    // It will freeze clients that receive this player's move.
+    if ((mi->m_moveFlags & MOVEMENTFLAG_ROOT) != 0)
+      mi->m_moveFlags &= ~MOVEMENTFLAG_ROOT;
+
+    // Cannot hover without SPELL_AURA_HOVER
+    if ((mi->m_moveFlags & MOVEMENTFLAG_HOVER) != 0 && !mover->HasAuraType(SPELL_AURA_HOVER))
+      mi->m_moveFlags &= ~MOVEMENTFLAG_HOVER;
+
+    // Cannot ascend and descend at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_ASCENDING) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_DESCENDING) != 0) {
+        mi->m_moveFlags &= ~(MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING);
+        KickPlayer("User sent illegal move flags");
+      }
     }
-#else
-#define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
-        if (check) \
-            mi->m_moveFlags &= ~maskToRemove;
-#endif
 
-    /*! This must be a packet spoofing attempt. MOVEMENTFLAG_ROOT sent from the client is not valid
-        in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
-        It will freeze clients that receive this player's movement info.
-    */
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & MOVEMENTFLAG_ROOT) != 0, MOVEMENTFLAG_ROOT);
+    // Cannot move left and right at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_LEFT) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_RIGHT) != 0) {
+        mi->m_moveFlags &= ~(MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT);
+        KickPlayer("User sent illegal move flags");
+      }
+    }
 
-    //! Cannot hover without SPELL_AURA_HOVER
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & MOVEMENTFLAG_HOVER) != 0 && !GetPlayer()->HasAuraType(SPELL_AURA_HOVER), MOVEMENTFLAG_HOVER);
+    // Cannot strafe left and right at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_STRAFE_LEFT) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_STRAFE_RIGHT) != 0) {
+        mi->m_moveFlags &= ~(MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+        KickPlayer("User sent illegal move flags");
+      }
+    }
 
-    //! Cannot ascend and descend at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING)) != 0,
-        (MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING));
+    // Cannot pitch up and down at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_PITCH_UP) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_PITCH_DOWN) != 0) {
+        mi->m_moveFlags &= ~(MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN);
+        KickPlayer("User sent illegal move flags");
+      }
+    }
 
-    //! Cannot move left and right at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT)) != 0,
-        (MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT));
+    // Cannot move forward and backward at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_FORWARD) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_BACKWARD) != 0) {
+        mi->m_moveFlags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
+        KickPlayer("User sent illegal move flags");
+      }
+    }
 
-    //! Cannot strafe left and right at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT)) != 0,
-        (MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT));
+    // Cannot walk on water without SPELL_AURA_WATER_WALK
+    if ((mi->m_moveFlags & MOVEMENTFLAG_WATERWALKING) != 0 &&
+        !mover->HasAuraType(SPELL_AURA_WATER_WALK) &&
+        !mover->HasAuraType(SPELL_AURA_GHOST)) {
+      KickPlayer("User sent illegal move flags");
+    }
 
-    //! Cannot pitch up and down at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN)) != 0,
-        (MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN));
+    // Cannot feather fall without SPELL_AURA_FEATHER_FALL
+    if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING_SLOW) != 0 &&
+        !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL)) {
+      KickPlayer("User sent illegal move flags");
+    }
 
-    //! Cannot move forwards and backwards at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD)) != 0,
-        (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD));
+    // Cannot fly without SPELL_AURA_FLY
+    if ((mi->m_moveFlags & MOVEMENTFLAG_FLYING) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0 && mover->HasAuraType(SPELL_AURA_FLY))
+        KickPlayer("User sent illegal move flags");
+    }
 
-    //! Cannot walk on water without SPELL_AURA_WATER_WALK
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & MOVEMENTFLAG_WATERWALKING) != 0 &&
-        !GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK) &&
-        !GetPlayer()->HasAuraType(SPELL_AURA_GHOST),
-        MOVEMENTFLAG_WATERWALKING);
+    // Cannot fly and fall at the same time
+    if ((mi->m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0 || (mi->m_moveFlags & MOVEMENTFLAG_DISABLE_GRAVITY) != 0) {
+      if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING) != 0)
+        mi->m_moveFlags &= ~MOVEMENTFLAG_FALLING;
+    }
 
-    //! Cannot feather fall without SPELL_AURA_FEATHER_FALL
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & MOVEMENTFLAG_FALLING_SLOW) != 0 && !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL),
-        MOVEMENTFLAG_FALLING_SLOW);
-
-    /*! Cannot fly if no fly auras present. Exception is being a GM.
-        Note that we check for account level instead of Player::IsGameMaster() because in some
-        situations it may be feasable to use .gm fly on as a GM without having .gm on,
-        e.g. aerial combat.
-    */
-
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY)) != 0 && GetSecurity() == SEC_PLAYER && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) && !GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED),
-        (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY));
-
-    //! Cannot fly and fall at the same time
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_FALLING)) != 0,
-        MOVEMENTFLAG_FALLING);
-
-    REMOVE_VIOLATING_FLAGS((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0 &&
-        (!GetPlayer()->movespline->Initialized() || GetPlayer()->movespline->Finalized()), MOVEMENTFLAG_SPLINE_ENABLED);
-
-#undef REMOVE_VIOLATING_FLAGS
+    if ((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0 &&
+        (!mover->movespline->Initialized() || mover->movespline->Finalized())) {
+      mi->m_moveFlags &= ~MOVEMENTFLAG_SPLINE_ENABLED;
+    }
 }
 
 void WorldSession::WriteMovementInfo(WorldPacket* data, CMovement* mi)
