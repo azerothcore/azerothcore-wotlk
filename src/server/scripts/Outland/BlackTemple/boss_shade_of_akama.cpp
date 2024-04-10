@@ -25,30 +25,43 @@ enum Says
     SAY_BROKEN_FREE_0               = 0,
     SAY_BROKEN_FREE_1               = 1,
     SAY_BROKEN_FREE_2               = 2,
+    SAY_LOW_HEALTH                  = 3,
+    SAY_DEATH                       = 4,
+
     SAY_BROKEN_S1                   = 0,
     SAY_BROKEN_S2                   = 1
 };
 
 enum Spells
 {
+    // Akama
     SPELL_STEALTH                   = 34189,
-    SPELL_AKAMA_SOUL_CHANNEL        = 40447,
-    SPELL_SHADE_SOUL_CHANNEL        = 40401,
-    SPELL_CHAIN_LIGHTNING           = 39945,
     SPELL_DESTRUCTIVE_POISON        = 40874,
-    SPELL_SHADE_OF_AKAMA_TRIGGER    = 40955,
-    SPELL_AKAMA_SOUL_RETRIEVE       = 40902,
+    SPELL_CHAIN_LIGHTNING           = 39945,
+    SPELL_AKAMA_SOUL_CHANNEL        = 40447,
+    SPELL_FIXATE                    = 40607,
+    SPELL_AKAMA_SOUL_RETRIEVE       = 40902,    // epilogue
+    SPELL_AKAMA_SOUL_EXPEL_CHANNEL  = 40927,    // epilogue
 
-    SPELL_ASHTONGUE_WAVE_B           = 42035,
-    SPELL_SUMMON_ASHTONGUE_SORCERER  = 40476,
-    SPELL_SUMMON_ASHTONGUE_DEFENDER  = 40474
+    // Shade & Channelers
+    SPELL_SHADE_SOUL_CHANNEL        = 40401,
+    SPELL_THREAT                    = 41602,
+    SPELL_SHADE_OF_AKAMA_TRIGGER    = 40955,
+
+    // Summons
+    SPELL_ASHTONGUE_WAVE_A          = 42073,   // unused
+    SPELL_ASHTONGUE_WAVE_B          = 42035,
+    SPELL_SUMMON_ASHTONGUE_SORCERER = 40476,
+    SPELL_SUMMON_ASHTONGUE_DEFENDER = 40474
 };
 
 enum Creatures
 {
-    NPC_ASHTONGUE_CHANNELER         = 23421,
-    NPC_CREATURE_GENERATOR_AKAMA    = 23210,
     NPC_ASHTONGUE_SORCERER          = 23215,
+    NPC_ASHTONGUE_DEFENDER          = 23216,
+    NPC_ASHTONGUE_ELEMENTAL         = 23523,
+    NPC_ASHTONGUE_ROGUE             = 23318,
+    NPC_ASHTONGUE_SPIRITBIND        = 23524,
     NPC_ASHTONGUE_BROKEN            = 23319
 };
 
@@ -56,220 +69,137 @@ enum Misc
 {
     SUMMON_GROUP_BROKENS            = 1,
 
-    POINT_START                     = 0,
-    POINT_CHANNEL_SOUL              = 1,
+    POINT_ENGAGE                    = 0,
+    POINT_OUTRO                     = 1,
 
-    ACTION_AKAMA_DIED               = 1,
-    ACTION_START_ENCOUNTER          = 2,
-    ACTION_STOP_SPAWNING            = 3,
-    ACTION_DESPAWN_ALL              = 4,
-    ACTION_CHANNELERS_START_CHANNEL = 5,
-    ACTION_KILL_CHANNELERS          = 6,
-    ACTION_NO_SORCERERS             = 7,
-    ACTION_SHADE_DIED               = 8,
+    ACTION_GENERATOR_START          = 1,
+    ACTION_GENERATOR_STOP           = 2,
+    ACTION_GENERATOR_DESPAWN_ALL    = 3,
 
-    EVENT_AKAMA_START_ENCOUNTER     = 1,
-    EVENT_AKAMA_START_CHANNEL       = 2,
-    EVENT_SPELL_CHAIN_LIGHTNING     = 4,
-    EVENT_SPELL_DESTRUCTIVE_POISON  = 5,
+    COUNTER_SPAWNS_MAX              = 20,   // Max number of spawns for each generator, number chosen at random
 
-    EVENT_SHADE_CHECK_DISTANCE      = 10,
-    EVENT_SHADE_RESET_ENCOUNTER     = 11,
-    EVENT_SHADE_GATHER_NPCS         = 12,
+    ACTION_AKAMA_START_OUTRO        = 1,
 
-    EVENT_SUMMON_WAVE_B             = 20,
-    EVENT_SUMMON_ASHTONGUE_SORCERER = 21,
-    EVENT_SUMMON_ASHTONGUE_DEFENDER = 22,
-
-    EVENT_AKAMA_SCENE0              = 29,
-    EVENT_AKAMA_SCENE1              = 30,
-    EVENT_AKAMA_SCENE2              = 31,
-    EVENT_AKAMA_SCENE3              = 32,
-    EVENT_AKAMA_SCENE4              = 33,
-    EVENT_AKAMA_SCENE5              = 34,
-    EVENT_AKAMA_SCENE6              = 35,
-    EVENT_AKAMA_SCENE7              = 36
+    FACTION_DEFAULT                 = 1820,
+    FACTION_ENGAGE                  = 1868
 };
+
+Position AkamaEngage = { 517.4877f, 400.79926f, 112.77704f };
+Position AkamaOutro = { 469.0867f,  401.0793f,  118.52704f, 0.087266460061073303f };
+Position ShadeEngage = { 512.48773f, 400.8283f, 112.77704f };
 
 struct boss_shade_of_akama : public BossAI
 {
-    boss_shade_of_akama(Creature* creature) : BossAI(creature, DATA_SHADE_OF_AKAMA), summonsChanneler(me), summonsGenerator(me)
-    {
-        events2.ScheduleEvent(EVENT_SHADE_GATHER_NPCS, 1000);
-    }
+    boss_shade_of_akama(Creature* creature) : BossAI(creature, DATA_SHADE_OF_AKAMA) { }
 
-    SummonList summonsChanneler;
-    SummonList summonsGenerator;
-    EventMap events2;
-
-    void ChannelersAction(int32 action)
-    {
-        for (SummonList::const_iterator i = summonsChanneler.begin(); i != summonsChanneler.end(); ++i)
-            if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-            {
-                if (action == ACTION_CHANNELERS_START_CHANNEL)
-                {
-                    summon->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
-                    summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                }
-                else if (action == ACTION_START_ENCOUNTER)
-                {
-                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                }
-                else if (action == ACTION_KILL_CHANNELERS)
-                {
-                    Unit::Kill(me, summon);
-                }
-            }
-    }
+    std::list<Creature*> channelers;
+    std::list<Creature*> generators;
 
     void Reset() override
     {
-        BossAI::Reset();
-        me->SetReactState(REACT_PASSIVE);
+        channelers.clear();
+        generators.clear();
+
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->SetImmuneToAll(true);
         me->SetWalk(true);
+        me->SetReactState(REACT_DEFENSIVE);
+        BossAI::Reset();
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        for (Creature* generator : generators)
+            generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
+
+        for (Creature* channeler : channelers)
+            channeler->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
         BossAI::EnterEvadeMode(why);
-        summonsGenerator.DoAction(ACTION_DESPAWN_ALL);
-        events2.ScheduleEvent(EVENT_SHADE_RESET_ENCOUNTER, 20000);
-        me->SetVisible(false);
-        ChannelersAction(ACTION_KILL_CHANNELERS);
     }
 
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
-        summonsGenerator.DoAction(ACTION_DESPAWN_ALL);
-        summonsChanneler.DespawnAll();
         me->CastSpell(me, SPELL_SHADE_OF_AKAMA_TRIGGER, true);
-        if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
+
+        for (Creature* generator : generators)
+            generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
+
+        if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+            akama->AI()->DoAction(ACTION_AKAMA_START_OUTRO);
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_AKAMA_SOUL_CHANNEL)
         {
-            akama->SetHomePosition(*akama);
-            akama->AI()->DoAction(ACTION_SHADE_DIED);
+            instance->SetBossState(DATA_SHADE_OF_AKAMA, IN_PROGRESS);
+
+            me->GetCreatureListWithEntryInGrid(channelers, NPC_ASHTONGUE_CHANNELER, 40.0f);
+            me->GetCreatureListWithEntryInGrid(generators, NPC_CREATURE_GENERATOR_AKAMA, 100.0f);
+
+            for (Creature* channeler : channelers)
+                channeler->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            for (Creature* generator : generators)
+                generator->AI()->DoAction(ACTION_GENERATOR_START);
+
+            ScheduleTimedEvent(1200ms, [&]
+            {
+                if (me->GetSpeed(MOVE_WALK) > 0.01f)
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(POINT_ENGAGE, ShadeEngage);
+                }
+            }, 1200ms);
         }
     }
 
-    void DoAction(int32 param) override
+    void MovementInform(uint32 type, uint32 point) override
     {
-        if (param == ACTION_START_ENCOUNTER)
+        if (type == POINT_MOTION_TYPE && point == POINT_ENGAGE)
         {
-            summonsGenerator.DoAction(ACTION_START_ENCOUNTER);
-            ChannelersAction(ACTION_START_ENCOUNTER);
-            events.ScheduleEvent(EVENT_SHADE_CHECK_DISTANCE, 1000);
-        }
-        else if (param == ACTION_AKAMA_DIED)
-        {
-            EnterEvadeMode(EVADE_REASON_OTHER);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveAurasDueToSpell(SPELL_AKAMA_SOUL_CHANNEL);
+            scheduler.CancelAll();
+
+            for (Creature* generator : generators)
+                generator->AI()->DoAction(ACTION_GENERATOR_STOP);
+
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+            {
+                akama->SetReactState(REACT_AGGRESSIVE);
+                akama->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                DoCast(akama, SPELL_THREAT, true);
+                me->AddThreat(akama, 900000.0f);
+                akama->AI()->DoCast(me, SPELL_FIXATE, true);
+                AttackStart(akama);
+            }
+
+            ScheduleTimedEvent(3500ms, [&]
+            {
+                if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+                    me->AddThreat(akama, 900000.0f);
+            }, 3500ms);
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        events2.Update(diff);
-        switch (events2.ExecuteEvent())
-        {
-        case EVENT_SHADE_GATHER_NPCS:
-        {
-            std::list<Creature*> ChannelerList;
-            me->GetCreaturesWithEntryInRange(ChannelerList, 100.0f, NPC_ASHTONGUE_CHANNELER);
-            for (std::list<Creature*>::const_iterator itr = ChannelerList.begin(); itr != ChannelerList.end(); ++itr)
-                summonsChanneler.Summon(*itr);
-
-            std::list<Creature*> SpawnerList;
-            me->GetCreaturesWithEntryInRange(SpawnerList, 100.0f, NPC_CREATURE_GENERATOR_AKAMA);
-            for (std::list<Creature*>::const_iterator itr = SpawnerList.begin(); itr != SpawnerList.end(); ++itr)
-                summonsGenerator.Summon(*itr);
-
-            summonsChanneler.Respawn();
-            summonsGenerator.Respawn();
-            ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
-
-            if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
-                akama->Respawn(true);
-            break;
-        }
-        case EVENT_SHADE_RESET_ENCOUNTER:
-            me->SetVisible(true);
-            summonsGenerator.Respawn();
-            summonsChanneler.Respawn();
-            ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
-
-            if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
-                akama->Respawn(true);
-            break;
-        }
-
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SHADE_CHECK_DISTANCE:
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
-            {
-                int32 slow = me->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
-                if (slow > -100)
-                {
-                    me->SetWalk(true);
-                    me->GetMotionMaster()->MovePoint(POINT_START, 510.0f, 400.7993f, 112.7837f);
-                }
-            }
-            else
-            {
-                int32 slow = me->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
-                if (slow < -100)
-                    me->GetMotionMaster()->Clear();
-                else if (slow == 0)
-                {
-                    summonsGenerator.DoAction(ACTION_NO_SORCERERS);
-                    me->SetWalk(false);
-                }
-            }
-
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                me->SetReactState(REACT_AGGRESSIVE);
-                DoResetThreatList();
-                me->GetVictim()->InterruptNonMeleeSpells(false);
-                me->AddThreat(me->GetVictim(), 1000000.0f);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetImmuneToAll(false);
-                summonsGenerator.DoAction(ACTION_STOP_SPAWNING);
-                break;
-            }
-            events.ScheduleEvent(EVENT_SHADE_CHECK_DISTANCE, 1000);
-            break;
-        }
+        scheduler.Update(diff);
 
         DoMeleeAttackIfReady();
-    }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return !SelectTargetFromPlayerList(120.0f);
     }
 };
 
 struct npc_akama_shade : public ScriptedAI
 {
-    npc_akama_shade(Creature* creature) : ScriptedAI(creature), summons(me)
+    npc_akama_shade(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
     }
 
     InstanceScript* instance;
-    EventMap events;
-    EventMap events2;
-    SummonList summons;
 
     void Reset() override
     {
@@ -279,242 +209,260 @@ struct npc_akama_shade : public ScriptedAI
             return;
         }
 
+        me->SetFaction(FACTION_DEFAULT);
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        me->CastSpell(me, SPELL_STEALTH, true);
-        events.Reset();
-        events2.Reset();
+        DoCastSelf(SPELL_STEALTH, true);
+        me->SetWalk(true);
+        scheduler.CancelAll();
     }
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type != POINT_MOTION_TYPE || point != POINT_CHANNEL_SOUL)
-            return;
+        if (type == POINT_MOTION_TYPE)
+        {
+            switch (point)
+            {
+            case POINT_ENGAGE:
+                me->SetHomePosition(me->GetPosition());
+                me->SetFaction(FACTION_ENGAGE);
+                DoCast(me, SPELL_AKAMA_SOUL_CHANNEL, true);
+                break;
+            case POINT_OUTRO:
+                DoCastSelf(SPELL_AKAMA_SOUL_RETRIEVE, true);
+                ScheduleUniqueTimedEvent(15600ms, [&]
+                {
+                        Talk(SAY_BROKEN_FREE_0);
+                        me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
+                }, 1);
+                ScheduleUniqueTimedEvent(26550ms, [&]
+                {
+                    Talk(SAY_BROKEN_FREE_1);
+                }, 2);
+                ScheduleUniqueTimedEvent(37500ms, [&]
+                {
+                    Talk(SAY_BROKEN_FREE_2);
+                }, 3);
+                ScheduleUniqueTimedEvent(52000ms, [&]
+                {
+                    std::list<Creature*> brokens;
+                    me->GetCreatureListWithEntryInGrid(brokens, NPC_ASHTONGUE_BROKEN, 40.0f);
+                    if (Creature* broken = GetClosestCreatureWithEntry(me, NPC_ASHTONGUE_BROKEN, 40.0f))
+                        broken->AI()->Talk(SAY_BROKEN_S1);
 
-        me->SetFacingTo(0.0f);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE1, 1000);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE2, 16500);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE3, 17500);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE4, 27000);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE5, 37000);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE6, 51000);
-        events2.ScheduleEvent(EVENT_AKAMA_SCENE7, 56000);
+                    for (Creature* broken : brokens)
+                    {
+                        broken->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        broken->SetFaction(FACTION_DEFAULT);
+                        broken->AI()->Talk(SAY_BROKEN_S2, 4800ms);
+                    }
+                }, 4);
+                break;
+            }
+        }
     }
 
     void DoAction(int32 param) override
     {
-        if (param == ACTION_SHADE_DIED)
-            events2.ScheduleEvent(EVENT_AKAMA_SCENE0, 1000);
+        if (param == ACTION_AKAMA_START_OUTRO)
+        {
+            me->SetWalk(false);
+            me->GetMotionMaster()->MovePoint(POINT_OUTRO, AkamaOutro);
+        }
     }
+
+    void JustSummoned(Creature* summon) override
+    {
+        // In Retail they seem to me like they should move in formations of 3 to set points, this is simpler for now
+        ScriptedAI::JustSummoned(summon);
+        float x, y, z;
+        me->GetNearPoint(summon, x, y, z, 25.f, 0, me->GetAngle(summon));
+        summon->SetWalk(true);
+        summon->GetMotionMaster()->MovePoint(POINT_OUTRO, x, y, z);
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override { }
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADE_OF_AKAMA)))
-            shade->AI()->DoAction(ACTION_AKAMA_DIED);
+        if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
+        {
+            shade->SetHomePosition(shade->GetHomePosition());
+            shade->AI()->EnterEvadeMode();
+        }
+
+        me->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 2000);
-        events.ScheduleEvent(EVENT_SPELL_DESTRUCTIVE_POISON, 5000);
+        ScheduleTimedEvent(2s, [&]
+            {
+                DoCastVictim(SPELL_CHAIN_LIGHTNING);
+            }, 10s, 15s);
+        ScheduleTimedEvent(5s, [&]
+            {
+                DoCastVictim(SPELL_DESTRUCTIVE_POISON);
+            }, 4s, 15s);
     }
 
-    void JustSummoned(Creature* summon) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
-        float dist = frand(30.0f, 32.0f);
-        summon->SetWalk(true);
-        summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * std::sin(summon->GetOrientation()), summon->GetPositionZ(), false);
-        summons.Summon(summon);
+        CloseGossipMenuFor(player);
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->RemoveAurasDueToSpell(SPELL_STEALTH);
+        me->GetMotionMaster()->MovePoint(POINT_ENGAGE, AkamaEngage);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        events2.Update(diff);
-        switch (events2.ExecuteEvent())
-        {
-        case EVENT_AKAMA_START_ENCOUNTER:
-            me->RemoveAura(SPELL_STEALTH);
-            me->SetWalk(true);
-            me->GetMotionMaster()->MovePoint(POINT_START, 517.4877f, 400.7993f, 112.7837f, false);
-            events2.ScheduleEvent(EVENT_AKAMA_START_CHANNEL, 11000);
-            break;
-        case EVENT_AKAMA_START_CHANNEL:
-            me->CastSpell(me, SPELL_AKAMA_SOUL_CHANNEL, false);
-            if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADE_OF_AKAMA)))
-            {
-                shade->AI()->AttackStart(me);
-                shade->GetMotionMaster()->Clear();
-                shade->AI()->DoAction(ACTION_START_ENCOUNTER);
-            }
-            break;
-        case EVENT_AKAMA_SCENE0:
-            me->SetWalk(true);
-            me->GetMotionMaster()->MovePoint(POINT_CHANNEL_SOUL, 467.0f, 400.7993f, 118.537f);
-            break;
-        case EVENT_AKAMA_SCENE1:
-            me->CastSpell(me, SPELL_AKAMA_SOUL_RETRIEVE, true);
-            break;
-        case EVENT_AKAMA_SCENE2:
-            Talk(SAY_BROKEN_FREE_0);
-            break;
-        case EVENT_AKAMA_SCENE3:
-            me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
-            break;
-        case EVENT_AKAMA_SCENE4:
-            Talk(SAY_BROKEN_FREE_1);
-            break;
-        case EVENT_AKAMA_SCENE5:
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* broken = ObjectAccessor::GetCreature(*me, *itr))
-                    broken->SetStandState(UNIT_STAND_STATE_KNEEL);
-            Talk(SAY_BROKEN_FREE_2);
-            break;
-        case EVENT_AKAMA_SCENE6:
-            if (Creature* broken = summons.GetCreatureWithEntry(NPC_ASHTONGUE_BROKEN))
-                broken->AI()->Talk(SAY_BROKEN_S1);
-            break;
-        case EVENT_AKAMA_SCENE7:
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* broken = ObjectAccessor::GetCreature(*me, *itr))
-                    broken->AI()->Talk(SAY_BROKEN_S2);
-            break;
-        }
-
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_CHAIN_LIGHTNING:
-            me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
-            events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, urand(10000, 15000));
-            break;
-        case EVENT_SPELL_DESTRUCTIVE_POISON:
-            me->CastSpell(me, SPELL_DESTRUCTIVE_POISON, false);
-            events.ScheduleEvent(EVENT_SPELL_DESTRUCTIVE_POISON, urand(4000, 5000));
-            break;
-        }
-
+        scheduler.Update(diff);
         DoMeleeAttackIfReady();
-    }
-
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
-    {
-        if (action == 0)
-        {
-            CloseGossipMenuFor(player);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            events2.ScheduleEvent(EVENT_AKAMA_START_ENCOUNTER, 0);
-        }
     }
 };
 
-struct npc_creature_generator_akama : public NullCreatureAI
+struct npc_creature_generator_akama : public ScriptedAI
 {
-    npc_creature_generator_akama(Creature* creature) : NullCreatureAI(creature), summons(me)
+    npc_creature_generator_akama(Creature* creature) : ScriptedAI(creature), summons(me)
     {
         instance = creature->GetInstanceScript();
     }
 
+    uint8 spawnCounter = 0;
+
     void Reset() override
     {
-        events.Reset();
         summons.DespawnAll();
+        scheduler.CancelAll();
     }
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
-        if (summon->GetEntry() == NPC_ASHTONGUE_SORCERER)
+        spawnCounter++;
+        ScriptedAI::JustSummoned(summon);
+
+        switch (summon->GetEntry())
         {
-            std::list<Creature*> channelerList;
-            me->GetCreaturesWithEntryInRange(channelerList, 120.0f, NPC_ASHTONGUE_CHANNELER);
-            for (std::list<Creature*>::const_iterator itr = channelerList.begin(); itr != channelerList.end(); ++itr)
+        case NPC_ASHTONGUE_SORCERER:
+            if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
             {
-                if ((*itr)->IsAlive() || (*itr)->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                    continue;
-
-                summon->SetInCombatWithZone();
-                summon->SetReactState(REACT_PASSIVE);
-                summon->GetMotionMaster()->MovePoint(POINT_START, **itr);
-                (*itr)->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                return;
+                float x, y, z;
+                shade->GetNearPoint(shade, x, y, z, 20.f, 0, shade->GetAngle(summon));
+                summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
             }
-        }
-
-        summon->SetInCombatWithZone();
-        if (Unit* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
-        {
-            summon->AddThreat(akama, 500.0f);
-            summon->AI()->AttackStart(akama);
+            break;
+        default:
+            summon->SetInCombatWithZone();
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
+                summon->AI()->AttackStart(akama);
+            break;
         }
     }
 
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
+        spawnCounter--;
         summon->DespawnOrUnsummon(10000);
         summons.Despawn(summon);
     }
 
     void DoAction(int32 param) override
     {
-        if (param == ACTION_STOP_SPAWNING || param == ACTION_DESPAWN_ALL)
+        switch (param)
         {
-            events.Reset();
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+        case ACTION_GENERATOR_STOP:
+            scheduler.CancelAll();
+            break;
+        case ACTION_GENERATOR_START:
+            if (me->GetPositionY() > 400.0f)    // Right Side
             {
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                ScheduleTimedEvent(10s, [&]
                 {
-                    if (summon->GetEntry() != NPC_ASHTONGUE_SORCERER)
-                        continue;
-                    summon->InterruptNonMeleeSpells(false);
-                    summon->GetMotionMaster()->Clear();
-                    summon->SetInCombatWithZone();
-                }
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_ASHTONGUE_WAVE_B);
+                }, 50s, 60s);
+
+                ScheduleTimedEvent(2s, 5s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_SUMMON_ASHTONGUE_DEFENDER);
+                }, 30s, 40s);
             }
-        }
-        if (param == ACTION_DESPAWN_ALL)
+
+            if (me->GetPositionY() < 400.0f)    // Left Side
+            {
+                ScheduleTimedEvent(3s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_ASHTONGUE_WAVE_B);
+                }, 50s, 60s);
+
+                ScheduleTimedEvent(2s, 5s, [&]
+                {
+                    if (spawnCounter <= COUNTER_SPAWNS_MAX)
+                        DoCastSelf(SPELL_SUMMON_ASHTONGUE_SORCERER);
+                }, 30s, 35s);
+            }
+            break;
+        case ACTION_GENERATOR_DESPAWN_ALL:
             summons.DespawnAll();
-        else if (param == ACTION_NO_SORCERERS)
-            events.CancelEvent(EVENT_SUMMON_ASHTONGUE_SORCERER);
-        else if (param == ACTION_START_ENCOUNTER)
-        {
-            events.ScheduleEvent(EVENT_SUMMON_WAVE_B, 5000);
-            events.ScheduleEvent(EVENT_SUMMON_ASHTONGUE_DEFENDER, 20000);
-            events.ScheduleEvent(EVENT_SUMMON_ASHTONGUE_SORCERER, 35000);
+            scheduler.CancelAll();
+            break;
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SUMMON_WAVE_B:
-            me->CastSpell(me, SPELL_ASHTONGUE_WAVE_B, true);
-            events.ScheduleEvent(EVENT_SUMMON_WAVE_B, 45000);
-            break;
-        case EVENT_SUMMON_ASHTONGUE_SORCERER: // left
-            me->CastSpell(me, SPELL_SUMMON_ASHTONGUE_SORCERER, true);
-            events.ScheduleEvent(EVENT_SUMMON_ASHTONGUE_SORCERER, 45000);
-            break;
-        case EVENT_SUMMON_ASHTONGUE_DEFENDER: // right
-            me->CastSpell(me, SPELL_SUMMON_ASHTONGUE_DEFENDER, true);
-            events.ScheduleEvent(EVENT_SUMMON_ASHTONGUE_DEFENDER, 45000);
-            break;
-        default:
-            break;
-        }
+        scheduler.Update(diff);
     }
 
 private:
-    EventMap events;
     SummonList summons;
     InstanceScript* instance;
+};
+
+struct npc_ashtongue_sorcerer : public NullCreatureAI
+{
+    npc_ashtongue_sorcerer(Creature* creature) : NullCreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
+
+    void MovementInform(uint32 type, uint32 point) override
+    {
+        if (type == POINT_MOTION_TYPE && point == POINT_ENGAGE)
+            me->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
+    }
+
+private:
+    InstanceScript* instance;
+};
+
+struct npc_ashtongue_channeler : public NullCreatureAI
+{
+    npc_ashtongue_channeler(Creature* creature) : NullCreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
+
+    void Reset() override
+    {
+        scheduler.Schedule(3600ms, [this](TaskContext context)
+        {
+            if (!me->HasUnitState(UNIT_STATE_CASTING))
+                me->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
+
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+private:
+    InstanceScript* instance;
+    TaskScheduler scheduler;
 };
 
 class spell_shade_of_akama_shade_soul_channel : public AuraScript
@@ -562,6 +510,8 @@ void AddSC_boss_shade_of_akama()
     RegisterBlackTempleCreatureAI(boss_shade_of_akama);
     RegisterBlackTempleCreatureAI(npc_akama_shade);
     RegisterBlackTempleCreatureAI(npc_creature_generator_akama);
+    RegisterBlackTempleCreatureAI(npc_ashtongue_channeler);
+    RegisterBlackTempleCreatureAI(npc_ashtongue_sorcerer);
     RegisterSpellScript(spell_shade_of_akama_shade_soul_channel);
     RegisterSpellScript(spell_shade_of_akama_akama_soul_expel);
 }

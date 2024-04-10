@@ -192,16 +192,22 @@ bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, By
     return false;
 }
 
-bool ScriptMgr::OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index)
+bool ScriptMgr::ShouldTrackValuesUpdatePosByIndex(Unit const* unit, uint8 updateType, uint16 index)
 {
-    auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script) { return script->OnBuildValuesUpdate(unit, updateType, fieldBuffer, target, index); });
+    auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script) { return script->ShouldTrackValuesUpdatePosByIndex(unit, updateType, index); });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
     return false;
+}
+
+void ScriptMgr::OnPatchValuesUpdate(Unit const* unit, ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player* target)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnPatchValuesUpdate(unit, valuesUpdateBuf, posPointers, target);
+    });
 }
 
 void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)
