@@ -22615,4 +22615,5 @@ UPDATE `creature` SET `position_z` = 444.3422     WHERE `guid` = 128467  AND `id
 UPDATE `creature` SET `position_z` = 444.36792    WHERE `guid` = 128469  AND `id1` = 29212; -- Zdiff = 0.10391235  Risen Drudge
 UPDATE `creature` SET `position_z` = 444.36954    WHERE `guid` = 128473  AND `id1` = 29212; -- Zdiff = 0.10153198  Risen Drudge
 UPDATE `creature` SET `position_z` = 378.2278     WHERE `guid` = 128753  AND `id1` = 29580; -- Zdiff = 1.0608215   Teleport - Hall -> Heart
-UPDATE `creature` SET `position_z` = 420.9005     WHERE `guid` = 128754  AND `id1` = 29581; -- Zdiff = 0.120513916 Teleport - Heart -> Hall
+ -- Zdiff = 0.120513916 Teleport - Heart -> Hall
+UPDATE `creature` SET `position_z` = 420.9005     WHERE `guid` = 128754  AND `id1` = 29581;
