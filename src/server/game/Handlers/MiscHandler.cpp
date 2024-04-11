@@ -613,22 +613,22 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
-    uint8 status;
-    recv_data >> guid;
-    recv_data >> status;
+    ObjectGuid resurrectOfferer;
+    bool accept;
+    recv_data >> resurrectOfferer;
+    recv_data >> accept;
 
     // Xinef: Prevent resurrect with prevent resurrection aura
     if (GetPlayer()->IsAlive() || GetPlayer()->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
         return;
 
-    if (status == 0)
+    if (accept == 0)
     {
         GetPlayer()->clearResurrectRequestData();           // reject
         return;
     }
 
-    if (!GetPlayer()->isResurrectRequestedBy(guid))
+    if (!GetPlayer()->isResurrectRequestedBy(resurrectOfferer))
         return;
 
     GetPlayer()->ResurectUsingRequestData();
