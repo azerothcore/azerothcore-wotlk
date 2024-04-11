@@ -284,7 +284,8 @@ public:
                 {
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
-                    summon->CallForHelp(40.0f);
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                    summon->CallForHelp(150.0f);
                 }
             }
             // Else look for a random target on the side the summoned NPC is
@@ -309,7 +310,8 @@ public:
                     Player* target = tList[urand(0, tList.size() - 1)];
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
-                    summon->CallForHelp(40.0f);
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                    summon->CallForHelp(150.0f);
                 }
             }
         }
