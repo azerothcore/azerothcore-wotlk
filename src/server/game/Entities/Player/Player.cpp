@@ -2160,8 +2160,6 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
     return nullptr;
 }
 
-bool Player::IsFalling () const { return (m_movement.m_moveFlags & MOVEMENTFLAG_FALLING) != 0; }
-
 void Player::SetInWater(bool apply)
 {
     if (m_isInWater == apply)
