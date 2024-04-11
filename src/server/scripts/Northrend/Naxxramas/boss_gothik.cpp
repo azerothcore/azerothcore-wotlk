@@ -287,11 +287,30 @@ public:
                     summon->CallForHelp(40.0f);
                 }
             }
-            // Else look for a target in the side the summoned NPC is
-            else if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(150.0f, 0, true))
+            // Else look for a random target on the side the summoned NPC is
+            else
             {
-                summon->AI()->AttackStart(plr);
-                summon->SetInCombatWithZone();
+                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                std::vector<Player*> tList;
+                for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                {
+                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+                    {
+                        continue;
+                    }
+                    if (IN_LIVE_SIDE(itr->GetSource()) != IN_LIVE_SIDE(summon))
+                    {
+                        continue;
+                    }
+                    tList.push_back(itr->GetSource());
+                }
+                if (!tList.empty())
+                {
+                    Player* target = tList[urand(0, tList.size() - 1)];
+                    summon->AI()->AttackStart(target);
+                    summon->SetInCombatWithZone();
+                    summon->CallForHelp(40.0f);
+                }
             }
         }
 
