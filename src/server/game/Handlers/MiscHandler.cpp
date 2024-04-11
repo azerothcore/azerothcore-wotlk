@@ -579,8 +579,8 @@ void WorldSession::HandleBugOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
+    ObjectGuid corpseGUID;
+    recv_data >> corpseGUID;
 
     if (m_player->IsAlive())
         return;
