@@ -406,8 +406,8 @@ void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 
-    uint32 unk;
-    recvData >> unk;
+    uint32 corpseTransportGUID;
+    recvData >> corpseTransportGUID;
 
     WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4 + 4 + 4 + 4);
     data << float(0);
