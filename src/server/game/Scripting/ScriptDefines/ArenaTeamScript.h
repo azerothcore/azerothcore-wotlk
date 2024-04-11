@@ -21,10 +21,20 @@
 #include "Battleground.h"
 #include "ScriptObject.h"
 
+enum ArenaTeamHook
+{
+    ARENATEAMHOOK_ON_GET_SLOT_BY_TYPE,
+    ARENATEAMHOOK_ON_GET_ARENA_POINTS,
+    ARENATEAMHOOK_ON_TYPEID_TO_QUEUEID,
+    ARENATEAMHOOK_ON_QUEUEID_TO_ARENA_TYPE,
+    ARENATEAMHOOK_ON_SET_ARENA_MAX_PLAYERS_PER_TEAM,
+    ARENATEAMHOOK_END
+};
+
 class ArenaTeamScript : public ScriptObject
 {
 protected:
-    ArenaTeamScript(const char* name);
+    ArenaTeamScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; };

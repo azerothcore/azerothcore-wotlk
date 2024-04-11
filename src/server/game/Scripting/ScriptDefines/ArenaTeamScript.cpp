@@ -21,48 +21,38 @@
 
 void ScriptMgr::OnGetSlotByType(const uint32 type, uint8& slot)
 {
-    ExecuteScript<ArenaTeamScript>([&](ArenaTeamScript* script)
-    {
-        script->OnGetSlotByType(type, slot);
-    });
+    CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_GET_SLOT_BY_TYPE, script->OnGetSlotByType(type, slot));
 }
 
 void ScriptMgr::OnGetArenaPoints(ArenaTeam* at, float& points)
 {
-    ExecuteScript<ArenaTeamScript>([&](ArenaTeamScript* script)
-    {
-        script->OnGetArenaPoints(at, points);
-    });
+    CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_GET_ARENA_POINTS, script->OnGetArenaPoints(at, points));
 }
 
 void ScriptMgr::OnArenaTypeIDToQueueID(const BattlegroundTypeId bgTypeId, const uint8 arenaType, uint32& queueTypeID)
 {
-    ExecuteScript<ArenaTeamScript>([&](ArenaTeamScript* script)
-    {
-        script->OnTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
-    });
+    CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_TYPEID_TO_QUEUEID, script->OnTypeIDToQueueID(bgTypeId, arenaType, queueTypeID));
 }
 
 void ScriptMgr::OnArenaQueueIdToArenaType(const BattlegroundQueueTypeId bgQueueTypeId, uint8& ArenaType)
 {
-    ExecuteScript<ArenaTeamScript>([&](ArenaTeamScript* script)
-    {
-        script->OnQueueIdToArenaType(bgQueueTypeId, ArenaType);
-    });
+    CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_QUEUEID_TO_ARENA_TYPE, script->OnQueueIdToArenaType(bgQueueTypeId, ArenaType));
 }
 
 void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPlayerPerTeam)
 {
-    ExecuteScript<ArenaTeamScript>([&](ArenaTeamScript* script)
-    {
-        script->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam);
-    });
+    CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_SET_ARENA_MAX_PLAYERS_PER_TEAM, script->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam));
 }
 
-ArenaTeamScript::ArenaTeamScript(const char* name)
-    : ScriptObject(name)
+ArenaTeamScript::ArenaTeamScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, ARENATEAMHOOK_END)
 {
-    ScriptRegistry<ArenaTeamScript>::AddScript(this);
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < ARENATEAMHOOK_END; i++)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<ArenaTeamScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<ArenaTeamScript>;
