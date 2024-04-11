@@ -21,11 +21,19 @@
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
 
+enum ArenaHook
+{
+    ARENAHOOK_CAN_ADD_MEMBER,
+    ARENAHOOK_ON_GET_POINTS,
+    ARENAHOOK_CAN_SAVE_TO_DB,
+    ARENAHOOK_END
+};
+
 class ArenaScript : public ScriptObject
 {
 protected:
 
-    ArenaScript(const char* name);
+    ArenaScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
 
