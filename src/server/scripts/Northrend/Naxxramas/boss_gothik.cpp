@@ -277,32 +277,21 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+            // If central gate is open, attack any one
+            if (gateOpened)
             {
-                if (gateOpened)
+                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
                 {
                     summon->AI()->AttackStart(target);
+                    summon->SetInCombatWithZone();
                     summon->CallForHelp(40.0f);
                 }
-                else
-                {
-                    if (summon->GetEntry() == NPC_LIVING_TRAINEE ||
-                        summon->GetEntry() == NPC_LIVING_KNIGHT  ||
-                        summon->GetEntry() == NPC_LIVING_RIDER   )
-                    {
-                        if (IN_LIVE_SIDE(target))
-                        {
-                            summon->AI()->AttackStart(target);
-                        }
-                    }
-                    else
-                    {
-                        if (!IN_LIVE_SIDE(target))
-                        {
-                            summon->AI()->AttackStart(target);
-                        }
-                    }
-                }
+            }
+            // Else look for a target in the side the summoned NPC is
+            else if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(150.0f, 0, true))
+            {
+                summon->AI()->AttackStart(plr);
+                summon->SetInCombatWithZone();
             }
         }
 
