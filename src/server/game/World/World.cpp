@@ -2079,7 +2079,7 @@ void World::SetInitialWorldSettings()
     Player::DeleteOldCharacters();
 
     // Delete all items which have been deleted X days before
-    Player::DeleteOldItems();
+    Player::DeleteOldRecoveryItems();
 
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();
