@@ -29,7 +29,17 @@
 
 namespace lfg
 {
-    LFGPlayerScript::LFGPlayerScript() : PlayerScript("LFGPlayerScript") { }
+    LFGPlayerScript::LFGPlayerScript() :
+        PlayerScript("LFGPlayerScript",
+        {
+            PLAYERHOOK_ON_LEVEL_CHANGED,
+            PLAYERHOOK_ON_LOGOUT,
+            PLAYERHOOK_ON_LOGIN,
+            PLAYERHOOK_ON_BIND_TO_INSTANCE,
+            PLAYERHOOK_ON_MAP_CHANGED
+        })
+    {
+    }
 
     void LFGPlayerScript::OnLevelChanged(Player* player, uint8 /*oldLevel*/)
     {
