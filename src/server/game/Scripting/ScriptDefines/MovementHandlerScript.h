@@ -21,10 +21,16 @@
 #include "Object.h"
 #include "ScriptObject.h"
 
+enum MovementHook
+{
+    MOVEMENTHOOK_ON_PLAYER_MOVE,
+    MOVEMENTHOOK_END
+};
+
 class MovementHandlerScript : public ScriptObject
 {
 protected:
-    MovementHandlerScript(const char* name);
+    MovementHandlerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     //Called whenever a player moves
