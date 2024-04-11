@@ -24,18 +24,6 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
     CALL_ENABLED_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE, script->OnPlayerMove(player, movementInfo, opcode));
 }
 
-// Custom Script
-bool ScriptMgr::OnPlayerMoveCheck(Player* player, ObjectGuid guid, MovementInfo movementInfo) const
-{
-    CALL_ENABLED_BOOLEAN_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE_CHECK, !script->OnPlayerMoveCheck(player, guid, movementInfo));
-}
-
-// Custom Script
-void ScriptMgr::OnPlayerMoveKnockBackAck(Player* player, ObjectGuid guid, MovementInfo movementInfo) const
-{
-    CALL_ENABLED_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE_KNOCK_BACK_ACK, script->OnPlayerMoveKnockBackAck(player, guid, movementInfo));
-}
-
 MovementHandlerScript::MovementHandlerScript(const char* name, std::vector<uint16> enabledHooks) :
     ScriptObject(name, MOVEMENTHOOK_END)
 {
