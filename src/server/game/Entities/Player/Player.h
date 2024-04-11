@@ -45,6 +45,9 @@
 #include <string>
 #include <vector>
 
+extern void PlayerInitialize ();
+extern void PlayerDestroy ();
+
 struct CreatureTemplate;
 struct Mail;
 struct TrainerSpell;

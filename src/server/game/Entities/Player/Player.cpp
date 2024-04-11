@@ -88,6 +88,20 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+static bool s_initialized;
+
+
+static BOOL LogoutRequestHandler (WorldSession* ses,
+                                  Opcodes       msgId,
+                                  uint32_t      eventTime,
+                                  WorldPacket*  msg);
+
+struct LogoutResponse {
+  BOOL logoutFailed;
+  bool instantLogout;
+};
+
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -16297,3 +16311,67 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 {
     ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
 }
+
+
+/****************************************************************************
+*
+*   NETMESSAGE HANDLERS
+*
+***/
+
+//===========================================================================
+static BOOL LogoutRequestHandler (WorldSession* ses,
+                                  Opcodes       msgId,
+                                  uint32_t      eventTime,
+                                  WorldPacket*  msg) {
+
+  Player* const player = ses->ActivePlayer();
+  if (!player) return FALSE;
+
+  LogoutResponse res;
+  res.logoutFailed = FALSE;
+  res.instantLogout = FALSE;
+
+  if (player->IsInCombat() || player->IsFalling()
+      || (!player->CanFreeMove() && !player->IsOnTaxi())) {
+    // Players can't log out while in combat or while falling
+    // or when they are not in control of their character
+    res.logoutFailed = TRUE;
+  }
+  else if (player->IsOnTaxi() || player->IsResting()) {
+    // Players can log out instantly while on taxi or while resting
+    res.instantLogout = TRUE;
+  }
+
+  // Send the logout response
+  WorldPacket outbound(SMSG_LOGOUT_RESPONSE, sizeof(res));
+  outbound << res.logoutFailed;
+  outbound << res.instantLogout;
+  ses->SendPacket(&outbound);
+
+  if (res.logoutFailed == FALSE) {
+    // Initiate the character logout process
+    ses->CharacterLogout(res.instantLogout);
+  }
+  return TRUE;
+}
+
+
+/****************************************************************************
+*
+*   Public functions
+*
+***/
+
+void PlayerInitialize () {
+  if (s_initialized) return;
+  WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, LogoutRequestHandler);
+  s_initialized = true;
+}
+
+void PlayerDestroy () {
+  if (!s_initialized) return;
+  WorldSocket::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
+  s_initialized = false;
+}
+

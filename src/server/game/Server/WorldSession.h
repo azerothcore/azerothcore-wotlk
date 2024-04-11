@@ -85,7 +85,6 @@ namespace WorldPackets
     namespace Character
     {
         class LogoutCancel;
-        class LogoutRequest;
         class ShowingCloak;
         class ShowingHelm;
         class PlayedTimeClient;
@@ -333,6 +332,7 @@ public:
     WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
+    void CharacterLogout (bool instant);
     bool CharacterLoggingOut () const { return this->m_loggingOut; }
     void CharacterRemoveFromGame(bool save);
 
@@ -387,13 +387,6 @@ public:
 
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
-
-    /// Engage the logout process for the user
-    void SetLogoutStartTime(time_t requestTime)
-    {
-        m_loggingOut = true;
-        _logoutTime = requestTime;
-    }
 
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
@@ -594,7 +587,6 @@ public:                                                 // opcodes handlers
     void HandleLootReleaseOpcode(WorldPacket& recvPacket);
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
-    void HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& logoutRequest);
     void HandlePlayerLogout(WorldPacket &msg);
     void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
@@ -1156,7 +1148,7 @@ private:
     // Warden
     std::unique_ptr<Warden> _warden;                    // Remains nullptr if Warden system is not enabled by config
 
-    time_t _logoutTime;
+    time_t m_logoutRequestTime;
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer
     bool m_loggingOut;

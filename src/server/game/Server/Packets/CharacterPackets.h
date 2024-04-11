@@ -44,25 +44,6 @@ namespace WorldPackets
             bool ShowHelm = false;
         };
 
-        class LogoutRequest final : public ClientPacket
-        {
-        public:
-            LogoutRequest(WorldPacket&& packet) : ClientPacket(std::move(packet)) { }
-
-            void Read() override { }
-        };
-
-        class LogoutResponse final : public ServerPacket
-        {
-        public:
-            LogoutResponse() : ServerPacket(SMSG_LOGOUT_RESPONSE, 4 + 1) { }
-
-            WorldPacket const* Write() override;
-
-            uint32 LogoutResult = 0;
-            bool Instant = false;
-        };
-
         class LogoutComplete final : public ServerPacket
         {
         public:

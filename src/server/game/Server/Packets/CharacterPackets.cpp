@@ -27,13 +27,6 @@ void WorldPackets::Character::ShowingHelm::Read()
     _worldPacket >> ShowHelm;
 }
 
-WorldPacket const* WorldPackets::Character::LogoutResponse::Write()
-{
-    _worldPacket << uint32(LogoutResult);
-    _worldPacket << uint8(Instant);
-    return &_worldPacket;
-}
-
 void WorldPackets::Character::PlayedTimeClient::Read()
 {
     _worldPacket >> TriggerScriptEvent;

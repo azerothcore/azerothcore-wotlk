@@ -61,6 +61,7 @@
 #include <openssl/opensslv.h>
 
 #include "FriendList.h"
+#include "Player.h"
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include "ServiceWin32.h"
@@ -384,6 +385,7 @@ int main(int argc, char** argv)
         LOG_INFO("server.worldserver", "Starting up anti-freeze thread ({} seconds max stuck time)...", coreStuckTime);
     }
 
+    PlayerInitialize();
     FriendListInitialize();
 
     LOG_INFO("server.worldserver", "{} (worldserver-daemon) ready...", GitRevision::GetFullVersion());
@@ -420,6 +422,8 @@ int main(int argc, char** argv)
 
     // Shutdown starts here
     threadPool.reset();
+
+    PlayerDestroy();
     FriendListDestroy();
 
     sLog->SetSynchronous();

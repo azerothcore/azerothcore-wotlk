@@ -413,66 +413,6 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
 }
 
-void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& /*logoutRequest*/)
-{
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - {}", GetSecurity());
-
-    if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
-        DoLootRelease(lguid);
-
-    bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
-                          || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsOnTaxi();
-
-    bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
-                                     && GetPlayer()->isAFK() && sAreaTableStore.LookupEntry(GetPlayer()->GetAreaId())->IsSanctuary();
-
-    bool preventAfkLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2
-                            && GetPlayer()->isAFK();
-
-    /// @todo: Possibly add RBAC permission to log out in combat
-    bool canLogoutInCombat = GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING);
-
-    uint32 reason = 0;
-    if (GetPlayer()->IsInCombat() && !canLogoutInCombat)
-        reason = 1;
-    else if (GetPlayer()->m_movement.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR))
-        reason = 3;                                         // is jumping or falling
-    else if (preventAfkSanctuaryLogout || preventAfkLogout || GetPlayer()->duel || GetPlayer()->HasAura(9454)) // is dueling or frozen by GM via freeze command
-        reason = 2;                                         // FIXME - Need the correct value
-
-    WorldPackets::Character::LogoutResponse logoutResponse;
-    logoutResponse.LogoutResult = reason;
-    logoutResponse.Instant = instantLogout;
-    SendPacket(logoutResponse.Write());
-
-    if (reason)
-    {
-        SetLogoutStartTime(0);
-        return;
-    }
-
-    //instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in worldserver.conf
-    if (instantLogout)
-    {
-        CharacterRemoveFromGame(true);
-        return;
-    }
-
-    // not set flags if player can't free move to prevent lost state at logout cancel
-    if (GetPlayer()->CanFreeMove())
-    {
-        if (GetPlayer()->GetStandState() == UNIT_STANDING)
-        {
-            GetPlayer()->SetStandState(UNIT_SITTING);
-        }
-
-        GetPlayer()->SetRooted(true);
-        GetPlayer()->SetUnitFlag(UNIT_FLAG_STUNNED);
-    }
-
-    SetLogoutStartTime(GameTime::GetGameTime().count());
-}
-
 //===========================================================================
 void WorldSession::HandlePlayerLogout(WorldPacket &msg)
 {
@@ -489,7 +429,8 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
     if (!GetPlayer())
         return;
 
-    SetLogoutStartTime(0);
+    m_loggingOut = false;
+    m_logoutRequestTime = 0;
 
     SendPacket(WorldPackets::Character::LogoutCancelAck().Write());
 
