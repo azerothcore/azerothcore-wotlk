@@ -21,16 +21,30 @@
 
 void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
 {
-    ExecuteScript<MovementHandlerScript>([&](MovementHandlerScript* script)
-    {
-        script->OnPlayerMove(player, movementInfo, opcode);
-    });
+    CALL_ENABLED_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE, script->OnPlayerMove(player, movementInfo, opcode));
 }
 
-MovementHandlerScript::MovementHandlerScript(const char* name) :
-    ScriptObject(name)
+// Custom Script
+bool ScriptMgr::OnPlayerMoveCheck(Player* player, ObjectGuid guid, MovementInfo movementInfo) const
 {
-    ScriptRegistry<MovementHandlerScript>::AddScript(this);
+    CALL_ENABLED_BOOLEAN_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE_CHECK, !script->OnPlayerMoveCheck(player, guid, movementInfo));
+}
+
+// Custom Script
+void ScriptMgr::OnPlayerMoveKnockBackAck(Player* player, ObjectGuid guid, MovementInfo movementInfo) const
+{
+    CALL_ENABLED_HOOKS(MovementHandlerScript, MOVEMENTHOOK_ON_PLAYER_MOVE_KNOCK_BACK_ACK, script->OnPlayerMoveKnockBackAck(player, guid, movementInfo));
+}
+
+MovementHandlerScript::MovementHandlerScript(const char* name, std::vector<uint16> enabledHooks) :
+    ScriptObject(name, MOVEMENTHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < MOVEMENTHOOK_END; i++)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<MovementHandlerScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<MovementHandlerScript>;

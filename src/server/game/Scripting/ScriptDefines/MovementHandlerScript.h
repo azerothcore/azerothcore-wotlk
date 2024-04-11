@@ -21,14 +21,26 @@
 #include "Object.h"
 #include "ScriptObject.h"
 
+enum MovementHook
+{
+    MOVEMENTHOOK_ON_PLAYER_MOVE,
+    MOVEMENTHOOK_ON_PLAYER_MOVE_CHECK, // Custom Script
+    MOVEMENTHOOK_ON_PLAYER_MOVE_KNOCK_BACK_ACK, // Custom Script
+    MOVEMENTHOOK_END
+};
+
 class MovementHandlerScript : public ScriptObject
 {
 protected:
-    MovementHandlerScript(const char* name);
+    MovementHandlerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     //Called whenever a player moves
     virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
+
+    // Custom Script
+    virtual bool OnPlayerMoveCheck(Player* /*player*/, ObjectGuid /*guid*/, MovementInfo /*movementInfo*/) const { return true; }
+    virtual void OnPlayerMoveKnockBackAck(Player* /*player*/, ObjectGuid /*guid*/, MovementInfo /*movementInfo*/) const { }
 };
 
 #endif
