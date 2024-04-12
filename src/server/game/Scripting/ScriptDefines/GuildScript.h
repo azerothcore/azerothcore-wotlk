@@ -20,11 +20,29 @@
 
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
+#include <vector>
+
+enum GuildHook
+{
+    GUILDHOOK_ON_ADD_MEMBER,
+    GUILDHOOK_ON_REMOVE_MEMBER,
+    GUILDHOOK_ON_MOTD_CHANGED,
+    GUILDHOOK_ON_INFO_CHANGED,
+    GUILDHOOK_ON_CREATE,
+    GUILDHOOK_ON_DISBAND,
+    GUILDHOOK_ON_MEMBER_WITDRAW_MONEY,
+    GUILDHOOK_ON_MEMBER_DEPOSIT_MONEY,
+    GUILDHOOK_ON_ITEM_MOVE,
+    GUILDHOOK_ON_EVENT,
+    GUILDHOOK_ON_BANK_EVENT,
+    GUILDHOOK_CAN_GUILD_SEND_BANK_LIST,
+    GUILDHOOK_END
+};
 
 class GuildScript : public ScriptObject
 {
 protected:
-    GuildScript(const char* name);
+    GuildScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
@@ -54,8 +72,7 @@ public:
     virtual void OnMemberDepositMoney(Guild* /*guild*/, Player* /*player*/, uint32& /*amount*/) { }
 
     // Called when a guild member moves an item in a guild bank.
-    virtual void OnItemMove(Guild* /*guild*/, Player* /*player*/, Item* /*pItem*/, bool /*isSrcBank*/, uint8 /*srcContainer*/, uint8 /*srcSlotId*/,
-            bool /*isDestBank*/, uint8 /*destContainer*/, uint8 /*destSlotId*/) { }
+    virtual void OnItemMove(Guild* /*guild*/, Player* /*player*/, Item* /*pItem*/, bool /*isSrcBank*/, uint8 /*srcContainer*/, uint8 /*srcSlotId*/, bool /*isDestBank*/, uint8 /*destContainer*/, uint8 /*destSlotId*/) { }
 
     virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, ObjectGuid::LowType /*playerGuid1*/, ObjectGuid::LowType /*playerGuid2*/, uint8 /*newRank*/) { }
 
