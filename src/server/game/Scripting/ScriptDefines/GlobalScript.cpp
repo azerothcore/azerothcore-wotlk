@@ -91,7 +91,7 @@ bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellI
 
 bool ScriptMgr::OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_SPELL_HEALING_BONUS_TAKEN_NEGATIVE_MODIFIERS, script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(GlobalScript, GLOBALHOOK_ON_SPELL_HEALING_BONUS_TAKEN_NEGATIVE_MODIFIERS, script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val));
 }
 
 void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)

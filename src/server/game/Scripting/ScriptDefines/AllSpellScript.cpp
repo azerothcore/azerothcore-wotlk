@@ -46,7 +46,7 @@ bool ScriptMgr::CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEf
 
 bool ScriptMgr::CanScalingEverything(Spell* spell)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_SCALING_EVERYTHING, script->CanScalingEverything(spell));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllSpellScript, ALLSPELLHOOK_CAN_SCALING_EVERYTHING, script->CanScalingEverything(spell));
 }
 
 bool ScriptMgr::CanSelectSpecTalent(Spell* spell)

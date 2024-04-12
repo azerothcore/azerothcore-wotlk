@@ -79,4 +79,10 @@ inline bool ReturnValidBool(Optional<bool> ret, bool need = false)
     for (auto const& script : ScriptRegistry<scriptType>::EnabledHooks[hookType]) { if (action) return false; } \
     return true;
 
+#define CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(scriptType, hookType, action) \
+    if (ScriptRegistry<scriptType>::EnabledHooks[hookType].empty()) \
+        return false; \
+    for (auto const& script : ScriptRegistry<scriptType>::EnabledHooks[hookType]) { if (action) return false; } \
+    return false;
+
 #endif // _SCRIPT_MGR_MACRO_H_

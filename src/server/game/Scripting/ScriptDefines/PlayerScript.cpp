@@ -426,7 +426,7 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid Battlemast
 
 bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_SHOULD_BE_REWARDED_WITH_MONEY_INSTEAD_OF_EXP, script->ShouldBeRewardedWithMoneyInsteadOfExp(player));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_SHOULD_BE_REWARDED_WITH_MONEY_INSTEAD_OF_EXP, script->ShouldBeRewardedWithMoneyInsteadOfExp(player));
 }
 
 void ScriptMgr::OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration)
@@ -596,7 +596,7 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
 
 bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_HAS_ACTIVE_POWER_TYPE, !script->OnPlayerHasActivePowerType(player, power));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_PLAYER_HAS_ACTIVE_POWER_TYPE, script->OnPlayerHasActivePowerType(player, power));
 }
 
 void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain)
