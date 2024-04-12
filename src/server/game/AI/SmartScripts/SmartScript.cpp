@@ -4551,7 +4551,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_WAYPOINT_DATA_REACHED:
         case SMART_EVENT_WAYPOINT_DATA_ENDED:
         {
-            LOG_ERROR("sql.sql", "Waypoint {} of Path {} Reached", var0, me->GetWaypointPath());
             if (!me || (e.event.wpData.pointId && var0 != e.event.wpData.pointId) || (e.event.wpData.pathId && me->GetWaypointPath() != e.event.wpData.pathId))
                 return;
             ProcessAction(e, unit);
