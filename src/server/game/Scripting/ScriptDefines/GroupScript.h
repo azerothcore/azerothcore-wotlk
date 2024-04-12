@@ -21,24 +21,12 @@
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
 
-enum GroupHook
-{
-    GROUPHOOK_ON_ADD_MEMBER,
-    GROUPHOOK_ON_INVITE_MEMBER,
-    GROUPHOOK_ON_REMOVE_MEMBER,
-    GROUPHOOK_ON_CHANGE_LEADER,
-    GROUPHOOK_ON_DISBAND,
-    GROUPHOOK_CAN_GROUP_JOIN_BATTLEGROUND_QUEUE,
-    GROUPHOOK_ON_CREATE,
-    GROUPHOOK_END
-};
-
 enum RemoveMethod : uint8;
 
 class GroupScript : public ScriptObject
 {
 protected:
-    GroupScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    GroupScript(const char* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
