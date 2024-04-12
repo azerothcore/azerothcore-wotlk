@@ -20,6 +20,7 @@
 
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
+#include <vector>
 
 enum ArenaHook
 {
