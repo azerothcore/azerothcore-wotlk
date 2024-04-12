@@ -39,7 +39,7 @@ ArenaScript::ArenaScript(const char* name, std::vector<uint16> enabledHooks)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < ARENAHOOK_END; i++)
+        for (uint16 i = 0; i < ARENAHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<ArenaScript>::AddScript(this, std::move(enabledHooks));

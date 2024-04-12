@@ -29,7 +29,7 @@ MovementHandlerScript::MovementHandlerScript(const char* name, std::vector<uint1
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < MOVEMENTHOOK_END; i++)
+        for (uint16 i = 0; i < MOVEMENTHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<MovementHandlerScript>::AddScript(this, std::move(enabledHooks));

@@ -19,12 +19,14 @@
 #define SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
 
 // TODO to remove
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
 
-enum PlayerHook {
+enum PlayerHook
+{
     PLAYERHOOK_ON_PLAYER_JUST_DIED,
     PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
     PLAYERHOOK_ON_SEND_INITIAL_PACKETS_BEFORE_ADD_TO_MAP,
