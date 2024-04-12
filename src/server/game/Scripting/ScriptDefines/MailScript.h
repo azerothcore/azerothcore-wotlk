@@ -20,10 +20,16 @@
 
 #include "ScriptObject.h"
 
+enum MailHook
+{
+    MAILHOOK_ON_BEFORE_MAIL_DRAFT_SEND_MAIL_TO,
+    MAILHOOK_END
+};
+
 class MailScript : public ScriptObject
 {
 protected:
-    MailScript(const char* name);
+    MailScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called before mail is sent
