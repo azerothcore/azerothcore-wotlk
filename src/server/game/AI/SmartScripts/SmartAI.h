@@ -207,6 +207,9 @@ public:
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
+    // New Waypoints
+    void PathEndReached(uint32 pathId) override;
+
 private:
     bool mIsCharmed;
     uint32 mFollowCreditType;

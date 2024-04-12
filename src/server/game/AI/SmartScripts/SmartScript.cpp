@@ -3057,6 +3057,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_START_WAYPOINT_DATA:
+        {
+            if (e.action.wpData.pathId)
+            {
+                me->LoadPath(e.action.wpData.pathId);
+                me->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+            }
+
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4536,6 +4546,15 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
             // If no targets are found and it's off cooldown, check again
             RecalcTimer(e, 1200, 1200);
+            break;
+        }
+        case SMART_EVENT_WAYPOINT_DATA_REACHED:
+        case SMART_EVENT_WAYPOINT_DATA_ENDED:
+        {
+            LOG_ERROR("sql.sql", "Waypoint {} of Path {} Reached", var0, me->GetWaypointPath());
+            if (!me || (e.event.wpData.pointId && var0 != e.event.wpData.pointId) || (e.event.wpData.pathId && me->GetWaypointPath() != e.event.wpData.pathId))
+                return;
+            ProcessAction(e, unit);
             break;
         }
         default:
