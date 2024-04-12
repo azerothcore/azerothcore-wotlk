@@ -1658,7 +1658,7 @@ void WorldSession::BootMeHandler(WorldPacket& msg)
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
-    m_Socket->Disconnect();
+    m_sock->Disconnect();
 }
 
 //===========================================================================

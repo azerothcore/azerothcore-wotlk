@@ -1132,7 +1132,7 @@ private:
 
     ObjectGuid::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
     Player* m_player;
-    std::shared_ptr<WorldSocket> m_Socket;
+    std::shared_ptr<WorldSocket> m_sock;
     std::string m_Address;
 
     AccountTypes _security;

@@ -132,7 +132,7 @@ WorldSession::WorldSession(uint32 id, uint32_t accountFlags, std::string&& name,
     AntiDOS(this),
     m_GUIDLow(0),
     m_player(nullptr),
-    m_Socket(sock),
+    m_sock(sock),
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
@@ -185,10 +185,10 @@ WorldSession::~WorldSession()
         CharacterRemoveFromGame(true);
 
     /// - If have unclosed socket, close it
-    if (m_Socket)
+    if (m_sock)
     {
-        m_Socket->Disconnect();
-        m_Socket = nullptr;
+        m_sock->Disconnect();
+        m_sock = nullptr;
     }
 
     ///- empty incoming packet queue
@@ -291,7 +291,7 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
-    if (!m_Socket)
+    if (!m_sock)
         return;
 
 #if defined(ACORE_DEBUG)
@@ -335,7 +335,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
-    m_Socket->SendPacket(*packet);
+    m_sock->SendPacket(*packet);
 }
 
 /// Add an incoming packet to the queue
@@ -369,8 +369,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
-    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
-        m_Socket->Disconnect();
+    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_sock)
+        m_sock->Disconnect();
 
     if (updater.ProcessUnsafe())
         UpdateTimeOutTime(diff);
@@ -389,7 +389,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 150;
 
-    while (m_Socket && _recvQueue.next(packet, updater))
+    while (m_sock && _recvQueue.next(packet, updater))
     {
         // New msg system:
         if (WorldSocket::m_handlers.contains(static_cast<Opcodes>(packet->GetOpcode()))) {
@@ -579,7 +579,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     //logout procedure should happen only in World::UpdateSessions() method!!!
     if (updater.ProcessUnsafe())
     {
-        if (m_Socket && m_Socket->IsOpen() && _warden)
+        if (m_sock && m_sock->IsOpen() && _warden)
         {
             _warden->Update(diff);
         }
@@ -589,15 +589,15 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             CharacterRemoveFromGame(true);
         }
 
-        if (m_Socket && !m_Socket->IsOpen())
+        if (m_sock && !m_sock->IsOpen())
         {
             if (GetPlayer() && _warden)
                 _warden->Update(diff);
 
-            m_Socket = nullptr;
+            m_sock = nullptr;
         }
 
-        if (!m_Socket)
+        if (!m_sock)
         {
             return false;                                       //Will remove this session from the world session map
         }
@@ -608,9 +608,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
 bool WorldSession::HandleSocketClosed()
 {
-    if (m_Socket && !m_Socket->IsOpen() && !IsKicked() && GetPlayer() && !CharacterLoggingOut() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
+    if (m_sock && !m_sock->IsOpen() && !IsKicked() && GetPlayer() && !CharacterLoggingOut() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
     {
-        m_Socket = nullptr;
+        m_sock = nullptr;
         GetPlayer()->TradeCancel(false);
         return true;
     }
@@ -620,13 +620,13 @@ bool WorldSession::HandleSocketClosed()
 
 bool WorldSession::IsSocketClosed() const
 {
-    return !m_Socket || !m_Socket->IsOpen();
+    return !m_sock || !m_sock->IsOpen();
 }
 
 void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 {
     // pussywizard: handle teleport ack timeout
-    if (m_Socket && m_Socket->IsOpen() && GetPlayer() && GetPlayer()->IsBeingTeleported())
+    if (m_sock && m_sock->IsOpen() && GetPlayer() && GetPlayer()->IsBeingTeleported())
     {
         time_t currTime = GameTime::GetGameTime().count();
         if (updateInSessions) // session update from World::UpdateSessions
@@ -741,7 +741,7 @@ void WorldSession::CharacterRemoveFromGame(bool save)
 
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
-        if (m_player->GetGroup() && !m_player->GetGroup()->isRaidGroup() && !m_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+        if (m_player->GetGroup() && !m_player->GetGroup()->isRaidGroup() && !m_player->GetGroup()->isLFGGroup() && m_sock && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             m_player->RemoveFromGroup();
 
         // pussywizard: checked second time after being removed from a group
@@ -826,12 +826,12 @@ void WorldSession::CharacterRemoveFromGame(bool save)
 /// Kick a player out of the World
 void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
-    if (m_Socket)
+    if (m_sock)
     {
         LOG_INFO("network.kick", "Account: {} Character: '{}' {} kicked with reason: {}", GetAccountId(), m_player ? m_player->GetName() : "<none>",
             m_player ? m_player->GetGUID().ToString() : "", reason);
 
-        m_Socket->Disconnect();
+        m_sock->Disconnect();
     }
 
     if (setKicked)
