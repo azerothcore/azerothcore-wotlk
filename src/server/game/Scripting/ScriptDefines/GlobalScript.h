@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
 #include <map>
+#include <vector>
 
 enum GlobalHook
 {
