@@ -77,6 +77,12 @@ void ScriptMgr::Initialize()
 
     _script_loader_callback();
     _modules_loader_callback();
+
+    ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
+    ScriptRegistry<AuctionHouseScript>::InitEnabledHooksIfNeeded(AUCTIONHOUSEHOOK_END);
+    ScriptRegistry<ArenaTeamScript>::InitEnabledHooksIfNeeded(ARENATEAMHOOK_END);
+    ScriptRegistry<ArenaScript>::InitEnabledHooksIfNeeded(ARENAHOOK_END);
+    ScriptRegistry<MovementHandlerScript>::InitEnabledHooksIfNeeded(MOVEMENTHOOK_END);
 }
 
 void ScriptMgr::Unload()
