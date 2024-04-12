@@ -26,180 +26,87 @@ void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, Object
     ASSERT(trans);
     ASSERT(itemGuid);
 
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnItemDelFromDB(trans, itemGuid);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_ITEM_DEL_FROM_DB, script->OnItemDelFromDB(trans, itemGuid));
 }
 
 void ScriptMgr::OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnMirrorImageDisplayItem(item, display);
-    });
-}
-
-void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap)
-{
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnBeforeUpdateArenaPoints(at, ap);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_MIRRORIMAGE_DISPLAY_ITEM, script->OnMirrorImageDisplayItem(item, display));
 }
 
 void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnAfterRefCount(player, LootStoreItem, loot, canRate, lootMode, maxcount, store);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AFTER_REF_COUNT, script->OnAfterRefCount(player, LootStoreItem, loot, canRate, lootMode, maxcount, store));
 }
 
 void ScriptMgr::OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AFTER_CALCULATE_LOOT_GROUP_AMOUNT, script->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store));
 }
 
 void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_DROP_ADD_ITEM, script->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store));
 }
 
 bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* lootStoreItem, float& chance, Loot& loot, LootStore const& store)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return !script->OnItemRoll(player, lootStoreItem, chance, loot, store);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ITEM_ROLL, !script->OnItemRoll(player, lootStoreItem, chance, loot, store));
 }
 
 bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList equalChanced, Loot& loot, LootStore const& store)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return !script->OnBeforeLootEqualChanced(player, equalChanced, loot, store);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_LOOT_EQUAL_CHANCED, !script->OnBeforeLootEqualChanced(player, equalChanced, loot, store));
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnInitializeLockedDungeons(player, level, lockData, dungeon);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_INITIALIZE_LOCKED_DUNGEONS, script->OnInitializeLockedDungeons(player, level, lockData, dungeon));
 }
 
 void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnAfterInitializeLockedDungeons(player);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AFTER_INITIALIZE_LOCKED_DUNGEONS, script->OnAfterInitializeLockedDungeons(player));
+}
+
+void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap)
+{
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_UPDATE_ARENA_POINTS, script->OnBeforeUpdateArenaPoints(at, ap));
 }
 
 void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AFTER_UPDATE_ENCOUNTER_STATE, script->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated));
 }
 
 void ScriptMgr::OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnBeforeWorldObjectSetPhaseMask(worldObject, oldPhaseMask, newPhaseMask, useCombinedPhases, update);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_WORLDOBJECT_SET_PHASEMASK, script->OnBeforeWorldObjectSetPhaseMask(worldObject, oldPhaseMask, newPhaseMask, useCombinedPhases, update));
 }
 
 bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return !script->OnIsAffectedBySpellModCheck(affectSpell, checkSpell, mod);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_IS_AFFECTED_BY_SPELL_MOD_CHECK, !script->OnIsAffectedBySpellModCheck(affectSpell, checkSpell, mod));
 }
 
 bool ScriptMgr::OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
-    });
-
-    if (ret && *ret)
-    {
-        return true;
-    }
-
-    return false;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_SPELL_HEALING_BONUS_TAKEN_NEGATIVE_MODIFIERS, script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val));
 }
 
 void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnLoadSpellCustomAttr(spell);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_LOAD_SPELL_CUSTOM_ATTR, script->OnLoadSpellCustomAttr(spell));
 }
 
 bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return script->OnAllowedForPlayerLootCheck(player, source);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ALLOWED_FOR_PLAYER_LOOT_CHECK, script->OnAllowedForPlayerLootCheck(player, source));
 }
 
 bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source)
 {
-    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
-    {
-        return script->OnAllowedToLootContainerCheck(player, source);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ALLOWED_TO_LOOT_CONTAINER_CHECK, script->OnAllowedToLootContainerCheck(player, source));
 }
 
 /**
@@ -209,10 +116,7 @@ bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid s
  */
 void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnInstanceIdRemoved(instanceId);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_INSTANCEID_REMOVED, script->OnInstanceIdRemoved(instanceId));
 }
 
 /**
@@ -226,10 +130,7 @@ void ScriptMgr::OnInstanceIdRemoved(uint32 instanceId)
  */
 void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->OnBeforeSetBossState(id, newState, oldState, instance);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_SET_BOSS_STATE, script->OnBeforeSetBossState(id, newState, oldState, instance));
 }
 
 /**
@@ -240,16 +141,18 @@ void ScriptMgr::OnBeforeSetBossState(uint32 id, EncounterState newState, Encount
  */
 void ScriptMgr::AfterInstanceGameObjectCreate(Map* instance, GameObject* go)
 {
-    ExecuteScript<GlobalScript>([&](GlobalScript* script)
-    {
-        script->AfterInstanceGameObjectCreate(instance, go);
-    });
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE, script->AfterInstanceGameObjectCreate(instance, go));
 }
 
-GlobalScript::GlobalScript(const char* name)
-    : ScriptObject(name)
+GlobalScript::GlobalScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, GLOBALHOOK_END)
 {
-    ScriptRegistry<GlobalScript>::AddScript(this);
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < GLOBALHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<GlobalScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<GlobalScript>;
