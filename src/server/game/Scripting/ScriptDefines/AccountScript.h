@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_ACCOUNT_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
 
 enum AccountHook
 {
