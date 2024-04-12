@@ -69,7 +69,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 (@CGUID+62, 23746, 530, 3433, 3517, 0, 6710.25, -7548.35, 131.092, 2.6529, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+63, 23747, 530, 3433, 3507, 0, 6767.38, -7574.12, 127.04, 1.55334, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+64, 23747, 530, 3433, 3507, 0, 6771.96, -7556.53, 127.058, 1.37184, 120, 0, 0, 53788, 1, NULL),
-(@CGUID+65, 23748, 530, 3433, 3517, 1, 6788.49, -7539.9, 126.109, 3.38594, 120, 0, 0, 53788, 1, NULL),
+(@CGUID+65, 23748, 530, 3433, 3517, 0, 6788.49, -7539.9, 126.109, 3.38594, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+66, 23761, 530, 3433, 3508, 1, 6769.81, -7616.67, 128.49, 0.697258, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+67, 23762, 530, 3433, 3507, 1, 6736.026, -7558.7544, 126.89935, 1.48352, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+68, 23764, 530, 3433, 3507, 0, 6740.1978, -7559.655, 126.451454, 1.972222, 120, 0, 0, 53788, 1, NULL),
@@ -174,8 +174,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (23560, 0, 1, 22212, 'Beat it, Mack! Else I\'ll have Budd cook ya fer my hounds....', 12, 0, 'Ameenah to Mack'),
 (23560, 0, 2, 22213, 'There be nuthin\' here to drink, Mack. Away with ya!', 12, 0, 'Ameenah to Mack'),
 (23560, 0, 3, 22214, 'Go jump in the lake, won\'t ya Mack? I smelled ya before I saw ya....', 12, 0, 'Ameenah to Mack'),
-(23748, 0, 0, 22252, 'Turgore! Get up and help me unload, you lazy peon!', 12, 0, 'Kurzel to Turgore'),
-(23748, 0, 1, 22253, 'Useless orc! Just you wait, one day I\'ll drop somethin in yer grog that you\'ll NEVER wake up from....', 12, 0, 'Kurzel to Turgore'),
+(23748, 0, 0, 22252, 'Turgore! Get up and help me unload, you lazy peon!', 12, 60, 'Kurzel to Turgore'),
+(23748, 1, 0, 22253, 'Useless orc! Just you wait, one day I\'ll drop somethin in yer grog that you\'ll NEVER wake up from....', 12, 0, 'Kurzel to Turgore'),
 (23764, 0, 0, 22254, 'Say, Brend, why is it that you never make eyes at me?', 12, 0, 'Marge to Brend'),
 (23764, 1, 0, 22265, 'Say, Brend, whisper me somethin\' sweet, will ya?', 12, 0, 'Marge to Brend'),
 (23764, 3, 0, 22258, 'Oohhhh. How dare you!', 12, 0, 'Marge to Brend'),
@@ -380,3 +380,66 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2371805
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2371805, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 32951, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mack - Actionlist - Cast \'Sleeping Sleep\''),
 (2371805, 9, 1, 0, 0, 0, 100, 0, 120000, 120000, 0, 0, 0, 0, 28, 32951, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mack - Actionlist - Remove Aura \'Sleeping Sleep\'');
+
+-- Pathing for Kurzel Entry: 23748
+SET @NPC := 139328;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6779.769,-7582.8804,127.5619,NULL,0,0,0,100,0),
+(@PATH,2,6779.769,-7582.8804,127.5619,1.48352980613708496,1600,0,0,100,0),
+(@PATH,3,6779.769,-7582.8804,127.5619,1.797689080238342285,9700,0,0,100,0), -- Pick Up Bags
+(@PATH,4,6785.543,-7576.1157,127.56975,NULL,0,0,0,100,0),
+(@PATH,5,6791.7485,-7543.877,126.10916,NULL,0,0,0,100,0),
+(@PATH,6,6788.494,-7539.904,126.10916,NULL,0,0,0,100,0),
+(@PATH,7,6788.494,-7539.904,126.10916,3.385938644409179687,24250,0,0,100,0), -- Leave Bags
+(@PATH,8,6785.9644,-7574.473,127.53085,NULL,0,0,0,100,0);
+
+-- Pathing for Kurzel Entry: 23748
+SET @NPC := 139328;
+SET @PATH := (@NPC * 10) + 1;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6779.9116,-7582.924,127.540245,NULL,0,0,0,100,0),
+(@PATH,2,6779.9116,-7582.924,127.540245,1.48352980613708496,1600,0,0,100,0),
+(@PATH,3,6779.9116,-7582.924,127.540245,1.797689080238342285,9700,0,0,100,0), -- Pick Up Bags
+(@PATH,4,6785.543,-7576.1157,127.56975,NULL,0,0,0,100,0),
+(@PATH,5,6791.7485,-7543.877,126.10916,NULL,0,0,0,100,0),
+(@PATH,6,6788.494,-7539.904,126.10916,NULL,0,0,0,100,0),
+(@PATH,7,6788.494,-7539.904,126.10916,3.385938644409179687,24250,0,0,100,0), -- Leave Bags
+(@PATH,8,6796,-7535.8457,126.11561,NULL,0,0,0,100,0),
+(@PATH,9,6796,-7535.8457,126.11561,4.852015495300292968,6400,0,0,100,0), -- Kick
+(@PATH,10,6789.434,-7551.1094,126.23186,NULL,0,0,0,100,0),
+(@PATH,11,6786.1133,-7575.298,127.538246,NULL,0,0,0,100,0);
+-- 0x20449C424017310000003A000079A062 .go xyz 6779.9116 -7582.924 127.540245
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 23748);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139328);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139328, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 2374800, 2374801, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - On Respawn - Start Random Path'),
+(-139328, 0, 1, 0, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 80, 2374802, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - On Point 3 of Path Any Reached - Run Script \'Pick Up Bags\''),
+(-139328, 0, 2, 0, 108, 0, 100, 0, 7, 0, 0, 0, 0, 0, 80, 2374803, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - On Point 7 of Path Any Reached - Run Script \'Drop-Off Bags\''),
+(-139328, 0, 3, 0, 108, 0, 100, 0, 9, 1393281, 0, 0, 0, 0, 80, 2374804, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - On Point 9 of Path 1393281 Reached - Run Script \'Kick Turgore\''),
+(-139328, 0, 4, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 2374800, 2374801, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - On Path Finished - Start Random Path');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2374800, 2374801));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1393280, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Start Random Path'),
+(2374801, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1393281, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Start Random Path');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374802);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374802, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Set Flag Standstate Kneel'),
+(2374802, 9, 1, 0, 0, 0, 100, 0, 3250, 3250, 0, 0, 0, 0, 124, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Load Equipment Id 1'),
+(2374802, 9, 2, 0, 0, 0, 100, 0, 6450, 6450, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Remove FlagStandstate Kneel');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374803);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374803, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Set Flag Standstate Kneel'),
+(2374803, 9, 1, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 124, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Load Equipment Id 0'),
+(2374803, 9, 2, 0, 0, 0, 100, 0, 21000, 21000, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Remove FlagStandstate Kneel');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374804);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374804, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Say Line 0'),
+(2374804, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Say Line 1');

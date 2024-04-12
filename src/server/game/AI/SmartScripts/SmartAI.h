@@ -204,11 +204,10 @@ public:
 
     void OnSpellClick(Unit* clicker, bool& result) override;
 
+    void PathEndReached(uint32 pathId) override;
+
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
-
-    // New Waypoints
-    void PathEndReached(uint32 pathId) override;
 
 private:
     bool mIsCharmed;
