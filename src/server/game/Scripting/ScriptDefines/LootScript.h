@@ -20,10 +20,16 @@
 
 #include "ScriptObject.h"
 
+enum LootHook
+{
+    LOOTHOOK_ON_LOOT_MONEY,
+    LOOTHOOK_END
+};
+
 class LootScript : public ScriptObject
 {
 protected:
-    LootScript(const char* name);
+    LootScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
