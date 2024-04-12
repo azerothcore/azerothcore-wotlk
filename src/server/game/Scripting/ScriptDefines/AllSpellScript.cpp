@@ -21,147 +21,78 @@
 
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnCalcMaxDuration(aura, maxDuration);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_CALC_MAX_DURATION, script->OnCalcMaxDuration(aura, maxDuration));
 }
 
 bool ScriptMgr::CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
 {
-    auto ret = IsValidBoolScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        return !script->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_DAMAGE_DONE, !script->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply));
 }
 
 bool ScriptMgr::CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
 {
-    auto ret = IsValidBoolScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        return !script->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_MOD_DAMAGE_PERCENT_DONE, !script->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply));
 }
 
 void ScriptMgr::OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnSpellCheckCast(spell, strict, res);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_SPELL_CHECK_CAST, script->OnSpellCheckCast(spell, strict, res));
 }
 
 bool ScriptMgr::CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEffect const* triggeredByAura)
 {
-    auto ret = IsValidBoolScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        return !script->CanPrepare(spell, targets, triggeredByAura);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_PREPARE, !script->CanPrepare(spell, targets, triggeredByAura));
 }
 
 bool ScriptMgr::CanScalingEverything(Spell* spell)
 {
-    auto ret = IsValidBoolScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        return script->CanScalingEverything(spell);
-    });
-
-    if (ret && *ret)
-    {
-        return true;
-    }
-
-    return false;
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_SCALING_EVERYTHING, script->CanScalingEverything(spell));
 }
 
 bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
 {
-    auto ret = IsValidBoolScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        return !script->CanSelectSpecTalent(spell);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_SELECT_SPEC_TALENT, !script->CanSelectSpecTalent(spell));
 }
 
 void ScriptMgr::OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnScaleAuraUnitAdd(spell, target, effectMask, checkIfValid, implicit, auraScaleMask, targetInfo);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_SCALE_AURA_UNIT_ADD, script->OnScaleAuraUnitAdd(spell, target, effectMask, checkIfValid, implicit, auraScaleMask, targetInfo));
 }
 
 void ScriptMgr::OnRemoveAuraScaleTargets(Spell* spell, TargetInfo& targetInfo, uint8 auraScaleMask, bool& needErase)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnRemoveAuraScaleTargets(spell, targetInfo, auraScaleMask, needErase);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_REMOVE_AURA_SCALE_TARGETS, script->OnRemoveAuraScaleTargets(spell, targetInfo, auraScaleMask, needErase));
 }
 
 void ScriptMgr::OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnBeforeAuraRankForLevel(spellInfo, latestSpellInfo, level);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_BEFORE_AURA_RANK_FOR_LEVEL, script->OnBeforeAuraRankForLevel(spellInfo, latestSpellInfo, level));
 }
 
 void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnDummyEffect(caster, spellID, effIndex, gameObjTarget);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_GAMEOBJECT, script->OnDummyEffect(caster, spellID, effIndex, gameObjTarget));
 }
 
 void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnDummyEffect(caster, spellID, effIndex, creatureTarget);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_CREATURE, script->OnDummyEffect(caster, spellID, effIndex, creatureTarget));
 }
 
 void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget)
 {
-    ExecuteScript<AllSpellScript>([&](AllSpellScript* script)
-    {
-        script->OnDummyEffect(caster, spellID, effIndex, itemTarget);
-    });
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_ITEM, script->OnDummyEffect(caster, spellID, effIndex, itemTarget));
 }
 
-AllSpellScript::AllSpellScript(char const* name)
-    : ScriptObject(name)
+AllSpellScript::AllSpellScript(char const* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, ALLSPELLHOOK_END)
 {
-    ScriptRegistry<AllSpellScript>::AddScript(this);
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < ALLSPELLHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<AllSpellScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<AllSpellScript>;
