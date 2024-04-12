@@ -140,15 +140,7 @@ namespace lfg
         }
     }
 
-    LFGGroupScript::LFGGroupScript() :
-        GroupScript("LFGGroupScript",
-        {
-            GROUPHOOK_ON_ADD_MEMBER,
-            GROUPHOOK_ON_REMOVE_MEMBER,
-            GROUPHOOK_ON_DISBAND,
-            GROUPHOOK_ON_CHANGE_LEADER,
-            GROUPHOOK_ON_INVITE_MEMBER
-        })
+    LFGGroupScript::LFGGroupScript() : GroupScript("LFGGroupScript")
     {
     }
 
