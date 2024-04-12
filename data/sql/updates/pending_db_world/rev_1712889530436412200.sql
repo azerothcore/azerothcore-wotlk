@@ -16,7 +16,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 (@CGUID+9 , 23716, 530, 3433, 3507, 1, 6737.85, -7577.82, 126.802, 0.942478, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+10, 23718, 530, 3433, 3507, 0, 6743.72, -7553.35, 126.19, 3.1765, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+11, 23724, 530, 3433, 3507, 1, 6742.99, -7615.56, 126.164, 2.56007, 120, 0, 0, 53788, 1, NULL),
-(@CGUID+12, 23745, 530, 3433, 3508, 0, 6774.4, -7640.2, 127.616, 1.3374, 120, 0, 0, 53788, 1, NULL),
+(@CGUID+12, 23745, 530, 3433, 3508, 1, 6774.4, -7640.2, 127.616, 1.3374, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+13, 23746, 530, 3433, 3517, 0, 6743.56, -7532.4, 136.939, 2.60054, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+14, 23746, 530, 3433, 3517, 0, 6733.52, -7507.14, 135.088, 1.81514, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+15, 23746, 530, 3433, 3517, 0, 6743.83, -7522.06, 136.811, 3.7001, 120, 0, 0, 53788, 1, NULL),
@@ -170,10 +170,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (23718, 3, 1, 22221, 'Whooo! Like daddy used to say, just makin room fer more! Heh.', 12, 0, 'Mack'),
 (23718, 3, 2, 22222, 'Ooohh. Somethin\'s not agreein\' with the tummy today...', 12, 0, 'Mack'),
 (23718, 4, 0, 22223, 'Hmmm, p\'rhaps I\'ll rest these old bones for a bit.', 12, 0, 'Mack'),
-(23560, 0, 0, 22207, 'Not now, Mack. I be in no mood for your drunken pawing. Off with ya!', 12, 0, 'Ameenah to Mack'),
-(23560, 0, 1, 22212, 'Beat it, Mack! Else I\'ll have Budd cook ya fer my hounds....', 12, 0, 'Ameenah to Mack'),
-(23560, 0, 2, 22213, 'There be nuthin\' here to drink, Mack. Away with ya!', 12, 0, 'Ameenah to Mack'),
-(23560, 0, 3, 22214, 'Go jump in the lake, won\'t ya Mack? I smelled ya before I saw ya....', 12, 0, 'Ameenah to Mack'),
+(23560, 0, 0, 22207, 'Not now, Mack. I be in no mood for your drunken pawing. Off with ya!', 12, 274, 'Ameenah to Mack'),
+(23560, 0, 1, 22212, 'Beat it, Mack! Else I\'ll have Budd cook ya fer my hounds....', 12, 274, 'Ameenah to Mack'),
+(23560, 0, 2, 22213, 'There be nuthin\' here to drink, Mack. Away with ya!', 12, 274, 'Ameenah to Mack'),
+(23560, 0, 3, 22214, 'Go jump in the lake, won\'t ya Mack? I smelled ya before I saw ya....', 12, 274, 'Ameenah to Mack'),
 (23748, 0, 0, 22252, 'Turgore! Get up and help me unload, you lazy peon!', 12, 60, 'Kurzel to Turgore'),
 (23748, 1, 0, 22253, 'Useless orc! Just you wait, one day I\'ll drop somethin in yer grog that you\'ll NEVER wake up from....', 12, 0, 'Kurzel to Turgore'),
 (23764, 0, 0, 22254, 'Say, Brend, why is it that you never make eyes at me?', 12, 0, 'Marge to Brend'),
@@ -443,3 +443,67 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374804
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2374804, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Say Line 0'),
 (2374804, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzel - Actionlist - Say Line 1');
+
+-- Pathing for Garg Entry: 23745
+SET @NPC := 139275;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN @PATH AND @PATH+3;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+-- Go Path
+(@PATH+0,1,6768.6436,-7638.577,127.382996,NULL,0,0,0,100,0),
+(@PATH+0,2,6762.757,-7665.549,126.44116,NULL,14545,0,0,100,0), -- Kick
+-- Return Paths
+(@PATH+1,1,6762.757,-7665.549,126.44116,NULL,0,0,0,100,0),
+(@PATH+1,2,6772.7305,-7667.0645,126.102066,NULL,0,0,0,100,0),
+(@PATH+1,3,6774.489,-7663.8013,126.18675,NULL,8050,0,0,100,0), -- Fish
+(@PATH+1,4,6774.404,-7640.1978,127.615875,NULL,0,0,0,100,0),
+(@PATH+1,5,6774.364,-7632.2266,127.38222,NULL,0,0,0,100,0),
+(@PATH+1,6,6774.364,-7632.2266,127.38222,4.014257431030273437,25900,0,0,100,0), -- Eat
+(@PATH+2,1,6772.7305,-7667.0645,126.102066,NULL,0,0,0,100,0),
+(@PATH+2,2,6774.489,-7663.8013,126.18675,NULL,8050,0,0,100,0), -- Fish
+(@PATH+2,3,6771.4478,-7652.6304,127.296295,NULL,0,0,0,100,0),
+(@PATH+2,4,6774.404,-7640.1978,127.615875,NULL,0,0,0,100,0),
+(@PATH+2,5,6774.364,-7632.2266,127.38222,NULL,0,0,0,100,0),
+(@PATH+2,6,6774.364,-7632.2266,127.38222,4.014257431030273437,25900,0,0,100,0), -- Eat
+(@PATH+3,1,6774.489,-7663.8013,126.18675,NULL,8050,0,0,100,0), -- Fish
+(@PATH+3,2,6771.4478,-7652.6304,127.296295,NULL,0,0,0,100,0),
+(@PATH+3,3,6774.404,-7640.1978,127.615875,NULL,0,0,0,100,0),
+(@PATH+3,4,6774.364,-7632.2266,127.38222,NULL,0,0,0,100,0),
+(@PATH+3,5,6774.364,-7632.2266,127.38222,4.014257431030273437,25900,0,0,100,0); -- Eat
+-- 0x20449C424017304000003A000079A063 .go xyz 6762.757 -7665.549 126.44116
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 23745);
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 23745);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(23745, 1, 2023, 0, 0, 53788), -- Spear
+(23745, 2, 6228, 0, 0, 53788); -- Fish
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374500);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374500, 9, 0, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 5, 60, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 60'),
+(2374500, 9, 1, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 71'),
+(2374500, 9, 2, 0, 0, 0, 100, 0, 8050, 8050, 0, 0, 0, 0, 233, 1392751, 1392753, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Start Random Path');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374501);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374501, 9, 0, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 5, 36, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 36'),
+(2374501, 9, 1, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 124, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Load Equipment Id 2 (Fish)');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2374502);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2374502, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 92'),
+(2374502, 9, 1, 0, 0, 0, 100, 0, 6450, 6450, 0, 0, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 92'),
+(2374502, 9, 2, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Play Emote 92'),
+(2374502, 9, 3, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 124, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Load Equipment Id 1 (Spear)'),
+(2374502, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1392750, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - Actionlist - Start Path');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139275);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139275, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1392750, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Respawn - Start Path'),
+(-139275, 0, 1, 0, 109, 0, 100, 0, 0, 1392750, 0, 0, 0, 0, 80, 2374500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Initial Path Finished - Run Script \'Kick Troll\''),
+(-139275, 0, 2, 0, 108, 0, 100, 0, 3, 1392751, 0, 0, 0, 0, 80, 2374501, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Point Reached - Run Script \'Catch Fish\''),
+(-139275, 0, 3, 0, 108, 0, 100, 0, 2, 1392752, 0, 0, 0, 0, 80, 2374501, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Point Reached - Run Script \'Catch Fish\''),
+(-139275, 0, 4, 0, 108, 0, 100, 0, 1, 1392753, 0, 0, 0, 0, 80, 2374501, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Point Reached - Run Script \'Catch Fish\''),
+(-139275, 0, 5, 0, 109, 0, 100, 0, 0, 1392751, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\''),
+(-139275, 0, 6, 0, 109, 0, 100, 0, 0, 1392752, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\''),
+(-139275, 0, 7, 0, 109, 0, 100, 0, 0, 1392753, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\'');

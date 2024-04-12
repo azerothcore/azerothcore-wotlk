@@ -3057,12 +3057,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_START_WAYPOINT_DATA:
+        case SMART_ACTION_WAYPOINT_DATA_START:
         {
             if (e.action.wpData.pathId)
             {
                 me->LoadPath(e.action.wpData.pathId);
                 me->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+            }
+
+            break;
+        }
+        case SMART_ACTION_WAYPOINT_DATA_RANDOM:
+        {
+            if (e.action.wpDataRandom.pathId1 && e.action.wpDataRandom.pathId2)
+            {
+                uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
+                me->LoadPath(path);
+                me->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
             }
 
             break;

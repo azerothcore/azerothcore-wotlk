@@ -771,7 +771,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
             case SMART_ACTION_FOLLOW_GROUP: return sizeof(SmartAction::followGroup);
             case SMART_ACTION_SET_ORIENTATION_TARGET: return sizeof(SmartAction::orientationTarget);
-            case SMART_ACTION_START_WAYPOINT_DATA: return sizeof(SmartAction::wpData);
+            case SMART_ACTION_WAYPOINT_DATA_START: return sizeof(SmartAction::wpData);
+            case SMART_ACTION_WAYPOINT_DATA_RANDOM: return sizeof(SmartAction::wpDataRandom);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1950,7 +1951,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_PLAY_SPELL_VISUAL:
         case SMART_ACTION_FOLLOW_GROUP:
         case SMART_ACTION_SET_ORIENTATION_TARGET:
-        case SMART_ACTION_START_WAYPOINT_DATA:
+        case SMART_ACTION_WAYPOINT_DATA_START:
+        case SMART_ACTION_WAYPOINT_DATA_RANDOM:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -722,9 +722,10 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
     SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
     SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
-    SMART_ACTION_START_WAYPOINT_DATA                = 232,    // pathId, repeat
+    SMART_ACTION_WAYPOINT_DATA_START                = 232,    // pathId, repeat
+    SMART_ACTION_WAYPOINT_DATA_RANDOM               = 233,    // pathId1, pathId2, repeat
 
-    SMART_ACTION_AC_END                             = 233,    // placeholder
+    SMART_ACTION_AC_END                             = 234,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1449,6 +1450,13 @@ struct SmartAction
             uint32 pathId;
             SAIBool repeat;
         } wpData;
+
+        struct
+        {
+            uint32 pathId1;
+            uint32 pathId2;
+            SAIBool repeat;
+        } wpDataRandom;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
