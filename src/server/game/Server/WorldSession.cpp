@@ -200,25 +200,52 @@ WorldSession::~WorldSession()
 }
 
 //===========================================================================
-void WorldSession::CharacterLogout (bool instant) {
-  Player* const player = ActivePlayer();
-  if (!player) return;
+void WorldSession::CharacterAbortLogout () {
+  if (Player* plr = ActivePlayer()) {
+    this->m_loggingOut = false;
 
-  this->m_loggingOut = true;
+    // Send the logout cancel ack packet
+    WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
+    SendPacket(&msg);
 
-  if (instant)
-    CharacterRemoveFromGame(true);
-  else {
-    // Start the logout timer
-    this->m_logoutRequestTime = time(nullptr);
+    // The player was locked during the camping timeout in CharacterLogout,
+    // so allow it to move freely again.
+    plr->SetMovement(MOVE_UNROOT);
+    plr->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+  }
+}
 
-    // Force the player to sit
-    if (player->GetStandState() == UNIT_STANDING)
-      player->SetStandState(UNIT_SITTING);
+//===========================================================================
+void WorldSession::CharacterLogout (bool instant, BOOL failed /*=FALSE*/) {
+  if (Player* plr = ActivePlayer()) {
+    this->m_loggingOut = true;
 
-    // Root and stun the player to prevent further control during logout
-    player->SetMovement(MOVE_ROOT);
-    player->SetUnitFlag(UNIT_FLAG_STUNNED);
+    // Send the logout response
+    {
+      WorldPacket outbound(SMSG_LOGOUT_RESPONSE, sizeof(instant)+sizeof(failed));
+      outbound << failed;
+      outbound << instant;
+      SendPacket(&outbound);
+    }
+
+    // Continue processing the character logout
+    // if we didn't send a failure response
+    if (!failed) {
+      if (instant)
+        CharacterRemoveFromGame(true);
+      else {
+        // Start the logout timer
+        this->m_logoutRequestTime = time(nullptr);
+
+        // Force the player to sit
+        if (plr->GetStandState() == UNIT_STANDING)
+          plr->SetStandState(UNIT_SITTING);
+
+        // Root and stun the player to prevent control during logout
+        plr->SetMovement(MOVE_ROOT);
+        plr->SetUnitFlag(UNIT_FLAG_STUNNED);
+      }
+    }
   }
 }
 

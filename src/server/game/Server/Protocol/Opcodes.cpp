@@ -205,7 +205,6 @@ void OpcodeTable::Initialize()
     /*0x04A*/ DEFINE_HANDLER(CMSG_PLAYER_LOGOUT,                                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePlayerLogout                 );
     /*0x04C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_RESPONSE,                                    STATUS_NEVER);
     /*0x04D*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_COMPLETE,                                    STATUS_NEVER);
-    /*0x04E*/ DEFINE_HANDLER(CMSG_LOGOUT_CANCEL,                                                    STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLogoutCancelOpcode);
     /*0x04F*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_CANCEL_ACK,                                  STATUS_NEVER);
     /*0x050*/ DEFINE_HANDLER(CMSG_NAME_QUERY,                                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleNameQueryOpcode                    );
     /*0x051*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_NAME_QUERY_RESPONSE,                                STATUS_NEVER);

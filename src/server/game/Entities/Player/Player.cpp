@@ -90,11 +90,10 @@ static BOOL LogoutRequestHandler (WorldSession* ses,
                                   Opcodes       msgId,
                                   uint32_t      eventTime,
                                   WorldPacket*  msg);
-
-struct LogoutResponse {
-  BOOL logoutFailed;
-  bool instantLogout;
-};
+static BOOL HandleLogoutCancel (WorldSession* ses,
+                                Opcodes       msgId,
+                                uint32_t      eventTime,
+                                WorldPacket*  msg);
 
 
 enum CharacterFlags
@@ -16315,40 +16314,43 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 ***/
 
 //===========================================================================
+static BOOL HandleLogoutCancel (WorldSession* ses,
+                                Opcodes       msgId,
+                                uint32_t      eventTime,
+                                WorldPacket*  msg) {
+
+  if (!ses->ActivePlayer())
+    return FALSE;
+
+  ses->CharacterAbortLogout();
+  return TRUE;
+}
+
+//===========================================================================
 static BOOL LogoutRequestHandler (WorldSession* ses,
                                   Opcodes       msgId,
                                   uint32_t      eventTime,
                                   WorldPacket*  msg) {
 
-  Player* const player = ses->ActivePlayer();
-  if (!player) return FALSE;
+  if (Player* plr = ses->ActivePlayer()) {
+    bool instantLogout = false;
+    bool logoutFailed = false;
 
-  LogoutResponse res;
-  res.logoutFailed = FALSE;
-  res.instantLogout = FALSE;
+    // THE PLAYER CAN'T LOG OUT WHILE IN COMBAT OR FALLING
+    // OR WHILE THEY ARE NOT IN CONTROL OF THEIR CHARACTER
+    if (plr->IsInCombat() || plr->IsFalling() || (!plr->CanFreeMove() && !plr->IsOnTaxi()))
+      logoutFailed = true;
 
-  if (player->IsInCombat() || player->IsFalling()
-      || (!player->CanFreeMove() && !player->IsOnTaxi())) {
-    // Players can't log out while in combat or while falling
-    // or when they are not in control of their character
-    res.logoutFailed = TRUE;
+    // THE PLAYER CAN LOG OUT INSTANTLY WHILE ON TAXI OR RESTING
+    if (plr->IsOnTaxi() || plr->IsResting())
+      instantLogout = true;
+
+    // SEND THE LOGOUT RESPONSE
+    ses->CharacterLogout(instantLogout, logoutFailed);
+    return TRUE;
   }
-  else if (player->IsOnTaxi() || player->IsResting()) {
-    // Players can log out instantly while on taxi or while resting
-    res.instantLogout = TRUE;
-  }
 
-  // Send the logout response
-  WorldPacket outbound(SMSG_LOGOUT_RESPONSE, sizeof(res));
-  outbound << res.logoutFailed;
-  outbound << res.instantLogout;
-  ses->SendPacket(&outbound);
-
-  if (res.logoutFailed == FALSE) {
-    // Initiate the character logout process
-    ses->CharacterLogout(res.instantLogout);
-  }
-  return TRUE;
+  return FALSE;
 }
 
 
@@ -16361,12 +16363,14 @@ static BOOL LogoutRequestHandler (WorldSession* ses,
 void PlayerInitialize () {
   if (s_initialized) return;
   WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, LogoutRequestHandler);
+  WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, HandleLogoutCancel);
   s_initialized = true;
 }
 
 void PlayerDestroy () {
   if (!s_initialized) return;
   WorldSocket::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
+  WorldSocket::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
   s_initialized = false;
 }
 

@@ -52,22 +52,6 @@ namespace WorldPackets
             WorldPacket const* Write() override { return &_worldPacket; }
         };
 
-        class LogoutCancel final : public ClientPacket
-        {
-        public:
-            LogoutCancel(WorldPacket&& packet) : ClientPacket(std::move(packet)) { }
-
-            void Read() override { }
-        };
-
-        class LogoutCancelAck final : public ServerPacket
-        {
-        public:
-            LogoutCancelAck() : ServerPacket(SMSG_LOGOUT_CANCEL_ACK, 0) { }
-
-            WorldPacket const* Write() override { return &_worldPacket; }
-        };
-
         class PlayedTimeClient final : public ClientPacket
         {
         public:

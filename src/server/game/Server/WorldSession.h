@@ -332,7 +332,8 @@ public:
     WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
-    void CharacterLogout (bool instant);
+    void CharacterAbortLogout ();
+    void CharacterLogout (bool instant, BOOL failed = FALSE);
     bool CharacterLoggingOut () const { return this->m_loggingOut; }
     void CharacterRemoveFromGame(bool save);
 
@@ -588,7 +589,6 @@ public:                                                 // opcodes handlers
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
     void HandlePlayerLogout(WorldPacket &msg);
-    void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
     // GM Ticket opcodes
     void HandleGMTicketCreateOpcode(WorldPacket& recvPacket);

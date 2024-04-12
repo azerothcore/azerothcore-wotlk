@@ -423,27 +423,6 @@ void WorldSession::HandlePlayerLogout(WorldPacket &msg)
     CharacterRemoveFromGame(true);
 }
 
-void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& /*logoutCancel*/)
-{
-    // Player have already logged out serverside, too late to cancel
-    if (!GetPlayer())
-        return;
-
-    m_loggingOut = false;
-    m_logoutRequestTime = 0;
-
-    SendPacket(WorldPackets::Character::LogoutCancelAck().Write());
-
-    // not remove flags if can't free move - its not set in Logout request code.
-    if (GetPlayer()->CanFreeMove())
-    {
-        GetPlayer()->SetRooted(false);
-
-        GetPlayer()->SetStandState(UNIT_STANDING);
-        GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);
-    }
-}
-
 void WorldSession::HandleTogglePvP(WorldPacket& recv_data)
 {
     // this opcode can be used in two ways: Either set explicit new status or toggle old status
