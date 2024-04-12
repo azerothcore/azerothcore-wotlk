@@ -20,6 +20,7 @@
 
 #include "Object.h"
 #include "ScriptObject.h"
+#include <vector>
 
 enum MovementHook
 {
