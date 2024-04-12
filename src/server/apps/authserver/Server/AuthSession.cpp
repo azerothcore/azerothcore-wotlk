@@ -221,7 +221,7 @@ void AuthSession::ReadHandler()
 
         if (_status != itr->second.status)
         {
-            CloseSocket();
+            Disconnect();
             return;
         }
 
@@ -235,7 +235,7 @@ void AuthSession::ReadHandler()
             size += challenge->size;
             if (size > MAX_ACCEPTED_CHALLENGE_SIZE)
             {
-                CloseSocket();
+                Disconnect();
                 return;
             }
         }
@@ -245,7 +245,7 @@ void AuthSession::ReadHandler()
 
         if (!(*this.*itr->second.handler)())
         {
-            CloseSocket();
+            Disconnect();
             return;
         }
 

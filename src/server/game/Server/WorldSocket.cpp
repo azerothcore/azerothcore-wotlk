@@ -260,7 +260,7 @@ void WorldSocket::ReadHandler()
             // We just received nice new header
             if (!ReadHeaderHandler())
             {
-                CloseSocket();
+                Disconnect();
                 return;
             }
         }
@@ -289,7 +289,7 @@ void WorldSocket::ReadHandler()
         {
             if (result != ReadDataHandlerResult::WaitingForQuery)
             {
-                CloseSocket();
+                Disconnect();
             }
 
             return;

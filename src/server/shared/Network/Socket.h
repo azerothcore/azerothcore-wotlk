@@ -152,7 +152,7 @@ public:
 
     [[nodiscard]] bool IsOpen() const { return !_closed && !_closing; }
 
-    void CloseSocket()
+    void Disconnect()
     {
         if (_closed.exchange(true))
             return;
@@ -161,7 +161,7 @@ public:
         _socket.shutdown(boost::asio::socket_base::shutdown_send, shutdownError);
 
         if (shutdownError)
-            LOG_DEBUG("network", "Socket::CloseSocket: {} errored when shutting down socket: {} ({})", GetRemoteIpAddress().to_string(),
+            LOG_DEBUG("network", "Socket::Disconnect: {} errored when shutting down socket: {} ({})", GetRemoteIpAddress().to_string(),
                 shutdownError.value(), shutdownError.message());
 
         OnClose();
@@ -209,7 +209,7 @@ private:
     {
         if (error)
         {
-            CloseSocket();
+            Disconnect();
             return;
         }
 
@@ -343,10 +343,10 @@ private:
             if (!_writeQueue.empty())
                 AsyncProcessQueue();
             else if (_closing)
-                CloseSocket();
+                Disconnect();
         }
         else
-            CloseSocket();
+            Disconnect();
     }
 
 #else
@@ -380,7 +380,7 @@ private:
 
             if (_closing && _writeQueue.empty())
             {
-                CloseSocket();
+                Disconnect();
             }
 
             return false;
@@ -391,7 +391,7 @@ private:
 
             if (_closing && _writeQueue.empty())
             {
-                CloseSocket();
+                Disconnect();
             }
 
             return false;
@@ -406,7 +406,7 @@ private:
 
         if (_closing && _writeQueue.empty())
         {
-            CloseSocket();
+            Disconnect();
         }
 
         return !_writeQueue.empty();

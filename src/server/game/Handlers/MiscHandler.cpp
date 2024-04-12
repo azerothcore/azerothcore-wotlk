@@ -1658,7 +1658,7 @@ void WorldSession::BootMeHandler(WorldPacket& msg)
         SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
-    m_Socket->CloseSocket();
+    m_Socket->Disconnect();
 }
 
 //===========================================================================
@@ -1671,7 +1671,7 @@ void WorldSession::CreateItemCheatHandler(WorldPacket& msg)
     if (!ActivePlayer()) {
         return;
     }
-    // READ THE MESSAGE DATA
+    // READ THE MESSAGE DATAe
     auto itemId = msg.read<uint32_t>();
     auto quantity = msg.read<uint32_t>();
     // CREATE THE ITEM(S)

@@ -187,7 +187,7 @@ WorldSession::~WorldSession()
     /// - If have unclosed socket, close it
     if (m_Socket)
     {
-        m_Socket->CloseSocket();
+        m_Socket->Disconnect();
         m_Socket = nullptr;
     }
 
@@ -370,7 +370,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
     if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
-        m_Socket->CloseSocket();
+        m_Socket->Disconnect();
 
     if (updater.ProcessUnsafe())
         UpdateTimeOutTime(diff);
@@ -831,7 +831,7 @@ void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
         LOG_INFO("network.kick", "Account: {} Character: '{}' {} kicked with reason: {}", GetAccountId(), m_player ? m_player->GetName() : "<none>",
             m_player ? m_player->GetGUID().ToString() : "", reason);
 
-        m_Socket->CloseSocket();
+        m_Socket->Disconnect();
     }
 
     if (setKicked)

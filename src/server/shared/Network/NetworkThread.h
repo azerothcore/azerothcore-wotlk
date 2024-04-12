@@ -205,7 +205,7 @@ protected:
             if (!sock->Update())
             {
                 if (sock->IsOpen())
-                    sock->CloseSocket();
+                    sock->Disconnect();
 
                 this->SocketRemoved(sock);
 
