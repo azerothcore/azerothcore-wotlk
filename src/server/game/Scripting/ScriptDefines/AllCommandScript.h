@@ -20,10 +20,17 @@
 
 #include "ScriptObject.h"
 
+enum AllCommandHook
+{
+    ALLCOMMANDHOOK_ON_HANDLE_DEV_COMMAND,
+    ALLCOMMANDHOOK_CAN_EXECUTE_COMMAND,
+    ALLCOMMANDHOOK_END
+};
+
 class AllCommandScript : public ScriptObject
 {
 protected:
-    AllCommandScript(const char* name);
+    AllCommandScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
