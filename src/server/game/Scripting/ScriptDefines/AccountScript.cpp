@@ -69,7 +69,7 @@ AccountScript::AccountScript(char const* name, std::vector<uint16> enabledHooks)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < ACCOUNTHOOK_END; i++)
+        for (uint16 i = 0; i < ACCOUNTHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<AccountScript>::AddScript(this, std::move(enabledHooks));

@@ -41,9 +41,7 @@ void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 
 void ScriptMgr::OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_INITIAL_PACKETS_BEFORE_ADD_TO_MAP, {
-        script->OnSendInitialPacketsBeforeAddToMap(player, data);
-    });
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_INITIAL_PACKETS_BEFORE_ADD_TO_MAP, script->OnSendInitialPacketsBeforeAddToMap(player, data));
 }
 
 void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
@@ -73,17 +71,17 @@ void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
 
 void ScriptMgr::OnPlayerPVPFlagChange(Player* player, bool state)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_PVP_FLAG_CHANGE,script->OnPlayerPVPFlagChange(player, state));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_PVP_FLAG_CHANGE, script->OnPlayerPVPFlagChange(player, state));
 }
 
 void ScriptMgr::OnCreatureKill(Player* killer, Creature* killed)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_KILL,script->OnCreatureKill(killer, killed));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_KILL, script->OnCreatureKill(killer, killed));
 }
 
 void ScriptMgr::OnCreatureKilledByPet(Player* petOwner, Creature* killed)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_KILLED_BY_PET,script->OnCreatureKilledByPet(petOwner, killed));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_KILLED_BY_PET, script->OnCreatureKilledByPet(petOwner, killed));
 }
 
 void ScriptMgr::OnPlayerKilledByCreature(Creature* killer, Player* killed)
@@ -198,11 +196,7 @@ void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
 
 void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TEXT_EMOTE,
-        (
-         script->OnTextEmote(player, textEmote, emoteNum, guid)
-        )
-    );
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TEXT_EMOTE, script->OnTextEmote(player, textEmote, emoteNum, guid));
 }
 
 void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
@@ -605,11 +599,13 @@ bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_HAS_ACTIVE_POWER_TYPE, !script->OnPlayerHasActivePowerType(player, power));
 }
 
-void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain) {
+void ScriptMgr::OnUpdateGatheringSkill(Player *player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32 &gain)
+{
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_GATHERING_SKILL, script->OnUpdateGatheringSkill(player, skillId, currentLevel, gray, green, yellow, gain));
 }
 
-void ScriptMgr::OnUpdateCraftingSkill(Player *player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain) {
+void ScriptMgr::OnUpdateCraftingSkill(Player *player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain)
+{
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_CRAFTING_SKILL, script->OnUpdateCraftingSkill(player, skill, currentLevel, gain));
 }
 
@@ -755,16 +751,12 @@ void ScriptMgr::OnFfaPvpStateUpdate(Player* player, bool result)
 
 void ScriptMgr::OnIsPvP(Player* player, bool& result)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_IS_PVP, {
-        script->OnIsPvP(player, result);
-    });
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_IS_PVP, script->OnIsPvP(player, result));
 }
 
 void ScriptMgr::OnGetMaxSkillValueForLevel(Player* player, uint16& result)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_SKILL_VALUE_FOR_LEVEL, {
-        script->OnGetMaxSkillValueForLevel(player, result);
-    });
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_SKILL_VALUE_FOR_LEVEL, script->OnGetMaxSkillValueForLevel(player, result));
 }
 
 bool ScriptMgr::NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value)
@@ -882,6 +874,7 @@ void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& 
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_UPDATE_MOVEMENT_INFO, script->AnticheatUpdateMovementInfo(player, movementInfo));
 }
+
 bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_HANDLE_DOUBLE_JUMP, !script->AnticheatHandleDoubleJump(player, mover));
@@ -897,7 +890,7 @@ PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < PLAYERHOOK_END; i++)
+        for (uint16 i = 0; i < PLAYERHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<PlayerScript>::AddScript(this, std::move(enabledHooks));
