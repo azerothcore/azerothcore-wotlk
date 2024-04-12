@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_WORLD_OBJECT_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
 
 enum WorldObjectHook
 {
