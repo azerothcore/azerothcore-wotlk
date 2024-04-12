@@ -21,112 +21,78 @@
 
 void ScriptMgr::OnOpenStateChange(bool open)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnOpenStateChange(open);
-    });
-}
-
-void ScriptMgr::OnLoadCustomDatabaseTable()
-{
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnLoadCustomDatabaseTable();
-    });
-}
-
-void ScriptMgr::OnBeforeConfigLoad(bool reload)
-{
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnBeforeConfigLoad(reload);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_OPEN_STATE_CHANGE, script->OnOpenStateChange(open));
 }
 
 void ScriptMgr::OnAfterConfigLoad(bool reload)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnAfterConfigLoad(reload);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_AFTER_CONFIG_LOAD, script->OnAfterConfigLoad(reload));
 }
 
-void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion)
+void ScriptMgr::OnLoadCustomDatabaseTable()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnBeforeFinalizePlayerWorldSession(cacheVersion);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_LOAD_CUSTOM_DATABASE_TABLE, script->OnLoadCustomDatabaseTable());
+}
+
+void ScriptMgr::OnBeforeConfigLoad(bool reload)
+{
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_BEFORE_CONFIG_LOAD, script->OnBeforeConfigLoad(reload));
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnMotdChange(newMotd);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_MOTD_CHANGE, script->OnMotdChange(newMotd));
 }
 
 void ScriptMgr::OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnShutdownInitiate(code, mask);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_SHUTDOWN_INITIATE, script->OnShutdownInitiate(code, mask));
 }
 
 void ScriptMgr::OnShutdownCancel()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnShutdownCancel();
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_SHUTDOWN_CANCEL, script->OnShutdownCancel());
 }
 
 void ScriptMgr::OnWorldUpdate(uint32 diff)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnUpdate(diff);
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_UPDATE, script->OnUpdate(diff));
 }
 
 void ScriptMgr::OnStartup()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnStartup();
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_STARTUP, script->OnStartup());
 }
 
 void ScriptMgr::OnShutdown()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnShutdown();
-    });
-}
-
-void ScriptMgr::OnBeforeWorldInitialized()
-{
-    ExecuteScript<WorldScript>([&](WorldScript* script)
-    {
-        script->OnBeforeWorldInitialized();
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_SHUTDOWN, script->OnShutdown());
 }
 
 void ScriptMgr::OnAfterUnloadAllMaps()
 {
-    ExecuteScript<WorldScript>([](WorldScript* script)
-    {
-        script->OnAfterUnloadAllMaps();
-    });
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_AFTER_UNLOAD_ALL_MAPS, script->OnAfterUnloadAllMaps());
 }
 
-WorldScript::WorldScript(const char* name) :
-    ScriptObject(name)
+void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion)
 {
-    ScriptRegistry<WorldScript>::AddScript(this);
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_BEFORE_FINALIZE_PLAYER_WORLD_SESSION, script->OnBeforeFinalizePlayerWorldSession(cacheVersion));
+}
+
+void ScriptMgr::OnBeforeWorldInitialized()
+{
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED, script->OnBeforeWorldInitialized());
+}
+
+WorldScript::WorldScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, WORLDHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < WORLDHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<WorldScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<WorldScript>;
