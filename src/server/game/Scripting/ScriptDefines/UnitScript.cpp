@@ -110,12 +110,12 @@ bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool upda
 
 bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_IS_CUSTOM_BUILD_VALUES_UPDATE, script->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(UnitScript, UNITHOOK_IS_CUSTOM_BUILD_VALUES_UPDATE, script->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index));
 }
 
 bool ScriptMgr::ShouldTrackValuesUpdatePosByIndex(Unit const* unit, uint8 updateType, uint16 index)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_SHOULD_TRACK_VALUES_UPDATE_POS_BY_INDEX, script->ShouldTrackValuesUpdatePosByIndex(unit, updateType, index));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(UnitScript, UNITHOOK_SHOULD_TRACK_VALUES_UPDATE_POS_BY_INDEX, script->ShouldTrackValuesUpdatePosByIndex(unit, updateType, index));
 }
 
 void ScriptMgr::OnPatchValuesUpdate(Unit const* unit, ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player* target)

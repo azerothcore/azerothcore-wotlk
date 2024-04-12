@@ -66,7 +66,7 @@ bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, B
 
 bool ScriptMgr::IsCheckNormalMatch(BattlegroundQueue* queue, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_IS_CHECK_NORMAL_MATCH, script->IsCheckNormalMatch(queue, bgTemplate, bracket_id, minPlayers, maxPlayers));
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_IS_CHECK_NORMAL_MATCH, script->IsCheckNormalMatch(queue, bgTemplate, bracket_id, minPlayers, maxPlayers));
 }
 
 bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
