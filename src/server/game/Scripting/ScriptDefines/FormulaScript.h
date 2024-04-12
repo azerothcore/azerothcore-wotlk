@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_FORMULA_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
 
 enum FormulaHook
 {
