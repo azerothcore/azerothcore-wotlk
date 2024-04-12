@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_ALL_COMMAND_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
 
 enum AllCommandHook
 {
