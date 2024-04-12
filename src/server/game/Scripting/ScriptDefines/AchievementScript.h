@@ -22,10 +22,20 @@
 #include "ScriptObject.h"
 #include <list>
 
+enum AchievementHook
+{
+    ACHIEVEMENTHOOK_SET_REALM_COMPLETED,
+    ACHIEVEMENTHOOK_IS_COMPLETED_CRITERIA,
+    ACHIEVEMENTHOOK_IS_REALM_COMPLETED,
+    ACHIEVEMENTHOOK_ON_BEFORE_CHECK_CRITERIA,
+    ACHIEVEMENTHOOK_CAN_CHECK_CRITERIA,
+    ACHIEVEMENTHOOK_END
+};
+
 class AchievementScript : public ScriptObject
 {
 protected:
-    AchievementScript(const char* name);
+    AchievementScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
