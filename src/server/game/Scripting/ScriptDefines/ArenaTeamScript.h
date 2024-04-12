@@ -20,6 +20,7 @@
 
 #include "Battleground.h"
 #include "ScriptObject.h"
+#include <vector>
 
 enum ArenaTeamHook
 {
