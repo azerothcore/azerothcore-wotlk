@@ -20,10 +20,18 @@
 
 #include "ScriptObject.h"
 
+enum GameEventHook
+{
+    GAMEEVENTHOOK_ON_START,
+    GAMEEVENTHOOK_ON_STOP,
+    GAMEEVENTHOOK_ON_EVENT_CHECK,
+    GAMEEVENTHOOK_END
+};
+
 class GameEventScript : public ScriptObject
 {
 protected:
-    GameEventScript(const char* name);
+    GameEventScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Runs on start event
