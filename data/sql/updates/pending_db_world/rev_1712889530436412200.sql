@@ -507,3 +507,76 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-139275, 0, 5, 0, 109, 0, 100, 0, 0, 1392751, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\''),
 (-139275, 0, 6, 0, 109, 0, 100, 0, 0, 1392752, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\''),
 (-139275, 0, 7, 0, 109, 0, 100, 0, 0, 1392753, 0, 0, 0, 0, 80, 2374502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Garg - On Path Finished - Run Script \'Eat Fish and Restart Event\'');
+
+-- Pathing for Prigmon Entry: 23761
+SET @NPC := 139329;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=6769.81,`position_y`=-7616.6704,`position_z`=128.4896 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6769.81,-7616.6704,128.4896,NULL,40600,0,0,100,0), -- EmoteState 133
+(@PATH,2,6765.559,-7622.009,127.863716,NULL,0,0,0,100,0),
+(@PATH,3,6747.774,-7635.6206,126.93343,NULL,40600,0,0,100,0); -- EmoteState 133
+-- 0x20449C424017344000003A000079A064 .go xyz 6769.81 -7616.6704 128.4896
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23761;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139329);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139329, 0, 0, 0, 108, 0, 100, 0, 1, 1393290, 0, 0, 0, 0, 80, 2376100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - On Point Reached - Run Script'),
+(-139329, 0, 1, 0, 108, 0, 100, 0, 3, 1393290, 0, 0, 0, 0, 80, 2376100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - On Point Reached - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2376100);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2376100, 9, 0, 0, 0, 0, 100, 0, 1700, 1700, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - Actionlist - Set Emote State 133'),
+(2376100, 9, 1, 0, 0, 0, 100, 0, 29100, 29100, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - Actionlist - Set Emote State 0'),
+(2376100, 9, 2, 0, 0, 0, 100, 0, 3240, 3240, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - Actionlist - Set Flag Standstate Kneel'),
+(2376100, 9, 3, 0, 0, 0, 100, 0, 6450, 6450, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prigmon - Actionlist - Remove FlagStandstate Kneel');
+
+-- Pathing for Donna Brascoe Entry: 23858
+SET @NPC := 139333;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6771.347,-7607.2363,128.5081,NULL,0,0,0,100,0),
+(@PATH,2,6771.347,-7607.2363,128.5081,2.897246599197387695,30000,0,0,100,0),
+(@PATH,3,6762.7954,-7614.173,128.21152,NULL,0,0,0,100,0),
+(@PATH,4,6757.339,-7613.1157,128.08092,NULL,0,0,0,100,0),
+(@PATH,5,6757.339,-7613.1157,128.08092,0.575958669185638427,30000,0,0,100,0),
+(@PATH,6,6764.669,-7612.788,128.36795,NULL,0,0,0,100,0),
+(@PATH,7,6764.4897,-7610.385,128.54819,NULL,0,0,0,100,0),
+(@PATH,8,6764.4897,-7610.385,128.54819,5.410520553588867187,60000,0,0,100,0);
+-- 0x20449C4240174C8000003A000079A065 .go xyz 6771.347 -7607.2363 128.5081
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 23858);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139333);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139333, 0, 0, 0, 108, 0, 100, 0, 2, 1393330, 0, 0, 0, 0, 80, 2385800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Donna Brascoe - On Point 2 of Path 1393330 Reached - Run Script'),
+(-139333, 0, 1, 0, 108, 0, 100, 0, 5, 1393330, 0, 0, 0, 0, 80, 2385800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Donna Brascoe - On Point 5 of Path 1393330 Reached - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2385800);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2385800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 173, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Donna Brascoe - Actionlist - Set Emote State 173'),
+(2385800, 9, 1, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Donna Brascoe - Actionlist - Set Emote State 0');
+
+-- Pathing for Samir Entry: 23724
+SET @NPC := 139274;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=6765.5796,`position_y`=-7632.0947,`position_z`=127.259575 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6765.5796,-7632.0947,127.259575,NULL,0,0,0,100,0),
+(@PATH,2,6765.5796,-7632.0947,127.259575,4.991641521453857421,24000,0,0,100,0),
+(@PATH,3,6742.9854,-7615.5625,126.163506,NULL,24000,0,0,100,0),
+(@PATH,4,6767.635,-7622.185,127.99035,NULL,0,0,0,100,0),
+(@PATH,5,6787.145,-7619.097,128.1925,NULL,30000,0,0,100,0),
+(@PATH,6,6765.5684,-7632.1235,127.25732,NULL,0,0,0,100,0),
+(@PATH,7,6782.38,-7627.6665,128.41327,NULL,0,0,0,100,0);
+-- 0x20449C4240172B0000003A000079A064 .go xyz 6765.5796 -7632.0947 127.259575
