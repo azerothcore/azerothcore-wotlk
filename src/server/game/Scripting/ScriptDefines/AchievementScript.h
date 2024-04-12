@@ -21,6 +21,7 @@
 #include "Duration.h"
 #include "ScriptObject.h"
 #include <list>
+#include <vector>
 
 enum AchievementHook
 {
