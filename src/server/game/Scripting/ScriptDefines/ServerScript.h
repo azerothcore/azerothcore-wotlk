@@ -19,11 +19,23 @@
 #define SCRIPT_OBJECT_SERVER_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum ServerHook
+{
+    SERVERHOOK_ON_NETWORK_START,
+    SERVERHOOK_ON_NETWORK_STOP,
+    SERVERHOOK_ON_SOCKET_OPEN,
+    SERVERHOOK_ON_SOCKET_CLOSE,
+    SERVERHOOK_CAN_PACKET_SEND,
+    SERVERHOOK_CAN_PACKET_RECEIVE,
+    SERVERHOOK_END
+};
 
 class ServerScript : public ScriptObject
 {
 protected:
-    ServerScript(const char* name);
+    ServerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when reactive socket I/O is started (WorldSocketMgr).
