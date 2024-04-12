@@ -36,6 +36,10 @@ services:
       context: .
       target: db-import
       dockerfile: apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     environment:
       AC_DATA_DIR: "/azerothcore/env/dist/data"
       AC_LOGS_DIR: "/azerothcore/env/dist/logs"
@@ -57,6 +61,10 @@ services:
       context: .
       target: worldserver
       dockerfile: apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     networks:
       - ac-network
     stdin_open: true
@@ -94,6 +102,10 @@ services:
       context: .
       target: authserver
       dockerfile: apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     networks:
       - ac-network
     tty: true
@@ -119,7 +131,6 @@ services:
   ac-client-data-init:
     container_name: ac-client-data-init
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: client-data
@@ -136,11 +147,14 @@ services:
   ac-tools:
     container_name: ac-tools
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-root}
     build:
       context: .
       target: tools
       dockerfile: apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     working_dir: /azerothcore/env/client/
     volumes:
       # this is not the directory of the extracted data! It's the client folder used by the extractors
@@ -159,7 +173,6 @@ services:
   ac-dev-server:
     tty: true
     image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    user: ${DOCKER_USER:-root}
     build:
       context: .
       dockerfile: ./apps/docker/Dockerfile.dev-server
