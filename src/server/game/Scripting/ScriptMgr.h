@@ -727,6 +727,11 @@ public:
     // With this approach, we wouldn't call all available hooks in case if we override just one hook.
     static EnabledHooksVector EnabledHooks;
 
+    static void InitEnabledHooksIfNeeded(uint16 totalAvailableHooks)
+    {
+        EnabledHooks.resize(totalAvailableHooks);
+    }
+
     static void AddScript(TScript* const script, std::vector<uint16> enabledHooks = {})
     {
         ASSERT(script);
@@ -735,7 +740,7 @@ public:
             return;
 
         if (EnabledHooks.empty())
-            EnabledHooks.resize(script->GetTotalAvailableHooks());
+            InitEnabledHooksIfNeeded(script->GetTotalAvailableHooks());
 
         if (script->isAfterLoadScript())
         {
