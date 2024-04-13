@@ -159,6 +159,13 @@ namespace WorldPackets
     }
 }
 
+
+struct LogoutResponse {
+  BOOL logoutFailed;
+  bool instantLogout;
+};
+
+
 enum AccountDataType
 {
     GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
@@ -352,6 +359,7 @@ public:
     void WriteMovementInfo(WorldPacket* data, CMovement* mi);
 
     void SendLogoutCancelAckMessage ();
+    void SendLogoutResponse (LogoutResponse& res);
 
     void SendPacket(WorldPacket const* packet);
     void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);

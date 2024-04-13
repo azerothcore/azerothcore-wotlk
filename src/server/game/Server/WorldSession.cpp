@@ -218,13 +218,8 @@ void WorldSession::CharacterLogout (bool instant, BOOL failed /*=FALSE*/) {
   if (Player* plr = ActivePlayer()) {
     this->m_loggingOut = true;
 
-    // Send the logout response
-    {
-      WorldPacket outbound(SMSG_LOGOUT_RESPONSE, sizeof(instant)+sizeof(failed));
-      outbound << failed;
-      outbound << instant;
-      SendPacket(&outbound);
-    }
+    LogoutResponse res = { failed, instant };
+    SendLogoutResponse(res);
 
     // Continue processing the character logout
     // if we didn't send a failure response
@@ -291,6 +286,15 @@ void WorldSession::SendLogoutCancelAckMessage () {
   WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
   SendPacket(&msg);
 }
+
+//===========================================================================
+void WorldSession::SendLogoutResponse (LogoutResponse& res) {
+  WorldPacket msg(SMSG_LOGOUT_RESPONSE, sizeof(res));
+  msg << res.logoutFailed;
+  msg << res.instantLogout;
+  SendPacket(&msg);
+}
+
 
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
