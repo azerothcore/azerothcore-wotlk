@@ -1064,7 +1064,6 @@ public:                                                 // opcodes handlers
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
     void BootMeHandler(WorldPacket& msg);
-    void CreateItemCheatHandler(WorldPacket& msg);
     void GmResurrectHandler(WorldPacket& msg);
     void LearnSpellHandler(WorldPacket& msg);
     void SendGmResurrectFailure();

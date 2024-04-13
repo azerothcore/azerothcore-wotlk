@@ -86,6 +86,10 @@
 
 static bool s_initialized;
 
+static BOOL PlayerCreateItemCheatHandler (WorldSession* ses,
+                                          Opcodes       msgId,
+                                          uint32_t      eventTime,
+                                          WorldPacket*  msg);
 static BOOL LogoutRequestHandler (WorldSession* ses,
                                   Opcodes       msgId,
                                   uint32_t      eventTime,
@@ -16314,6 +16318,29 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 ***/
 
 //===========================================================================
+static BOOL PlayerCreateItemCheatHandler (WorldSession* ses,
+                                          Opcodes       msgId,
+                                          uint32_t      eventTime,
+                                          WorldPacket*  msg) {
+
+  if (!ses->IsGMAccount()) {
+    ses->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
+
+  if (Player* plr = ses->ActivePlayer()) {
+    // READ THE MESSAGE DATA
+    auto itemId = msg->read<uint32_t>();
+    auto quantity = msg->read<uint32_t>();
+    // CREATE THE ITEM(S)
+    plr->CreateItem(itemId, quantity);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+//===========================================================================
 static BOOL HandleLogoutCancel (WorldSession* ses,
                                 Opcodes       msgId,
                                 uint32_t      eventTime,
@@ -16360,17 +16387,25 @@ static BOOL LogoutRequestHandler (WorldSession* ses,
 *
 ***/
 
+//===========================================================================
 void PlayerInitialize () {
   if (s_initialized) return;
+
+  WorldSocket::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
   WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, LogoutRequestHandler);
   WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, HandleLogoutCancel);
+
   s_initialized = true;
 }
 
+//===========================================================================
 void PlayerDestroy () {
   if (!s_initialized) return;
+
+  WorldSocket::ClearMessageHandler(CMSG_CREATEITEM);
   WorldSocket::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
   WorldSocket::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
+
   s_initialized = false;
 }
 

@@ -1662,23 +1662,6 @@ void WorldSession::BootMeHandler(WorldPacket& msg)
 }
 
 //===========================================================================
-void WorldSession::CreateItemCheatHandler(WorldPacket& msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-    if (!ActivePlayer()) {
-        return;
-    }
-    // READ THE MESSAGE DATAe
-    auto itemId = msg.read<uint32_t>();
-    auto quantity = msg.read<uint32_t>();
-    // CREATE THE ITEM(S)
-    ActivePlayer()->CreateItem(itemId, quantity);
-}
-
-//===========================================================================
 void WorldSession::GmResurrectHandler(WorldPacket& msg)
 {
     if (!IsGMAccount()) {
