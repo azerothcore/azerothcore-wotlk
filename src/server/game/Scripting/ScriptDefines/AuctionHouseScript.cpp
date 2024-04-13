@@ -91,7 +91,7 @@ AuctionHouseScript::AuctionHouseScript(const char* name, std::vector<uint16> ena
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < AUCTIONHOUSEHOOK_END; i++)
+        for (uint16 i = 0; i < AUCTIONHOUSEHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<AuctionHouseScript>::AddScript(this, std::move(enabledHooks));
