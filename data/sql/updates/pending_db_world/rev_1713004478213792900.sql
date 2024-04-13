@@ -61,7 +61,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (@PATH, 13, 1044.7418 ,1438.5563 ,27.436478, NULL, 0, 'Scarlet Monastery Patrol'),
 (@PATH, 14, 1045.2096 ,1448.4248 ,29.248976, NULL, 0, 'Scarlet Monastery Patrol');
 
- -- Scarlet Myrmidon with guid 39969 smart ai
+ -- Scarlet Myrmidon with guid 39967 smart ai
 SET @ENTRY := -39967;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 4300;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
