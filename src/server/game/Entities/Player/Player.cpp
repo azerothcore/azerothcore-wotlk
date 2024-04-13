@@ -16360,20 +16360,26 @@ static BOOL LogoutRequestHandler (WorldSession* ses,
                                   WorldPacket*  msg) {
 
   if (Player* plr = ses->ActivePlayer()) {
-    bool instantLogout = false;
-    bool logoutFailed = false;
+    LogoutResponse res;
+    res.logoutFailed = FALSE;
+    res.instantLogout = FALSE;
 
     // THE PLAYER CAN'T LOG OUT WHILE IN COMBAT OR FALLING
     // OR WHILE THEY ARE NOT IN CONTROL OF THEIR CHARACTER
     if (plr->IsInCombat() || plr->IsFalling() || (!plr->CanFreeMove() && !plr->IsOnTaxi()))
-      logoutFailed = true;
+      res.logoutFailed = TRUE;
 
     // THE PLAYER CAN LOG OUT INSTANTLY WHILE ON TAXI OR RESTING
     if (plr->IsOnTaxi() || plr->IsResting())
-      instantLogout = true;
+      res.instantLogout = TRUE;
 
-    // SEND THE LOGOUT RESPONSE
-    ses->CharacterLogout(instantLogout, logoutFailed);
+    ses->SendLogoutResponse(res);
+
+    // INITIATE THE CHARACTER LOGOUT PROCESS
+    // IF WE SENT A SUCCESSFUL LOGOUT RESPONSE
+    if (res.logoutFailed == FALSE)
+      ses->CharacterLogout(res.instantLogout);
+
     return TRUE;
   }
 

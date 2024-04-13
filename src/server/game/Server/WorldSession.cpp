@@ -214,30 +214,22 @@ void WorldSession::CharacterAbortLogout () {
 }
 
 //===========================================================================
-void WorldSession::CharacterLogout (bool instant, BOOL failed /*=FALSE*/) {
+void WorldSession::CharacterLogout (bool instant) {
   if (Player* plr = ActivePlayer()) {
     this->m_loggingOut = true;
+    if (instant)
+      CharacterRemoveFromGame(true);
+    else {
+      // Start the logout timer
+      this->m_logoutRequestTime = time(nullptr);
 
-    LogoutResponse res = { failed, instant };
-    SendLogoutResponse(res);
+      // Force the player to sit
+      if (plr->GetStandState() == UNIT_STANDING)
+        plr->SetStandState(UNIT_SITTING);
 
-    // Continue processing the character logout
-    // if we didn't send a failure response
-    if (!failed) {
-      if (instant)
-        CharacterRemoveFromGame(true);
-      else {
-        // Start the logout timer
-        this->m_logoutRequestTime = time(nullptr);
-
-        // Force the player to sit
-        if (plr->GetStandState() == UNIT_STANDING)
-          plr->SetStandState(UNIT_SITTING);
-
-        // Root and stun the player to prevent control during logout
-        plr->SetMovement(MOVE_ROOT);
-        plr->SetUnitFlag(UNIT_FLAG_STUNNED);
-      }
+      // Root and stun the player to prevent control during logout
+      plr->SetMovement(MOVE_ROOT);
+      plr->SetUnitFlag(UNIT_FLAG_STUNNED);
     }
   }
 }

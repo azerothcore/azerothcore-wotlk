@@ -340,7 +340,7 @@ public:
     ~WorldSession();
 
     void CharacterAbortLogout ();
-    void CharacterLogout (bool instant, BOOL failed = FALSE);
+    void CharacterLogout (bool instant);
     bool CharacterLoggingOut () const { return this->m_loggingOut; }
     void CharacterRemoveFromGame(bool save);
 
