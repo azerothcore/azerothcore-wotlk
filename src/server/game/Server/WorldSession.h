@@ -346,7 +346,7 @@ public:
 
     char const* GetAccountName();
 
-    bool IsGMAccount() const;
+    bool IsGMAccount () const;
 
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }

@@ -249,9 +249,8 @@ char const* WorldSession::GetAccountName()
 }
 
 //===========================================================================
-bool WorldSession::IsGMAccount() const
-{
-    return ((m_accountFlags & (uint32_t)AccountFlag::FLAG_GM) == (uint32_t)AccountFlag::FLAG_GM);
+bool WorldSession::IsGMAccount () const {
+    return (m_accountFlags & static_cast<uint>(AccountFlag::FLAG_GM)) != 0;
 }
 
 std::string const& WorldSession::GetPlayerName() const
