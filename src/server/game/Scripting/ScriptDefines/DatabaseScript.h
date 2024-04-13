@@ -21,11 +21,18 @@
 #include "ScriptObject.h"
 #include <vector>
 
+enum DatabaseHook
+{
+    DATABASEHOOK_ON_AFTER_DATABASES_LOADED,
+    DATABASEHOOK_ON_AFTER_DATABASE_LOAD_CREATURETEMPLATES,
+    DATABASEHOOK_END
+};
+
 class DatabaseScript : public ScriptObject
 {
 protected:
 
-    DatabaseScript(const char* name);
+    DatabaseScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
 

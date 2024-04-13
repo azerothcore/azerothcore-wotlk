@@ -19,11 +19,26 @@
 #define SCRIPT_OBJECT_ACCOUNT_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum AccountHook
+{
+    ACCOUNTHOOK_ON_ACCOUNT_LOGIN,
+    ACCOUNTHOOK_ON_BEFORE_ACCOUNT_DELETE,
+    ACCOUNTHOOK_ON_LAST_IP_UPDATE,
+    ACCOUNTHOOK_ON_FAILED_ACCOUNT_LOGIN,
+    ACCOUNTHOOK_ON_EMAIL_CHANGE,
+    ACCOUNTHOOK_ON_FAILED_EMAIL_CHANGE,
+    ACCOUNTHOOK_ON_PASSWORD_CHANGE,
+    ACCOUNTHOOK_ON_FAILED_PASSWORD_CHANGE,
+    ACCOUNTHOOK_CAN_ACCOUNT_CREATE_CHARACTER,
+    ACCOUNTHOOK_END
+};
 
 class AccountScript : public ScriptObject
 {
 protected:
-    AccountScript(const char* name);
+    AccountScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when an account logged in successfully

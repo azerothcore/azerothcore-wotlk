@@ -240,10 +240,10 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode(why);
+            if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
+                akama->DespawnOrUnsummon();
 
-            if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
-                akama->AI()->EnterEvadeMode(why);
+            BossAI::EnterEvadeMode(why);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -413,7 +413,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_SUMMON_MINIONS2:
-                    if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
+                    if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                         akama->AI()->DoAction(ACTION_FIGHT_MINIONS);
                     break;
                 case EVENT_PHASE_2_EYE_BEAM_START:
@@ -450,7 +450,7 @@ public:
                         maiev->AI()->Talk(SAY_MAIEV_SHADOWSONG_ILLIDAN3);
                     }
 
-                    if (Creature* akama = instance->GetCreature(NPC_AKAMA_ILLIDAN))
+                    if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                     {
                         akama->AI()->DoAction(ACTION_ILLIDAN_DEAD);
                         akama->SetTarget(me->GetGUID());
