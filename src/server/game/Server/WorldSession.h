@@ -351,6 +351,8 @@ public:
     void ReadMovementInfo(WorldPacket& data, CMovement* mi);
     void WriteMovementInfo(WorldPacket* data, CMovement* mi);
 
+    void SendLogoutCancelAckMessage ();
+
     void SendPacket(WorldPacket const* packet);
     void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
     void SendNotification(uint32 string_id, ...);

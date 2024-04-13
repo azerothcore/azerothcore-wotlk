@@ -204,9 +204,7 @@ void WorldSession::CharacterAbortLogout () {
   if (Player* plr = ActivePlayer()) {
     this->m_loggingOut = false;
 
-    // Send the logout cancel ack packet
-    WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
-    SendPacket(&msg);
+    SendLogoutCancelAckMessage();
 
     // The player was locked during the camping timeout in CharacterLogout,
     // so allow it to move freely again.
@@ -286,6 +284,12 @@ std::string WorldSession::GetPlayerInfo() const
 ObjectGuid::LowType WorldSession::GetGuidLow() const
 {
     return GetPlayer() ? GetPlayer()->GetGUID().GetCounter() : 0;
+}
+
+//===========================================================================
+void WorldSession::SendLogoutCancelAckMessage () {
+  WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
+  SendPacket(&msg);
 }
 
 /// Send a packet to the client
