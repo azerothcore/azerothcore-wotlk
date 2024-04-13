@@ -3061,8 +3061,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (e.action.wpData.pathId)
             {
-                me->LoadPath(e.action.wpData.pathId);
-                me->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+                for (WorldObject* target : targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        target->ToCreature()->LoadPath(e.action.wpData.pathId);
+                        target->ToCreature()->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+                    }
+                }
             }
 
             break;
@@ -3071,9 +3077,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (e.action.wpDataRandom.pathId1 && e.action.wpDataRandom.pathId2)
             {
-                uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
-                me->LoadPath(path);
-                me->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
+                for (WorldObject* target : targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
+                        target->ToCreature()->LoadPath(path);
+                        target->ToCreature()->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
+                    }
+                }
             }
 
             break;

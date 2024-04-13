@@ -72,7 +72,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 (@CGUID+65, 23748, 530, 3433, 3517, 0, 6788.49, -7539.9, 126.109, 3.38594, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+66, 23761, 530, 3433, 3508, 1, 6769.81, -7616.67, 128.49, 0.697258, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+67, 23762, 530, 3433, 3507, 1, 6736.026, -7558.7544, 126.89935, 1.48352, 120, 0, 0, 53788, 1, NULL),
-(@CGUID+68, 23764, 530, 3433, 3507, 0, 6740.1978, -7559.655, 126.451454, 1.972222, 120, 0, 0, 53788, 1, NULL),
+(@CGUID+68, 23764, 530, 3433, 3507, 1, 6740.1978, -7559.655, 126.451454, 1.972222, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+69, 23766, 530, 3433, 3507, 1, 6742.55, -7556.7, 126.212, 2.21112, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+70, 23858, 530, 3433, 3508, 1, 6764.49, -7610.38, 128.548, 5.41052, 120, 0, 0, 53788, 1, NULL),
 (@CGUID+71, 24851, 530, 3433, 3508, 0, 6789.3, -7750.54, 126.815, 1.02974, 120, 0, 0, 53788, 1, NULL),
@@ -176,17 +176,16 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `BroadcastTextId`, `
 (23560, 0, 3, 22214, 'Go jump in the lake, won\'t ya Mack? I smelled ya before I saw ya....', 12, 274, 'Ameenah to Mack'),
 (23748, 0, 0, 22252, 'Turgore! Get up and help me unload, you lazy peon!', 12, 60, 'Kurzel to Turgore'),
 (23748, 1, 0, 22253, 'Useless orc! Just you wait, one day I\'ll drop somethin in yer grog that you\'ll NEVER wake up from....', 12, 0, 'Kurzel to Turgore'),
-(23764, 0, 0, 22254, 'Say, Brend, why is it that you never make eyes at me?', 12, 0, 'Marge to Brend'),
+(23764, 0, 0, 22254, 'Say, Brend, why is it that you never make eyes at me?', 12, 396, 'Marge to Brend'),
 (23764, 1, 0, 22265, 'Say, Brend, whisper me somethin\' sweet, will ya?', 12, 0, 'Marge to Brend'),
-(23764, 3, 0, 22258, 'Oohhhh. How dare you!', 12, 0, 'Marge to Brend'),
+(23764, 3, 0, 22258, 'Oohhhh. How dare you!', 12, 5, 'Marge to Brend'),
 (23764, 4, 0, 22259, 'Let that be a lesson to ya....', 12, 0, 'Marge to Brend'),
 (23764, 2, 0, 22266, 'But Brend, yer always drinkin\'!', 12, 0, 'Marge to Brend'),
 (23764, 5, 0, 22267, 'Filthy orc!', 12, 0, 'Marge to Morgom'),
-(23762, 0, 0, 22255, 'Well, Marge, I\'ve actually been looking for a way to tell you this....', 12, 0, 'Brend to Marge'),
-(23762, 1, 0, 22256, 'Try as I might, I can\'t seem to drink you pretty!', 12, 0, 'Brend to Marge'),
-(23762, 2, 0, 22260, 'Hahahahahahahah!', 12, 0, 'Brend to Marge'),
-(23762, 3, 0, 22268, 'Lissen Marge, I thought I told ya never to bother me when I be drinkin\'....', 12, 0, 'Brend to Marge'),
-(23762, 4, 0, 22269, 'Hey Morgom, looks like Margie here be needin\' some attention. What\'dya say?', 12, 0, 'Brend to Morgom'),
+(23762, 0, 0, 22255, 'Well, Marge, I\'ve actually been looking for a way to tell you this....', 12, 1, 'Brend to Marge'),
+(23762, 1, 0, 22256, 'Try as I might, I can\'t seem to drink you pretty!', 12, 1, 'Brend to Marge'),
+(23762, 2, 0, 22268, 'Lissen Marge, I thought I told ya never to bother me when I be drinkin\'....', 12, 396, 'Brend to Marge'),
+(23762, 3, 0, 22269, 'Hey Morgom, looks like Margie here be needin\' some attention. What\'dya say?', 12, 0, 'Brend to Morgom'),
 (23766, 0, 0, 22270, 'Zug Zug!', 12, 0, 'Morgom');
 
 DELETE FROM `creature_addon` WHERE (`guid` = @CGUID+2);
@@ -580,3 +579,111 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,6765.5684,-7632.1235,127.25732,NULL,0,0,0,100,0),
 (@PATH,7,6782.38,-7627.6665,128.41327,NULL,0,0,0,100,0);
 -- 0x20449C4240172B0000003A000079A064 .go xyz 6765.5796 -7632.0947 127.259575
+
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 23764);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(23764, 1, 2717, 0, 0, 53788);
+
+-- Pathing for Marge Entry: 23764
+SET @NPC := 139331;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6707.7837,-7581.739,126.92148,NULL,0,1,0,100,0),
+(@PATH,2,6706.914,-7601.817,125.75387,NULL,0,1,0,100,0),
+(@PATH,3,6717.3823,-7607.291,126.25313,NULL,0,1,0,100,0),
+(@PATH,4,6767.432,-7593.558,127.700195,NULL,0,1,0,100,0),
+(@PATH,5,6771.6353,-7607.7554,128.52863,NULL,0,1,0,100,0),
+(@PATH,6,6766.284,-7613.7754,128.30774,NULL,0,1,0,100,0),
+(@PATH,7,6754.3076,-7614.549,127.613434,NULL,0,1,0,100,0),
+(@PATH,8,6745.358,-7601.0747,126.58633,NULL,0,1,0,100,0),
+(@PATH,9,6752.4004,-7585.6665,127.67639,NULL,0,1,0,100,0),
+(@PATH,10,6766.2617,-7565.039,127.083145,NULL,0,1,0,100,0),
+(@PATH,11,6785.4507,-7567.6406,126.813774,NULL,0,1,0,100,0),
+(@PATH,12,6786.0024,-7585.2285,127.08642,NULL,0,1,0,100,0),
+(@PATH,13,6769.0938,-7591.8647,127.65797,NULL,0,1,0,100,0),
+(@PATH,14,6756.7524,-7583.4106,126.999275,NULL,0,1,0,100,0),
+(@PATH,15,6744.7173,-7570.9653,126.96568,NULL,0,1,0,100,0),
+(@PATH,16,6740.1978,-7559.655,126.451454,NULL,0,1,0,100,0); -- Throw Bottle
+-- 0x20449C424017350000003A000079A065 .go xyz 6707.7837 -7581.739 126.92148
+
+DELETE FROM `waypoint_data` WHERE `id`=@PATH+1;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH+1,1,6737.375,-7556.5435,126.62047,NULL,8100,0,0,100,0), -- Pick Up New Bottle
+(@PATH+1,2,6740.1978,-7559.655,126.451454,NULL,0,0,0,100,0),
+(@PATH+1,3,6740.0806,-7559.5254,126.45913,NULL,0,0,0,100,0),
+(@PATH+1,4,6740.0806,-7559.5254,126.45913,1.972222089767456054,0,0,0,100,0);
+
+-- Pathing for Brend Entry: 23762
+SET @NPC := 139330;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,6745.162,-7592.8345,126.13598,NULL,0,1,0,100,0),
+(@PATH,2,6754.219,-7617.1416,127.310326,NULL,0,1,0,100,0),
+(@PATH,3,6771.998,-7623.348,128.08301,NULL,0,1,0,100,0),
+(@PATH,4,6785.475,-7616.0693,128.53796,NULL,0,1,0,100,0),
+(@PATH,5,6789.082,-7594.475,127.34944,NULL,0,1,0,100,0),
+(@PATH,6,6789.169,-7580.259,127.03157,NULL,0,1,0,100,0),
+(@PATH,7,6783.683,-7567.1753,126.75947,NULL,0,1,0,100,0),
+(@PATH,8,6774.5586,-7560.7173,127.01713,NULL,0,1,0,100,0),
+(@PATH,9,6759.7524,-7561.8696,126.23902,NULL,0,1,0,100,0),
+(@PATH,10,6748.3784,-7577.643,127.507355,NULL,0,1,0,100,0),
+(@PATH,11,6751.5986,-7612.553,127.2652,NULL,0,1,0,100,0),
+(@PATH,12,6765.166,-7621.724,127.84164,NULL,0,1,0,100,0),
+(@PATH,13,6783.303,-7611.415,128.59036,NULL,0,1,0,100,0),
+(@PATH,14,6789.3887,-7579.3794,127.28639,NULL,0,1,0,100,0),
+(@PATH,15,6777.856,-7558.4507,126.401634,NULL,0,1,0,100,0),
+(@PATH,16,6750.376,-7561.012,126.14468,NULL,16000,1,0,100,0), -- Hit By Bottle (42333), StandState: 7 for 16s
+(@PATH,17,6736.026,-7558.7544,126.89935,NULL,0,0,0,100,0),
+(@PATH,18,6736.026,-7558.7544,126.89935,1.48352980613708496,0,0,0,100,0);
+-- 0x20449C424017348000003A000079A063 .go xyz 6745.162 -7592.8345 126.13598
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (23762, 23764, 23766));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139331);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139331, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Respawn - Set Event Phase 1'),
+(-139331, 0, 1, 0, 1, 1, 100, 0, 120000, 180000, 120000, 180000, 0, 0, 80, 2376400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Out of Combat - Run Script (Phase 1)'),
+(-139331, 0, 2, 0, 1, 1, 100, 0, 6400, 21600, 6400, 21600, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Out of Combat - Play Emote 92 (Phase 1)'),
+(-139331, 0, 3, 4, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Data Set 1 1 - Stop Follow'),
+(-139331, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1393311, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Data Set 1 1 - Start Waypoint Path'),
+(-139331, 0, 6, 0, 108, 0, 100, 0, 1, 1393311, 0, 0, 0, 0, 80, 2376401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Point 1 of Path 1393311 Reached - Run Script \'Pick Up Bottle\''),
+(-139331, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 124, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Data Set 1 1 - Load Equipment Id 0'),
+(-139331, 0, 7, 0, 109, 0, 100, 0, 0, 1393311, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - On Path 1393311 Finished - Set Event Phase 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2376400);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2376400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Set Event Phase 0'),
+(2376400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 10, 139330, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Set Event Phase 0 (Brend)'),
+(2376400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Say Line 0'),
+(2376400, 9, 3, 0, 0, 0, 100, 0, 5250, 5250, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 139330, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Say Line 0 (Brend)'),
+(2376400, 9, 4, 0, 0, 0, 100, 0, 8080, 8080, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 139330, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Say Line 1 (Brend)'),
+(2376400, 9, 5, 0, 0, 0, 100, 0, 2800, 2800, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Say Line 3'),
+(2376400, 9, 6, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 29, 10, 180, 0, 0, 0, 0, 10, 139330, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Start Follow Closest Creature \'Brend\''),
+(2376400, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1393300, 0, 0, 0, 0, 0, 10, 139330, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Start Waypoint Path (Brend)');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139330);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139330, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - On Respawn - Set Event Phase 1'),
+(-139330, 0, 1, 0, 1, 1, 100, 0, 6400, 21600, 6400, 21600, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - Out of Combat - Play Emote 92 (Phase 1)'),
+(-139330, 0, 2, 0, 108, 0, 100, 0, 16, 1393300, 0, 0, 0, 0, 80, 2376200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - On Point 16 of Path 1393300 Reached - Run Script \'Hit by Bottle\''),
+(-139330, 0, 3, 0, 109, 0, 100, 0, 0, 1393300, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - On Path 1393300 Finished - Set Event Phase 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2376200);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2376200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 139331, 0, 0, 0, 0, 0, 0, 0, 'Brend - Actionlist - Set Data 1 1'),
+(2376200, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 42333, 0, 10, 139331, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - Actionlist - Cross Cast \'Throw Torch\''),
+(2376200, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - Actionlist - Set Flag Standstate Dead'),
+(2376200, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 10, 139331, 0, 0, 0, 0, 0, 0, 0, 'Brend - Actionlist - Say Line 4 (Marge)'),
+(2376200, 9, 4, 0, 0, 0, 100, 0, 16000, 16000, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brend - Actionlist - Remove FlagStandstate Dead');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2376401);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2376401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Set Flag Standstate Kneel'),
+(2376401, 9, 1, 0, 0, 0, 100, 0, 8100, 8100, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Remove FlagStandstate Kneel'),
+(2376401, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 124, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Marge - Actionlist - Load Equipment Id 1');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -139332);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-139332, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Morgom - On Respawn - Set Event Phase 1'),
+(-139332, 0, 1, 0, 1, 1, 100, 0, 6400, 21600, 6400, 21600, 0, 0, 5, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Morgom - Out of Combat - Play Emote 92 (Phase 1)');
