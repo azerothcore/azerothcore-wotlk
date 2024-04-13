@@ -724,8 +724,11 @@ enum SMART_ACTION
     SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
     SMART_ACTION_WAYPOINT_DATA_START                = 232,    // pathId, repeat
     SMART_ACTION_WAYPOINT_DATA_RANDOM               = 233,    // pathId1, pathId2, repeat
+    SMART_ACTION_MOVEMENT_STOP                      = 234,    // 
+    SMART_ACTION_MOVEMENT_PAUSE                     = 235,    // timer
+    SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
 
-    SMART_ACTION_AC_END                             = 234,    // placeholder
+    SMART_ACTION_AC_END                             = 237,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1457,6 +1460,11 @@ struct SmartAction
             uint32 pathId2;
             SAIBool repeat;
         } wpDataRandom;
+
+        struct
+        {
+            uint32 timer;
+        } move;
         //! Note for any new future actions
         //! All parameters must have type uint32
 

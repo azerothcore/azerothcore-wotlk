@@ -3090,6 +3090,30 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_MOVEMENT_STOP:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->StopMoving();
+
+            break;
+        }
+        case SMART_ACTION_MOVEMENT_PAUSE:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->PauseMovement(e.action.move.timer);
+
+            break;
+        }
+        case SMART_ACTION_MOVEMENT_RESUME:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->ResumeMovement(e.action.move.timer);
+
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
