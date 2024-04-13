@@ -280,8 +280,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (@PATH, 7+1, 1137.558, 1435.392, 30.44586, NULL, 0,'Scarlet Monastery Patrol'),
 (@PATH, 8+1, 1140.994, 1449.657, 30.44585, NULL, 0,'Scarlet Monastery Patrol');
 
-
-
 -- Replaces the generated coordinates
 DELETE FROM `creature` WHERE (`id1` = 4302) AND (`guid` IN (40031));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
