@@ -1,9 +1,15 @@
+ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (8596));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+(13, 1, 8596, 0, 0, 23, 0, 1519, 0, 0, 0, 'Potential target of the spell in area  (1519)'),
+(13, 1, 8596, 0, 0, 31, 0, 3, 6173, 39538, 0, 'Potential target of the spell is creature, entry is Gazin Tenorm (6173) and guid is 39538');
+
  -- Duthorian Rall smart ai
 SET @ENTRY := 6171;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 0, 19, 0, 100, 0, 1781, 0, 0, 0, 86, 8596, 0, 19, 5489, 40, 0, 19, 6173, 40, 0, 0, 0, 0, 0, 'On player accepted quest The Tome of Divinity (1781) - Closest alive creature (5489) in 40 yards: Cast spell  Heal Visual (8596) at Closest alive creature (6173) in 40 yards');
+(@ENTRY, 0, 0, 0, 19, 0, 100, 0, 1781, 0, 0, 0, 86, 8596, 0, 10, 37571, 5489, 0, 10, 39538, 6173, 0, 0, 0, 0, 0, 'On player accepted quest The Tome of Divinity (1781) - Creature Brother Joshua (5489) with guid 37571 (fetching): Cast spell  Heal Visual (8596) at Creature Gazin Tenorm (6173) with guid 39538 (fetching)');
+
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 6171 AND `SourceId` = 0;
 
@@ -21,5 +27,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY * 100, 9, 3, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 2.5 seconds - Self: Remove stand state KNEEL'),
 (@ENTRY * 100, 9, 4, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 66, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 2.5 seconds - Self: Set orientation to home position orientation');
 
-
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 6173 AND `SourceId` = 0;
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 6173;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(6173, 0, 0, 'Thanks to you, $n.', 12, 6, 100, 0, 0, 0, 2284, 0, 'Gazin Tenorm');
