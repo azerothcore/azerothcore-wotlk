@@ -712,29 +712,46 @@ public:
     typedef std::map<uint32, TScript*> ScriptMap;
     typedef typename ScriptMap::iterator ScriptMapIterator;
 
-    typedef std::vector<TScript*> ScriptVector;
+    typedef std::vector<std::pair<TScript*,std::vector<uint16>>> ScriptVector;
     typedef typename ScriptVector::iterator ScriptVectorIterator;
+
+    typedef std::vector<std::vector<TScript*>> EnabledHooksVector;
+    typedef typename EnabledHooksVector::iterator EnabledHooksVectorIterator;
 
     // The actual list of scripts. This will be accessed concurrently, so it must not be modified
     // after server startup.
     static ScriptMap ScriptPointerList;
     // After database load scripts
     static ScriptVector ALScripts;
+    // The list of hook types with the list of enabled scripts for this specific hook.
+    // With this approach, we wouldn't call all available hooks in case if we override just one hook.
+    static EnabledHooksVector EnabledHooks;
 
-    static void AddScript(TScript* const script)
+    static void InitEnabledHooksIfNeeded(uint16 totalAvailableHooks)
+    {
+        EnabledHooks.resize(totalAvailableHooks);
+    }
+
+    static void AddScript(TScript* const script, std::vector<uint16> enabledHooks = {})
     {
         ASSERT(script);
 
         if (!_checkMemory(script))
             return;
 
+        if (EnabledHooks.empty())
+            InitEnabledHooksIfNeeded(script->GetTotalAvailableHooks());
+
         if (script->isAfterLoadScript())
         {
-            ALScripts.push_back(script);
+            ALScripts.emplace_back(script, std::move(enabledHooks));
         }
         else
         {
             script->checkValidity();
+
+            for (uint16 v : enabledHooks)
+                EnabledHooks[v].emplace_back(script);
 
             // We're dealing with a code-only script; just add it.
             ScriptPointerList[_scriptIdCounter++] = script;
@@ -744,9 +761,9 @@ public:
 
     static void AddALScripts()
     {
-        for(ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it)
+        for (ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it)
         {
-            TScript* const script = *it;
+            TScript* const script = (*it).first;
 
             script->checkValidity();
 
@@ -778,6 +795,14 @@ public:
                     // If the script is already assigned -> delete it!
                     if (oldScript)
                     {
+                        for (auto& vIt : EnabledHooks)
+                            for (size_t i = 0; i < vIt.size(); ++i)
+                                if (vIt[i] == oldScript)
+                                {
+                                    vIt.erase(vIt.begin() + i);
+                                    break;
+                                }
+
                         delete oldScript;
                     }
 
@@ -800,6 +825,9 @@ public:
             }
             else
             {
+                for (uint16 v : (*it).second)
+                    EnabledHooks[v].emplace_back(script);
+
                 // We're dealing with a code-only script; just add it.
                 ScriptPointerList[_scriptIdCounter++] = script;
                 sScriptMgr->IncreaseScriptCount();
@@ -844,7 +872,8 @@ private:
 
 // Instantiate static members of ScriptRegistry.
 template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;
-template<class TScript> std::vector<TScript*> ScriptRegistry<TScript>::ALScripts;
+template<class TScript> std::vector<std::pair<TScript*,std::vector<uint16>>> ScriptRegistry<TScript>::ALScripts;
+template<class TScript> std::vector<std::vector<TScript*>> ScriptRegistry<TScript>::EnabledHooks;
 template<class TScript> uint32 ScriptRegistry<TScript>::_scriptIdCounter = 0;
 
 #endif
