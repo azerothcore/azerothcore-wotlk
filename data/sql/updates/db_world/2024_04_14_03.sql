@@ -1,3 +1,4 @@
+-- DB update 2024_04_14_02 -> 2024_04_14_03
 --
 UPDATE `creature` SET `comment` = 'GUID SAI - Mechanar Bridge Event Stage 1 Wave 1' WHERE `guid` = 138817;
 UPDATE `creature` SET `comment` = 'GUID SAI - Mechanar Bridge Event Stage 1 Wave 1' WHERE `guid` = 138818;
