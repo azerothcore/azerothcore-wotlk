@@ -635,11 +635,20 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+
+    if (playerData)
     {
         accountId = playerData->AccountId;
         name = playerData->Name;
         level = playerData->Level;
+
+        // check mailbox
+        if (playerData->MailCount)
+        {
+            SendCharDelete(CHAR_DELETE_FAILED);
+            return;
+        }
     }
 
     // prevent deleting other players' characters using cheating tools
