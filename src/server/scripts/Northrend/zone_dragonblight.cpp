@@ -2180,13 +2180,18 @@ public:
     {
         npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
         {
+            _textCounter = 1;
             _playerGUID.Clear();
+            _lastHemorageTime = 0;
+            _lastKidneyShotTime = 0;
         }
 
         void Reset() override
         {
             _textCounter = 1;
             _playerGUID.Clear();
+            _lastHemorageTime = 0;
+            _lastKidneyShotTime = 0;
         }
 
         void JustEngagedWith(Unit* who) override
@@ -2195,7 +2200,7 @@ public:
             _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
 
             if (Player* player = who->ToPlayer())
-                Talk (SAY_AGGRO, player);
+                Talk(SAY_AGGRO, player);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -2236,11 +2241,11 @@ public:
                 {
                     case EVENT_HEMORRHAGE:
                         DoCastVictim(SPELL_HEMORRHAGE);
-                        _events.ScheduleEvent(EVENT_HEMORRHAGE, 12s, 168s);
+                        _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(12000, 18000));
                         break;
                     case EVENT_KIDNEY_SHOT:
                         DoCastVictim(SPELL_KIDNEY_SHOT);
-                        _events.ScheduleEvent(EVENT_KIDNEY_SHOT, 20s, 26s);
+                        _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(20000, 26000));
                         break;
                     default:
                         break;
@@ -2252,6 +2257,8 @@ public:
         EventMap _events;
         uint8    _textCounter;
         ObjectGuid   _playerGUID;
+        uint32   _lastHemorageTime;
+        uint32   _lastKidneyShotTime;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2259,6 +2266,11 @@ public:
         return new npc_torturer_lecraftAI(creature);
     }
 };
+
+void AddSC_npc_torturer_lecraft()
+{
+    new npc_torturer_lecraft();
+}
 
 // 47447 - Corrosive Spit
 class spell_dragonblight_corrosive_spit : public AuraScript
