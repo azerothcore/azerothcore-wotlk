@@ -6865,8 +6865,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
                 float average = extraDPS * proto->Delay / 1000.0f;
                 float mod = ssv->IsTwoHand(proto->ScalingStatValue) ? 0.2f : 0.3f;
 
-                minDamage = (1.0f - mod) * average;
-                maxDamage = (1.0f + mod) * average;
+                minDamage = (0.6f - mod) * average;
+                maxDamage = (0.3f + mod) * average;
             }
         }
 
