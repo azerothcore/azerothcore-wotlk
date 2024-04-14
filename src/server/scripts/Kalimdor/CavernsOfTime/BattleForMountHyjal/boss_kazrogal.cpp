@@ -161,7 +161,7 @@ public:
         {
             Unit* target = GetTarget();
 
-            if (target->GetPower(POWER_MANA) < aurEff->GetBaseAmount())
+            if ((int32)target->GetPower(POWER_MANA) < aurEff->GetBaseAmount())
             {
                 target->CastSpell(target, SPELL_MARK_DAMAGE, true, nullptr, aurEff);
                 // Remove aura
