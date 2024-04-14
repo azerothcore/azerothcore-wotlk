@@ -635,9 +635,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
-
-    if (playerData)
+    if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
     {
         accountId = playerData->AccountId;
         name = playerData->Name;
