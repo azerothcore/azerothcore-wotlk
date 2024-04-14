@@ -644,7 +644,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         // check mailbox
         if (playerData->MailCount)
         {
-            SendCharDelete(CHAR_DELETE_FAILED);
+            std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo = std::make_shared<CharacterFactionChangeInfo>();
+            SendCharFactionChange(CHAR_CREATE_CHARACTER_DELETE_MAIL, factionChangeInfo.get());
             return;
         }
     }
