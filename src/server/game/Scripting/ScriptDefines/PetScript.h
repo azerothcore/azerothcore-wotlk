@@ -19,11 +19,23 @@
 #define SCRIPT_OBJECT_PET_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum PetHook
+{
+    PETHOOK_ON_INIT_STATS_FOR_LEVEL,
+    PETHOOK_ON_CALCULATE_MAX_TALENT_POINTS_FOR_LEVEL,
+    PETHOOK_CAN_UNLEARN_SPELL_SET,
+    PETHOOK_CAN_UNLEARN_SPELL_DEFAULT,
+    PETHOOK_CAN_RESET_TALENTS,
+    PETHOOK_ON_PET_ADD_TO_WORLD,
+    PETHOOK_END
+};
 
 class PetScript : public ScriptObject
 {
 protected:
-    PetScript(const char* name);
+    PetScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
