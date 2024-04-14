@@ -220,7 +220,9 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
     MySQLPreparedStatement* m_mStmt = GetPreparedStatement(index);
     //ASSERT(m_mStmt); // Can only be null if preparation failed, server side error or bad query
     if (!m_mStmt)
+    {
         return false;
+    }
 
     m_mStmt->BindParameters(stmt);
 
@@ -273,7 +275,9 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
     MySQLPreparedStatement* m_mStmt = GetPreparedStatement(index);
     //ASSERT(m_mStmt);            // Can only be null if preparation failed, server side error or bad query
     if (!m_mStmt)
+    {
         return false;
+    }
 
     m_mStmt->BindParameters(stmt);
     *mysqlStmt = m_mStmt;
