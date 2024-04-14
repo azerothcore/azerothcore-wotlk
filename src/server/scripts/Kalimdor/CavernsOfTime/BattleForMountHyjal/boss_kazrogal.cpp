@@ -87,6 +87,7 @@ public:
 
     Milliseconds GetMarkRepeatTimer()
     {
+        ++_markCounter;
         Milliseconds timer = 45000ms - (5000ms * _markCounter);
         if (timer <= 10000ms)
             return 10000ms;
