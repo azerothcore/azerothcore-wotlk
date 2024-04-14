@@ -640,6 +640,13 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         accountId = playerData->AccountId;
         name = playerData->Name;
         level = playerData->Level;
+
+        // check mailbox
+        if (playerData->MailCount)
+        {
+            SendCharDelete(CHAR_DELETE_FAILED);
+            return;
+        }
     }
 
     // prevent deleting other players' characters using cheating tools
