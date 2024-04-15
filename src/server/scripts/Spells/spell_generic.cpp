@@ -50,7 +50,7 @@
 
 enum broadcastTextIDs
 {
-    BROADCAST_TEXT_FLAG_OF_OWNERSHIP     = 28008, // The Flag of Ownership
+    BROADCAST_TEXT_FLAG_OF_OWNERSHIP     = 28008
 };
 
 // 46642 - 5,000 Gold
@@ -148,13 +148,20 @@ class spell_the_flag_of_ownership : public SpellScript
         LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
 
         std::string formatString = bct->GetText(loc_idx, caster->getGender());
+        std::string targetName = target->GetName();
         size_t pos = formatString.find("$n");
         if (pos != std::string::npos) {
-            formatString.replace(pos, 2, target->GetName().c_str());
+            formatString.replace(pos, 2, targetName.c_str());
+        }
+        
+        // TextEmote without the string replacement duplicates the character name
+        pos = formatString.find("%s ");
+        if (pos != std::string::npos) {
+            formatString.replace(pos, 3, "");
         }
 
         char buff[100];
-        snprintf(buff, sizeof(buff), formatString.c_str(), caster->GetName().c_str(), target->GetName().c_str());
+        snprintf(buff, sizeof(buff), formatString.c_str());
         caster->TextEmote(buff, caster);
         haveTarget = true;
     }
