@@ -131,7 +131,7 @@ class spell_the_flag_of_ownership : public SpellScript
         return true;
     }
 
-    void HandleScript(SpellEffIndex  /*effIndex*/)
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -140,9 +140,21 @@ class spell_the_flag_of_ownership : public SpellScript
         if (!target)
             return;
         caster->CastSpell(target, 52605, true);
+
         const BroadcastText* bct = sObjectMgr->GetBroadcastText(BROADCAST_TEXT_FLAG_OF_OWNERSHIP);
+        if (!bct)
+            return;
+        Player* player = caster->ToPlayer();
+        LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+
+        std::string formatString = bct->GetText(loc_idx, caster->getGender());
+        size_t pos = formatString.find("$n");
+        if (pos != std::string::npos) {
+            formatString.replace(pos, 2, target->GetName().c_str());
+        }
+
         char buff[100];
-        snprintf(buff, sizeof(buff), bct->GetText().c_str(), "", target->GetName().c_str());
+        snprintf(buff, sizeof(buff), formatString.c_str(), caster->GetName().c_str(), target->GetName().c_str());
         caster->TextEmote(buff, caster);
         haveTarget = true;
     }
