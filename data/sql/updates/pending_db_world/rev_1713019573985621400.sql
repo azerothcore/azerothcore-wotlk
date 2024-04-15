@@ -33,4 +33,5 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` 
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 6173;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(6173, 0, 0, 'Thanks to you, $n.', 12, 6, 100, 0, 0, 0, 2284, 0, 'Gazin Tenorm');-- Language is 6
+-- Language is 6
+(6173, 0, 0, 'Thanks to you, $n.', 12, 6, 100, 0, 0, 0, 2284, 0, 'Gazin Tenorm');
