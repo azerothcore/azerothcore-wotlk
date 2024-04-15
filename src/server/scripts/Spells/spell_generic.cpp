@@ -153,7 +153,7 @@ class spell_the_flag_of_ownership : public SpellScript
         if (pos != std::string::npos) {
             formatString.replace(pos, 2, targetName.c_str());
         }
-        
+
         // TextEmote without the string replacement duplicates the character name
         pos = formatString.find("%s ");
         if (pos != std::string::npos) {
