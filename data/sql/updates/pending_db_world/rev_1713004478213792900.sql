@@ -5,8 +5,6 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 3995900, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #3995900, walk, repeat, Aggressive');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -39959 AND `SourceId` = 0;
-
 SET @PATH := 3995900;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
@@ -32,15 +30,12 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (@PATH, 20, 959.5735, 1377.871, 18.04585, NULL, 0, 'Scarlet Monastery Guid 39959 Patrol'),
 (@PATH, 21, 942.4823, 1377.869, 18.22111, NULL, 0, 'Scarlet Monastery Guid 39959 Patrol');
 
-
 -- Scarlet Sorcerer with guid 39998 smart ai
 SET @ENTRY := -39998;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 4294;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 3999800, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #3999800, walk, repeat, Aggressive');
-
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -39998 AND `SourceId` = 0;
 
 SET @PATH := 3999800;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
@@ -66,8 +61,6 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 3996700, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #3996700, walk, repeat, Aggressive');
-
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -39967 AND `SourceId` = 0;
 
 DELETE FROM `creature` WHERE (`id1` = 4300) AND (`guid` IN (39967));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -99,8 +92,6 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 60, 0, 100, 0, 0, 0, 0, 0, 53, 0, 3997800, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once - Self: Start path #3997800, walk, repeat, Aggressive');
-
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -39978 AND `SourceId` = 0;
 
 SET @PATH := 3997800;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
@@ -148,8 +139,6 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 3998000, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #3998000, walk, repeat, Aggressive');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -39980 AND `SourceId` = 0;
-
 SET @PATH := 3998000;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
@@ -173,8 +162,6 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 4001500, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #4001500, walk, repeat, Aggressive');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -40015 AND `SourceId` = 0;
-
 SET @PATH := 4001500;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
@@ -196,8 +183,6 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 4001900, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #4001900, walk, repeat, Aggressive');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -40019 AND `SourceId` = 0;
-
 SET @PATH := 4001900;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
@@ -216,8 +201,6 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 4000800, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #4000800, walk, repeat, Aggressive');
-
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -40008 AND `SourceId` = 0;
 
 DELETE FROM `creature` WHERE (`id1` = 4299) AND (`guid` IN (40008));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -250,8 +233,6 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `en
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 0, 0, 0, 53, 0, 4003400, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Once (OOC) - Self: Start path #4003400, walk, repeat, Aggressive');
-
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = -40034 AND `SourceId` = 0;
 
 SET @PATH := 4003400;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
