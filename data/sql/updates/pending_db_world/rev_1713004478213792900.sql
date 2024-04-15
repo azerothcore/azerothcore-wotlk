@@ -229,6 +229,9 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 UPDATE `creature` SET  `MovementType`=0 WHERE `guid`=40008;
 
+-- delete waypoint_data path
+DELETE FROM `waypoint_data` WHERE `id`=400080;
+
 -- Scarlet Wizard with guid 40034 smart ai
 SET @ENTRY := -40034;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 4300;
@@ -257,3 +260,6 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 DELETE FROM `creature_addon` WHERE (`guid` IN (40031));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (40031, 0, 0, 0, 1, 0, 0, NULL);
+
+-- delete waypoint_data path
+DELETE FROM `waypoint_data` WHERE `id`=400310;
