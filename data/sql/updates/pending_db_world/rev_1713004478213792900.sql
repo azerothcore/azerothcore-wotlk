@@ -151,7 +151,9 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (@PATH, 7, 1000.262, 1360.218, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol'),
 (@PATH, 8, 1026.781, 1361.222, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol'),
 (@PATH, 9, 1041.813, 1368.812, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol'),
-(@PATH, 10, 1049.958, 1360.567, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol');
+(@PATH, 10, 1049.958, 1360.567, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol'),
+(@PATH, 11, 1041.813, 1368.812, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol'),
+(@PATH, 12, 1026.781, 1361.222, 27.43648, NULL, 0, 'Scarlet Monastery Guid 39980 Patrol');
 
 UPDATE `creature` SET `id1`=4295, `id2`=0, `id3`=0, `map`=189, `zoneId`=0, `areaId`=0, `spawnMask`=1, `phaseMask`=1, `equipment_id`=1, `position_x`=1027.78, `position_y`=1399.18, `position_z`=27.3967, `orientation`=3.15905, `spawntimesecs`=86400, `wander_distance`=0, `currentwaypoint`=0, `curhealth`=3831, `curmana`=0, `MovementType`=0, `npcflag`=0, `unit_flags`=0, `dynamicflags`=0, `ScriptName`='', `VerifiedBuild`=0, `CreateObject`=0, `Comment`=NULL WHERE `guid`=39982;
 
@@ -213,17 +215,17 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 SET @PATH := 4000800;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-(@PATH, 0+1, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 1+1, 1081.354, 1385.916, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 2+1, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 3+1, 1100.825, 1379.118, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 4+1, 1128.136, 1379.364, 30.47259, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 5+1, 1137.428, 1373.87, 30.43785, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 6+1, 1140.826, 1345.011, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 7+1, 1137.428, 1373.87, 30.43785, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 8+1, 1128.276, 1379.281, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 9+1, 1100.825, 1379.118, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
-(@PATH, 10+1, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol');
+(@PATH, 1, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 2, 1081.354, 1385.916, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 3, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 4, 1100.825, 1379.118, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 5, 1128.136, 1379.364, 30.47259, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 6, 1137.428, 1373.87, 30.43785, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 7, 1140.826, 1345.011, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 8, 1137.428, 1373.87, 30.43785, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 9, 1128.276, 1379.281, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 10, 1100.825, 1379.118, 30.44586, NULL, 0,'Scarlet Monastery Guid 40008 Patrol'),
+(@PATH, 11, 1081.633, 1379.474, 30.44585, NULL, 0,'Scarlet Monastery Guid 40008 Patrol');
 
 UPDATE `creature` SET  `MovementType`=0 WHERE `guid`=40008;
 
@@ -237,15 +239,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 SET @PATH := 4003400;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-(@PATH, 0+1, 1140.994, 1449.657, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 1+1, 1137.558, 1435.392, 30.44586, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 2+1, 1135.353, 1419.83, 30.53343, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 3+1, 1112.505, 1417.833, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 4+1, 1091.572, 1417.443, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 5+1, 1112.505, 1417.833, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 6+1, 1135.353, 1419.83, 30.53343, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 7+1, 1137.558, 1435.392, 30.44586, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
-(@PATH, 8+1, 1140.994, 1449.657, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol');
+(@PATH, 1, 1140.994, 1449.657, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 2, 1137.558, 1435.392, 30.44586, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 3, 1135.353, 1419.83, 30.53343, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 4, 1112.505, 1417.833, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 5, 1091.572, 1417.443, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 6, 1112.505, 1417.833, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 7, 1135.353, 1419.83, 30.53343, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 8, 1137.558, 1435.392, 30.44586, NULL, 0,'Scarlet Monastery Guid 40034 Patrol'),
+(@PATH, 9, 1140.994, 1449.657, 30.44585, NULL, 0,'Scarlet Monastery Guid 40034 Patrol');
 
 -- Replaces the generated coordinates
 DELETE FROM `creature` WHERE (`id1` = 4302) AND (`guid` IN (40031));
