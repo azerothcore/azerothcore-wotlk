@@ -48,6 +48,11 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+enum broadcastTextIDs
+{
+    BROADCAST_TEXT_FLAG_OF_OWNERSHIP     = 28008, // The Flag of Ownership
+};
+
 // 46642 - 5,000 Gold
 class spell_gen_5000_gold : public SpellScript
 {
@@ -135,8 +140,9 @@ class spell_the_flag_of_ownership : public SpellScript
         if (!target)
             return;
         caster->CastSpell(target, 52605, true);
+        const BroadcastText* bct = sObjectMgr->GetBroadcastText(BROADCAST_TEXT_FLAG_OF_OWNERSHIP);
         char buff[100];
-        snprintf(buff, sizeof(buff), "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
+        snprintf(buff, sizeof(buff), bct->GetText().c_str(), "", target->GetName().c_str());
         caster->TextEmote(buff, caster);
         haveTarget = true;
     }
