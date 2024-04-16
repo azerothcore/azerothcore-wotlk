@@ -90,14 +90,14 @@ static BOOL PlayerCreateItemCheatHandler (WorldSession* ses,
                                           Opcodes       msgId,
                                           uint32_t      eventTime,
                                           WorldPacket*  msg);
-static BOOL LogoutRequestHandler (WorldSession* ses,
-                                  Opcodes       msgId,
-                                  uint32_t      eventTime,
-                                  WorldPacket*  msg);
-static BOOL HandleLogoutCancel (WorldSession* ses,
-                                Opcodes       msgId,
-                                uint32_t      eventTime,
-                                WorldPacket*  msg);
+static BOOL PlayerLogoutRequestHandler (WorldSession* ses,
+                                        Opcodes       msgId,
+                                        uint32_t      eventTime,
+                                        WorldPacket*  msg);
+static BOOL PlayerLogoutCancelHandler (WorldSession* ses,
+                                       Opcodes       msgId,
+                                       uint32_t      eventTime,
+                                       WorldPacket*  msg);
 
 
 enum CharacterFlags
@@ -16341,10 +16341,10 @@ static BOOL PlayerCreateItemCheatHandler (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL HandleLogoutCancel (WorldSession* ses,
-                                Opcodes       msgId,
-                                uint32_t      eventTime,
-                                WorldPacket*  msg) {
+static BOOL PlayerLogoutCancelHandler (WorldSession* ses,
+                                       Opcodes       msgId,
+                                       uint32_t      eventTime,
+                                       WorldPacket*  msg) {
 
   if (!ses->ActivePlayer())
     return FALSE;
@@ -16354,10 +16354,10 @@ static BOOL HandleLogoutCancel (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL LogoutRequestHandler (WorldSession* ses,
-                                  Opcodes       msgId,
-                                  uint32_t      eventTime,
-                                  WorldPacket*  msg) {
+static BOOL PlayerLogoutRequestHandler (WorldSession* ses,
+                                        Opcodes       msgId,
+                                        uint32_t      eventTime,
+                                        WorldPacket*  msg) {
 
   if (Player* plr = ses->ActivePlayer()) {
     LogoutResponse res;
@@ -16398,8 +16398,8 @@ void PlayerInitialize () {
   if (s_initialized) return;
 
   WorldSocket::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
-  WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, LogoutRequestHandler);
-  WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, HandleLogoutCancel);
+  WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
+  WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
 
   s_initialized = true;
 }
