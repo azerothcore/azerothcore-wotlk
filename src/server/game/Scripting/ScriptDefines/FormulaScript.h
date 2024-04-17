@@ -19,13 +19,28 @@
 #define SCRIPT_OBJECT_FORMULA_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum FormulaHook
+{
+    FORMULAHOOK_ON_HONOR_CALCULATION,
+    FORMULAHOOK_ON_GRAY_LEVEL_CALCULATION,
+    FORMULAHOOK_ON_COLOR_CODE_CALCULATION,
+    FORMULAHOOK_ON_ZERO_DIFFERENCE_CALCULATION,
+    FORMULAHOOK_ON_BASE_GAIN_CALCULATION,
+    FORMULAHOOK_ON_GAIN_CALCULATION,
+    FORMULAHOOK_ON_GROUP_RATE_CALCULATION,
+    FORMULAHOOK_ON_AFTER_ARENA_RATING_CALCULATION,
+    FORMULAHOOK_ON_BEFORE_UPDATING_PERSONAL_RATING,
+    FORMULAHOOK_END
+};
 
 enum XPColorChar : uint8;
 
 class FormulaScript : public ScriptObject
 {
 protected:
-    FormulaScript(const char* name);
+    FormulaScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called after calculating honor.

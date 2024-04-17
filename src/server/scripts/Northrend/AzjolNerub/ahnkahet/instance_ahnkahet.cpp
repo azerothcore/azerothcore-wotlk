@@ -24,8 +24,12 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_PRINCE_TALDARAM, DATA_PRINCE_TALDARAM },
-    { 0,                   0                    }
+    { NPC_PRINCE_TALDARAM,     DATA_PRINCE_TALDARAM     },
+    { NPC_JEDOGA_SHADOWSEEKER, DATA_JEDOGA_SHADOWSEEKER },
+    { NPC_ELDER_NADOX,         DATA_ELDER_NADOX         },
+    { NPC_HERALD_VOLAZJ,       DATA_HERALD_VOLAZJ       },
+    { NPC_AMANITAR,            DATA_AMANITAR            },
+    { 0,                       0                        }
 };
 
 DoorData const doorData[] =
