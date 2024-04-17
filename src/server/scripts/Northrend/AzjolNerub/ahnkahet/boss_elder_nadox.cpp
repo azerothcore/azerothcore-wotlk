@@ -73,7 +73,7 @@ enum Yells
 
 struct boss_elder_nadox : public BossAI
 {
-    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
+    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_ELDER_NADOX),
         guardianSummoned(false),
         respectYourElders(true)
     {
