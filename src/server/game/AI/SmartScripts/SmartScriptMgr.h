@@ -214,8 +214,10 @@ enum SMART_EVENT
     SMART_EVENT_AREA_CASTING             = 105,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_AREA_RANGE               = 106,      // min, max, repeatMin, repeatMax, rangeMin, rangeMax
     SMART_EVENT_SUMMONED_UNIT_EVADE      = 107,      // CreatureId(0 all), CooldownMin, CooldownMax
+    SMART_EVENT_WAYPOINT_DATA_REACHED    = 108,      // PointId (0: any), pathId (0: any)
+    SMART_EVENT_WAYPOINT_DATA_ENDED      = 109,      // PointId (0: any), pathId (0: any)
 
-    SMART_EVENT_AC_END                   = 108
+    SMART_EVENT_AC_END                   = 110
 };
 
 struct SmartEvent
@@ -509,6 +511,12 @@ struct SmartEvent
 
         struct
         {
+            uint32 pointId;
+            uint32 pathId;
+        } wpData;
+
+        struct
+        {
             uint32 param1;
             uint32 param2;
             uint32 param3;
@@ -714,8 +722,13 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
     SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
     SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
+    SMART_ACTION_WAYPOINT_DATA_START                = 232,    // pathId, repeat
+    SMART_ACTION_WAYPOINT_DATA_RANDOM               = 233,    // pathId1, pathId2, repeat
+    SMART_ACTION_MOVEMENT_STOP                      = 234,    //
+    SMART_ACTION_MOVEMENT_PAUSE                     = 235,    // timer
+    SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
 
-    SMART_ACTION_AC_END                             = 232,    // placeholder
+    SMART_ACTION_AC_END                             = 237,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1434,6 +1447,24 @@ struct SmartAction
             uint32 targetParam3;
             uint32 targetParam4;
         } orientationTarget;
+
+        struct
+        {
+            uint32 pathId;
+            SAIBool repeat;
+        } wpData;
+
+        struct
+        {
+            uint32 pathId1;
+            uint32 pathId2;
+            SAIBool repeat;
+        } wpDataRandom;
+
+        struct
+        {
+            uint32 timer;
+        } move;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1844,6 +1875,8 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_AREA_CASTING,              SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_AREA_RANGE,                SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_SUMMONED_UNIT_EVADE,       SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_WAYPOINT_DATA_REACHED,     SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_WAYPOINT_DATA_ENDED,       SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags
