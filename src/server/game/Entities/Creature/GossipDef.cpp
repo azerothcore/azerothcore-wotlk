@@ -233,7 +233,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
         }
     }
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
 }
 
 void PlayerMenu::SendCloseGossip()
@@ -241,7 +241,7 @@ void PlayerMenu::SendCloseGossip()
     _gossipMenu.SetSenderGUID(ObjectGuid::Empty);
 
     WorldPacket data(SMSG_GOSSIP_COMPLETE, 0);
-    _session->SendPacket(&data);
+    _session->Send(&data);
 }
 
 void PlayerMenu::SendPointOfInterest(uint32 poiId) const
@@ -266,7 +266,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poiId) const
     data << uint32(poi->Importance);
     data << name;
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
 }
 
 /*********************************************************/
@@ -367,7 +367,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
     }
 
     data.put<uint8>(count_pos, count);
-    _session->SendPacket(&data);
+    _session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST (QuestGiver: {})", guid.ToString());
 }
 
@@ -377,7 +377,7 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) con
     data << npcGUID;
     data << uint8(questStatus);
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC {}, status={}", npcGUID.ToString(), questStatus);
 }
 
@@ -495,7 +495,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         data << uint32(quest->DetailsEmote[i]);
         data << uint32(quest->DetailsEmoteDelay[i]);       // DetailsEmoteDelay (in ms)
     }
-    _session->SendPacket(&data);
+    _session->Send(&data);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS {}, questid={}", npcGUID.ToString(), quest->GetQuestId());
 }
@@ -636,7 +636,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
         data << questObjectiveText[i];
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid={}", quest->GetQuestId());
 }
 
@@ -741,7 +741,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)    // reward reputation override?
         data << uint32(quest->RewardFactionValueIdOverride[i]);
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD {}, questid={}", npcGUID.ToString(), quest->GetQuestId());
 }
 
@@ -832,6 +832,6 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
     data << uint32(0x08);
     data << uint32(0x10);
 
-    _session->SendPacket(&data);
+    _session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS {}, questid={}", npcGUID.ToString(), quest->GetQuestId());
 }

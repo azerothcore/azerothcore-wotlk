@@ -55,7 +55,7 @@ void WorldSession::SendPartyResult(PartyOperation operation, const std::string& 
     data << uint32(res);
     data << uint32(val);                                    // LFD cooldown related (used with ERR_PARTY_LFG_BOOT_COOLDOWN_S and ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S)
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
@@ -146,7 +146,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
             data << uint32(0);                                      // unk
             data << uint8(0);                                       // count
             data << uint32(0);                                      // unk
-            invitedPlayer->GetSession()->SendPacket(&data);
+            invitedPlayer->GetSession()->Send(&data);
         }
 
         return;
@@ -206,7 +206,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     data << uint32(0);                                      // unk
     data << uint8(0);                                       // count
     data << uint32(0);                                      // unk
-    invitedPlayer->GetSession()->SendPacket(&data);
+    invitedPlayer->GetSession()->Send(&data);
 
     SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
 }
@@ -289,7 +289,7 @@ void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
     // report
     WorldPacket data(SMSG_GROUP_DECLINE, GetPlayer()->GetName().length());
     data << GetPlayer()->GetName();
-    leader->GetSession()->SendPacket(&data);
+    leader->GetSession()->Send(&data);
 }
 
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
@@ -961,7 +961,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
         data << Guid.WriteAsPacked();
         data << uint32(GROUP_UPDATE_FLAG_STATUS);
         data << uint16(MEMBER_STATUS_OFFLINE);
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -1079,7 +1079,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     if (updateFlags & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
         data << uint32(player->GetVehicle()->GetVehicleInfo()->m_seatID[player->m_movement.transport.seat]);
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket& /*recvData*/)

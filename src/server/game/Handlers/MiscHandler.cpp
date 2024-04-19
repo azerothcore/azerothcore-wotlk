@@ -409,7 +409,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     data.put(0, displaycount);                            // insert right count, count displayed
     data.put(4, matchCount);                              // insert right count, count of matches
 
-    SendPacket(&data);
+    Send(&data);
     LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
 }
 
@@ -627,7 +627,7 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
     data << length;
     data << szStr;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
@@ -647,7 +647,7 @@ void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
         WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
         data << length;
         data << szStr;
-        SendPacket(&data);
+        Send(&data);
     }
 }
 
@@ -786,7 +786,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
         data << uint32(type);
         data << uint32(0);
-        SendPacket(&data);
+        Send(&data);
 
         return;
     }
@@ -819,7 +819,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
     WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
     data << uint32(type);
     data << uint32(0);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
@@ -855,7 +855,7 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
     data << uint32(adata->Time);                                // unix time
     data << uint32(size);                                       // decompressed length
     data.append(dest);                                          // compressed data
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
@@ -939,7 +939,7 @@ void WorldSession::HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& p
     playedTime.TotalTime = m_player->GetTotalPlayedTime();
     playedTime.LevelTime = m_player->GetLevelPlayedTime();
     playedTime.TriggerScriptEvent = packet.TriggerScriptEvent;  // 0-1 - will not show in chat frame
-    SendPacket(playedTime.Write());
+    Send(playedTime.Write());
 }
 
 void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
@@ -981,7 +981,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     }
 
     player->BuildEnchantmentsInfoData(&data);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
@@ -1013,7 +1013,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION));
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
-    SendPacket(&data);
+    Send(&data);
 }
 
 //===========================================================================
@@ -1080,7 +1080,7 @@ void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)
     // Complaint Received message
     WorldPacket data(SMSG_COMPLAIN_RESULT, 1);
     data << uint8(0);
-    SendPacket(&data);
+    Send(&data);
 
     LOG_DEBUG("network", "REPORT SPAM: type {}, {}, unk1 {}, unk2 {}, unk3 {}, unk4 {}, message {}",
         spam_type, spammer_guid.ToString(), unk1, unk2, unk3, unk4, description);
@@ -1102,7 +1102,7 @@ void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
     // 0x1 realm split
     // 0x2 realm split pending
     data << split_date;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
@@ -1501,7 +1501,7 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
 
     WorldPackets::Misc::UITime response;
     response.Time = GameTime::GetGameTime().count();
-    SendPacket(response.Write());
+    Send(response.Write());
 }
 
 void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
@@ -1516,7 +1516,7 @@ void WorldSession::SendSetPhaseShift(uint32 PhaseShift)
 {
     WorldPacket data(SMSG_SET_PHASE_SHIFT, 4);
     data << uint32(PhaseShift);
-    SendPacket(&data);
+    Send(&data);
 }
 
 //Battlefield and Battleground

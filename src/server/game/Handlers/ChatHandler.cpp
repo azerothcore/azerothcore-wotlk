@@ -809,7 +809,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, m_player, m_player, GetPlayer()->GetName());
-    player->GetSession()->SendPacket(&data);
+    player->GetSession()->Send(&data);
 }
 
 void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
@@ -824,25 +824,25 @@ void WorldSession::SendPlayerNotFoundNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
     data << name;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendPlayerAmbiguousNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size() + 1);
     data << name;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendWrongFactionNotice()
 {
     WorldPacket data(SMSG_CHAT_WRONG_FACTION, 0);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendChatRestrictedNotice(ChatRestrictionType restriction)
 {
     WorldPacket data(SMSG_CHAT_RESTRICTED, 1);
     data << uint8(restriction);
-    SendPacket(&data);
+    Send(&data);
 }

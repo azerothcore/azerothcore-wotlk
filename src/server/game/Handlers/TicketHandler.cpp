@@ -125,7 +125,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 
     WorldPacket data(SMSG_GMTICKET_CREATE, 4);
     data << uint32(response);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
@@ -152,7 +152,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
 
     WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
     data << uint32(response);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
@@ -161,7 +161,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
     {
         WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
         data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-        SendPacket(&data);
+        Send(&data);
 
         sWorld->SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName().c_str(), ticket->GetId());
 
@@ -191,7 +191,7 @@ void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
     // are we sure this is a uint32? Should ask Zor
     WorldPacket data(SMSG_GMTICKET_SYSTEMSTATUS, 4);
     data << uint32(sTicketMgr->GetStatus() ? GMTICKET_QUEUE_STATUS_ENABLED : GMTICKET_QUEUE_STATUS_DISABLED);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
@@ -288,11 +288,11 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
 
         WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 4);
         data << uint8(getSurvey);
-        SendPacket(&data);
+        Send(&data);
 
         WorldPacket data2(SMSG_GMTICKET_DELETETICKET, 4);
         data2 << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-        SendPacket(&data2);
+        Send(&data2);
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
         sTicketMgr->SendTicket(this, nullptr);

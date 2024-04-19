@@ -125,7 +125,7 @@ namespace Acore
             if (!player->HaveAtClient(i_source))
                 return;
 
-            player->GetSession()->SendPacket(i_message);
+            player->GetSession()->Send(i_message);
         }
     };
 
@@ -150,7 +150,7 @@ namespace Acore
             if (player == i_source || !player->HaveAtClient(i_source) || player->IsFriendlyTo(i_source))
                 return;
 
-            player->GetSession()->SendPacket(i_message);
+            player->GetSession()->Send(i_message);
         }
     };
 

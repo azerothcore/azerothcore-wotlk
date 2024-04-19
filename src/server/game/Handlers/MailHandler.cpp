@@ -746,7 +746,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 
     data.put<uint32>(0, realCount);     //  this will display warning about undelivered mail to player if realCount > mailsCount
     data.put<uint8>(4, mailsCount);     // set real send mails to client
-    SendPacket(&data);
+    Send(&data);
 
     // recalculate m_nextMailDelivereTime and unReadMails
     m_player->UpdateNextMailTimeAndUnreads();
@@ -866,5 +866,5 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
         data << uint32(0);
     }
 
-    SendPacket(&data);
+    Send(&data);
 }

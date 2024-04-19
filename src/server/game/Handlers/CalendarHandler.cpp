@@ -180,7 +180,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
         data << holiday->TextureFilename;                   // m_textureFilename (holiday name)
     }
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleCalendarGetEvent(WorldPacket& recvData)
@@ -777,7 +777,7 @@ void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
 
     WorldPacket data(SMSG_CALENDAR_SEND_NUM_PENDING, 4);
     data << uint32(pending);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
@@ -824,7 +824,7 @@ void WorldSession::SendCalendarRaidLockout(InstanceSave const* save, bool add)
     data << uint32(save->GetDifficulty());
     data << uint32(save->GetResetTime() >= currTime ? save->GetResetTime() - currTime : 0);
     data << ObjectGuid::Create<HighGuid::Instance>(save->GetInstanceId());
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendCalendarRaidLockoutUpdated(InstanceSave const* save, bool isExtended)
@@ -838,5 +838,5 @@ void WorldSession::SendCalendarRaidLockoutUpdated(InstanceSave const* save, bool
     data << uint32(save->GetDifficulty());
     data << uint32(resetTimeOp >= currTime ? resetTimeOp - currTime : resetTimeOp); // pussywizard: old time in secs to reset
     data << uint32(resetTime >= currTime ? resetTime - currTime : 0); // pussywizard: new time in secs to reset
-    SendPacket(&data);
+    Send(&data);
 }

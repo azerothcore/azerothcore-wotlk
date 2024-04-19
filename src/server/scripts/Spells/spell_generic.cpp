@@ -1997,7 +1997,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
             {
                 WorldPacket data;
                 player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 7744, GetSpellInfo()->CategoryRecoveryTime); // Will of the forsaken
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->Send(&data);
             }
             else
             {
@@ -2010,11 +2010,11 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
                 data << uint16(GetSpellInfo()->GetCategory());                   // spell category
                 data << uint32(0);
                 data << uint32(GetSpellInfo()->CategoryRecoveryTime);
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->Send(&data);
 
                 WorldPacket data2;
                 player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
-                player->GetSession()->SendPacket(&data2);
+                player->GetSession()->Send(&data2);
             }
         }
     }
@@ -2677,7 +2677,7 @@ class spell_gen_spirit_healer_res : public SpellScript
         {
             WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
             data << target->GetGUID();
-            originalCaster->GetSession()->SendPacket(&data);
+            originalCaster->GetSession()->Send(&data);
         }
     }
 

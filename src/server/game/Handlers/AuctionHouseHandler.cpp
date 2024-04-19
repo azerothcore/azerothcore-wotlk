@@ -70,7 +70,7 @@ void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
     data << guid;
     data << uint32(ahEntry->houseId);
     data << uint8(1);                                       // 3.3.3: 1 - AH enabled, 0 - AH disabled
-    SendPacket(&data);
+    Send(&data);
 }
 
 //call this method when player bids, creates, or deletes auction
@@ -82,7 +82,7 @@ void WorldSession::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uin
     data << ErrorCode;
     if (!ErrorCode && Action)
         data << bidError;                                   //when bid, then send 0, once...
-    SendPacket(&data);
+    Send(&data);
 }
 
 //this function sends notification, if bidder is online
@@ -96,7 +96,7 @@ void WorldSession::SendAuctionBidderNotification(uint32 location, uint32 auction
     data << uint32(diff);
     data << uint32(item_template);
     data << uint32(0);
-    SendPacket(&data);
+    Send(&data);
 }
 
 //this void causes on client to display: "Your auction sold"
@@ -110,7 +110,7 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
     data << uint32(auction->item_template);
     data << uint32(0);                                      //unk
     data << float(0);                                       //unk (time?)
-    SendPacket(&data);
+    Send(&data);
 }
 
 //this void creates new auction and adds auction to some auctionhouse
@@ -644,7 +644,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     data.put<uint32>(0, count);                           // add count to placeholder
     data << totalcount;
     data << (uint32)300;                                    //unk 2.3.0
-    SendPacket(&data);
+    Send(&data);
 }
 
 //this void sends player info about his auctions
@@ -698,7 +698,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
     data.put<uint32>(0, count);
     data << (uint32) totalcount;
     data << (uint32) 0;
-    SendPacket(&data);
+    Send(&data);
 }
 
 //this void is called when player clicks on search button
@@ -773,5 +773,5 @@ void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)
         data << uint32(0);
         data << float(0);
     }*/
-    SendPacket(&data);
+    Send(&data);
 }

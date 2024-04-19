@@ -239,7 +239,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
 
     data.put<uint8>(0, num);
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
@@ -670,7 +670,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
             // see LoginFailureReason enum for more reasons
             data << uint8(LoginFailureReason::NoWorld);
-            SendPacket(&data);
+            Send(&data);
             return;
         }
     }
@@ -686,7 +686,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
         data << uint8(result);
-        SendPacket(&data);
+        Send(&data);
     };
 
     // pussywizard:
@@ -809,7 +809,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     data << pCurrChar->GetPositionY();
     data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
-    SendPacket(&data);
+    Send(&data);
 
     // load player specific part before send times
     LoadAccountData(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA), PER_CHARACTER_CACHE_MASK);
@@ -818,11 +818,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
     data << uint8(2);                                       // 2 - COMPLAINT_ENABLED_WITH_AUTO_IGNORE
     data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
-    SendPacket(&data);
+    Send(&data);
 
     // Send MOTD
     {
-        SendPacket(sMotdMgr->GetMotdPacket());
+        Send(sMotdMgr->GetMotdPacket());
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
@@ -856,7 +856,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4 + 4);
     data << uint32(0);
     data << uint32(0);
-    SendPacket(&data);
+    Send(&data);
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
@@ -1127,18 +1127,18 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     data << pCurrChar->GetPositionY();
     data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
-    SendPacket(&data);
+    Send(&data);
 
     SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
     data << uint8(2);                                       // unknown value
     data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
-    SendPacket(&data);
+    Send(&data);
 
     // Send MOTD
     {
-        SendPacket(sMotdMgr->GetMotdPacket());
+        Send(sMotdMgr->GetMotdPacket());
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
@@ -1150,7 +1150,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4 + 4);
     data << uint32(0);
     data << uint32(0);
-    SendPacket(&data);
+    Send(&data);
 
     // Xinef: fix possible problem with flag UNIT_FLAG_STUNNED added during logout
     if (!pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
@@ -1202,7 +1202,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
                 data << uint8(eff);
                 data << uint8(opType);
                 data << int32(val);
-                SendPacket(&data);
+                Send(&data);
             }
         }
     }
@@ -1510,7 +1510,7 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(2);
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -1518,7 +1518,7 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(2);
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -1531,14 +1531,14 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(1);                                  // no money
-        SendPacket(&data);
+        Send(&data);
         return;
     }
     else
     {
         WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(0);                                  // ok
-        SendPacket(&data);
+        Send(&data);
     }
 
     m_player->ModifyMoney(-int32(cost));                     // it isn't free
@@ -1616,7 +1616,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         recvData.rfinish();
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
         data << uint8(CHAR_CREATE_ERROR);
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -1885,7 +1885,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 
     WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
     data << uint8(errorId);                                       // 4 - equipment swap failed - inventory is full
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
@@ -2545,14 +2545,14 @@ void WorldSession::SendCharCreate(ResponseCodes result)
 {
     WorldPacket data(SMSG_CHAR_CREATE, 1);
     data << uint8(result);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendCharDelete(ResponseCodes result)
 {
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << uint8(result);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo)
@@ -2564,7 +2564,7 @@ void WorldSession::SendCharRename(ResponseCodes result, CharacterRenameInfo cons
         data << renameInfo->Guid;
         data << renameInfo->Name;
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo)
@@ -2583,7 +2583,7 @@ void WorldSession::SendCharFactionChange(ResponseCodes result, CharacterFactionC
         data << uint8(factionChangeInfo->FacialHair);
         data << uint8(factionChangeInfo->Race);
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo)
@@ -2601,7 +2601,7 @@ void WorldSession::SendCharCustomize(ResponseCodes result, CharacterCustomizeInf
         data << uint8(customizeInfo->HairColor);
         data << uint8(customizeInfo->FacialHair);
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid)
@@ -2609,5 +2609,5 @@ void WorldSession::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, O
     WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
     data << uint32(result);
     data << guid;
-    SendPacket(&data);
+    Send(&data);
 }

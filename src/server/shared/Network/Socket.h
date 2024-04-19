@@ -223,7 +223,7 @@ private:
     {
         if (error)
         {
-            CloseSocket();
+            Disconnect();
             return;
         }
 

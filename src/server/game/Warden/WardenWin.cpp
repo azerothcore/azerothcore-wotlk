@@ -206,7 +206,7 @@ void WardenWin::InitializeModule()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenInitModuleRequest));
     pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenInitModuleRequest));
-    _session->SendPacket(&pkt);
+    _session->Send(&pkt);
 }
 
 void WardenWin::RequestHash()
@@ -223,7 +223,7 @@ void WardenWin::RequestHash()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
     pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenHashRequest));
-    _session->SendPacket(&pkt);
+    _session->Send(&pkt);
 }
 
 void WardenWin::HandleHashResult(ByteBuffer& buff)
@@ -545,7 +545,7 @@ void WardenWin::RequestChecks()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
-    _session->SendPacket(&pkt);
+    _session->Send(&pkt);
 
     _dataSent = true;
 

@@ -984,7 +984,7 @@ bool Player::SatisfyQuestLog(bool msg)
     if (msg)
     {
         WorldPacket data(SMSG_QUESTLOG_FULL, 0);
-        GetSession()->SendPacket(&data);
+        GetSession()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTLOG_FULL");
     }
     return false;
@@ -2343,7 +2343,7 @@ void Player::SendQuestComplete(uint32 quest_id)
     {
         WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
         data << uint32(quest_id);
-        GetSession()->SendPacket(&data);
+        GetSession()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = {}", quest_id);
     }
 }
@@ -2370,7 +2370,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));
     data << uint32(quest->GetBonusTalents());              // bonus talents
     data << uint32(quest->GetRewArenaPoints());
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
 }
 
 void Player::SendQuestFailed(uint32 questId, BAG_RESULT reason)
@@ -2380,7 +2380,7 @@ void Player::SendQuestFailed(uint32 questId, BAG_RESULT reason)
         WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 4 + 4);
         data << uint32(questId);
         data << uint32(reason);                             // failed reason (valid reasons: 4, 16, 50, 17, 74, other values show default message)
-        GetSession()->SendPacket(&data);
+        GetSession()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
     }
 }
@@ -2391,7 +2391,7 @@ void Player::SendQuestTimerFailed(uint32 quest_id)
     {
         WorldPacket data(SMSG_QUESTUPDATE_FAILEDTIMER, 4);
         data << uint32(quest_id);
-        GetSession()->SendPacket(&data);
+        GetSession()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
     }
 }
@@ -2400,7 +2400,7 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
 {
     WorldPacket data(SMSG_QUESTGIVER_QUEST_INVALID, 4);
     data << uint32(msg);
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
@@ -2420,7 +2420,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
         data << uint32(quest->GetQuestId());
         data << quest->GetTitle();
         data << GetGUID();
-        pReceiver->GetSession()->SendPacket(&data);
+        pReceiver->GetSession()->Send(&data);
 
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_CONFIRM_ACCEPT");
     }
@@ -2433,7 +2433,7 @@ void Player::SendPushToPartyResponse(Player const* player, uint8 msg) const
         WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << player->GetGUID();
         data << uint8(msg);                                 // valid values: 0-8
-        GetSession()->SendPacket(&data);
+        GetSession()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent MSG_QUEST_PUSH_RESULT");
     }
 }
@@ -2444,7 +2444,7 @@ void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/,
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
     //data << quest->RequiredItemId[item_idx];
     //data << count;
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
 }
 
 void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count)
@@ -2463,7 +2463,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid,
     data << uint32(old_count + add_count);
     data << uint32(quest->RequiredNpcOrGoCount[ creatureOrGO_idx ]);
     data << guid;
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
 
     uint16 log_slot = FindQuestSlot(quest->GetQuestId());
     if (log_slot < MAX_QUEST_LOG_SIZE)
@@ -2479,7 +2479,7 @@ void Player::SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint
     data << uint32(quest->GetQuestId());
     data << uint32(old_count + add_count);
     data << uint32(quest->GetPlayersSlain());
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
 
     uint16 log_slot = FindQuestSlot(quest->GetQuestId());
     if (log_slot < MAX_QUEST_LOG_SIZE)

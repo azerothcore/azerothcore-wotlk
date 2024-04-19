@@ -63,7 +63,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
             break;
     }
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
@@ -123,7 +123,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
                 data << uint32(0);
         }
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 //==============================================================
@@ -652,7 +652,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     WorldPacket data(SMSG_TRADE_STATUS, 12);
     data << uint32(TRADE_STATUS_BEGIN_TRADE);
     data << m_player->GetGUID();
-    pOther->GetSession()->SendPacket(&data);
+    pOther->GetSession()->Send(&data);
 }
 
 void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)

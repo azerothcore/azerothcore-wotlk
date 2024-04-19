@@ -99,7 +99,7 @@ void WardenMac::RequestHash()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
     pkt.append((uint8*)&Request, sizeof(WardenHashRequest));
-    _session->SendPacket(&pkt);
+    _session->Send(&pkt);
 }
 
 struct keyData
@@ -197,7 +197,7 @@ void WardenMac::RequestChecks()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
-    _session->SendPacket(&pkt);
+    _session->Send(&pkt);
 
     _dataSent = true;
 }

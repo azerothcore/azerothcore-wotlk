@@ -54,13 +54,13 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
         if (error == ERR_REFER_A_FRIEND_NOT_IN_GROUP)
             data << target->GetName();
 
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
     data2 << m_player->GetPackGUID();
-    target->GetSession()->SendPacket(&data2);
+    target->GetSession()->Send(&data2);
 }
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)

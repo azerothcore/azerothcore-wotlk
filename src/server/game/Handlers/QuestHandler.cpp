@@ -628,7 +628,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
             WorldPacket data(MSG_QUEST_PUSH_RESULT, 8 + 4 + 1);
             data << m_player->GetGUID();
             data << uint8(msg);                             // valid values: 0-8
-            player->GetSession()->SendPacket(&data);
+            player->GetSession()->Send(&data);
             m_player->SetDivider();
         }
     }
@@ -650,5 +650,5 @@ void WorldSession::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)
     for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
         data << uint32(*itr);
 
-    SendPacket(&data);
+    Send(&data);
 }

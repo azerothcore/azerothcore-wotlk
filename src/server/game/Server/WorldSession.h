@@ -361,7 +361,7 @@ public:
     void SendLogoutCancelAckMessage ();
     void SendLogoutResponse (LogoutResponse& res);
 
-    void SendPacket(WorldPacket const* packet);
+    void Send(WorldPacket const* packet);
     void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
     void SendNotification(uint32 string_id, ...);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);

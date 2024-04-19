@@ -275,7 +275,7 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 //===========================================================================
 void WorldSession::SendLogoutCancelAckMessage () {
   WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
-  SendPacket(&msg);
+  Send(&msg);
 }
 
 //===========================================================================
@@ -283,12 +283,12 @@ void WorldSession::SendLogoutResponse (LogoutResponse& res) {
   WorldPacket msg(SMSG_LOGOUT_RESPONSE, sizeof(res));
   msg << res.logoutFailed;
   msg << res.instantLogout;
-  SendPacket(&msg);
+  Send(&msg);
 }
 
 
 /// Send a packet to the client
-void WorldSession::SendPacket(WorldPacket const* packet)
+void WorldSession::Send(WorldPacket const* packet)
 {
     if (!m_sock)
         return;
@@ -807,7 +807,7 @@ void WorldSession::CharacterRemoveFromGame(bool save)
 
         //! Send the 'logout complete' packet to the client
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
-        SendPacket(WorldPackets::Character::LogoutComplete().Write());
+        Send(WorldPackets::Character::LogoutComplete().Write());
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
         //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
@@ -878,7 +878,7 @@ void WorldSession::SendNotification(const char* format, ...)
 
         WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
-        SendPacket(&data);
+        Send(&data);
     }
 }
 
@@ -896,7 +896,7 @@ void WorldSession::SendNotification(uint32 string_id, ...)
 
         WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
-        SendPacket(&data);
+        Send(&data);
     }
 }
 
@@ -935,7 +935,7 @@ void WorldSession::SendAuthWaitQueue(uint32 position)
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_OK);
-        SendPacket(&packet);
+        Send(&packet);
     }
     else
     {
@@ -943,7 +943,7 @@ void WorldSession::SendAuthWaitQueue(uint32 position)
         packet << uint8(AUTH_WAIT_QUEUE);
         packet << uint32(position);
         packet << uint8(0);                                 // unk
-        SendPacket(&packet);
+        Send(&packet);
     }
 }
 
@@ -1016,7 +1016,7 @@ void WorldSession::SendAccountDataTimes(uint32 mask)
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
             data << uint32(GetAccountData(AccountDataType(i))->Time);// also unix time
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::LoadTutorialsData(PreparedQueryResult result)
@@ -1039,7 +1039,7 @@ void WorldSession::SendTutorialsData()
     WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * MAX_ACCOUNT_TUTORIAL_VALUES);
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         data << m_Tutorials[i];
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SaveTutorialsData(CharacterDatabaseTransaction trans)
@@ -1370,7 +1370,7 @@ void WorldSession::SendAddonsInfo()
         data << uint32(1);  // IsBanned
     }
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SetPlayer(Player* player)
@@ -1736,7 +1736,7 @@ void WorldSession::SendTimeSync()
 {
     WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
     data << uint32(_timeSyncNextCounter);
-    SendPacket(&data);
+    Send(&data);
 
     _pendingTimeSyncRequests[_timeSyncNextCounter] = getMSTime();
 
@@ -1819,7 +1819,7 @@ void WorldSession::SendGmResurrectFailure()
 {
     WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
     msg << 1u;
-    SendPacket(&msg);
+    Send(&msg);
 }
 
 //===========================================================================
@@ -1827,7 +1827,7 @@ void WorldSession::SendGmResurrectSuccess()
 {
     WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
     msg << 0u;
-    SendPacket(&msg);
+    Send(&msg);
 }
 
 //===========================================================================

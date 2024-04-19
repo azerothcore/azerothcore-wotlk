@@ -75,7 +75,7 @@ FriendList::FriendList (Player* plr) {
       msg << plr->GetAreaId();
       msg << (uint32_t)plr->GetLevel();
       msg << (uint32_t)plr->getClass();
-      it->second->m_playerPtr->GetSession()->SendPacket(&msg);
+      it->second->m_playerPtr->GetSession()->Send(&msg);
     }
   }
 }
@@ -295,7 +295,7 @@ void FriendList::AddContacts () {
     results->NextRow();
   }
 
-  m_playerPtr->GetSession()->SendPacket(&msg);
+  m_playerPtr->GetSession()->Send(&msg);
 }
 
 //===========================================================================
@@ -447,7 +447,7 @@ void FriendList::SendContactList (uint32_t flags) {
     msg << CONTACT_MUTED;
   }
 
-  m_playerPtr->GetSession()->SendPacket(&msg);
+  m_playerPtr->GetSession()->Send(&msg);
 }
 
 //===========================================================================
@@ -469,7 +469,7 @@ void FriendList::SendFriendStatus (FRIEND_RESULT res, ObjectGuid guid) {
     }
   }
 
-  m_playerPtr->GetSession()->SendPacket(&msg);
+  m_playerPtr->GetSession()->Send(&msg);
 }
 
 //===========================================================================
@@ -666,7 +666,7 @@ static BOOL WhoIsHandler (WorldSession* ses,
   // Send the response
   WorldPacket outbound(SMSG_WHOIS, strlen(szResponse) + 1);
   outbound << szResponse;
-  ses->SendPacket(&outbound);
+  ses->Send(&outbound);
 
   return TRUE;
 }

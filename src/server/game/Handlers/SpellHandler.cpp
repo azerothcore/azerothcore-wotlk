@@ -752,7 +752,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         data << uint32(0);
     }
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)

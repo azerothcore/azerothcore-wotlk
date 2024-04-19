@@ -147,7 +147,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     if (!CanUseBank(buyBankSlot.Banker))
     {
         packet.Result = ERR_BANKSLOT_NOTBANKER;
-        SendPacket(packet.Write());
+        Send(packet.Write());
         LOG_DEBUG("network", "WORLD: HandleBuyBankSlotOpcode - {} not found or you can't interact with him.", buyBankSlot.Banker.ToString());
         return;
     }
@@ -164,7 +164,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     if (!slotEntry)
     {
         packet.Result = ERR_BANKSLOT_FAILED_TOO_MANY;
-        SendPacket(packet.Write());
+        Send(packet.Write());
         return;
     }
 
@@ -173,7 +173,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     if (!m_player->HasEnoughMoney(price))
     {
         packet.Result = ERR_BANKSLOT_INSUFFICIENT_FUNDS;
-        SendPacket(packet.Write());
+        Send(packet.Write());
         return;
     }
 
@@ -181,7 +181,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     m_player->ModifyMoney(-int32(price));
 
     packet.Result = ERR_BANKSLOT_OK;
-    SendPacket(packet.Write());
+    Send(packet.Write());
 
     m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
 }
@@ -191,5 +191,5 @@ void WorldSession::SendShowBank(ObjectGuid guid)
     m_currentBankerGUID = guid;
     WorldPackets::Bank::ShowBank packet;
     packet.Banker = guid;
-    SendPacket(packet.Write());
+    Send(packet.Write());
 }

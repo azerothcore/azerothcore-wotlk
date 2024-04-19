@@ -92,5 +92,5 @@ void WorldSession::SendAttackStop(Unit const* enemy)
         data << enemy->GetPackGUID();               // must be packed guid
         data << (uint32)enemy->isDead();
     }
-    SendPacket(&data);
+    Send(&data);
 }

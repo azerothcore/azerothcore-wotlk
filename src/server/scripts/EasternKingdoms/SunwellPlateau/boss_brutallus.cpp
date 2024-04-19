@@ -430,7 +430,7 @@ class spell_madrigosa_activate_barrier : public SpellScript
                         WorldPacket pkt;
                         go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
                         data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->SendPacket(&pkt);
+                        i->GetSource()->GetSession()->Send(&pkt);
                     }
             }
         }
@@ -462,7 +462,7 @@ class spell_madrigosa_deactivate_barrier : public SpellScript
                         WorldPacket pkt;
                         go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
                         data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->SendPacket(&pkt);
+                        i->GetSource()->GetSession()->Send(&pkt);
                     }
             }
         }

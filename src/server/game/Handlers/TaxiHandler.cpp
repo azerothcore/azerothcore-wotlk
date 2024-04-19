@@ -53,7 +53,7 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
     WorldPacket data(SMSG_TAXINODE_STATUS, 9);
     data << guid;
     data << uint8(player->m_taxi.IsTaximaskNodeKnown(nearest) ? 1 : 0);
-    SendPacket(&data);
+    Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_TAXINODE_STATUS");
 }
 
@@ -100,7 +100,7 @@ void WorldSession::SendTaxiMenu(Creature* unit)
     data << unit->GetGUID();
     data << uint32(curloc);
     GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->isTaxiCheater());
-    SendPacket(&data);
+    Send(&data);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_SHOWTAXINODES");
 
@@ -136,12 +136,12 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
     if (GetPlayer()->m_taxi.SetTaximaskNode(curloc))
     {
         WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
-        SendPacket(&msg);
+        Send(&msg);
 
         WorldPacket update(SMSG_TAXINODE_STATUS, 9);
         update << unit->GetGUID();
         update << uint8(1);
-        SendPacket(&update);
+        Send(&update);
 
         return true;
     }
@@ -154,7 +154,7 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
     if (GetPlayer()->m_taxi.SetTaximaskNode(nodeid))
     {
         WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
-        SendPacket(&msg);
+        Send(&msg);
     }
 }
 
@@ -282,7 +282,7 @@ void WorldSession::SendActivateTaxiReply(ActivateTaxiReply reply)
     GetPlayer()->SetCanTeleport(true);
     WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(reply);
-    SendPacket(&data);
+    Send(&data);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_ACTIVATETAXIREPLY");
 }

@@ -346,7 +346,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
                             playerMember->RemoveBattlegroundQueueId(bgQueue);
                             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
                             queue.RemovePlayer(playerMember->GetGUID(), true);
-                            playerMember->GetSession()->SendPacket(&data);
+                            playerMember->GetSession()->Send(&data);
                         }
                     }
                 }
@@ -469,7 +469,7 @@ void ArenaTeam::Roster(WorldSession* session)
         }
     }
 
-    session->SendPacket(&data);
+    session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
 }
 
@@ -484,7 +484,7 @@ void ArenaTeam::Query(WorldSession* session)
     data << uint32(EmblemColor);                            // emblem color
     data << uint32(BorderStyle);                            // border style
     data << uint32(BorderColor);                            // border color
-    session->SendPacket(&data);
+    session->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_QUERY_RESPONSE");
 }
 
@@ -498,7 +498,7 @@ void ArenaTeam::SendStats(WorldSession* session)
     data << uint32(Stats.SeasonGames);                      // played this season
     data << uint32(Stats.SeasonWins);                       // wins this season
     data << uint32(Stats.Rank);                             // rank
-    session->SendPacket(&data);
+    session->Send(&data);
 }
 
 void ArenaTeam::NotifyStatsChanged()
@@ -525,7 +525,7 @@ void ArenaTeam::Inspect(WorldSession* session, ObjectGuid guid)
     data << uint32(Stats.SeasonWins);                       // season wins
     data << uint32(member->SeasonGames);                    // played (count of all games, that the inspected member participated...)
     data << uint32(member->PersonalRating);                 // personal rating
-    session->SendPacket(&data);
+    session->Send(&data);
 }
 
 void ArenaTeamMember::ModifyPersonalRating(Player* player, int32 mod, uint32 type)
@@ -564,7 +564,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
-            player->GetSession()->SendPacket(packet);
+            player->GetSession()->Send(packet);
 }
 
 void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
@@ -612,7 +612,7 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
         }
     }
 
-    session->SendPacket(&data);
+    session->Send(&data);
 }
 
 uint8 ArenaTeam::GetSlotByType(uint32 type)

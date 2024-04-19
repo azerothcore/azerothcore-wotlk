@@ -681,14 +681,14 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
         queryData << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
         queryData << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
         queryData << pProto->HolidayId;                          // Holiday.dbc?
-        SendPacket(&queryData);
+        Send(&queryData);
     }
     else
     {
         LOG_DEBUG("network", "WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: {})", item);
         WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         queryData << uint32(item | 0x80000000);
-        SendPacket(&queryData);
+        Send(&queryData);
     }
 }
 
@@ -719,7 +719,7 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
             m_player->SendInventoryChangeFailure(msg, pItem, nullptr);
         }
         data << pItem->GetGUID();
-        SendPacket(&data);
+        Send(&data);
     }
     else
         m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
@@ -1064,7 +1064,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
         data << vendorGuid;
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -1133,12 +1133,12 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     if (count == 0)
     {
         data << uint8(0);
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
     data.put<uint8>(countPos, count);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
@@ -1237,7 +1237,7 @@ void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid I
     data << uint32(slot);
     data << uint32(Duration);
     data << Playerguid;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
@@ -1260,7 +1260,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
         data << uint32(itemid);
         data << Name;
         data << uint32(pName->InventoryType);
-        SendPacket(&data);
+        Send(&data);
     }
 }
 
@@ -1681,7 +1681,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
         data << uint8(1);                                       // no text
     }
 
-    SendPacket(&data);
+    Send(&data);
 }
 
 bool WorldSession::recoveryItem(Item* pItem)

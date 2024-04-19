@@ -218,7 +218,7 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
         }
     }
     BuildPlayerLockDungeonBlock(data, lock);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
@@ -253,7 +253,7 @@ void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*
     LOG_DEBUG("network", "SMSG_LFG_PARTY_INFO [{}]", guid.ToString());
     WorldPacket data(SMSG_LFG_PARTY_INFO, 1 + size);
     BuildPartyLockDungeonBlock(data, lockMap);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
@@ -327,7 +327,7 @@ void WorldSession::SendLfgUpdatePlayer(lfg::LfgUpdateData const& updateData)
             data << uint32(*it);
         data << updateData.comment;
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
@@ -371,7 +371,7 @@ void WorldSession::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
             data << uint32(*it);
         data << updateData.comment;
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgRoleChosen(ObjectGuid guid, uint8 roles)
@@ -382,7 +382,7 @@ void WorldSession::SendLfgRoleChosen(ObjectGuid guid, uint8 roles)
     data << guid;                                          // Guid
     data << uint8(roles > 0);                              // Ready
     data << uint32(roles);                                 // Roles
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
@@ -429,7 +429,7 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
             data << uint8(player ? player->GetLevel() : 0);// Level
         }
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgJoinResult(lfg::LfgJoinResultData const& joinData)
@@ -444,7 +444,7 @@ void WorldSession::SendLfgJoinResult(lfg::LfgJoinResultData const& joinData)
     data << uint32(joinData.state);                        // Check Value
     if (!joinData.lockmap.empty())
         BuildPartyLockDungeonBlock(data, joinData.lockmap);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgQueueStatus(lfg::LfgQueueStatusData const& queueData)
@@ -463,7 +463,7 @@ void WorldSession::SendLfgQueueStatus(lfg::LfgQueueStatusData const& queueData)
     data << uint8(queueData.healers);                      // Healers needed
     data << uint8(queueData.dps);                          // Dps needed
     data << uint32(queueData.queuedTime);                  // Player wait time in queue
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardData)
@@ -499,7 +499,7 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
                 data << uint32(rewardData.quest->RewardItemIdCount[i]);
             }
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
@@ -531,7 +531,7 @@ void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
     data << uint32(secsleft);                              // Time Left
     data << uint32(lfg::LFG_GROUP_KICK_VOTES_NEEDED);      // Needed Votes
     data << boot.reason.c_str();                           // Kick reason
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
@@ -579,7 +579,7 @@ void WorldSession::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
         data << uint8(player.accept != lfg::LFG_ANSWER_PENDING);// Answered
         data << uint8(player.accept == lfg::LFG_ANSWER_AGREE);  // Accepted
     }
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgLfrList(bool update)
@@ -587,14 +587,14 @@ void WorldSession::SendLfgLfrList(bool update)
     LOG_DEBUG("network", "SMSG_LFG_LFR_LIST [{}] update: {}", GetPlayer()->GetGUID().ToString(), update ? 1 : 0);
     WorldPacket data(SMSG_LFG_UPDATE_SEARCH, 1);
     data << uint8(update);                                 // In Lfg Queue?
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgDisabled()
 {
     LOG_DEBUG("network", "SMSG_LFG_DISABLED [{}]", GetPlayer()->GetGUID().ToString());
     WorldPacket data(SMSG_LFG_DISABLED, 0);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgOfferContinue(uint32 dungeonEntry)
@@ -602,7 +602,7 @@ void WorldSession::SendLfgOfferContinue(uint32 dungeonEntry)
     LOG_DEBUG("network", "SMSG_LFG_OFFER_CONTINUE [{}] dungeon entry: {}", GetPlayer()->GetGUID().ToString(), dungeonEntry);
     WorldPacket data(SMSG_LFG_OFFER_CONTINUE, 4);
     data << uint32(dungeonEntry);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendLfgTeleportError(uint8 err)
@@ -610,5 +610,5 @@ void WorldSession::SendLfgTeleportError(uint8 err)
     LOG_DEBUG("network", "SMSG_LFG_TELEPORT_DENIED [{}] reason: {}", GetPlayer()->GetGUID().ToString(), err);
     WorldPacket data(SMSG_LFG_TELEPORT_DENIED, 4);
     data << uint32(err);                                   // Error
-    SendPacket(&data);
+    Send(&data);
 }

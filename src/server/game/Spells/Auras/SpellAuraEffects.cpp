@@ -6174,7 +6174,7 @@ void AuraEffect::HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode,
     if (apply)
     {
         data.Initialize(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
-        target->ToPlayer()->GetSession()->SendPacket(&data);
+        target->ToPlayer()->GetSession()->Send(&data);
     }
 }
 

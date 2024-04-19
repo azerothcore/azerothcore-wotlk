@@ -155,7 +155,7 @@ void GmTicket::SendResponse(WorldSession* session) const
         data << uint8(0);
     }
 
-    session->SendPacket(&data);
+    session->Send(&data);
 }
 
 std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) const
@@ -435,7 +435,7 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     else
         data << uint32(GMTICKET_STATUS_DEFAULT);
 
-    session->SendPacket(&data);
+    session->Send(&data);
 }
 
 void TicketMgr::UpdateLastChange()

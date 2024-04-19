@@ -121,7 +121,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        m_session->SendPacket(&data);
+        m_session->Send(&data);
     }
 }
 
@@ -935,7 +935,7 @@ void AddonChannelCommandHandler::Send(std::string const& msg)
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, GetSession()->GetPlayer(), GetSession()->GetPlayer(), msg);
-    GetSession()->SendPacket(&data);
+    GetSession()->Send(&data);
 }
 
 void AddonChannelCommandHandler::SendAck() // a Command acknowledged, no body

@@ -66,14 +66,14 @@ void WorldSession::SendTabardVendorActivate(ObjectGuid guid)
 {
     WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendShowMailBox(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
@@ -206,7 +206,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     data << strTitle;
 
     data.put<uint32>(count_pos, count);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
@@ -267,7 +267,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
     data << guid;
     data << uint32(spellId);                                // should be same as in packet from client
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
@@ -451,7 +451,7 @@ void WorldSession::SendBindPoint(Creature* npc)
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
     data << npc->GetGUID();
     data << uint32(bindspell);
-    SendPacket(&data);
+    Send(&data);
 
     m_player->PlayerTalkClass->SendCloseGossip();
 }
@@ -490,7 +490,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     if (!petStable)
     {
         data << uint8(0);                                   // stable slots
-        SendPacket(&data);
+        Send(&data);
         return;
     }
 
@@ -537,14 +537,14 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     }
 
     data.put<uint8>(wpos, num);                             // set real data to placeholder
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendStableResult(uint8 res)
 {
     WorldPacket data(SMSG_STABLE_RESULT, 1);
     data << uint8(res);
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::HandleStablePet(WorldPacket& recvData)

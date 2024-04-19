@@ -2509,7 +2509,7 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, Tea
                 itr->second != self &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            itr->second->SendPacket(packet);
+            itr->second->Send(packet);
         }
     }
 }
@@ -2527,7 +2527,7 @@ void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, T
                 !AccountMgr::IsPlayerAccount(itr->second->GetSecurity()) &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            itr->second->SendPacket(packet);
+            itr->second->Send(packet);
         }
     }
 }
@@ -2664,7 +2664,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession
                 itr->second != self &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            itr->second->SendPacket(packet);
+            itr->second->Send(packet);
             foundPlayerToSend = true;
         }
     }

@@ -971,7 +971,7 @@ void BattlefieldWG::SendInitWorldStatesTo(Player* player)
 
     FillInitialWorldStates(data);
 
-    player->GetSession()->SendPacket(&data);
+    player->GetSession()->Send(&data);
 }
 
 void BattlefieldWG::SendInitWorldStatesToAll()

@@ -37,7 +37,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint32 BattleId, uint32 ZoneId, uint3
     data << uint32((GameTime::GetGameTime().count() + p_time));
 
     //Sending the packet to player
-    SendPacket(&data);
+    Send(&data);
 }
 
 //This send invitation to player to join the queue
@@ -50,7 +50,7 @@ void WorldSession::SendBfInvitePlayerToQueue(uint32 BattleId)
     data << uint8(1);                                       //warmup ? used ?
 
     //Sending packet to player
-    SendPacket(&data);
+    Send(&data);
 }
 
 //This send packet for inform player that he join queue
@@ -66,7 +66,7 @@ void WorldSession::SendBfQueueInviteResponse(uint32 BattleId, uint32 ZoneId, boo
     data << uint8((CanQueue ? 1 : 0));  //Accepted          //0 you cannot queue wg     //1 you are queued
     data << uint8((Full ? 0 : 1));      //Logging In        //0 wg full                 //1 queue for upcoming
     data << uint8(1); //Warmup
-    SendPacket(&data);
+    Send(&data);
 }
 
 //This is call when player accept to join war
@@ -79,7 +79,7 @@ void WorldSession::SendBfEntered(uint32 BattleId)
     data << uint8(1);                                       //unk
     data << uint8(1);                                       //unk
     data << uint8(m_player->isAFK() ? 1 : 0);                //Clear AFK
-    SendPacket(&data);
+    Send(&data);
 }
 
 void WorldSession::SendBfLeaveMessage(uint32 BattleId, BFLeaveReason reason)
@@ -89,7 +89,7 @@ void WorldSession::SendBfLeaveMessage(uint32 BattleId, BFLeaveReason reason)
     data << uint8(reason);//byte Reason
     data << uint8(2);//byte BattleStatus
     data << uint8(0);//bool Relocated
-    SendPacket(&data);
+    Send(&data);
 }
 
 //Send by client when he click on accept for queue
