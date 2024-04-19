@@ -19,6 +19,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -319,6 +320,26 @@ public:
         return true;
     }
 
+};
+
+// 31538 - Cannibalize (Heal)
+class spell_cannibalize_heal : public SpellScript
+{
+    PrepareSpellScript(spell_cannibalize_heal);
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            uint32 heal = caster->CountPctFromMaxHealth(7);
+            SetHitHeal(heal);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_cannibalize_heal::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
 };
 
 struct npc_hyjal_ground_trash : public ScriptedAI
@@ -698,4 +719,5 @@ void AddSC_hyjal()
     RegisterHyjalAI(npc_hyjal_ground_trash);
     RegisterHyjalAI(npc_hyjal_gargoyle);
     RegisterHyjalAI(npc_hyjal_frost_wyrm);
+    RegisterSpellScript(spell_cannibalize_heal);
 }
