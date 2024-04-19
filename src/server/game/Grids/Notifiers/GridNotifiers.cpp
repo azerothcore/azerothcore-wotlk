@@ -100,7 +100,7 @@ void VisibleNotifier::SendToSelf()
 
     WorldPacket packet;
     i_data.BuildPacket(packet);
-    i_player.GetSession()->Send(&packet);
+    i_player.User()->Send(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
     {

@@ -673,7 +673,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
 
 void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) const
 {
-    if (GetPlayer()->GetSession()->PlayerLoading())
+    if (GetPlayer()->User()->PlayerLoading())
         return;
 
     // Don't send for achievements with ACHIEVEMENT_FLAG_TRACKING
@@ -2230,7 +2230,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (m_player->IsGameMaster())
     {
         LOG_INFO("achievement", "Not available in GM mode.");
-        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
+        ChatHandler(m_player->User()).PSendSysMessage("Not available in GM mode");
         return;
     }
 
@@ -2274,7 +2274,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(m_player->GetSession()->GetSecurity()))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(m_player->User()->GetSecurity()))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);
@@ -2306,7 +2306,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             std::string subject = reward->subject;
             std::string text = reward->text;
 
-            LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant localeConstant = GetPlayer()->User()->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
             {
                 if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
@@ -2340,7 +2340,7 @@ void AchievementMgr::SendAllAchievementData() const
 {
     WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, _completedAchievements.size() * 8 + 4 + _criteriaProgress.size() * 38 + 4);
     BuildAllDataPacket(&data);
-    GetPlayer()->GetSession()->Send(&data);
+    GetPlayer()->User()->Send(&data);
 }
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
@@ -2348,7 +2348,7 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player) const
     WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + _completedAchievements.size() * 8 + 4 + _criteriaProgress.size() * 38 + 4);
     data << GetPlayer()->GetPackGUID();
     BuildAllDataPacket(&data);
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 /**

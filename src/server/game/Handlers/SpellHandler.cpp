@@ -31,9 +31,9 @@
 #include "TotemPackets.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
+void User::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
 {
     // some spell cast packet including more data (for projectiles?)
     if (castFlags & 0x02)
@@ -56,7 +56,7 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
     }
 }
 
-void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
+void User::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     /// @todo: add targets.read() check
     Player* pUser = m_player;
@@ -166,7 +166,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
+void User::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_OPEN_ITEM packet, data length = {}", (uint32)recvPacket.size());
 
@@ -240,7 +240,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_GIFT_BY_ITEM);
             stmt->SetData(0, item->GetGUID().GetCounter());
             _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
-                .WithPreparedCallback(std::bind(&WorldSession::HandleOpenWrappedItemCallback, this, bagIndex, slot, item->GetGUID().GetCounter(), std::placeholders::_1)));
+                .WithPreparedCallback(std::bind(&User::HandleOpenWrappedItemCallback, this, bagIndex, slot, item->GetGUID().GetCounter(), std::placeholders::_1)));
         }
         else
         {
@@ -249,7 +249,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result)
+void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result)
 {
     if (!GetPlayer())
         return;
@@ -289,7 +289,7 @@ void WorldSession::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, Obj
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
+void User::HandleGameObjectUseOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -310,7 +310,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
+void User::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
     ObjectGuid guid;
     recvPacket >> guid;
@@ -338,7 +338,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, go->GetEntry());
 }
 
-void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
+void User::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
     uint8  castCount, castFlags;
@@ -477,7 +477,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     spell->prepare(&targets);
 }
 
-void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
+void User::HandleCancelCastOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
 
@@ -489,7 +489,7 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
         m_player->InterruptNonMeleeSpells(false, spellId, false, true);
 }
 
-void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
+void User::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
     recvPacket >> spellId;
@@ -525,7 +525,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     m_player->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
-void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
+void User::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
 {
     ObjectGuid guid;
     uint32 spellId;
@@ -563,18 +563,18 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
     pet->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
-void WorldSession::HandleCancelGrowthAuraOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelGrowthAuraOpcode(WorldPacket& /*recvPacket*/)
 {
 }
 
-void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/)
 {
     // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
     m_player->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
-void WorldSession::HandleCancelChanneling(WorldPacket& recvData)
+void User::HandleCancelChanneling(WorldPacket& recvData)
 {
     uint32 spellID = 0;
     recvData >> spellID;
@@ -607,7 +607,7 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recvData)
     mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
-void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed)
+void User::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed)
 {
     // ignore for remote control state
     if (m_player->m_mover != m_player)
@@ -628,7 +628,7 @@ void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& tot
         totem->ToTotem()->UnSummon();
 }
 
-void WorldSession::HandleSelfResOpcode(WorldPacket& /*recvData*/)
+void User::HandleSelfResOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
 
@@ -644,7 +644,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void WorldSession::HandleSpellClick(WorldPacket& recvData)
+void User::HandleSpellClick(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -662,7 +662,7 @@ void WorldSession::HandleSpellClick(WorldPacket& recvData)
     unit->HandleSpellClick(m_player);
 }
 
-void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
+void User::HandleMirrorImageDataRequest(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
     ObjectGuid guid;
@@ -755,7 +755,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
+void User::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
 

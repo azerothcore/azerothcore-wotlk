@@ -56,7 +56,7 @@ namespace lfg
 
         if (!player->GetGroup() || !player->GetGroup()->isLFGGroup())
         {
-            player->GetSession()->SendLfgLfrList(false);
+            player->User()->SendLfgLfrList(false);
             sLFGMgr->LeaveLfg(player->GetGUID());
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : ObjectGuid::Empty);
 
@@ -124,7 +124,7 @@ namespace lfg
 
             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 if (Player* member = itr->GetSource())
-                    player->GetSession()->SendNameQueryOpcode(member->GetGUID());
+                    player->User()->SendNameQueryOpcode(member->GetGUID());
 
             if (group->IsLfgWithBuff())
                 player->CastSpell(player, LFG_SPELL_LUCK_OF_THE_DRAW, true);
@@ -238,7 +238,7 @@ namespace lfg
             if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
             {
                 sLFGMgr->SetDungeon(gguid, dungeonId);
-                leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
+                leader->User()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
             }
         }
 
@@ -253,7 +253,7 @@ namespace lfg
             //else if (state == LFG_STATE_BOOT)
             // Update internal kick cooldown of kicked
 
-            player->GetSession()->SendLfgUpdateParty(LfgUpdateData(LFG_UPDATETYPE_LEADER_UNK1));
+            player->User()->SendLfgUpdateParty(LfgUpdateData(LFG_UPDATETYPE_LEADER_UNK1));
             if (player->GetMap()->IsDungeon())            // Teleport player out the dungeon
             {
                 // Xinef: no longer valid sLFGMgr->TeleportPlayer(player, true);

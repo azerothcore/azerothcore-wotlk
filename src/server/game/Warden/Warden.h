@@ -98,7 +98,7 @@ struct ClientWardenModule
     uint8* CompressedData{};
 };
 
-class WorldSession;
+class User;
 
 class Warden
 {
@@ -109,7 +109,7 @@ public:
     Warden();
     virtual ~Warden();
 
-    virtual void Init(WorldSession* session, SessionKey const& k) = 0;
+    virtual void Init(User* session, SessionKey const& k) = 0;
     virtual ClientWardenModule* GetModuleForClient() = 0;
     virtual void InitializeModule() = 0;
     virtual void RequestHash() = 0;
@@ -136,7 +136,7 @@ public:
     WardenPayloadMgr* GetPayloadMgr();
 
 private:
-    WorldSession* _session;
+    User* _session;
     WardenPayloadMgr _payloadMgr;
     uint8 _inputKey[16];
     uint8 _outputKey[16];

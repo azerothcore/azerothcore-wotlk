@@ -32,7 +32,7 @@
 #include "UpdateMask.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <boost/algorithm/string/replace.hpp>
 
 Player* ChatHandler::GetPlayer() const
@@ -53,11 +53,11 @@ bool ChatHandler::IsAvailable(uint32 securityLevel) const
 
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 {
-    WorldSession* target_session = nullptr;
+    User* target_session = nullptr;
     uint32 target_account = 0;
 
     if (target)
-        target_session = target->GetSession();
+        target_session = target->User();
     else if (guid)
         target_account = sCharacterCache->GetCharacterAccountIdByGuid(guid);
 
@@ -70,7 +70,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
     return HasLowerSecurityAccount(target_session, target_account, strong);
 }
 
-bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_account, bool strong)
+bool ChatHandler::HasLowerSecurityAccount(User* target, uint32 target_account, bool strong)
 {
     uint32 target_sec;
 

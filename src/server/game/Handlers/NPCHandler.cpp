@@ -31,7 +31,7 @@
 #include "SpellMgr.h"
 #include "UpdateMask.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 enum StableResultCode
 {
@@ -43,7 +43,7 @@ enum StableResultCode
     STABLE_ERR_EXOTIC       = 0x0C,                         // "you are unable to control exotic creatures"
 };
 
-void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
+void User::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -62,21 +62,21 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
     SendTabardVendorActivate(guid);
 }
 
-void WorldSession::SendTabardVendorActivate(ObjectGuid guid)
+void User::SendTabardVendorActivate(ObjectGuid guid)
 {
     WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
     Send(&data);
 }
 
-void WorldSession::SendShowMailBox(ObjectGuid guid)
+void User::SendShowMailBox(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
     Send(&data);
 }
 
-void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
+void User::HandleTrainerListOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
 
@@ -84,13 +84,13 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
     SendTrainerList(guid);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid)
+void User::SendTrainerList(ObjectGuid guid)
 {
     std::string str = GetAcoreString(LANG_NPC_TAINER_HELLO);
     SendTrainerList(guid, str);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
+void User::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 {
     LOG_DEBUG("network", "WORLD: SendTrainerList");
 
@@ -209,7 +209,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     Send(&data);
 }
 
-void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
+void User::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     uint32 spellId = 0;
@@ -270,7 +270,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
+void User::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -321,7 +321,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     unit->AI()->sGossipHello(m_player);
 }
 
-/*void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recvData)
+/*void User::HandleGossipSelectOptionOpcode(WorldPacket & recvData)
 {
     LOG_DEBUG("network.opcode", "WORLD: CMSG_GOSSIP_SELECT_OPTION");
 
@@ -362,7 +362,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     }
 }*/
 
-void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
+void User::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 
@@ -384,7 +384,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
     SendSpiritResurrect();
 }
 
-void WorldSession::SendSpiritResurrect()
+void User::SendSpiritResurrect()
 {
     m_player->Resurrect(0.5f, true);
 
@@ -415,7 +415,7 @@ void WorldSession::SendSpiritResurrect()
     //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in Resurrect
 }
 
-void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
+void User::HandleBinderActivateOpcode(WorldPacket& recvData)
 {
     ObjectGuid npcGUID;
     recvData >> npcGUID;
@@ -437,7 +437,7 @@ void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
     SendBindPoint(unit);
 }
 
-void WorldSession::SendBindPoint(Creature* npc)
+void User::SendBindPoint(Creature* npc)
 {
     // prevent set homebind to instances in any case
     if (GetPlayer()->GetMap()->Instanceable())
@@ -456,7 +456,7 @@ void WorldSession::SendBindPoint(Creature* npc)
     m_player->PlayerTalkClass->SendCloseGossip();
 }
 
-void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
+void User::HandleListStabledPetsOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS");
     ObjectGuid npcGUID;
@@ -477,7 +477,7 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
     SendStablePet(npcGUID);
 }
 
-void WorldSession::SendStablePet(ObjectGuid guid)
+void User::SendStablePet(ObjectGuid guid)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS Send.");
 
@@ -540,14 +540,14 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     Send(&data);
 }
 
-void WorldSession::SendStableResult(uint8 res)
+void User::SendStableResult(uint8 res)
 {
     WorldPacket data(SMSG_STABLE_RESULT, 1);
     data << uint8(res);
     Send(&data);
 }
 
-void WorldSession::HandleStablePet(WorldPacket& recvData)
+void User::HandleStablePet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_PET");
     ObjectGuid npcGUID;
@@ -615,7 +615,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
     SendStableResult(STABLE_ERR_STABLE);
 }
 
-void WorldSession::HandleUnstablePet(WorldPacket& recvData)
+void User::HandleUnstablePet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_UNSTABLE_PET.");
     ObjectGuid npcGUID;
@@ -729,7 +729,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
+void User::HandleBuyStableSlot(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_BUY_STABLE_SLOT.");
     ObjectGuid npcGUID;
@@ -763,12 +763,12 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
         SendStableResult(STABLE_ERR_STABLE);
 }
 
-void WorldSession::HandleStableRevivePet(WorldPacket& /* recvData */)
+void User::HandleStableRevivePet(WorldPacket& /* recvData */)
 {
     LOG_DEBUG("network", "HandleStableRevivePet: Not implemented");
 }
 
-void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
+void User::HandleStableSwapPet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_SWAP_PET.");
     ObjectGuid npcGUID;
@@ -881,7 +881,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
+void User::HandleRepairItemOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_REPAIR_ITEM");
 

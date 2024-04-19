@@ -146,7 +146,7 @@ public:
     void DeleteFromDB();
 
     void WritePacket(WorldPacket& data) const;
-    void SendResponse(WorldSession* session) const;
+    void SendResponse(User* session) const;
 
     void TeleportTo(Player* player) const;
     std::string FormatMessageString(ChatHandler& handler, bool detailed = false) const;
@@ -243,7 +243,7 @@ public:
     void ShowClosedList(ChatHandler& handler) const;
     void ShowEscalatedList(ChatHandler& handler) const;
 
-    void SendTicket(WorldSession* session, GmTicket* ticket) const;
+    void SendTicket(User* session, GmTicket* ticket) const;
 
 protected:
     void _RemoveTicket(uint32 ticketId, int64 source = -1, bool permanently = false);

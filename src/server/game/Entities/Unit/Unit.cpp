@@ -1010,7 +1010,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (Player* killer = attacker->GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             // pussywizard: don't allow GMs to deal damage in normal way (this leaves no evidence in logs!), they have commands to do so
-            //if (!allowGM && killer->GetSession()->GetSecurity() && killer->GetSession()->GetSecurity() <= SEC_ADMINISTRATOR)
+            //if (!allowGM && killer->User()->GetSecurity() && killer->User()->GetSecurity() <= SEC_ADMINISTRATOR)
             //  return 0;
 
             if (Battleground* bg = killer->GetBattleground())
@@ -2636,7 +2636,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
                                  GetGUID().ToString(), victim->GetGUID().ToString(), dmgInfo.GetDamage(), dmgInfo.GetAbsorb(), dmgInfo.GetBlock(), dmgInfo.GetResist());
 
         // Let the pet know we've started attacking someting. Handles melee attacks only
-        // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
+        // Spells such as auto-shot and others handled in User::HandleCastSpellOpcode
         if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
             for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
                 if (Unit* pet = *itr)
@@ -4293,7 +4293,7 @@ void SafeUnitPointer::UnitDeleted()
             if (ptr)
                 LOG_INFO("misc", "SafeUnitPointer::UnitDeleted (A2)");
 
-            p->GetSession()->KickPlayer("Unit deleted");
+            p->User()->KickPlayer("Unit deleted");
         }
     }
     else if (ptr)
@@ -4441,7 +4441,7 @@ AuraApplication* Unit::_CreateAuraApplication(Aura* aura, uint8 effMask)
 
     // ghost spell check, allow apply any auras at player loading in ghost mode (will be cleanup after load)
     // Xinef: Added IsAllowingDeadTarget check
-    if (!IsAlive() && !aurSpellInfo->IsDeathPersistent() && !aurSpellInfo->IsAllowingDeadTarget() && (GetTypeId() != TYPEID_PLAYER || !ToPlayer()->GetSession()->PlayerLoading()))
+    if (!IsAlive() && !aurSpellInfo->IsDeathPersistent() && !aurSpellInfo->IsAllowingDeadTarget() && (GetTypeId() != TYPEID_PLAYER || !ToPlayer()->User()->PlayerLoading()))
         return nullptr;
 
     Unit* caster = aura->GetCaster();
@@ -13426,7 +13426,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
                 SendMessageToSet(&data, true);
 
                 data.Initialize(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
 
                 // mounts can also have accessories
                 GetVehicleKit()->InstallAllAccessories(false);
@@ -13454,7 +13454,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         data << GetPackGUID();
         data << uint32(GameTime::GetGameTime().count());   // Packet counter
         data << player->GetCollisionHeight();
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -13474,7 +13474,7 @@ void Unit::Dismount()
         data << GetPackGUID();
         data << uint32(GameTime::GetGameTime().count());   // Packet counter
         data << thisPlayer->GetCollisionHeight();
-        thisPlayer->GetSession()->Send(&data);
+        thisPlayer->User()->Send(&data);
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
@@ -14415,7 +14415,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
     {
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
+            // register forced speed changes for User::HandleForceSpeedChangeAck
             // and do it only for real sent packets and use run for run/mounted as client expected
             ++ToPlayer()->m_forced_speed_changes[mtype];
 
@@ -16267,7 +16267,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo, uint32 procPhase)
 {
     // Player is loaded now - do not allow passive spell casts to proc
-    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetSession()->PlayerLoading())
+    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->User()->PlayerLoading())
         return;
     // For melee/ranged based attack need update skills and set some Aura states if victim present
     if (procFlag & MELEE_BASED_TRIGGER_MASK && target && procPhase == PROC_SPELL_PHASE_HIT)
@@ -16826,7 +16826,7 @@ void Unit::SendPetActionFeedback(uint8 msg)
 
     WorldPacket data(SMSG_PET_ACTION_FEEDBACK, 1);
     data << uint8(msg);
-    owner->ToPlayer()->GetSession()->Send(&data);
+    owner->ToPlayer()->User()->Send(&data);
 }
 
 void Unit::SendPetTalk(uint32 pettalk)
@@ -16838,7 +16838,7 @@ void Unit::SendPetTalk(uint32 pettalk)
     WorldPacket data(SMSG_PET_ACTION_SOUND, 8 + 4);
     data << GetGUID();
     data << uint32(pettalk);
-    owner->ToPlayer()->GetSession()->Send(&data);
+    owner->ToPlayer()->User()->Send(&data);
 }
 
 void Unit::SendPetAIReaction(ObjectGuid guid)
@@ -16850,7 +16850,7 @@ void Unit::SendPetAIReaction(ObjectGuid guid)
     WorldPacket data(SMSG_AI_REACTION, 8 + 4);
     data << guid;
     data << uint32(AI_REACTION_HOSTILE);
-    owner->ToPlayer()->GetSession()->Send(&data);
+    owner->ToPlayer()->User()->Send(&data);
 }
 
 ///----------End of Pet responses methods----------
@@ -16947,7 +16947,7 @@ void Unit::SetStandState(uint8 state)
     {
         WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
         data << (uint8)state;
-        ToPlayer()->GetSession()->Send(&data);
+        ToPlayer()->User()->Send(&data);
     }
 }
 
@@ -19263,7 +19263,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             return;
 
         // modify hostile references for new phasemask, some special cases deal with hostile references themselves
-        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->CharacterLoggingOut()))
+        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->User()->CharacterLoggingOut()))
         {
             HostileRefMgr& refMgr = getHostileRefMgr();
             HostileReference* ref = refMgr.getFirst();
@@ -19372,7 +19372,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         data << float(speedXY);                                 // Horizontal speed
         data << float(-speedZ);                                 // Z Movement speed (vertical)
 
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
 
         if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || player->HasAuraType(SPELL_AURA_FLY))
             player->SetCanFly(true, true);
@@ -19731,7 +19731,7 @@ void Unit::JumpTo(float speedXY, float speedZ, bool forward)
         data << float(speedXY);                                 // Horizontal speed
         data << float(-speedZ);                                 // Z Movement speed (vertical)
 
-        ToPlayer()->GetSession()->Send(&data);
+        ToPlayer()->User()->Send(&data);
     }
 }
 
@@ -19889,7 +19889,7 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
             bg->EventPlayerDroppedFlag(player);
 
         WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
     }
 
     ASSERT(!m_vehicle);
@@ -21145,7 +21145,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
     if (posPointers.UnitFieldFlagsPos >= 0)
     {
         uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
-        if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
+        if (target->IsGameMaster() && target->User()->IsGMAccount())
             appendValue &= ~UNIT_FLAG_NOT_SELECTABLE;
 
         valuesUpdateBuf.put(posPointers.UnitFieldFlagsPos, appendValue);
@@ -21172,7 +21172,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
 
             if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
             {
-                if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
+                if (target->IsGameMaster() && target->User()->IsGMAccount())
                 {
                     displayId = cinfo->GetFirstVisibleModel()->CreatureDisplayID;
                 }
@@ -21428,7 +21428,7 @@ void Unit::Whisper(std::string_view text, Language language, Player* target, boo
         return;
     }
 
-    LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant locale = target->User()->GetSessionDbLocaleIndex();
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, language, this, target, text, 0, "", locale);
     target->SendDirectMessage(&data);
@@ -21477,7 +21477,7 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
         return;
     }
 
-    LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant locale = target->User()->GetSessionDbLocaleIndex();
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);

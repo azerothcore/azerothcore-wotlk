@@ -39,7 +39,7 @@
 #include "Warden.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 inline bool isNasty(uint8 c)
 {
@@ -56,7 +56,7 @@ inline bool isNasty(uint8 c)
     return false;
 }
 
-void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
+void User::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     uint32 type;
     uint32 lang;
@@ -383,7 +383,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
                 bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
-                bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
+                bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->User()->GetSecurity() : SEC_PLAYER);
 
                 if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && receiver != sender)
                 {
@@ -675,7 +675,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
+void User::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
 {
     if (GetPlayer()->IsSpectator())
         return;
@@ -725,7 +725,7 @@ namespace Acore
     };
 }                                                           // namespace Acore
 
-void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
+void User::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
     if (!GetPlayer()->IsAlive())
         return;
@@ -795,7 +795,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
         ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
 }
 
-void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
+void User::HandleChatIgnoredOpcode(WorldPacket& recvData)
 {
     ObjectGuid iguid;
     uint8 unk;
@@ -809,10 +809,10 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, m_player, m_player, GetPlayer()->GetName());
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
-void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
+void User::HandleChannelDeclineInvite(WorldPacket& recvPacket)
 {
     // used only with EXTRA_LOGS
     (void)recvPacket;
@@ -820,27 +820,27 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
     LOG_DEBUG("network", "Opcode {}", recvPacket.GetOpcode());
 }
 
-void WorldSession::SendPlayerNotFoundNotice(std::string const& name)
+void User::SendPlayerNotFoundNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
     data << name;
     Send(&data);
 }
 
-void WorldSession::SendPlayerAmbiguousNotice(std::string const& name)
+void User::SendPlayerAmbiguousNotice(std::string const& name)
 {
     WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size() + 1);
     data << name;
     Send(&data);
 }
 
-void WorldSession::SendWrongFactionNotice()
+void User::SendWrongFactionNotice()
 {
     WorldPacket data(SMSG_CHAT_WRONG_FACTION, 0);
     Send(&data);
 }
 
-void WorldSession::SendChatRestrictedNotice(ChatRestrictionType restriction)
+void User::SendChatRestrictedNotice(ChatRestrictionType restriction)
 {
     WorldPacket data(SMSG_CHAT_RESTRICTED, 1);
     data << uint8(restriction);

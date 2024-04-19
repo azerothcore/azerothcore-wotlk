@@ -32,7 +32,7 @@ EndScriptData */
 #include "Player.h"
 #include "Realm.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 
@@ -63,7 +63,7 @@ public:
     // Enables or disables the staff badge
     static bool HandleGMChatCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
-        if (WorldSession* session = handler->GetSession())
+        if (User* session = handler->GetSession())
         {
             if (!enableArg)
             {
@@ -119,7 +119,7 @@ public:
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
         for (auto const& [playerGuid, player] : ObjectAccessor::GetPlayers())
         {
-            AccountTypes playerSec = player->GetSession()->GetSecurity();
+            AccountTypes playerSec = player->User()->GetSecurity();
             if ((player->IsGameMaster() ||
                  (!AccountMgr::IsPlayerAccount(playerSec) && playerSec <= AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_GM_LIST)))) &&
                 (!handler->GetSession() || player->IsVisibleGloballyFor(handler->GetSession()->GetPlayer())))

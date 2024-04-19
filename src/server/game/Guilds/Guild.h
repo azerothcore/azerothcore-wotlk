@@ -569,7 +569,7 @@ private:
 
         void SetInfo(std::string_view name, std::string_view icon);
         void SetText(std::string_view text);
-        void SendText(const Guild* guild, WorldSession* session) const;
+        void SendText(const Guild* guild, User* session) const;
 
         std::string const& GetName() const { return m_name; }
         std::string const& GetIcon() const { return m_icon; }
@@ -676,8 +676,8 @@ private:
     };
 
 public:
-    static void SendCommandResult(WorldSession* session, GuildCommandType type, GuildCommandError errCode, std::string_view param = {});
-    static void SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode);
+    static void SendCommandResult(User* session, GuildCommandType type, GuildCommandError errCode, std::string_view param = {});
+    static void SendSaveEmblemResult(User* session, GuildEmblemError errCode);
 
     Guild();
     ~Guild();
@@ -695,42 +695,42 @@ public:
     bool SetName(std::string_view const& name);
 
     // Handle client commands
-    void HandleRoster(WorldSession* session);
-    void HandleQuery(WorldSession* session);
-    void HandleSetMOTD(WorldSession* session, std::string_view motd);
-    void HandleSetInfo(WorldSession* session, std::string_view info);
-    void HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo);
-    void HandleSetLeader(WorldSession* session, std::string_view name);
-    void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string_view name, std::string_view icon);
-    void HandleSetMemberNote(WorldSession* session, std::string_view name, std::string_view note, bool officer);
-    void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_view name, uint32 rights, uint32 moneyPerDay, std::array<GuildBankRightsAndSlots, GUILD_BANK_MAX_TABS> const& rightsAndSlots);
-    void HandleBuyBankTab(WorldSession* session, uint8 tabId);
-    void HandleInviteMember(WorldSession* session, std::string const& name);
-    void HandleAcceptMember(WorldSession* session);
-    void HandleLeaveMember(WorldSession* session);
-    void HandleRemoveMember(WorldSession* session, std::string_view name);
-    void HandleUpdateMemberRank(WorldSession* session, std::string_view name, bool demote);
-    void HandleAddNewRank(WorldSession* session, std::string_view name);
-    void HandleRemoveRank(WorldSession* session, uint8 rankId);
-    void HandleRemoveLowestRank(WorldSession* session);
-    void HandleMemberDepositMoney(WorldSession* session, uint32 amount);
-    bool HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair = false);
-    void HandleMemberLogout(WorldSession* session);
-    void HandleDisband(WorldSession* session);
+    void HandleRoster(User* session);
+    void HandleQuery(User* session);
+    void HandleSetMOTD(User* session, std::string_view motd);
+    void HandleSetInfo(User* session, std::string_view info);
+    void HandleSetEmblem(User* session, const EmblemInfo& emblemInfo);
+    void HandleSetLeader(User* session, std::string_view name);
+    void HandleSetBankTabInfo(User* session, uint8 tabId, std::string_view name, std::string_view icon);
+    void HandleSetMemberNote(User* session, std::string_view name, std::string_view note, bool officer);
+    void HandleSetRankInfo(User* session, uint8 rankId, std::string_view name, uint32 rights, uint32 moneyPerDay, std::array<GuildBankRightsAndSlots, GUILD_BANK_MAX_TABS> const& rightsAndSlots);
+    void HandleBuyBankTab(User* session, uint8 tabId);
+    void HandleInviteMember(User* session, std::string const& name);
+    void HandleAcceptMember(User* session);
+    void HandleLeaveMember(User* session);
+    void HandleRemoveMember(User* session, std::string_view name);
+    void HandleUpdateMemberRank(User* session, std::string_view name, bool demote);
+    void HandleAddNewRank(User* session, std::string_view name);
+    void HandleRemoveRank(User* session, uint8 rankId);
+    void HandleRemoveLowestRank(User* session);
+    void HandleMemberDepositMoney(User* session, uint32 amount);
+    bool HandleMemberWithdrawMoney(User* session, uint32 amount, bool repair = false);
+    void HandleMemberLogout(User* session);
+    void HandleDisband(User* session);
 
     void UpdateMemberData(Player* player, uint8 dataid, uint32 value);
     void OnPlayerStatusChange(Player* player, uint32 flag, bool state);
 
     // Send info to client
-    void SendInfo(WorldSession* session) const;
-    void SendEventLog(WorldSession* session) const;
-    void SendBankLog(WorldSession* session, uint8 tabId) const;
-    void SendBankTabsInfo(WorldSession* session, bool showTabs = false);
-    void SendBankTabData(WorldSession* session, uint8 tabId, bool sendAllSlots) const;
-    void SendBankTabText(WorldSession* session, uint8 tabId) const;
-    void SendPermissions(WorldSession* session);
-    void SendMoneyInfo(WorldSession* session) const;
-    void SendLoginInfo(WorldSession* session);
+    void SendInfo(User* session) const;
+    void SendEventLog(User* session) const;
+    void SendBankLog(User* session, uint8 tabId) const;
+    void SendBankTabsInfo(User* session, bool showTabs = false);
+    void SendBankTabData(User* session, uint8 tabId, bool sendAllSlots) const;
+    void SendBankTabText(User* session, uint8 tabId) const;
+    void SendPermissions(User* session);
+    void SendMoneyInfo(User* session) const;
+    void SendLoginInfo(User* session);
 
     // Load from DB
     bool LoadFromDB(Field* fields);
@@ -744,11 +744,11 @@ public:
     bool Validate();
 
     // Broadcasts
-    void BroadcastToGuild(WorldSession* session, bool officerOnly, std::string_view msg, uint32 language = LANG_UNIVERSAL) const;
+    void BroadcastToGuild(User* session, bool officerOnly, std::string_view msg, uint32 language = LANG_UNIVERSAL) const;
     void BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const;
     void BroadcastPacket(WorldPacket const* packet) const;
 
-    void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
+    void MassInviteToEvent(User* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
     template<class Do>
     void BroadcastWorker(Do& _do, Player* except = nullptr)
@@ -861,11 +861,11 @@ private:
     void _MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAmount);
     bool _DoItemsMove(MoveItemData* pSrc, MoveItemData* pDest, bool sendError, uint32 splitedAmount = 0);
 
-    void _SendBankContent(WorldSession* session, uint8 tabId, bool sendAllSlots) const;
-    void _SendBankMoneyUpdate(WorldSession* session) const;
+    void _SendBankContent(User* session, uint8 tabId, bool sendAllSlots) const;
+    void _SendBankMoneyUpdate(User* session) const;
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
-    void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
+    void _SendBankList(User* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
     void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid = ObjectGuid::Empty, Optional<std::string_view> param1 = {}, Optional<std::string_view> param2 = {}, Optional<std::string_view> param3 = {}) const;
 };

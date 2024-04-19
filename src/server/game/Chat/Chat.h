@@ -21,7 +21,7 @@
 #include "ChatCommand.h"
 #include "Errors.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <vector>
 
 class ChatHandler;
@@ -29,7 +29,7 @@ class Creature;
 class Group;
 class Player;
 class Unit;
-class WorldSession;
+class User;
 class WorldObject;
 
 struct GameTele;
@@ -37,7 +37,7 @@ struct GameTele;
 class AC_GAME_API ChatHandler
 {
 public:
-    explicit ChatHandler(WorldSession* session) : m_session(session), sentErrorMessage(false) {}
+    explicit ChatHandler(User* session) : m_session(session), sentErrorMessage(false) {}
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
@@ -104,7 +104,7 @@ public:
     virtual int GetSessionDbLocaleIndex() const;
 
     bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
-    bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
+    bool HasLowerSecurityAccount(User* target, uint32 account, bool strong = false);
 
     void SendGlobalGMSysMessage(const char* str);
     Player* getSelectedPlayer() const;
@@ -136,13 +136,13 @@ public:
 
     bool IsConsole() const { return (m_session == nullptr); }
     Player* GetPlayer() const;
-    WorldSession* GetSession() { return m_session; }
+    User* GetSession() { return m_session; }
     bool IsAvailable(uint32 securityLevel) const;
 protected:
     explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
 
 private:
-    WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
+    User* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
     // common global flag
     bool sentErrorMessage;

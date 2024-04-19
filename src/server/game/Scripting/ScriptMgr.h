@@ -158,8 +158,8 @@ public: /* ServerScript */
     void OnNetworkStop();
     void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> socket);
-    bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
-    bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
+    bool CanPacketReceive(User* session, WorldPacket const& packet);
+    bool CanPacketSend(User* session, WorldPacket const& packet);
 
 public: /* WorldScript */
     void OnLoadCustomDatabaseTable();
@@ -494,7 +494,7 @@ public: /* GuildScript */
                          bool isDestBank, uint8 destContainer, uint8 destSlotId);
     void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
     void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
-    bool CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots);
+    bool CanGuildSendBankList(Guild const* guild, User* session, uint8 tabId, bool sendAllSlots);
 
 public: /* GroupScript */
     void OnGroupAddMember(Group* group, ObjectGuid guid);
@@ -659,7 +659,7 @@ public: /* MiscScript */
     void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
     bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
     bool CanItemApplyEquipSpell(Player* player, Item* item);
-    bool CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature);
+    bool CanSendAuctionHello(User const* session, ObjectGuid guid, Creature* creature);
     void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
     void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);
     void ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId);

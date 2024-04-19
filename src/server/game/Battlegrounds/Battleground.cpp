@@ -557,7 +557,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 {
                     WorldPacket status;
                     sBattlegroundMgr->BuildBattlegroundStatusPacket(&status, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, 0, GetStartTime(), GetArenaType(), player->GetBgTeamId());
-                    player->GetSession()->Send(&status);
+                    player->User()->Send(&status);
 
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
                     player->ResetAllPowers();
@@ -601,7 +601,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                             data << t->GetGUID();
                             data << uint32(t->GetZoneId());
                             data << uint32(15 * IN_MILLISECONDS);
-                            p->GetSession()->Send(&data);
+                            p->User()->Send(&data);
                         }
                 m_ToBeTeleported.clear();
             }
@@ -660,14 +660,14 @@ Position const* Battleground::GetTeamStartPosition(TeamId teamId) const
 void Battleground::SendPacketToAll(WorldPacket const* packet)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-        itr->second->GetSession()->Send(packet);
+        itr->second->User()->Send(packet);
 }
 
 void Battleground::SendPacketToTeam(TeamId teamId, WorldPacket const* packet, Player* sender, bool self)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (itr->second->GetBgTeamId() == teamId && (self || sender != itr->second))
-            itr->second->GetSession()->Send(packet);
+            itr->second->User()->Send(packet);
 }
 
 void Battleground::SendChatMessage(Creature* source, uint8 textId, WorldObject* target /*= nullptr*/)
@@ -884,7 +884,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
         BlockMovement(player);
 
-        player->GetSession()->Send(&pvpLogData);
+        player->User()->Send(&pvpLogData);
 
         if (isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
         {
@@ -911,7 +911,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime(), GetArenaType(), player->GetBgTeamId());
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
 
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, player->GetMapId());
     }
@@ -1017,7 +1017,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
 
         BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetBgTypeID(), GetArenaType());
 
@@ -1296,7 +1296,7 @@ bool Battleground::HasFreeSlots() const
 void Battleground::SpectatorsSendPacket(WorldPacket& data)
 {
     for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
-        (*itr)->GetSession()->Send(&data);
+        (*itr)->User()->Send(&data);
 }
 
 void Battleground::ReadyMarkerClicked(Player* p)
@@ -1306,7 +1306,7 @@ void Battleground::ReadyMarkerClicked(Player* p)
     readyMarkerClickedSet.insert(p->GetGUID());
     uint32 count = readyMarkerClickedSet.size();
     uint32 req = ArenaTeam::GetReqPlayersForType(GetArenaType());
-    p->GetSession()->SendNotification("You are marked as ready %u/%u", count, req);
+    p->User()->SendNotification("You are marked as ready %u/%u", count, req);
     if (count == req)
     {
         m_Events |= BG_STARTING_EVENT_2;
@@ -1687,9 +1687,9 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
     std::map<uint32, WorldPacket> localizedPackets;
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        if (localizedPackets.find(itr->second->GetSession()->GetSessionDbLocaleIndex()) == localizedPackets.end())
+        if (localizedPackets.find(itr->second->User()->GetSessionDbLocaleIndex()) == localizedPackets.end())
         {
-            char const* format = sObjectMgr->GetAcoreString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
+            char const* format = sObjectMgr->GetAcoreString(entry, itr->second->User()->GetSessionDbLocaleIndex());
 
             char str[1024];
             va_list ap;
@@ -1697,10 +1697,10 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
             vsnprintf(str, 1024, format, ap);
             va_end(ap);
 
-            ChatHandler::BuildChatPacket(localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()], CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, nullptr, nullptr, str);
+            ChatHandler::BuildChatPacket(localizedPackets[itr->second->User()->GetSessionDbLocaleIndex()], CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, nullptr, nullptr, str);
         }
 
-        itr->second->SendDirectMessage(&localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()]);
+        itr->second->SendDirectMessage(&localizedPackets[itr->second->User()->GetSessionDbLocaleIndex()]);
     }
 }
 
@@ -1832,10 +1832,10 @@ void Battleground::PlayerAddedToBGCheckIfBGIsRunning(Player* player)
     BlockMovement(player);
 
     BuildPvPLogDataPacket(data);
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 
     sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, GetEndTime(), GetStartTime(), GetArenaType(), player->GetBgTeamId());
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 uint32 Battleground::GetAlivePlayersCountByTeam(TeamId teamId) const

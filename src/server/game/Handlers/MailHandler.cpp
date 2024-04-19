@@ -29,15 +29,15 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 
-bool WorldSession::CanOpenMailBox(ObjectGuid guid)
+bool User::CanOpenMailBox(ObjectGuid guid)
 {
     if (guid == m_player->GetGUID())
     {
-        if (m_player->GetSession()->GetSecurity() < SEC_MODERATOR)
+        if (m_player->User()->GetSecurity() < SEC_MODERATOR)
         {
             LOG_ERROR("network.opcode", "{} attempt open mailbox in cheating way.", m_player->GetName());
             return false;
@@ -59,7 +59,7 @@ bool WorldSession::CanOpenMailBox(ObjectGuid guid)
     return true;
 }
 
-void WorldSession::HandleSendMail(WorldPacket& recvData)
+void User::HandleSendMail(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint64 unk3;
@@ -210,7 +210,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
+    uint32 rc_account = receive ? receive->User()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -322,7 +322,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         {
             CleanStringForMysqlQuery(subject);
             CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"{}\", NOW(), {})",
-                GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), player->GetSession()->GetRemoteAddress(), rc_account, receiver, money, subject, 5);
+                GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), player->User()->GetRemoteAddress(), rc_account, receiver, money, subject, 5);
         }
     }
 
@@ -344,7 +344,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 }
 
 //called when mail is read
-void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
+void User::HandleMailMarkAsRead(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -367,7 +367,7 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
 }
 
 //called when client deletes mail
-void WorldSession::HandleMailDelete(WorldPacket& recvData)
+void User::HandleMailDelete(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -397,7 +397,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
 
-void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
+void User::HandleMailReturnToSender(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -478,7 +478,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
 }
 
 //called when player takes item attached in mail
-void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
+void User::HandleMailTakeItem(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -536,7 +536,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
             Player* sender = ObjectAccessor::FindPlayerByLowGUID(m->sender);
             if (sender)
             {
-                sender_accId = sender->GetSession()->GetAccountId();
+                sender_accId = sender->User()->GetAccountId();
             }
             else
             {
@@ -560,7 +560,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"{}\", NOW(), {})",
-                        GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), player->GetSession()->GetRemoteAddress(), sender_accId, senderName, m->COD, subj, 1);
+                        GetAccountId(), player->GetGUID().GetCounter(), player->GetName(), player->User()->GetRemoteAddress(), sender_accId, senderName, m->COD, subj, 1);
                 }
             }
 
@@ -586,7 +586,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
 }
 
-void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
+void User::HandleMailTakeMoney(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -625,7 +625,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
 }
 
 //called when player lists his received mails
-void WorldSession::HandleGetMailList(WorldPacket& recvData)
+void User::HandleGetMailList(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     recvData >> mailbox;
@@ -753,7 +753,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 }
 
 //used when player copies mail body to his inventory
-void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
+void User::HandleMailCreateTextItem(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
@@ -820,7 +820,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
 }
 
 //TODO Fix me! ... this void has probably bad condition, but good data are sent
-void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
+void User::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
 {
     WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
 

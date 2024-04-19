@@ -20,7 +20,7 @@
 #include "Player.h"
 #include <cctype>
 
-void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
+void User::HandleJoinChannel(WorldPacket& recvPacket)
 {
     uint32 channelId;
     uint8 unknown1, unknown2;
@@ -58,7 +58,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
+void User::HandleLeaveChannel(WorldPacket& recvPacket)
 {
     uint32 unk;
     std::string channelName;
@@ -76,7 +76,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleChannelList(WorldPacket& recvPacket)
+void User::HandleChannelList(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -89,7 +89,7 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
             channel->List(GetPlayer());
 }
 
-void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
+void User::HandleChannelPassword(WorldPacket& recvPacket)
 {
     std::string channelName, password;
     recvPacket >> channelName >> password;
@@ -104,7 +104,7 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
             channel->Password(GetPlayer(), password);
 }
 
-void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
+void User::HandleChannelSetOwner(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -119,7 +119,7 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
             channel->SetOwner(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
+void User::HandleChannelOwner(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -131,7 +131,7 @@ void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
             channel->SendWhoOwner(GetPlayer()->GetGUID());
 }
 
-void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
+void User::HandleChannelModerator(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -146,7 +146,7 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
             channel->SetModerator(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
+void User::HandleChannelUnmoderator(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -161,7 +161,7 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
             channel->UnsetModerator(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
+void User::HandleChannelMute(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -176,7 +176,7 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
             channel->SetMute(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
+void User::HandleChannelUnmute(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -191,7 +191,7 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
             channel->UnsetMute(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
+void User::HandleChannelInvite(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -206,7 +206,7 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
             channel->Invite(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
+void User::HandleChannelKick(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -221,7 +221,7 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
             channel->Kick(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
+void User::HandleChannelBan(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -236,7 +236,7 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
             channel->Ban(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
+void User::HandleChannelUnban(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -251,7 +251,7 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
             channel->UnBan(GetPlayer(), targetName);
 }
 
-void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
+void User::HandleChannelAnnouncements(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -263,7 +263,7 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
             channel->Announce(GetPlayer());
 }
 
-void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
+void User::HandleChannelModerateOpcode(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -276,13 +276,13 @@ void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
             chn->ToggleModeration(GetPlayer());
 }
 
-void WorldSession::HandleChannelDisplayListQuery(WorldPacket& recvPacket)
+void User::HandleChannelDisplayListQuery(WorldPacket& recvPacket)
 {
     // this should be OK because the 2 function _were_ the same
     HandleChannelList(recvPacket);
 }
 
-void WorldSession::HandleGetChannelMemberCount(WorldPacket& recvPacket)
+void User::HandleGetChannelMemberCount(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -305,7 +305,7 @@ void WorldSession::HandleGetChannelMemberCount(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
+void User::HandleSetChannelWatch(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -320,7 +320,7 @@ void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
             channel->AddWatching(GetPlayer());
 }
 
-void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
+void User::HandleClearChannelWatch(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;

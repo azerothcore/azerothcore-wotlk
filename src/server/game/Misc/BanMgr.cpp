@@ -24,7 +24,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 
 BanMgr* BanMgr::instance()
 {
@@ -68,13 +68,13 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
     stmt->SetData(3, Reason);
     trans->Append(stmt);
 
-    if (WorldSession* session = sWorld->FindSession(AccountID))
+    if (User* session = sWorld->FindUser(AccountID))
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
+            session->KickPlayer("Ban Account at condition 'FindUser(account)->GetPlayerName() != author'");
 
-    if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
+    if (User* session = sWorld->FindOfflineUser(AccountID))
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+            session->KickPlayer("Ban Account at condition 'FindOfflineUser(account)->GetPlayerName() != author'");
 
     LoginDatabase.CommitTransaction(trans);
 
@@ -130,13 +130,13 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
     stmt->SetData(3, Reason);
     trans->Append(stmt);
 
-    if (WorldSession* session = sWorld->FindSession(AccountID))
+    if (User* session = sWorld->FindUser(AccountID))
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindSession(account)->GetPlayerName() != author'");
+            session->KickPlayer("Ban Account at condition 'FindUser(account)->GetPlayerName() != author'");
 
-    if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
+    if (User* session = sWorld->FindOfflineUser(AccountID))
         if (session->GetPlayerName() != Author)
-            session->KickPlayer("Ban Account at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+            session->KickPlayer("Ban Account at condition 'FindOfflineUser(account)->GetPlayerName() != author'");
 
     LoginDatabase.CommitTransaction(trans);
 
@@ -204,13 +204,13 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
         Field* fields = resultAccounts->Fetch();
         uint32 AccountID = fields[0].Get<uint32>();
 
-        if (WorldSession* session = sWorld->FindSession(AccountID))
+        if (User* session = sWorld->FindUser(AccountID))
             if (session->GetPlayerName() != Author)
-                session->KickPlayer("Ban IP at condition 'FindSession(account)->GetPlayerName() != author'");
+                session->KickPlayer("Ban IP at condition 'FindUser(account)->GetPlayerName() != author'");
 
-        if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
+        if (User* session = sWorld->FindOfflineUser(AccountID))
             if (session->GetPlayerName() != Author)
-                session->KickPlayer("Ban IP at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+                session->KickPlayer("Ban IP at condition 'FindOfflineUser(account)->GetPlayerName() != author'");
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);
@@ -248,7 +248,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
     CharacterDatabase.Execute(stmt);
 
     if (target)
-        target->GetSession()->KickPlayer("Ban");
+        target->User()->KickPlayer("Ban");
 
     if (sWorld->getBoolConfig(CONFIG_SHOW_BAN_IN_WORLD))
     {

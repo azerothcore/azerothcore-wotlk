@@ -25,15 +25,15 @@
 #include "Socket.h"
 #include "Util.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <boost/asio/ip/tcp.hpp>
 
 using boost::asio::ip::tcp;
 
-typedef int(*MSGHANDLER)(WorldSession*  ses,
-                         Opcodes        msgId,
-                         uint32_t       eventTime,
-                         WorldPacket*   msg);
+typedef int(*MSGHANDLER)(User*        user,
+                         Opcodes      msgId,
+                         uint32_t     eventTime,
+                         WorldPacket* msg);
 
 class EncryptableAndCompressiblePacket : public WorldPacket
 {
@@ -114,10 +114,10 @@ private:
     void CheckIpCallback(PreparedQueryResult result);
 
     /// writes network.opcode log
-    /// accessing WorldSession is not threadsafe, only do it when holding _worldSessionLock
+    /// accessing User is not threadsafe, only do it when holding _worldSessionLock
     void LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mutex> const& guard) const;
 
-    /// sends and logs network.opcode without accessing WorldSession
+    /// sends and logs network.opcode without accessing User
     void SendPacketAndLogOpcode(WorldPacket const& packet);
     void HandleSendAuthSession();
     void HandleAuthSession(WorldPacket& recvPacket);
@@ -134,7 +134,7 @@ private:
     uint32 _OverSpeedPings;
 
     std::mutex _worldSessionLock;
-    WorldSession* _worldSession;
+    User* _worldSession;
     bool _authed;
 
     MessageBuffer _headerBuffer;

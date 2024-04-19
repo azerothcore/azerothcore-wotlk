@@ -154,7 +154,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
     if (player->IsGameMaster())
         return Map::CAN_ENTER;
 
-    char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
+    char const* mapName = entry->name[player->User()->GetSessionDbcLocale()];
 
     if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
@@ -167,7 +167,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             /// @todo: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            player->User()->SendAreaTriggerMessage(player->User()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
             LOG_DEBUG("maps", "MAP: Player '{}' must be in a raid group to enter instance '{}'", player->GetName(), mapName);
             return Map::CANNOT_ENTER_NOT_IN_RAID;
         }
@@ -200,7 +200,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
             if (!corpseMap)
             {
                 WorldPacket data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
                 LOG_DEBUG("maps", "MAP: Player '{}' does not have a corpse in instance '{}' and cannot enter.", player->GetName(), mapName);
                 return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
             }

@@ -26,9 +26,9 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
+void User::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_BUY");
 
@@ -222,7 +222,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     sPetitionMgr->AddPetition(charter->GetGUID(), m_player->GetGUID(), name, uint8(type));
 }
 
-void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
+void User::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
 
@@ -261,7 +261,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
+void User::HandlePetitionQueryOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_QUERY");   // ok
 
@@ -274,7 +274,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
     SendPetitionQueryOpcode(petitionguid);
 }
 
-void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
+void User::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 {
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
     if (!petition)
@@ -321,7 +321,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
     Send(&data);
 }
 
-void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
+void User::HandlePetitionRenameOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_RENAME");   // ok
 
@@ -386,7 +386,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
+void User::HandlePetitionSignOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SIGN");    // ok
 
@@ -489,7 +489,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
         // update for owner if online
         if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
-            owner->GetSession()->Send(&data);
+            owner->User()->Send(&data);
         return;
     }
 
@@ -522,10 +522,10 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     // update for owner if online
     if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
-        owner->GetSession()->Send(&data);
+        owner->User()->Send(&data);
 }
 
-void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
+void User::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_DECLINE");  // ok
 
@@ -542,11 +542,11 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
     {
         WorldPacket data(MSG_PETITION_DECLINE, 8);
         data << m_player->GetGUID();
-        owner->GetSession()->Send(&data);
+        owner->User()->Send(&data);
     }
 }
 
-void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
+void User::HandleOfferPetitionOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_OFFER_PETITION");   // ok
 
@@ -634,10 +634,10 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
             data << uint32(0);                                  // there 0 ...
         }
 
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
-void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
+void User::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_TURN_IN_PETITION");
 
@@ -810,7 +810,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
+void User::HandlePetitionShowListOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received CMSG_PETITION_SHOWLIST");
 
@@ -820,7 +820,7 @@ void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
     SendPetitionShowList(guid);
 }
 
-void WorldSession::SendPetitionShowList(ObjectGuid guid)
+void User::SendPetitionShowList(ObjectGuid guid)
 {
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)

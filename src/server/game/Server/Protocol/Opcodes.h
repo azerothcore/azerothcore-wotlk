@@ -1364,11 +1364,11 @@ enum SessionStatus
 enum PacketProcessing
 {
     PROCESS_INPLACE = 0,                                    //process packet whenever we receive it - mostly for non-handled or non-implemented packets
-    PROCESS_THREADUNSAFE,                                   //packet is not thread-safe - process it in World::UpdateSessions()
+    PROCESS_THREADUNSAFE,                                   //packet is not thread-safe - process it in World::UpdateUsers()
     PROCESS_THREADSAFE                                      //packet is thread-safe - process it in Map::Update()
 };
 
-class WorldSession;
+class User;
 class WorldPacket;
 
 class OpcodeHandler
@@ -1387,7 +1387,7 @@ public:
     ClientOpcodeHandler(char const* name, SessionStatus status, PacketProcessing processing)
         : OpcodeHandler(name, status), ProcessingPlace(processing) { }
 
-    virtual void Call(WorldSession* session, WorldPacket& packet) const = 0;
+    virtual void Call(User* session, WorldPacket& packet) const = 0;
 
     PacketProcessing ProcessingPlace;
 };

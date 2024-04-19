@@ -22,9 +22,9 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
+bool User::CanUseBank(ObjectGuid bankerGUID) const
 {
     // bankerGUID parameter is optional, set to 0 by default.
     if (!bankerGUID)
@@ -42,7 +42,7 @@ bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
     return true;
 }
 
-void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
+void User::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
 
@@ -62,7 +62,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
     SendShowBank(guid);
 }
 
-void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet)
+void User::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet)
 {
     LOG_DEBUG("network", "STORAGE: receive bag = {}, slot = {}", packet.Bag, packet.Slot);
 
@@ -96,7 +96,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& pa
     m_player->UpdateTitansGrip();
 }
 
-void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet)
+void User::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet)
 {
     LOG_DEBUG("network", "STORAGE: receive bag = {}, slot = {}", packet.Bag, packet.Slot);
 
@@ -141,7 +141,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
     }
 }
 
-void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot)
+void User::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot)
 {
     WorldPackets::Bank::BuyBankSlotResult packet;
     if (!CanUseBank(buyBankSlot.Banker))
@@ -186,7 +186,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
 }
 
-void WorldSession::SendShowBank(ObjectGuid guid)
+void User::SendShowBank(ObjectGuid guid)
 {
     m_currentBankerGUID = guid;
     WorldPackets::Bank::ShowBank packet;

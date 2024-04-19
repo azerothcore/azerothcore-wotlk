@@ -4140,8 +4140,8 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     WorldPacket data(SMSG_DUEL_REQUESTED, 8 + 8);
     data << pGameObj->GetGUID();
     data << caster->GetGUID();
-    caster->GetSession()->Send(&data);
-    target->GetSession()->Send(&data);
+    caster->User()->Send(&data);
+    target->User()->Send(&data);
 
     // create duel-info
     bool isMounted = (GetSpellInfo()->Id == 62875);
@@ -4223,7 +4223,7 @@ void Spell::EffectSummonPlayer(SpellEffIndex /*effIndex*/)
     data << m_caster->GetGUID();                                // summoner guid
     data << uint32(m_caster->GetZoneId());                      // summoner zone
     data << uint32(MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS);  // auto decline after msecs
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 void Spell::EffectActivateObject(SpellEffIndex effIndex)
@@ -4382,7 +4382,7 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
 
             player->SendLearnPacket(glyphEntry->SpellId, true); // Send packet to properly handle client-side spell tooltips
             player->CastSpell(m_caster, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
-            player->SetGlyph(m_glyphIndex, glyph, !player->GetSession()->PlayerLoading());
+            player->SetGlyph(m_glyphIndex, glyph, !player->User()->PlayerLoading());
             player->SendTalentsInfoData(false);
         }
     }
@@ -5857,7 +5857,7 @@ void Spell::EffectDiscoverTaxi(SpellEffIndex effIndex)
 
     uint32 nodeid = m_spellInfo->Effects[effIndex].MiscValue;
     if (sTaxiNodesStore.LookupEntry(nodeid))
-        player->GetSession()->SendDiscoverNewTaxiNode(nodeid);
+        player->User()->SendDiscoverNewTaxiNode(nodeid);
 }
 
 void Spell::EffectTitanGrip(SpellEffIndex /*effIndex*/)
@@ -6164,7 +6164,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     {
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
-            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            player->User()->SendNotification(LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;
@@ -6336,5 +6336,5 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex  /*effIndex*/)
     data << m_caster->GetGUID();
     data << uint32(m_caster->GetZoneId());
     data << uint32(MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS); // auto decline after msecs
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }

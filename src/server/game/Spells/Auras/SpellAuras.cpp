@@ -1587,7 +1587,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 break;
             case SPELLFAMILY_POTION:
                 // Alchemy: Mixology
-                if (caster && caster->HasAura(53042) && caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->GetSession()->PlayerLoading())
+                if (caster && caster->HasAura(53042) && caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->User()->PlayerLoading())
                 {
                     if (sSpellMgr->GetSpellGroup(GetId()) == 1) /*Elixirs*/
                     {

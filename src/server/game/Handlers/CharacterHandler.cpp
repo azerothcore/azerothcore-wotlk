@@ -56,7 +56,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -214,7 +214,7 @@ bool LoginQueryHolder::Initialize()
     return res;
 }
 
-void WorldSession::HandleCharEnum(PreparedQueryResult result)
+void User::HandleCharEnum(PreparedQueryResult result)
 {
     WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
 
@@ -242,7 +242,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
     Send(&data);
 }
 
-void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
+void User::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
 {
     CharacterDatabasePreparedStatement* stmt = nullptr;
 
@@ -256,10 +256,10 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
     stmt->SetData(0, PET_SAVE_AS_CURRENT);
     stmt->SetData(1, GetAccountId());
 
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleCharEnum, this, std::placeholders::_1)));
+    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&User::HandleCharEnum, this, std::placeholders::_1)));
 }
 
-void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
+void User::HandleCharCreateOpcode(WorldPacket& recvData)
 {
     std::shared_ptr<CharacterCreateInfo> createInfo = std::make_shared<CharacterCreateInfo>();
 
@@ -595,7 +595,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     }));
 }
 
-void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
+void User::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -604,7 +604,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     uint32 initAccountId = GetAccountId();
 
     // can't delete loaded character
-    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
+    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineUserForCharacter(guid.GetCounter()))
     {
         sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         return;
@@ -656,7 +656,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
-void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
+void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
     m_playerLoading = true;
     ObjectGuid playerGuid;
@@ -690,14 +690,14 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     };
 
     // pussywizard:
-    if (WorldSession* sess = sWorld->FindOfflineSessionForCharacterGUID(playerGuid.GetCounter()))
+    if (User* sess = sWorld->FindOfflineUserForCharacter(playerGuid.GetCounter()))
         if (sess->GetAccountId() != GetAccountId())
         {
             SendCharLogin(CHAR_LOGIN_DUPLICATE_CHARACTER);
             return;
         }
     // pussywizard:
-    if (WorldSession* sess = sWorld->FindOfflineSession(GetAccountId()))
+    if (User* sess = sWorld->FindOfflineUser(GetAccountId()))
     {
         Player* p = sess->GetPlayer();
         if (!p || sess->IsKicked())
@@ -761,9 +761,9 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
             sess->SetPlayer(nullptr);
             SetPlayer(p);
-            p->SetSession(this);
+            p->SetUser(this);
             delete p->PlayerTalkClass;
-            p->PlayerTalkClass = new PlayerMenu(p->GetSession());
+            p->PlayerTalkClass = new PlayerMenu(p->User());
             HandlePlayerLoginToCharInWorld(p);
             return;
         }
@@ -782,19 +782,19 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     });
 }
 
-void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
+void User::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 {
     ObjectGuid playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
     // for send server info and strings (config)
-    ChatHandler chH = ChatHandler(pCurrChar->GetSession());
+    ChatHandler chH = ChatHandler(pCurrChar->User());
 
     // "GetAccountId() == db stored account id" checked in LoadFromDB (prevent login not own character using cheating tools)
     if (!pCurrChar->LoadFromDB(playerGuid, holder))
     {
         SetPlayer(nullptr);
-        KickPlayer("WorldSession::HandlePlayerLogin Player::LoadFromDB failed"); // disconnect client, player no set to session and it will not deleted or saved at kick
+        KickPlayer("User::HandlePlayerLogin Player::LoadFromDB failed"); // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar; // delete it manually
         m_playerLoading = false;
         return;
@@ -890,7 +890,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
 
         // Probably a hackfix, but currently the best workaround to prevent character names showing as Unknown after teleport out from instances at login.
-        pCurrChar->GetSession()->SendNameQueryOpcode(pCurrChar->GetGUID());
+        pCurrChar->User()->SendNameQueryOpcode(pCurrChar->GetGUID());
     }
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
@@ -1082,16 +1082,16 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     // Load pet if any (if player not alive and in taxi flight or another then pet will remember as temporary unsummoned)
     pCurrChar->LoadPet();
 
-    if (pCurrChar->GetSession()->GetRecruiterId() != 0 || pCurrChar->GetSession()->IsARecruiter())
+    if (pCurrChar->User()->GetRecruiterId() != 0 || pCurrChar->User()->IsARecruiter())
     {
-        bool isReferrer = pCurrChar->GetSession()->IsARecruiter();
+        bool isReferrer = pCurrChar->User()->IsARecruiter();
 
-        for (auto const& [accID, session] : sWorld->GetAllSessions())
+        for (auto const& [accID, session] : sWorld->GetAllUsers())
         {
             if (!session->GetRecruiterId() && !session->IsARecruiter())
                 continue;
 
-            if ((isReferrer && pCurrChar->GetSession()->GetAccountId() == session->GetRecruiterId()) || (!isReferrer && pCurrChar->GetSession()->GetRecruiterId() == session->GetAccountId()))
+            if ((isReferrer && pCurrChar->User()->GetAccountId() == session->GetRecruiterId()) || (!isReferrer && pCurrChar->User()->GetRecruiterId() == session->GetAccountId()))
             {
                 Player* rf = session->GetPlayer();
                 if (rf)
@@ -1114,7 +1114,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
 
-void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
+void User::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 {
     ChatHandler chH = ChatHandler(this);
     m_playerLoading = true;
@@ -1236,12 +1236,12 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     m_playerLoading = false;
 }
 
-void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player* /*pCurrChar*/)
+void User::HandlePlayerLoginToCharOutOfWorld(Player* /*pCurrChar*/)
 {
     ABORT();
 }
 
-void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
+void User::HandleSetFactionAtWar(WorldPacket& recvData)
 {
     uint32 repListID;
     uint8  flag;
@@ -1253,13 +1253,13 @@ void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 }
 
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
-void WorldSession::HandleSetFactionCheat(WorldPacket& /*recvData*/)
+void User::HandleSetFactionCheat(WorldPacket& /*recvData*/)
 {
     LOG_ERROR("network.opcode", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendStates();
 }
 
-void WorldSession::HandleTutorialFlag(WorldPacket& recvData)
+void User::HandleTutorialFlag(WorldPacket& recvData)
 {
     uint32 data;
     recvData >> data;
@@ -1275,26 +1275,26 @@ void WorldSession::HandleTutorialFlag(WorldPacket& recvData)
     SetTutorialInt(index, flag);
 }
 
-void WorldSession::HandleTutorialClear(WorldPacket& /*recvData*/)
+void User::HandleTutorialClear(WorldPacket& /*recvData*/)
 {
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         SetTutorialInt(i, 0xFFFFFFFF);
 }
 
-void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
+void User::HandleTutorialReset(WorldPacket& /*recvData*/)
 {
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         SetTutorialInt(i, 0x00000000);
 }
 
-void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
+void User::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
 }
 
-void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
+void User::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
     uint32 replistid;
     uint8 inactive;
@@ -1303,7 +1303,7 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
     m_player->GetReputationMgr().SetInactive(replistid, inactive);
 }
 
-void WorldSession::HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet)
+void User::HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet)
 {
     if (packet.ShowHelm)
         m_player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_HELM);
@@ -1311,7 +1311,7 @@ void WorldSession::HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm&
         m_player->SetPlayerFlag(PLAYER_FLAGS_HIDE_HELM);
 }
 
-void WorldSession::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet)
+void User::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet)
 {
     if (packet.ShowCloak)
         m_player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
@@ -1319,7 +1319,7 @@ void WorldSession::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloa
         m_player->SetPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
 }
 
-void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
+void User::HandleCharRenameOpcode(WorldPacket& recvData)
 {
     std::shared_ptr<CharacterRenameInfo> renameInfo = std::make_shared<CharacterRenameInfo>();
 
@@ -1349,10 +1349,10 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
     stmt->SetData(2, renameInfo->Name);
 
     _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
-        .WithPreparedCallback(std::bind(&WorldSession::HandleCharRenameCallBack, this, renameInfo, std::placeholders::_1)));
+        .WithPreparedCallback(std::bind(&User::HandleCharRenameCallBack, this, renameInfo, std::placeholders::_1)));
 }
 
-void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result)
+void User::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result)
 {
     if (!result)
     {
@@ -1375,7 +1375,7 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
     atLoginFlags &= ~AT_LOGIN_RENAME;
 
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(guidLow)) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
+    if (ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(guidLow)) || sWorld->FindOfflineUserForCharacter(guidLow))
     {
         SendCharRename(CHAR_CREATE_ERROR, renameInfo.get());
         return;
@@ -1404,7 +1404,7 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
     sCharacterCache->UpdateCharacterData(renameInfo->Guid, renameInfo->Name);
 }
 
-void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
+void User::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 {
     // pussywizard:
     if (!sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
@@ -1483,7 +1483,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     SendSetPlayerDeclinedNamesResult(DECLINED_NAMES_RESULT_SUCCESS, guid);
 }
 
-void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
+void User::HandleAlterAppearance(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
 
@@ -1555,7 +1555,7 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
     m_player->SetStandState(0);                              // stand up
 }
 
-void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
+void User::HandleRemoveGlyph(WorldPacket& recvData)
 {
     uint32 slot;
     recvData >> slot;
@@ -1595,7 +1595,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleCharCustomize(WorldPacket& recvData)
+void User::HandleCharCustomize(WorldPacket& recvData)
 {
     std::shared_ptr<CharacterCustomizeInfo> customizeInfo = std::make_shared<CharacterCustomizeInfo>();
 
@@ -1606,12 +1606,12 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to customise {}, but it does not belong to their account!",
             GetAccountId(), GetRemoteAddress(), customizeInfo->Guid.ToString());
         recvData.rfinish();
-        KickPlayer("WorldSession::HandleCharCustomize Trying to customise character of another account");
+        KickPlayer("User::HandleCharCustomize Trying to customise character of another account");
         return;
     }
 
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(customizeInfo->Guid) || sWorld->FindOfflineSessionForCharacterGUID(customizeInfo->Guid.GetCounter()))
+    if (ObjectAccessor::FindConnectedPlayer(customizeInfo->Guid) || sWorld->FindOfflineUserForCharacter(customizeInfo->Guid.GetCounter()))
     {
         recvData.rfinish();
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
@@ -1632,10 +1632,10 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     stmt->SetData(0, customizeInfo->Guid.GetCounter());
 
     _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
-        .WithPreparedCallback(std::bind(&WorldSession::HandleCharCustomizeCallback, this, customizeInfo, std::placeholders::_1)));
+        .WithPreparedCallback(std::bind(&User::HandleCharCustomizeCallback, this, customizeInfo, std::placeholders::_1)));
 }
 
-void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> customizeInfo, PreparedQueryResult result)
+void User::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> customizeInfo, PreparedQueryResult result)
 {
     if (!result)
     {
@@ -1726,7 +1726,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
         GetAccountId(), GetRemoteAddress(), oldName, customizeInfo->Guid.ToString(), customizeInfo->Name);
 }
 
-void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
+void User::HandleEquipmentSetSave(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
 
@@ -1785,7 +1785,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
     m_player->SetEquipmentSet(index, eqSet);
 }
 
-void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
+void User::HandleEquipmentSetDelete(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
 
@@ -1795,7 +1795,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
     m_player->DeleteEquipmentSet(setGuid);
 }
 
-void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
+void User::HandleEquipmentSetUse(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
@@ -1888,7 +1888,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
+void User::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 {
     std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo = std::make_shared<CharacterFactionChangeInfo>();
 
@@ -1899,7 +1899,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to factionchange character {}, but it does not belong to their account!",
             GetAccountId(), GetRemoteAddress(), factionChangeInfo->Guid.ToString());
         recvData.rfinish();
-        KickPlayer("WorldSession::HandleCharFactionOrRaceChange Trying to change faction of character of another account");
+        KickPlayer("User::HandleCharFactionOrRaceChange Trying to change faction of character of another account");
         return;
     }
 
@@ -1913,7 +1913,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
              >> factionChangeInfo->Race;
 
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(factionChangeInfo->Guid) || sWorld->FindOfflineSessionForCharacterGUID(factionChangeInfo->Guid.GetCounter()))
+    if (ObjectAccessor::FindConnectedPlayer(factionChangeInfo->Guid) || sWorld->FindOfflineUserForCharacter(factionChangeInfo->Guid.GetCounter()))
     {
         SendCharFactionChange(CHAR_CREATE_ERROR, factionChangeInfo.get());
         return;
@@ -1925,10 +1925,10 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     stmt->SetData(0, factionChangeInfo->Guid.GetCounter());
 
     _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
-        .WithPreparedCallback(std::bind(&WorldSession::HandleCharFactionOrRaceChangeCallback, this, factionChangeInfo, std::placeholders::_1)));
+        .WithPreparedCallback(std::bind(&User::HandleCharFactionOrRaceChangeCallback, this, factionChangeInfo, std::placeholders::_1)));
 }
 
-void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo, PreparedQueryResult result)
+void User::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo, PreparedQueryResult result)
 {
     if (!result)
     {
@@ -2541,21 +2541,21 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     SendCharFactionChange(RESPONSE_SUCCESS, factionChangeInfo.get());
 }
 
-void WorldSession::SendCharCreate(ResponseCodes result)
+void User::SendCharCreate(ResponseCodes result)
 {
     WorldPacket data(SMSG_CHAR_CREATE, 1);
     data << uint8(result);
     Send(&data);
 }
 
-void WorldSession::SendCharDelete(ResponseCodes result)
+void User::SendCharDelete(ResponseCodes result)
 {
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << uint8(result);
     Send(&data);
 }
 
-void WorldSession::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo)
+void User::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo)
 {
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + renameInfo->Name.size() + 1);
     data << uint8(result);
@@ -2567,7 +2567,7 @@ void WorldSession::SendCharRename(ResponseCodes result, CharacterRenameInfo cons
     Send(&data);
 }
 
-void WorldSession::SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo)
+void User::SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo)
 {
     WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1 + 8 + factionChangeInfo->Name.size() + 1 + 7);
     data << uint8(result);
@@ -2586,7 +2586,7 @@ void WorldSession::SendCharFactionChange(ResponseCodes result, CharacterFactionC
     Send(&data);
 }
 
-void WorldSession::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo)
+void User::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo)
 {
     WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1 + 8 + customizeInfo->Name.size() + 1 + 6);
     data << uint8(result);
@@ -2604,7 +2604,7 @@ void WorldSession::SendCharCustomize(ResponseCodes result, CharacterCustomizeInf
     Send(&data);
 }
 
-void WorldSession::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid)
+void User::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid)
 {
     WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
     data << uint32(result);

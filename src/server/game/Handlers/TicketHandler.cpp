@@ -24,10 +24,10 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <zlib.h>
 
-void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
+void User::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 {
     // Don't accept tickets if the ticket queue is disabled. (Ticket UI is greyed out but not fully dependable)
     if (sTicketMgr->GetStatus() == GMTICKET_QUEUE_STATUS_DISABLED)
@@ -128,7 +128,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
+void User::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
 {
     std::string message;
     recv_data >> message;
@@ -155,7 +155,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
     Send(&data);
 }
 
-void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
 {
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
@@ -170,7 +170,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
     }
 }
 
-void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
 {
     SendQueryTimeResponse();
 
@@ -185,7 +185,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
         sTicketMgr->SendTicket(this, nullptr);
 }
 
-void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
 {
     // Note: This only disables the ticket UI at client side and is not fully reliable
     // are we sure this is a uint32? Should ask Zor
@@ -194,7 +194,7 @@ void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
     Send(&data);
 }
 
-void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
+void User::HandleGMSurveySubmit(WorldPacket& recv_data)
 {
     uint32 nextSurveyID = sTicketMgr->GetNextSurveyID();
     // just put the survey into the database
@@ -253,7 +253,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void WorldSession::HandleReportLag(WorldPacket& recv_data)
+void User::HandleReportLag(WorldPacket& recv_data)
 {
     // just put the lag report into the database...
     // can't think of anything else to do with it
@@ -277,7 +277,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     CharacterDatabase.Execute(stmt);
 }
 
-void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
+void User::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
 {
     // empty packet
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))

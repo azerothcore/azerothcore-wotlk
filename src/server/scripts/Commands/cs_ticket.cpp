@@ -153,8 +153,8 @@ public:
         {
             WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-            submitter->GetSession()->Send(&data);
-            ChatHandler(submitter->GetSession()).SendSysMessage(LANG_TICKET_CLOSED);
+            submitter->User()->Send(&data);
+            ChatHandler(submitter->User()).SendSysMessage(LANG_TICKET_CLOSED);
         }
         return true;
     }
@@ -223,8 +223,8 @@ public:
 
         if (Player* player2 = ticket->GetPlayer())
         {
-            ticket->SendResponse(player2->GetSession());
-            ChatHandler(player2->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
+            ticket->SendResponse(player2->User());
+            ChatHandler(player2->User()).SendSysMessage(LANG_TICKET_COMPLETED);
         }
 
         Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
@@ -267,7 +267,7 @@ public:
             // Force abandon ticket
             WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
 
         return true;
@@ -285,7 +285,7 @@ public:
         ticket->SetEscalatedStatus(TICKET_IN_ESCALATION_QUEUE);
 
         if (Player* player = ticket->GetPlayer())
-            sTicketMgr->SendTicket(player->GetSession(), ticket);
+            sTicketMgr->SendTicket(player->User(), ticket);
 
         sTicketMgr->UpdateLastChange();
         return true;
@@ -352,7 +352,7 @@ public:
         uint32 security = SEC_PLAYER;
         Player* assignedPlayer = ticket->GetAssignedPlayer();
         if (assignedPlayer)
-            security = assignedPlayer->GetSession()->GetSecurity();
+            security = assignedPlayer->User()->GetSecurity();
         else
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
@@ -361,7 +361,7 @@ public:
         }
 
         // Check security
-        //! If no m_session present it means we're issuing this command from the console
+        //! If no m_user present it means we're issuing this command from the console
         uint32 mySecurity = handler->GetSession() ? handler->GetSession()->GetSecurity() : SEC_CONSOLE;
         if (security > mySecurity)
         {

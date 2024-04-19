@@ -33,7 +33,7 @@ class SpellInfo;
 class CreatureAI;
 class Quest;
 class Player;
-class WorldSession;
+class User;
 class CreatureGroup;
 
 // max different by z coordinate for creature aggro reaction

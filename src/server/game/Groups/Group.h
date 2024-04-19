@@ -36,7 +36,7 @@ class Player;
 class Unit;
 class WorldObject;
 class WorldPacket;
-class WorldSession;
+class User;
 
 struct MapEntry;
 
@@ -269,8 +269,8 @@ public:
     void ResetInstances(uint8 method, bool isRaid, Player* leader);
 
     // -no description-
-    //void SendInit(WorldSession* session);
-    void SendTargetIconList(WorldSession* session);
+    //void SendInit(User* session);
+    void SendTargetIconList(User* session);
     void SendUpdate();
     void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);

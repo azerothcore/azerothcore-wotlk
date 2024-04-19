@@ -20,7 +20,7 @@
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "serpent_shrine.h"
 #include "SpellScript.h"
 

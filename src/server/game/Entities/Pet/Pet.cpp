@@ -34,22 +34,22 @@
 #include "Unit.h"
 #include "Util.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : ObjectGuid::Empty, true),
-    m_usedTalentCount(0),
-    m_removed(false),
-    m_owner(owner),
-    m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL),
-    m_petType(type),
-    m_duration(0),
-    m_auraRaidUpdateMask(0),
-    m_loading(false),
-    m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL),
-    m_tempspellTarget(nullptr),
-    m_tempoldTarget(),
-    m_tempspellIsPositive(false),
-    m_tempspell(0)
+                                        m_usedTalentCount(0),
+                                        m_removed(false),
+                                        m_owner(owner),
+                                        m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL),
+                                        m_petType(type),
+                                        m_duration(0),
+                                        m_auraRaidUpdateMask(0),
+                                        m_loading(false),
+                                        m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL),
+                                        m_tempspellTarget(nullptr),
+                                        m_tempoldTarget(),
+                                        m_tempspellIsPositive(false),
+                                        m_tempspell(0)
 {
     ASSERT(m_owner && m_owner->GetTypeId() == TYPEID_PLAYER);
 
@@ -417,11 +417,11 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
         owner->ToPlayer()->SetLastPetNumber(petInfo->PetNumber);
 
-    owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
-        .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime, savedhealth = petInfo->Health, savedmana = petInfo->Mana, healthPct, fullMana]
+    owner->User()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
+        .AfterComplete([this, owner, user = owner->User(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime, savedhealth = petInfo->Health, savedmana = petInfo->Mana, healthPct, fullMana]
         (SQLQueryHolderBase const& holder)
     {
-        if (session->GetPlayer() != owner || owner->GetPet() != this)
+        if (user->GetPlayer() != owner || owner->GetPet() != this)
             return;
 
         // passing previous checks ensure that 'this' is still valid
@@ -690,7 +690,7 @@ void Pet::Update(uint32 diff)
                     if (owner->GetPetGUID() != GetGUID())
                     {
                         LOG_ERROR("entities.pet", "Pet {} is not pet of owner {}, removed", GetEntry(), GetOwner()->GetName());
-                        ASSERT(getPetType() != HUNTER_PET, "Unexpected unlinked pet found for owner {}", owner->GetSession()->GetPlayerInfo());
+                        ASSERT(getPetType() != HUNTER_PET, "Unexpected unlinked pet found for owner {}", owner->User()->GetPlayerInfo());
                         Remove(PET_SAVE_NOT_IN_SLOT);
                         return;
                     }
@@ -1508,7 +1508,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
         if (!cooldowns.empty() && GetOwner())
         {
             BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, cooldowns);
-            GetOwner()->GetSession()->Send(&data);
+            GetOwner()->User()->Send(&data);
         }
     }
 }

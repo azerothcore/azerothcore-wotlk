@@ -434,7 +434,7 @@ public:
             uint32 queueSlot = 0;
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
 
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
@@ -449,7 +449,7 @@ public:
 
     static bool HandleCommentatorCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
-        WorldSession* session = handler->GetSession();
+        User* session = handler->GetSession();
 
         if (!session)
         {
@@ -493,7 +493,7 @@ public:
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
-        WorldSession* session = handler->GetSession();
+        User* session = handler->GetSession();
 
         if (!session)
         {
@@ -886,7 +886,7 @@ public:
                 if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
                 {
                     // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                    if (!targetPlayer->GetSession()->GetSecurity())
+                    if (!targetPlayer->User()->GetSecurity())
                     {
                         handler->SendErrorMessage("Only GMs can be summoned to an instance!");
                         return false;
@@ -914,7 +914,7 @@ public:
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
             if (handler->needReportToTarget(targetPlayer))
             {
-                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(m_player->GetName()).c_str());
+                ChatHandler(targetPlayer->User()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(m_player->GetName()).c_str());
             }
 
             // stop flight if need
@@ -1005,7 +1005,7 @@ public:
         {
             Player* player = itr->GetSource();
 
-            if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
+            if (!player || player == handler->GetSession()->GetPlayer() || !player->User())
             {
                 continue;
             }
@@ -1039,7 +1039,7 @@ public:
             handler->PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
             if (handler->needReportToTarget(player))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
+                ChatHandler(player->User()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
             }
 
             // stop flight if need
@@ -1122,7 +1122,7 @@ public:
         {
             auto targetPlayer = target->GetConnectedPlayer();
 
-            targetPlayer->Resurrect(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+            targetPlayer->Resurrect(!AccountMgr::IsPlayerAccount(targetPlayer->User()->GetSecurity()) ? 1.0f : 0.5f);
             targetPlayer->SpawnCorpseBones();
             targetPlayer->SaveToDB(false, false);
         }
@@ -1360,7 +1360,7 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, target->GetName().c_str());
         }
 
-        targetPlayer->GetSession()->KickPlayer("HandleKickPlayerCommand");
+        targetPlayer->User()->KickPlayer("HandleKickPlayerCommand");
 
         return true;
     }
@@ -1669,7 +1669,7 @@ public:
         if (count < 0)
         {
             // Only have scam check on player accounts
-            if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
+            if (playerTarget->User()->GetSecurity() == SEC_PLAYER)
             {
                 if (!playerTarget->HasItemCount(itemId, 0))
                 {
@@ -1966,14 +1966,14 @@ public:
                 return false;
             }
 
-            accId             = playerTarget->GetSession()->GetAccountId();
+            accId             = playerTarget->User()->GetAccountId();
             money             = playerTarget->GetMoney();
             totalPlayerTime   = playerTarget->GetTotalPlayedTime();
             level             = playerTarget->GetLevel();
-            latency           = playerTarget->GetSession()->GetLatency();
+            latency           = playerTarget->User()->GetLatency();
             raceid            = playerTarget->getRace();
             classid           = playerTarget->getClass();
-            muteTime          = playerTarget->GetSession()->m_muteTime;
+            muteTime          = playerTarget->User()->m_muteTime;
             mapId             = playerTarget->GetMapId();
             areaId            = playerTarget->GetAreaId();
             alive             = playerTarget->IsAlive() ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO);
@@ -2407,11 +2407,11 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
+        uint32 accountId = target ? target->User()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
         // find only player from same account if any
         if (!target)
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (User* session = sWorld->FindUser(accountId))
             {
                 target = session->GetPlayer();
             }
@@ -2449,7 +2449,7 @@ public:
         {
             // Target is online, mute will be in effect right away.
             int64 muteTime = GameTime::GetGameTime().count() + muteDuration;
-            target->GetSession()->m_muteTime = muteTime;
+            target->User()->m_muteTime = muteTime;
             stmt->SetData(0, muteTime);
             std::string nameLink = handler->playerLink(player->GetName());
 
@@ -2458,7 +2458,7 @@ public:
                 sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
             }
 
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true).c_str(), muteBy.c_str(), muteReasonStr.c_str());
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true).c_str(), muteBy.c_str(), muteReasonStr.c_str());
         }
         else
         {
@@ -2490,8 +2490,8 @@ public:
             std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
             HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
-                if (itr->second->GetSession()->GetSecurity())
-                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
+                if (itr->second->User()->GetSecurity())
+                    ChatHandler(itr->second->User()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
                             (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
         }
 
@@ -2512,12 +2512,12 @@ public:
         }
 
         Player* playerTarget = target->GetConnectedPlayer();
-        uint32 accountId = playerTarget ? playerTarget->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(target->GetGUID());
+        uint32 accountId = playerTarget ? playerTarget->User()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(target->GetGUID());
 
         // find only player from same account if any
         if (!playerTarget)
         {
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (User* session = sWorld->FindUser(accountId))
             {
                 playerTarget = session->GetPlayer();
             }
@@ -2537,7 +2537,7 @@ public:
                 return false;
             }
 
-            playerTarget->GetSession()->m_muteTime = 0;
+            playerTarget->User()->m_muteTime = 0;
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
@@ -2549,7 +2549,7 @@ public:
 
         if (playerTarget)
         {
-            ChatHandler(playerTarget->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+            ChatHandler(playerTarget->User()).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
         }
 
         handler->PSendSysMessage(LANG_YOU_ENABLE_CHAT, handler->playerLink(target->GetName().c_str()));

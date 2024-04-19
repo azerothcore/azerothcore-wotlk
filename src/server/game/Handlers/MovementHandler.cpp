@@ -37,17 +37,17 @@
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
-void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
+void User::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAck();
 }
 
-void WorldSession::HandleMoveWorldportAck()
+void User::HandleMoveWorldportAck()
 {
     // ignore unexpected far teleports
     if (!GetPlayer()->IsBeingTeleportedFar())
@@ -263,7 +263,7 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->ProcessDelayedOperations();
 }
 
-void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
+void User::HandleMoveTeleportAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "MSG_MOVE_TELEPORT_ACK");
 
@@ -331,7 +331,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
         plMover->SetClientControl(plMover, false, true);
 }
 
-void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
+void User::HandleMovementOpcodes(WorldPacket& recvData)
 {
     uint16 opcode = recvData.GetOpcode();
 
@@ -341,7 +341,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     Player* plrMover = mover->ToPlayer();
 
-    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
+    // ignore, waiting processing in User::HandleMoveWorldportAckOpcode and User::HandleMoveTeleportAck
     if (plrMover && plrMover->IsBeingTeleported())
     {
         recvData.rfinish();                     // prevent warnings spam
@@ -529,7 +529,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         jumpopcode = true;
         if (plrMover && !sScriptMgr->AnticheatHandleDoubleJump(plrMover, mover))
         {
-            plrMover->GetSession()->KickPlayer();
+            plrMover->User()->KickPlayer();
             return;
         }
     }
@@ -537,7 +537,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     /* start some hack detection */
     if (plrMover && !sScriptMgr->AnticheatCheckMovementInfo(plrMover, movementInfo, mover, jumpopcode))
     {
-        plrMover->GetSession()->KickPlayer();
+        plrMover->User()->KickPlayer();
         return;
     }
 
@@ -608,7 +608,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
+void User::HandleForceSpeedChangeAck(WorldPacket& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
     LOG_DEBUG("network", "WORLD: Recvd {} ({}, 0x{:X}) opcode", GetOpcodeNameForLogging(static_cast<OpcodeClient>(opcode)), opcode, opcode);
@@ -682,7 +682,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
             force_move_type = MOVE_PITCH_RATE;
             break;
         default:
-            LOG_ERROR("network.opcode", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: {}", opcode);
+            LOG_ERROR("network.opcode", "User::HandleForceSpeedChangeAck: Unknown move type opcode: {}", opcode);
             return;
     }
 
@@ -714,7 +714,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
+void User::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
@@ -729,7 +729,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
+void User::HandleMoveNotActiveMover(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
@@ -750,7 +750,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
     m_player->m_mover->m_movement = mi;
 }
 
-void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
+void User::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 {
     WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
     data << GetPlayer()->GetGUID();
@@ -758,7 +758,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
+void User::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_KNOCK_BACK_ACK");
 
@@ -793,7 +793,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     m_player->SendMessageToSet(&data, false);
 }
 
-void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
+void User::HandleMoveHoverAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_HOVER_ACK");
 
@@ -809,7 +809,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk2
 }
 
-void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
+void User::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_WATER_WALK_ACK");
 
@@ -825,7 +825,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk2
 }
 
-void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
+void User::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
     if (!m_player->IsAlive() || m_player->IsInCombat())
         return;
@@ -849,7 +849,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     m_player->SummonIfPossible(agree, summoner_guid);
 }
 
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+void User::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 
@@ -862,14 +862,14 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
     if (!mover)
     {
-        LOG_ERROR("network.opcode", "WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [{}]", GetPlayer()->GetGUID().ToString());
+        LOG_ERROR("network.opcode", "User::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [{}]", GetPlayer()->GetGUID().ToString());
         return;
     }
 
     // prevent tampered movement data
     if (guid != mover->GetGUID())
     {
-        LOG_ERROR("network.opcode", "WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [{}]", GetPlayer()->GetGUID().ToString());
+        LOG_ERROR("network.opcode", "User::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [{}]", GetPlayer()->GetGUID().ToString());
         return;
     }
 
@@ -881,7 +881,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
+void User::HandleTimeSyncResp(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
@@ -915,7 +915,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     ComputeNewClockDelta();
 }
 
-void WorldSession::ComputeNewClockDelta()
+void User::ComputeNewClockDelta()
 {
     // implementation of the technique described here: https://web.archive.org/web/20180430214420/http://www.mine-control.com/zack/timesync/timesync.html
     // to reduce the skew induced by dropped TCP packets that get resent.
@@ -951,7 +951,7 @@ void WorldSession::ComputeNewClockDelta()
     }
 }
 
-void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
+void User::HandleMoveRootAck(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -991,7 +991,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     mover->SendMessageToSet(&data, m_player);
 }
 
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
+void User::HandleMoveUnRootAck(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();

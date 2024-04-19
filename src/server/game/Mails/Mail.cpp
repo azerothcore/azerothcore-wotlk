@@ -219,7 +219,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     else
     {
         Player* pSender = ObjectAccessor::FindPlayerByLowGUID(sender.GetSenderId());
-        expire_delay = pSender && pSender->GetSession()->GetSecurity() ? 90 * DAY : 30 * DAY;
+        expire_delay = pSender && pSender->User()->GetSecurity() ? 90 * DAY : 30 * DAY;
     }
 
     time_t expire_time = deliver_time + expire_delay;

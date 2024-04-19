@@ -27,7 +27,7 @@
 #include "SpellAuras.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 template<class T>
 inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
@@ -538,7 +538,7 @@ void Acore::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 template<class Builder>
 void Acore::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
-    LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = p->User()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx + 1;
     WorldPacket* data;
 
@@ -563,7 +563,7 @@ void Acore::LocalizedPacketDo<Builder>::operator()(Player* p)
 template<class Builder>
 void Acore::LocalizedPacketListDo<Builder>::operator()(Player* p)
 {
-    LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = p->User()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx + 1;
     WorldPacketList* data_list;
 

@@ -84,7 +84,6 @@ namespace WorldPackets
 
     namespace Character
     {
-        class LogoutCancel;
         class ShowingCloak;
         class ShowingHelm;
         class PlayedTimeClient;
@@ -235,20 +234,20 @@ enum CharterTypes
 class PacketFilter
 {
 public:
-    explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
+    explicit PacketFilter(User* pSession) : m_pSession(pSession) {}
     virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
     [[nodiscard]] virtual bool ProcessUnsafe() const { return true; }
 
 protected:
-    WorldSession* const m_pSession;
+    User* const m_pSession;
 };
 //process only thread-safe packets in Map::Update()
 class MapSessionFilter : public PacketFilter
 {
 public:
-    explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
+    explicit MapSessionFilter(User* pSession) : PacketFilter(pSession) {}
     ~MapSessionFilter() override = default;
 
     bool Process(WorldPacket* packet) override;
@@ -257,11 +256,11 @@ public:
 };
 
 //class used to filer only thread-unsafe packets from queue
-//in order to update only be used in World::UpdateSessions()
+//in order to update only be used in World::UpdateUsers()
 class WorldSessionFilter : public PacketFilter
 {
 public:
-    explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
+    explicit WorldSessionFilter(User* pSession) : PacketFilter(pSession) {}
     ~WorldSessionFilter() override = default;
 
     bool Process(WorldPacket* packet) override;
@@ -271,7 +270,7 @@ public:
 // only to prevent bloating the parameter list
 class CharacterCreateInfo
 {
-    friend class WorldSession;
+    friend class User;
     friend class Player;
 
 protected:
@@ -293,7 +292,7 @@ protected:
 
 struct CharacterRenameInfo
 {
-    friend class WorldSession;
+    friend class User;
 
 protected:
     ObjectGuid Guid;
@@ -303,7 +302,7 @@ protected:
 struct CharacterCustomizeInfo : public CharacterRenameInfo
 {
     friend class Player;
-    friend class WorldSession;
+    friend class User;
 
 protected:
     uint8 Gender = GENDER_NONE;
@@ -317,7 +316,7 @@ protected:
 struct CharacterFactionChangeInfo : public CharacterCustomizeInfo
 {
     friend class Player;
-    friend class WorldSession;
+    friend class User;
 
 protected:
     uint8 Race = 0;
@@ -331,13 +330,13 @@ struct PacketCounter
 };
 
 /// Player session in the World
-class WorldSession
+class User
 {
 public:
     Player* ActivePlayer() const;
 
-    WorldSession(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
-    ~WorldSession();
+    User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    ~User();
 
     void CharacterAbortLogout ();
     void CharacterLogout (bool instant);
@@ -1093,7 +1092,7 @@ protected:
     {
         friend class World;
     public:
-        DosProtection(WorldSession* s);
+        DosProtection(User* s);
         bool EvaluateOpcode(WorldPacket& p, time_t time) const;
     protected:
         enum Policy
@@ -1105,7 +1104,7 @@ protected:
 
         uint32 GetMaxPacketCounterAllowed(uint16 opcode) const;
 
-        WorldSession* Session;
+        User* Session;
 
     private:
         Policy _policy;
@@ -1191,8 +1190,8 @@ private:
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
 
-    WorldSession(WorldSession const& right) = delete;
-    WorldSession& operator=(WorldSession const& right) = delete;
+    User(User const& right) = delete;
+    User& operator=(User const& right) = delete;
 };
 #endif
 /// @}

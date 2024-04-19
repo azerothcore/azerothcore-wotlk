@@ -24,7 +24,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 //#include "WorldStatePackets.h"
 
 void ArenaScore::AppendToPacket(WorldPacket& data)

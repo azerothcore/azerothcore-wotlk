@@ -295,20 +295,20 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         {
             case GOSSIP_ACTION_TRADE:
                 creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_VENDOR);
-                player->GetSession()->SendListInventory(creature->GetGUID());
+                player->User()->SendListInventory(creature->GetGUID());
                 spellId = player->GetTeamId(true) ? SPELL_AURA_SHOP_G : SPELL_AURA_SHOP_S;
                 creature->AI()->DoAction(ARGENT_PONY_STATE_VENDOR);
                 break;
             case GOSSIP_ACTION_BANK:
                 creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_BANKER);
-                player->GetSession()->SendShowBank(player->GetGUID());
+                player->User()->SendShowBank(player->GetGUID());
                 spellId = player->GetTeamId(true) ? SPELL_AURA_BANK_G : SPELL_AURA_BANK_S;
                 creature->AI()->DoAction(ARGENT_PONY_STATE_BANK);
                 break;
             case GOSSIP_ACTION_MAILBOX:
                 {
                     creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
-                    player->GetSession()->SendShowMailBox(creature->GetGUID());
+                    player->User()->SendShowMailBox(creature->GetGUID());
                     spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
                     creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
                     break;
@@ -567,9 +567,9 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
                     for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                         if (Player* groupPlayer = itr->GetSource())
                             if (groupPlayer != player)
-                                groupPlayer->GetSession()->Send(&_data);
+                                groupPlayer->User()->Send(&_data);
 
-                player->GetSession()->Send(&_data);
+                player->User()->Send(&_data);
             }
         }
     }

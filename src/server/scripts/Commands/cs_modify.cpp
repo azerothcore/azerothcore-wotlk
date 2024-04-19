@@ -98,7 +98,7 @@ public:
 
             if (handler->needReportToTarget(player))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(resourceReportMessage, handler->GetNameLink().c_str(), std::forward<Args>(args)...);
+                ChatHandler(player->User()).PSendSysMessage(resourceReportMessage, handler->GetNameLink().c_str(), std::forward<Args>(args)...);
             }
         }
     }
@@ -139,7 +139,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_HP_CHANGED, handler->GetNameLink().c_str(), healthPoints, healthPoints);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_HP_CHANGED, handler->GetNameLink().c_str(), healthPoints, healthPoints);
         }
 
         target->SetMaxHealth(healthPoints);
@@ -162,7 +162,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MANA_CHANGED, handler->GetNameLink().c_str(), manaPoints, manaPoints);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_MANA_CHANGED, handler->GetNameLink().c_str(), manaPoints, manaPoints);
         }
 
         target->SetMaxPower(POWER_MANA, manaPoints);
@@ -187,7 +187,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ENERGY_CHANGED, handler->GetNameLink().c_str(), energyPoints / 10, energyPoints / 10);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_ENERGY_CHANGED, handler->GetNameLink().c_str(), energyPoints / 10, energyPoints / 10);
         }
 
         target->SetMaxPower(POWER_ENERGY, energyPoints);
@@ -214,7 +214,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RAGE_CHANGED, handler->GetNameLink().c_str(), ragePoints / 10, ragePoints / 10);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_RAGE_CHANGED, handler->GetNameLink().c_str(), ragePoints / 10, ragePoints / 10);
         }
 
         target->SetMaxPower(POWER_RAGE, ragePoints);
@@ -239,7 +239,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RUNIC_POWER_CHANGED, handler->GetNameLink().c_str(), runePoints / 10, runePoints / 10);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_RUNIC_POWER_CHANGED, handler->GetNameLink().c_str(), runePoints / 10, runePoints / 10);
         }
 
         target->SetMaxPower(POWER_RUNIC_POWER, runePoints);
@@ -326,7 +326,7 @@ public:
         handler->PSendSysMessage(LANG_YOU_CHANGE_SPELLFLATID, spellFlatID, val, mark ? *mark : 65535, handler->GetNameLink(target).c_str());
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark ? *mark : 65535);
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark ? *mark : 65535);
         }
 
         WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER, (1 + 1 + 2 + 2));
@@ -334,7 +334,7 @@ public:
         data << uint8(op);
         data << uint16(val);
         data << uint16(mark ? *mark : 65535);
-        target->GetSession()->Send(&data);
+        target->User()->Send(&data);
 
         return true;
     }
@@ -513,7 +513,7 @@ public:
 
             handler->PSendSysMessage(LANG_YOU_CHANGE_SIZE, scale, handler->GetNameLink(player).c_str());
             if (handler->needReportToTarget(player))
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink().c_str(), scale);
+                ChatHandler(player->User()).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink().c_str(), scale);
         }
 
         target->SetObjectScale(scale);
@@ -619,7 +619,7 @@ public:
             {
                 handler->PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, handler->GetNameLink(target).c_str());
                 if (handler->needReportToTarget(target))
-                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ALL_MONEY_GONE, handler->GetNameLink().c_str());
+                    ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_ALL_MONEY_GONE, handler->GetNameLink().c_str());
 
                 target->SetMoney(0);
             }
@@ -630,7 +630,7 @@ public:
 
                 handler->PSendSysMessage(LANG_YOU_TAKE_MONEY, std::abs(moneyToAdd), handler->GetNameLink(target).c_str());
                 if (handler->needReportToTarget(target))
-                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink().c_str(), std::abs(moneyToAdd));
+                    ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink().c_str(), std::abs(moneyToAdd));
                 target->SetMoney(newmoney);
             }
         }
@@ -638,7 +638,7 @@ public:
         {
             handler->PSendSysMessage(LANG_YOU_GIVE_MONEY, moneyToAdd, handler->GetNameLink(target).c_str());
             if (handler->needReportToTarget(target))
-                ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_GIVEN, handler->GetNameLink().c_str(), moneyToAdd);
+                ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_MONEY_GIVEN, handler->GetNameLink().c_str(), moneyToAdd);
 
             if (moneyToAdd >= MAX_MONEY_AMOUNT)
                 moneyToAdd = MAX_MONEY_AMOUNT;
@@ -963,7 +963,7 @@ public:
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink().c_str());
+            ChatHandler(target->User()).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink().c_str());
         }
 
         return true;

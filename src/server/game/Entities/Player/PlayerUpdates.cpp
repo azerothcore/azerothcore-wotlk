@@ -121,20 +121,20 @@ void Player::Update(uint32 p_time)
         uint32 elapsed = uint32(now - m_Last_tick);
         m_Played_time[PLAYED_TIME_TOTAL] += elapsed; // Total played time
         m_Played_time[PLAYED_TIME_LEVEL] += elapsed; // Level played time
-        GetSession()->SetTotalTime(GetSession()->GetTotalTime() + elapsed);
+        User()->SetTotalTime(User()->GetTotalTime() + elapsed);
         m_Last_tick = now;
     }
 
     // If mute expired, remove it from the DB
-    if (GetSession()->m_muteTime && GetSession()->m_muteTime < now)
+    if (User()->m_muteTime && User()->m_muteTime < now)
     {
-        GetSession()->m_muteTime = 0;
+        User()->m_muteTime = 0;
         LoginDatabasePreparedStatement* stmt =
             LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         stmt->SetData(0, 0); // Set the mute time to 0
         stmt->SetData(1, "");
         stmt->SetData(2, "");
-        stmt->SetData(3, GetSession()->GetAccountId());
+        stmt->SetData(3, User()->GetAccountId());
         LoginDatabase.Execute(stmt);
     }
 
@@ -267,7 +267,7 @@ void Player::Update(uint32 p_time)
     {
         LOG_INFO("misc", "Player::Update - invalid position ({0:.1f}, {0:.1f}, {0:.1f})! Map: {}, MapId: {}, {}",
             GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString());
-        GetSession()->KickPlayer("Invalid position");
+        User()->KickPlayer("Invalid position");
         return;
     }
 
@@ -465,7 +465,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
     static std::mutex           channelsLock;
     std::lock_guard<std::mutex> guard(channelsLock);
 
-    if (GetSession()->PlayerLoading() && !IsBeingTeleportedFar())
+    if (User()->PlayerLoading() && !IsBeingTeleportedFar())
         return; // The client handles it automatically after loading, but not
                 // after teleporting
 
@@ -478,7 +478,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
         return;
 
     std::string current_zone_name =
-        current_zone->area_name[GetSession()->GetSessionDbcLocale()];
+        current_zone->area_name[User()->GetSessionDbcLocale()];
 
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
@@ -519,7 +519,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                         currentNameExt = current_zone_name.c_str();
 
                     snprintf(new_channel_name_buf, 100,
-                             channel->pattern[m_session->GetSessionDbcLocale()],
+                             channel->pattern[m_user->GetSessionDbcLocale()],
                              currentNameExt);
 
                     joinChannel = cMgr->GetJoinChannel(new_channel_name_buf,
@@ -538,7 +538,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                 }
                 else
                     joinChannel = cMgr->GetJoinChannel(
-                        channel->pattern[m_session->GetSessionDbcLocale()],
+                        channel->pattern[m_user->GetSessionDbcLocale()],
                         channel->ChannelID);
             }
             else
@@ -1127,7 +1127,7 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
     if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade();
+        User()->SendCancelTrade();
 
     CheckAreaExploreAndOutdoor();
 
@@ -1355,7 +1355,7 @@ void Player::UpdateHomebindTime(uint32 time)
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
             data << uint32(0);
-            GetSession()->Send(&data);
+            User()->Send(&data);
         }
         // instance is valid, reset homebind timer
         m_HomebindTimer = 0;
@@ -1378,7 +1378,7 @@ void Player::UpdateHomebindTime(uint32 time)
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
         data << uint32(1);
-        GetSession()->Send(&data);
+        User()->Send(&data);
         LOG_DEBUG(
             "maps",
             "PLAYER: Player '{}' ({}) will be teleported to homebind in 60 "
@@ -1736,7 +1736,7 @@ void Player::UpdateTriggerVisibility()
         return;
 
     udata.BuildPacket(packet);
-    GetSession()->Send(&packet);
+    User()->Send(&packet);
 }
 
 void Player::UpdateForQuestWorldObjects()
@@ -1788,7 +1788,7 @@ void Player::UpdateForQuestWorldObjects()
     }
 
     udata.BuildPacket(packet);
-    GetSession()->Send(&packet);
+    User()->Send(&packet);
 }
 
 void Player::UpdateTitansGrip()

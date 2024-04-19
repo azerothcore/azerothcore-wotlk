@@ -745,7 +745,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         if (player && player->IsInWorld())
         {
             //player->Update(t_diff);
-            WorldSession* session = player->GetSession();
+            User* session = player->User();
             MapSessionFilter updater(session);
             session->Update(s_diff, updater);
         }
@@ -2571,7 +2571,7 @@ void Map::SendInitTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->Send(&packet);
+    player->User()->Send(&packet);
 }
 
 void Map::SendRemoveTransports(Player* player)
@@ -2596,7 +2596,7 @@ void Map::SendRemoveTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->Send(&packet);
+    player->User()->Send(&packet);
 }
 
 inline void Map::setNGrid(NGridType* grid, uint32 x, uint32 y)
@@ -2627,7 +2627,7 @@ void Map::SendObjectUpdates()
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
         iter->second.BuildPacket(packet);
-        iter->first->GetSession()->Send(&packet);
+        iter->first->User()->Send(&packet);
         packet.clear();                                     // clean the string
     }
 }
@@ -2754,7 +2754,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
 void Map::SendToPlayers(WorldPacket const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
-        itr->GetSource()->GetSession()->Send(data);
+        itr->GetSource()->User()->Send(data);
 }
 
 template<class T>
@@ -2978,7 +2978,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                 return false;
             }
         }
-        else if (player->GetSession()->PlayerLoading() && playerBind && playerBind->save != mapSave)
+        else if (player->User()->PlayerLoading() && playerBind && playerBind->save != mapSave)
         {
             // Prevent "Convert to Raid" exploit to reset instances
             return false;
@@ -3007,7 +3007,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             data << uint32(60000);
             data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
             player->SetPendingBind(mapSave->GetInstanceId(), 60000);
         }
     }
@@ -3177,7 +3177,7 @@ void InstanceMap::PermBindAllPlayers()
         {
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
             sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), save, true, player);
         }
 
@@ -3555,7 +3555,7 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
             }
 
             snprintf(buffer, 16384, "%s (%s, acc: %u, ip: %s, guild: %u), xyz: (%.1f, %.1f, %.1f), auras: %s\n",
-                p->GetName().c_str(), p->GetGUID().ToString().c_str(), p->GetSession()->GetAccountId(), p->GetSession()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
+                p->GetName().c_str(), p->GetGUID().ToString().c_str(), p->User()->GetAccountId(), p->User()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
             playersInfo += buffer;
         }
     CleanStringForMysqlQuery(playersInfo);

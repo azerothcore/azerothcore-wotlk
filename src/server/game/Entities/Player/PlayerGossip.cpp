@@ -22,7 +22,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
 /*********************************************************/
 /***                    GOSSIP SYSTEM                  ***/
@@ -101,7 +101,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_TAXIVENDOR:
-                    if (GetSession()->SendLearnNewTaxiNode(creature))
+                    if (User()->SendLearnNewTaxiNode(creature))
                         return;
                     break;
                 case GOSSIP_OPTION_BATTLEFIELD:
@@ -170,7 +170,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             // search in broadcast_text and broadcast_text_locale
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
-            LocaleConstant locale = GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant locale = User()->GetSessionDbLocaleIndex();
 
             if (optionBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
@@ -202,7 +202,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
     }
 
     if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && npcflags & UNIT_NPC_FLAG_FLIGHTMASTER)
-        menu->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_INTERACT_1, GetSession()->GetAcoreString(LANG_TOGGLE_INSTANT_FLIGHT), 0, GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT, "", 0, false); // instant flight toggle option
+        menu->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_INTERACT_1, User()->GetAcoreString(LANG_TOGGLE_INSTANT_FLIGHT), 0, GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT, "", 0, false); // instant flight toggle option
 }
 
 void Player::SendPreparedGossip(WorldObject* source)
@@ -262,9 +262,9 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             ToggleInstantFlight();
 
             if (m_isInstantFlightOn)
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_ON);
+                User()->SendNotification(LANG_INSTANT_FLIGHT_ON);
             else
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_OFF);
+                User()->SendNotification(LANG_INSTANT_FLIGHT_OFF);
 
             PlayerTalkClass->SendCloseGossip();
             return;
@@ -321,13 +321,13 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         case GOSSIP_OPTION_VENDOR:
         case GOSSIP_OPTION_ARMORER:
-            GetSession()->SendListInventory(guid, menuItemData->GossipActionMenuId);
+            User()->SendListInventory(guid, menuItemData->GossipActionMenuId);
             break;
         case GOSSIP_OPTION_STABLEPET:
-            GetSession()->SendStablePet(guid);
+            User()->SendStablePet(guid);
             break;
         case GOSSIP_OPTION_TRAINER:
-            GetSession()->SendTrainerList(guid);
+            User()->SendTrainerList(guid);
             break;
         case GOSSIP_OPTION_LEARNDUALSPEC:
             if (GetSpecsCount() == 1 && GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
@@ -350,25 +350,25 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             ResetPetTalents();
             break;
         case GOSSIP_OPTION_TAXIVENDOR:
-            GetSession()->SendTaxiMenu(source->ToCreature());
+            User()->SendTaxiMenu(source->ToCreature());
             break;
         case GOSSIP_OPTION_INNKEEPER:
             PlayerTalkClass->SendCloseGossip();
             SetBindPoint(guid);
             break;
         case GOSSIP_OPTION_BANKER:
-            GetSession()->SendShowBank(guid);
+            User()->SendShowBank(guid);
             break;
         case GOSSIP_OPTION_PETITIONER:
             PlayerTalkClass->SendCloseGossip();
-            GetSession()->SendPetitionShowList(guid);
+            User()->SendPetitionShowList(guid);
             break;
         case GOSSIP_OPTION_TABARDDESIGNER:
             PlayerTalkClass->SendCloseGossip();
-            GetSession()->SendTabardVendorActivate(guid);
+            User()->SendTabardVendorActivate(guid);
             break;
         case GOSSIP_OPTION_AUCTIONEER:
-            GetSession()->SendAuctionHello(guid, source->ToCreature());
+            User()->SendAuctionHello(guid, source->ToCreature());
             break;
         case GOSSIP_OPTION_SPIRITGUIDE:
             PrepareGossipMenu(source);
@@ -384,7 +384,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
                 return;
             }
 
-            GetSession()->SendBattleGroundList(guid, bgTypeId);
+            User()->SendBattleGroundList(guid, bgTypeId);
             break;
         }
     }

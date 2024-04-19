@@ -90,9 +90,9 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
                 }
 
                 LocaleConstant locale = LOCALE_enUS;
-                if (player && player->GetSession())
+                if (player && player->User())
                 {
-                    locale = player->GetSession()->GetSessionDbLocaleIndex();
+                    locale = player->User()->GetSessionDbLocaleIndex();
                 }
 
                 if (locale > LOCALE_enUS)
@@ -296,7 +296,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
     if (bidder)
     {
-        bidder_accId = bidder->GetSession()->GetAccountId();
+        bidder_accId = bidder->User()->GetAccountId();
     }
     else
     {
@@ -317,7 +317,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
         if (bidder)
         {
             if (sendNotification) // can be changed in the hook
-                bidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, auction->bidder, 0, 0, auction->item_template);
+                bidder->User()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, auction->bidder, 0, 0, auction->item_template);
             // FIXME: for offline player need also
             if (updateAchievementCriteria) // can be changed in the hook
                 bidder->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
@@ -373,7 +373,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             }
 
             if (sendNotification) // can be changed in the hook
-                owner->GetSession()->SendAuctionOwnerNotification(auction);
+                owner->User()->SendAuctionOwnerNotification(auction);
         }
 
         if (sendMail) // can be changed in the hook
@@ -393,7 +393,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
                     owner_level = gpd_owner->Level;
                 }
                 CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"profit: {}g, bidder: {} {} lvl (guid: {}), seller: {} {} lvl (guid: {}), item {} ({})\", NOW(), {})",
-                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name, bidder ? bidder->GetSession()->GetRemoteAddress() : "", owner_accId, owner_name, auction->bid, (profit / GOLD), gpd->Name, gpd->Level, auction->bidder.GetCounter(), owner_name, owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount, 2);
+                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name, bidder ? bidder->User()->GetRemoteAddress() : "", owner_accId, owner_name, auction->bid, (profit / GOLD), gpd->Name, gpd->Level, auction->bidder.GetCounter(), owner_name, owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount, 2);
             }
     }
 }
@@ -415,7 +415,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionExpiredMail(this, auction, owner, owner_accId, sendNotification, sendMail);
 
         if (owner && sendNotification) // can be changed in the hook
-            owner->GetSession()->SendAuctionOwnerNotification(auction);
+            owner->User()->SendAuctionOwnerNotification(auction);
 
         if (sendMail) // can be changed in the hook
             MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(ObjectGuid::Empty, 0, auction->buyout, auction->deposit))
@@ -441,7 +441,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
         sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(this, auction, oldBidder, oldBidder_accId, newBidder, newPrice, sendNotification, sendMail);
 
         if (oldBidder && newBidder && sendNotification) // can be changed in the hook
-            oldBidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, newBidder->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
+            oldBidder->User()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, newBidder->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
         if (sendMail) // can be changed in the hook
             MailDraft(auction->BuildAuctionMailSubject(AUCTION_OUTBIDDED), AuctionEntry::BuildAuctionMailBody(auction->owner, auction->bid, auction->buyout, auction->deposit, auction->GetAuctionCut()))
@@ -747,8 +747,8 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     {
         auto curTime = GameTime::GetGameTime();
 
-        int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-        int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
+        int loc_idx = player->User()->GetSessionDbLocaleIndex();
+        int locdbc_idx = player->User()->GetSessionDbcLocale();
 
         for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
         {

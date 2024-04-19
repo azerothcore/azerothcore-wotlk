@@ -26,7 +26,7 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -346,7 +346,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
                             playerMember->RemoveBattlegroundQueueId(bgQueue);
                             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
                             queue.RemovePlayer(playerMember->GetGUID(), true);
-                            playerMember->GetSession()->Send(&data);
+                            playerMember->User()->Send(&data);
                         }
                     }
                 }
@@ -364,7 +364,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
     // Inform player and remove arena team info from player data
     if (player)
     {
-        player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
+        player->User()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team
         for (uint32 i = 0; i < ARENA_TEAM_END; ++i)
             player->SetArenaTeamInfoField(GetSlot(), ArenaTeamInfoType(i), 0);
@@ -380,7 +380,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
     }
 }
 
-void ArenaTeam::Disband(WorldSession* session)
+void ArenaTeam::Disband(User* session)
 {
     // Remove all members from arena team
     while (!Members.empty())
@@ -432,7 +432,7 @@ void ArenaTeam::Disband()
     sArenaTeamMgr->RemoveArenaTeam(TeamId);
 }
 
-void ArenaTeam::Roster(WorldSession* session)
+void ArenaTeam::Roster(User* session)
 {
     Player* player = nullptr;
 
@@ -473,7 +473,7 @@ void ArenaTeam::Roster(WorldSession* session)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
 }
 
-void ArenaTeam::Query(WorldSession* session)
+void ArenaTeam::Query(User* session)
 {
     WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4 * 7 + GetName().size() + 1);
     data << uint32(GetId());                                // team id
@@ -488,7 +488,7 @@ void ArenaTeam::Query(WorldSession* session)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_QUERY_RESPONSE");
 }
 
-void ArenaTeam::SendStats(WorldSession* session)
+void ArenaTeam::SendStats(User* session)
 {
     WorldPacket data(SMSG_ARENA_TEAM_STATS, 4 * 7);
     data << uint32(GetId());                                // team id
@@ -507,10 +507,10 @@ void ArenaTeam::NotifyStatsChanged()
     // Updates arena team stats for every member of the team (not only the ones who participated!)
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
-            SendStats(player->GetSession());
+            SendStats(player->User());
 }
 
-void ArenaTeam::Inspect(WorldSession* session, ObjectGuid guid)
+void ArenaTeam::Inspect(User* session, ObjectGuid guid)
 {
     ArenaTeamMember* member = GetMember(guid);
     if (!member || GetSlot() >= MAX_ARENA_SLOT)
@@ -564,7 +564,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
-            player->GetSession()->Send(packet);
+            player->User()->Send(packet);
 }
 
 void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
@@ -598,7 +598,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 str
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_EVENT");
 }
 
-void ArenaTeam::MassInviteToEvent(WorldSession* session)
+void ArenaTeam::MassInviteToEvent(User* session)
 {
     WorldPacket data(SMSG_CALENDAR_ARENA_TEAM, (Members.size() - 1) * (4 + 8 + 1));
     data << uint32(Members.size() - 1);

@@ -326,7 +326,7 @@ public:
     {
         ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
+            player->User()->SendListInventory(creature->GetGUID());
         return true;
     }
 

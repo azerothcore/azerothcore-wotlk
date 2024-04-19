@@ -363,7 +363,7 @@ int main(int argc, char** argv)
     std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [](void*)
     {
         sWorld->KickAll();              // save and kick all players
-        sWorld->UpdateSessions(1);      // real players unload required UpdateSessions call
+        sWorld->UpdateUsers(1);      // real players unload required UpdateUsers call
 
         sWorldSocketMgr.StopNetwork();
 

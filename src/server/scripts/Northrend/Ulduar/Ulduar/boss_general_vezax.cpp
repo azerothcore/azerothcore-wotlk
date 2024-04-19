@@ -25,7 +25,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "ulduar.h"
 
 enum VezaxSpellData
@@ -643,7 +643,7 @@ public:
             if (pInstance->GetData(TYPE_XT002) != DONE && pInstance->GetData(TYPE_MIMIRON) != DONE && pInstance->GetData(TYPE_THORIM) != DONE && pInstance->GetData(TYPE_FREYA) != DONE && pInstance->GetData(TYPE_HODIR) != DONE)
             {
                 std::string accountName;
-                AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
+                AccountMgr::GetName(plr->User()->GetAccountId(), accountName);
                 sBan->BanAccount(accountName, "0s", "Tele hack", "Server");
                 return true;
             }

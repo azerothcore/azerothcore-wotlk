@@ -30,7 +30,7 @@ std::mutex AsyncAuctionListingMgr::auctionListingTempLock;
 bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     if (Player* plr = ObjectAccessor::FindPlayer(playerguid))
-        plr->GetSession()->HandleAuctionListOwnerItemsEvent(creatureGuid);
+        plr->User()->HandleAuctionListOwnerItemsEvent(creatureGuid);
     return true;
 }
 
@@ -69,7 +69,7 @@ bool AuctionListItemsDelayEvent::Execute()
         data.put<uint32>(0, count);
         data << (uint32) totalcount;
         data << (uint32) 300; // clientside search cooldown [ms] (gray search button)
-        plr->GetSession()->Send(&data);
+        plr->User()->Send(&data);
     }
 
     return true;

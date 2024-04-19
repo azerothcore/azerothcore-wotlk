@@ -26,7 +26,7 @@ EndScriptData */
 #include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 

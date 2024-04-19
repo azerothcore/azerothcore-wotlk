@@ -77,7 +77,7 @@ enum GOSummonType
 class WorldPacket;
 class UpdateData;
 class ByteBuffer;
-class WorldSession;
+class User;
 class Creature;
 class Player;
 class InstanceScript;

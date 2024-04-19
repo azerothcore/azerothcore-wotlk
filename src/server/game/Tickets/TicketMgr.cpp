@@ -27,7 +27,7 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 inline float GetAge(uint64 t) { return float(GameTime::GetGameTime().count() - t) / DAY; }
 
@@ -131,7 +131,7 @@ void GmTicket::WritePacket(WorldPacket& data) const
     data << uint8(_viewed ? GMTICKET_OPENEDBYGM_STATUS_OPENED : GMTICKET_OPENEDBYGM_STATUS_NOT_OPENED); // whether or not it has been viewed
 }
 
-void GmTicket::SendResponse(WorldSession* session) const
+void GmTicket::SendResponse(User* session) const
 {
     WorldPacket data(SMSG_GMRESPONSE_RECEIVED);
     data << uint32(1);          // responseID
@@ -426,7 +426,7 @@ void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
             handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
 }
 
-void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
+void TicketMgr::SendTicket(User* session, GmTicket* ticket) const
 {
     WorldPacket data(SMSG_GMTICKET_GETTICKET, (ticket ? (4 + 4 + 1 + 4 + 4 + 4 + 1 + 1) : 4));
 

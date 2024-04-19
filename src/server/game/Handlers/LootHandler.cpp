@@ -28,9 +28,9 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
+void User::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player* player = GetPlayer();
@@ -111,7 +111,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         DoLootRelease(lguid);
 }
 
-void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
+void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
 
@@ -206,7 +206,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(goldPerPlayer);
                 data << uint8(playersNear.size() > 1 ? 0 : 1);     // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
-                (*i)->GetSession()->Send(&data);
+                (*i)->User()->Send(&data);
             }
         }
         else
@@ -235,7 +235,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void WorldSession::HandleLootOpcode(WorldPacket& recvData)
+void User::HandleLootOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT");
 
@@ -253,7 +253,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
-void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
+void User::HandleLootReleaseOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT_RELEASE");
 
@@ -267,7 +267,7 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
             DoLootRelease(lguid);
 }
 
-void WorldSession::DoLootRelease(ObjectGuid lguid)
+void User::DoLootRelease(ObjectGuid lguid)
 {
     Player*  player = GetPlayer();
     Loot*    loot;
@@ -418,7 +418,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     }
 }
 
-void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
+void User::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 {
     uint8 slotid;
     ObjectGuid lootguid, target_playerguid;
@@ -438,7 +438,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
+    LOG_DEBUG("network", "User::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
     if (m_player->GetLootGUID() != lootguid)
     {

@@ -24,9 +24,9 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
+void User::HandleAttackSwingOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -66,12 +66,12 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
     m_player->Attack(pEnemy, true);
 }
 
-void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
+void User::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
 {
     GetPlayer()->AttackStop();
 }
 
-void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet)
+void User::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet)
 {
     if (packet.CurrentSheathState >= MAX_SHEATH_STATE)
     {
@@ -82,7 +82,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& pa
     m_player->SetSheath(SheathState(packet.CurrentSheathState));
 }
 
-void WorldSession::SendAttackStop(Unit const* enemy)
+void User::SendAttackStop(Unit const* enemy)
 {
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
     data << GetPlayer()->GetPackGUID();

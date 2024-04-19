@@ -25,7 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Weather.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <memory>
 
 namespace WeatherMgr

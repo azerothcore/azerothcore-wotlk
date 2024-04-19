@@ -43,7 +43,7 @@ void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_CLOSE, script->OnSocketClose(socket));
 }
 
-bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
+bool ScriptMgr::CanPacketSend(User* session, WorldPacket const& packet)
 {
     ASSERT(session);
 
@@ -55,7 +55,7 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
     CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, copy));
 }
 
-bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
+bool ScriptMgr::CanPacketReceive(User* session, WorldPacket const& packet)
 {
     if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
         return true;

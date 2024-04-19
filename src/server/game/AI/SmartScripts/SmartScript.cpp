@@ -511,7 +511,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         {
                             if (player->CanTakeQuest(q, true))
                             {
-                                if (WorldSession* session = player->GetSession())
+                                if (User* session = player->User())
                                 {
                                     PlayerMenu menu(session);
                                     menu.SendQuestGiverQuestDetails(q, me->GetGUID(), true);

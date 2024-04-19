@@ -37,7 +37,7 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuras.h"
-#include "WorldSession.h"
+#include "User.h"
 
 namespace lfg
 {
@@ -390,7 +390,7 @@ namespace lfg
         ObjectGuid guid = player->GetGUID();
 
         uint8 level = player->GetLevel();
-        uint8 expansion = player->GetSession()->Expansion();
+        uint8 expansion = player->User()->Expansion();
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
 
@@ -709,7 +709,7 @@ namespace lfg
             LOG_DEBUG("lfg", "LFGMgr::Join: [{}] joining with {} members. result: {}", guid.ToString(), grp ? grp->GetMembersCount() : 1, joinData.result);
             if (!dungeons.empty())                             // Only should show lockmap when have no dungeons available
                 joinData.lockmap.clear();
-            player->GetSession()->SendLfgJoinResult(joinData);
+            player->User()->SendLfgJoinResult(joinData);
             return;
         }
 
@@ -755,7 +755,7 @@ namespace lfg
                 if (Player* plrg = itr->GetSource())
                 {
                     ObjectGuid pguid = plrg->GetGUID();
-                    plrg->GetSession()->SendLfgUpdateParty(updateData);
+                    plrg->User()->SendLfgUpdateParty(updateData);
                     SetState(pguid, LFG_STATE_ROLECHECK);
                     if (!isContinue)
                         SetSelectedDungeons(pguid, dungeons);
@@ -785,8 +785,8 @@ namespace lfg
                 SetSelectedDungeons(guid, dungeons);
             }
             // Send update to player
-            player->GetSession()->SendLfgJoinResult(joinData);
-            player->GetSession()->SendLfgUpdatePlayer(LfgUpdateData(LFG_UPDATETYPE_JOIN_QUEUE, dungeons, comment));
+            player->User()->SendLfgJoinResult(joinData);
+            player->User()->SendLfgUpdatePlayer(LfgUpdateData(LFG_UPDATETYPE_JOIN_QUEUE, dungeons, comment));
             SetState(guid, LFG_STATE_QUEUED);
             SetRoles(guid, roles);
             debugNames.append(player->GetName());
@@ -935,12 +935,12 @@ namespace lfg
                 }
         }
         LfgJoinResultData joinData;
-        p->GetSession()->SendLfgJoinResult(joinData);
+        p->User()->SendLfgJoinResult(joinData);
         LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_JOIN_RAIDBROWSER, dungeons, comment);
         if (p->GetGroup())
-            p->GetSession()->SendLfgUpdateParty(updateData);
+            p->User()->SendLfgUpdateParty(updateData);
         else
-            p->GetSession()->SendLfgUpdatePlayer(updateData);
+            p->User()->SendLfgUpdatePlayer(updateData);
     }
 
     void LFGMgr::LfrSearchAdd(Player* p, uint32 dungeonId)
@@ -958,7 +958,7 @@ namespace lfg
         RBCacheMap::iterator itr = RBCacheStore[player->GetTeamId()].find(dungeonId);
         if (itr != RBCacheStore[player->GetTeamId()].end())
         {
-            player->GetSession()->Send(&(itr->second));
+            player->User()->Send(&(itr->second));
             return;
         }
         // send empty packet if cache not found
@@ -970,7 +970,7 @@ namespace lfg
         data << (uint32)0;
         data << (uint32)0;
         data << (uint32)0;
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
     }
 
     void LFGMgr::UpdateRaidBrowser(uint32 diff)
@@ -1217,7 +1217,7 @@ namespace lfg
                 for (RBSearchersMap::const_iterator sitr = RBSearchersStore[team].begin(); sitr != RBSearchersStore[team].end(); ++sitr)
                     if (sitr->second == dungeonId)
                         if (Player* p = ObjectAccessor::FindConnectedPlayer(sitr->first))
-                            p->GetSession()->Send(&differencePacket);
+                            p->User()->Send(&differencePacket);
 
                 break; // one dungeon updated in one LFGMgr::UpdateRaidBrowser
             }
@@ -2121,7 +2121,7 @@ namespace lfg
 
         if (!dungeon)
         {
-            player->GetSession()->SendLfgTeleportError(uint8(LFG_TELEPORTERROR_INVALID_LOCATION));
+            player->User()->SendLfgTeleportError(uint8(LFG_TELEPORTERROR_INVALID_LOCATION));
             return;
         }
 
@@ -2180,7 +2180,7 @@ namespace lfg
 
         if (error != LFG_TELEPORTERROR_OK)
         {
-            player->GetSession()->SendLfgTeleportError(uint8(error));
+            player->User()->SendLfgTeleportError(uint8(error));
 
             LOG_DEBUG("lfg", "Player [{}] could NOT be teleported in to map [{}] (x: {}, y: {}, z: {}) Error: {}",
             player->GetName(), dungeon->map, dungeon->x, dungeon->y, dungeon->z, error);
@@ -2295,7 +2295,7 @@ namespace lfg
             // Give rewards
             LOG_DEBUG("lfg", "LFGMgr::FinishDungeon: [{}] done dungeon {}, {} previously done.", player->GetGUID().ToString(), GetDungeon(gguid), done ? " " : " not");
             LfgPlayerRewardData data = LfgPlayerRewardData(dungeon->Entry(), GetDungeon(gguid, false), done, quest);
-            player->GetSession()->SendLfgPlayerReward(data);
+            player->User()->SendLfgPlayerReward(data);
         }
     }
 
@@ -2629,49 +2629,49 @@ namespace lfg
     void LFGMgr::SendLfgRoleChosen(ObjectGuid guid, ObjectGuid pguid, uint8 roles)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgRoleChosen(pguid, roles);
+            player->User()->SendLfgRoleChosen(pguid, roles);
     }
 
     void LFGMgr::SendLfgRoleCheckUpdate(ObjectGuid guid, LfgRoleCheck const& roleCheck)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgRoleCheckUpdate(roleCheck);
+            player->User()->SendLfgRoleCheckUpdate(roleCheck);
     }
 
     void LFGMgr::SendLfgUpdatePlayer(ObjectGuid guid, LfgUpdateData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgUpdatePlayer(data);
+            player->User()->SendLfgUpdatePlayer(data);
     }
 
     void LFGMgr::SendLfgUpdateParty(ObjectGuid guid, LfgUpdateData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgUpdateParty(data);
+            player->User()->SendLfgUpdateParty(data);
     }
 
     void LFGMgr::SendLfgJoinResult(ObjectGuid guid, LfgJoinResultData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgJoinResult(data);
+            player->User()->SendLfgJoinResult(data);
     }
 
     void LFGMgr::SendLfgBootProposalUpdate(ObjectGuid guid, LfgPlayerBoot const& boot)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgBootProposalUpdate(boot);
+            player->User()->SendLfgBootProposalUpdate(boot);
     }
 
     void LFGMgr::SendLfgUpdateProposal(ObjectGuid guid, LfgProposal const& proposal)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgUpdateProposal(proposal);
+            player->User()->SendLfgUpdateProposal(proposal);
     }
 
     void LFGMgr::SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            player->GetSession()->SendLfgQueueStatus(data);
+            player->User()->SendLfgQueueStatus(data);
     }
 
     bool LFGMgr::IsLfgGroup(ObjectGuid guid)

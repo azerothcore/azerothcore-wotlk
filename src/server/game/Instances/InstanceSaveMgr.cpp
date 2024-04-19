@@ -494,7 +494,7 @@ void InstanceSaveMgr::Update()
     {
         LOG_INFO("instance.save", "Instance ID reset occurred, sending updated calendar and raid info to all players!");
         WorldPacket dummy;
-        for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        for (UserMap::const_iterator itr = sWorld->GetAllUsers().begin(); itr != sWorld->GetAllUsers().end(); ++itr)
             if (Player* plr = itr->second->GetPlayer())
             {
                 itr->second->HandleCalendarGetCalendar(dummy);
@@ -691,7 +691,7 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
     {
         save->SetCanReset(false);
         if (!bind.perm && player) // temporary changing to permanent
-            player->GetSession()->SendCalendarRaidLockout(save, true);
+            player->User()->SendCalendarRaidLockout(save, true);
     }
 
     bind.save = save;
@@ -718,7 +718,7 @@ void InstanceSaveMgr::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Diffic
         }
 
         if (itr->second.perm && player)
-            player->GetSession()->SendCalendarRaidLockout(itr->second.save, false);
+            player->User()->SendCalendarRaidLockout(itr->second.save, false);
 
         InstanceSave* tmp = itr->second.save;
         w->m[difficulty].erase(itr);
@@ -737,7 +737,7 @@ void InstanceSaveMgr::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 ma
         else
         {
             if (itr->second.perm && player)
-                player->GetSession()->SendCalendarRaidLockout(itr->second.save, false);
+                player->User()->SendCalendarRaidLockout(itr->second.save, false);
 
             InstanceSave* tmp = itr->second.save;
             w->m[difficulty].erase(itr);

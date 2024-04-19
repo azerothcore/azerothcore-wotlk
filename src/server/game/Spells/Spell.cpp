@@ -4659,7 +4659,7 @@ void Spell::SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cas
     WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, caster, spellInfo, castCount, result, customError);
 
-    caster->GetSession()->Send(&data);
+    caster->User()->Send(&data);
 }
 
 void Spell::SendCastResult(SpellCastResult result)
@@ -4670,7 +4670,7 @@ void Spell::SendCastResult(SpellCastResult result)
     if (m_caster->GetTypeId() != TYPEID_PLAYER || m_caster->IsCharmed())
         return;
 
-    if (m_caster->ToPlayer()->GetSession()->PlayerLoading())  // don't send cast results at loading time
+    if (m_caster->ToPlayer()->User()->PlayerLoading())  // don't send cast results at loading time
         return;
 
     // Xinef: override every possible result, except for gm fail result... breaks many things and goes unnoticed because of this and makes me rage when i find this out
@@ -4696,7 +4696,7 @@ void Spell::SendPetCastResult(SpellCastResult result)
     WorldPacket data(SMSG_PET_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, player, m_spellInfo, m_cast_count, result, m_customError);
 
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 void Spell::SendSpellStart()
@@ -5218,7 +5218,7 @@ void Spell::SendResurrectRequest(Player* target)
     // for player resurrections the name is looked up by guid
     std::string const sentName(m_caster->GetTypeId() == TYPEID_PLAYER
                                ? ""
-                               : m_caster->GetNameForLocaleIdx(target->GetSession()->GetSessionDbLocaleIndex()));
+                               : m_caster->GetNameForLocaleIdx(target->User()->GetSessionDbLocaleIndex()));
 
     WorldPacket data(SMSG_RESURRECT_REQUEST, (8 + 4 + sentName.size() + 1 + 1 + 1 + 4));
     data << m_caster->GetGUID();
@@ -5231,7 +5231,7 @@ void Spell::SendResurrectRequest(Player* target)
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_NO_RES_TIMER))
         data << uint32(0);
-    target->GetSession()->Send(&data);
+    target->User()->Send(&data);
 }
 
 void Spell::TakeCastItem()
@@ -6512,7 +6512,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     Player* target = ObjectAccessor::FindPlayer(m_caster->ToPlayer()->GetTarget());
 
                     if (!target ||
-                            !(target->GetSession()->GetRecruiterId() == playerCaster->GetSession()->GetAccountId() || target->GetSession()->GetAccountId() == playerCaster->GetSession()->GetRecruiterId()))
+                            !(target->User()->GetRecruiterId() == playerCaster->User()->GetAccountId() || target->User()->GetAccountId() == playerCaster->User()->GetRecruiterId()))
                         return SPELL_FAILED_BAD_TARGETS;
 
                     // Xinef: Implement summon pending error
@@ -7988,9 +7988,9 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         case SPELL_EFFECT_SUMMON_RAF_FRIEND:
             if (m_caster->GetTypeId() != TYPEID_PLAYER || target->GetTypeId() != TYPEID_PLAYER)
                 return false;
-            if (m_caster->ToPlayer()->GetSession()->IsARecruiter() && target->ToPlayer()->GetSession()->GetRecruiterId() != m_caster->ToPlayer()->GetSession()->GetAccountId())
+            if (m_caster->ToPlayer()->User()->IsARecruiter() && target->ToPlayer()->User()->GetRecruiterId() != m_caster->ToPlayer()->User()->GetAccountId())
                 return false;
-            if (m_caster->ToPlayer()->GetSession()->GetRecruiterId() != target->ToPlayer()->GetSession()->GetAccountId() && target->ToPlayer()->GetSession()->IsARecruiter())
+            if (m_caster->ToPlayer()->User()->GetRecruiterId() != target->ToPlayer()->User()->GetAccountId() && target->ToPlayer()->User()->IsARecruiter())
                 return false;
             if (target->ToPlayer()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
                 return false;

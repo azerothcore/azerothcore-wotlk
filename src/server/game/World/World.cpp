@@ -92,7 +92,7 @@
 #include "WeatherMgr.h"
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -143,18 +143,18 @@ World::World()
 /// World destructor
 World::~World()
 {
-    ///- Empty the kicked session set
-    while (!_sessions.empty())
+    ///- Empty the kicked user set
+    while (!m_users.empty())
     {
-        // not remove from queue, prevent loading new sessions
-        delete _sessions.begin()->second;
-        _sessions.erase(_sessions.begin());
+        // not remove from queue, prevent loading new users
+        delete m_users.begin()->second;
+        m_users.erase(m_users.begin());
     }
 
-    while (!_offlineSessions.empty())
+    while (!m_offlineUsers.empty())
     {
-        delete _offlineSessions.begin()->second;
-        _offlineSessions.erase(_offlineSessions.begin());
+        delete m_offlineUsers.begin()->second;
+        m_offlineUsers.erase(m_offlineUsers.begin());
     }
 
     CliCommandHolder* command = nullptr;
@@ -176,9 +176,9 @@ std::unique_ptr<IWorld>& getWorldInstance()
 /// Find a player in a specified zone
 Player* World::FindPlayerInZone(uint32 zone)
 {
-    ///- circle through active sessions and return the first player found in the zone
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    ///- circle through active users and return the first player found in the zone
+    UserMap::const_iterator itr;
+    for (itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         if (!itr->second)
             continue;
@@ -206,94 +206,94 @@ void World::SetClosed(bool val)
     sScriptMgr->OnOpenStateChange(!val);
 }
 
-/// Find a session by its id
-WorldSession* World::FindSession(uint32 id) const
+/// Find a user by its id
+User* World::FindUser(uint32 id) const
 {
-    SessionMap::const_iterator itr = _sessions.find(id);
+    UserMap::const_iterator itr = m_users.find(id);
 
-    if (itr != _sessions.end())
-        return itr->second;                                 // also can return nullptr for kicked session
+    if (itr != m_users.end())
+        return itr->second;                                 // also can return nullptr for kicked user
     else
         return nullptr;
 }
 
-WorldSession* World::FindOfflineSession(uint32 id) const
+User* World::FindOfflineUser(uint32 id) const
 {
-    SessionMap::const_iterator itr = _offlineSessions.find(id);
-    if (itr != _offlineSessions.end())
+    UserMap::const_iterator itr = m_offlineUsers.find(id);
+    if (itr != m_offlineUsers.end())
         return itr->second;
     else
         return nullptr;
 }
 
-WorldSession* World::FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const
+User* World::FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const
 {
-    if (_offlineSessions.empty())
+    if (m_offlineUsers.empty())
         return nullptr;
 
-    for (SessionMap::const_iterator itr = _offlineSessions.begin(); itr != _offlineSessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_offlineUsers.begin(); itr != m_offlineUsers.end(); ++itr)
         if (itr->second->GetGuidLow() == guidLow)
             return itr->second;
 
     return nullptr;
 }
 
-/// Remove a given session
-bool World::KickSession(uint32 id)
+/// Remove a given user
+bool World::KickUser(uint32 id)
 {
-    ///- Find the session, kick the user, but we can't delete session at this moment to prevent iterator invalidation
-    SessionMap::const_iterator itr = _sessions.find(id);
+    ///- Find the user, kick the user, but we can't delete user at this moment to prevent iterator invalidation
+    UserMap::const_iterator itr = m_users.find(id);
 
-    if (itr != _sessions.end() && itr->second)
+    if (itr != m_users.end() && itr->second)
     {
         if (itr->second->PlayerLoading())
             return false;
 
-        itr->second->KickPlayer("KickSession", false);
+        itr->second->KickPlayer("KickUser", false);
     }
 
     return true;
 }
 
-void World::AddSession(WorldSession* s)
+void World::AddUser(User* user)
 {
-    _addSessQueue.add(s);
+    m_pendingUsers.add(user);
 }
 
-void World::AddSession_(WorldSession* s)
+void World::AddUser_(User* user)
 {
-    ASSERT (s);
+    ASSERT (user);
 
-    // kick existing session with same account (if any)
-    // if character on old session is being loaded, then return
-    if (!KickSession(s->GetAccountId()))
+    // kick existing user with same account (if any)
+    // if character on old user is being loaded, then return
+    if (!KickUser(user->GetAccountId()))
     {
-        s->KickPlayer("kick existing session with same account");
-        delete s; // session not added yet in session list, so not listed in queue
+        user->KickPlayer("kick existing user with same account");
+        delete user; // user not added yet in user list, so not listed in queue
         return;
     }
 
-    SessionMap::const_iterator old = _sessions.find(s->GetAccountId());
-    if (old != _sessions.end())
+    UserMap::const_iterator old = m_users.find(user->GetAccountId());
+    if (old != m_users.end())
     {
-        WorldSession* oldSession = old->second;
+        User* oldSession = old->second;
 
         if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            _disconnects[s->GetAccountId()] = GameTime::GetGameTime().count();
+            _disconnects[user->GetAccountId()] = GameTime::GetGameTime().count();
 
         // pussywizard:
         if (oldSession->HandleSocketClosed())
         {
-            // there should be no offline session if current one is logged onto a character
-            SessionMap::iterator iter;
-            if ((iter = _offlineSessions.find(oldSession->GetAccountId())) != _offlineSessions.end())
+            // there should be no offline user if current one is logged onto a character
+            UserMap::iterator iter;
+            if ((iter = m_offlineUsers.find(oldSession->GetAccountId())) != m_offlineUsers.end())
             {
-                WorldSession* tmp = iter->second;
-                _offlineSessions.erase(iter);
+                User* tmp = iter->second;
+                m_offlineUsers.erase(iter);
                 delete tmp;
             }
             oldSession->SetOfflineTime(GameTime::GetGameTime().count());
-            _offlineSessions[oldSession->GetAccountId()] = oldSession;
+            m_offlineUsers[oldSession->GetAccountId()] = oldSession;
         }
         else
         {
@@ -301,29 +301,29 @@ void World::AddSession_(WorldSession* s)
         }
     }
 
-    _sessions[s->GetAccountId()] = s;
+    m_users[user->GetAccountId()] = user;
 
     uint32 Sessions = GetActiveAndQueuedSessionCount();
     uint32 pLimit = GetPlayerAmountLimit();
 
-    // don't count this session when checking player limit
+    // don't count this user when checking player limit
     --Sessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(s->GetSecurity()) && !s->CanSkipQueue() && !HasRecentlyDisconnected(s))
+    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(user->GetSecurity()) && !user->CanSkipQueue() && !HasRecentlyDisconnected(user))
     {
-        AddQueuedPlayer(s);
+        AddQueuedPlayer(user);
         UpdateMaxSessionCounters();
         return;
     }
 
-    s->InitializeSession();
+    user->InitializeSession();
 
     UpdateMaxSessionCounters();
 }
 
-bool World::HasRecentlyDisconnected(WorldSession* session)
+bool World::HasRecentlyDisconnected(User* user)
 {
-    if (!session)
+    if (!user)
         return false;
 
     if (uint32 tolerance = getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
@@ -332,7 +332,7 @@ bool World::HasRecentlyDisconnected(WorldSession* session)
         {
             if ((GameTime::GetGameTime().count() - i->second) < tolerance)
             {
-                if (i->first == session->GetAccountId())
+                if (i->first == user->GetAccountId())
                     return true;
                 ++i;
             }
@@ -343,7 +343,7 @@ bool World::HasRecentlyDisconnected(WorldSession* session)
     return false;
 }
 
-int32 World::GetQueuePos(WorldSession* sess)
+int32 World::GetQueuePos(User* sess)
 {
     uint32 position = 1;
 
@@ -354,7 +354,7 @@ int32 World::GetQueuePos(WorldSession* sess)
     return 0;
 }
 
-void World::AddQueuedPlayer(WorldSession* sess)
+void World::AddQueuedPlayer(User* sess)
 {
     sess->SetInQueue(true);
     _queuedPlayer.push_back(sess);
@@ -363,9 +363,9 @@ void World::AddQueuedPlayer(WorldSession* sess)
     sess->SendAuthResponse(AUTH_WAIT_QUEUE, false, GetQueuePos(sess));
 }
 
-bool World::RemoveQueuedPlayer(WorldSession* sess)
+bool World::RemoveQueuedPlayer(User* sess)
 {
-    uint32 sessions = GetActiveSessionCount();
+    uint32 users = GetActiveSessionCount();
 
     uint32 position = 1;
     Queue::iterator iter = _queuedPlayer.begin();
@@ -385,17 +385,17 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         }
     }
 
-    // if session not queued then it was an active session
+    // if user not queued then it was an active user
     if (!found)
     {
-        ASSERT(sessions > 0);
-        --sessions;
+        ASSERT(users > 0);
+        --users;
     }
 
     // accept first in queue
-    if ((!GetPlayerAmountLimit() || sessions < GetPlayerAmountLimit()) && !_queuedPlayer.empty())
+    if ((!GetPlayerAmountLimit() || users < GetPlayerAmountLimit()) && !_queuedPlayer.empty())
     {
-        WorldSession* pop_sess = _queuedPlayer.front();
+        User* pop_sess = _queuedPlayer.front();
         pop_sess->InitializeSession();
         _queuedPlayer.pop_front();
 
@@ -1427,7 +1427,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE] = sConfigMgr->GetOption<bool>("SetAllCreaturesWithWaypointMovementActive", false);
 
     // packet spoof punishment
-    _int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetOption<int32>("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::POLICY_KICK);
+    _int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetOption<int32>("PacketSpoof.Policy", (uint32)User::DosProtection::POLICY_KICK);
     _int_configs[CONFIG_PACKET_SPOOF_BANMODE] = sConfigMgr->GetOption<int32>("PacketSpoof.BanMode", (uint32)0);
     if (_int_configs[CONFIG_PACKET_SPOOF_BANMODE] > 1)
         _int_configs[CONFIG_PACKET_SPOOF_BANMODE] = (uint32)0;
@@ -2338,8 +2338,8 @@ void World::Update(uint32 diff)
         _mail_expire_check_timer = currentGameTime + 6h;
     }
 
-    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
-    UpdateSessions(diff);
+    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update users"));
+    UpdateUsers(diff);
 
     /// <li> Handle weather updates when the timer has passed
     if (_timers[WUPDATE_WEATHERS].Passed())
@@ -2498,10 +2498,10 @@ void World::ForceGameEventUpdate()
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalMessage(WorldPacket const* packet, User* self, TeamId teamId)
 {
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    UserMap::const_iterator itr;
+    for (itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         if (itr->second &&
                 itr->second->GetPlayer() &&
@@ -2515,10 +2515,10 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, Tea
 }
 
 /// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalGMMessage(WorldPacket const* packet, User* self, TeamId teamId)
 {
-    SessionMap::iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    UserMap::iterator itr;
+    for (itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         if (itr->second &&
                 itr->second->GetPlayer() &&
@@ -2584,7 +2584,7 @@ void World::SendWorldText(uint32 string_id, ...)
 
     Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
             continue;
@@ -2602,7 +2602,7 @@ void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
 
     Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto const& itr : _sessions)
+    for (auto const& itr : m_users)
     {
         if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
         {
@@ -2631,31 +2631,31 @@ void World::SendGMText(uint32 string_id, ...)
 
     Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         // Session should have permissions to receive global gm messages
-        WorldSession* session = itr->second;
-        if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
+        User* user = itr->second;
+        if (!user || AccountMgr::IsPlayerAccount(user->GetSecurity()))
             continue;
 
         // Player should be in world
-        Player* player = session->GetPlayer();
+        Player* player = user->GetPlayer();
         if (!player || !player->IsInWorld())
             continue;
 
-        wt_do(session->GetPlayer());
+        wt_do(user->GetPlayer());
     }
 
     va_end(ap);
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
+bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self, TeamId teamId)
 {
     bool foundPlayerToSend = false;
-    SessionMap::const_iterator itr;
+    UserMap::const_iterator itr;
 
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (itr = m_users.begin(); itr != m_users.end(); ++itr)
     {
         if (itr->second &&
                 itr->second->GetPlayer() &&
@@ -2673,7 +2673,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession
 }
 
 /// Send a System Message to all players in the zone (except self if mentioned)
-void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, TeamId teamId)
+void World::SendZoneText(uint32 zone, const char* text, User* self, TeamId teamId)
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
@@ -2683,22 +2683,22 @@ void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, Team
 /// Kick (and save) all players
 void World::KickAll()
 {
-    _queuedPlayer.clear();                                 // prevent send queue update packet and login queued sessions
+    _queuedPlayer.clear();                                 // prevent send queue update packet and login queued users
 
-    // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-        itr->second->KickPlayer("KickAll sessions");
+    // user not removed at kick and will removed in next update tick
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
+        itr->second->KickPlayer("KickAll users");
 
-    // pussywizard: kick offline sessions
-    for (SessionMap::const_iterator itr = _offlineSessions.begin(); itr != _offlineSessions.end(); ++itr)
-        itr->second->KickPlayer("KickAll offline sessions");
+    // pussywizard: kick offline users
+    for (UserMap::const_iterator itr = m_offlineUsers.begin(); itr != m_offlineUsers.end(); ++itr)
+        itr->second->KickPlayer("KickAll offline users");
 }
 
 /// Kick (and save) all players with security level less `sec`
 void World::KickAllLess(AccountTypes sec)
 {
-    // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    // user not removed at kick and will removed in next update tick
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetSecurity() < sec)
             itr->second->KickPlayer("KickAllLess");
 }
@@ -2770,13 +2770,13 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
-    ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
+    ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining users)
     if (time == 0)
     {
         if (!(options & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
             _stopEvent = true;                             // exist code already set
         else
-            _shutdownTimer = 1;                            //So that the session count is re-evaluated at next world tick
+            _shutdownTimer = 1;                            //So that the user count is re-evaluated at next world tick
     }
     ///- Else set the shutdown timer and warn users
     else
@@ -2850,74 +2850,74 @@ void World::SendServerMessage(ServerMessageType messageID, std::string stringPar
         SendGlobalMessage(chatServerMessage.Write());
 }
 
-void World::UpdateSessions(uint32 diff)
+void World::UpdateUsers(uint32 diff)
 {
     {
         METRIC_DETAILED_NO_THRESHOLD_TIMER("world_update_time",
-            METRIC_TAG("type", "Add sessions"),
-            METRIC_TAG("parent_type", "Update sessions"));
+            METRIC_TAG("type", "Add users"),
+            METRIC_TAG("parent_type", "Update users"));
 
-        ///- Add new sessions
-        WorldSession* sess = nullptr;
-        while (_addSessQueue.next(sess))
+        ///- Add new users
+        User* user = nullptr;
+        while (m_pendingUsers.next(user))
         {
-            AddSession_(sess);
+            AddUser_(user);
         }
     }
 
     ///- Then send an update signal to remaining ones
-    for (SessionMap::iterator itr = _sessions.begin(), next; itr != _sessions.end(); itr = next)
+    for (UserMap::iterator itr = m_users.begin(), next; itr != m_users.end(); itr = next)
     {
         next = itr;
         ++next;
 
-        ///- and remove not active sessions from the list
-        WorldSession* pSession = itr->second;
-        WorldSessionFilter updater(pSession);
+        ///- and remove not active users from the list
+        User* user = itr->second;
+        WorldSessionFilter updater(user);
 
         // pussywizard:
-        if (pSession->HandleSocketClosed())
+        if (user->HandleSocketClosed())
         {
-            if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
-            _sessions.erase(itr);
-            // there should be no offline session if current one is logged onto a character
-            SessionMap::iterator iter;
-            if ((iter = _offlineSessions.find(pSession->GetAccountId())) != _offlineSessions.end())
+            if (!RemoveQueuedPlayer(user) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
+                _disconnects[user->GetAccountId()] = GameTime::GetGameTime().count();
+            m_users.erase(itr);
+            // there should be no offline user if current one is logged onto a character
+            UserMap::iterator iter;
+            if ((iter = m_offlineUsers.find(user->GetAccountId())) != m_offlineUsers.end())
             {
-                WorldSession* tmp = iter->second;
-                _offlineSessions.erase(iter);
+                User* tmp = iter->second;
+                m_offlineUsers.erase(iter);
                 delete tmp;
             }
-            pSession->SetOfflineTime(GameTime::GetGameTime().count());
-            _offlineSessions[pSession->GetAccountId()] = pSession;
+            user->SetOfflineTime(GameTime::GetGameTime().count());
+            m_offlineUsers[user->GetAccountId()] = user;
             continue;
         }
 
         [[maybe_unused]] uint32 currentSessionId = itr->first;
         METRIC_DETAILED_TIMER("world_update_sessions_time", METRIC_TAG("account_id", std::to_string(currentSessionId)));
 
-        if (!pSession->Update(diff, updater))
+        if (!user->Update(diff, updater))
         {
-            if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
-            _sessions.erase(itr);
-            delete pSession;
+            if (!RemoveQueuedPlayer(user) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
+                _disconnects[user->GetAccountId()] = GameTime::GetGameTime().count();
+            m_users.erase(itr);
+            delete user;
         }
     }
 
     // pussywizard:
-    if (_offlineSessions.empty())
+    if (m_offlineUsers.empty())
         return;
     uint32 currTime = GameTime::GetGameTime().count();
-    for (SessionMap::iterator itr = _offlineSessions.begin(), next; itr != _offlineSessions.end(); itr = next)
+    for (UserMap::iterator itr = m_offlineUsers.begin(), next; itr != m_offlineUsers.end(); itr = next)
     {
         next = itr;
         ++next;
-        WorldSession* pSession = itr->second;
+        User* pSession = itr->second;
         if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
         {
-            _offlineSessions.erase(itr);
+            m_offlineUsers.erase(itr);
             delete pSession;
         }
     }
@@ -3040,7 +3040,7 @@ void World::ResetDailyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_DAILY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyQuestStatus();
 
@@ -3075,7 +3075,7 @@ void World::ResetWeeklyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_WEEKLY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetWeeklyQuestStatus();
 
@@ -3093,7 +3093,7 @@ void World::ResetMonthlyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_MONTHLY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetMonthlyQuestStatus();
 
@@ -3107,7 +3107,7 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
     stmt->SetData(0, event_id);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetSeasonalQuestStatus(event_id);
 }
@@ -3119,7 +3119,7 @@ void World::ResetRandomBG()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_BATTLEGROUND_RANDOM);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    for (UserMap::const_iterator itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
@@ -3148,7 +3148,7 @@ void World::ResetGuildCap()
 
 void World::UpdateMaxSessionCounters()
 {
-    _maxActiveSessionCount = std::max(_maxActiveSessionCount, uint32(_sessions.size() - _queuedPlayer.size()));
+    _maxActiveSessionCount = std::max(_maxActiveSessionCount, uint32(m_users.size() - _queuedPlayer.size()));
     _maxQueuedSessionCount = std::max(_maxQueuedSessionCount, uint32(_queuedPlayer.size()));
 }
 
@@ -3171,8 +3171,8 @@ void World::LoadDBVersion()
 
 void World::UpdateAreaDependentAuras()
 {
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    UserMap::const_iterator itr;
+    for (itr = m_users.begin(); itr != m_users.end(); ++itr)
         if (itr->second && itr->second->GetPlayer() && itr->second->GetPlayer()->IsInWorld())
         {
             itr->second->GetPlayer()->UpdateAreaDependentAuras(itr->second->GetPlayer()->GetAreaId());

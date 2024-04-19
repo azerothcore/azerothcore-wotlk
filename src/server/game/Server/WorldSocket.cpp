@@ -29,7 +29,7 @@
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "zlib.h"
 #include <memory>
 
@@ -590,7 +590,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    // Must be done before WorldSession is created
+    // Must be done before User is created
     bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
     if (wardenActive && account.OS != "Win" && account.OS != "OSX")
     {
@@ -696,7 +696,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sScriptMgr->OnLastIpUpdate(account.m_accountId, address);
 
-    _worldSession = new WorldSession(account.m_accountId, account.m_accountFlags, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new User(account.m_accountId, account.m_accountFlags, std::move(authSession->Account), shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
@@ -707,7 +707,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
 
-    sWorld->AddSession(_worldSession);
+    sWorld->AddUser(_worldSession);
 
     AsyncRead();
 }

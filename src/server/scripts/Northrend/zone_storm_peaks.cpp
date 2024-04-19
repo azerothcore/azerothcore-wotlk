@@ -718,10 +718,10 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
+                player->User()->SendTrainerList(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
+                player->User()->SendListInventory(creature->GetGUID());
                 break;
         }
         return true;

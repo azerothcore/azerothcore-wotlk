@@ -78,7 +78,7 @@ public:
 
     virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, ObjectGuid::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
 
-    [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, WorldSession* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
+    [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, User* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
 };
 
 #endif

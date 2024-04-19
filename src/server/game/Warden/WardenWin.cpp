@@ -30,7 +30,7 @@
 #include "WardenModuleWin.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
@@ -109,7 +109,7 @@ WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
 WardenWin::~WardenWin() = default;
 
-void WardenWin::Init(WorldSession* session, SessionKey const& k)
+void WardenWin::Init(User* session, SessionKey const& k)
 {
     _session = session;
     // Generate Warden Key

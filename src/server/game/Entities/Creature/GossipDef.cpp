@@ -24,7 +24,7 @@
 #include "QuestDef.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 GossipMenu::GossipMenu()
 {
@@ -174,7 +174,7 @@ void GossipMenu::ClearMenu()
     _menuItemData.clear();
 }
 
-PlayerMenu::PlayerMenu(WorldSession* session) : _session(session)
+PlayerMenu::PlayerMenu(User* session) : _session(session)
 {
     _gossipMenu.SetLocale(session->GetSessionDbLocaleIndex());
 }

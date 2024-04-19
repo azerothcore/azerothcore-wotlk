@@ -39,7 +39,7 @@
 #include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "FriendList.h"
 
 #include <string>
@@ -660,7 +660,7 @@ typedef std::unordered_map<uint32, SkillStatusData> SkillStatusMap;
 class Quest;
 class Spell;
 class Item;
-class WorldSession;
+class User;
 
 enum PlayerSlots
 {
@@ -1065,12 +1065,12 @@ struct EntryPointData
 
 class Player : public Unit, public GridObject<Player>
 {
-    friend class WorldSession;
+    friend class User;
     friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
-    explicit Player(WorldSession* session);
+    explicit Player(User* user);
     ~Player() override;
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
@@ -1091,7 +1091,7 @@ public:
 
     [[nodiscard]] bool hasSpanishClient()
     {
-        return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
+        return User()->GetSessionDbLocaleIndex() == LOCALE_esES || User()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
 
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
@@ -1636,7 +1636,7 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
+    void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from User::SendMailTo
     uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
@@ -1978,8 +1978,8 @@ public:
 
     void RemovedInsignia(Player* looterPlr);
 
-    [[nodiscard]] WorldSession* GetSession() const { return m_session; }
-    void SetSession(WorldSession* sess) { m_session = sess; }
+    User* User () const { return m_user; }
+    void SetUser (class User* user) { m_user = user; }
 
     void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) override;
     void DestroyForPlayer(Player* target, bool onDeath = false) const override;
@@ -2403,7 +2403,7 @@ public:
     void SetTemporaryUnsummonedPetNumber(uint32 petnumber) { m_temporaryUnsummonedPetNumber = petnumber; }
     void UnsummonPetTemporaryIfAny();
     void ResummonPetTemporaryUnSummonedIfAny();
-    [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->CharacterLoggingOut() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
+    [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return User()->CharacterLoggingOut() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
     void SendCinematicStart(uint32 CinematicSequenceId) const;
@@ -2818,7 +2818,7 @@ public:
     float m_resurrectX, m_resurrectY, m_resurrectZ;
     uint32 m_resurrectHealth, m_resurrectMana;
 
-    WorldSession* m_session;
+    class User* m_user;
 
     typedef std::list<Channel*> JoinedChannelsList;
     JoinedChannelsList m_channels;

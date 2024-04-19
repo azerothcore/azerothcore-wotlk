@@ -27,7 +27,7 @@
 #include "SpellAuras.h"
 #include "TemporarySummon.h"
 #include "Vehicle.h"
-#include "WorldSession.h"
+#include "User.h"
 
 BattlefieldWG::~BattlefieldWG()
 {
@@ -873,7 +873,7 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
 void BattlefieldWG::OnPlayerLeaveWar(Player* player)
 {
     // Remove all aura from WG /// @todo: false we can go out of this zone on retail and keep Rank buff, remove on end of WG
-    if (!player->GetSession()->CharacterLoggingOut())
+    if (!player->User()->CharacterLoggingOut())
     {
         if (player->GetVehicle())                              // Remove vehicle of player if he go out.
             player->GetVehicle()->Dismiss();
@@ -971,7 +971,7 @@ void BattlefieldWG::SendInitWorldStatesTo(Player* player)
 
     FillInitialWorldStates(data);
 
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 void BattlefieldWG::SendInitWorldStatesToAll()

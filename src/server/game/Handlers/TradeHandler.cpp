@@ -26,9 +26,9 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::SendTradeStatus(TradeStatus status)
+void User::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
 
@@ -66,19 +66,19 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     Send(&data);
 }
 
-void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     LOG_DEBUG("network", "WORLD: Ignore Trade {}", m_player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
-void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     LOG_DEBUG("network", "WORLD: Busy Trade {}", m_player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
-void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
+void User::SendUpdateTrade(bool trader_data /*= true*/)
 {
     TradeData* view_trade = trader_data ? m_player->GetTradeData()->GetTraderData() : m_player->GetTradeData();
 
@@ -129,7 +129,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
 //==============================================================
 // transfer the items to the players
 
-void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
+void User::moveItems(Item* myItems[], Item* hisItems[])
 {
     Player* trader = m_player->GetTrader();
     if (!trader)
@@ -241,7 +241,7 @@ static void clearAcceptTradeMode(Item * *myItems, Item * *hisItems)
     }
 }
 
-void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->m_trade;
     if (!my_trade)
@@ -271,7 +271,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     // not accept case incorrect money amount
     if (!trader->HasEnoughMoney(his_trade->GetMoney()))
     {
-        trader->GetSession()->SendNotification(LANG_NOT_ENOUGH_GOLD);
+        trader->User()->SendNotification(LANG_NOT_ENOUGH_GOLD);
         his_trade->SetAccepted(false, true);
         return;
     }
@@ -408,7 +408,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         }
 
         // inform partner client
-        trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
+        trader->User()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
 
         // test if item will fit in each inventory
         hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == BAG_OK);
@@ -422,7 +422,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             clearAcceptTradeMode(my_trade, his_trade);
 
             SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
-            trader->GetSession()->SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
+            trader->User()->SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
             delete my_spell;
@@ -434,7 +434,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             clearAcceptTradeMode(my_trade, his_trade);
 
             SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
-            trader->GetSession()->SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
+            trader->User()->SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
             delete my_spell;
@@ -463,12 +463,12 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         if( my_trade->GetMoney() >= 10 * GOLD )
         {
             CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
-                GetAccountId(), m_player->GetGUID().GetCounter(), m_player->GetName(), GetRemoteAddress(), trader->GetSession()->GetAccountId(), trader->GetName(), my_trade->GetMoney(), 6);
+                GetAccountId(), m_player->GetGUID().GetCounter(), m_player->GetName(), GetRemoteAddress(), trader->User()->GetAccountId(), trader->GetName(), my_trade->GetMoney(), 6);
         }
         if( his_trade->GetMoney() >= 10 * GOLD )
         {
             CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
-                trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName(), trader->GetSession()->GetRemoteAddress(), GetAccountId(), m_player->GetName(), his_trade->GetMoney(), 6);
+                trader->User()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName(), trader->User()->GetRemoteAddress(), GetAccountId(), m_player->GetName(), his_trade->GetMoney(), 6);
         }
 
         // update money
@@ -496,16 +496,16 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
 
-        trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_COMPLETE);
+        trader->User()->SendTradeStatus(TRADE_STATUS_TRADE_COMPLETE);
         SendTradeStatus(TRADE_STATUS_TRADE_COMPLETE);
     }
     else
     {
-        trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
+        trader->User()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
     }
 }
 
-void WorldSession::HandleUnacceptTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleUnacceptTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->GetTradeData();
     if (!my_trade)
@@ -514,17 +514,17 @@ void WorldSession::HandleUnacceptTradeOpcode(WorldPacket& /*recvPacket*/)
     my_trade->SetAccepted(false, true);
 }
 
-void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->m_trade;
     if (!my_trade)
         return;
 
-    my_trade->GetTrader()->GetSession()->SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
+    my_trade->GetTrader()->User()->SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
     SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
 }
 
-void WorldSession::SendCancelTrade()
+void User::SendCancelTrade()
 {
     if (PlayerRecentlyLoggedOut() || CharacterLoggingOut())
         return;
@@ -532,14 +532,14 @@ void WorldSession::SendCancelTrade()
     SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
 }
 
-void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 {
     // sended also after LOGOUT COMPLETE
     if (m_player)                                             // needed because STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT
         m_player->TradeCancel(true);
 }
 
-void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
+void User::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
     ObjectGuid ID;
     recvPacket >> ID;
@@ -612,7 +612,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSession()->CharacterLoggingOut())
+    if (pOther->User()->CharacterLoggingOut())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_LOGOUT);
         return;
@@ -652,10 +652,10 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     WorldPacket data(SMSG_TRADE_STATUS, 12);
     data << uint32(TRADE_STATUS_BEGIN_TRADE);
     data << m_player->GetGUID();
-    pOther->GetSession()->Send(&data);
+    pOther->User()->Send(&data);
 }
 
-void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
+void User::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
 {
     uint32 gold;
     recvPacket >> gold;
@@ -667,7 +667,7 @@ void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
     my_trade->SetMoney(gold);
 }
 
-void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
+void User::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
 {
     // send update
     uint8 tradeSlot;
@@ -719,7 +719,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     my_trade->SetItem(TradeSlots(tradeSlot), item);
 }
 
-void WorldSession::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
+void User::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
 {
     uint8 tradeSlot;
     recvPacket >> tradeSlot;

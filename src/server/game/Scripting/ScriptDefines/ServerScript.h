@@ -58,7 +58,7 @@ public:
      * @param packet Contains information about the WorldPacket
      * @return True if you want to continue sending the packet, false if you want to disallow sending the packet
      */
-    [[nodiscard]] virtual bool CanPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
+    [[nodiscard]] virtual bool CanPacketSend(User* /*session*/, WorldPacket& /*packet*/) { return true; }
 
     /**
      * @brief Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
@@ -68,7 +68,7 @@ public:
      * @param packet Contains information about the WorldPacket
      * @return True if you want to continue receive the packet, false if you want to disallow receive the packet
      */
-    [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
+    [[nodiscard]] virtual bool CanPacketReceive(User* /*session*/, WorldPacket& /*packet*/) { return true; }
 };
 
 #endif

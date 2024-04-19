@@ -77,7 +77,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
+                player->User()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INN:
                 player->SetBindPoint(creature->GetGUID());

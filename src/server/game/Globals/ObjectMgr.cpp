@@ -9319,7 +9319,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (!cInfo)
     {
         if (player)
-            ChatHandler(player->GetSession()).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+            ChatHandler(player->User()).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
         else
             LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` have data for not existed creature template (Entry: {}), ignore", vendor_entry);
         return false;
@@ -9330,7 +9330,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
         if (!skip_vendors || skip_vendors->count(vendor_entry) == 0)
         {
             if (player)
-                ChatHandler(player->GetSession()).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+                ChatHandler(player->User()).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
             else
                 LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` have data for not creature template (Entry: {}) without vendor flag, ignore", vendor_entry);
 
@@ -9344,7 +9344,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (!sObjectMgr->GetItemTemplate(item_id))
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
+            ChatHandler(player->User()).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
         else
             LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` for Vendor (Entry: {}) have in item list non-existed item ({}), ignore", vendor_entry, item_id);
         return false;
@@ -9353,7 +9353,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (ExtendedCost && !sItemExtendedCostStore.LookupEntry(ExtendedCost))
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST, ExtendedCost);
+            ChatHandler(player->User()).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST, ExtendedCost);
         else
             LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` have Item (Entry: {}) with wrong ExtendedCost ({}) for vendor ({}), ignore", item_id, ExtendedCost, vendor_entry);
         return false;
@@ -9362,7 +9362,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (maxcount > 0 && incrtime == 0)
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage("MaxCount != 0 (%u) but IncrTime == 0", maxcount);
+            ChatHandler(player->User()).PSendSysMessage("MaxCount != 0 (%u) but IncrTime == 0", maxcount);
         else
             LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` has `maxcount` ({}) for item {} of vendor (Entry: {}) but `incrtime`=0, ignore", maxcount, item_id, vendor_entry);
         return false;
@@ -9370,7 +9370,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     else if (maxcount == 0 && incrtime > 0)
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage("MaxCount == 0 but IncrTime<>= 0");
+            ChatHandler(player->User()).PSendSysMessage("MaxCount == 0 but IncrTime<>= 0");
         else
             LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` has `maxcount`=0 for item {} of vendor (Entry: {}) but `incrtime`<>0, ignore", item_id, vendor_entry);
         return false;
@@ -9383,7 +9383,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (vItems->FindItemCostPair(item_id, ExtendedCost))
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, ExtendedCost);
+            ChatHandler(player->User()).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, ExtendedCost);
         else
             LOG_ERROR("sql.sql", "Table `npc_vendor` has duplicate items {} (with extended cost {}) for vendor (Entry: {}), ignoring", item_id, ExtendedCost, vendor_entry);
         return false;

@@ -16,7 +16,7 @@
  */
 
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
 TradeData* TradeData::GetTraderData() const
 {
@@ -97,7 +97,7 @@ void TradeData::SetMoney(uint32 money)
 
     if (!m_player->HasEnoughMoney(money))
     {
-        m_player->GetSession()->SendTradeStatus(TRADE_STATUS_BUSY);
+        m_player->User()->SendTradeStatus(TRADE_STATUS_BUSY);
         return;
     }
 
@@ -112,9 +112,9 @@ void TradeData::SetMoney(uint32 money)
 void TradeData::Update(bool forTarget /*= true*/)
 {
     if (forTarget)
-        m_trader->GetSession()->SendUpdateTrade(true);      // player state for trader
+        m_trader->User()->SendUpdateTrade(true);      // player state for trader
     else
-        m_player->GetSession()->SendUpdateTrade(false);     // player state for player
+        m_player->User()->SendUpdateTrade(false);     // player state for player
 }
 
 void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
@@ -124,8 +124,8 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
     if (!state)
     {
         if (crosssend)
-            m_trader->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+            m_trader->User()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
         else
-            m_player->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+            m_player->User()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
     }
 }

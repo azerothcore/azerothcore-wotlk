@@ -34,7 +34,7 @@ void WhoListCacheMgr::Update()
 
     for (auto const& [guid, player] : ObjectAccessor::GetPlayers())
     {
-        if (!player->FindMap() || player->GetSession()->PlayerLoading())
+        if (!player->FindMap() || player->User()->PlayerLoading())
             continue;
 
         std::string playerName = player->GetName();
@@ -53,7 +53,7 @@ void WhoListCacheMgr::Update()
 
         wstrToLower(wideGuildName);
 
-        _whoListStorage.emplace_back(player->GetGUID(), player->GetTeamId(), player->GetSession()->GetSecurity(), player->GetLevel(),
+        _whoListStorage.emplace_back(player->GetGUID(), player->GetTeamId(), player->User()->GetSecurity(), player->GetLevel(),
             player->getClass(), player->getRace(),
             (player->IsSpectator() ? 4395 /*Dalaran*/ : player->GetZoneId()), player->getGender(), player->IsVisible(),
             widePlayerName, wideGuildName, playerName, guildName);

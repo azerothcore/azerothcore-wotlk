@@ -74,7 +74,7 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Obj
     CALL_ENABLED_HOOKS(GuildScript, GUILDHOOK_ON_BANK_EVENT, script->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId));
 }
 
-bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots)
+bool ScriptMgr::CanGuildSendBankList(Guild const* guild, User* session, uint8 tabId, bool sendAllSlots)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(GuildScript, GUILDHOOK_CAN_GUILD_SEND_BANK_LIST, !script->CanGuildSendBankList(guild, session, tabId, sendAllSlots));
 }

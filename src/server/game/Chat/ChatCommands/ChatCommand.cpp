@@ -25,7 +25,7 @@
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
@@ -152,7 +152,7 @@ void Acore::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
     }
 }
 
-static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr)
+static void LogCommandUsage(User const& session, std::string_view cmdStr)
 {
     if (AccountMgr::IsPlayerAccount(session.GetSecurity()))
         return;

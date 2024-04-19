@@ -288,7 +288,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     }
 
     // remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones)
-    if (!player->GetSession()->CharacterLoggingOut())
+    if (!player->User()->CharacterLoggingOut())
     {
         SendRemoveWorldStates(player);
     }
@@ -636,7 +636,7 @@ void OutdoorPvP::BroadcastPacket(WorldPacket& data) const
     for (auto const& playerSet : _players)
         for (auto itr : playerSet)
             if (Player* const player = ObjectAccessor::FindPlayer(itr))
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
 }
 
 void OutdoorPvP::RegisterZone(uint32 zoneId)

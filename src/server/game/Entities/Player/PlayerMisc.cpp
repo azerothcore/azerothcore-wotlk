@@ -20,7 +20,7 @@
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WorldSession.h"
+#include "User.h"
 
 /*********************************************************/
 /***               FLOOD FILTER SYSTEM                 ***/
@@ -29,7 +29,7 @@
 void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
 {
     // ignore chat spam protection for GMs in any mode
-    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (!AccountMgr::IsPlayerAccount(User()->GetSecurity()))
         return;
 
     uint32 limit, delay;
@@ -54,8 +54,8 @@ void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
         {
             // prevent overwrite mute time, if message send just before mutes set, for example.
             time_t new_mute = current + sWorld->getIntConfig(CONFIG_CHATFLOOD_MUTE_TIME);
-            if (GetSession()->m_muteTime < new_mute)
-                GetSession()->m_muteTime = new_mute;
+            if (User()->m_muteTime < new_mute)
+                User()->m_muteTime = new_mute;
 
             m_chatFloodData[index].Count = 0;
         }
@@ -68,7 +68,7 @@ void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
 
 bool Player::CanSpeak() const
 {
-    return  GetSession()->m_muteTime <= time (nullptr);
+    return  User()->m_muteTime <= time (nullptr);
 }
 
 /*********************************************************/
@@ -78,7 +78,7 @@ bool Player::CanSpeak() const
 void Player::SendAttackSwingNotInRange()
 {
     WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid)
@@ -128,25 +128,25 @@ void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDat
 void Player::SendAttackSwingDeadTarget()
 {
     WorldPacket data(SMSG_ATTACKSWING_DEADTARGET, 0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendAttackSwingCantAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendAttackSwingCancelAttack()
 {
     WorldPacket data(SMSG_CANCEL_COMBAT, 0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendAttackSwingBadFacingAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_BADFACING, 0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendAutoRepeatCancel(Unit* target)
@@ -161,7 +161,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
     WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
     data << uint32(Area);
     data << uint32(Experience);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendDungeonDifficulty(bool IsInGroup)
@@ -171,7 +171,7 @@ void Player::SendDungeonDifficulty(bool IsInGroup)
     data << (uint32)GetDungeonDifficulty();
     data << uint32(val);
     data << uint32(IsInGroup);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
@@ -181,14 +181,14 @@ void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
     data << uint32(forcedDifficulty == -1 ? GetRaidDifficulty() : forcedDifficulty);
     data << uint32(val);
     data << uint32(IsInGroup);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendResetFailedNotify(uint32 mapid)
 {
     WorldPacket data(SMSG_RESET_FAILED_NOTIFY, 4);
     data << uint32(mapid);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 /// Reset all solo instances and optionally send a message on success for each
@@ -327,7 +327,7 @@ void Player::SendResetInstanceSuccess(uint32 MapId)
 {
     WorldPacket data(SMSG_INSTANCE_RESET, 4);
     data << uint32(MapId);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
@@ -340,7 +340,7 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
     WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 4);
     data << uint32(reason);
     data << uint32(MapId);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 /*********************************************************/

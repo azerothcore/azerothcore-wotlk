@@ -19,7 +19,7 @@
 #include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 
@@ -187,14 +187,14 @@ public:
             chr->SetTaxiCheater(true);
             handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
+                ChatHandler(chr->User()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
         }
         else
         {
             chr->SetTaxiCheater(false);
             handler->PSendSysMessage(LANG_YOU_REMOVE_TAXIS, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_REMOVED, handler->GetNameLink().c_str());
+                ChatHandler(chr->User()).PSendSysMessage(LANG_YOURS_TAXIS_REMOVED, handler->GetNameLink().c_str());
         }
 
         return true;
@@ -213,13 +213,13 @@ public:
         {
             handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
+                ChatHandler(chr->User()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
         }
         else
         {
             handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(chr).c_str());
             if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
+                ChatHandler(chr->User()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
         }
 
         for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)

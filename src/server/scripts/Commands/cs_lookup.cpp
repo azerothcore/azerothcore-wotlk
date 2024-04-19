@@ -1608,7 +1608,7 @@ public:
                 return false;
             }
 
-            *ip = target->GetSession()->GetRemoteAddress();
+            *ip = target->User()->GetRemoteAddress();
         }
         else
         {

@@ -30,9 +30,9 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
+void User::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
@@ -62,14 +62,14 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     SendBattleGroundList(guid, bgTypeId);
 }
 
-void WorldSession::SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId)
+void User::SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId)
 {
     WorldPacket data;
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, guid, m_player, bgTypeId, 0);
     Send(&data);
 }
 
-void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
+void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     uint32 bgTypeId_;
@@ -263,7 +263,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             {
                 WorldPacket data;
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                member->GetSession()->Send(&data);
+                member->User()->Send(&data);
             });
 
             return;
@@ -281,10 +281,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
             // send status packet
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member->AddBattlegroundQueueId(bgQueueTypeId), STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
-            member->GetSession()->Send(&data);
+            member->User()->Send(&data);
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-            member->GetSession()->Send(&data);
+            member->User()->Send(&data);
 
             sScriptMgr->OnPlayerJoinBG(member);
         });
@@ -293,7 +293,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
 }
 
-void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
+void User::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
 
@@ -344,7 +344,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
     Send(&data);
 }
 
-void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
+void User::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Recvd MSG_PVP_LOG_DATA Message");
 
@@ -363,7 +363,7 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
     LOG_DEBUG("network", "WORLD: Sent MSG_PVP_LOG_DATA Message");
 }
 
-void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
+void User::HandleBattlefieldListOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
@@ -388,7 +388,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
+void User::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 {
     uint8 arenaType;    // arenatype if arena
     uint8 unk2;         // unk, can be 0x0 (may be if was invited?) and 0x1
@@ -414,7 +414,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 
     if (m_player->GetCharmGUID() || m_player->IsInCombat())
     {
-        m_player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+        m_player->User()->SendNotification(LANG_YOU_IN_COMBAT);
         return;
     }
 
@@ -583,7 +583,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
+void User::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 
@@ -601,7 +601,7 @@ void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
     m_player->LeaveBattleground();
 }
 
-void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
+void User::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
 {
     // requested at login and on map change
     // send status for current queues and current bg
@@ -662,7 +662,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
+void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_BATTLEMASTER_JOIN_ARENA");
 
@@ -874,7 +874,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
             if (err <= 0)
             {
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                member->GetSession()->Send(&data);
+                member->User()->Send(&data);
                 continue;
             }
 
@@ -882,10 +882,10 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
             // send status packet
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, arenatype, TEAM_NEUTRAL, isRated);
-            member->GetSession()->Send(&data);
+            member->User()->Send(&data);
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-            member->GetSession()->Send(&data);
+            member->User()->Send(&data);
 
             LOG_DEBUG("bg.battleground", "Battleground: player joined queue for arena as group bg queue type {} bg type {}: {}, NAME {}", bgQueueTypeId, bgTypeId, member->GetGUID().ToString(), member->GetName());
 
@@ -896,7 +896,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
 }
 
-void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
+void User::HandleReportPvPAFK(WorldPacket& recvData)
 {
     ObjectGuid playerGuid;
     recvData >> playerGuid;
@@ -904,11 +904,11 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
 
     if (!reportedPlayer)
     {
-        LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: player not found");
+        LOG_DEBUG("bg.battleground", "User::HandleReportPvPAFK: player not found");
         return;
     }
 
-    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: {} reported {}", m_player->GetName(), reportedPlayer->GetName());
+    LOG_DEBUG("bg.battleground", "User::HandleReportPvPAFK: {} reported {}", m_player->GetName(), reportedPlayer->GetName());
 
     reportedPlayer->ReportedAfkBy(m_player);
 }

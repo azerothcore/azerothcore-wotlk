@@ -31,7 +31,7 @@
 #include <unordered_map>
 
 class WorldPacket;
-class WorldSession;
+class User;
 class Player;
 
 /// Storage class for commands issued for delayed execution
@@ -53,7 +53,7 @@ private:
     CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
-typedef std::unordered_map<uint32, WorldSession*> SessionMap;
+typedef std::unordered_map<uint32, User*> UserMap;
 
 // ServerMessages.dbc
 enum ServerMessageType
@@ -525,13 +525,13 @@ class IWorld
 {
 public:
     virtual ~IWorld() = default;
-    [[nodiscard]] virtual WorldSession* FindSession(uint32 id) const = 0;
-    [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
-    [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
-    virtual void AddSession(WorldSession* s) = 0;
-    virtual bool KickSession(uint32 id) = 0;
+    [[nodiscard]] virtual User* FindUser(uint32 id) const = 0;
+    [[nodiscard]] virtual User* FindOfflineUser(uint32 id) const = 0;
+    [[nodiscard]] virtual User* FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const = 0;
+    virtual void AddUser(User* s) = 0;
+    virtual bool KickUser(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
-    [[nodiscard]] virtual const SessionMap& GetAllSessions() const = 0;
+    [[nodiscard]] virtual const UserMap& GetAllUsers() const = 0;
     [[nodiscard]] virtual uint32 GetActiveAndQueuedSessionCount() const = 0;
     [[nodiscard]] virtual uint32 GetActiveSessionCount() const = 0;
     [[nodiscard]] virtual uint32 GetQueuedSessionCount() const = 0;
@@ -549,10 +549,10 @@ public:
     virtual void LoadDBAllowedSecurityLevel() = 0;
     virtual void SetPlayerAmountLimit(uint32 limit) = 0;
     [[nodiscard]] virtual uint32 GetPlayerAmountLimit() const = 0;
-    virtual void AddQueuedPlayer(WorldSession*) = 0;
-    virtual bool RemoveQueuedPlayer(WorldSession* session) = 0;
-    virtual int32 GetQueuePos(WorldSession*) = 0;
-    virtual bool HasRecentlyDisconnected(WorldSession*) = 0;
+    virtual void AddQueuedPlayer(User*) = 0;
+    virtual bool RemoveQueuedPlayer(User* session) = 0;
+    virtual int32 GetQueuePos(User*) = 0;
+    virtual bool HasRecentlyDisconnected(User*) = 0;
     [[nodiscard]] virtual bool getAllowMovement() const = 0;
     virtual void SetAllowMovement(bool allow) = 0;
     virtual void SetNewCharString(std::string const& str) = 0;
@@ -568,10 +568,10 @@ public:
     virtual void SendWorldText(uint32 string_id, ...) = 0;
     virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
-    virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalGMMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendZoneText(uint32 zone, const char* text, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) = 0;
     [[nodiscard]] virtual bool IsShuttingDown() const = 0;
     [[nodiscard]] virtual uint32 GetShutDownTimeLeft() const = 0;
@@ -579,7 +579,7 @@ public:
     virtual void ShutdownCancel() = 0;
     virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
-    virtual void UpdateSessions(uint32 diff) = 0;
+    virtual void UpdateUsers(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;
     [[nodiscard]] virtual float getRate(Rates rate) const = 0;
     virtual void setBoolConfig(WorldBoolConfigs index, bool value) = 0;

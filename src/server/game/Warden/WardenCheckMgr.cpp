@@ -20,7 +20,7 @@
 #include "Log.h"
 #include "Util.h"
 #include "Warden.h"
-#include "WorldSession.h"
+#include "User.h"
 
 WardenCheckMgr::WardenCheckMgr()
 {

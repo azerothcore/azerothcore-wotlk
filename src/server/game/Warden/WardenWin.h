@@ -66,7 +66,7 @@ struct WardenInitModuleRequest
 #pragma pack(pop)
 #endif
 
-class WorldSession;
+class User;
 class Warden;
 
 class WardenWin : public Warden
@@ -75,7 +75,7 @@ public:
     WardenWin();
     ~WardenWin() override;
 
-    void Init(WorldSession* session, SessionKey const& K) override;
+    void Init(User* session, SessionKey const& K) override;
     ClientWardenModule* GetModuleForClient() override;
     void InitializeModule() override;
     void RequestHash() override;

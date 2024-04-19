@@ -262,7 +262,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     auto const& itr = m_QueuedPlayers.find(guid);
     if (itr == m_QueuedPlayers.end())
     {
-        //This happens if a player logs out while in a bg because WorldSession::CharacterLoggingOut() notifies the bg twice
+        //This happens if a player logs out while in a bg because User::CharacterLoggingOut() notifies the bg twice
         std::string playerName = "Unknown";
 
         if (Player* player = ObjectAccessor::FindPlayer(guid))
@@ -1057,7 +1057,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY))
     {
-        ChatHandler(leader->GetSession()).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName.c_str(), q_min_level, q_max_level,
+        ChatHandler(leader->User()).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName.c_str(), q_min_level, q_max_level,
             qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0,
             qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
     }
@@ -1118,7 +1118,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
 
         if (sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY))
         {
-            ChatHandler(leader->GetSession()).PSendSysMessage(LANG_ARENA_QUEUE_ANNOUNCE_SELF,
+            ChatHandler(leader->User()).PSendSysMessage(LANG_ARENA_QUEUE_ANNOUNCE_SELF,
                 bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed - qPlayers);
         }
         else
@@ -1269,11 +1269,11 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
         // send status packet
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType, TEAM_NEUTRAL, bg->isRated());
-        player->GetSession()->Send(&data);
+        player->User()->Send(&data);
 
         // pussywizard:
         if (bg->isArena() && bg->isRated())
-            bg->ArenaLogEntries[player->GetGUID()].Fill(player->GetName(), player->GetGUID().GetCounter(), player->GetSession()->GetAccountId(), ginfo->ArenaTeamId, player->GetSession()->GetRemoteAddress());
+            bg->ArenaLogEntries[player->GetGUID()].Fill(player->GetName(), player->GetGUID().GetCounter(), player->User()->GetAccountId(), ginfo->ArenaTeamId, player->User()->GetRemoteAddress());
     }
 }
 
@@ -1307,7 +1307,7 @@ bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             // send remaining time in queue
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME - INVITATION_REMIND_TIME, 0, m_ArenaType, TEAM_NEUTRAL, bg->isRated(), m_BgTypeId);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
     }
 

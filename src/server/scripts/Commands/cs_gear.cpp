@@ -19,7 +19,7 @@
 #include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 
@@ -71,7 +71,7 @@ public:
 
         if (handler->needReportToTarget(target->GetConnectedPlayer()))
         {
-            ChatHandler(target->GetConnectedPlayer()->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, nameLink.c_str());
+            ChatHandler(target->GetConnectedPlayer()->User()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, nameLink.c_str());
         }
 
         return true;

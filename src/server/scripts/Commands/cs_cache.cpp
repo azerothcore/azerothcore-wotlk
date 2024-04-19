@@ -115,11 +115,11 @@ public:
                 }
                 else
                 {
-                    sCharacterCache->AddCharacterCacheEntry(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId(), cPlayer->GetName(),
+                    sCharacterCache->AddCharacterCacheEntry(cPlayer->GetGUID(), cPlayer->User()->GetAccountId(), cPlayer->GetName(),
                         cPlayer->getGender(), cPlayer->getRace(), cPlayer->getClass(), cPlayer->GetLevel());
                 }
 
-                sCharacterCache->UpdateCharacterAccountId(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId());
+                sCharacterCache->UpdateCharacterAccountId(cPlayer->GetGUID(), cPlayer->User()->GetAccountId());
                 sCharacterCache->UpdateCharacterGuildId(cPlayer->GetGUID(), cPlayer->GetGuildId());
                 sCharacterCache->UpdateCharacterMailCount(cPlayer->GetGUID(), cPlayer->GetMailSize(), true);
                 sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_2v2, cPlayer->GetArenaTeamId(ARENA_SLOT_2v2));

@@ -183,7 +183,7 @@ public:
             data << spellId;
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);
             data << uint32(SPELL_CUSTOM_ERROR_CANT_BUILD_MORE_VEHICLES);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
         return true;
     }
@@ -779,7 +779,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
+                player->User()->SendListInventory(creature->GetGUID());
                 break;
         }
 

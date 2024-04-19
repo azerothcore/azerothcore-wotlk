@@ -21,9 +21,9 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
+void User::HandleLearnTalentOpcode(WorldPacket& recvData)
 {
     uint32 talent_id, requested_rank;
     recvData >> talent_id >> requested_rank;
@@ -32,7 +32,7 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
     m_player->SendTalentsInfoData(false);
 }
 
-void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
+void User::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
 
@@ -56,7 +56,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
     recvPacket.rfinish();
 }
 
-void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
+void User::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
     ObjectGuid guid;
@@ -89,7 +89,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     unit->CastSpell(m_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 
-void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)
+void User::HandleUnlearnSkillOpcode(WorldPacket& recvData)
 {
     uint32 skillId;
     recvData >> skillId;

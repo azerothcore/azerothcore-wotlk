@@ -25,7 +25,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 void BattlegroundEYScore::BuildObjectivesBlock(WorldPacket& data)
 {

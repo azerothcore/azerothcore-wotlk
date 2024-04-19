@@ -2777,7 +2777,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
                     WorldPacket data;
                     BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, cooldownSpell, 0);
-                    GetSession()->Send(&data);
+                    User()->Send(&data);
                 }
             }
         }
@@ -3917,7 +3917,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
                     // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
-                        m_session->DoLootRelease(GetLootGUID());
+                        m_user->DoLootRelease(GetLootGUID());
                         released = true;                    // so we don't need to look at dstBag
                         break;
                     }
@@ -3935,7 +3935,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
                     // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
-                        m_session->DoLootRelease(GetLootGUID());
+                        m_user->DoLootRelease(GetLootGUID());
                         released = true;                    // not realy needed here
                         break;
                     }
@@ -4072,7 +4072,7 @@ void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*
                 break;
         }
     }
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
@@ -4084,7 +4084,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
     if (param > 0)
         data << uint32(param);
     data << uint8(msg);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param)
@@ -4096,7 +4096,7 @@ void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, 
     if (param > 0)
         data << uint32(param);
     data << uint8(msg);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 void Player::TradeCancel(bool sendback)
@@ -4107,9 +4107,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            User()->SendCancelTrade();
 
-        trader->GetSession()->SendCancelTrade();
+        trader->User()->SendCancelTrade();
 
         // cleanup
         delete m_trade;
@@ -4304,7 +4304,7 @@ void Player::AddEnchantmentDuration(Item* item, EnchantmentSlot slot, uint32 dur
     }
     if (item && duration > 0)
     {
-        GetSession()->SendItemEnchantTimeUpdate(GetGUID(), item->GetGUID(), slot, uint32(duration / 1000));
+        User()->SendItemEnchantTimeUpdate(GetGUID(), item->GetGUID(), slot, uint32(duration / 1000));
         m_enchantDuration.push_back(EnchantDuration(item, slot, duration));
     }
 }
@@ -4741,7 +4741,7 @@ void Player::SendEnchantmentDurations()
 {
     for (EnchantDurationList::const_iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
     {
-        GetSession()->SendItemEnchantTimeUpdate(GetGUID(), itr->item->GetGUID(), itr->slot, uint32(itr->leftduration) / 1000);
+        User()->SendItemEnchantTimeUpdate(GetGUID(), itr->item->GetGUID(), itr->slot, uint32(itr->leftduration) / 1000);
     }
 }
 
@@ -4782,7 +4782,7 @@ void Player::SendItemPush(Item* item, uint32 count, bool received, bool created,
     if (broadcast && GetGroup())
         GetGroup()->BroadcastPacket(&data, true);
     else
-        GetSession()->Send(&data);
+        User()->Send(&data);
 }
 
 /*********************************************************/
@@ -4924,7 +4924,7 @@ void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
 
 bool Player::isBeingLoaded() const
 {
-    return GetSession()->PlayerLoading();
+    return User()->PlayerLoading();
 }
 
 bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder const& holder)
@@ -4955,9 +4955,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     // check if the character's account in the db and the logged in account match.
     // player should be able to load/delete character only with correct account!
-    if (dbAccountId != GetSession()->GetAccountId())
+    if (dbAccountId != User()->GetAccountId())
     {
-        LOG_ERROR("entities.player", "Player ({}) loading from wrong account (is: {}, should be: {})", playerGuid.ToString(), GetSession()->GetAccountId(), dbAccountId);
+        LOG_ERROR("entities.player", "Player ({}) loading from wrong account (is: {}, should be: {})", playerGuid.ToString(), User()->GetAccountId(), dbAccountId);
         return false;
     }
 
@@ -5109,7 +5109,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadInstanceTimeRestrictions(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES));
     _LoadEntryPointData(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ENTRY_POINT));
 
-    GetSession()->SetPlayer(this);
+    User()->SetPlayer(this);
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
 
     Map* map = nullptr;
@@ -5249,7 +5249,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // client without expansion support
     if (mapEntry)
     {
-        if (GetSession()->Expansion() < mapEntry->Expansion())
+        if (User()->Expansion() < mapEntry->Expansion())
         {
             LOG_DEBUG("entities.player.loading", "Player {} using client without required expansion tried login at non accessible map {}", GetName(), mapId);
             RelocateToHomebind();
@@ -5516,7 +5516,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     outDebugValues();
 
     // GM state
-    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (!AccountMgr::IsPlayerAccount(User()->GetSecurity()))
     {
         switch (sWorld->getIntConfig(CONFIG_GM_LOGIN_STATE))
         {
@@ -5577,7 +5577,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     // RaF stuff.
     m_grantableLevels = fields[71].Get<uint8>();
-    if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
+    if (User()->IsARecruiter() || (User()->GetRecruiterId() != 0))
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     if (m_grantableLevels > 0)
@@ -5957,7 +5957,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
         // Send problematic items by mail
         while (!problematicItems.empty())
         {
-            std::string subject = GetSession()->GetAcoreString(LANG_NOT_EQUIPPED_ITEM);
+            std::string subject = User()->GetAcoreString(LANG_NOT_EQUIPPED_ITEM);
 
             MailDraft draft(subject, "There were problems with equipping item(s).");
             for (uint8 i = 0; !problematicItems.empty() && i < MAX_MAIL_ITEMS; ++i)
@@ -6522,7 +6522,7 @@ void Player::BindToInstance()
 
     WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
     data << uint32(0);
-    GetSession()->Send(&data);
+    User()->Send(&data);
     sInstanceSaveMgr->PlayerBindToInstance(this->GetGUID(), mapSave, true, this);
 }
 
@@ -6557,7 +6557,7 @@ void Player::SendRaidInfo()
         }
     }
     data.put<uint32>(p_counter, counter);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 }
 
 /*
@@ -6584,7 +6584,7 @@ void Player::SendSavedInstances()
     //Send opcode 811. true or false means, whether you have current raid/heroic instances
     data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP);
     data << uint32(hasBeenSaved);
-    GetSession()->Send(&data);
+    User()->Send(&data);
 
     if (!hasBeenSaved)
         return;
@@ -6598,7 +6598,7 @@ void Player::SendSavedInstances()
             {
                 data.Initialize(SMSG_UPDATE_LAST_INSTANCE);
                 data << uint32(itr->second.save->GetMapId());
-                GetSession()->Send(&data);
+                User()->Send(&data);
             }
         }
     }
@@ -6606,7 +6606,7 @@ void Player::SendSavedInstances()
 
 void Player::PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const
 {
-    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = User()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingQuests)
     {
         Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
@@ -6632,18 +6632,18 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s", stream.str().c_str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }
 
 void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const
 {
-    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = User()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingAchievements)
     {
         AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
@@ -6665,18 +6665,18 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s", stream.str().c_str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }
 
 void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const
 {
-    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = User()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingItems)
     {
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
@@ -6703,11 +6703,11 @@ void Player::PrettyPrintRequirementsItemsList(const std::vector<const Progressio
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s", stream.str().c_str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(User()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }
@@ -6733,12 +6733,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            User()->SendAreaTriggerMessage("%s", User()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
         }
 
         Player* partyLeader = this;
-        std::string leaderName = m_session->GetAcoreString(LANG_YOU);
+        std::string leaderName = m_user->GetAcoreString(LANG_YOU);
         {
             ObjectGuid leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
             Player* tempLeader = HashMapHolder<Player>::Find(leaderGuid);
@@ -6845,18 +6845,18 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 if (requirementPrintMode == 0)
                 {
                     //Just print out the requirements are not met
-                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
+                    ChatHandler(User()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
                 }
                 else if (requirementPrintMode == 1)
                 {
                     //Blizzlike method of printing out the requirements
                     if (missingPlayerQuests.size() && !missingPlayerQuests[0]->note.empty())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage("%s", missingPlayerQuests[0]->note.c_str());
+                        ChatHandler(User()).PSendSysMessage("%s", missingPlayerQuests[0]->note.c_str());
                     }
                     else if (missingLeaderQuests.size() && !missingLeaderQuests[0]->note.empty())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage("%s", missingLeaderQuests[0]->note.c_str());
+                        ChatHandler(User()).PSendSysMessage("%s", missingLeaderQuests[0]->note.c_str());
                     }
                     else if (mapDiff->hasErrorMessage)
                     {
@@ -6865,21 +6865,21 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     else if (missingPlayerItems.size())
                     {
-                        LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                        LocaleConstant loc_idx = User()->GetSessionDbLocaleIndex();
                         std::string name = sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1;
                         if (ItemLocale const* il = sObjectMgr->GetItemLocale(missingPlayerItems[0]->id))
                         {
                             ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
                         }
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
+                        User()->SendAreaTriggerMessage(User()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
                     }
                     else if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        User()->SendAreaTriggerMessage(User()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                     }
                     else if (ilvlRequirementNotMet)
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
+                        ChatHandler(User()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
                     }
                 }
                 else
@@ -6888,56 +6888,56 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     //Pretty way of printing out requirements
                     if (missingPlayerQuests.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
+                        ChatHandler(User()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
                         PrettyPrintRequirementsQuestList(missingPlayerQuests);
                         errorAlreadyPrinted = true;
                     }
                     if (missingLeaderQuests.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
+                        ChatHandler(User()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
                         PrettyPrintRequirementsQuestList(missingLeaderQuests);
                         errorAlreadyPrinted = true;
                     }
 
                     if (missingPlayerAchievements.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
+                        ChatHandler(User()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
                         PrettyPrintRequirementsAchievementsList(missingPlayerAchievements);
                         errorAlreadyPrinted = true;
                     }
                     if (missingLeaderAchievements.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
+                        ChatHandler(User()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
                         PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
                         errorAlreadyPrinted = true;
                     }
 
                     if (missingPlayerItems.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
+                        ChatHandler(User()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
                         PrettyPrintRequirementsItemsList(missingPlayerItems);
                         errorAlreadyPrinted = true;
                     }
 
                     if (missingLeaderItems.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
+                        ChatHandler(User()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
                         PrettyPrintRequirementsItemsList(missingLeaderItems);
                         errorAlreadyPrinted = true;
                     }
 
                     if (ilvlRequirementNotMet)
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
+                        ChatHandler(User()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
                     }
 
                     if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        User()->SendAreaTriggerMessage(User()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                     }
                     else if (LevelMax)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                        User()->SendAreaTriggerMessage(User()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
                     }
                     else if (mapDiff->hasErrorMessage && !errorAlreadyPrinted)
                     {
@@ -6949,7 +6949,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 uint32 optionalStringID = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID);
                 if (optionalStringID > 0)
                 {
-                    ChatHandler(GetSession()).SendSysMessage(optionalStringID);
+                    ChatHandler(User()).SendSysMessage(optionalStringID);
                 }
             }
             return false;
@@ -7019,7 +7019,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
 
         // accept saved data only for valid position (and non instanceable), and accessable
         if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
-            !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
+            !bindMapEntry->Instanceable() && User()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else
         {
@@ -7111,14 +7111,14 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     m_achievementMgr->SaveToDB(trans);
     m_reputationMgr->SaveToDB(trans);
     _SaveEquipmentSets(trans);
-    GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
+    User()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
     _SavePlayerSettings(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
-    if (m_session->CharacterLoggingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
+    if (m_user->CharacterLoggingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
 
     // save pet (hunter pet level and experience and all type pets health/mana).

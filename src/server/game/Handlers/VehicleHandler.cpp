@@ -21,9 +21,9 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
+void User::HandleDismissControlledVehicle(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 
@@ -55,7 +55,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
     m_player->ExitVehicle();
 }
 
-void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
+void User::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE");
 
@@ -137,7 +137,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
+void User::HandleEnterPlayerVehicle(WorldPacket& data)
 {
     // Read guid
     ObjectGuid guid;
@@ -159,7 +159,7 @@ void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
     }
 }
 
-void WorldSession::HandleEjectPassenger(WorldPacket& data)
+void User::HandleEjectPassenger(WorldPacket& data)
 {
     Vehicle* vehicle = m_player->GetVehicleKit();
     if (!vehicle)
@@ -223,7 +223,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
         LOG_ERROR("network.opcode", "HandleEjectPassenger: Player {} tried to eject invalid {}", GetPlayer()->GetGUID().ToString(), guid.ToString());
 }
 
-void WorldSession::HandleRequestVehicleExit(WorldPacket& /*recvData*/)
+void User::HandleRequestVehicleExit(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_REQUEST_VEHICLE_EXIT");
 

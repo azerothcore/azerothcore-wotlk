@@ -23,7 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
+#include "User.h"
 
 enum CreatureTextRange
 {
@@ -139,7 +139,7 @@ public:
 
     void operator()(Player* player)
     {
-        LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+        LocaleConstant loc_idx = player->User()->GetSessionDbLocaleIndex();
         WorldPacket* messageTemplate;
         std::size_t whisperGUIDpos;
 
@@ -233,8 +233,8 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
             }
         case TEXT_RANGE_WORLD:
             {
-                SessionMap const& smap = sWorld->GetAllSessions();
-                for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
+                UserMap const& smap = sWorld->GetAllUsers();
+                for (UserMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
                     if (Player* player = itr->second->GetPlayer())
                         if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
                             localizer(player);

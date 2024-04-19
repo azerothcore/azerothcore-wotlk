@@ -26,7 +26,7 @@
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "icecrown_citadel.h"
 
 enum EventIds
@@ -1468,7 +1468,7 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
-            if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
+            if (player && player->User() && player->User()->GetSecurity() >= SEC_MODERATOR)
             {
                 return true;
             }

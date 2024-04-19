@@ -3300,7 +3300,7 @@ public:
             if (!player->GetGroup() || !player->GetGroup()->isRaidGroup() || !player->GetGroup()->IsLeader(player->GetGUID()))
             {
                 CloseGossipMenuFor(player);
-                ChatHandler(player->GetSession()).PSendSysMessage("Only the raid leader can turn off the buff.");
+                ChatHandler(player->User()).PSendSysMessage("Only the raid leader can turn off the buff.");
                 return true;
             }
             if (InstanceScript* inst = creature->GetInstanceScript())

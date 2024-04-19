@@ -194,7 +194,7 @@ public:
         {
             playerTarget->resetSpells(/* bool myClassOnly */);
 
-            ChatHandler(playerTarget->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
+            ChatHandler(playerTarget->User()).SendSysMessage(LANG_RESET_SPELLS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != playerTarget)
                 handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(playerTarget).c_str());
         }
@@ -250,7 +250,7 @@ public:
         {
             targetPlayer->resetTalents(true);
             targetPlayer->SendTalentsInfoData(false);
-            ChatHandler(targetPlayer->GetSession()).SendSysMessage(LANG_RESET_TALENTS);
+            ChatHandler(targetPlayer->User()).SendSysMessage(LANG_RESET_TALENTS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != targetPlayer)
                 handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(targetPlayer).c_str());
 

@@ -29,7 +29,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
-#include "WorldSession.h"
+#include "User.h"
 
 BossBoundaryData::~BossBoundaryData()
 {
@@ -602,7 +602,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 
         instance->DoForAllPlayers([&, buff](Player* player)
         {
-            player->GetSession()->SendNotification("%s", buff);
+            player->User()->SendNotification("%s", buff);
         });
     }
 }

@@ -14,31 +14,31 @@
 typedef std::map<ObjectGuid, FriendList*> FRIENDLISTMAP_T;
 
 
-static BOOL AddFriendHandler (WorldSession* ses,
+static BOOL AddFriendHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg);
-static BOOL AddIgnoreHandler (WorldSession* ses,
+static BOOL AddIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg);
-static BOOL ContactListHandler (WorldSession* ses,
+static BOOL ContactListHandler (User*         user,
                                 Opcodes       msgId,
                                 uint32_t      eventTime,
                                 WorldPacket*  msg);
-static BOOL DeleteFriendHandler (WorldSession*  ses,
-                                 Opcodes        msgId,
-                                 uint32_t       eventTime,
-                                 WorldPacket*   msg);
-static BOOL DelIgnoreHandler (WorldSession* ses,
+static BOOL DeleteFriendHandler (User*        user,
+                                 Opcodes      msgId,
+                                 uint32_t     eventTime,
+                                 WorldPacket* msg);
+static BOOL DelIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg);
-static BOOL SetFriendNotesHandler (WorldSession*  ses,
-                                   Opcodes        msgId,
-                                   uint32_t       eventTime,
-                                   WorldPacket*   msg);
-static BOOL WhoIsHandler (WorldSession* ses,
+static BOOL SetFriendNotesHandler (User*        user,
+                                   Opcodes      msgId,
+                                   uint32_t     eventTime,
+                                   WorldPacket* msg);
+static BOOL WhoIsHandler (User*         user,
                           Opcodes       msgId,
                           uint32_t      eventTime,
                           WorldPacket*  msg);
@@ -75,7 +75,7 @@ FriendList::FriendList (Player* plr) {
       msg << plr->GetAreaId();
       msg << (uint32_t)plr->GetLevel();
       msg << (uint32_t)plr->getClass();
-      it->second->m_playerPtr->GetSession()->Send(&msg);
+      it->second->m_playerPtr->User()->Send(&msg);
     }
   }
 }
@@ -295,7 +295,7 @@ void FriendList::AddContacts () {
     results->NextRow();
   }
 
-  m_playerPtr->GetSession()->Send(&msg);
+  m_playerPtr->User()->Send(&msg);
 }
 
 //===========================================================================
@@ -447,7 +447,7 @@ void FriendList::SendContactList (uint32_t flags) {
     msg << CONTACT_MUTED;
   }
 
-  m_playerPtr->GetSession()->Send(&msg);
+  m_playerPtr->User()->Send(&msg);
 }
 
 //===========================================================================
@@ -469,7 +469,7 @@ void FriendList::SendFriendStatus (FRIEND_RESULT res, ObjectGuid guid) {
     }
   }
 
-  m_playerPtr->GetSession()->Send(&msg);
+  m_playerPtr->User()->Send(&msg);
 }
 
 //===========================================================================
@@ -501,12 +501,12 @@ void FriendList::SetFriendNotes (ObjectGuid const& guid, char const* notes) {
 ***/
 
 //===========================================================================
-static BOOL AddFriendHandler (WorldSession* ses,
+static BOOL AddFriendHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg) {
 
-  Player* plr = ses->ActivePlayer();
+  Player* plr = user->ActivePlayer();
   if (!plr) {
     return FALSE;
   }
@@ -523,12 +523,12 @@ static BOOL AddFriendHandler (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL AddIgnoreHandler (WorldSession* ses,
+static BOOL AddIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg) {
 
-  FriendList* friendList = ses->ActivePlayer()->FriendListPtr();
+  FriendList* friendList = user->ActivePlayer()->FriendListPtr();
 
   // Read the message data
   char name[256];
@@ -548,12 +548,12 @@ static BOOL AddIgnoreHandler (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL ContactListHandler (WorldSession* ses,
+static BOOL ContactListHandler (User*         user,
                                 Opcodes       msgId,
                                 uint32_t      eventTime,
                                 WorldPacket*  msg) {
 
-  Player* plr = ses->ActivePlayer();
+  Player* plr = user->ActivePlayer();
   if (!plr) {
     return FALSE;
   }
@@ -566,12 +566,12 @@ static BOOL ContactListHandler (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL DeleteFriendHandler (WorldSession*  ses,
-                                 Opcodes        msgId,
-                                 uint32_t       eventTime,
-                                 WorldPacket*   msg) {
+static BOOL DeleteFriendHandler (User*        user,
+                                 Opcodes      msgId,
+                                 uint32_t     eventTime,
+                                 WorldPacket* msg) {
 
-  Player* plr = ses->ActivePlayer();
+  Player* plr = user->ActivePlayer();
   if (!plr) {
     return FALSE;
   }
@@ -591,12 +591,12 @@ static BOOL DeleteFriendHandler (WorldSession*  ses,
 }
 
 //===========================================================================
-static BOOL DelIgnoreHandler (WorldSession* ses,
+static BOOL DelIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
                               WorldPacket*  msg) {
 
-  Player* plr = ses->ActivePlayer();
+  Player* plr = user->ActivePlayer();
   if (!plr) {
     return FALSE;
   }
@@ -610,12 +610,12 @@ static BOOL DelIgnoreHandler (WorldSession* ses,
 }
 
 //===========================================================================
-static BOOL SetFriendNotesHandler (WorldSession*  ses,
-                                   Opcodes        msgId,
-                                   uint32_t       eventTime,
-                                   WorldPacket*   msg) {
+static BOOL SetFriendNotesHandler (User*        user,
+                                   Opcodes      msgId,
+                                   uint32_t     eventTime,
+                                   WorldPacket* msg) {
 
-  Player* plr = ses->ActivePlayer();
+  Player* plr = user->ActivePlayer();
   if (!plr) {
     return FALSE;
   }
@@ -638,13 +638,13 @@ static BOOL SetFriendNotesHandler (WorldSession*  ses,
 }
 
 //===========================================================================
-static BOOL WhoIsHandler (WorldSession* ses,
+static BOOL WhoIsHandler (User*         user,
                           Opcodes       msgId,
                           uint32_t      eventTime,
                           WorldPacket*  msg) {
 
-  if (!ses->IsGMAccount()) {
-    ses->SendNotification(LANG_PERMISSION_DENIED);
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
     return FALSE;
   }
 
@@ -660,13 +660,13 @@ static BOOL WhoIsHandler (WorldSession* ses,
   // and copy its account name to the response buffer
   Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
   if (playerPtr) {
-    strcpy(szResponse, playerPtr->GetSession()->GetAccountName());
+    strcpy(szResponse, playerPtr->User()->GetAccountName());
   }
 
   // Send the response
   WorldPacket outbound(SMSG_WHOIS, strlen(szResponse) + 1);
   outbound << szResponse;
-  ses->Send(&outbound);
+  user->Send(&outbound);
 
   return TRUE;
 }

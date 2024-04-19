@@ -25,7 +25,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
+#include "User.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used by items.
  * Ordered alphabetically using scriptname.
@@ -74,7 +74,7 @@ class spell_item_titanium_seal_of_dalaran : public SpellScript
         Unit* caster = GetCaster();
         if (Player* player = caster->ToPlayer())
         {
-            LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant loc_idx = player->User()->GetSessionDbLocaleIndex();
             if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP))
                 player->TextEmote(bct->GetText(loc_idx, player->getGender()));
             if (urand(0, 1))
@@ -618,7 +618,7 @@ class spell_item_feast : public SpellScript
         Unit* caster = GetCaster();
         if (Player* player = caster->ToPlayer())
         {
-            LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant loc_idx = player->User()->GetSessionDbLocaleIndex();
 
             switch(GetSpellInfo()->Id)
             {

@@ -142,7 +142,7 @@ class spell_the_flag_of_ownership : public SpellScript
             return;
         caster->CastSpell(target, SPELL_TAUNT_FLAG, true);
 
-        LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
+        LocaleConstant loc_idx = caster->ToPlayer()->User()->GetSessionDbLocaleIndex();
         BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
         std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
         caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
@@ -1997,7 +1997,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
             {
                 WorldPacket data;
                 player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 7744, GetSpellInfo()->CategoryRecoveryTime); // Will of the forsaken
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
             }
             else
             {
@@ -2010,11 +2010,11 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
                 data << uint16(GetSpellInfo()->GetCategory());                   // spell category
                 data << uint32(0);
                 data << uint32(GetSpellInfo()->CategoryRecoveryTime);
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
 
                 WorldPacket data2;
                 player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
-                player->GetSession()->Send(&data2);
+                player->User()->Send(&data2);
             }
         }
     }
@@ -2677,7 +2677,7 @@ class spell_gen_spirit_healer_res : public SpellScript
         {
             WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
             data << target->GetGUID();
-            originalCaster->GetSession()->Send(&data);
+            originalCaster->User()->Send(&data);
         }
     }
 

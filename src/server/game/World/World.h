@@ -157,16 +157,16 @@ public:
 
     static uint32 m_worldLoopCounter;
 
-    [[nodiscard]] WorldSession* FindSession(uint32 id) const override;
-    [[nodiscard]] WorldSession* FindOfflineSession(uint32 id) const override;
-    [[nodiscard]] WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const override;
-    void AddSession(WorldSession* s) override;
-    bool KickSession(uint32 id) override;
+    [[nodiscard]] User* FindUser(uint32 id) const override;
+    [[nodiscard]] User* FindOfflineUser(uint32 id) const override;
+    [[nodiscard]] User* FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const override;
+    void AddUser(User* user) override;
+    bool KickUser(uint32 id) override;
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters() override;
-    [[nodiscard]] const SessionMap& GetAllSessions() const override { return _sessions; }
-    [[nodiscard]] uint32 GetActiveAndQueuedSessionCount() const override { return _sessions.size(); }
-    [[nodiscard]] uint32 GetActiveSessionCount() const override { return _sessions.size() - _queuedPlayer.size(); }
+    [[nodiscard]] const UserMap& GetAllUsers() const override { return m_users; }
+    [[nodiscard]] uint32 GetActiveAndQueuedSessionCount() const override { return m_users.size(); }
+    [[nodiscard]] uint32 GetActiveSessionCount() const override { return m_users.size() - _queuedPlayer.size(); }
     [[nodiscard]] uint32 GetQueuedSessionCount() const override { return _queuedPlayer.size(); }
     /// Get the maximum number of parallel sessions on the server since last reboot
     [[nodiscard]] uint32 GetMaxQueuedSessionCount() const override { return _maxQueuedSessionCount; }
@@ -201,11 +201,11 @@ public:
     [[nodiscard]] uint32 GetPlayerAmountLimit() const override { return _playerLimit; }
 
     //player Queue
-    typedef std::list<WorldSession*> Queue;
-    void AddQueuedPlayer(WorldSession*) override;
-    bool RemoveQueuedPlayer(WorldSession* session) override;
-    int32 GetQueuePos(WorldSession*) override;
-    bool HasRecentlyDisconnected(WorldSession*) override;
+    typedef std::list<User*> Queue;
+    void AddQueuedPlayer(User*) override;
+    bool RemoveQueuedPlayer(User* session) override;
+    int32 GetQueuePos(User*) override;
+    bool HasRecentlyDisconnected(User*) override;
 
     /// \todo Actions on m_allowMovement still to be implemented
     /// Is movement allowed?
@@ -240,10 +240,10 @@ public:
 
     void SendWorldText(uint32 string_id, ...) override;
     void SendGMText(uint32 string_id, ...) override;
-    void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    void SendGlobalMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    void SendGlobalGMMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    void SendZoneText(uint32 zone, const char* text, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) override;
 
     void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override;
@@ -260,7 +260,7 @@ public:
 
     void Update(uint32 diff) override;
 
-    void UpdateSessions(uint32 diff) override;
+    void UpdateUsers(uint32 diff) override;
     /// Set a server rate (see #Rates)
     void setRate(Rates rate, float value) override { _rate_values[rate] = value; }
     /// Get a server rate (see #Rates)
@@ -380,8 +380,8 @@ private:
     IntervalTimer _timers[WUPDATE_COUNT];
     Seconds _mail_expire_check_timer;
 
-    SessionMap _sessions;
-    SessionMap _offlineSessions;
+    UserMap m_users;
+    UserMap m_offlineUsers;
     typedef std::unordered_map<uint32, time_t> DisconnectMap;
     DisconnectMap _disconnects;
     uint32 _maxActiveSessionCount;
@@ -427,8 +427,8 @@ private:
     Queue _queuedPlayer;
 
     // sessions that are added async
-    void AddSession_(WorldSession* s);
-    LockedQueue<WorldSession*> _addSessQueue;
+    void AddUser_(User* user);
+    LockedQueue<User*> m_pendingUsers;
 
     // used versions
     std::string _dbVersion;
@@ -441,7 +441,7 @@ private:
      *
      * @param session The World Session that we are finalizing.
      */
-    inline void FinalizePlayerWorldSession(WorldSession* session);
+    inline void FinalizePlayerWorldSession(User* session);
 };
 
 std::unique_ptr<IWorld>& getWorldInstance();

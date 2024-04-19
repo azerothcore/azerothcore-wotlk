@@ -23,7 +23,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -422,16 +422,20 @@ class spell_madrigosa_activate_barrier : public SpellScript
             go->SetGoState(GO_STATE_READY);
             if (Map* map = go->GetMap())
             {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (i->GetSource())
-                    {
-                        UpdateData data;
-                        WorldPacket pkt;
-                        go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                        data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->Send(&pkt);
-                    }
+                go->SetGoState(GO_STATE_READY);
+                if (Map* map = go->GetMap())
+                {
+                    Map::PlayerList const& PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (i->GetSource())
+                        {
+                            UpdateData data;
+                            WorldPacket pkt;
+                            go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
+                            data.BuildPacket(pkt);
+                            i->GetSource()->User()->Send(&pkt);
+                        }
+                }
             }
         }
     }
@@ -454,16 +458,20 @@ class spell_madrigosa_deactivate_barrier : public SpellScript
             go->SetGoState(GO_STATE_ACTIVE);
             if (Map* map = go->GetMap())
             {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (i->GetSource())
-                    {
-                        UpdateData data;
-                        WorldPacket pkt;
-                        go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                        data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->Send(&pkt);
-                    }
+                go->SetGoState(GO_STATE_ACTIVE);
+                if (Map* map = go->GetMap())
+                {
+                    Map::PlayerList const& PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (i->GetSource())
+                        {
+                            UpdateData data;
+                            WorldPacket pkt;
+                            go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
+                            data.BuildPacket(pkt);
+                            i->GetSource()->User()->Send(&pkt);
+                        }
+                }
             }
         }
     }

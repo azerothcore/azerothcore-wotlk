@@ -27,9 +27,9 @@
 #include "SpellMgr.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
+void User::HandleSplitItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SPLIT_ITEM");
     uint8 srcbag, srcslot, dstbag, dstslot;
@@ -61,7 +61,7 @@ void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
     m_player->SplitItem(src, dst, count);
 }
 
-void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
+void User::HandleSwapInvItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SWAP_INV_ITEM");
     uint8 srcslot, dstslot;
@@ -102,7 +102,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
     m_player->SwapItem(src, dst);
 }
 
-void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
+void User::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
 {
     ObjectGuid itemguid;
     uint8 dstslot;
@@ -121,7 +121,7 @@ void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
     m_player->SwapItem(item->GetPos(), dstpos);
 }
 
-void WorldSession::HandleSwapItem(WorldPacket& recvData)
+void User::HandleSwapItem(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SWAP_ITEM");
     uint8 dstbag, dstslot, srcbag, srcslot;
@@ -162,7 +162,7 @@ void WorldSession::HandleSwapItem(WorldPacket& recvData)
     m_player->SwapItem(src, dst);
 }
 
-void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
+void User::HandleAutoEquipItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_AUTOEQUIP_ITEM");
     uint8 srcbag, srcslot;
@@ -292,7 +292,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
+void User::HandleDestroyItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_DESTROYITEM");
     uint8 bag, slot, count, data1, data2, data3;
@@ -533,7 +533,7 @@ void ItemTemplate::InitializeQueryData()
 }
 
 // Only _static_ data send in this packet !!!
-void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
+void User::HandleItemQuerySingleOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_ITEM_QUERY_SINGLE");
     uint32 item;
@@ -692,7 +692,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleReadItem(WorldPacket& recvData)
+void User::HandleReadItem(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_READ_ITEM");
 
@@ -725,7 +725,7 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
         m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
 }
 
-void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
+void User::HandleSellItemOpcode(WorldPacket& recvData)
 {
     ObjectGuid vendorguid, itemguid;
     uint32 count;
@@ -905,7 +905,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
     return;
 }
 
-void WorldSession::HandleBuybackItem(WorldPacket& recvData)
+void User::HandleBuybackItem(WorldPacket& recvData)
 {
     ObjectGuid vendorguid;
     uint32 slot;
@@ -960,7 +960,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
         m_player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, 0, 0);
 }
 
-void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
+void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 {
     ObjectGuid vendorguid, bagguid;
     uint32 item, slot, count;
@@ -1001,7 +1001,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
     GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, bag, bagslot);
 }
 
-void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
+void User::HandleBuyItemOpcode(WorldPacket& recvData)
 {
     ObjectGuid vendorguid;
     uint32 item, slot, count;
@@ -1018,7 +1018,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
     GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, NULL_BAG, NULL_SLOT);
 }
 
-void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
+void User::HandleListInventoryOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
 
@@ -1032,7 +1032,7 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
+void User::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_LIST_INVENTORY");
 
@@ -1141,7 +1141,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     Send(&data);
 }
 
-void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
+void User::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_AUTOSTORE_BAG_ITEM");
     uint8 srcbag, srcslot, dstbag;
@@ -1192,7 +1192,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
     m_player->UpdateTitansGrip();
 }
 
-void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
+void User::HandleSetAmmoOpcode(WorldPacket& recvData)
 {
     if (!m_player->IsAlive())
     {
@@ -1219,7 +1219,7 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
         m_player->RemoveAmmo();
 }
 
-void WorldSession::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId)
+void User::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
     data << target.WriteAsPacked();
@@ -1229,7 +1229,7 @@ void WorldSession::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration)
+void User::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration)
 {
     // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
@@ -1240,7 +1240,7 @@ void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid I
     Send(&data);
 }
 
-void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
+void User::HandleItemNameQueryOpcode(WorldPacket& recvData)
 {
     uint32 itemid;
     recvData >> itemid;
@@ -1264,7 +1264,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
+void User::HandleWrapItemOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_WRAP_ITEM");
 
@@ -1397,7 +1397,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     m_player->DestroyItemCount(gift, count, true);
 }
 
-void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
+void User::HandleSocketOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SOCKET_GEMS");
 
@@ -1595,7 +1595,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     itemTarget->SendUpdateSockets();
 }
 
-void WorldSession::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
+void User::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_CANCEL_TEMP_ENCHANTMENT");
 
@@ -1619,7 +1619,7 @@ void WorldSession::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
     item->ClearEnchantment(TEMP_ENCHANTMENT_SLOT);
 }
 
-void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
+void User::HandleItemRefundInfoRequest(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND_INFO");
 
@@ -1636,7 +1636,7 @@ void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
     GetPlayer()->SendRefundInfo(item);
 }
 
-void WorldSession::HandleItemRefund(WorldPacket& recvData)
+void User::HandleItemRefund(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND");
     ObjectGuid guid;
@@ -1661,7 +1661,7 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
  *
  * This function is called when player clicks on item which has some flag set
  */
-void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
+void User::HandleItemTextQuery(WorldPacket& recvData )
 {
     ObjectGuid itemGuid;
     recvData >> itemGuid;
@@ -1684,7 +1684,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     Send(&data);
 }
 
-bool WorldSession::recoveryItem(Item* pItem)
+bool User::recoveryItem(Item* pItem)
 {
     if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
             && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)

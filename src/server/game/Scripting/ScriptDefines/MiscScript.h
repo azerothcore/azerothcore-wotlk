@@ -75,7 +75,7 @@ public:
 
     [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendAuctionHello(WorldSession const* /*session*/, ObjectGuid /*guid*/, Creature* /*creature*/) { return true; }
+    [[nodiscard]] virtual bool CanSendAuctionHello(User const* /*session*/, ObjectGuid /*guid*/, Creature* /*creature*/) { return true; }
 
     virtual void ValidateSpellAtCastSpell(Player* /*player*/, uint32& /*oldSpellId*/, uint32& /*spellId*/, uint8& /*castCount*/, uint8& /*castFlags*/) { }
 

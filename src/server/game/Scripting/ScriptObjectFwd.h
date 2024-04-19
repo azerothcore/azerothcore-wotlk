@@ -73,7 +73,7 @@ class Vehicle;
 class Weather;
 class WorldObject;
 class WorldPacket;
-class WorldSession;
+class User;
 class WorldSocket;
 
 enum ArenaTeamInfoType : uint8;

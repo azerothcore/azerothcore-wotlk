@@ -22,7 +22,7 @@
 #include "SRP6.h"
 #include "ScriptMgr.h"
 #include "Util.h"
-#include "WorldSession.h"
+#include "User.h"
 
 namespace AccountMgr
 {
@@ -85,7 +85,7 @@ namespace AccountMgr
                 // Kick if player is online
                 if (Player* p = ObjectAccessor::FindPlayer(guid))
                 {
-                    WorldSession* s = p->GetSession();
+                    User* s = p->User();
                     s->KickPlayer("Delete account");            // mark session to remove at next session list update
                     s->CharacterRemoveFromGame(false);                     // logout player without waiting next session list update
                 }

@@ -31,7 +31,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 
@@ -61,7 +61,7 @@ public:
             return false;
 
         std::string name("Console");
-        if (WorldSession* session = handler->GetSession())
+        if (User* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
         sWorld->SendWorldText(LANG_ANNOUNCE_COLOR, name.c_str(), message.data());
@@ -74,7 +74,7 @@ public:
             return false;
 
         std::string name("Console");
-        if (WorldSession* session = handler->GetSession())
+        if (User* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_COLOR, name.c_str(), message.data());

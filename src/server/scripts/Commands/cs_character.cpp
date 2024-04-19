@@ -35,7 +35,7 @@ EndScriptData */
 #include "ReputationMgr.h"
 #include "Timer.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "User.h"
 
 using namespace Acore::ChatCommands;
 
@@ -257,11 +257,11 @@ public:
             if (handler->needReportToTarget(player))
             {
                 if (oldLevel == newLevel)
-                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET, handler->GetNameLink().c_str());
+                    ChatHandler(player->User()).PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET, handler->GetNameLink().c_str());
                 else if (oldLevel < newLevel)
-                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_UP, handler->GetNameLink().c_str(), newLevel);
+                    ChatHandler(player->User()).PSendSysMessage(LANG_YOURS_LEVEL_UP, handler->GetNameLink().c_str(), newLevel);
                 else                                                // if (oldlevel > newlevel)
-                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, handler->GetNameLink().c_str(), newLevel);
+                    ChatHandler(player->User()).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, handler->GetNameLink().c_str(), newLevel);
             }
         }
         else
@@ -386,7 +386,7 @@ public:
 
                 ObjectAccessor::UpdatePlayerNameMapReference(player->GetName(), target);
 
-                if (WorldSession* session = target->GetSession())
+                if (User* session = target->User())
                     session->KickPlayer("HandleCharacterRenameCommand GM Command renaming character");
             }
             else
@@ -734,8 +734,8 @@ public:
         uint32 accountId;
         if (Player* target = player.GetConnectedPlayer())
         {
-            accountId = target->GetSession()->GetAccountId();
-            target->GetSession()->KickPlayer("HandleCharacterEraseCommand GM Command deleting character");
+            accountId = target->User()->GetAccountId();
+            target->User()->KickPlayer("HandleCharacterEraseCommand GM Command deleting character");
         }
         else
         {
@@ -1076,7 +1076,7 @@ public:
 
             if (player->IsConnected())
             {
-                player->GetConnectedPlayer()->GetSession()->KickPlayer("CMD char changeaccount");
+                player->GetConnectedPlayer()->User()->KickPlayer("CMD char changeaccount");
             }
 
             CharacterDatabase.Query("UPDATE characters SET account = {} WHERE guid = {}", accountId, player->GetGUID().GetCounter());

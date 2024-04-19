@@ -23,7 +23,7 @@
 #include "Warden.h"
 #include <map>
 
-class WorldSession;
+class User;
 class Warden;
 
 class WardenMac : public Warden
@@ -32,7 +32,7 @@ public:
     WardenMac();
     ~WardenMac() override;
 
-    void Init(WorldSession* session, SessionKey const& k) override;
+    void Init(User* session, SessionKey const& k) override;
     ClientWardenModule* GetModuleForClient() override;
     void InitializeModule() override;
     void RequestHash() override;

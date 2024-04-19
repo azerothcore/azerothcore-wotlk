@@ -681,7 +681,7 @@ public:
             if (!player)
                 return false;
 
-            accountId = player->GetSession()->GetAccountId();
+            accountId = player->User()->GetAccountId();
             AccountMgr::GetName(accountId, accountName);
             exp = account;
         }
@@ -769,7 +769,7 @@ public:
         }
 
         // handler->getSession() == nullptr only for console
-        targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
+        targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->User()->GetAccountId();
         int32 gmRealmID = (isAccountNameGiven) ? Acore::StringTo<int32>(arg3).value_or(0) : Acore::StringTo<int32>(arg2).value_or(0);
         uint32 playerSecurity;
         if (handler->GetSession())

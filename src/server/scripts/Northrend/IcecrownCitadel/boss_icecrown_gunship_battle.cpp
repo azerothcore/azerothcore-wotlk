@@ -2365,7 +2365,7 @@ public:
                         WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
                         data << GetUnitOwner()->GetPackGUID();
                         data << uint8(value);
-                        player->GetSession()->Send(&data);
+                        player->User()->Send(&data);
                     }
                 }
             }

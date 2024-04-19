@@ -23,7 +23,7 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
 const int32 ReputationMgr::Reputation_Cap    =  42999;
@@ -251,7 +251,7 @@ void ReputationMgr::SendStates()
 
 void ReputationMgr::SendVisible(FactionState const* faction) const
 {
-    if (m_player->GetSession()->PlayerLoading())
+    if (m_player->User()->PlayerLoading())
         return;
 
     // make faction visible in reputation list at client

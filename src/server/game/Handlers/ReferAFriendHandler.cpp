@@ -18,9 +18,9 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "User.h"
 
-void WorldSession::HandleGrantLevel(WorldPacket& recvData)
+void User::HandleGrantLevel(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 
@@ -36,7 +36,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
         error = ERR_REFER_A_FRIEND_NO_TARGET;
     else if (levels == 0)
         error = ERR_REFER_A_FRIEND_INSUFFICIENT_GRANTABLE_LEVELS;
-    else if (GetRecruiterId() != target->GetSession()->GetAccountId())
+    else if (GetRecruiterId() != target->User()->GetAccountId())
         error = ERR_REFER_A_FRIEND_NOT_REFERRED_BY;
     else if (target->GetTeamId() != m_player->GetTeamId())
         error = ERR_REFER_A_FRIEND_DIFFERENT_FACTION;
@@ -60,10 +60,10 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
     data2 << m_player->GetPackGUID();
-    target->GetSession()->Send(&data2);
+    target->User()->Send(&data2);
 }
 
-void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
+void User::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 
@@ -74,7 +74,7 @@ void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
     if (!other)
         return;
 
-    if (GetAccountId() != other->GetSession()->GetRecruiterId())
+    if (GetAccountId() != other->User()->GetRecruiterId())
         return;
 
     if (other->GetGrantableLevels())

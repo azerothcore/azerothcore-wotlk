@@ -27,10 +27,10 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-    _dataSent(false), _module(nullptr), _initialized(false), _interrupted(false), _checkInProgress(false)
+                   _dataSent(false), _module(nullptr), _initialized(false), _interrupted(false), _checkInProgress(false)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
@@ -315,7 +315,7 @@ WardenPayloadMgr* Warden::GetPayloadMgr()
     return &_payloadMgr;
 }
 
-void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
+void User::HandleWardenDataOpcode(WorldPacket& recvData)
 {
     if (!_warden || recvData.empty())
         return;

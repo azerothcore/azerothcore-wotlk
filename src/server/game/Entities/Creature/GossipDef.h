@@ -23,7 +23,7 @@
 #include "Object.h"
 #include "QuestDef.h"
 
-class WorldSession;
+class User;
 class ObjectGuid;
 
 #define GOSSIP_MAX_MENU_ITEMS               32
@@ -257,7 +257,7 @@ private:
 class PlayerMenu
 {
 public:
-    explicit PlayerMenu(WorldSession* session);
+    explicit PlayerMenu(User* session);
     ~PlayerMenu();
 
     GossipMenu& GetGossipMenu() { return _gossipMenu; }
@@ -290,6 +290,6 @@ public:
 private:
     GossipMenu _gossipMenu;
     QuestMenu  _questMenu;
-    WorldSession* _session;
+    User* _session;
 };
 #endif

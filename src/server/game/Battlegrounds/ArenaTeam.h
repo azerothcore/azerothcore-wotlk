@@ -23,7 +23,7 @@
 #include <list>
 #include <map>
 
-class WorldSession;
+class User;
 class WorldPacket;
 class Player;
 class Group;
@@ -141,7 +141,7 @@ public:
     ~ArenaTeam();
 
     bool Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
-    void Disband(WorldSession* session);
+    void Disband(User* session);
     void Disband();
 
     typedef std::list<ArenaTeamMember> MemberList;
@@ -188,12 +188,12 @@ public:
     void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
     void NotifyStatsChanged();
 
-    void MassInviteToEvent(WorldSession* session);
+    void MassInviteToEvent(User* session);
 
-    void Roster(WorldSession* session);
-    void Query(WorldSession* session);
-    void SendStats(WorldSession* session);
-    void Inspect(WorldSession* session, ObjectGuid guid);
+    void Roster(User* session);
+    void Query(User* session);
+    void SendStats(User* session);
+    void Inspect(User* session, ObjectGuid guid);
 
     uint32 GetPoints(uint32 MemberRating);
     int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);

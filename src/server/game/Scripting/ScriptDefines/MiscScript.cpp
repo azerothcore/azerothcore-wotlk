@@ -74,7 +74,7 @@ bool ScriptMgr::CanItemApplyEquipSpell(Player* player, Item* item)
     CALL_ENABLED_BOOLEAN_HOOKS(MiscScript, MISCHOOK_CAN_ITEM_APPLY_EQUIP_SPELL, !script->CanItemApplyEquipSpell(player, item));
 }
 
-bool ScriptMgr::CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature)
+bool ScriptMgr::CanSendAuctionHello(User const* session, ObjectGuid guid, Creature* creature)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(MiscScript, MISCHOOK_CAN_SEND_AUCTIONHELLO, !script->CanSendAuctionHello(session, guid, creature));
 }

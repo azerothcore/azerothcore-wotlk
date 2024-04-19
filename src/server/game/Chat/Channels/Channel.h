@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include <list>
 #include <map>
 #include <string>

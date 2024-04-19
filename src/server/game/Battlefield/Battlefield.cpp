@@ -119,7 +119,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
         if (m_PlayersInWar[player->GetTeamId()].find(player->GetGUID()) != m_PlayersInWar[player->GetTeamId()].end())
         {
             m_PlayersInWar[player->GetTeamId()].erase(player->GetGUID());
-            player->GetSession()->SendBfLeaveMessage(m_BattleId);
+            player->User()->SendBfLeaveMessage(m_BattleId);
             if (Group* group = player->GetGroup()) // Remove the player from the raid group
                 if (group->isBFGroup())
                     group->RemoveMember(player->GetGUID());
@@ -232,7 +232,7 @@ void Battlefield::InvitePlayerToQueue(Player* player)
         return;
 
     if (m_PlayersInQueue[player->GetTeamId()].size() <= m_MinPlayer || m_PlayersInQueue[GetOtherTeam(player->GetTeamId())].size() >= m_MinPlayer)
-        player->GetSession()->SendBfInvitePlayerToQueue(m_BattleId);
+        player->User()->SendBfInvitePlayerToQueue(m_BattleId);
 }
 
 void Battlefield::InvitePlayersInQueueToWar()
@@ -302,7 +302,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
 
     m_PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
     m_InvitedPlayers[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + m_TimeForAcceptInvite;
-    player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
+    player->User()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
 }
 
 void Battlefield::InitStalker(uint32 entry, float x, float y, float z, float o)
@@ -388,30 +388,30 @@ bool Battlefield::HasPlayer(Player* player) const
     return m_players[player->GetTeamId()].find(player->GetGUID()) != m_players[player->GetTeamId()].end();
 }
 
-// Called in WorldSession::HandleBfQueueInviteResponse
+// Called in User::HandleBfQueueInviteResponse
 void Battlefield::PlayerAcceptInviteToQueue(Player* player)
 {
     // Add player in queue
     m_PlayersInQueue[player->GetTeamId()].insert(player->GetGUID());
     // Send notification
-    player->GetSession()->SendBfQueueInviteResponse(m_BattleId, m_ZoneId);
+    player->User()->SendBfQueueInviteResponse(m_BattleId, m_ZoneId);
 }
 
-// Called in WorldSession::HandleBfExitRequest
+// Called in User::HandleBfExitRequest
 void Battlefield::AskToLeaveQueue(Player* player)
 {
     // Remove player from queue
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
 }
 
-// Called in WorldSession::HandleHearthAndResurrect
+// Called in User::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
     // Player leaving Wintergrasp, trigger Hearthstone spell.
     player->CastSpell(player, 8690, true);
 }
 
-// Called in WorldSession::HandleBfEntryInviteResponse
+// Called in User::HandleBfEntryInviteResponse
 void Battlefield::PlayerAcceptInviteToWar(Player* player)
 {
     if (!IsWarTime())
@@ -419,7 +419,7 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
 
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
-        player->GetSession()->SendBfEntered(m_BattleId);
+        player->User()->SendBfEntered(m_BattleId);
         m_PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
         m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
 
@@ -451,7 +451,7 @@ void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->Send(data);
+                player->User()->Send(data);
 }
 
 void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
@@ -459,7 +459,7 @@ void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInQueue[team].begin(); itr != m_PlayersInQueue[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->Send(data);
+                player->User()->Send(data);
 }
 
 void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
@@ -467,7 +467,7 @@ void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->Send(data);
+                player->User()->Send(data);
 }
 
 void Battlefield::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
@@ -656,7 +656,7 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const ObjectGu
 
     data << guid << time;
     ASSERT(player);
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 // ----------------------

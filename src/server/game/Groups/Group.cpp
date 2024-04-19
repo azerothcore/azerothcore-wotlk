@@ -39,14 +39,14 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "User.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
-    itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
-    totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
-    rollVoteMask(ROLL_ALL_TYPE_NO_DISENCHANT)
+                                                   itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
+                                                   totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
+                                                   rollVoteMask(ROLL_ALL_TYPE_NO_DISENCHANT)
 {
 }
 
@@ -581,14 +581,14 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             if (method == GROUP_REMOVEMETHOD_KICK || method == GROUP_REMOVEMETHOD_KICK_LFG)
             {
                 data.Initialize(SMSG_GROUP_UNINVITE, 0);
-                player->GetSession()->Send(&data);
+                player->User()->Send(&data);
             }
 
             // Do we really need to send this opcode?
             data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
             data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
             data << m_guid << uint32(m_counter) << uint32(0) << uint64(0);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
 
         // Remove player from group in DB
@@ -800,7 +800,7 @@ void Group::Disband(bool hideDestroy /* = false */)
         if (!hideDestroy)
         {
             data.Initialize(SMSG_GROUP_DESTROYED, 0);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
 
         //we already removed player from group and in player->GetGroup() is his original group, send update
@@ -813,7 +813,7 @@ void Group::Disband(bool hideDestroy /* = false */)
             data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
             data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
             data << m_guid << uint32(m_counter) << uint32(0) << uint64(0);
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
         }
     }
     RollId.clear();
@@ -871,7 +871,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
             continue;
 
         if (itr->second == NOT_EMITED_YET)
-            p->GetSession()->Send(&data);
+            p->User()->Send(&data);
     }
 }
 
@@ -894,7 +894,7 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
         voteMask &= ~ROLL_FLAG_TYPE_NEED;
     data << uint8(voteMask);                                // roll type mask
 
-    p->GetSession()->Send(&data);
+    p->User()->Send(&data);
 }
 
 void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll, bool autoPass)
@@ -917,7 +917,7 @@ void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rol
             continue;
 
         if (itr->second != NOT_VALID)
-            p->GetSession()->Send(&data);
+            p->User()->Send(&data);
     }
 }
 
@@ -940,7 +940,7 @@ void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 
             continue;
 
         if (itr->second != NOT_VALID)
-            p->GetSession()->Send(&data);
+            p->User()->Send(&data);
     }
 }
 
@@ -960,7 +960,7 @@ void Group::SendLootAllPassed(Roll const& roll)
             continue;
 
         if (itr->second != NOT_VALID)
-            player->GetSession()->Send(&data);
+            player->User()->Send(&data);
     }
 }
 
@@ -1029,7 +1029,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
-                if (!member || !member->GetSession())
+                if (!member || !member->User())
                     continue;
                 if (member->IsAtLootRewardDistance(pLootedObject))
                 {
@@ -1114,7 +1114,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (!member || !member->GetSession())
+            if (!member || !member->User())
                 continue;
 
             if (member->IsAtLootRewardDistance(pLootedObject))
@@ -1176,7 +1176,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* playerToRoll = itr->GetSource();
-                if (!playerToRoll || !playerToRoll->GetSession())
+                if (!playerToRoll || !playerToRoll->User())
                     continue;
 
                 if (playerToRoll->IsAtGroupRewardDistance(lootedObject))
@@ -1251,7 +1251,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* playerToRoll = itr->GetSource();
-            if (!playerToRoll || !playerToRoll->GetSession())
+            if (!playerToRoll || !playerToRoll->User())
                 continue;
 
             if (playerToRoll->IsAtGroupRewardDistance(lootedObject))
@@ -1352,7 +1352,7 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 
     for (Player* looter : looters)
     {
-        looter->GetSession()->Send(&data);
+        looter->User()->Send(&data);
     }
 }
 
@@ -1641,7 +1641,7 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid)
     BroadcastPacket(&data, true);
 }
 
-void Group::SendTargetIconList(WorldSession* session)
+void Group::SendTargetIconList(User* session)
 {
     if (!session)
         return;
@@ -1706,7 +1706,7 @@ void Group::SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot)
 
         Player* member = ObjectAccessor::FindConnectedPlayer(citr->guid);
 
-        uint8 onlineState = (member && !member->GetSession()->CharacterLoggingOut()) ? MEMBER_STATUS_ONLINE : MEMBER_STATUS_OFFLINE;
+        uint8 onlineState = (member && !member->User()->CharacterLoggingOut()) ? MEMBER_STATUS_ONLINE : MEMBER_STATUS_OFFLINE;
         onlineState = onlineState | ((isBGGroup() || isBFGroup()) ? MEMBER_STATUS_PVP : 0);
 
         data << citr->name;
@@ -1734,7 +1734,7 @@ void Group::SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot)
         data << uint8(m_raidDifficulty >= RAID_DIFFICULTY_10MAN_HEROIC);    // 3.3 Dynamic Raid Difficulty - 0 normal/1 heroic
     }
 
-    player->GetSession()->Send(&data);
+    player->User()->Send(&data);
 }
 
 void Group::UpdatePlayerOutOfRange(Player* player)
@@ -1743,13 +1743,13 @@ void Group::UpdatePlayerOutOfRange(Player* player)
         return;
 
     WorldPacket data;
-    player->GetSession()->BuildPartyMemberStatsChangedPacket(player, &data);
+    player->User()->BuildPartyMemberStatsChangedPacket(player, &data);
 
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
         if (member && (!member->IsInMap(player) || !member->IsWithinDist(player, member->GetSightRange(player), false)))
-            member->GetSession()->Send(&data);
+            member->User()->Send(&data);
     }
 }
 
@@ -1762,7 +1762,7 @@ void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRai
             continue;
 
         if (group == -1 || itr->getSubGroup() == group)
-            player->GetSession()->Send(packet);
+            player->User()->Send(packet);
     }
 }
 
@@ -1773,7 +1773,7 @@ void Group::BroadcastReadyCheck(WorldPacket const* packet)
         Player* player = itr->GetSource();
         if (player)
             if (IsLeader(player->GetGUID()) || IsAssistant(player->GetGUID()))
-                player->GetSession()->Send(packet);
+                player->User()->Send(packet);
     }
 }
 
@@ -2218,7 +2218,7 @@ void Group::ResetMaxEnchantingLevel()
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         pMember = ObjectAccessor::FindPlayer(citr->guid);
-        if (pMember && pMember->GetSession() && !pMember->GetSession()->IsSocketClosed()
+        if (pMember && pMember->User() && !pMember->User()->IsSocketClosed()
             && m_maxEnchantingLevel < pMember->GetSkillValue(SKILL_ENCHANTING))
         {
             m_maxEnchantingLevel = pMember->GetSkillValue(SKILL_ENCHANTING);
