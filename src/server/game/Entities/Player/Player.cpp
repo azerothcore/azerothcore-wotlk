@@ -16360,6 +16360,17 @@ static BOOL PlayerLearnSpellCheatHandler (User*         user,
 
     // TODO: Learn all spells if spellId == -1
 
+    SpellEntry const* spell = sSpellStore.LookupEntry(spellId);
+    if (spell && spell->AttributesEx7 == SPELL_ATTR7_DEBUG_SPELL &&
+        !plr->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS)) {
+      // The player is trying to learn a debug spell,
+      // which can only be cast by units with the flag UNIT_FLAG2_ALLOW_CHEAT_SPELLS
+      // to prevent player abuse of internal spells.
+      // Teach them the Internal Knowledge spell to give them the Internal skill,
+      // allowing the casting of debug spells.
+      plr->LearnSpell(36356);
+    }
+
     // Learn the spell
     plr->LearnSpell(spellId);
   }
