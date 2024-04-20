@@ -3060,6 +3060,63 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_WAYPOINT_DATA_START:
+        {
+            if (e.action.wpData.pathId)
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        target->ToCreature()->LoadPath(e.action.wpData.pathId);
+                        target->ToCreature()->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+                    }
+                }
+            }
+
+            break;
+        }
+        case SMART_ACTION_WAYPOINT_DATA_RANDOM:
+        {
+            if (e.action.wpDataRandom.pathId1 && e.action.wpDataRandom.pathId2)
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
+                        target->ToCreature()->LoadPath(path);
+                        target->ToCreature()->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
+                    }
+                }
+            }
+
+            break;
+        }
+        case SMART_ACTION_MOVEMENT_STOP:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->StopMoving();
+
+            break;
+        }
+        case SMART_ACTION_MOVEMENT_PAUSE:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->PauseMovement(e.action.move.timer);
+
+            break;
+        }
+        case SMART_ACTION_MOVEMENT_RESUME:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->ResumeMovement(e.action.move.timer);
+
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4539,6 +4596,14 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
             // If no targets are found and it's off cooldown, check again
             RecalcTimer(e, 1200, 1200);
+            break;
+        }
+        case SMART_EVENT_WAYPOINT_DATA_REACHED:
+        case SMART_EVENT_WAYPOINT_DATA_ENDED:
+        {
+            if (!me || (e.event.wpData.pointId && var0 != e.event.wpData.pointId) || (e.event.wpData.pathId && me->GetWaypointPath() != e.event.wpData.pathId))
+                return;
+            ProcessAction(e, unit);
             break;
         }
         default:

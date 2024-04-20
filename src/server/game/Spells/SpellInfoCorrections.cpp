@@ -188,7 +188,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         63665,  // Charge (Argent Tournament emote on riders)
-        31298,  // Sleep (needs target selection script)
         2895,   // Wrath of Air Totem rank 1 (Aura)
         68933,  // Wrath of Air Totem rank 2 (Aura)
         29200   // Purify Helboar Meat
