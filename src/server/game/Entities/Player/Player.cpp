@@ -90,6 +90,10 @@ static BOOL PlayerCreateItemCheatHandler (User*         user,
                                           Opcodes       msgId,
                                           uint32_t      eventTime,
                                           WorldPacket*  msg);
+static BOOL PlayerLearnSpellCheatHandler (User*         user,
+                                          Opcodes       msgId,
+                                          uint          eventTime,
+                                          WorldPacket*  msg);
 static BOOL PlayerLogoutRequestHandler (User*         user,
                                         Opcodes       msgId,
                                         uint32_t      eventTime,
@@ -16341,6 +16345,29 @@ static BOOL PlayerCreateItemCheatHandler (User*         user,
 }
 
 //===========================================================================
+static BOOL PlayerLearnSpellCheatHandler (User*         user,
+                                          Opcodes       msgId,
+                                          uint          eventTime,
+                                          WorldPacket*  msg) {
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
+
+  if (Player* plr = user->ActivePlayer()) {
+    // Read the msg data
+    int spellId = msg->read<int>();
+
+    // TODO: Learn all spells if spellId == -1
+
+    // Learn the spell
+    plr->LearnSpell(spellId);
+  }
+
+  return TRUE;
+}
+
+//===========================================================================
 static BOOL PlayerLogoutCancelHandler (User*        user,
                                        Opcodes      msgId,
                                        uint32_t     eventTime,
@@ -16398,6 +16425,7 @@ void PlayerInitialize () {
   if (s_initialized) return;
 
   WorldSocket::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
+  WorldSocket::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
   WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
 
@@ -16409,6 +16437,7 @@ void PlayerDestroy () {
   if (!s_initialized) return;
 
   WorldSocket::ClearMessageHandler(CMSG_CREATEITEM);
+  WorldSocket::ClearMessageHandler(CMSG_LEARN_SPELL);
   WorldSocket::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
   WorldSocket::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
 
