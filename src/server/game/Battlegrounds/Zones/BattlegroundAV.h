@@ -325,9 +325,9 @@ enum BG_AV_ObjectTypes
     BG_AV_OBJECT_FROSTWOLF_BANNER            = 247,
     BG_AV_OBJECT_STORMPIKE_BANNER            = 248,
     BG_AV_OBJECT_GENERIC_MIN                 = 249,
-    BG_AV_OBJECT_GENERIC_MAX                 = 321,
+    BG_AV_OBJECT_GENERIC_MAX                 = 323,
 
-    BG_AV_OBJECT_MAX                         = 322
+    BG_AV_OBJECT_MAX                         = 324
 };
 
 enum BG_AV_OBJECTS
@@ -652,6 +652,10 @@ std::tuple<uint32, Position, std::array<float, 4>> const BG_AV_GenericObjectPos[
     { 179389, { -168.342f,   -458.4f, 33.2862f,    5.83813f }, {         0.0f,         0.0f,  -0.220697f,  0.975342f } }, // 52237
     { 179390, {  561.851f, -73.1481f, 37.9558f,    4.88692f }, {         0.0f,         0.0f,  -0.642787f,  0.766045f } }, // 52237
     { 179390, { -142.968f, -444.076f, 26.4163f,    4.04917f }, {         0.0f,         0.0f,  -0.898793f,  0.438373f } }, // 52237
+    // Wanted: ORCS!
+    { 179437, {  618.748f, -52.1126f, 42.1122f,    6.21337f }, {         0.0f,         0.0f, -0.0348988f,  0.999390f } }, // 46248
+    // Wanted: DWARVES!
+    { 179438, { -1181.10f, -370.747f, 53.6246f,    2.68781f }, {         0.0f,         0.0f,   0.974370f,  0.224951f } }, // 46248
 };
 
 const float BG_AV_DoorPositons[2][4] =
