@@ -5318,6 +5318,13 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
             // remove all spells that related to this skill
             for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(id))
                 removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell), SPEC_MASK_ALL, false);
+
+
+          if (id == 769) {
+            // Disallow the player from casting Debug spells
+            // if we just removed the Internal skill
+            this->RemoveUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+          }
         }
     }
     else if (newVal)                                        //add
@@ -5365,6 +5372,13 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 learnSkillRewardedSpells(id, newVal);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+
+                if (id == 769) {
+                  // Allow the player to cast Debug spells
+                  // if he just learned the Internal skill
+                  this->SetUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+                }
+
                 return;
             }
     }
@@ -13715,6 +13729,12 @@ void Player::_LoadSkills(PreparedQueryResult result)
             {
                 LOG_ERROR("entities.player", "Character {} has more than {} skills.", GetGUID().ToString(), PLAYER_MAX_SKILLS);
                 break;
+            }
+
+            if (skill == 769) {
+                // Allow the player to cast Debug spells
+                // if he knows the Internal skill
+                this->SetUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
             }
         } while (result->NextRow());
     }
