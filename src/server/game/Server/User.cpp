@@ -279,6 +279,12 @@ void User::SendLogoutCancelAckMessage () {
 }
 
 //===========================================================================
+void User::SendLogoutCompleteMessage () {
+  WorldPacket msg(SMSG_LOGOUT_COMPLETE, 0);
+  Send(&msg);
+}
+
+//===========================================================================
 void User::SendLogoutResponse (LogoutResponse& res) {
   WorldPacket msg(SMSG_LOGOUT_RESPONSE, sizeof(res));
   msg << res.logoutFailed;
@@ -807,8 +813,7 @@ void User::CharacterRemoveFromGame(bool save)
 
         //! Send the 'logout complete' packet to the client
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
-        Send(WorldPackets::Character::LogoutComplete().Write());
-        LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
+        SendLogoutCompleteMessage();
 
         //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);

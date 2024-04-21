@@ -358,6 +358,7 @@ public:
     void WriteMovementInfo(WorldPacket* data, CMovement* mi);
 
     void SendLogoutCancelAckMessage ();
+    void SendLogoutCompleteMessage ();
     void SendLogoutResponse (LogoutResponse& res);
 
     void Send(WorldPacket const* packet);

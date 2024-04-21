@@ -44,14 +44,6 @@ namespace WorldPackets
             bool ShowHelm = false;
         };
 
-        class LogoutComplete final : public ServerPacket
-        {
-        public:
-            LogoutComplete() : ServerPacket(SMSG_LOGOUT_COMPLETE, 0) { }
-
-            WorldPacket const* Write() override { return &_worldPacket; }
-        };
-
         class PlayedTimeClient final : public ClientPacket
         {
         public:
