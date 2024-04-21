@@ -28,6 +28,7 @@
 /// List of Opcodes
 enum Opcodes : uint16
 {
+    MSG_NULL_ACTION,
     CMSG_BOOTME                                     = 0x001,
     CMSG_DBLOOKUP                                   = 0x002,
     SMSG_DBLOOKUP                                   = 0x003,
