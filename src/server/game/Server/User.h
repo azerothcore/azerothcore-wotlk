@@ -329,6 +329,9 @@ struct PacketCounter
     uint32 amountCounter;
 };
 
+extern void UserInitialize ();
+extern void UserDestroy ();
+
 /// Player session in the World
 class User
 {
@@ -907,7 +910,6 @@ public:                                                 // opcodes handlers
     void HandleReportPvPAFK(WorldPacket& recvData);
 
     void HandleWardenDataOpcode(WorldPacket& recvData);
-    void HandleWorldTeleport(WorldPacket& msg);
     void HandleMinimapPingOpcode(WorldPacket& recvData);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);

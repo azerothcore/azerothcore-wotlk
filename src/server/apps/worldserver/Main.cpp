@@ -385,6 +385,7 @@ int main(int argc, char** argv)
         LOG_INFO("server.worldserver", "Starting up anti-freeze thread ({} seconds max stuck time)...", coreStuckTime);
     }
 
+    UserInitialize();
     PlayerInitialize();
     FriendListInitialize();
 
@@ -423,6 +424,7 @@ int main(int argc, char** argv)
     // Shutdown starts here
     threadPool.reset();
 
+    UserDestroy();
     PlayerDestroy();
     FriendListDestroy();
 

@@ -1016,35 +1016,6 @@ void User::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     Send(&data);
 }
 
-//===========================================================================
-void User::HandleWorldTeleport(WorldPacket& msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-
-    // READ THE MESSAGE DATA
-    auto eventTime      = msg.read<uint32>();
-    auto continentID    = msg.read<uint32>();
-    auto player         = msg.read<ObjectGuid>();
-    auto position       = msg.read<G3D::Vector3>();
-    auto facing         = msg.read<float>();
-
-    // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE PLAYER GUID
-    // OR RETRIEVE A POINTER TO THE ACTIVE PLAYER FOR THE CURRENT SESSION
-    Player* playerPtr = player ? ObjectAccessor::FindPlayer(player) : ActivePlayer();
-    if (!playerPtr) {
-        return;
-    }
-
-    LOG_GM(GetAccountId(),
-           "Player {} sent command: worldport {} {} {} {} {}",
-           playerPtr->GetName(), continentID, position.x, position.y, position.z, facing);
-
-    playerPtr->Teleport(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
-}
-
 void User::HandleComplainOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_COMPLAIN");

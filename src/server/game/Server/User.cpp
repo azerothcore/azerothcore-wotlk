@@ -32,6 +32,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Hyperlinks.h"
+#include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
 #include "Metric.h"
@@ -54,6 +55,13 @@
 
 #include "BanMgr.h"
 #define CAMP_TIME_SECONDS 20  // The time it takes for a character to log out
+
+static bool s_initialized;
+
+static BOOL UserWorldTeleportHandler (User*         user,
+                                      Opcodes       msgId,
+                                      uint          eventTime,
+                                      WorldPacket*  msg);
 
 namespace
 {
@@ -1840,3 +1848,64 @@ void User::SendPlayerNotFoundFailure()
 {
     SendNotification("Player not found");
 }
+
+/****************************************************************************
+*
+*   MESSAGE HANDLERS
+*
+***/
+
+//===========================================================================
+static BOOL UserWorldTeleportHandler (User        *user,
+                                      Opcodes     msgId,
+                                      uint        eventTime,
+                                      WorldPacket *msg) {
+
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
+
+  // READ THE MESSAGE DATA
+  auto requestTime  = msg->read<uint32>();
+  auto continentID  = msg->read<uint32>();
+  auto player       = msg->read<ObjectGuid>();
+  auto position     = msg->read<G3D::Vector3>();
+  auto facing       = msg->read<float>();
+
+  // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE PLAYER GUID
+  // OR RETRIEVE A POINTER TO THE ACTIVE PLAYER FOR THE CURRENT SESSION
+  Player* playerPtr = player ? ObjectAccessor::FindPlayer(player) : user->ActivePlayer();
+  if (!playerPtr) {
+    // TODO: Look for a matching character GUID in DB and set its position offline
+    return FALSE;
+  }
+
+  // WRITE THE ACTION TO THE GM LOG
+  LOG_GM(user->GetAccountId(),
+         "Player {} sent command: worldport {} {} {} {} {}",
+         playerPtr->GetName(), continentID, position.x, position.y, position.z, facing);
+
+  // TELEPORT THE PLAYER
+  playerPtr->Teleport(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
+  return TRUE;
+}
+
+//===========================================================================
+void UserInitialize () {
+  if (s_initialized) return;
+
+  WorldSocket::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler);
+
+  s_initialized = true;
+}
+
+//===========================================================================
+void UserDestroy () {
+  if (!s_initialized) return;
+
+  WorldSocket::ClearMessageHandler(CMSG_WORLD_TELEPORT);
+
+  s_initialized = false;
+}
+
