@@ -23,12 +23,10 @@
 enum Yells
 {
     SAY_AGGRO                           = 0,
-    SAY_SUMMON1                         = 1,
-    SAY_SUMMON2                         = 2,
-    SAY_KILL                            = 3,
-    SAY_DEATH                           = 4,
-    SAY_VOIDA                           = 5,
-    SAY_VOIDB                           = 6
+    SAY_SUMMON                          = 1,
+    SAY_KILL                            = 2,
+    SAY_DEATH                           = 3,
+    SAY_VOID                            = 4
 };
 
 enum Spells
@@ -38,7 +36,8 @@ enum Spells
     SPELL_WRATH_OF_THE_ASTROMANCER      = 42783,
     SPELL_BLINDING_LIGHT                = 33009,
     SPELL_PSYCHIC_SCREAM                = 34322,
-    SPELL_VOID_BOLT                     = 39329
+    SPELL_VOID_BOLT                     = 39329,
+    SPELL_TRUE_BEAM                     = 33365,
 };
 
 enum Misc
@@ -61,6 +60,7 @@ struct boss_high_astromancer_solarian : public BossAI
 {
     boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
     {
+        callForHelpRange = 105.0f;
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -71,10 +71,14 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         BossAI::Reset();
         me->SetModelVisible(true);
-        _visible = true;
+        me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(20, [&]{
+            Talk(SAY_VOID);
+            me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
+            me->SetModelVisible(true);
+            me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_VOID_BOLT);
@@ -115,11 +119,21 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
-        me->CallForHelp(105.0f);
+        me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_ARCANE_MISSILES, 0, 40.0f);
+            me->GetMotionMaster()->Clear();
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, false, true, -SPELL_WRATH_OF_THE_ASTROMANCER))
+            {
+                DoCast(target, SPELL_ARCANE_MISSILES);
+            }
+            else
+            {
+                //no targets in required range
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), 30.0f);
+                me->CastStop();
+            }
             context.Repeat(800ms, 7300ms);
         }).Schedule(21800ms, [this](TaskContext context)
         {
@@ -131,13 +145,13 @@ struct boss_high_astromancer_solarian : public BossAI
             context.Repeat(33900ms, 48100ms);
         }).Schedule(52100ms, [this](TaskContext context)
         {
-            _visible = false;
             me->SetReactState(REACT_PASSIVE);
+            Talk(SAY_SUMMON);
+            me->RemoveAllAuras();
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
             {
-                Talk(SAY_SUMMON1);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -146,6 +160,7 @@ struct boss_high_astromancer_solarian : public BossAI
                         {
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                DoCast(light, SPELL_TRUE_BEAM);
                                 me->SetPosition(*light);
                                 me->StopMovingOnCurrentPos();
                             }
@@ -158,9 +173,7 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(20s, [this](TaskContext)
             {
-                _visible = true;
                 me->SetReactState(REACT_AGGRESSIVE);
-                Talk(SAY_SUMMON2);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())
@@ -170,6 +183,7 @@ struct boss_high_astromancer_solarian : public BossAI
                             light->RemoveAllAuras();
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                me->RemoveAllAuras();
                                 me->SetModelVisible(true);
                             }
                             else
@@ -204,7 +218,7 @@ struct boss_high_astromancer_solarian : public BossAI
 
         scheduler.Update(diff);
 
-        if (_visible)
+        if (me->GetReactState() == REACT_AGGRESSIVE)
         {
             DoMeleeAttackIfReady();
         }
@@ -218,81 +232,52 @@ struct boss_high_astromancer_solarian : public BossAI
             summon->SetInCombatWithZone();
         }
     }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
-    }
-private:
-    bool _visible;
 };
 
-class spell_astromancer_wrath_of_the_astromancer : public SpellScriptLoader
+class spell_astromancer_wrath_of_the_astromancer : public AuraScript
 {
-public:
-    spell_astromancer_wrath_of_the_astromancer() : SpellScriptLoader("spell_astromancer_wrath_of_the_astromancer") { }
+    PrepareAuraScript(spell_astromancer_wrath_of_the_astromancer);
 
-    class spell_astromancer_wrath_of_the_astromancer_AuraScript : public AuraScript
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_astromancer_wrath_of_the_astromancer_AuraScript);
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
 
-        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
+        Unit* target = GetUnitOwner();
+        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false);
+    }
 
-            Unit* target = GetUnitOwner();
-            target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_astromancer_wrath_of_the_astromancer_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_astromancer_wrath_of_the_astromancer_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_astromancer_wrath_of_the_astromancer::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_astromancer_solarian_transform : public SpellScriptLoader
+class spell_astromancer_solarian_transform : public AuraScript
 {
-public:
-    spell_astromancer_solarian_transform() : SpellScriptLoader("spell_astromancer_solarian_transform") { }
+    PrepareAuraScript(spell_astromancer_solarian_transform);
 
-    class spell_astromancer_solarian_transform_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_astromancer_solarian_transform_AuraScript);
+        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, true);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, true);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, false);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_astromancer_solarian_transform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_astromancer_solarian_transform_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_astromancer_solarian_transform_AuraScript();
+        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_astromancer_solarian_transform::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_astromancer_solarian_transform::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_high_astromancer_solarian()
 {
     RegisterTheEyeAI(boss_high_astromancer_solarian);
-    new spell_astromancer_wrath_of_the_astromancer();
-    new spell_astromancer_solarian_transform();
+    RegisterSpellScript(spell_astromancer_wrath_of_the_astromancer);
+    RegisterSpellScript(spell_astromancer_solarian_transform);
 }
 

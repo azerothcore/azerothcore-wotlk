@@ -19,14 +19,43 @@
 #define SCRIPT_OBJECT_UNIT_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum UnitHook
+{
+    UNITHOOK_ON_HEAL,
+    UNITHOOK_ON_DAMAGE,
+    UNITHOOK_MODIFY_PERIODIC_DAMAGE_AURAS_TICK,
+    UNITHOOK_MODIFY_MELEE_DAMAGE,
+    UNITHOOK_MODIFY_SPELL_DAMAGE_TAKEN,
+    UNITHOOK_MODIFY_HEAL_RECEIVED,
+    UNITHOOK_ON_BEFORE_ROLL_MELEE_OUTCOME_AGAINST,
+    UNITHOOK_ON_AURA_APPLY,
+    UNITHOOK_ON_AURA_REMOVE,
+    UNITHOOK_IF_NORMAL_REACTION,
+    UNITHOOK_IS_NEEDMOD_SPELL_DAMAGE_PERCENT,
+    UNITHOOK_IS_NEEDMOD_MELEE_DAMAGE_PERCENT,
+    UNITHOOK_IS_NEEDMOD_HEAL_PERCENT,
+    UNITHOOK_CAN_SET_PHASE_MASK,
+    UNITHOOK_IS_CUSTOM_BUILD_VALUES_UPDATE,
+    UNITHOOK_SHOULD_TRACK_VALUES_UPDATE_POS_BY_INDEX,
+    UNITHOOK_ON_PATCH_VALUES_UPDATE,
+    UNITHOOK_ON_UNIT_UPDATE,
+    UNITHOOK_ON_DISPLAYID_CHANGE,
+    UNITHOOK_ON_UNIT_ENTER_EVADE_MODE,
+    UNITHOOK_ON_UNIT_ENTER_COMBAT,
+    UNITHOOK_ON_UNIT_DEATH,
+    UNITHOOK_END
+};
 
 enum ReputationRank : uint8;
 class ByteBuffer;
+struct BuildValuesCachePosPointers;
 
 class UnitScript : public ScriptObject
 {
 protected:
-    UnitScript(const char* name, bool addToScripts = true);
+    UnitScript(const char* name, bool addToScripts = true, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when a unit deals healing to another unit
@@ -69,7 +98,9 @@ public:
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
 
-    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
+    [[nodiscard]] virtual bool ShouldTrackValuesUpdatePosByIndex(Unit const* /*unit*/, uint8 /*updateType*/, uint16 /*index*/) { return false; }
+
+    virtual void OnPatchValuesUpdate(Unit const* /*unit*/, ByteBuffer& /*valuesUpdateBuf*/, BuildValuesCachePosPointers& /*posPointers*/, Player* /*target*/) { }
 
     /**
      * @brief This hook runs in Unit::Update

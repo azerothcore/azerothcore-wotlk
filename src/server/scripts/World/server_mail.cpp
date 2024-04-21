@@ -24,7 +24,7 @@
 class ServerMailReward : public PlayerScript
 {
 public:
-    ServerMailReward() : PlayerScript("ServerMailReward") { }
+    ServerMailReward() : PlayerScript("ServerMailReward", {PLAYERHOOK_ON_LOGIN}) { }
 
     // CHARACTER_LOGIN = 8
     void OnLogin(Player* player) override
