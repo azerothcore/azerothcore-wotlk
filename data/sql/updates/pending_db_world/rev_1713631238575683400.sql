@@ -3,11 +3,10 @@ DELETE FROM `spell_target_position` WHERE `ID`=17237  AND `EffectIndex`=0;
 DELETE FROM `spell_target_position` WHERE `ID`=17239  AND `EffectIndex`=0;
 DELETE FROM `spell_target_position` WHERE `ID`=17240  AND `EffectIndex`=0;
 INSERT INTO `spell_target_position` VALUES
-(17278, 0, 329, 3533.95, -2965.1, 125, 0, 0);
+(17278, 0, 329, 3533.95, -2965.1, 125, 0, 0),
 (17237, 0, 329, 3838, -3500, 195, 0, 0),
 (17239, 0, 329, 3847, -3748, 195, 0, 0),
 (17240, 0, 329, 4057, -3665, 182, 0, 0);
-
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 10399;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
