@@ -1,3 +1,4 @@
+-- DB update 2024_04_21_03 -> 2024_04_21_04
 DELETE FROM `spell_target_position` WHERE `ID`=17278  AND `EffectIndex`=0;
 DELETE FROM `spell_target_position` WHERE `ID`=17237  AND `EffectIndex`=0;
 DELETE FROM `spell_target_position` WHERE `ID`=17239  AND `EffectIndex`=0;
