@@ -1,3 +1,4 @@
+-- DB update 2024_04_21_04 -> 2024_04_21_05
 -- Scarlet Centurion with guid 39959 smart ai
 SET @ENTRY := -39959;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 4301;
