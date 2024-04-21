@@ -52,7 +52,7 @@ public:
         if (player->IsAlive() && !player->IsInCombat())
             if (player->HasItemCount(39319)) // Scepter of Domination
             {
-                player->TeleportTo(571, 6242.67f, -1972.10f, 484.783f, 0.6f);
+                player->Teleport(571, 6242.67f, -1972.10f, 484.783f, 0.6f);
                 return true;
             }
 
@@ -237,7 +237,7 @@ public:
                 return false;
         }
 
-        player->TeleportTo(pPosition);
+        player->Teleport(pPosition);
 
         return false;
     }

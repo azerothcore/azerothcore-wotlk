@@ -163,7 +163,7 @@ enum eScriptFlags
     // Emote flags
     SF_EMOTE_USE_STATE          = 0x1,
 
-    // TeleportTo flags
+    // Teleport flags
     SF_TELEPORT_USE_CREATURE    = 0x1,
 
     // KillCredit flags

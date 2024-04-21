@@ -2172,7 +2172,7 @@ namespace lfg
                 player->SetEntryPoint();
             }
 
-            if (!player->TeleportTo(mapid, x, y, z, orientation, 0, nullptr, mapid == player->GetMapId()))
+            if (!player->Teleport(mapid, x, y, z, orientation, 0, nullptr, mapid == player->GetMapId()))
             {
                 error = LFG_TELEPORTERROR_INVALID_LOCATION;
             }

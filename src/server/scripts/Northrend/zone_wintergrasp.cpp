@@ -241,7 +241,7 @@ public:
             for (uint8 i = 0; i < gy.size(); i++)
                 if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
                     if (GraveyardStruct const* safeLoc = sGraveyard->GetGraveyard(gy[i]->GetGraveyardId()))
-                        player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, 0);
+                        player->Teleport(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, 0);
         }
         return true;
     }

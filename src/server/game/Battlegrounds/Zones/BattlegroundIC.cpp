@@ -78,7 +78,7 @@ void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
     float z = BG_IC_HangarTrigger[player->GetTeamId()].GetPositionZ();
     transport->CalculatePassengerPosition(x, y, z);
 
-    player->TeleportTo(GetMapId(), x, y, z, player->GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT);
+    player->Teleport(GetMapId(), x, y, z, player->GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT);
 }
 
 void BattlegroundIC::HandlePlayerResurrect(Player* player)

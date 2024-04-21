@@ -1225,7 +1225,7 @@ public:
 
                 if (AreAllWingsCleared)
                 {
-                    player->TeleportTo(533, sapphironEntryTP.m_positionX, sapphironEntryTP.m_positionY, sapphironEntryTP.m_positionZ, sapphironEntryTP.m_orientation);
+                    player->Teleport(533, sapphironEntryTP.m_positionX, sapphironEntryTP.m_positionY, sapphironEntryTP.m_positionZ, sapphironEntryTP.m_orientation);
                     return true;
                 }
             }

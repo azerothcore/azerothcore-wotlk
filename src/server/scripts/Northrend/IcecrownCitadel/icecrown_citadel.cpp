@@ -2287,7 +2287,7 @@ public:
             player->GetMap()->PlayerRelocation(player, x, y, z, o);
         }
 
-        player->TeleportTo(631, destPos.GetPositionX(), destPos.GetPositionY(), destPos.GetPositionZ(), destPos.GetOrientation());
+        player->Teleport(631, destPos.GetPositionX(), destPos.GetPositionY(), destPos.GetPositionZ(), destPos.GetOrientation());
 
         return true;
     }

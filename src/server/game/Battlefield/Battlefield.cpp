@@ -320,7 +320,7 @@ void Battlefield::KickAfkPlayers()
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 if (player->isAFK() && player->GetZoneId() == GetZoneId() && !player->IsGameMaster())
-                    player->TeleportTo(KickPosition);
+                    player->Teleport(KickPosition);
 }
 
 void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
@@ -328,7 +328,7 @@ void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
         if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster())
-            player->TeleportTo(KickPosition);
+            player->Teleport(KickPosition);
     }
 }
 
@@ -760,12 +760,12 @@ void BfGraveyard::RelocateDeadPlayers()
             continue;
 
         if (closestGrave)
-            player->TeleportTo(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
+            player->Teleport(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
         else
         {
             closestGrave = m_Bf->GetClosestGraveyard(player);
             if (closestGrave)
-                player->TeleportTo(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
+                player->Teleport(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
         }
     }
 }

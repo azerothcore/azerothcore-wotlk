@@ -412,7 +412,7 @@ void Player::Update(uint32 p_time)
     if (HasDelayedTeleport() /* && IsAlive()*/)
     {
         SetHasDelayedTeleport(false);
-        TeleportTo(teleportStore_dest, teleportStore_options);
+        Teleport(teleportStore_dest, teleportStore_options);
     }
 
     if (!IsBeingTeleported() && bRequestForcedVisibilityUpdate)

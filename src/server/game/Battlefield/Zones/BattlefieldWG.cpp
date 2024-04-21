@@ -276,7 +276,7 @@ void BattlefieldWG::OnBattleStart()
                 float x, y, z;
                 player->GetPosition(x, y, z);
                 if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
+                    player->Teleport(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
                 SendInitWorldStatesTo(player);
             }
         }
@@ -848,13 +848,13 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
     AddUpdateTenacity(player);
 
     if (player->GetTeamId() == GetDefenderTeam())
-        player->TeleportTo(571, 5345, 2842, 410, 3.14f);
+        player->Teleport(571, 5345, 2842, 410, 3.14f);
     else
     {
         if (player->GetTeamId() == TEAM_HORDE)
-            player->TeleportTo(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
+            player->Teleport(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
         else
-            player->TeleportTo(571, 5101.284f, 2186.564f, 365.549f, 3.812f);
+            player->Teleport(571, 5101.284f, 2186.564f, 365.549f, 3.812f);
     }
 
     if (player->GetTeamId() == GetAttackerTeam())

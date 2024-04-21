@@ -147,7 +147,7 @@ public:
             else // save only in non-flight case
                 target->SaveRecallPosition();
 
-            target->TeleportTo({ mapId, pos });
+            target->Teleport({ mapId, pos });
         }
         else
         {
@@ -176,7 +176,7 @@ public:
         if (where.index() == 1)    // References target's homebind
         {
             if (Player* target = player->GetConnectedPlayer())
-                target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
+                target->Teleport(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
             else
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
@@ -269,7 +269,7 @@ public:
             else // save only in non-flight case
                 target->SaveRecallPosition();
 
-            player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+            player->Teleport(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
         }
 
         return true;
@@ -306,7 +306,7 @@ public:
         else // save only in non-flight case
             player->SaveRecallPosition();
 
-        player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+        player->Teleport(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
         return true;
     }
 

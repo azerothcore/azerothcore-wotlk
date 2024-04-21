@@ -1618,7 +1618,7 @@ void GameObject::Use(Unit* user)
                     if (itr != ChairListSlots.end())
                     {
                         itr->second = player->GetGUID(); //this slot in now used by player
-                        player->TeleportTo(GetMapId(), x_lowest, y_lowest, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                        player->Teleport(GetMapId(), x_lowest, y_lowest, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
                         player->SetStandState(UNIT_SITTINGCHAIRLOW + info->chair.height);
                         return;
                     }
@@ -2033,7 +2033,7 @@ void GameObject::Use(Unit* user)
                 Player* player = user->ToPlayer();
 
                 // fallback, will always work
-                player->TeleportTo(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                player->Teleport(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
 
                 WorldPacket data(SMSG_ENABLE_BARBER_SHOP, 0);
                 player->User()->Send(&data);

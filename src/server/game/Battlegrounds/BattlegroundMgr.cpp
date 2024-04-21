@@ -641,7 +641,7 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
         Position const* pos = bg->GetTeamStartPosition(player->GetBgTeamId());
 
         LOG_DEBUG("bg.battleground", "BattlegroundMgr::SendToBattleground: Sending {} to map {}, {} (bgType {})", player->GetName(), mapid, pos->ToString(), bgTypeId);
-        player->TeleportTo(mapid, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
+        player->Teleport(mapid, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
     }
     else
     {

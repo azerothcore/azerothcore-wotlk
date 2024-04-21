@@ -766,7 +766,7 @@ void User::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     }
 
     if (!teleported)
-        player->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT);
+        player->Teleport(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT);
 }
 
 void User::HandleUpdateAccountData(WorldPacket& recv_data)
@@ -1042,7 +1042,7 @@ void User::HandleWorldTeleport(WorldPacket& msg)
            "Player {} sent command: worldport {} {} {} {} {}",
            playerPtr->GetName(), continentID, position.x, position.y, position.z, facing);
 
-    playerPtr->TeleportTo(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
+    playerPtr->Teleport(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
 }
 
 void User::HandleComplainOpcode(WorldPacket& recv_data)
@@ -1345,7 +1345,7 @@ void User::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 oldMap->AfterPlayerUnlinkFromMap();
                 p->SetMap(homeMap0);
                 p->Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-                if (!p->TeleportTo(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
+                if (!p->Teleport(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
                     p->User()->KickPlayer("HandleSetRaidDifficultyOpcode 1");
             }
 
@@ -1382,7 +1382,7 @@ void User::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
             for (std::map<Player*, Position>::iterator itr = playerTeleport.begin(); itr != playerTeleport.end(); ++itr)
             {
                 itr->first->SetRaidDifficulty(Difficulty(mode)); // needed for teleport not to fail
-                if (!itr->first->TeleportTo(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
+                if (!itr->first->Teleport(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
                     itr->first->User()->KickPlayer("HandleSetRaidDifficultyOpcode 2");
             }
         }
@@ -1584,7 +1584,7 @@ void User::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     m_player->BuildPlayerRepop();
     m_player->Resurrect(1.0f);
     m_player->SpawnCorpseBones();
-    m_player->TeleportTo(m_player->m_homebindMapId, m_player->m_homebindX, m_player->m_homebindY, m_player->m_homebindZ, m_player->GetOrientation());
+    m_player->Teleport(m_player->m_homebindMapId, m_player->m_homebindX, m_player->m_homebindY, m_player->m_homebindZ, m_player->GetOrientation());
 }
 
 void User::HandleInstanceLockResponse(WorldPacket& recvPacket)

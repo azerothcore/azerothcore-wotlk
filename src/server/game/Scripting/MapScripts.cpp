@@ -488,7 +488,7 @@ void Map::ScriptsProcess()
                 {
                     // Source or target must be Player.
                     if (Player* player = _GetScriptPlayerSourceOrTarget(source, target, step.script))
-                        player->TeleportTo(step.script->TeleportTo.MapID, step.script->TeleportTo.DestX, step.script->TeleportTo.DestY, step.script->TeleportTo.DestZ, step.script->TeleportTo.Orientation);
+                        player->Teleport(step.script->TeleportTo.MapID, step.script->TeleportTo.DestX, step.script->TeleportTo.DestY, step.script->TeleportTo.DestZ, step.script->TeleportTo.Orientation);
                 }
                 break;
 

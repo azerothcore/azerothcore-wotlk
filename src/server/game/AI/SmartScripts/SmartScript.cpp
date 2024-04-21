@@ -1609,7 +1609,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
             {
                 if (IsPlayer(target))
-                    target->ToPlayer()->TeleportTo(e.action.teleport.mapID, e.target.x, e.target.y, e.target.z, e.target.o);
+                    target->ToPlayer()->Teleport(e.action.teleport.mapID, e.target.x, e.target.y, e.target.z, e.target.o);
                 else if (IsCreature(target))
                     target->ToCreature()->NearTeleportTo(e.target.x, e.target.y, e.target.z, e.target.o);
             }

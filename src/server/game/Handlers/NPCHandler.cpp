@@ -405,7 +405,7 @@ void User::SendSpiritResurrect()
         GraveyardStruct const* ghostGrave = sGraveyard->GetClosestGraveyard(m_player, m_player->GetTeamId());
 
         if (corpseGrave != ghostGrave)
-            m_player->TeleportTo(corpseGrave->Map, corpseGrave->x, corpseGrave->y, corpseGrave->z, m_player->GetOrientation());
+            m_player->Teleport(corpseGrave->Map, corpseGrave->x, corpseGrave->y, corpseGrave->z, m_player->GetOrientation());
         // or update at original position
         //else
         //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in Resurrect

@@ -391,7 +391,7 @@ class spell_ioc_gunship_portal : public SpellScript
          * Transport Position X: 0 Y: 0 Z: 0 O: 0
          * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
 
-        caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
+        caster->Teleport(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
     }
 
     void HandleScript2(SpellEffIndex effIndex)

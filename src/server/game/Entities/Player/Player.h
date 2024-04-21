@@ -1094,10 +1094,10 @@ public:
         return User()->GetSessionDbLocaleIndex() == LOCALE_esES || User()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
 
-    bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
-    bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
+    bool Teleport(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
+    bool Teleport(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {
-        return TeleportTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), options, target);
+        return Teleport(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), options, target);
     }
     bool TeleportToEntryPoint();
 

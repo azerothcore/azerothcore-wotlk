@@ -89,7 +89,7 @@ public:
         else
             player->SaveRecallPosition();
 
-        player->TeleportTo({ mapId, pos });
+        player->Teleport({ mapId, pos });
         return true;
     }
 
@@ -192,7 +192,7 @@ public:
         else
             player->SaveRecallPosition();
 
-        player->TeleportTo(gy->Map, gy->x, gy->y, gy->z, player->GetOrientation());
+        player->Teleport(gy->Map, gy->x, gy->y, gy->z, player->GetOrientation());
         return true;
     }
 
@@ -225,7 +225,7 @@ public:
         Map const* map = sMapMgr->CreateBaseMap(mapId);
         float z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
 
-        player->TeleportTo(mapId, x, y, z, player->GetOrientation());
+        player->Teleport(mapId, x, y, z, player->GetOrientation());
         return true;
     }
 
@@ -298,7 +298,7 @@ public:
 
         float z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
 
-        player->TeleportTo(zoneEntry->mapid, x, y, z, player->GetOrientation());
+        player->Teleport(zoneEntry->mapid, x, y, z, player->GetOrientation());
         return true;
     }
 
