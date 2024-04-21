@@ -23,13 +23,16 @@ void ScriptMgr::OnLootMoney(Player* player, uint32 gold)
 {
     ASSERT(player);
 
-    ExecuteScript<LootScript>([&](LootScript* script)
-    {
-        script->OnLootMoney(player, gold);
-    });
+    CALL_ENABLED_HOOKS(LootScript, LOOTHOOK_ON_LOOT_MONEY, script->OnLootMoney(player, gold));
 }
 
-LootScript::LootScript(const char* name) : ScriptObject(name)
+LootScript::LootScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, LOOTHOOK_END)
 {
-    ScriptRegistry<LootScript>::AddScript(this);
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < LOOTHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<LootScript>::AddScript(this, std::move(enabledHooks));
 }

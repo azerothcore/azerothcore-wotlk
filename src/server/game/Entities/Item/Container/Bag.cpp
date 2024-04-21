@@ -166,7 +166,7 @@ void Bag::StoreItem(uint8 slot, Item* pItem, bool /*update*/)
     }
 }
 
-void Bag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Bag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     Item::BuildCreateUpdateBlockForPlayer(data, target);
 

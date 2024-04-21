@@ -25,7 +25,17 @@
 class ChatLogScript : public PlayerScript
 {
 public:
-    ChatLogScript() : PlayerScript("ChatLogScript") { }
+    ChatLogScript() :
+        PlayerScript("ChatLogScript",
+        {
+            PLAYERHOOK_ON_CHAT,
+            PLAYERHOOK_ON_CHAT_WITH_GROUP,
+            PLAYERHOOK_ON_CHAT_WITH_GUILD,
+            PLAYERHOOK_ON_CHAT_WITH_CHANNEL,
+            PLAYERHOOK_ON_CHAT_WITH_RECEIVER
+        })
+    {
+    }
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg) override
     {

@@ -23,55 +23,46 @@ void ScriptMgr::OnWorldObjectDestroy(WorldObject* object)
 {
     ASSERT(object);
 
-    ExecuteScript<WorldObjectScript>([&](WorldObjectScript* script)
-    {
-        script->OnWorldObjectDestroy(object);
-    });
+    CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_DESTROY, script->OnWorldObjectDestroy(object));
 }
 
 void ScriptMgr::OnWorldObjectCreate(WorldObject* object)
 {
     ASSERT(object);
 
-    ExecuteScript<WorldObjectScript>([&](WorldObjectScript* script)
-    {
-        script->OnWorldObjectCreate(object);
-    });
+    CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_CREATE, script->OnWorldObjectCreate(object));
 }
 
 void ScriptMgr::OnWorldObjectSetMap(WorldObject* object, Map* map)
 {
     ASSERT(object);
 
-    ExecuteScript<WorldObjectScript>([&](WorldObjectScript* script)
-    {
-        script->OnWorldObjectSetMap(object, map);
-    });
+    CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_SET_MAP, script->OnWorldObjectSetMap(object, map));
 }
 
 void ScriptMgr::OnWorldObjectResetMap(WorldObject* object)
 {
     ASSERT(object);
 
-    ExecuteScript<WorldObjectScript>([&](WorldObjectScript* script)
-    {
-        script->OnWorldObjectResetMap(object);
-    });
+    CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_RESET_MAP, script->OnWorldObjectResetMap(object));
 }
 
 void ScriptMgr::OnWorldObjectUpdate(WorldObject* object, uint32 diff)
 {
     ASSERT(object);
 
-    ExecuteScript<WorldObjectScript>([&](WorldObjectScript* script)
-    {
-        script->OnWorldObjectUpdate(object, diff);
-    });
+    CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_UPDATE, script->OnWorldObjectUpdate(object, diff));
 }
 
-WorldObjectScript::WorldObjectScript(const char* name) : ScriptObject(name)
+WorldObjectScript::WorldObjectScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, WORLDOBJECTHOOK_END)
 {
-    ScriptRegistry<WorldObjectScript>::AddScript(this);
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < WORLDOBJECTHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<WorldObjectScript>::AddScript(this, std::move(enabledHooks));
 }
 
 template class AC_GAME_API ScriptRegistry<WorldObjectScript>;
