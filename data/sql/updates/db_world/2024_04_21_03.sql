@@ -1,3 +1,4 @@
+-- DB update 2024_04_21_02 -> 2024_04_21_03
 -- Update gameobject 'A Dusty Tome' with sniffed values
 
 -- new spawns
