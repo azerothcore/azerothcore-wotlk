@@ -102,15 +102,6 @@ struct boss_alar : public BossAI
         });
     }
 
-    void JustReachedHome() override
-    {
-        BossAI::JustReachedHome();
-        if (me->IsEngaged())
-        {
-            ConstructWaypointsAndMove();
-        }
-    }
-
     void Reset() override
     {
         BossAI::Reset();
@@ -127,6 +118,15 @@ struct boss_alar : public BossAI
         me->SetModelVisible(true);
         me->SetReactState(REACT_AGGRESSIVE);
         ConstructWaypointsAndMove();
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        if (me->IsEngaged())
+        {
+            ConstructWaypointsAndMove();
+        }
     }
 
     void JustEngagedWith(Unit* who) override
@@ -156,6 +156,29 @@ struct boss_alar : public BossAI
             context.Repeat(_platformMoveRepeatTimer);
         });
         ScheduleMainSpellAttack(0s);
+    }
+
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        if (me->isMoving())
+            return true;
+
+        return _hasPretendedToDie || me->IsWithinMeleeRange(victim);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (why == EVADE_REASON_BOUNDARY)
+        {
+            BossAI::EnterEvadeMode(why);
+        }
+        else
+        {
+            if (me->GetThreatMgr().GetThreatList().empty())
+            {
+                BossAI::EnterEvadeMode(why);
+            }
+        }
     }
 
     void JustDied(Unit* killer) override

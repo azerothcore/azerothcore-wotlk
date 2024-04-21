@@ -3238,7 +3238,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 57467: // Meteor
             case 26789: // Shard of the Fallen Star
             case 31436: // Malevolent Cleave
-            case 35181: // Dive Bomb
             case 40810: // Saber Lash
             case 43267: // Saber Lash
             case 43268: // Saber Lash

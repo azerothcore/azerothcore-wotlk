@@ -19,6 +19,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -70,7 +72,10 @@ enum Spells
     SPELL_FROST_BREATH                = 31688,
 
     // Fel Stalker
-    SPELL_MANA_BURN                   = 31729
+    SPELL_MANA_BURN                   = 31729,
+
+    // Misc
+    SPELL_DEATH_AND_DECAY             = 31258
 };
 
 enum Talk
@@ -98,7 +103,10 @@ public:
     }
     struct hyjalJainaAI : public ScriptedAI
     {
-        hyjalJainaAI(Creature* creature) : ScriptedAI(creature) { }
+        hyjalJainaAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->ApplySpellImmune(SPELL_DEATH_AND_DECAY, IMMUNITY_ID, SPELL_DEATH_AND_DECAY, true);
+        }
 
         void Reset() override
         {
@@ -319,6 +327,26 @@ public:
         return true;
     }
 
+};
+
+// 31538 - Cannibalize (Heal)
+class spell_cannibalize_heal : public SpellScript
+{
+    PrepareSpellScript(spell_cannibalize_heal);
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            uint32 heal = caster->CountPctFromMaxHealth(7);
+            SetHitHeal(heal);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_cannibalize_heal::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
 };
 
 struct npc_hyjal_ground_trash : public ScriptedAI
@@ -698,4 +726,5 @@ void AddSC_hyjal()
     RegisterHyjalAI(npc_hyjal_ground_trash);
     RegisterHyjalAI(npc_hyjal_gargoyle);
     RegisterHyjalAI(npc_hyjal_frost_wyrm);
+    RegisterSpellScript(spell_cannibalize_heal);
 }
