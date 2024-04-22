@@ -634,6 +634,9 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
     if (MovementType == POINT_MOTION_TYPE && Data == SMART_ESCORT_LAST_OOC_POINT)
         me->ClearUnitState(UNIT_STATE_EVADE);
 
+    if (MovementType == WAYPOINT_MOTION_TYPE)
+        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_DATA_REACHED, nullptr, Data + 1); // Data + 1 to align smart_scripts and waypoint_data Id rows
+
     GetScript()->ProcessEventsFor(SMART_EVENT_MOVEMENTINFORM, nullptr, MovementType, Data);
     if (!HasEscortState(SMART_ESCORT_ESCORTING))
         return;
@@ -1148,6 +1151,11 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
     //    return;
 
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
+}
+
+void SmartAI::PathEndReached(uint32 pathId)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_DATA_ENDED, nullptr, 0, me->GetWaypointPath());
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
