@@ -7223,3 +7223,105 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 DELETE FROM `gameobject` WHERE (`id` IN (180728))
 AND (`guid` IN (825));
 DELETE FROM `gameobject_addon` WHERE (`guid` IN (825));
+
+-- vendors
+DELETE FROM `creature` WHERE (`id1` IN (5569, 8116, 8117, 8118, 8121, 8122))
+AND (`guid` BETWEEN 12523 AND 12528);
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
+-- Fizzlebang Booms
+(12523, 5569, 0, 1, 1, 0, -4850.69775390625, -1295.2379150390625, 501.951171875, 1.396263360977172851, 120, 0, 0, 0, 0, 0, "", 50250, 1, NULL),
+-- Ziggle Sparks
+(12524, 8116, 0, 1, 1, 0, -14472.853515625, 458.61517333984375, 37.13787078857421875, 1.762782573699951171, 120, 0, 0, 0, 0, 0, "", 50250, 1, NULL),
+-- Wizbang Booms
+(12525, 8117, 0, 1, 1, 0, -4896.26708984375, -962.62823486328125, 501.53125, 2.722713708877563476, 120, 0, 0, 0, 0, 0, "", 50250, 1, NULL),
+-- Lillian Singh
+(12526, 8118, 0, 1, 1, 1, -8807.99, 639.385, 94.2291, 3.81468, 300, 0, 0, 0, 0, 0, "", NULL, 1, NULL),
+-- Jaxxil Sparks
+(12527, 8121, 1, 1, 1, 0, -1052.948974609375, -3639.453369140625, 23.9609375, 5.323254108428955078, 120, 0, 0, 0, 0, 0, "", 50250, 1, NULL),
+-- Kizzak Sparks
+(12528, 8122, 1, 1, 1, 0, 2018.953125, -4729.00341796875, 26.100921630859375, 1.93731546401977539, 120, 0, 0, 0, 0, 0, "", 50250, 1, NULL);
+
+DELETE FROM `game_event_creature` WHERE (`eventEntry` = 72)
+AND (`guid` BETWEEN 12523 AND 12528);
+INSERT INTO `game_event_creature` VALUES
+(72, 12523),
+(72, 12524),
+(72, 12525),
+(72, 12526),
+(72, 12527),
+(72, 12528);
+
+DELETE FROM `npc_vendor` WHERE (`entry` IN (5569, 8116, 8117, 8118, 8121, 8122));
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+-- Fizzlebang Booms
+(5569, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(5569, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(5569, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(5569, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(5569, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(5569, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(5569, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(5569, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(5569, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(5569, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(5569, 0, 34850, 0, 0, 0, 0), -- Midsummer Ground Flower
+-- Ziggle Sparks
+(8116, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(8116, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(8116, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(8116, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(8116, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(8116, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(8116, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(8116, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(8116, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(8116, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(8116, 0, 34850, 0, 0, 0, 0), -- Midsummer Ground Flower
+-- Wizbang Booms
+(8117, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(8117, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(8117, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(8117, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(8117, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(8117, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(8117, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(8117, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(8117, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(8117, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(8117, 0, 34850, 0, 0, 0, 0), -- Midsummer Ground Flower
+-- Lillian Singh
+(8118, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(8118, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(8118, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(8118, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(8118, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(8118, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(8118, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(8118, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(8118, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(8118, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(8118, 0, 34850, 0, 0, 0, 0), -- Midsummer Ground Flower
+-- Jaxxil Sparks
+(8121, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(8121, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(8121, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(8121, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(8121, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(8121, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(8121, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(8121, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(8121, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(8121, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(8121, 0, 34850, 0, 0, 0, 0), -- Midsummer Ground Flower
+-- Kizzak Sparks
+(8122, 0, 5740, 0, 0, 0, 0),  -- Red Fireworks Rocket
+(8122, 0, 8624, 0, 0, 0, 0),  -- Red Sparkler
+(8122, 0, 8625, 0, 0, 0, 0),  -- White Sparkler
+(8122, 0, 8626, 0, 0, 0, 0),  -- Blue Sparkler
+(8122, 0, 9312, 0, 0, 0, 0),  -- Blue Firework
+(8122, 0, 9313, 0, 0, 0, 0),  -- Green Firework
+(8122, 0, 9314, 0, 0, 0, 0),  -- Red Streaks Firework
+(8122, 0, 9315, 0, 0, 0, 0),  -- Yellow Rose Firework
+(8122, 0, 9317, 0, 0, 0, 0),  -- Red, White and Blue Firework
+(8122, 0, 9318, 0, 0, 0, 0),  -- Red Firework
+(8122, 0, 34850, 0, 0, 0, 0); -- Midsummer Ground Flower
