@@ -150,7 +150,7 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
-            scheduler.DelayAll(22s);
+            scheduler.DelayAll(23s);
             // blink to room center in this line using SPELL_TELEPORT_START_POSITION and START_POSITION_X, START_POSITION_Y, START_POSITION_Z
             scheduler.Schedule(1s, [this](TaskContext)
             {
