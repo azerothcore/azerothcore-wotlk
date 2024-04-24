@@ -1,4 +1,3 @@
---
 /*
 [ 1 ] + [ Expansion ] + [ Item Rarity ] + [ NPC Level Range ]
 
@@ -6,7 +5,7 @@ So for example, 1126869 is [ 1 ] + [ TBC ] + [ Green ] + [ 68-69 ]
 
 Item Rarity is replaced when dealing with consumables, containers, recipes
 
-5: Bags (maybe add something else cause TBC+ doesn't drop containers)
+5: Bags
 6: Potions
 7: Scrolls
 8: Non-BoP Recipes and Others, like simple gems (These are not numbered by NPC Level)
@@ -58711,3 +58710,279 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 10826) AND (`Item` IN (16039));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (10826, 16039, 0, 50, 0, 1, 1, 1, 1, 'Lord Darkscythe - Ta\'Kierthan Songblade');
+
+-- Unique Loot
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 697) AND (`Item` IN (2450, 2452, 2838, 3355, 3356, 3357, 1998));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(697, 1998, 0, 1, 0, 1, 0, 1, 1, 'Bloodscalp Shaman - Bloodscalp Channeling Staff');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 4260) AND (`Item` IN (3356, 5755));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(4260, 5755, 0, 1, 0, 1, 0, 1, 1, 'Venture Co. Shredder - Onyx Shredder Plate');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 597) AND (`Item` IN (3356, 3357, 1523));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(597, 1523, 0, 1, 0, 1, 0, 1, 1, 'Bloodscalp Berserker - Huge Stone Club');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 676) AND (`Item` IN (1664));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(676, 1664, 0, 1, 0, 1, 0, 1, 1, 'Venture Co. Surveyor - Spellforce Rod');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (781, 783)) AND (`Item` IN (1624));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(781, 1624, 0, 1.5, 0, 1, 0, 1, 1, 'Skullsplitter Headhunter - Skullsplitter Helm'),
+(783, 1624, 0, 1.5, 0, 1, 0, 1, 1, 'Skullsplitter Berserker - Skullsplitter Helm');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 671) AND (`Item` IN (1522));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(671, 1522, 0, 1.5, 0, 1, 0, 1, 1, 'Bloodscalp Headhunter - Headhunting Spear');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 723) AND (`Item` IN (1680, 3928, 6149, 24036, 24039, 24041, 24043));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(723, 1680, 0, 32, 0, 1, 1, 1, 1, 'Mosh\'Ogg Butcher - Headchopper');
+
+-- Mosh'ogg Butcher has no spawn
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(723, 1, 1004150, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 41-50'),
+(723, 2, 1024444, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 44-44'),
+(723, 3, 1034444, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 44-44'),
+(723, 4, 1044444, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 44-44'),
+(723, 5, 1054162, 0.1, 0, 1, 1, 'World Drop - 14 Slot Bag - NPC Levels: 41-62'),
+(723, 6, 1064049, 3, 0, 1, 1, 'World Drop - Potions IV - NPC Levels 40-49'),
+(723, 7, 1073545, 1, 0, 1, 1, 'World Drop - Scrolls III - NPC Levels 35-45'),
+(723, 8, 1080005, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~45'),
+(723, 9, 1080021, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 41-45');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 206) AND (`Item` IN (2450, 2452, 2453, 3355, 3356, 3357, 897));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(206, 897, 0, 2, 0, 1, 0, 1, 1, 'Nightbane Vile Fang - Madwolf Bracers');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 891) AND (`Item` IN (2450, 2453, 3355, 2226));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(891, 2226, 0, 1.5, 0, 1, 0, 1, 1, 'Splinter Fist Fire Weaver - Ogremage Staff');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 533) AND (`Item` IN (2450, 2452, 2453, 2835, 2836, 2838, 3355, 3356, 2233));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(533, 2233, 0, 2, 0, 1, 0, 1, 1, 'Nightbane Shadow Weaver - Shadow Weaver Leggings');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 889) AND (`Item` IN (2450, 2452, 2835, 2836, 3356, 911));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(889, 911, 0, 2, 0, 1, 0, 1, 1, 'Splinter Fist Ogre - Ironwood Treebranch');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 785) AND (`Item` IN (2453, 2838, 3356, 2017));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(785, 2017, 0, 1.25, 0, 1, 0, 1, 1, 'Skeletal Warder - Glowing Leather Bracers');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 210) AND (`Item` IN (2450, 2838, 886));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(210, 886, 0, 1, 0, 1, 0, 1, 1, 'Bone Chewer - Black Metal Shortsword');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 892) AND (`Item` IN (2452, 2453, 2836, 2838, 3356, 2227));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(892, 2227, 0, 1, 0, 1, 0, 1, 1, 'Splinter Fist Taskmaster - Heavy Ogre War Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (215, 909)) AND (`Item` IN (2450, 2452, 3356, 920));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(215, 920, 0, 2, 0, 1, 0, 1, 1, 'Defias Night Runner - Wicked Spiked Mace'),
+(909, 920, 0, 2, 0, 1, 0, 1, 1, 'Defias Night Blade - Wicked Spiked Mace');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 787) AND (`Item` IN (2013));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(787, 2013, 0, 1.3, 0, 1, 0, 1, 1, 'Skeletal Healer - Cryptbone Staff');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 171) AND (`Item` IN (1394));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(171, 1394, 0, 3, 0, 1, 0, 1, 1, 'Murloc Warrior - Driftwood Club');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 832) AND (`Item` IN (4290));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(832, 4290, 0, 1.5, 0, 1, 0, 1, 1, 'Dust Devil - Dust Bowl');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 40) AND (`Item` IN (1389));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(40, 1389, 0, 6, 0, 1, 0, 1, 1, 'Kobold Miner - Kobold Mining Mallet');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 440) AND (`Item` IN (2450, 2835, 1446));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(440, 1446, 0, 1.5, 0, 1, 0, 1, 1, 'Blackrock Grunt - Blackrock Boots');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 424) AND (`Item` IN (765, 2447, 2449, 2450, 2452, 2453));
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 544) AND (`Item` IN (2449, 2450, 2452, 1406));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(544, 1406, 0, 1.5, 0, 1, 0, 1, 1, 'Murloc Nightcrawler - Pearl-encrusted Spear');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 436) AND (`Item` IN (2449, 2450, 2452, 2453, 2835, 2836, 3356, 1300));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(436, 1300, 0, 1, 0, 1, 0, 1, 1, 'Blackrock Shadowcaster - Lesser Staff of the Spire');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 545) AND (`Item` IN (765, 2450, 2452, 2835, 2836, 3356, 1473));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(545, 1473, 0, 1, 0, 1, 0, 1, 1, 'Murloc Tidecaller - Riverside Staff');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 578) AND (`Item` IN (2450, 2453, 2835, 1469));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(578, 1469, 0, 1, 0, 1, 0, 1, 1, 'Murloc Scout - Scimitar of Atun');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 579) AND (`Item` IN (2835, 2836, 1459));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(579, 1459, 0, 2, 0, 1, 0, 1, 1, 'Shadowhide Assassin - Shadowhide Scalper');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 433) AND (`Item` IN (422, 2449, 2450, 2452, 2453, 2835, 2836, 3355, 3356, 4538, 4542, 4593, 4606, 5374, 1457));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(433, 1457, 0, 2, 0, 1, 0, 1, 1, 'Shadowhide Gnoll - Shadowhide Mace');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 568) AND (`Item` IN (422, 2449, 2450, 2452, 2453, 2835, 2836, 4538, 4542, 4606, 5374, 16882, 2175));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(568, 2175, 0, 2, 0, 1, 0, 1, 1, 'Shadowhide Warrior - Shadowhide Battle Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 431) AND (`Item` IN (422, 2449, 2450, 2452, 2453, 2835, 2836, 4538, 4542, 4606, 5375, 5500, 1461));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(431, 1461, 0, 2, 0, 1, 0, 1, 1, 'Shadowhide Slayer - Slayer\'s Battle Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 432) AND (`Item` IN (422, 2449, 2450, 2453, 2835, 2836, 3355, 3356, 4538, 4542, 4606, 1458));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(432, 1458, 0, 2, 0, 1, 0, 1, 1, 'Shadowhide Brute - Shadowhide Maul');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 434) AND (`Item` IN (422, 2449, 2450, 2453, 2835, 2836, 3355, 3356, 4538, 4542, 4593, 4606, 5498, 16882, 1460));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(434, 1460, 0, 1.5, 0, 1, 0, 1, 1, 'Rabid Shadowhide Gnoll - Shadowhide Two-handed Sword');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 580) AND (`Item` IN (414, 2447, 2449, 2450, 2452, 2453, 2835, 2836, 4537, 4541, 4605, 5498, 1220));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(580, 1220, 0, 1.75, 0, 1, 0, 1, 1, 'Redridge Drudger - Lupine Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 445) AND (`Item` IN (414, 765, 1179, 2287, 2447, 2449, 2452, 2835, 2836, 4537, 4541, 4592, 4605, 1218));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(445, 1218, 0, 3, 0, 1, 0, 1, 1, 'Redridge Alpha - Heavy Gnoll War Club');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 442) AND (`Item` IN (1179, 2449, 2450, 2452, 2453, 2835, 2836, 4605, 5498, 1287));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(442, 1287, 0, 1, 0, 1, 0, 1, 1, 'Tarantula - Giant Tarantula Fang');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (437, 4065)) AND (`Item` IN (422, 2449, 2450, 2452, 2453, 2835, 2836, 4538, 4542, 4606, 5498, 1296));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(437, 1296, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Renegade - Blackrock Mace'),
+(4065, 1296, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Sentry - Blackrock Mace');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (435, 4464)) AND (`Item` IN (422, 785, 2449, 2450, 2452, 2453, 2835, 2836, 3355, 3356, 4538, 4542, 4593, 4606, 9355, 1455));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(435, 1455, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Champion - Blackrock Champion\'s Axe'),
+(4464, 1455, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Gladiator - Blackrock Champion\'s Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (485, 4064)) AND (`Item` IN (422, 1205, 2449, 2450, 2452, 2453, 2835, 2836, 3770, 4538, 4542, 4593, 4606, 1448));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(485, 1448, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Outrunner - Blackrock Gauntlets'),
+(4064, 1448, 0, 3, 0, 1, 0, 1, 1, 'Blackrock Scout - Blackrock Gauntlets');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 426) AND (`Item` IN (414, 765, 2447, 2449, 2450, 2452, 2453, 2835, 2836, 4537, 4541, 4592, 4605, 1214));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(426, 1214, 0, 1.5, 0, 1, 0, 1, 1, 'Redridge Brute - Gnoll Punisher');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 446) AND (`Item` IN (414, 765, 2447, 2449, 2450, 2452, 2453, 2835, 2836, 4537, 4541, 4592, 4605, 5498, 1440));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(446, 1440, 0, 2, 0, 1, 0, 1, 1, 'Redridge Basher - Gnoll Skull Basher');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 423) AND (`Item` IN (414, 765, 2447, 2449, 2450, 2452, 2453, 2835, 2836, 4537, 4541, 4592, 4605, 1211));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(423, 1211, 0, 2, 0, 1, 0, 1, 1, 'Redridge Mongrel - Gnoll War Harness');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2719) AND (`Item` IN (2838, 3356, 3357, 3927, 4601, 4602, 4608, 7912, 1521));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2719, 1521, 0, 2, 0, 1, 0, 1, 1, 'Dustbelcher Lord - Lumbering Ogre Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1118) AND (`Item` IN (2064));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1118, 2064, 0, 6, 0, 1, 0, 1, 1, 'Rockjaw Backbreaker - Trogg Club');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1123) AND (`Item` IN (2260));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1123, 2260, 0, 5, 0, 1, 0, 1, 1, 'Frostmane Headhunter - Frostmane Hand Axe');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2478) AND (`Item` IN (818, 856, 858, 954, 955, 1180, 1206, 1210, 1705, 2406, 2455, 2883, 3012, 4293, 4294, 4409, 4698, 4700, 5319, 5972, 6271, 6390, 6588, 6716, 10407, 11038, 14170, 24059, 24060, 24062, 24064, 24070, 24078));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2478, 5319, 0, 100, 0, 1, 0, 1, 1, 'Haren Swifthoof - Bashing Pauldrons'),
+(2478, 1, 1001620, 6, 0, 1, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
+(2478, 2, 1012020, 1, 0, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 20-20'),
+(2478, 3, 1022020, 2, 0, 1, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 20-20'),
+(2478, 4, 1031820, 0.1, 0, 1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
+(2478, 5, 1051120, 0.5, 0, 1, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
+(2478, 6, 1062029, 3, 0, 1, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
+(2478, 7, 1071930, 1, 0, 1, 0, 1, 1, 'World Drop - Scrolls II - NPC Levels 19-30'),
+(2478, 8, 1080002, 0.3, 0, 1, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
+(2478, 9, 1080016, 1.5, 0, 1, 0, 1, 1, 'World Drop - Gems - NPC Levels: 20-25');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1172) AND (`Item` IN (2282, 3110));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1172, 2282, 0, 2, 0, 1, 0, 1, 1, 'Tunnel Rat Vermin - Rodentia Shortsword'),
+(1172, 3110, 0, 38, 1, 1, 1, 1, 1, 'Tunnel Rat Vermin - Tunnel Rat Ear');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1173) AND (`Item` IN (2282));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1173, 2282, 0, 2, 0, 1, 0, 1, 1, 'Tunnel Rat Scout - Rodentia Shortsword');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 7170) AND (`Item` IN (818, 858, 954, 955, 1179, 1180, 1206, 1210, 1705, 2287, 2409, 2447, 2455, 2657, 2700, 2835, 3012, 3394, 4346, 4348, 4698, 4700, 5573, 5575, 10407, 24059, 24060, 24062, 24064, 24070, 24077, 24078, 4949));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(7170, 4949, 0, 100, 0, 1, 1, 'Thragomm - Orcish Cleaver'),
+(7170, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
+(7170, 2, 1012121, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 21-21'),
+(7170, 3, 1022121, 2, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 21-21'),
+(7170, 4, 1032121, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 21-21'),
+(7170, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
+(7170, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
+(7170, 7, 1071930, 1, 0, 1, 1, 'World Drop - Scrolls II - NPC Levels 19-30'),
+(7170, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
+(7170, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 6523) AND (`Item` IN (422, 2452, 2453, 4538, 4593, 4606, 5500, 6315));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(6523, 6315, 0, 3, 0, 1, 0, 1, 1, 'Dark Iron Rifleman - Steelarrow Crossbow');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (2562, 2564)) AND (`Item` IN (1707, 2836, 2838, 3355, 3356, 4539, 4544, 3341));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2562, 3341, 0, 1.2, 0, 1, 0, 1, 1, 'Boulderfist Ogre - Gauntlets of Ogre Strength'),
+(2564, 3341, 0, 1.2, 0, 1, 0, 1, 1, 'Boulderfist Enforcer - Gauntlets of Ogre Strength');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2345) AND (`Item` IN (422, 2450, 2452, 2453, 2838, 3356, 3357, 3770, 4538, 4606, 5498, 5500, 4724));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2345, 4724, 0, 3, 0, 1, 0, 1, 1, 'Dun Garok Rifleman - Humbert\'s Helm');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2344) AND (`Item` IN (3053));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2344, 3053, 0, 3, 0, 1, 0, 1, 1, 'Dun Garok Mountaineer - Humbert\'s Chestpiece');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 232) AND (`Item` IN (2450, 9242, 1485));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(232, 1485, 0, 15, 0, 1, 0, 1, 1, 'Farmer Ray - Pitchfork');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2266) AND (`Item` IN (2450, 2452, 3356, 3770, 4542, 4593, 4606, 5374, 1485));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2266, 1485, 0, 15, 0, 1, 0, 1, 1, 'Hillsbrad Farmer - Pitchfork');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2451) AND (`Item` IN (1485));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2451, 1485, 0, 15, 0, 1, 0, 1, 1, 'Farmer Kalaba - Pitchfork');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2403) AND (`Item` IN (2450, 3355, 4542, 4606, 1485));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2403, 1485, 0, 15, 0, 1, 0, 1, 1, 'Farmer Getz - Pitchfork');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (2427, 2428)) AND (`Item` IN (2835, 3355, 4538, 4542, 5374, 3429));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2427, 3429, 0, 1, 0, 1, 0, 1, 1, 'Jailor Eston - Guardsman Belt'),
+(2428, 3429, 0, 1, 0, 1, 0, 1, 1, 'Jailor Marlgen - Guardsman Belt');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2368) AND (`Item` IN (422, 2450, 2452, 2835, 2836, 2838, 3355, 3820, 4538, 4593));
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2370) AND (`Item` IN (2450, 2838, 3355, 3820));
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2372) AND (`Item` IN (422, 2450, 2453, 2836, 3356, 4538, 4542, 4593, 4606, 5374, 5637, 3204));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2372, 3204, 0, 2, 0, 1, 0, 1, 1, 'Mudsnout Gnoll - Deepwood Bracers');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2246) AND (`Item` IN (2838, 3355, 3356, 3357, 3771, 4539, 4544, 4607, 5498, 1280));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2246, 1280, 0, 1.8, 0, 1, 0, 1, 1, 'Syndicate Assassin - Cloaked Hood');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1934) AND (`Item` IN (117, 765, 2835, 3334));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1934, 3334, 0, 1.6, 0, 1, 0, 1, 1, 'Tirisfal Farmer - Farmer\'s Shovel');
