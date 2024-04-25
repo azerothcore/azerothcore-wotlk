@@ -1,3 +1,4 @@
+-- DB update 2024_04_25_00 -> 2024_04_25_01
 -- Manually apply 'automated z correction' to DB creature spawns
 -- the core hackfix which has been doing this "on the run" was removed already.
 -- this "restores" the state of all DB spawns that triggered the hackfix in
