@@ -35738,8 +35738,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Chance`, `GroupId`, `Mi
 (1052130, 5576, 0, 1, 1, 1, 'Large Brown Sack'),
 (1053140, 1725, 0, 1, 1, 1, 'Large Knapsack'),
 (1054162, 1685, 0, 1, 1, 1, 'Troll-hide Bag'),
-(1054162, 3914, 85, 1, 1, 1, 'Journeyman\'s Backpack'),
-(1054863, 4500, 0, 1, 1, 1, 'Traveler\'s Backpack');
+(1054162, 3914, 85, 1, 1, 1, 'Journeyman\'s Backpack');
 
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Chance`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (1061019, 858, 66, 1, 1, 1, 'Lesser Healing Potion'),
@@ -56257,7 +56256,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1137, 6, 1080001, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~5-10'),
 (1137, 7, 1080013, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 6-10'),
 (3068, 1, 1000610, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 6-10'),
-(3068, 2, 1010909, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 9-9'),
+(3068, 2, 1010909, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 9-9'),
 (3068, 3, 1020909, 1, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 9-9'),
 (3068, 4, 1050110, 0.5, 0, 1, 1, 'World Drop - 6 Slot Bag - NPC Levels: 1-10'),
 (3068, 5, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56327,7 +56326,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1132, 6, 1080001, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~5-10'),
 (1132, 7, 1080013, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 6-10'),
 (1910, 1, 1000610, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 6-10'),
-(1910, 2, 1011010, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 10-10'),
+(1910, 2, 1011010, 30, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 10-10'),
 (1910, 3, 1021010, 2, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 10-10'),
 (1910, 4, 1050110, 0.5, 0, 1, 1, 'World Drop - 6 Slot Bag - NPC Levels: 1-10'),
 (1910, 5, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56428,7 +56427,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1119, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (1119, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (1130, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(1130, 2, 1011212, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
+(1130, 2, 1011212, 75, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
 (1130, 3, 1021212, 2, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 12-12'),
 (1130, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (1130, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
@@ -56436,8 +56435,8 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1130, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (1130, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (1911, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(1911, 2, 1011212, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
-(1911, 3, 1021212, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 12-12'),
+(1911, 2, 1011212, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
+(1911, 3, 1021212, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 12-12'),
 (1911, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (1911, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (1911, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56452,8 +56451,8 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (3056, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (3056, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (10358, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(10358, 2, 1011212, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
-(10358, 3, 1021212, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 12-12'),
+(10358, 2, 1011212, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 12-12'),
+(10358, 3, 1021212, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 12-12'),
 (10358, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (10358, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (10358, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56461,7 +56460,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10358, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (2175, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
 (2175, 2, 1011313, 67, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
-(2175, 3, 1021313, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
+(2175, 3, 1021313, 33, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
 (2175, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (2175, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (2175, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56476,40 +56475,40 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (3535, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (3535, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (5865, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(5865, 2, 1011313, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
-(5865, 3, 1021313, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
+(5865, 2, 1011313, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
+(5865, 3, 1021313, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
 (5865, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (5865, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (5865, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (5865, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (5865, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (10359, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(10359, 2, 1011313, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
-(10359, 3, 1021313, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
+(10359, 2, 1011313, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
+(10359, 3, 1021313, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
 (10359, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (10359, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (10359, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (10359, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (10359, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (12431, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(12431, 2, 1011313, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
-(12431, 3, 1021313, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
+(12431, 2, 1011313, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 13-13'),
+(12431, 3, 1021313, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 13-13'),
 (12431, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (12431, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (12431, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (12431, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (12431, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (2191, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(2191, 2, 1011414, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 14-14'),
-(2191, 3, 1021414, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 14-14'),
+(2191, 2, 1011414, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 14-14'),
+(2191, 3, 1021414, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 14-14'),
 (2191, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (2191, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (2191, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (2191, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (2191, 8, 1080014, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 11-14'),
 (12432, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(12432, 2, 1011414, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 14-14'),
-(12432, 3, 1021414, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 14-14'),
+(12432, 2, 1011414, 50, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 14-14'),
+(12432, 3, 1021414, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 14-14'),
 (12432, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (12432, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (12432, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56549,31 +56548,31 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (3470, 8, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (5837, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
 (5837, 2, 1011515, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-15'),
-(5837, 3, 1021515, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-15'),
+(5837, 3, 1021515, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-15'),
 (5837, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (5837, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (5837, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (5837, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (5837, 8, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (12433, 1, 1001115, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 11-15'),
-(12433, 2, 1011515, 5, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-15'),
-(12433, 3, 1021515, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-15'),
+(12433, 2, 1011515, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-15'),
+(12433, 3, 1021515, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-15'),
 (12433, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (12433, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (12433, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (12433, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (12433, 8, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (7017, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(7017, 2, 1011516, 5, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-16'),
-(7017, 3, 1021516, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-16'),
+(7017, 2, 1011516, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-16'),
+(7017, 3, 1021516, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-16'),
 (7017, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (7017, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (7017, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
 (7017, 7, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (7017, 8, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (14268, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(14268, 2, 1011516, 5, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-16'),
-(14268, 3, 1021516, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-16'),
+(14268, 2, 1011516, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 15-16'),
+(14268, 3, 1021516, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 15-16'),
 (14268, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (14268, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (14268, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56629,7 +56628,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5829, 8, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (5838, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
 (5838, 2, 1011717, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 17-17'),
-(5838, 3, 1021717, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 17-17'),
+(5838, 3, 1021717, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 17-17'),
 (5838, 4, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (5838, 5, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
 (5838, 6, 1070518, 1, 0, 1, 1, 'World Drop - Scrolls I - NPC Levels 5-18'),
@@ -56716,7 +56715,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2192, 8, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (2192, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (3295, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(3295, 2, 1011919, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
+(3295, 2, 1011919, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
 (3295, 3, 1021919, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
 (3295, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (3295, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
@@ -56725,7 +56724,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (3295, 8, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (3295, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (5836, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(5836, 2, 1011919, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
+(5836, 2, 1011919, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
 (5836, 3, 1021919, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
 (5836, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (5836, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
@@ -56735,7 +56734,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5836, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (5863, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
 (5863, 2, 1011919, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
-(5863, 3, 1021919, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
+(5863, 3, 1021919, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
 (5863, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (5863, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (5863, 6, 1061019, 3, 0, 1, 1, 'World Drop - Potions I - NPC Levels 10-19'),
@@ -56743,7 +56742,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5863, 8, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (5863, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (14266, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(14266, 2, 1011919, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
+(14266, 2, 1011919, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
 (14266, 3, 1021919, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
 (14266, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (14266, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
@@ -56752,7 +56751,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (14266, 8, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (14266, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (14270, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(14270, 2, 1011919, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
+(14270, 2, 1011919, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 19-19'),
 (14270, 3, 1021919, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 19-19'),
 (14270, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (14270, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
@@ -56762,7 +56761,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (14270, 9, 1080015, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 15-19'),
 (573, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
 (573, 2, 1012020, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 20-20'),
-(573, 3, 1022020, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 20-20'),
+(573, 3, 1022020, 5, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 20-20'),
 (573, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (573, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
 (573, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56770,7 +56769,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (573, 8, 1080002, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~10-20'),
 (573, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (2172, 1, 1001620, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 16-20'),
-(2172, 2, 1012020, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 20-20'),
+(2172, 2, 1012020, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 20-20'),
 (2172, 3, 1022020, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 20-20'),
 (2172, 4, 1031820, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 18-20'),
 (2172, 5, 1051120, 0.5, 0, 1, 1, 'World Drop - 8 Slot Bag - NPC Levels: 11-20'),
@@ -56797,7 +56796,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1920, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (1920, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (14269, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(14269, 2, 1012121, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 21-21'),
+(14269, 2, 1012121, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 21-21'),
 (14269, 3, 1022121, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 21-21'),
 (14269, 4, 1032121, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 21-21'),
 (14269, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56842,7 +56841,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2476, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (2476, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (3735, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(3735, 2, 1012222, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
+(3735, 2, 1012222, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
 (3735, 3, 1022222, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 22-22'),
 (3735, 4, 1032222, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 22-22'),
 (3735, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56860,7 +56859,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (7016, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (7016, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (10559, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(10559, 2, 1012222, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
+(10559, 2, 1012222, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
 (10559, 3, 1022222, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 22-22'),
 (10559, 4, 1032222, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 22-22'),
 (10559, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56869,7 +56868,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10559, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (10559, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (10644, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(10644, 2, 1012222, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
+(10644, 2, 1012222, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 22-22'),
 (10644, 3, 1022222, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 22-22'),
 (10644, 4, 1032222, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 22-22'),
 (10644, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56879,7 +56878,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10644, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (521, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
 (521, 2, 1012323, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
-(521, 3, 1022323, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
+(521, 3, 1022323, 5, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
 (521, 4, 1032323, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 23-23'),
 (521, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (521, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56888,7 +56887,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (521, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (616, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
 (616, 2, 1012323, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
-(616, 3, 1022323, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
+(616, 3, 1022323, 70, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
 (616, 4, 1032323, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 23-23'),
 (616, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (616, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56897,7 +56896,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (616, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (1948, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
 (1948, 2, 1012323, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
-(1948, 3, 1022323, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
+(1948, 3, 1022323, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
 (1948, 4, 1032323, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 23-23'),
 (1948, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (1948, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56914,7 +56913,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2090, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (2090, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (10643, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(10643, 2, 1012323, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
+(10643, 2, 1012323, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
 (10643, 3, 1022323, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
 (10643, 4, 1032323, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 23-23'),
 (10643, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56923,7 +56922,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10643, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (10643, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (14281, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(14281, 2, 1012323, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
+(14281, 2, 1012323, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 23-23'),
 (14281, 3, 1022323, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 23-23'),
 (14281, 4, 1032323, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 23-23'),
 (14281, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56932,8 +56931,8 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (14281, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (14281, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (1037, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(1037, 2, 1012425, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-25'),
-(1037, 3, 1022425, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-25'),
+(1037, 2, 1012425, 5, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-25'),
+(1037, 3, 1022425, 100, 0, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-25'),
 (1037, 4, 1032425, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 24-25'),
 (1037, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (1037, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56950,7 +56949,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (1112, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (1112, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (3253, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(3253, 2, 1012424, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
+(3253, 2, 1012424, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
 (3253, 3, 1022424, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
 (3253, 4, 1032424, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 24-24'),
 (3253, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -56969,7 +56968,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5832, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (5847, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
 (5847, 2, 1012424, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
-(5847, 3, 1022424, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
+(5847, 3, 1022424, 70, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
 (5847, 4, 1032424, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 24-24'),
 (5847, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (5847, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56978,7 +56977,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5847, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (5849, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
 (5849, 2, 1012424, 1, 0, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
-(5849, 3, 1022424, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
+(5849, 3, 1022424, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
 (5849, 4, 1032424, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 24-24'),
 (5849, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
 (5849, 6, 1062029, 3, 0, 1, 1, 'World Drop - Potions II - NPC Levels 20-29'),
@@ -56986,7 +56985,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5849, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (5849, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (14279, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(14279, 2, 1012424, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
+(14279, 2, 1012424, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 24-24'),
 (14279, 3, 1022424, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 24-24'),
 (14279, 4, 1032424, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 24-24'),
 (14279, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57013,7 +57012,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (4015, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (4015, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (5834, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(5834, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(5834, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (5834, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (5834, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (5834, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57022,7 +57021,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5834, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (5834, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (5848, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(5848, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(5848, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (5848, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (5848, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (5848, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57031,7 +57030,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (5848, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (5848, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (10639, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(10639, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(10639, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (10639, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (10639, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (10639, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57040,7 +57039,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10639, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (10639, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (10641, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(10641, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(10641, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (10641, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (10641, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (10641, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57049,7 +57048,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10641, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (10641, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (14273, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(14273, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(14273, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (14273, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (14273, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (14273, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57058,7 +57057,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (14273, 8, 1080003, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~25'),
 (14273, 9, 1080016, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 20-25'),
 (14424, 1, 1002125, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 21-25'),
-(14424, 2, 1012525, 0, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
+(14424, 2, 1012525, 10, 1, 1, 1, 'World Drop - White World Drop - NPC Levels: 25-25'),
 (14424, 3, 1022525, 90, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 25-25'),
 (14424, 4, 1032525, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 25-25'),
 (14424, 5, 1052130, 0.5, 0, 1, 1, 'World Drop - 10 Slot Bag - NPC Levels: 21-30'),
@@ -57355,7 +57354,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2452, 7, 1080004, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~35'),
 (2452, 8, 1080020, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 36-40'),
 (2603, 1, 1003140, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 31-40'),
-(2603, 2, 1023636, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 36-36'),
+(2603, 2, 1023636, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 36-36'),
 (2603, 3, 1033636, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 36-36'),
 (2603, 4, 1053140, 0.4, 0, 1, 1, 'World Drop - 12 Slot Bag - NPC Levels: 31-40'),
 (2603, 5, 1063039, 3, 0, 1, 1, 'World Drop - Potions III - NPC Levels 30-39'),
@@ -57371,7 +57370,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2751, 7, 1080004, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~35'),
 (2751, 8, 1080020, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 36-40'),
 (4132, 1, 1003140, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 31-40'),
-(4132, 2, 1023636, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 36-36'),
+(4132, 2, 1023636, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 36-36'),
 (4132, 3, 1033636, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 36-36'),
 (4132, 4, 1053140, 0.4, 0, 1, 1, 'World Drop - 12 Slot Bag - NPC Levels: 31-40'),
 (4132, 5, 1063039, 3, 0, 1, 1, 'World Drop - Potions III - NPC Levels 30-39'),
@@ -57557,7 +57556,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (2605, 8, 1080005, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~45'),
 (2605, 9, 1080020, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 36-40'),
 (2609, 1, 1003140, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 31-40'),
-(2609, 2, 1024040, 0, 2, 1, 1, 'World Drop - Green World Drop - NPC Levels: 39-40'),
+(2609, 2, 1024040, 65, 2, 1, 1, 'World Drop - Green World Drop - NPC Levels: 39-40'),
 (2609, 3, 1034040, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 39-40'),
 (2609, 4, 1043840, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 38-40'),
 (2609, 5, 1053140, 0.4, 0, 1, 1, 'World Drop - 12 Slot Bag - NPC Levels: 31-40'),
@@ -58079,7 +58078,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (8303, 8, 1080008, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~50-63'),
 (8303, 9, 1080022, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 46-62'),
 (8924, 1, 1004150, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 41-50'),
-(8924, 2, 1025050, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 50-50'),
+(8924, 2, 1025050, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 50-50'),
 (8924, 3, 1035050, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 50-50'),
 (8924, 4, 1045050, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 50-50'),
 (8924, 5, 1054162, 0.1, 0, 1, 1, 'World Drop - 14 Slot Bag - NPC Levels: 41-62'),
@@ -58097,7 +58096,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (14344, 8, 1080008, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~50-63'),
 (14344, 9, 1080022, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 46-62'),
 (6650, 1, 1005163, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 51-63'),
-(6650, 2, 1025051, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 50-51'),
+(6650, 2, 1025051, 75, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 50-51'),
 (6650, 3, 1035051, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 50-51'),
 (6650, 4, 1045051, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 50-51'),
 (6650, 5, 1054162, 0.1, 0, 1, 1, 'World Drop - 14 Slot Bag - NPC Levels: 41-62'),
@@ -58394,7 +58393,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (10821, 8, 1080008, 0.3, 0, 1, 1, 'World Drop - Profession Recipes - NPC Levels ~50-63'),
 (10821, 9, 1080022, 0.3, 0, 1, 1, 'World Drop - Gems - NPC Levels 46-62'),
 (10826, 1, 1005163, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 51-63'),
-(10826, 2, 1025757, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 57-57'),
+(10826, 2, 1025757, 50, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 57-57'),
 (10826, 3, 1035757, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 57-57'),
 (10826, 4, 1045757, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 57-57'),
 (10826, 5, 1054162, 0.1, 0, 1, 1, 'World Drop - 14 Slot Bag - NPC Levels: 41-62'),
@@ -58744,7 +58743,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 -- Mosh'ogg Butcher has no spawn
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (723, 1, 1004150, 6, 0, 1, 1, 'World Drop - Grey World Drop - NPC Levels: 41-50'),
-(723, 2, 1024444, 0, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 44-44'),
+(723, 2, 1024444, 68, 1, 1, 1, 'World Drop - Green World Drop - NPC Levels: 44-44'),
 (723, 3, 1034444, 0.1, 0, 1, 1, 'World Drop - Blue World Drop - NPC Levels: 44-44'),
 (723, 4, 1044444, 0.01, 0, 1, 1, 'World Drop - Purple World Drop - NPC Levels: 44-44'),
 (723, 5, 1054162, 0.1, 0, 1, 1, 'World Drop - 14 Slot Bag - NPC Levels: 41-62'),
@@ -58992,3 +58991,343 @@ DELETE FROM `creature_loot_template` WHERE `Entry` IN (10157, 5346, 14268, 11734
 AND `Item` IN (2835, 2836, 2838, 7912, 12365);
 DELETE FROM `creature_loot_template` WHERE `Entry` IN (1865, 628, 2728, 500, 624, 4054, 3114, 3280, 4012, 4109, 4788, 615, 1924, 202, 202, 202, 202, 202, 202, 203, 203, 203, 203, 203, 205, 205, 205, 205, 205, 210, 212, 212, 212, 212, 212, 213, 213, 213, 217, 217, 217, 218, 285, 285, 300, 315, 315, 315, 315, 390, 390, 390, 391, 391, 422, 422, 422, 422, 422, 428, 428, 428, 428, 428, 429, 429, 429, 430, 430, 430, 430, 430, 430, 441, 441, 441, 441, 449, 449, 449, 449, 452, 452, 452, 452, 452, 452, 453, 453, 454, 454, 454, 454, 454, 454, 456, 456, 458, 458, 458, 458, 458, 473, 474, 474, 475, 475, 475, 476, 476, 476, 478, 480, 480, 480, 481, 481, 481, 500, 500, 500, 500, 501, 502, 504, 504, 504, 504, 504, 504, 504, 505, 505, 505, 511, 513, 513, 513, 515, 515, 515, 515, 517, 517, 517, 517, 518, 518, 524, 524, 525, 539, 539, 539, 539, 539, 539, 547, 547, 547, 547, 547, 547, 548, 548, 548, 548, 550, 565, 565, 565, 565, 565, 569, 570, 570, 570, 570, 587, 587, 588, 589, 589, 589, 589, 589, 589, 589, 590, 590, 590, 590, 590, 590, 594, 595, 595, 595, 604, 604, 615, 615, 615, 619, 623, 623, 623, 624, 625, 628, 628, 628, 628, 660, 660, 667, 667, 669, 669, 671, 674, 674, 679, 681, 681, 681, 682, 682, 682, 683, 683, 684, 684, 686, 686, 686, 687, 687, 687, 688, 689, 689, 690, 690, 690, 690, 691, 694, 694, 694, 696, 696, 699, 699, 701, 701, 701, 701, 702, 703, 709, 710, 710, 712, 712, 712, 712, 712, 712, 732, 732, 735, 736, 736, 740, 741, 742, 744, 744, 745, 745, 747, 750, 750, 751, 751, 751, 752, 752, 759, 759, 759, 760, 760, 761, 762, 762, 762, 762, 766, 768, 769, 769, 772, 772, 772, 772, 780, 780, 780, 783, 783, 785, 787, 787, 819, 819, 819, 822, 824, 824, 824, 824, 824, 824, 832, 832, 833, 833, 833, 833, 834, 834, 834, 834, 854, 856, 858, 858, 871, 871, 871, 873, 879, 880, 880, 880, 898, 898, 898, 898, 898, 909, 910, 910, 910, 920, 920, 920, 922, 922, 923, 923, 923, 923, 923, 930, 930, 930, 937, 937, 937, 937, 939, 940, 940, 940, 941, 942, 942, 948, 948, 948, 948, 949, 949, 976, 978, 979, 979, 1526, 1725, 1727, 1727, 1727, 1765, 1765, 1766, 1766, 1767, 1768, 1768, 1769, 1769, 1770, 1770, 1770, 1772, 1772, 1778, 1779, 1779, 1779, 1779, 1780, 1780, 1782, 1782, 1783, 1783, 1784, 1787, 1787, 1789, 1791, 1791, 1795, 1797, 1802, 1806, 1808, 1815, 1816, 1817, 1822, 1822, 1824, 1835, 1866, 1866, 1866, 1867, 1867, 1869, 1869, 1888, 1888, 1888, 1888, 1889, 1891, 1891, 1894, 1895, 1895, 1907, 1907, 1907, 1909, 1909, 1912, 1912, 1912, 1912, 1913, 1914, 1914, 1915, 1915, 1915, 1922, 1923, 1924, 1924, 1924, 1935, 1939, 1939, 1940, 1941, 1941, 1942, 1943, 1943, 1953, 1957, 1974, 1974, 1995, 1996, 1996, 1998, 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2005, 2005, 2008, 2008, 2009, 2009, 2009, 2010, 2010, 2010, 2011, 2011, 2011, 2012, 2015, 2017, 2017, 2021, 2021, 2022, 2025, 2027, 2029, 2030, 2033, 2034, 2042, 2042, 2043, 2053, 2054, 2054, 2069, 2069, 2069, 2070, 2070, 2071, 2071, 2071, 2089, 2089, 2089, 2089, 2102, 2102, 2102, 2103, 2103, 2103, 2103, 2152, 2152, 2156, 2156, 2156, 2156, 2156, 2157, 2157, 2157, 2163, 2164, 2164, 2164, 2164, 2165, 2165, 2165, 2165, 2165, 2167, 2167, 2168, 2168, 2168, 2169, 2169, 2169, 2170, 2170, 2171, 2171, 2176, 2176, 2177, 2177, 2177, 2177, 2177, 2178, 2178, 2178, 2178, 2178, 2179, 2179, 2180, 2180, 2180, 2181, 2181, 2181, 2181, 2181, 2181, 2182, 2182, 2183, 2183, 2189, 2189, 2189, 2189, 2189, 2189, 2190, 2190, 2190, 2190, 2202, 2203, 2203, 2204, 2205, 2206, 2208, 2212, 2212, 2212, 2212, 2231, 2232, 2232, 2233, 2233, 2234, 2235, 2236, 2236, 2237, 2237, 2237, 2237, 2237, 2240, 2242, 2242, 2242, 2243, 2243, 2244, 2244, 2244, 2244, 2245, 2245, 2247, 2248, 2248, 2248, 2248, 2248, 2248, 2249, 2249, 2249, 2249, 2249, 2249, 2250, 2251, 2252, 2253, 2253, 2254, 2254, 2254, 2255, 2256, 2256, 2260, 2260, 2261, 2261, 2261, 2261, 2261, 2268, 2269, 2269, 2269, 2269, 2269, 2270, 2270, 2270, 2271, 2271, 2272, 2272, 2272, 2287, 2287, 2287, 2287, 2318, 2318, 2318, 2318, 2318, 2318, 2319, 2319, 2319, 2321, 2321, 2321, 2321, 2321, 2322, 2322, 2322, 2323, 2323, 2323, 2323, 2324, 2324, 2336, 2336, 2336, 2336, 2337, 2338, 2338, 2338, 2338, 2339, 2339, 2339, 2344, 2344, 2344, 2344, 2348, 2348, 2348, 2349, 2349, 2350, 2350, 2350, 2350, 2350, 2350, 2351, 2351, 2351, 2351, 2351, 2351, 2354, 2354, 2354, 2354, 2354, 2354, 2356, 2356, 2356, 2356, 2356, 2358, 2358, 2359, 2359, 2359, 2360, 2360, 2360, 2360, 2369, 2371, 2371, 2371, 2373, 2373, 2374, 2374, 2374, 2374, 2375, 2375, 2375, 2375, 2375, 2375, 2376, 2376, 2376, 2376, 2376, 2376, 2377, 2377, 2377, 2377, 2377, 2377, 2384, 2384, 2384, 2384, 2384, 2384, 2385, 2385, 2385, 2385, 2387, 2387, 2406, 2407, 2407, 2408, 2408, 2408, 2408, 2408, 2503, 2503, 2505, 2505, 2505, 2521, 2521, 2544, 2552, 2552, 2554, 2554, 2554, 2555, 2556, 2556, 2559, 2559, 2559, 2559, 2560, 2560, 2561, 2561, 2563, 2563, 2563, 2566, 2566, 2566, 2566, 2567, 2567, 2567, 2569, 2570, 2570, 2570, 2571, 2571, 2571, 2572, 2572, 2573, 2573, 2573, 2574, 2574, 2574, 2574, 2579, 2581, 2582, 2582, 2582, 2582, 2582, 2583, 2583, 2584, 2584, 2585, 2586, 2586, 2586, 2587, 2587, 2588, 2588, 2588, 2588, 2589, 2589, 2589, 2589, 2589, 2591, 2595, 2595, 2618, 2619, 2619, 2628, 2628, 2635, 2640, 2643, 2647, 2649, 2650, 2650, 2651, 2652, 2652, 2653, 2654, 2655, 2655, 2655, 2655, 2655, 2655, 2655, 2656, 2656, 2656, 2656, 2656, 2656, 2657, 2659, 2681, 2693, 2694, 2701, 2701, 2701, 2715, 2715, 2715, 2716, 2717, 2717, 2718, 2718, 2720, 2720, 2723, 2725, 2725, 2727, 2731, 2732, 2732, 2734, 2735, 2736, 2740, 2742, 2742, 2743, 2743, 2743, 2761, 2791, 2793, 2829, 2830, 2831, 2893, 2893, 2894, 2894, 2927, 2928, 2928, 2929, 2949, 2949, 2949, 2950, 2950, 2950, 2951, 2956, 2956, 2957, 2957, 2958, 2959, 2960, 2962, 2963, 2963, 2963, 2964, 2964, 2965, 2965, 2969, 2969, 2971, 2971, 2972, 2976, 2977, 2978, 2978, 2978, 2979, 2979, 2989, 2989, 2989, 2990, 3035, 3099, 3100, 3100, 3100, 3103, 3103, 3104, 3104, 3106, 3106, 3106, 3107, 3107, 3110, 3111, 3111, 3112, 3113, 3113, 3113, 3114, 3115, 3115, 3115, 3115, 3116, 3116, 3116, 3117, 3117, 3117, 3117, 3118, 3118, 3118, 3118, 3119, 3119, 3119, 3120, 3120, 3120, 3126, 3129, 3129, 3130, 3130, 3131, 3131, 3131, 3196, 3197, 3197, 3197, 3198, 3198, 3198, 3199, 3199, 3199, 3203, 3203, 3204, 3204, 3204, 3205, 3206, 3206, 3206, 3207, 3207, 3232, 3234, 3234, 3234, 3234, 3235, 3238, 3238, 3238, 3238, 3239, 3239, 3239, 3239, 3240, 3240, 3240, 3240, 3241, 3242, 3242, 3242, 3242, 3242, 3243, 3244, 3244, 3244, 3244, 3245, 3245, 3245, 3245, 3245, 3245, 3245, 3246, 3246, 3246, 3246, 3247, 3248, 3248, 3249, 3249, 3250, 3250, 3251, 3251, 3251, 3251, 3252, 3252, 3254, 3254, 3254, 3254, 3255, 3255, 3255, 3255, 3255, 3255, 3256, 3256, 3256, 3256, 3256, 3256, 3256, 3256, 3258, 3258, 3258, 3258, 3258, 3258, 3258, 3258, 3260, 3260, 3260, 3260, 3260, 3261, 3261, 3261, 3261, 3261, 3261, 3261, 3261, 3263, 3263, 3263, 3263, 3265, 3265, 3265, 3266, 3266, 3266, 3266, 3266, 3267, 3267, 3268, 3268, 3268, 3269, 3269, 3269, 3269, 3271, 3271, 3271, 3272, 3272, 3272, 3272, 3273, 3273, 3273, 3273, 3273, 3274, 3274, 3275, 3275, 3275, 3276, 3276, 3276, 3276, 3277, 3277, 3277, 3278, 3278, 3278, 3278, 3279, 3279, 3280, 3280, 3282, 3283, 3283, 3283, 3284, 3284, 3284, 3284, 3285, 3286, 3286, 3286, 3374, 3374, 3376, 3376, 3376, 3376, 3377, 3377, 3378, 3379, 3379, 3380, 3381, 3381, 3381, 3381, 3381, 3382, 3382, 3382, 3382, 3383, 3383, 3383, 3384, 3384, 3385, 3385, 3385, 3385, 3385, 3385, 3385, 3386, 3386, 3386, 3386, 3396, 3397, 3397, 3397, 3415, 3415, 3415, 3416, 3424, 3424, 3424, 3425, 3425, 3425, 3425, 3425, 3426, 3426, 3426, 3426, 3426, 3436, 3436, 3436, 3438, 3455, 3456, 3456, 3456, 3456, 3457, 3457, 3457, 3457, 3457, 3457, 3457, 3458, 3458, 3458, 3458, 3458, 3458, 3458, 3459, 3459, 3459, 3459, 3459, 3459, 3461, 3461, 3461, 3463, 3463, 3463, 3463, 3463, 3466, 3466, 3474, 3566, 3566, 3630, 3630, 3631, 3632, 3632, 3633, 3633, 3634, 3634, 3634, 3638, 3638, 3638, 3641, 3655, 3660, 3667, 3717, 3725, 3725, 3727, 3728, 3730, 3730, 3732, 3739, 3739, 3740, 3743, 3743, 3743, 3746, 3746, 3748, 3749, 3750, 3750, 3750, 3752, 3752, 3754, 3754, 3755, 3757, 3758, 3759, 3759, 3762, 3765, 3765, 3767, 3767, 3767, 3767, 3770, 3770, 3770, 3770, 3770, 3771, 3771, 3772, 3772, 3772, 3774, 3774, 3774, 3789, 3791, 3801, 3802, 3803, 3803, 3804, 3809, 3809, 3809, 3809, 3809, 3810, 3810, 3810, 3810, 3810, 3810, 3812, 3814, 3815, 3815, 3816, 3817, 3819, 3819, 3819, 3819, 3819, 3820, 3820, 3820, 3821, 3821, 3821, 3823, 3823, 3823, 3823, 3823, 3824, 3824, 3824, 3825, 3825, 3825, 3825, 3917, 3917, 3917, 3917, 3921, 3921, 3921, 3922, 3922, 3922, 3924, 3924, 3924, 3924, 3925, 3925, 3925, 3925, 3926, 3926, 3926, 3928, 3928, 3928, 3928, 3987, 3987, 3988, 3988, 3988, 3989, 3989, 3989, 3989, 3991, 3991, 3991, 4003, 4003, 4003, 4003, 4005, 4006, 4006, 4006, 4007, 4007, 4007, 4007, 4008, 4011, 4012, 4012, 4012, 4013, 4014, 4014, 4016, 4016, 4017, 4018, 4018, 4018, 4018, 4019, 4019, 4019, 4020, 4021, 4022, 4022, 4022, 4022, 4023, 4023, 4023, 4023, 4024, 4024, 4024, 4024, 4024, 4025, 4025, 4025, 4025, 4026, 4026, 4026, 4026, 4027, 4027, 4027, 4027, 4031, 4036, 4036, 4037, 4038, 4038, 4038, 4038, 4040, 4040, 4040, 4040, 4041, 4041, 4041, 4042, 4044, 4044, 4044, 4044, 4052, 4056, 4056, 4056, 4057, 4057, 4057, 4061, 4061, 4061, 4061, 4061, 4065, 4067, 4067, 4067, 4067, 4073, 4073, 4074, 4093, 4093, 4093, 4094, 4094, 4094, 4094, 4095, 4095, 4096, 4096, 4096, 4097, 4097, 4097, 4097, 4099, 4099, 4099, 4099, 4100, 4100, 4100, 4100, 4100, 4101, 4101, 4101, 4101, 4101, 4104, 4104, 4104, 4104, 4107, 4107, 4107, 4107, 4109, 4109, 4109, 4109, 4109, 4111, 4111, 4114, 4114, 4116, 4117, 4117, 4117, 4117, 4118, 4118, 4118, 4119, 4120, 4120, 4124, 4124, 4124, 4126, 4126, 4126, 4127, 4127, 4127, 4128, 4128, 4128, 4128, 4129, 4129, 4129, 4129, 4129, 4130, 4130, 4130, 4130, 4131, 4131, 4131, 4131, 4133, 4133, 4133, 4139, 4139, 4140, 4140, 4140, 4142, 4142, 4143, 4143, 4143, 4144, 4144, 4144, 4147, 4147, 4147, 4150, 4150, 4151, 4151, 4154, 4158, 4158, 4248, 4248, 4249, 4249, 4280, 4281, 4316, 4316, 4316, 4316, 4462, 4462, 4462, 4463, 4463, 4463, 4463, 4463, 4465, 4466, 4467, 4467, 4468, 4468, 4505, 4505, 4506, 4632, 4633, 4634, 4634, 4635, 4635, 4636, 4636, 4637, 4637, 4637, 4639, 4639, 4640, 4641, 4642, 4644, 4644, 4644, 4644, 4645, 4645, 4646, 4648, 4649, 4655, 4656, 4656, 4657, 4657, 4657, 4657, 4663, 4663, 4665, 4666, 4668, 4670, 4670, 4671, 4672, 4673, 4673, 4673, 4674, 4674, 4675, 4676, 4677, 4679, 4681, 4692, 4692, 4692, 4693, 4693, 4696, 4696, 4697, 4699, 4699, 4700, 4700, 4711, 4712, 4714, 4718, 4719, 4726, 4726, 4726, 4728, 4728, 4729, 4788, 4789, 4802, 4844, 4844, 4846, 4851, 5224, 5234, 5235, 5236, 5249, 5253, 5263, 5268, 5274, 5307, 5331, 5332, 5332, 5333, 5333, 5334, 5335, 5336, 5426, 5458, 5461, 5461, 5462, 5462, 5475, 5615, 5616, 5617, 5618, 5618, 5622, 5645, 5646, 5647, 5840, 5843, 5843, 5844, 5844, 5844, 5846, 5846, 5850, 5853, 5854, 5854, 5856, 5860, 5861, 5861, 5861, 5862, 5982, 5991, 5999, 6020, 6020, 6073, 6073, 6073, 6073, 6115, 6115, 6115, 6123, 6123, 6123, 6136, 6137, 6137, 6138, 6193, 6194, 6195, 6196, 6196, 6221, 6348, 6349, 6370, 6371, 6375, 6380, 6466, 6494, 6505, 6505, 6505, 6505, 6506, 6506, 6507, 6508, 6508, 6508, 6509, 6510, 6511, 6512, 6513, 6513, 6513, 6514, 6514, 6514, 6514, 6516, 6516, 6516, 6518, 6519, 6520, 6520, 6520, 6520, 6521, 6521, 6521, 6521, 6521, 6527, 6547, 6547, 6547, 6547, 6547, 6551, 6551, 6551, 6551, 6551, 6552, 6552, 6553, 6553, 6553, 6554, 6554, 6554, 6554, 6555, 6555, 6556, 6556, 6557, 6557, 6557, 6557, 6559, 6559, 6559, 6559, 6559, 6668, 6668, 7032, 7035, 7039, 7047, 7049, 7086, 7086, 7086, 7086, 7086, 7086, 7086, 7092, 7092, 7092, 7092, 7092, 7099, 7100, 7107, 7107, 7107, 7109, 7110, 7111, 7112, 7113, 7113, 7113, 7115, 7115, 7120, 7120, 7120, 7126, 7132, 7132, 7132, 7136, 7153, 7153, 7153, 7153, 7155, 7155, 7157, 7158, 7158, 7235, 7318, 7318, 7371, 7432, 7438, 7442, 7444, 7445, 7445, 7449, 7450, 7452, 7454, 7458, 7458, 7459, 7460, 7523, 7523, 7524, 7584, 7856, 7873, 8419, 8525, 8528, 8529, 8530, 8531, 8532, 8540, 8541, 8543, 8543, 8557, 8566, 8600, 8600, 8603, 8603, 8605, 8607, 8637, 8956, 8956, 8957, 8957, 8958, 8958, 8959, 8960, 8960, 8960, 8961, 8961, 9043, 9044, 9162, 9163, 9163, 9163, 9163, 9163, 9164, 9164, 9164, 9165, 9165, 9166, 9166, 9166, 9166, 9166, 9167, 9167, 9167, 9167, 9167, 9318, 9464, 9622, 9691, 10157, 10157, 10158, 10158, 10158, 10158, 10158, 10159, 10159, 10159, 10159, 10159, 10160, 10160, 10160, 10160, 10617, 10648, 10757, 10801, 10916, 11440, 11440, 11443, 11576, 11576, 11577, 11577, 11686, 11687, 11697, 11697, 11730, 11736, 11738, 11739, 11739, 11739, 11740, 11741, 11744, 11744, 11744, 11746, 11746, 11781, 11785, 11858, 11858, 11880, 11880, 11880, 11910, 11910, 11910, 11911, 11911, 11911, 11911, 11912, 11912, 11912, 11913, 11913, 11913, 11913, 12178, 12418, 12579, 12856, 12856, 12856, 14123, 14429, 14460, 24818, 24819, 24819, 949, 949, 3272, 7977, 3993, 3280, 3638, 315, 518, 757, 834, 834, 1865, 1908, 1983, 2015, 2420, 2565, 2733, 2967, 3056, 3503, 3727, 3941, 4009, 5600, 7053, 9879, 2015, 2407, 2017, 3396, 212, 285, 330, 345, 345, 429, 453, 456, 473, 473, 474, 478, 478, 481, 524, 548, 565, 615, 672, 684, 685, 688, 743, 746, 767, 832, 833, 879, 881, 881, 905, 930, 1526, 1767, 1769, 1769, 1770, 1778, 1782, 1797, 1867, 1868, 1869, 1888, 1909, 1912, 1923, 1924, 1935, 1993, 1995, 1995, 1996, 1997, 2012, 2018, 2020, 2069, 2070, 2070, 2071, 2089, 2089, 2091, 2152, 2162, 2163, 2163, 2164, 2164, 2168, 2171, 2171, 2176, 2183, 2185, 2187, 2207, 2241, 2270, 2305, 2305, 2305, 2335, 2335, 2344, 2348, 2348, 2349, 2349, 2420, 2420, 2421, 2421, 2421, 2421, 2421, 2421, 2422, 2522, 2553, 2554, 2555, 2578, 2579, 2597, 2599, 2701, 2714, 2723, 2729, 2736, 2762, 2907, 2945, 2945, 2945, 2957, 2958, 2958, 2959, 2960, 2962, 2964, 2965, 2969, 2973, 2974, 2974, 2990, 3035, 3099, 3110, 3112, 3121, 3121, 3122, 3129, 3195, 3207, 3232, 3236, 3238, 3238, 3238, 3239, 3239, 3240, 3243, 3247, 3249, 3250, 3252, 3255, 3279, 3382, 3384, 3394, 3397, 3397, 3452, 3454, 3467, 3473, 3503, 3634, 3660, 3713, 3713, 3717, 3717, 3740, 3746, 3748, 3770, 3774, 3781, 3810, 3812, 3820, 3821, 3824, 3825, 3928, 3944, 3992, 4005, 4006, 4006, 4007, 4009, 4009, 4011, 4011, 4013, 4018, 4023, 4025, 4026, 4026, 4027, 4027, 4031, 4036, 4042, 4044, 4052, 4067, 4070, 4112, 4119, 4120, 4127, 4127, 4128, 4128, 4128, 4131, 4202, 4202, 4202, 4248, 4249, 4316, 4463, 4499, 4619, 4676, 4682, 4685, 4701, 4702, 4713, 4729, 4803, 6020, 6073, 6547, 6846, 9336, 9336, 9377, 9517, 9878, 10756, 11910, 12347, 12387, 12676, 14428, 4032, 2001, 3711, 1971, 675, 2175, 2175, 2175, 2580, 3108, 3470, 5865, 2565, 391, 391, 511, 730, 736, 768, 832, 833, 892, 930, 1713, 1753, 1772, 1773, 1778, 1779, 1797, 1797, 1889, 1912, 1997, 2007, 2012, 2013, 2014, 2018, 2018, 2033, 2034, 2039, 2069, 2069, 2070, 2156, 2157, 2163, 2163, 2183, 2257, 2257, 2257, 2349, 2349, 2406, 2473, 2563, 2567, 2906, 2962, 2970, 2970, 3035, 3068, 3127, 3130, 3225, 3235, 3235, 3237, 3237, 3239, 3240, 3252, 3384, 3467, 3473, 3473, 3474, 3476, 3631, 3662, 3746, 3782, 3811, 3821, 3917, 4005, 4011, 4014, 4031, 4037, 4041, 4668, 4679, 4685, 4727, 4802, 5601, 6167, 6167, 6347, 8518, 9916, 11576, 11681, 13019, 728, 1922, 1924, 2001, 2420, 4032, 7319, 218, 685, 767, 818, 875, 875, 877, 879, 921, 1526, 1769, 1888, 1923, 1993, 1993, 1997, 2006, 2006, 2007, 2012, 2013, 2071, 2174, 2256, 2287, 2347, 2356, 2560, 2960, 2990, 3099, 3111, 3122, 3125, 3127, 3227, 3227, 3249, 3250, 3415, 3424, 3472, 3633, 3641, 3712, 3821, 3941, 3941, 3941, 3942, 3942, 4005, 4035, 4457, 4803, 6497, 7234, 7234, 7235, 10559, 11562, 11563, 11578, 11684, 12250, 12676, 12759, 14431, 7319, 729, 822, 832, 855, 1753, 1766, 1778, 1868, 1941, 2008, 2033, 2033, 2034, 2042, 2335, 2420, 2420, 2423, 2959, 3056, 3058, 3112, 3126, 3243, 3243, 3275, 3435, 3435, 3473, 3503, 3566, 3632, 4116, 4129, 4458, 4789, 5601, 5601, 5808, 5808, 5826, 6167, 6846, 10160, 10356, 14268, 14429, 822, 1868, 1936, 2000, 2013, 2408, 2585, 2973, 3068, 3123, 3123, 3225, 3742, 4036, 4042, 4461, 5837, 6093, 8213, 12676, 1922, 525, 1765, 1767, 1778, 1797, 1889, 1998, 2014, 2043, 3227, 3461, 3715, 3986, 4034, 4037, 14428, 2001, 10644, 525, 1923, 2655, 2944, 3126, 3415, 3655, 3782, 4695, 5601, 14431, 3476, 768, 1999, 2039, 2043, 2971, 3122, 3127, 3131, 3577, 3784, 4009, 4009, 4020, 4035, 5808, 6020, 10356, 11914, 4020, 345, 814, 1766, 2043, 2476, 2476, 3123, 3125, 3250, 4008, 14340, 947, 14227, 2000, 2730, 4020, 3228, 4020, 4020, 2042, 2656, 3530, 4020, 4020, 4021, 4021, 4021, 2000, 2184, 2184, 2186, 3226, 4020, 5786, 14427, 1999, 7017, 7319, 12431)
 AND `Item` IN (2447, 765, 785, 2449, 2450, 2452, 3820, 2453, 3355, 3369, 3356, 3357, 3818, 3821, 3358, 3819, 4625, 8831, 8836, 8838, 8839, 8845, 8846);
+
+-- And finally... cleanup
+DELETE FROM `reference_loot_template` WHERE `Entry` IN (24102,24103,24104,24107,24108,24109,24110,24112,24113,24114,24116,24118,24120,24150,24151,24152,24153,24154,24155,24156,24157,24158,24159,24161,24731,24733,24737,526780,526790);
+
+-- Create a placeholder loot table to prevent worldserver errors. Same is used in Mangos :)
+UPDATE `creature_template` SET `lootid` = 1 WHERE (`entry` = 1);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1, 1 , 1000105, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 2 , 1000105, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 3 , 1026162, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 4 , 1036162, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 5 , 1046162, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 6 , 1105865, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 7 , 1106672, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 8 , 1125858, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 9 , 1125859, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 10, 1125959, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 11, 1125960, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 12, 1126060, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 13, 1126061, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 14, 1126161, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 15, 1126162, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 16, 1126262, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 17, 1126263, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 18, 1126363, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 19, 1126364, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 20, 1126464, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 21, 1126465, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 22, 1126565, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 23, 1126566, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 24, 1126666, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 25, 1126667, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 26, 1126767, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 27, 1126768, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 28, 1126868, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 29, 1126869, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 30, 1126969, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 31, 1126970, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 32, 1127070, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 33, 1127071, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 34, 1127171, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 35, 1127172, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 36, 1127272, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 37, 1127273, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 38, 1127373, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 39, 1135858, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 40, 1135859, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 41, 1135959, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 42, 1135960, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 43, 1136060, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 44, 1136061, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 45, 1136161, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 46, 1136162, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 47, 1136262, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 48, 1136263, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 49, 1136363, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 50, 1136364, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 51, 1136464, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 52, 1136465, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 53, 1136565, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 54, 1136566, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 55, 1136666, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 56, 1136667, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 57, 1136767, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 58, 1136768, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 59, 1136868, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 60, 1136869, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 61, 1136969, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 62, 1136970, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 63, 1137070, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 64, 1137071, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 65, 1137171, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 66, 1137172, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 67, 1137272, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 68, 1147073, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 69, 1175872, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 70, 1180009, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 71, 1180010, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 72, 1180011, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 73, 1180012, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 74, 1276872, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors'),
+(1, 75, 1276882, 100, 0, 1, 0, 1, 1, 'Placeholder to Prevent Worldserver Errors');
+
+-- 2 Recipes are BoP and were set to only appear when presented with the associated profession, although that shouldn't be the case, and yes, they should appear regardless
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 1) AND (`SourceEntry` IN (8029, 20976));
+
+-- Dealing with other worldserver errors
+UPDATE `creature_template` SET `lootid` = 1008 WHERE (`entry` = 1008);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1008) AND `Item` IN (1205, 2589, 2592, 3770, 4306);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1008, 1205, 0, 3, 0, 1, 0, 1, 1, 'Mosshide Mongrel - Melon Juice'),
+(1008, 2589, 0, 15, 0, 1, 1, 1, 3, 'Mosshide Mongrel - Linen Cloth'),
+(1008, 2592, 0, 30, 0, 1, 1, 1, 2, 'Mosshide Mongrel - Wool Cloth'),
+(1008, 3770, 0, 5, 0, 1, 0, 1, 1, 'Mosshide Mongrel - Mutton Chop'),
+(1008, 4306, 0, 5, 0, 1, 1, 1, 1, 'Mosshide Mongrel - Silk Cloth');
+
+UPDATE `creature_template` SET `lootid` = 1012 WHERE (`entry` = 1012);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1012) AND `Item` IN (1205, 2589, 2592, 2611, 3770, 4306);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1012, 1205, 0, 3, 0, 1, 1, 1, 1, 'Mosshide Brute - Melon Juice'),
+(1012, 2589, 0, 15, 0, 1, 2, 1, 3, 'Mosshide Brute - Linen Cloth'),
+(1012, 2592, 0, 30, 0, 1, 2, 1, 2, 'Mosshide Brute - Wool Cloth'),
+(1012, 2611, 0, 80, 1, 1, 0, 1, 1, 'Mosshide Brute - Crude Flint'),
+(1012, 3770, 0, 5, 0, 1, 1, 1, 1, 'Mosshide Brute - Mutton Chop'),
+(1012, 4306, 0, 5, 0, 1, 2, 1, 1, 'Mosshide Brute - Silk Cloth');
+
+UPDATE `creature_template` SET `lootid` = 1013 WHERE (`entry` = 1013);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1013) AND `Item` IN (1205, 2589, 2592, 2611, 3770, 4306);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1013, 1205, 0, 3, 0, 1, 1, 1, 1, 'Mosshide Mystic - Melon Juice'),
+(1013, 2589, 0, 15, 0, 1, 2, 1, 3, 'Mosshide Mystic - Linen Cloth'),
+(1013, 2592, 0, 30, 0, 1, 2, 1, 2, 'Mosshide Mystic - Wool Cloth'),
+(1013, 2611, 0, 80, 1, 1, 0, 1, 1, 'Mosshide Mystic - Crude Flint'),
+(1013, 3770, 0, 5, 0, 1, 1, 1, 1, 'Mosshide Mystic - Mutton Chop'),
+(1013, 4306, 0, 5, 0, 1, 2, 1, 1, 'Mosshide Mystic - Silk Cloth');
+
+UPDATE `creature_template` SET `lootid` = 1016 WHERE (`entry` = 1016);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1016) AND (`Item` IN (1697, 3180, 3685, 5635));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1016, 1697, 0, 33, 0, 1, 0, 1, 1, 'Highland Lashtail - Keen Raptor Tooth'),
+(1016, 3180, 0, 10, 0, 1, 0, 1, 1, 'Highland Lashtail - Flecked Raptor Scale'),
+(1016, 3685, 0, 60, 0, 1, 0, 1, 1, 'Highland Lashtail - Raptor Egg'),
+(1016, 5635, 0, 8, 0, 1, 0, 1, 1, 'Highland Lashtail - Sharp Claw');
+
+UPDATE `creature_template` SET `lootid` = 1021 WHERE (`entry` = 1021);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1021) AND (`Item` IN (1697, 3180, 3685, 5233, 5635));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1021, 1697, 0, 33, 0, 1, 0, 1, 1, 'Mottled Screecher - Keen Raptor Tooth'),
+(1021, 3180, 0, 10, 0, 1, 0, 1, 1, 'Mottled Screecher - Flecked Raptor Scale'),
+(1021, 3685, 0, 60, 0, 1, 0, 1, 1, 'Mottled Screecher - Raptor Egg'),
+(1021, 5233, 0, 10, 1, 1, 0, 1, 1, 'Mottled Screecher - Stone of Relu'),
+(1021, 5635, 0, 8, 0, 1, 0, 1, 1, 'Mottled Screecher - Sharp Claw');
+
+UPDATE `creature_template` SET `lootid` = 1023 WHERE (`entry` = 1023);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1023) AND (`Item` IN (1697, 3685, 5233, 5635, 5637));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1023, 1697, 0, 35, 0, 1, 0, 1, 1, 'Mottled Razormaw - Keen Raptor Tooth'),
+(1023, 3685, 0, 60, 0, 1, 0, 1, 1, 'Mottled Razormaw - Raptor Egg'),
+(1023, 5233, 0, 10, 1, 1, 0, 1, 1, 'Mottled Razormaw - Stone of Relu'),
+(1023, 5635, 0, 8, 0, 1, 0, 1, 1, 'Mottled Razormaw - Sharp Claw'),
+(1023, 5637, 0, 2, 0, 1, 0, 1, 1, 'Mottled Razormaw - Large Fang');
+
+UPDATE `creature_template` SET `lootid` = 1032 WHERE (`entry` = 1032);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1032) AND (`Item` IN (814, 3349, 3670, 3671, 3674, 3676, 5529, 45005));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1032, 814, 0, 30, 0, 1, 0, 1, 1, 'Black Ooze - Flask of Oil'),
+(1032, 3349, 0, 10, 1, 1, 0, 1, 1, 'Black Ooze - Sida\'s Bag'),
+(1032, 3670, 0, 12, 0, 1, 0, 1, 2, 'Black Ooze - Large Slimy Bone'),
+(1032, 3671, 0, 5, 0, 1, 0, 1, 2, 'Black Ooze - Lifeless Skull'),
+(1032, 3674, 0, 10, 0, 1, 0, 1, 2, 'Black Ooze - Decomposed Boot'),
+(1032, 3676, 0, 10, 0, 1, 0, 1, 2, 'Black Ooze - Slimy Ichor'),
+(1032, 5529, 0, 12, 0, 1, 0, 1, 1, 'Black Ooze - Tomb Dust'),
+(1032, 45005, 45005, 3, 0, 1, 0, 1, 1, 'Black Ooze - (ReferenceTable)');
+
+UPDATE `creature_template` SET `lootid` = 1033 WHERE (`entry` = 1033);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1033) AND (`Item` IN (814, 3349, 3670, 3671, 3674, 3676, 5529, 45005));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1033, 814, 0, 30, 0, 1, 0, 1, 1, 'Monstrous Ooze - Flask of Oil'),
+(1033, 3349, 0, 10, 1, 1, 0, 1, 1, 'Monstrous Ooze - Sida\'s Bag'),
+(1033, 3670, 0, 12, 0, 1, 0, 1, 2, 'Monstrous Ooze - Large Slimy Bone'),
+(1033, 3671, 0, 5, 0, 1, 0, 1, 2, 'Monstrous Ooze - Lifeless Skull'),
+(1033, 3674, 0, 10, 0, 1, 0, 1, 2, 'Monstrous Ooze - Decomposed Boot'),
+(1033, 3676, 0, 10, 0, 1, 0, 1, 2, 'Monstrous Ooze - Slimy Ichor'),
+(1033, 5529, 0, 12, 0, 1, 0, 1, 1, 'Monstrous Ooze - Tomb Dust'),
+(1033, 45005, 45005, 3, 0, 1, 0, 1, 1, 'Monstrous Ooze - (ReferenceTable)');
+
+UPDATE `creature_template` SET `lootid` = 1162 WHERE (`entry` = 1162);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1162) AND (`Item` IN (1179, 2268, 2287, 2536, 2589));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1162, 1179, 0, 3, 0, 1, 2, 1, 1, 'Stonesplinter Scout - Ice Cold Milk'),
+(1162, 2268, 0, 2, 0, 1, 1, 1, 1, 'Stonesplinter Scout - Stonesplinter Blade'),
+(1162, 2287, 0, 6, 0, 1, 2, 1, 1, 'Stonesplinter Scout - Haunch of Meat'),
+(1162, 2536, 0, 38, 1, 1, 0, 1, 1, 'Stonesplinter Scout - Trogg Stone Tooth'),
+(1162, 2589, 0, 43, 0, 1, 0, 1, 3, 'Stonesplinter Scout - Linen Cloth');
+
+UPDATE `creature_template` SET `lootid` = 1175 WHERE (`entry` = 1175);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1175) AND (`Item` IN (1179, 2589, 3110, 3110, 4537));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1175, 1179, 0, 3, 0, 1, 3, 1, 1, 'Tunnel Rat Digger - Ice Cold Milk'),
+(1175, 2589, 0, 40, 0, 1, 0, 1, 3, 'Tunnel Rat Digger - Linen Cloth'),
+(1175, 3110, 0, 38, 1, 1, 1, 1, 1, 'Tunnel Rat Digger - Tunnel Rat Ear'),
+(1175, 3110, 0, 38, 1, 1, 2, 1, 1, 'Tunnel Rat Digger - Tunnel Rat Ear'),
+(1175, 4537, 0, 5, 0, 1, 3, 1, 1, 'Tunnel Rat Digger - Tel\'Abim Banana');
+
+UPDATE `creature_template` SET `lootid` = 1183 WHERE (`entry` = 1183);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1183) AND (`Item` IN (1179, 2287, 2589, 2592, 2607));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1183, 1179, 0, 3, 0, 1, 2, 1, 1, 'Mo\'grosh Mystic - Ice Cold Milk'),
+(1183, 2287, 0, 6, 0, 1, 2, 1, 1, 'Mo\'grosh Mystic - Haunch of Meat'),
+(1183, 2589, 0, 22, 0, 1, 1, 1, 5, 'Mo\'grosh Mystic - Linen Cloth'),
+(1183, 2592, 0, 24, 0, 1, 1, 1, 4, 'Mo\'grosh Mystic - Wool Cloth'),
+(1183, 2607, 0, 8, 1, 1, 0, 1, 1, 'Mo\'grosh Mystic - Mo\'grosh Crystal');
+
+UPDATE `creature_template` SET `lootid` = 1206 WHERE (`entry` = 1206);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1206) AND (`Item` IN (1179, 2287, 2589, 2592, 5109));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1206, 1179, 0, 5, 0, 1, 3, 1, 1, 'Gnasher - Ice Cold Milk'),
+(1206, 2287, 0, 8, 0, 1, 3, 1, 1, 'Gnasher - Haunch of Meat'),
+(1206, 2589, 0, 27, 0, 1, 2, 1, 3, 'Gnasher - Linen Cloth'),
+(1206, 2592, 0, 26, 0, 1, 2, 1, 2, 'Gnasher - Wool Cloth'),
+(1206, 5109, 0, 3, 0, 1, 1, 1, 1, 'Gnasher - Stonesplinter Rags');
+
+UPDATE `creature_template` SET `lootid` = 1207 WHERE (`entry` = 1207);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1207) AND (`Item` IN (1179, 2287, 2589, 2592, 5109));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1207, 1179, 0, 5, 0, 1, 3, 1, 1, 'Brawler - Ice Cold Milk'),
+(1207, 2287, 0, 8, 0, 1, 3, 1, 1, 'Brawler - Haunch of Meat'),
+(1207, 2589, 0, 27, 0, 1, 2, 1, 3, 'Brawler - Linen Cloth'),
+(1207, 2592, 0, 26, 0, 1, 2, 1, 2, 'Brawler - Wool Cloth'),
+(1207, 5109, 0, 3, 0, 1, 1, 1, 1, 'Brawler - Stonesplinter Rags');
+
+UPDATE `creature_template` SET `lootid` = 1562 WHERE (`entry` = 1562);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1562) AND (`Item` IN (1707, 1708, 2955, 3897, 3910, 4306, 4338, 8494, 9260, 44011));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1562, 1707, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Mage - Stormwind Brie'),
+(1562, 1708, 0, 3, 0, 1, 0, 1, 1, 'Bloodsail Mage - Sweet Nectar'),
+(1562, 2955, 0, 0.1, 0, 1, 1, 1, 1, 'Bloodsail Mage - First Mate Hat'),
+(1562, 3897, 0, 10, 1, 1, 0, 1, 1, 'Bloodsail Mage - Dizzy\'s Eye'),
+(1562, 3910, 0, 80, 1, 1, 0, 1, 1, 'Bloodsail Mage - Snuff'),
+(1562, 4306, 0, 30, 0, 1, 2, 1, 3, 'Bloodsail Mage - Silk Cloth'),
+(1562, 4338, 0, 10, 0, 1, 2, 1, 1, 'Bloodsail Mage - Mageweave Cloth'),
+(1562, 8494, 0, 0.01, 0, 1, 1, 1, 1, 'Bloodsail Mage - Parrot Cage (Hyacinth Macaw)'),
+(1562, 9260, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Mage - Volatile Rum'),
+(1562, 44011, 44011, 10, 0, 1, 0, 1, 1, 'Bloodsail Mage - (ReferenceTable)');
+
+UPDATE `creature_template` SET `lootid` = 1563 WHERE (`entry` = 1563);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1563) AND (`Item` IN (1707, 1708, 2955, 3897, 3910, 4306, 4338, 8494, 9260, 44011));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1563, 1707, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Swashbuckler - Stormwind Brie'),
+(1563, 1708, 0, 3, 0, 1, 0, 1, 1, 'Bloodsail Swashbuckler - Sweet Nectar'),
+(1563, 2955, 0, 0.1, 0, 1, 1, 1, 1, 'Bloodsail Swashbuckler - First Mate Hat'),
+(1563, 3897, 0, 10, 1, 1, 0, 1, 1, 'Bloodsail Swashbuckler - Dizzy\'s Eye'),
+(1563, 3910, 0, 80, 1, 1, 0, 1, 1, 'Bloodsail Swashbuckler - Snuff'),
+(1563, 4306, 0, 30, 0, 1, 2, 1, 3, 'Bloodsail Swashbuckler - Silk Cloth'),
+(1563, 4338, 0, 10, 0, 1, 2, 1, 1, 'Bloodsail Swashbuckler - Swashbucklerweave Cloth'),
+(1563, 8494, 0, 0.01, 0, 1, 1, 1, 1, 'Bloodsail Swashbuckler - Parrot Cage (Hyacinth Macaw)'),
+(1563, 9260, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Swashbuckler - Volatile Rum'),
+(1563, 44011, 44011, 10, 0, 1, 0, 1, 1, 'Bloodsail Swashbuckler - (ReferenceTable)');
+
+UPDATE `creature_template` SET `lootid` = 1564 WHERE (`entry` = 1564);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1564) AND (`Item` IN (1707, 1708, 2955, 3897, 3910, 4306, 4338, 8494, 9260, 44011));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1564, 1707, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Warlock - Stormwind Brie'),
+(1564, 1708, 0, 3, 0, 1, 0, 1, 1, 'Bloodsail Warlock - Sweet Nectar'),
+(1564, 2955, 0, 0.1, 0, 1, 1, 1, 1, 'Bloodsail Warlock - First Mate Hat'),
+(1564, 3897, 0, 10, 1, 1, 0, 1, 1, 'Bloodsail Warlock - Dizzy\'s Eye'),
+(1564, 3910, 0, 80, 1, 1, 0, 1, 1, 'Bloodsail Warlock - Snuff'),
+(1564, 4306, 0, 30, 0, 1, 2, 1, 3, 'Bloodsail Warlock - Silk Cloth'),
+(1564, 4338, 0, 10, 0, 1, 2, 1, 1, 'Bloodsail Warlock - Warlockweave Cloth'),
+(1564, 8494, 0, 0.01, 0, 1, 1, 1, 1, 'Bloodsail Warlock - Parrot Cage (Hyacinth Macaw)'),
+(1564, 9260, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Warlock - Volatile Rum'),
+(1564, 44011, 44011, 10, 0, 1, 0, 1, 1, 'Bloodsail Warlock - (ReferenceTable)');
+
+UPDATE `creature_template` SET `lootid` = 1565 WHERE (`entry` = 1565);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 1565) AND (`Item` IN (1707, 1708, 2955, 3897, 3910, 4306, 4338, 8494, 9260, 44011));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(1565, 1707, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Sea Dog - Stormwind Brie'),
+(1565, 1708, 0, 3, 0, 1, 0, 1, 1, 'Bloodsail Sea Dog - Sweet Nectar'),
+(1565, 2955, 0, 0.1, 0, 1, 1, 1, 1, 'Bloodsail Sea Dog - First Mate Hat'),
+(1565, 3897, 0, 10, 1, 1, 0, 1, 1, 'Bloodsail Sea Dog - Dizzy\'s Eye'),
+(1565, 3910, 0, 80, 1, 1, 0, 1, 1, 'Bloodsail Sea Dog - Snuff'),
+(1565, 4306, 0, 30, 0, 1, 2, 1, 3, 'Bloodsail Sea Dog - Silk Cloth'),
+(1565, 4338, 0, 10, 0, 1, 2, 1, 1, 'Bloodsail Sea Dog - Sea Dogweave Cloth'),
+(1565, 8494, 0, 0.01, 0, 1, 1, 1, 1, 'Bloodsail Sea Dog - Parrot Cage (Hyacinth Macaw)'),
+(1565, 9260, 0, 5, 0, 1, 0, 1, 1, 'Bloodsail Sea Dog - Volatile Rum'),
+(1565, 44011, 44011, 10, 0, 1, 0, 1, 1, 'Bloodsail Sea Dog - (ReferenceTable)');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 5982) AND (`Item` IN (556, 1645, 4602));
+UPDATE `creature_template` SET `lootid` = 5983 WHERE (`entry` = 5983);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 5983) AND (`Item` IN (1464, 3404, 4638, 5117, 5829, 8146, 8168, 8244, 8396, 10593, 11417, 11418, 12037, 12207));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(5983, 1464, 0, 40.3789, 0, 1, 0, 1, 1, 'Bonepicker - Buzzard Talon'),
+(5983, 3404, 0, 39.4426, 0, 1, 0, 1, 1, 'Bonepicker - Buzzard Wing'),
+(5983, 4638, 0, 0.1019, 0, 1, 0, 1, 1, 'Bonepicker - Reinforced Steel Lockbox'),
+(5983, 5117, 0, 5.0012, 0, 1, 0, 1, 1, 'Bonepicker - Vibrant Plume'),
+(5983, 5829, 0, 20.1592, 0, 1, 0, 1, 1, 'Bonepicker - Razor-sharp Beak'),
+(5983, 8146, 0, 3.8996, 0, 1, 0, 1, 1, 'Bonepicker - Wicked Claw'),
+(5983, 8168, 0, 80.8736, 0, 1, 0, 1, 2, 'Bonepicker - Jet Black Feather'),
+(5983, 8244, 0, 0.01, 0, 1, 0, 1, 1, 'Bonepicker - Flawless Draenethyst Sphere'),
+(5983, 8396, 0, 40, 0, 1, 0, 1, 1, 'Bonepicker - Vulture Gizzard'),
+(5983, 10593, 0, 3, 0, 1, 0, 1, 1, 'Bonepicker - Imperfect Draenethyst Fragment'),
+(5983, 11417, 0, 4.7479, 0, 1, 0, 1, 1, 'Bonepicker - Feathery Wing'),
+(5983, 11418, 0, 19.7406, 0, 1, 0, 1, 1, 'Bonepicker - Hollow Wing Bone'),
+(5983, 12037, 0, 38.7513, 0, 1, 0, 1, 1, 'Bonepicker - Mystery Meat'),
+(5983, 12207, 0, 34.7498, 0, 1, 0, 1, 1, 'Bonepicker - Giant Egg');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 2588) AND (`Item` IN (1707, 1708, 3771, 4306, 4338, 4539, 4544, 4607, 4614, 4636, 5113, 6986, 8364));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(2588, 1707, 0, 5, 0, 1, 2, 1, 2, 'Syndicate Prowler - Stormwind Brie'),
+(2588, 1708, 0, 3, 0, 1, 2, 1, 2, 'Syndicate Prowler - Sweet Nectar'),
+(2588, 4306, 0, 30, 0, 1, 1, 1, 4, 'Syndicate Prowler - Silk Cloth'),
+(2588, 4338, 0, 5, 0, 1, 1, 1, 3, 'Syndicate Prowler - Mageweave Cloth'),
+(2588, 4614, 0, 0.025, 0, 1, 0, 1, 1, 'Syndicate Prowler - Pendant of Myzrael'),
+(2588, 4636, 0, 0.35, 0, 1, 0, 1, 1, 'Syndicate Prowler - Strong Iron Lockbox'),
+(2588, 5113, 0, 15, 0, 1, 0, 1, 1, 'Syndicate Prowler - Mark of the Syndicate'),
+(2588, 6986, 0, 4, 0, 1, 0, 1, 1, 'Syndicate Prowler - Crimson Lotus');
+
+UPDATE `creature_template` SET `lootid` = 24477 WHERE (`entry` = 24477);
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 24477) AND (`Item` IN (1707, 1708, 4306, 4338, 4440, 4506, 4614, 4636, 5113, 6986));
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(24477, 1707, 0, 5, 0, 1, 2, 1, 2, 'Syndicate Thief - Stormwind Brie'),
+(24477, 1708, 0, 3, 0, 1, 2, 1, 2, 'Syndicate Thief - Sweet Nectar'),
+(24477, 4306, 0, 30, 0, 1, 1, 1, 4, 'Syndicate Thief - Silk Cloth'),
+(24477, 4338, 0, 5, 0, 1, 1, 1, 3, 'Syndicate Thief - Mageweave Cloth'),
+(24477, 4440, 0, 100, 1, 1, 0, 1, 1, 'Syndicate Thief - Sigil of Strom'),
+(24477, 4506, 0, 80, 1, 1, 0, 1, 2, 'Syndicate Thief - Stromgarde Badge'),
+(24477, 4614, 0, 0.025, 0, 1, 0, 1, 1, 'Syndicate Thief - Pendant of Myzrael'),
+(24477, 4636, 0, 0.35, 0, 1, 0, 1, 1, 'Syndicate Thief - Strong Iron Lockbox'),
+(24477, 5113, 0, 15, 0, 1, 0, 1, 1, 'Syndicate Thief - Mark of the Syndicate'),
+(24477, 6986, 0, 4, 0, 1, 0, 1, 1, 'Syndicate Thief - Crimson Lotus');
+
+-- Some LiitA creatures were dropping wrong loot for their level, replaced with creatures of similar level range
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 38032);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(38032, 22829, 0, 2.4, 0, 1, 0, 1, 1, 'Crown Sprayer - Super Healing Potion'),
+(38032, 26040, 26040, 35, 0, 1, 0, 1, 1, 'Crown Sprayer - (ReferenceTable)'),
+(38032, 33444, 0, 5.2, 0, 1, 0, 1, 1, 'Crown Sprayer - Pungent Seal Whey'),
+(38032, 33454, 0, 7.9, 0, 1, 0, 1, 1, 'Crown Sprayer - Salted Venison'),
+(38032, 35615, 0, 2.1, 0, 1, 0, 1, 1, 'Crown Sprayer - Glowworm Cavern Bindings'),
+(38032, 35616, 0, 2.2, 0, 1, 0, 1, 1, 'Crown Sprayer - Spored Tendrils Spaulders'),
+(38032, 37624, 0, 0.1, 0, 1, 0, 1, 1, 'Crown Sprayer - Stained-Glass Shard Ring'),
+(38032, 37625, 0, 0.1, 0, 1, 0, 1, 1, 'Crown Sprayer - Web Winder Gloves'),
+(38032, 43624, 0, 0.02, 0, 1, 0, 1, 1, 'Crown Sprayer - Titanium Lockbox'),
+(38032, 43852, 0, 11.6, 0, 1, 0, 1, 1, 'Crown Sprayer - Thick Fur Clothing Scraps'),
+(38032, 45912, 0, 0.1, 0, 1, 0, 1, 1, 'Crown Sprayer - Book of Glyph Mastery');
+
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 38030);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(38030, 5760, 0, 0.399, 0, 1, 0, 1, 1, 'Crown Underling - Eternium Lockbox'),
+(38030, 14047, 0, 11.0668, 0, 1, 0, 1, 3, 'Crown Underling - Runecloth'),
+(38030, 21877, 0, 24.581, 0, 1, 0, 1, 3, 'Crown Underling - Netherweave Cloth'),
+(38030, 24000, 24000, 5, 0, 1, 1, 1, 1, 'Crown Underling - (ReferenceTable)'),
+(38030, 24002, 24002, 5, 0, 1, 1, 1, 1, 'Crown Underling - (ReferenceTable)'),
+(38030, 24003, 24003, 1, 0, 1, 1, 1, 1, 'Crown Underling - (ReferenceTable)'),
+(38030, 24005, 24005, 1, 0, 1, 1, 1, 1, 'Crown Underling - (ReferenceTable)'),
+(38030, 24009, 24009, 1, 0, 1, 1, 1, 1, 'Crown Underling - (ReferenceTable)');
+
+-- This one was just NULL loot
+UPDATE `creature_template` SET `lootid` = 0 WHERE (`entry` = 22657);
