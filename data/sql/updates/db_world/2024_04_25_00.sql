@@ -1,3 +1,4 @@
+-- DB update 2024_04_24_00 -> 2024_04_25_00
 -- Update gameobject 'Doodad_DwarfSign_Alchemist01' with sniffed values
 -- this spawn was using the (incorrect) ID 34357 before
 -- updated spawns
