@@ -2410,7 +2410,6 @@ public:
                         sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
             }
 
-
         }
 
         void PreventPowerGainOnHit(SpellEffIndex effIndex)
