@@ -5147,7 +5147,7 @@ class spell_gen_consumption : public SpellScript
             return;
         }
         int32 value = 0;
-        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX 25 N
+        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX25 N
         {
             value = urand(4500, 4700);
         }
