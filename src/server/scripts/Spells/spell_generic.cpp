@@ -5171,7 +5171,6 @@ class spell_gen_consumption : public SpellScript
     }
 };
 
-
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
