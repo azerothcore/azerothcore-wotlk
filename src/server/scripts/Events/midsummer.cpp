@@ -2605,21 +2605,18 @@ struct go_cheer_speaker : public GameObjectAI
         {
             _scheduler.Schedule(Milliseconds(_curTS), [this](TaskContext context)
                 {
-                    spawnNextFirework();
+                    int32 dt = 0;
+                    do {
+                        dt = spawnNextFirework();
+                    } while (dt == 0);
 
-
-                    // TODO always reschedule for next timestamp
-                    // or even check if next has same timestamp and immediately execute it
-
-                    // immediately handle all entries with the same timestamp
-                    // spawnNextFirework() takes care of increasing the counter
-                    while(_showRunning && fireworkShowStormwind[_curIdx][0] == _curTS)
-                        spawnNextFirework();
-
-                    if (fireworkShowStormwind[_curIdx][0] > _curTS)
-                        context.Repeat(Milliseconds(fireworkShowStormwind[_curIdx][0] - _curTS));
+                    if (0 < dt)
+                        context.Repeat(Milliseconds(dt));
                     else
-                        LOG_ERROR("scripts.midsummer", "go_cheer_speaker: could not schedule next firework explosion in {} ms.", (fireworkShowStormwind[_curIdx][0] - _curTS));
+                    {
+                        stopShow();
+                        LOG_ERROR("scripts.midsummer", "go_cheer_speaker: could not schedule next firework explosion in {} ms.", dt);
+                    }
                 });
         }
 
@@ -2636,32 +2633,40 @@ struct go_cheer_speaker : public GameObjectAI
         LOG_ERROR("scripts.midsummer", "stopShow()");
     }
 
-    void spawnNextFirework()
+    int32 spawnNextFirework()
     {
         if (!_showRunning)
-            return;
+            return -1;
+
+        if (_curIdx >= COUNT_FIREWORK_SHOW_STORMWIND)
+            return -2;
 
         LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}", _curIdx);
 
-        _curTS = fireworkShowStormwind[_curIdx][0];
-
-        uint32 idx = fireworkShowStormwind[_curIdx][2];
-        if (idx < COUNT_FIREWORK_SPAWN_POSITIONS)
+        uint32 posIdx = fireworkShowStormwind[_curIdx][2];
+        if (posIdx < COUNT_FIREWORK_SPAWN_POSITIONS)
         {
             me->SummonGameObject(fireworkShowStormwind[_curIdx][1],
-                fireworkSpawnPosition[idx][0],
-                fireworkSpawnPosition[idx][1],
-                fireworkSpawnPosition[idx][2],
-                fireworkSpawnPosition[idx][3],
-                fireworkSpawnPosition[idx][4],
-                fireworkSpawnPosition[idx][5],
-                fireworkSpawnPosition[idx][6],
-                fireworkSpawnPosition[idx][7],
+                fireworkSpawnPosition[posIdx][0],
+                fireworkSpawnPosition[posIdx][1],
+                fireworkSpawnPosition[posIdx][2],
+                fireworkSpawnPosition[posIdx][3],
+                fireworkSpawnPosition[posIdx][4],
+                fireworkSpawnPosition[posIdx][5],
+                fireworkSpawnPosition[posIdx][6],
+                fireworkSpawnPosition[posIdx][7],
                 0);
         }
 
+        _curTS = fireworkShowStormwind[_curIdx][0];
+
         if (++_curIdx >= COUNT_FIREWORK_SHOW_STORMWIND)
-            stopShow();
+            return -3;
+
+        if (fireworkShowStormwind[_curIdx][0] < _curTS)
+            return -4;
+
+        return (fireworkShowStormwind[_curIdx][0] - _curTS);
     }
 
     void UpdateAI(uint32 diff) override
