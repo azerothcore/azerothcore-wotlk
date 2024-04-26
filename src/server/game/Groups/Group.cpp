@@ -2005,11 +2005,11 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         for (auto const& itr : arenaTeam->GetMembers())
         {
             Player* teamMember = ObjectAccessor::FindConnectedPlayer(itr.Guid);
-            //are they online?
-            if (teamMember)
+            //are they online and not a member of this current group?
+            if (teamMember && !IsMember(teamMember->GetGUID())
             {
                 //are they already in queue for a rated arena?
-                if (!IsMember(teamMember->GetGUID()) && teamMember->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
+                if (teamMember->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
                 {
                     GroupQueueInfo ginfo;
                     BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
