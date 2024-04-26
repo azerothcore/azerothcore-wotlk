@@ -2006,7 +2006,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         {
             Player* teamMember = ObjectAccessor::FindConnectedPlayer(itr.Guid);
             //are they online and not a member of this current group?
-            if (teamMember && !IsMember(teamMember->GetGUID())
+            if (teamMember && !IsMember(teamMember->GetGUID()))
             {
                 //are they already in queue for a rated arena?
                 if (teamMember->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
@@ -2022,9 +2022,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
                 //are they currently in an arena match?
                 Battleground* bg = teamMember->GetBattleground(false);
                 if (bg && bg->isRated() && bg->GetMinPlayersPerTeam() == MinPlayerCount)
-                {
                     return ERR_BATTLEGROUND_JOIN_FAILED;
-                }
             }
         }
     }
