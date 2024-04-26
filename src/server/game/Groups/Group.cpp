@@ -1992,11 +1992,11 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         {
             return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
         }
-
-        // for arenas: check party size is proper
-        if (bgTemplate->isArena() && GetMembersCount() != MinPlayerCount)
-            return ERR_ARENA_TEAM_PARTY_SIZE;
     }
+
+    // for arenas: check party size is proper
+    if (bgTemplate->isArena() && memberscount != MinPlayerCount)
+        return ERR_ARENA_TEAM_PARTY_SIZE;
 
     //check against other arena team members
     if (isRated)
