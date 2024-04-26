@@ -1673,6 +1673,36 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 DELETE FROM `gameobject` WHERE (`id` IN (180728))
 AND (`guid` IN (825, 16586));
 
+-- SmartAI
+-- firework animation is beeing triggered on despawn
+UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE (`entry` IN (180703, 180704, 180707, 180708, 180720, 180721, 180722, 180723, 180724, 180725, 180726, 180727, 180728, 180729, 180730, 180731, 180733, 180736, 180737, 180738, 180739, 180740, 180741));
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` IN (180703, 180704, 180707, 180708, 180720, 180721, 180722, 180723, 180724, 180725, 180726, 180727, 180728, 180729, 180730, 180731, 180733, 180736, 180737, 180738, 180739, 180740, 180741));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(180703, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Red - On Respawn - Despawn In 420 ms'),
+(180704, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Red - On Respawn - Despawn In 420 ms'),
+(180707, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1, Red BIG - On Respawn - Despawn In 420 ms'),
+(180708, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2, Red BIG - On Respawn - Despawn In 420 ms'),
+(180720, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Blue - On Respawn - Despawn In 420 ms'),
+(180721, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Blue - On Respawn - Despawn In 420 ms'),
+(180722, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Blue BIG - On Respawn - Despawn In 420 ms'),
+(180723, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Blue BIG - On Respawn - Despawn In 420 ms'),
+(180724, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Green - On Respawn - Despawn In 420 ms'),
+(180725, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Green BIG - On Respawn - Despawn In 420 ms'),
+(180726, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Green BIG - On Respawn - Despawn In 420 ms'),
+(180727, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Green - On Respawn - Despawn In 420 ms'),
+(180728, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 White - On Respawn - Despawn In 420 ms'),
+(180729, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 White BIG - On Respawn - Despawn In 420 ms'),
+(180730, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 White - On Respawn - Despawn In 420 ms'),
+(180731, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 White BIG - On Respawn - Despawn In 420 ms'),
+(180733, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Purple BIG - On Respawn - Despawn In 420 ms'),
+(180736, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Yellow - On Respawn - Despawn In 420 ms'),
+(180737, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Yellow BIG - On Respawn - Despawn In 420 ms'),
+(180738, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Yellow - On Respawn - Despawn In 420 ms'),
+(180739, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Yellow BIG - On Respawn - Despawn In 420 ms'),
+(180740, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Purple - On Respawn - Despawn In 420 ms'),
+(180741, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Purple BIG - On Respawn - Despawn In 420 ms');
+
 -- vendors
 DELETE FROM `creature` WHERE (`id1` IN (5569, 8116, 8117, 8118, 8121, 8122))
 AND (`guid` BETWEEN 12523 AND 12528);
