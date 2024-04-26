@@ -94,6 +94,8 @@ services:
         condition: service_completed_successfully
       ac-client-data-init:
         condition: service_completed_successfully
+      ac-client-custom-data-copy:
+        condition: service_completed_successfully
 
   ac-authserver:
     container_name: ac-authserver
@@ -126,6 +128,18 @@ services:
       ac-database:
         condition: service_healthy
       ac-db-import:
+        condition: service_completed_successfully
+
+  ac-client-custom-data-copy:
+    container_name: ac-client-custom-data-copy
+    image: instrumentisto/rsync-ssh
+    entrypoint: /bin/sh
+    command: -c "rsync -a /azerothcore/env/dist/additional/data/ /azerothcore/env/dist/data"
+    volumes:
+      - ${DOCKER_VOL_CLIENT_DATA:-ac-client-data}:/azerothcore/env/dist/data
+      - ${DOCKER_ADD_VOL_DATA:-./env/dist/custom-data}:/azerothcore/env/dist/additional/data/:ro
+    depends_on:
+      ac-client-data-init:
         condition: service_completed_successfully
 
   ac-client-data-init:
