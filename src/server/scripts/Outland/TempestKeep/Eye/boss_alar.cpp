@@ -271,11 +271,11 @@ struct boss_alar : public BossAI
                 me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }, 30s);
-        ScheduleTimedEvent(50s, [&]
+        ScheduleTimedEvent(34s, [&]
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
-        }, 50s);
+        }, 57s);
         ScheduleUniqueTimedEvent(10min, [&]
         {
             DoCastSelf(SPELL_BERSERK);

@@ -1153,7 +1153,7 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
 }
 
-void SmartAI::PathEndReached(uint32 pathId)
+void SmartAI::PathEndReached(uint32 /*pathId*/)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_DATA_ENDED, nullptr, 0, me->GetWaypointPath());
 }
