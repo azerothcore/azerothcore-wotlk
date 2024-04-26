@@ -1703,6 +1703,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (180740, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 2 Purple - On Respawn - Despawn In 420 ms'),
 (180741, 1, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 420, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework, Show, Type 1 Purple BIG - On Respawn - Despawn In 420 ms');
 
+-- TODO: maybe add conditions to these SmartAI entries (?)
+-- to only enable them if specific world events are active
+
+-- firework controller
+-- 180749 'Cheer Speaker'
+UPDATE `gameobject_template` SET `ScriptName` = 'go_cheer_speaker' WHERE (`entry` = 180749);
+
 -- vendors
 DELETE FROM `creature` WHERE (`id1` IN (5569, 8116, 8117, 8118, 8121, 8122))
 AND (`guid` BETWEEN 12523 AND 12528);
