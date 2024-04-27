@@ -2448,7 +2448,7 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
         }
     }
 
-    if (sWorld->getBoolConfig(CONFIG_VMAP_PVP_LOS_IN_OPEN_WORLD))
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_PVP_LOS_OPEN_WORLD))
     {
         if (IsWorldMap())
         {
