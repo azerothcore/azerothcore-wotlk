@@ -20,6 +20,7 @@
 
 #include "AuthSession.h"
 #include "SocketMgr.h"
+#include "Config.h"
 
 class AuthSocketMgr : public SocketMgr<AuthSession>
 {
