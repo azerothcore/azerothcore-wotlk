@@ -1291,8 +1291,6 @@ enum eFireworks
     GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG  = 180741,
                                          
     COUNT_FIREWORK_SPAWN_POSITIONS      = 48,
-    COUNT_FIREWORK_SHOW_STORMWIND       = 1223,
-    COUNT_TASKS_PER_SCHEDULER_MAX       = 420,
 };
 
 // VerifiedBuild 50250
@@ -1352,7 +1350,7 @@ float const fireworkSpawnPosition[COUNT_FIREWORK_SPAWN_POSITIONS][8] =
 
 // VerifiedBuild 50250
 // timestamp[ms], firework gameobject ID, fireworkSpawnPositionIndex
-uint32 const fireworkShowStormwind[COUNT_FIREWORK_SHOW_STORMWIND][3] =
+std::vector<std::array<uint32, 3>> const fireworkShowStormwind  =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE, 0 },
     { 2018, GO_FIREWORK_SHOW_TYPE_2_PURPLE, 1 },
@@ -2579,46 +2577,72 @@ uint32 const fireworkShowStormwind[COUNT_FIREWORK_SHOW_STORMWIND][3] =
     { 681116, GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG, 16 },
 };
 
+// <mapId, zoneId>, <fireworkShow pointer, fireworkShow count>
+std::map<std::pair<uint32, uint32>, std::pair<std::vector<std::array<uint32, 3>> const*, uint32>> const FireworkShowStore = {
+    // Stormwind
+    { { 0, 1519 }, { &fireworkShowStormwind, 1223 } },
+};
+
 struct go_cheer_speaker : public GameObjectAI
 {
     go_cheer_speaker(GameObject* go) : GameObjectAI(go)
     {
-        // TODO: detect area and link correct firework setup
-        // TODO: ensure that only one gameobject within each area tales control
+        _curIdx = 0;
+        _curTS = 0;;
+        _showRunning = false;
+        _fireworkShow = nullptr;
+        _maxCount = 0;
 
+        initShow();
         stopShow();
         startShow();
+    }
+
+    void initShow()
+    {
+        _fireworkShow = nullptr;
+        _maxCount = 0;
+
+        auto itr = FireworkShowStore.find(std::make_pair(me->GetMapId(), me->GetZoneId()));
+        if (itr != FireworkShowStore.end())
+        {
+            if (itr->second.first)
+            {
+                _fireworkShow = itr->second.first;
+                _maxCount = itr->second.second;
+            }
+        }
     }
 
     // TODO: provide start offset to handle a "late start"
     // e.g. if the gameobject is spawned later then the desired start time
     void startShow()
     {
+        if (!_fireworkShow || !_maxCount)
+            return;
+
         _curIdx = 0;
-        _curTS = fireworkShowStormwind[0][0];
+        _curTS = 0;
         _showRunning = true;
         _scheduler.CancelAll();
 
         me->setActive(true);
 
-        //for (uint32 i = 0; i < COUNT_FIREWORK_SHOW_STORMWIND; i++)
-        {
-            _scheduler.Schedule(Milliseconds(_curTS), [this](TaskContext context)
-                {
-                    int32 dt = 0;
-                    do {
-                        dt = spawnNextFirework();
-                    } while (dt == 0);
+        _scheduler.Schedule(Milliseconds(_curTS), [this](TaskContext context)
+            {
+                int32 dt = 0;
+                do {
+                    dt = spawnNextFirework();
+                } while (dt == 0);
 
-                    if (0 < dt)
-                        context.Repeat(Milliseconds(dt));
-                    else
-                    {
-                        stopShow();
-                        LOG_ERROR("scripts.midsummer", "go_cheer_speaker: could not schedule next firework explosion in {} ms.", dt);
-                    }
-                });
-        }
+                if (0 < dt)
+                    context.Repeat(Milliseconds(dt));
+                else
+                {
+                    stopShow();
+                    LOG_ERROR("scripts.midsummer", "go_cheer_speaker: could not schedule next firework explosion in {} ms.", dt);
+                }
+            });
 
         LOG_ERROR("scripts.midsummer", "startShow()");
     }
@@ -2638,15 +2662,18 @@ struct go_cheer_speaker : public GameObjectAI
         if (!_showRunning)
             return -1;
 
-        if (_curIdx >= COUNT_FIREWORK_SHOW_STORMWIND)
+        if (!_fireworkShow || !_maxCount)
             return -2;
 
-        LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}", _curIdx);
+        if (_curIdx >= _maxCount)
+            return -3;
 
-        uint32 posIdx = fireworkShowStormwind[_curIdx][2];
+        LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}, {}, {}, {}", _curIdx, (*_fireworkShow)[_curIdx][1], (*_fireworkShow)[_curIdx][2], (*_fireworkShow)[_curIdx][3]);
+
+        uint32 posIdx = (*_fireworkShow)[_curIdx][2];
         if (posIdx < COUNT_FIREWORK_SPAWN_POSITIONS)
         {
-            me->SummonGameObject(fireworkShowStormwind[_curIdx][1],
+            me->SummonGameObject((*_fireworkShow)[_curIdx][1],
                 fireworkSpawnPosition[posIdx][0],
                 fireworkSpawnPosition[posIdx][1],
                 fireworkSpawnPosition[posIdx][2],
@@ -2658,15 +2685,15 @@ struct go_cheer_speaker : public GameObjectAI
                 0);
         }
 
-        _curTS = fireworkShowStormwind[_curIdx][0];
+        _curTS = (*_fireworkShow)[_curIdx][0];
 
-        if (++_curIdx >= COUNT_FIREWORK_SHOW_STORMWIND)
-            return -3;
-
-        if (fireworkShowStormwind[_curIdx][0] < _curTS)
+        if (++_curIdx >= _maxCount)
             return -4;
 
-        return (fireworkShowStormwind[_curIdx][0] - _curTS);
+        if ((*_fireworkShow)[_curIdx][0] < _curTS)
+            return -5;
+
+        return ((*_fireworkShow)[_curIdx][0] - _curTS);
     }
 
     void UpdateAI(uint32 diff) override
@@ -2679,6 +2706,8 @@ private:
     uint32_t _curIdx;
     uint32_t _curTS;
     bool _showRunning;
+    std::vector<std::array<uint32, 3>> const* _fireworkShow;
+    uint32 _maxCount;
 };
 
 void AddSC_event_midsummer_scripts()
