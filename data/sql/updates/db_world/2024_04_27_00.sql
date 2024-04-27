@@ -1,3 +1,4 @@
+-- DB update 2024_04_25_01 -> 2024_04_27_00
 -- Update gameobject 'AuctionNode' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (152583))
