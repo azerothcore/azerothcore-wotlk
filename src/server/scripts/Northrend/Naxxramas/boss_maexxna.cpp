@@ -77,16 +77,26 @@ enum Misc
     // {3531.271f, -3847.424f, 299.450f, 0.0f},
     // {3497.067f, -3843.384f, 302.384f, 0.0f}
 
-const Position PosWrap[8] =
+
+    // right side
+    // {3562.40f, -3890.35f, 314.30f, 0.0f},
+    // {3560.78f, -3878.10f, 316.18f, 0.0f},
+    // {3554.95f, -3863.24f, 314.46f, 0.0f},
+    // {3549.02f, -3855.07f, 311.58f, 0.0f},
+    // {3538.34f, -3844.68f, 314.21f, 0.0f},
+    // {3526.43f, -3838.73f, 317.10f, 0.0f},
+    // {3507.84f, -3832.71f, 319.00f, 0.0f},
+    // {3493.35f, -3834.06f, 318.71f, 0.0f}
+
+const Position PosWrap[7] =
 {
-    {3562.40f, -3890.35f, 314.30f, 0.0f},
-    {3560.78f, -3878.10f, 316.18f, 0.0f},
-    {3554.95f, -3863.24f, 314.46f, 0.0f},
-    {3549.02f, -3855.07f, 311.58f, 0.0f},
-    {3538.34f, -3844.68f, 314.21f, 0.0f},
-    {3526.43f, -3838.73f, 317.10f, 0.0f},
-    {3507.84f, -3832.71f, 319.00f, 0.0f},
-    {3493.35f, -3834.06f, 318.71f, 0.0f}
+{3496.615f,  -3834.182f,  320.7863f,  2.670354f},
+{3509.108f,  -3833.922f,  320.4750f,  1.710423f},
+{3523.644f,  -3838.309f,  320.5775f,  2.775074f},
+{3538.152f,  -3846.353f,  320.5188f,  1.431170f},
+{3546.219f,  -3856.167f,  320.9324f,  2.932153f},
+{3555.135f,  -3869.507f,  320.8307f,  0.942477f},
+{3560.282f,  -3886.143f,  321.2827f,  3.874631f}
 };
 
 struct WebTargetSelector
@@ -202,19 +212,20 @@ public:
             BossAI::JustDied(killer);
         }
 
-        bool DoCastWebWrap()
+        void DoCastWebWrap()
         {
-
             std::list<Unit*> candidates;
             SelectTargetList(candidates, RAID_MODE(1, 2), SelectTargetMethod::Random, 1, WebTargetSelector(me));
 
-            if (candidates.empty())
-                return false;
+            std::vector<uint32> positions {0, 1, 2, 3, 4, 5, 6};
+            Acore::Containers::RandomShuffle(positions);
 
+            if (candidates.empty())
+                return;
 
             for (uint i = 0; i < candidates.size() ; i++)
             {
-                const Position &randomPos = PosWrap[urand(0,7)];
+                const Position &randomPos = PosWrap[positions[i]];
 
                 auto candIt = candidates.begin();
 
@@ -240,62 +251,32 @@ public:
                 float angle = target->GetAngle(randomPos.GetPositionX(), randomPos.GetPositionY());
 
                 // set immune anticheat and calculate speed
-                if (Player *plr = target->ToPlayer())
+                // if (Player *plr = target->ToPlayer())
                 {
                     // plr->SetLaunched(true);
                     // plr->SetXYSpeed(horizontalSpeed);
-                }
+                // }
 
-                target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), horizontalSpeed, verticalSpeed);
-                // target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
-
-                wraps.push_back(std::make_pair(uint32(2000), target->GetGUID()));
-
-                auto candIt = candidates.begin();
-
-                if(candidates.size() > 1)
-                    std::advance(candIt, urand(0, candidates.size() - 1));
-
-                Unit* target = *candIt;
-                candIt = candidates.erase(candIt);
-
-                float dx = target->GetPositionX() - PosWrap[i].GetPositionX();
-                float dy = target->GetPositionY() - PosWrap[i].GetPositionY();
-                float dist = sqrt((dx * dx) + (dy * dy));
-                float yDist = PosWrap[i].GetPositionZ() - target->GetPositionZ();
-
-                // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
-                // velocity based on how close we are to it. If we are close initially, reduce the travel-time
-                // by increasing horizontal velocity, in which case we won't need as much vertical velocity, thus
-                // won't hit the ceiling.
-                //s=ut+(0.5a*t^2) || s = vertical speed, u = initial up velocity, a = gravity factor(negative), t = time of flight
-                // sadly this only aproximates some parts of this formula
-                float horizontalSpeed = dist/1.5f;
-                float verticalSpeed = 20.0f + (yDist*0.5f);
-                float angle = target->GetAngle(PosWrap[i].GetPositionX(), PosWrap[i].GetPositionY());
-
-                // set immune anticheat and calculate speed
-                if (Player* plr = target->ToPlayer())
-                {
-                    // plr->SetLaunched(true);
-                    // plr->SetXYSpeed(horizontalSpeed);
-                }
-
-                target->KnockbackFrom(PosWrap[i].GetPositionX(), PosWrap[i].GetPositionY(), horizontalSpeed, verticalSpeed);
+                target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), -horizontalSpeed, verticalSpeed);
+                // pacify self for 3 seconds, long enough until web spawns
+                //target->CastCustomSpell(63726, SPELLVALUE_AURA_DURATION, 5000, target, true);
+                // pacify self for 5 seconds, long enough until web spawns
+                me->CastSpell(target, 28618, true);
+                if (Aura* aur = me->AddAura(60, me))
+                    aur->SetDuration(5000);
                 // target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
 
                 wraps.push_back(std::make_pair(uint32(2000), target->GetGUID()));
             }
-
-        return true;
+        }
     }
 
-void UpdateWraps(uint32 uiDiff)
+    void UpdateWraps(uint32 diff)
     {
         bool wdone = false;
         for (auto& p : wraps2)
         {
-            if (p.first < uiDiff)
+            if (p.first < diff)
             {
                 if (Player* pl = ObjectAccessor::GetPlayer(*me, p.second))
                 {
@@ -304,7 +285,7 @@ void UpdateWraps(uint32 uiDiff)
                 wdone = true;
             }
             else
-                p.first -= uiDiff;
+                p.first -= diff;
         }
 
         if (wdone)
@@ -313,17 +294,17 @@ void UpdateWraps(uint32 uiDiff)
         wdone = false;
         for (auto& p : wraps)
         {
-            if (p.first < uiDiff)
+            if (p.first < diff)
             {
                 if (Player* pl = ObjectAccessor::GetPlayer(*me, p.second))
                 {
                     pl->CastSpell(pl, SPELL_WEB_WRAP_STUN, true);
-                    wraps2.push_back(std::make_pair(3000, p.second));
+                    //wraps2.push_back(std::make_pair(3000, p.second));
                 }
                 wdone = true;
             }
             else
-                p.first -= uiDiff;
+                p.first -= diff;
         }
         if (wdone)
             wraps.clear();
@@ -336,6 +317,8 @@ void UpdateWraps(uint32 uiDiff)
 
             if (!UpdateVictim())
                 return;
+
+            UpdateWraps(diff);
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -476,7 +459,7 @@ public:
                     if (victim->IsAlive())
                     {
                         victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
-                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
+                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
                     }
                     victim->RestoreDisplayId();
                 }
@@ -576,42 +559,42 @@ public:
 //};
 //
 //
-// class spell_web_wrap_damage : public SpellScriptLoader
-// {
-// public:
-    // spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
-//
-    // class spell_web_wrap_damage_AuraScript : public AuraScript
-    // {
-        // PrepareAuraScript(spell_web_wrap_damage_AuraScript);
-//
-        // void OnPeriodic(AuraEffect const* aurEff)
-        // {
-            // if (aurEff->GetTickNumber() == 2)
-            // {
-                // GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
-            // }
-//
-        // }
-//
-        // void Register() override
-        // {
-            // OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        // }
-    // };
-//
-    // AuraScript* GetAuraScript() const override
-    // {
-        // return new spell_web_wrap_damage_AuraScript();
-    // }
-// };
+class spell_web_wrap_damage : public SpellScriptLoader
+{
+public:
+    spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
+
+    class spell_web_wrap_damage_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_web_wrap_damage_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            if (aurEff->GetTickNumber() == 2)
+            {
+                GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
+            }
+
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_web_wrap_damage_AuraScript();
+    }
+};
 
 void AddSC_boss_maexxna()
 {
     new boss_maexxna();
     new boss_maexxna_webwrap();
     //new boss_maexxna_webwrap_trigger();
-    //new spell_web_wrap_damage();
+    new spell_web_wrap_damage();
     //new spell_web_wrap_maexxna();
 };
 
