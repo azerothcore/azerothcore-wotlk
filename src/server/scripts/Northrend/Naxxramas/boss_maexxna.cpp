@@ -215,15 +215,9 @@ public:
                 float distXY = sqrt((dx * dx) + (dy * dy));
                 float distZ = randomPos.GetPositionZ() - target->GetPositionZ();
 
-                // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
-                // velocity based on how close we are to it. If we are close initially, reduce the travel-time
-                // by increasing horizontal velocity, in which case we won't need as much vertical velocity, thus
-                // won't hit the ceiling.
-                // vertical speed calculation is based on the physics formula for projectile motion,
-                // s=ut+(0.5a*t^2) || s = vertical speed, u = initial up velocity, a = gravity factor(negative), t = time of flight
-                // but simplified. Normally you would need the initial vertical velocity and gravity too.
                 float horizontalSpeed = distXY / 1.5f;
-                float verticalSpeed = 20.0f + (distZ * 0.5f);
+                // smooth knockback arc that avoids the ceiling
+                float verticalSpeed = std::min(28.0f, 12.0f + distZ * 0.2f + distXY * 0.2f);
 
                 target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), -horizontalSpeed, verticalSpeed);
                 me->CastSpell(target, SPELL_WEB_WRAP_PACIFY_5, true); // pacify silence for 5 seconds
