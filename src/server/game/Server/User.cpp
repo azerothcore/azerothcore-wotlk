@@ -1083,7 +1083,7 @@ void User::ReadMovementInfo(WorldPacket& data, CMovement* mi)
     data >> mi->time;
     data >> mi->pos.PositionXYZOStream();
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_ONTRANSPORT) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_IMMOBILIZED) != 0)
     {
         data >> mi->transport.guid.ReadAsPacked();
 
@@ -1095,13 +1095,13 @@ void User::ReadMovementInfo(WorldPacket& data, CMovement* mi)
             data >> mi->transport.time2;
     }
 
-    if ((mi->m_moveFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) != 0
+    if ((mi->m_moveFlags & (MOVEFLAG_SWIMMING | MOVEFLAG_FLYING)) != 0
         || (mi->m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING) != 0)
         data >> mi->pitch;
 
     data >> mi->fallTime;
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_FALLING) != 0)
     {
         data >> mi->jump.zspeed;
         data >> mi->jump.sinAngle;
@@ -1109,91 +1109,91 @@ void User::ReadMovementInfo(WorldPacket& data, CMovement* mi)
         data >> mi->jump.xyspeed;
     }
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ELEVATION) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_SPLINE_MOVER) != 0)
         data >> mi->splineElevation;
 
-    // MOVEMENTFLAG_ROOT sent from the client is not valid
-    // in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
+    // MOVEFLAG_ROOTED sent from the client is not valid
+    // in conjunction with any of the moving movement flags such as MOVEFLAG_FORWARD.
     // It will freeze clients that receive this player's move.
-    if ((mi->m_moveFlags & MOVEMENTFLAG_ROOT) != 0)
-      mi->m_moveFlags &= ~MOVEMENTFLAG_ROOT;
+    if ((mi->m_moveFlags & MOVEFLAG_ROOTED) != 0)
+      mi->m_moveFlags &= ~MOVEFLAG_ROOTED;
 
     // Cannot hover without SPELL_AURA_HOVER
-    if ((mi->m_moveFlags & MOVEMENTFLAG_HOVER) != 0 && !mover->HasAuraType(SPELL_AURA_HOVER))
-      mi->m_moveFlags &= ~MOVEMENTFLAG_HOVER;
+    if ((mi->m_moveFlags & MOVEFLAG_HOVER) != 0 && !mover->HasAuraType(SPELL_AURA_HOVER))
+      mi->m_moveFlags &= ~MOVEFLAG_HOVER;
 
     // Cannot ascend and descend at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_ASCENDING) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_DESCENDING) != 0) {
-        mi->m_moveFlags &= ~(MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING);
+    if ((mi->m_moveFlags & MOVEFLAG_ASCENDING) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_DESCENDING) != 0) {
+        mi->m_moveFlags &= ~(MOVEFLAG_ASCENDING | MOVEFLAG_DESCENDING);
         KickPlayer("User sent illegal move flags");
       }
     }
 
     // Cannot move left and right at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_LEFT) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_RIGHT) != 0) {
-        mi->m_moveFlags &= ~(MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT);
+    if ((mi->m_moveFlags & MOVEFLAG_LEFT) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_RIGHT) != 0) {
+        mi->m_moveFlags &= ~(MOVEFLAG_LEFT | MOVEFLAG_RIGHT);
         KickPlayer("User sent illegal move flags");
       }
     }
 
     // Cannot strafe left and right at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_STRAFE_LEFT) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_STRAFE_RIGHT) != 0) {
-        mi->m_moveFlags &= ~(MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+    if ((mi->m_moveFlags & MOVEFLAG_STRAFE_LEFT) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_STRAFE_RIGHT) != 0) {
+        mi->m_moveFlags &= ~(MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT);
         KickPlayer("User sent illegal move flags");
       }
     }
 
     // Cannot pitch up and down at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_PITCH_UP) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_PITCH_DOWN) != 0) {
-        mi->m_moveFlags &= ~(MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN);
+    if ((mi->m_moveFlags & MOVEFLAG_PITCH_UP) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_PITCH_DOWN) != 0) {
+        mi->m_moveFlags &= ~(MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN);
         KickPlayer("User sent illegal move flags");
       }
     }
 
     // Cannot move forward and backward at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_FORWARD) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_BACKWARD) != 0) {
-        mi->m_moveFlags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
+    if ((mi->m_moveFlags & MOVEFLAG_FORWARD) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_BACKWARD) != 0) {
+        mi->m_moveFlags &= ~(MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD);
         KickPlayer("User sent illegal move flags");
       }
     }
 
     // Cannot walk on water without SPELL_AURA_WATER_WALK
-    if ((mi->m_moveFlags & MOVEMENTFLAG_WATERWALKING) != 0 &&
+    if ((mi->m_moveFlags & MOVEFLAG_WATER_WALK) != 0 &&
         !mover->HasAuraType(SPELL_AURA_WATER_WALK) &&
         !mover->HasAuraType(SPELL_AURA_GHOST) &&
         !mover->isDead()) {
-      mi->m_moveFlags &= ~MOVEMENTFLAG_WATERWALKING;
+      mi->m_moveFlags &= ~MOVEFLAG_WATER_WALK;
       // TODO: The client sends this flag on player repop.
       // Investigate a possible resolution
       //KickPlayer("User sent illegal move flags");
     }
 
     // Cannot feather fall without SPELL_AURA_FEATHER_FALL
-    if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING_SLOW) != 0 &&
+    if ((mi->m_moveFlags & MOVEFLAG_FEATHER_FALL) != 0 &&
         !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL)) {
       KickPlayer("User sent illegal move flags");
     }
 
     // Cannot fly without SPELL_AURA_FLY
-    if ((mi->m_moveFlags & MOVEMENTFLAG_FLYING) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0 && mover->HasAuraType(SPELL_AURA_FLY))
+    if ((mi->m_moveFlags & MOVEFLAG_FLYING) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_CAN_FLY) != 0 && mover->HasAuraType(SPELL_AURA_FLY))
         KickPlayer("User sent illegal move flags");
     }
 
     // Cannot fly and fall at the same time
-    if ((mi->m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0 || (mi->m_moveFlags & MOVEMENTFLAG_DISABLE_GRAVITY) != 0) {
-      if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING) != 0)
-        mi->m_moveFlags &= ~MOVEMENTFLAG_FALLING;
+    if ((mi->m_moveFlags & MOVEFLAG_CAN_FLY) != 0 || (mi->m_moveFlags & MOVEFLAG_DISABLE_GRAVITY) != 0) {
+      if ((mi->m_moveFlags & MOVEFLAG_FALLING) != 0)
+        mi->m_moveFlags &= ~MOVEFLAG_FALLING;
     }
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0 &&
+    if ((mi->m_moveFlags & MOVEFLAG_SPLINE_AWAITING_LOAD) != 0 &&
         (!mover->movespline->Initialized() || mover->movespline->Finalized())) {
-      mi->m_moveFlags &= ~MOVEMENTFLAG_SPLINE_ENABLED;
+      mi->m_moveFlags &= ~MOVEFLAG_SPLINE_AWAITING_LOAD;
     }
 }
 
@@ -1206,7 +1206,7 @@ void User::WriteMovementInfo(WorldPacket* data, CMovement* mi)
     *data << mi->time;
     *data << mi->pos.PositionXYZOStream();
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_ONTRANSPORT) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_IMMOBILIZED) != 0)
     {
         *data << mi->transport.guid.WriteAsPacked();
 
@@ -1218,13 +1218,13 @@ void User::WriteMovementInfo(WorldPacket* data, CMovement* mi)
             *data << mi->transport.time2;
     }
 
-    if ((mi->m_moveFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) != 0 ||
+    if ((mi->m_moveFlags & (MOVEFLAG_SWIMMING | MOVEFLAG_FLYING)) != 0 ||
         (mi->m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING) != 0)
         *data << mi->pitch;
 
     *data << mi->fallTime;
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_FALLING) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_FALLING) != 0)
     {
         *data << mi->jump.zspeed;
         *data << mi->jump.sinAngle;
@@ -1232,7 +1232,7 @@ void User::WriteMovementInfo(WorldPacket* data, CMovement* mi)
         *data << mi->jump.xyspeed;
     }
 
-    if ((mi->m_moveFlags & MOVEMENTFLAG_SPLINE_ELEVATION) != 0)
+    if ((mi->m_moveFlags & MOVEFLAG_SPLINE_MOVER) != 0)
         *data << mi->splineElevation;
 }
 

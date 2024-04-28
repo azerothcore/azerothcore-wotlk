@@ -855,7 +855,7 @@ public:
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_CHECK_PLAYER, 750ms);
-            me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
             me->SetCorpseDelay(0);
             me->LoadCreaturesAddon(true);
         }

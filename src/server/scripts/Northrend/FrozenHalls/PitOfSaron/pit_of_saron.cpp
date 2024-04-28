@@ -92,7 +92,7 @@ public:
                         {
                             if (Creature* summon = me->SummonCreature(introPositions[counter].entry[idx], PortalPos))
                             {
-                                summon->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                summon->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                 summon->SetSpeed(MOVE_RUN, 0.8f);
                                 summon->GetMotionMaster()->MovePoint(1, introPositions[counter].endPosition);
                                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
@@ -133,13 +133,13 @@ public:
                         {
                             if (!n1->IsInCombat() && n1->IsAlive())
                             {
-                                n1->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                n1->AddUnitMovementFlag(MOVEFLAG_WALK);
                                 n1->GetMotionMaster()->MovePoint(1, NecrolytePos1);
                                 n1->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
                             if (!n2->IsInCombat() && n2->IsAlive())
                             {
-                                n2->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                n2->AddUnitMovementFlag(MOVEFLAG_WALK);
                                 n2->GetMotionMaster()->MovePoint(1, NecrolytePos2);
                                 n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
@@ -276,7 +276,7 @@ public:
                             {
                                 if (c->GetPositionX() < 450.0f)
                                     continue;
-                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                 float dist = rand_norm();
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->SetSpeed(MOVE_RUN, 0.8f);
@@ -777,7 +777,7 @@ public:
                         for (uint8 i = 0; i < 6; ++i)
                             if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
                             {
-                                s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                s->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                 Position finalPos = endPos;
                                 s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.52f));
 
@@ -797,7 +797,7 @@ public:
                             for (uint8 i = 0; i < 6; ++i)
                                 if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
                                 {
-                                    s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                    s->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                     Position midPos = middlePos;
                                     Position finalPos = endPos;
                                     s->MovePosition(midPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.4f));

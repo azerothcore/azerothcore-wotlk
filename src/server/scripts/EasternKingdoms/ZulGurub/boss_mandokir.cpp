@@ -604,7 +604,7 @@ public:
     npc_chained_spirit(Creature* creature) : ScriptedAI(creature)
     {
         instance = me->GetInstanceScript();
-        me->AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
+        me->AddUnitMovementFlag(MOVEFLAG_HOVER);
     }
 
     void Reset() override

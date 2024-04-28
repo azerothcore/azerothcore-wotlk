@@ -358,7 +358,7 @@ public:
         {
             // xinef: screams like a baby
             if (image->GetEntry() != NPC_ANUBREKHAN_IMAGE)
-                image->SetUnitMovementFlags(MOVEMENTFLAG_RIGHT);
+                image->SetUnitMovementFlags(MOVEFLAG_RIGHT);
             _summonGUID = image->GetGUID();
         }
 

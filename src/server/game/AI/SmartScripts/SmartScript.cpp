@@ -1758,9 +1758,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             if (e.GetTargetType() == SMART_TARGET_SELF)
             {
-                me->SetFacingTo((me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
+                me->SetFacingTo((me->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
                 if (e.action.orientation.quickChange)
-                    me->SetOrientation((me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
+                    me->SetOrientation((me->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
             }
             else if (e.GetTargetType() == SMART_TARGET_POSITION)
             {
@@ -3085,7 +3085,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 case 0: // Reset
                 {
                     for (WorldObject* target : targets)
-                        target->ToCreature()->SetFacingTo((target->ToCreature()->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->ToCreature()->GetTransGUID() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition()).GetOrientation());
+                        target->ToCreature()->SetFacingTo((target->ToCreature()->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && target->ToCreature()->GetTransGUID() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition()).GetOrientation());
 
                     break;
                 }

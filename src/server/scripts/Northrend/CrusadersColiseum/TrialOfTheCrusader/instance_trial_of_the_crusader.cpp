@@ -662,7 +662,7 @@ public:
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
                             c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -710,7 +710,7 @@ public:
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
                             c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -721,7 +721,7 @@ public:
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
                             c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->RemoveAura(53421);
@@ -758,7 +758,7 @@ public:
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
                             c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -783,7 +783,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_1_01);
                             if( Creature* fizzlebang = c->SummonCreature(NPC_FIZZLEBANG, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000) )
                             {
-                                fizzlebang->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                fizzlebang->AddUnitMovementFlag(MOVEFLAG_WALK);
                                 fizzlebang->GetMotionMaster()->MovePoint(0, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY() - 65.0f, Locs[LOC_BEHIND_GATE].GetPositionZ() - 1.0f);
                             }
                             events.RescheduleEvent(EVENT_SCENE_102, 20000);
@@ -912,7 +912,7 @@ public:
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
                             c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -1109,7 +1109,7 @@ public:
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                 //if( Unit* target = c->SelectNearestTarget(200.0f) )
                                 //  c->AI()->AttackStart(target);
                             }
@@ -1229,7 +1229,7 @@ public:
                             if( Creature* t = c->SummonCreature(NPC_LICH_KING, Locs[LOC_ARTHAS_PORTAL]) )
                             {
                                 t->SetReactState(REACT_PASSIVE);
-                                t->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                t->AddUnitMovementFlag(MOVEFLAG_WALK);
                                 t->SetDisplayId(11686);
                                 t->AI()->Talk(SAY_STAGE_4_02);
                                 t->SetVisible(false);
@@ -1498,7 +1498,7 @@ public:
                             jaraxxus->CastSpell(jaraxxus, 67924, true);
                             jaraxxus->SetReactState(REACT_AGGRESSIVE);
                             jaraxxus->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            jaraxxus->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            jaraxxus->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         }
                     }
                     break;

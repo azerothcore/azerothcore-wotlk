@@ -1294,7 +1294,7 @@ class spell_dk_death_grip : public SpellScript
         if (target->GetTypeId() == TYPEID_PLAYER && caster->GetExactDist(target) < 8.0f) // xinef: should be 8.0f, but we have to add target size (1.5f)
             return SPELL_FAILED_TOO_CLOSE;
 
-        if (caster->HasUnitState(UNIT_STATE_JUMPING) || caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+        if (caster->HasUnitState(UNIT_STATE_JUMPING) || caster->HasUnitMovementFlag(MOVEFLAG_FALLING))
             return SPELL_FAILED_MOVING;
 
         return SPELL_CAST_OK;

@@ -1260,7 +1260,7 @@ public:
             events.ScheduleEvent(EVENT_START_FLIGHT, 0);
             events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
             me->SetCanFly(true);
-            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            me->AddUnitMovementFlag(MOVEFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
             me->SetFaction(player->GetFaction());
         }

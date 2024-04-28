@@ -28,29 +28,29 @@ namespace Movement
 {
     UnitMoveType SelectSpeedType(uint32 moveFlags)
     {
-        if (moveFlags & MOVEMENTFLAG_FLYING)
+        if (moveFlags & MOVEFLAG_FLYING)
         {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.flight >= speed_obj.flight_back*/)
+            if (moveFlags & MOVEFLAG_BACKWARD /*&& speed_obj.flight >= speed_obj.flight_back*/)
                 return MOVE_FLIGHT_BACK;
             else
                 return MOVE_FLIGHT;
         }
-        else if (moveFlags & MOVEMENTFLAG_SWIMMING)
+        else if (moveFlags & MOVEFLAG_SWIMMING)
         {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.swim >= speed_obj.swim_back*/)
+            if (moveFlags & MOVEFLAG_BACKWARD /*&& speed_obj.swim >= speed_obj.swim_back*/)
                 return MOVE_SWIM_BACK;
             else
                 return MOVE_SWIM;
         }
-        else if (moveFlags & MOVEMENTFLAG_WALKING)
+        else if (moveFlags & MOVEFLAG_WALK)
         {
             //if (speed_obj.run > speed_obj.walk)
             return MOVE_WALK;
         }
-        else if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)
+        else if (moveFlags & MOVEFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)
             return MOVE_RUN_BACK;
 
-        // Flying creatures use MOVEMENTFLAG_CAN_FLY or MOVEMENTFLAG_DISABLE_GRAVITY
+        // Flying creatures use MOVEFLAG_CAN_FLY or MOVEFLAG_DISABLE_GRAVITY
         // Run speed is their default flight speed.
         return MOVE_RUN;
     }
@@ -59,7 +59,7 @@ namespace Movement
     {
         MoveSpline& move_spline = *unit->movespline;
 
-        bool transport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
+        bool transport = unit->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && unit->GetTransGUID();
         Location real_position;
         // there is a big chance that current position is unknown if current state is not finalized, need compute it
         // this also allows CalculatePath spline position and update map position in much greater intervals
@@ -90,19 +90,19 @@ namespace Movement
         move_spline.onTransport = transport;
 
         uint32 moveFlags = unit->m_movement.m_moveFlags;
-        moveFlags |= MOVEMENTFLAG_SPLINE_ENABLED;
+        moveFlags |= MOVEFLAG_SPLINE_AWAITING_LOAD;
 
         if (!args.flags.orientationInversed)
         {
-            moveFlags = (moveFlags & ~(MOVEMENTFLAG_BACKWARD)) | MOVEMENTFLAG_FORWARD;
+            moveFlags = (moveFlags & ~(MOVEFLAG_BACKWARD)) | MOVEFLAG_FORWARD;
         }
         else
         {
-            moveFlags = (moveFlags & ~(MOVEMENTFLAG_FORWARD)) | MOVEMENTFLAG_BACKWARD;
+            moveFlags = (moveFlags & ~(MOVEFLAG_FORWARD)) | MOVEFLAG_BACKWARD;
         }
 
-        if (moveFlags & MOVEMENTFLAG_ROOT)
-            moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
+        if (moveFlags & MOVEFLAG_ROOTED)
+            moveFlags &= ~MOVEFLAG_MOVE_MASK;
 
         if (!args.HasVelocity)
         {
@@ -110,9 +110,9 @@ namespace Movement
             // walk move speed for it but not add walk flag to unit
             uint32 moveFlagsForSpeed = moveFlags;
             if (args.flags.walkmode)
-                moveFlagsForSpeed |= MOVEMENTFLAG_WALKING;
+                moveFlagsForSpeed |= MOVEFLAG_WALK;
             else
-                moveFlagsForSpeed &= ~MOVEMENTFLAG_WALKING;
+                moveFlagsForSpeed &= ~MOVEFLAG_WALK;
 
             args.velocity = unit->GetSpeed(SelectSpeedType(moveFlagsForSpeed));
         }
@@ -149,7 +149,7 @@ namespace Movement
         if (move_spline.Finalized())
             return;
 
-        bool transport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
+        bool transport = unit->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && unit->GetTransGUID();
         Location loc;
         if (move_spline.onTransport == transport)
             loc = move_spline.ComputePosition();
@@ -168,7 +168,7 @@ namespace Movement
         }
 
         args.flags = MoveSplineFlag::Done;
-        unit->m_movement.m_moveFlags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_SPLINE_ENABLED);
+        unit->m_movement.m_moveFlags &= ~(MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_SPLINE_AWAITING_LOAD);
         move_spline.onTransport = transport;
         move_spline.Initialize(args);
 
@@ -188,10 +188,10 @@ namespace Movement
     MoveSplineInit::MoveSplineInit(Unit* m) : unit(m)
     {
         args.splineId = splineIdGen.NewId();
-        args.TransformForTransport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
+        args.TransformForTransport = unit->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && unit->GetTransGUID();
         // mix existing state into new
-        args.flags.walkmode = (unit->m_movement.m_moveFlags & MOVEMENTFLAG_WALKING) != 0;
-        args.flags.flying = (unit->m_movement.m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0;
+        args.flags.walkmode = (unit->m_movement.m_moveFlags & MOVEFLAG_WALK) != 0;
+        args.flags.flying = (unit->m_movement.m_moveFlags & (MOVEFLAG_CAN_FLY | MOVEFLAG_DISABLE_GRAVITY)) != 0;
     }
 
     void MoveSplineInit::SetFacing(Unit const* target)

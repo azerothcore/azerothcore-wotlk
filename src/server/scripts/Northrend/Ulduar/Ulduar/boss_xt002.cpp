@@ -737,7 +737,7 @@ public:
             me->StopMoving();
             _locked = true;
             _boomed = false;
-            me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+            me->SetUnitMovementFlags(MOVEFLAG_WALK);
 
             if (me->GetInstanceScript())
                 if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))

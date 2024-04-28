@@ -368,7 +368,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
               << unit->GetSpeed(MOVE_PITCH_RATE);
 
         // 0x08000000
-        if ((unit->m_movement.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0)
+        if ((unit->m_movement.m_moveFlags & MOVEFLAG_SPLINE_AWAITING_LOAD) != 0)
         {
             Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
         }
@@ -481,7 +481,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     {
         /// @todo Allow players to aquire this updateflag.
         *data << uint32(unit->GetVehicleKit()->GetVehicleInfo()->m_ID);
-        if (unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+        if (unit->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED))
             *data << float(unit->GetTransOffsetO());
         else
             *data << float(unit->GetOrientation());
@@ -1022,7 +1022,7 @@ void CMovement::OutDebug()
     LOG_INFO("movement", "time {} current time {}", m_moveFlags2, uint64(::GameTime::GetGameTime().count()));
     LOG_INFO("movement", "position: `{}`", pos.ToString());
 
-    if (m_moveFlags & MOVEMENTFLAG_ONTRANSPORT)
+    if (m_moveFlags & MOVEFLAG_IMMOBILIZED)
     {
         LOG_INFO("movement", "TRANSPORT:");
         LOG_INFO("movement", "guid: {}", transport.guid.ToString());
@@ -1036,14 +1036,14 @@ void CMovement::OutDebug()
         }
     }
 
-    if ((m_moveFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+    if ((m_moveFlags & (MOVEFLAG_SWIMMING | MOVEFLAG_FLYING)) || (m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
         LOG_INFO("movement", "pitch: {}", pitch);
 
     LOG_INFO("movement", "fallTime: {}", fallTime);
-    if (m_moveFlags & MOVEMENTFLAG_FALLING)
+    if (m_moveFlags & MOVEFLAG_FALLING)
         LOG_INFO("movement", "j_zspeed: {} j_sinAngle: {} j_cosAngle: {} j_xyspeed: {}", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
-    if (m_moveFlags & MOVEMENTFLAG_SPLINE_ELEVATION)
+    if (m_moveFlags & MOVEFLAG_SPLINE_MOVER)
         LOG_INFO("movement", "splineElevation: {}", splineElevation);
 }
 

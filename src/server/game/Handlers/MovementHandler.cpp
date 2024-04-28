@@ -124,7 +124,7 @@ void User::HandleMoveWorldportAck()
             t->RemovePassenger(m_player);
             m_player->m_transport = nullptr;
             m_player->m_movement.transport.Reset();
-            m_player->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_player->m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
         }
 
     if (!m_player->getHostileRefMgr().IsEmpty())
@@ -400,7 +400,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
     if (mover->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
         // Xinef: skip moving packets
-        if ((movementInfo.m_moveFlags & MOVEMENTFLAG_MASK_MOVING) != 0)
+        if ((movementInfo.m_moveFlags & MOVEFLAG_MOVE_MASK) != 0)
         {
             if (plrMover)
             {
@@ -418,7 +418,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if ((movementInfo.m_moveFlags & MOVEMENTFLAG_ONTRANSPORT) != 0)
+    if ((movementInfo.m_moveFlags & MOVEFLAG_IMMOBILIZED) != 0)
     {
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
@@ -479,7 +479,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
             GameObject* go = mover->GetMap()->GetGameObject(movementInfo.transport.guid);
             if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
             {
-                movementInfo.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+                movementInfo.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
             }
         }
     }
@@ -511,7 +511,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if (plrMover && ((movementInfo.m_moveFlags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
+    if (plrMover && ((movementInfo.m_moveFlags & MOVEFLAG_SWIMMING) != 0) != plrMover->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(),
@@ -579,7 +579,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {
-        if (plrMover->IsSitState() && (movementInfo.m_moveFlags & (MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_TURNING)))
+        if (plrMover->IsSitState() && (movementInfo.m_moveFlags & (MOVEFLAG_MOVE_MASK | MOVEFLAG_TURN_MASK)))
             plrMover->SetStandState(UNIT_STANDING);
 
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
@@ -1024,7 +1024,7 @@ void User::HandleMoveUnRootAck(WorldPacket& recvData)
 
     if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
     {
-        movementInfo.m_moveFlags &= ~MOVEMENTFLAG_FALLING;
+        movementInfo.m_moveFlags &= ~MOVEFLAG_FALLING;
     }
 
     movementInfo.guid = mover->GetGUID();

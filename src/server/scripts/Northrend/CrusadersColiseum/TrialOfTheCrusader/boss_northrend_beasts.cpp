@@ -240,7 +240,7 @@ public:
         boss_gormokAI(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            me->AddUnitMovementFlag(MOVEFLAG_WALK);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -775,7 +775,7 @@ public:
         boss_icehowlAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            me->AddUnitMovementFlag(MOVEFLAG_WALK);
             me->SetReactState(REACT_PASSIVE);
             if (IsHeroic())
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_DISPEL, true);

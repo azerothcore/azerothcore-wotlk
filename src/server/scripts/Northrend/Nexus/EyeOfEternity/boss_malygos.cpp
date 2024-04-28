@@ -402,7 +402,7 @@ public:
                         float x = CenterPos.GetPositionX() + cos(angle) * 35.0f;
                         float y = CenterPos.GetPositionY() + std::sin(angle) * 35.0f;
                         float z = FourSidesPos[0].GetPositionZ();
-                        me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_CENTER_AIR, x, y, z);
                         break;
                     }
@@ -527,7 +527,7 @@ public:
                                             init.SetTransportExit();
                                             init.Launch();
 
-                                            pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
+                                            pPlayer->SetUnitMovementFlags(0);
                                             pPlayer->SetDisableGravity(true, true);
 
                                             sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
@@ -845,7 +845,7 @@ public:
                 {
                     timer2 = 0;
                     uint32 tmp = urand(0, 3);
-                    me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                     me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_SIDE_0 + tmp, FourSidesPos[tmp]);
                 }
                 else

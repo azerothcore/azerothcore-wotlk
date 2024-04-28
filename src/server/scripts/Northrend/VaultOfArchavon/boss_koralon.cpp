@@ -112,16 +112,16 @@ public:
                 rotateTimer += diff;
                 if (rotateTimer >= 3000)
                 {
-                    if (!me->HasUnitMovementFlag(MOVEMENTFLAG_LEFT))
+                    if (!me->HasUnitMovementFlag(MOVEFLAG_LEFT))
                     {
-                        me->SetUnitMovementFlags(MOVEMENTFLAG_LEFT);
+                        me->SetUnitMovementFlags(MOVEFLAG_LEFT);
                         me->SendMovementFlagUpdate();
                         rotateTimer = 1;
                         return;
                     }
                     else
                     {
-                        me->RemoveUnitMovementFlag(MOVEMENTFLAG_LEFT);
+                        me->RemoveUnitMovementFlag(MOVEFLAG_LEFT);
                         me->SendMovementFlagUpdate();
                         rotateTimer = 0;
                         return;

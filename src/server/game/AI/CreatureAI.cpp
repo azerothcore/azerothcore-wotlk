@@ -346,7 +346,7 @@ void CreatureAI::MoveCircleChecks()
 
     if (
         !victim ||
-        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEFLAG_ROOTED) ||
         !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
         (!victim->IsPlayer() && !victim->IsPet())  // only player & pets to save CPU
     )
@@ -361,7 +361,7 @@ void CreatureAI::MoveBackwardsChecks()
 {
     Unit *victim = me->GetVictim();
 
-    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEFLAG_ROOTED) ||
         (!victim->IsPlayer() && !victim->IsPet()))
     {
         return;

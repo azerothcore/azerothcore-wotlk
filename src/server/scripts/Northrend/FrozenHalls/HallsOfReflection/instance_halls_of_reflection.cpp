@@ -237,7 +237,7 @@ public:
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                    creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_DARK_RANGER_LORALEN:
                     creature->SetVisible(false);
@@ -254,17 +254,17 @@ public:
                     creature->SetVisible(false);
                     NPC_LichKingIntroGUID = creature->GetGUID();
                     creature->SetReactState(REACT_PASSIVE);
-                    creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->AddUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_FALRIC:
                     creature->SetVisible(false);
                     NPC_FalricGUID = creature->GetGUID();
-                    creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->AddUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_MARWYN:
                     creature->SetVisible(false);
                     NPC_MarwynGUID = creature->GetGUID();
-                    creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->AddUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_WAVE_MERCENARY:
                 case NPC_WAVE_FOOTMAN:
@@ -309,7 +309,7 @@ public:
 
                     NPC_LichKingGUID = creature->GetGUID();
                     creature->SetHealth((creature->GetMaxHealth() * 3) / 4);
-                    creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_SYLVANAS_PART2:
                     if (!creature->IsAlive())
@@ -344,7 +344,7 @@ public:
                         creature->StopMovingOnCurrentPos();
                     }
                     creature->SetSheath(SHEATH_STATE_MELEE);
-                    creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    creature->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                     break;
                 case NPC_ICE_WALL_TARGET:
                     if (creature->GetPositionX() > 5525.0f)
@@ -550,7 +550,7 @@ public:
                         c->SetHealth(c->GetMaxHealth() / 20);
                         c->AI()->Reset();
                         c->setActive(false);
-                        c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     }
                     if (Creature* c = instance->GetCreature(NPC_LichKingGUID))
@@ -566,7 +566,7 @@ public:
                         c->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, c);
                         c->AI()->Reset();
                         c->setActive(false);
-                        c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         c->SetSpeed(MOVE_RUN, c->GetCreatureTemplate()->speed_run);
                     }
@@ -624,7 +624,7 @@ public:
                             case 4:
                                 if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
                                 {
-                                    c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                    c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                     c->SetSpeed(MOVE_RUN, 2.5f);
                                 }
                                 break;
@@ -1161,7 +1161,7 @@ public:
                                 c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_ONBOARD_ALLY : SAY_ONBOARD_HORDE);
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             {
-                                c->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->AddUnitMovementFlag(MOVEFLAG_WALK);
                                 c->GetMotionMaster()->MovePoint(0, WalkCaveInPos);
                                 c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP); // need gossip ID 10931
                             }

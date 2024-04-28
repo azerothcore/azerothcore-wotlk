@@ -523,7 +523,7 @@ public:
                                 uiData = DONE; // save to db
                                 if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                                 {
-                                    announcer->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                                    announcer->SetUnitMovementFlags(MOVEFLAG_WALK);
                                     announcer->GetMotionMaster()->MovePoint(1, 735.81f, 661.92f, 412.39f);
                                 }
                                 events.ScheduleEvent(EVENT_GRAND_GROUP_1_MOVE_MIDDLE, 10s);
@@ -564,7 +564,7 @@ public:
                             {
                                 InstanceProgress = INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST;
                                 uiData = DONE; // save to db
-                                announcer->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                                announcer->SetUnitMovementFlags(MOVEFLAG_WALK);
                                 announcer->GetMotionMaster()->MovePoint(1, 735.81f, 661.92f, 412.39f);
                                 events.ScheduleEvent(EVENT_GRAND_GROUP_1_MOVE_MIDDLE, 8500ms);
                             }
@@ -1208,7 +1208,7 @@ public:
                     {
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
-                            bk->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                            bk->SetUnitMovementFlags(MOVEFLAG_WALK);
                             bk->GetMotionMaster()->MovePoint(0, 746.81f, 623.15f, 411.42f);
                             bk->AI()->Talk(SAY_BK_INTRO_2);
                         }
@@ -1222,7 +1222,7 @@ public:
                     {
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
-                            bk->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            bk->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             bk->AI()->Talk(SAY_BK_INTRO_3);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_ATTACK, 5s);

@@ -789,7 +789,7 @@ public:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                         {
                             uther->SetTarget();
-                            uther->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            uther->AddUnitMovementFlag(MOVEFLAG_WALK);
                             uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
                         ScheduleNextEvent(currentEvent, 1000);
@@ -798,7 +798,7 @@ public:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                         {
                             jaina->SetTarget();
-                            jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            jaina->AddUnitMovementFlag(MOVEFLAG_WALK);
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
                         Talk(SAY_PHASE116);
@@ -816,7 +816,7 @@ public:
                     case EVENT_ACTION_PHASE1+21:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                         {
-                            jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            jaina->AddUnitMovementFlag(MOVEFLAG_WALK);
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
                         summons.DespawnEntry(NPC_HORSE_ESCORT);
@@ -842,7 +842,7 @@ public:
                         {
                             cityman->AI()->Talk(SAY_PHASE202);
                             cityman->SetTarget(me->GetGUID());
-                            cityman->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            cityman->AddUnitMovementFlag(MOVEFLAG_WALK);
                             cityman->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_CITYMAN]);
                         }
 

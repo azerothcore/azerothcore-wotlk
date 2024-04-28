@@ -381,7 +381,7 @@ public:
                     break;
             }
 
-            if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+            if (!me->HasUnitMovementFlag(MOVEFLAG_DISABLE_GRAVITY))
                 DoMeleeAttackIfReady();
         }
     };

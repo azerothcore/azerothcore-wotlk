@@ -495,7 +495,7 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.0f, false);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(true);
-                me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                 me->RemoveAllAuras();
                 AddCreatureAddonAuras();
                 events.Reset();
@@ -564,7 +564,7 @@ public:
                     me->SetRegeneratingHealth(false);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(true);
-                    me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                    me->AddUnitMovementFlag(MOVEFLAG_WALK);
                     if( pInstance )
                     {
                         pInstance->SetData(DATA_MOUNT_DIED, BossOrder);
@@ -626,7 +626,7 @@ public:
                         {
                             mount->DespawnOrUnsummon();
                             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, mount->GetDisplayId());
-                            me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             me->SetHealth(50000);
                             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
                             me->SetRegeneratingHealth(true);
@@ -719,7 +719,7 @@ public:
 
                         if( Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ) )
                         {
-                            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            me->AddUnitMovementFlag(MOVEFLAG_WALK);
                             NewMountGUID = mount->GetGUID();
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetImmuneToAll(true);

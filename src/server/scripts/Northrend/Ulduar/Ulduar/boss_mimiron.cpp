@@ -1968,7 +1968,7 @@ public:
         void Reset() override
         {
             me->SetCanFly(true);
-            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            me->AddUnitMovementFlag(MOVEFLAG_FLYING);
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 

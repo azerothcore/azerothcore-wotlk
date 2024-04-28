@@ -605,15 +605,15 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
 
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        _owner->AddUnitMovementFlag(MOVEFLAG_FALLING);
         _owner->m_movement.SetFallTime(0);
         _owner->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), _owner->GetPositionZ());
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
     {
-        _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
-        _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        _owner->RemoveUnitMovementFlag(MOVEFLAG_MOVE_MASK);
+        _owner->RemoveUnitMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
+        _owner->AddUnitMovementFlag(MOVEFLAG_FALLING);
         _owner->m_movement.SetFallTime(0);
         _owner->SendMovementFlagUpdate();
     }

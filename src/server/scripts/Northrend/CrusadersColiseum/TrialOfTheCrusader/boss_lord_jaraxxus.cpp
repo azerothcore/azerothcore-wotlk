@@ -105,7 +105,7 @@ public:
         boss_jaraxxusAI(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            me->AddUnitMovementFlag(MOVEFLAG_WALK);
             me->SetReactState(REACT_PASSIVE);
         }
 

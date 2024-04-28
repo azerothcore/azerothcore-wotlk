@@ -1413,7 +1413,7 @@ void User::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 
     recv_data.read_skip<float>();                           // unk2
 
-    sScriptMgr->AnticheatSetCanFlybyServer(m_player, (movementInfo.m_moveFlags & MOVEMENTFLAG_CAN_FLY) != 0);
+    sScriptMgr->AnticheatSetCanFlybyServer(m_player, (movementInfo.m_moveFlags & MOVEFLAG_CAN_FLY) != 0);
 
     m_player->m_mover->m_movement.m_moveFlags = movementInfo.m_moveFlags;
 }

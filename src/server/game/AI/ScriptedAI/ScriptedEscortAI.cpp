@@ -589,7 +589,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     uint32 startingWaypointId = CurrentWP->id;
 
     // Flying unit, just fill array
-    if ((me->m_movement.m_moveFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)) != 0)
+    if ((me->m_movement.m_moveFlags & (MOVEFLAG_CAN_FLY | MOVEFLAG_DISABLE_GRAVITY)) != 0)
     {
         // xinef: first point in vector is unit real position
         points->clear();

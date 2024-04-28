@@ -1390,7 +1390,7 @@ bool Player::Teleport(uint32 mapid, float x, float y, float z, float orientation
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
             m_movement.transport.Reset();
-            m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
             RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
         }
 
@@ -1412,7 +1412,13 @@ bool Player::Teleport(uint32 mapid, float x, float y, float z, float orientation
         ExitVehicle();
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
-    SetUnitMovementFlags(GetUnitMovementFlags() & MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE);
+    SetUnitMovementFlags(GetUnitMovementFlags() &
+                         MOVEFLAG_DISABLE_GRAVITY |
+                         MOVEFLAG_ROOTED |
+                         MOVEFLAG_CAN_FLY |
+                         MOVEFLAG_WATER_WALK |
+                         MOVEFLAG_FEATHER_FALL |
+                         MOVEFLAG_HOVER);
     DisableSpline();
 
     // Xinef: Remove all movement imparing effects auras, skip small teleport like blink
@@ -1429,13 +1435,13 @@ bool Player::Teleport(uint32 mapid, float x, float y, float z, float orientation
     if (m_transport)
     {
         if (options & TELE_TO_NOT_LEAVE_TRANSPORT)
-            AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            AddUnitMovementFlag(MOVEFLAG_IMMOBILIZED);
         else
         {
             m_transport->RemovePassenger(this);
             m_transport = nullptr;
             m_movement.transport.Reset();
-            m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
         }
     }
 
@@ -6375,7 +6381,7 @@ void Player::CheckDuelDistance(time_t currTime)
 
 bool Player::IsOutdoorPvPActive()
 {
-    return IsAlive() && !HasInvisibilityAura() && !HasStealthAura() && IsPvP() && !HasUnitMovementFlag(MOVEMENTFLAG_FLYING) && !IsOnTaxi();
+    return IsAlive() && !HasInvisibilityAura() && !HasStealthAura() && IsPvP() && !HasUnitMovementFlag(MOVEFLAG_FLYING) && !IsOnTaxi();
 }
 
 void Player::DuelComplete(DuelCompleteType type)
@@ -12864,7 +12870,7 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         if (target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         {
             // Xinef: restore original orientation, important for shooting vehicles!
-            Position pos = target->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->GetTransGUID() && target->GetTransGUID().IsMOTransport() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition();
+            Position pos = target->HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && target->GetTransGUID() && target->GetTransGUID().IsMOTransport() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition();
             target->SetOrientation(pos.GetOrientation());
             target->SetFacingTo(pos.GetOrientation());
             target->DisableSpline();

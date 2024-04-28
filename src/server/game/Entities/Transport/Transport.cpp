@@ -117,7 +117,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
         RemovePassenger(obj);
         obj->SetTransport(nullptr);
         obj->m_movement.transport.Reset();
-        obj->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        obj->m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
     }
 
     GameObject::CleanupsBeforeDelete(finalCleanup);
@@ -279,7 +279,7 @@ void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
             CalculatePassengerOffset(x, y, z, &o);
 
             passenger->SetTransport(this);
-            passenger->m_movement.m_moveFlags |= MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movement.m_moveFlags |= MOVEFLAG_IMMOBILIZED;
             passenger->m_movement.transport.guid = GetGUID();
             passenger->m_movement.transport.pos.Relocate(x, y, z, o);
             if (passenger->ToUnit())
@@ -304,7 +304,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (withAll)
         {
             passenger->SetTransport(nullptr);
-            passenger->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
             passenger->m_movement.transport.guid.Clear();
             passenger->m_movement.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             if (passenger->ToUnit())
@@ -332,7 +332,7 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
     float o = data->orientation;
 
     creature->SetTransport(this);
-    creature->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    creature->AddUnitMovementFlag(MOVEFLAG_IMMOBILIZED);
     creature->m_movement.transport.guid = GetGUID();
     creature->m_movement.transport.pos.Relocate(x, y, z, o);
     CalculatePassengerPosition(x, y, z, &o);
@@ -791,7 +791,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
         RemovePassenger(obj);
         obj->SetTransport(nullptr);
         obj->m_movement.transport.Reset();
-        obj->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        obj->m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
     }
 
     GameObject::CleanupsBeforeDelete(finalCleanup);
@@ -979,7 +979,7 @@ void StaticTransport::AddPassenger(WorldObject* passenger, bool withAll)
             CalculatePassengerOffset(x, y, z, &o);
 
             passenger->SetTransport(this);
-            passenger->m_movement.m_moveFlags |= MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movement.m_moveFlags |= MOVEFLAG_IMMOBILIZED;
             passenger->m_movement.transport.guid = GetGUID();
             passenger->m_movement.transport.pos.Relocate(x, y, z, o);
         }
@@ -999,7 +999,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (withAll)
         {
             passenger->SetTransport(nullptr);
-            passenger->m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+            passenger->m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
             passenger->m_movement.transport.guid.Clear();
             passenger->m_movement.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         }

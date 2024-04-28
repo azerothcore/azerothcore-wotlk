@@ -1429,7 +1429,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 float ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
                 bool isCasterInWater = m_caster->IsInWater();
-                if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
+                if (!m_caster->HasUnitMovementFlag(MOVEFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
                 {
                     float tstX = 0.0f, tstY = 0.0f, tstZ = 0.0f, prevX = 0.0f, prevY = 0.0f, prevZ = 0.0f;
                     float tstZ1 = 0.0f, tstZ2 = 0.0f, tstZ3 = 0.0f, destz1 = 0.0f, destz2 = 0.0f, destz3 = 0.0f, srange = 0.0f, srange1 = 0.0f, srange2 = 0.0f, srange3 = 0.0f;
@@ -4409,7 +4409,7 @@ void Spell::update(uint32 difftime)
     // xinef: added preparing state (real cast, skip channels as they have other flags for this)
     if ((m_caster->GetTypeId() == TYPEID_PLAYER && m_timer != 0) &&
             m_caster->isMoving() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) && m_spellState == SPELL_STATE_PREPARING &&
-            (m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK || !m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR)))
+            (m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK || !m_caster->HasUnitMovementFlag(MOVEFLAG_FALLEN_FAR)))
     {
         // don't cancel for melee, autorepeat, triggered and instant spells
         if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered())
@@ -5797,7 +5797,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->isMoving() && !IsTriggered())
     {
         // skip stuck spell to allow use it in falling case and apply spell limitations at movement
-        if ((!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK) &&
+        if ((!m_caster->HasUnitMovementFlag(MOVEFLAG_FALLEN_FAR) || m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK) &&
                 (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
             return SPELL_FAILED_MOVING;
     }

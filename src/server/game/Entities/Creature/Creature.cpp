@@ -932,7 +932,7 @@ bool Creature::IsFreeToMove()
     // Do not reposition ourself when we are not allowed to move
     if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove() || !IsCombatMovementAllowed()) &&
         (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE ||
-        (m_movement.m_moveFlags & MOVEMENTFLAG_SPLINE_ENABLED) != 0))
+        (m_movement.m_moveFlags & MOVEFLAG_SPLINE_AWAITING_LOAD) != 0))
     {
         return false;
     }
@@ -1184,7 +1184,7 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
 
     LoadCreaturesAddon();
 
-    //! Need to be called after LoadCreaturesAddon - MOVEMENTFLAG_HOVER is set there
+    //! Need to be called after LoadCreaturesAddon - MOVEFLAG_HOVER is set there
     m_positionZ += GetHoverHeight();
 
     LastUsedScriptID = GetScriptId();
@@ -1997,8 +1997,8 @@ void Creature::setDeathState(DeathState s, bool despawn)
         //SetWalk(true);
 
         // pussywizard:
-        if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
-            RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        if (HasUnitMovementFlag(MOVEFLAG_FALLING))
+            RemoveUnitMovementFlag(MOVEFLAG_FALLING);
 
         UpdateMovementFlags();
 
@@ -2709,7 +2709,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
         //! basing on whether the creature is in air or not
         //! Set MovementFlag_Hover. Otherwise do nothing.
         if (CanHover())
-            AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
+            AddUnitMovementFlag(MOVEFLAG_HOVER);
     }
 
     if (cainfo->bytes2 != 0)
@@ -3397,7 +3397,7 @@ void Creature::UpdateMovementFlags()
     if (!info)
         return;
 
-    // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MovementFlags in your own scripts
+    // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MOVEFLAG in your own scripts
     if (info->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
         return;
 
@@ -3425,7 +3425,7 @@ void Creature::UpdateMovementFlags()
     }
 
     if (!isInAir)
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        RemoveUnitMovementFlag(MOVEFLAG_FALLING);
 
     bool Swim = false;
     LiquidData const& liquidData = GetLiquidData();

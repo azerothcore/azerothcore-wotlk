@@ -1191,14 +1191,14 @@ public:
             GetUnitOwner()->Dismount();
             GetUnitOwner()->SetCanFly(true);
             GetUnitOwner()->SetDisableGravity(true);
-            GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            GetUnitOwner()->AddUnitMovementFlag(MOVEFLAG_FLYING);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             GetUnitOwner()->SetCanFly(false);
             GetUnitOwner()->SetDisableGravity(false);
-            GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            GetUnitOwner()->RemoveUnitMovementFlag(MOVEFLAG_FLYING);
             GetUnitOwner()->GetMotionMaster()->MoveFall();
         }
 

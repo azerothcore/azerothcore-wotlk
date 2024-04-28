@@ -179,7 +179,7 @@ void Vehicle::ApplyAllImmunities()
         case 452: // Isle of Conquest
         case 543: // Isle of Conquest
             //_me->SetControlled(true, UNIT_STATE_ROOT);
-            //me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            //me->AddUnitMovementFlag(MOVEFLAG_ROOTED);
             //me->SetSpeed(MOVE_TURN_RATE, 0.7f);
             //me->SetSpeed(MOVE_PITCH_RATE, 0.7f);
             //me->m_movement.m_moveFlags2=59;
@@ -374,7 +374,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     if (seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE)
         unit->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
-    unit->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    unit->AddUnitMovementFlag(MOVEFLAG_IMMOBILIZED);
     VehicleSeatEntry const* veSeat = seat->second.SeatInfo;
     unit->m_movement.transport.pos.Relocate(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
     unit->m_movement.transport.time = 0;
@@ -407,7 +407,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     {
         unit->SendClearTarget();                                // SMSG_BREAK_TARGET
         unit->SetControlled(true, UNIT_STATE_ROOT);              // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
-        // also adds MOVEMENTFLAG_ROOT
+        // also adds MOVEFLAG_ROOTED
         Movement::MoveSplineInit init(unit);
         init.DisableTransportPathTransformations();
         init.MoveTo(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
@@ -475,7 +475,7 @@ void Vehicle::RemovePassenger(Unit* unit)
     {
         if (!_me->GetTransport())
         {
-            unit->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            unit->RemoveUnitMovementFlag(MOVEFLAG_IMMOBILIZED);
             unit->m_movement.transport.Reset();
         }
         else

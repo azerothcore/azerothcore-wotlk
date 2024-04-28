@@ -186,13 +186,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             {
                 UnitMoveType moveType = MOVE_RUN;
                 if (target->CanFly())
-                    moveType = target->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD) ? MOVE_FLIGHT_BACK : MOVE_FLIGHT;
+                    moveType = target->HasUnitMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_FLIGHT_BACK : MOVE_FLIGHT;
                 else
                 {
                     if (target->IsWalking())
                         moveType = MOVE_WALK;
                     else
-                        moveType = target->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN;
+                        moveType = target->HasUnitMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN;
                 }
                 float speed = target->GetSpeed(moveType) * 0.5f;
                 additionalRange = owner->GetExactDistSq(target) < G3D::square(speed) ? 0 : speed;
@@ -324,7 +324,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
         uint32 moveFlags = target->GetUnitMovementFlags();
         if (target->movespline->isWalking())
         {
-            moveFlags |= MOVEMENTFLAG_WALKING;
+            moveFlags |= MOVEFLAG_WALK;
         }
 
         UnitMoveType moveType = Movement::SelectSpeedType(moveFlags);
@@ -351,23 +351,23 @@ static Position const PredictPosition(Unit* target)
     float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
     float orientation = target->GetOrientation();
 
-    if ((target->m_movement.m_moveFlags & MOVEMENTFLAG_FORWARD) != 0)
+    if ((target->m_movement.m_moveFlags & MOVEFLAG_FORWARD) != 0)
     {
         pos.m_positionX += cos(orientation) * speed;
         pos.m_positionY += std::sin(orientation) * speed;
     }
-    else if ((target->m_movement.m_moveFlags & MOVEMENTFLAG_BACKWARD) != 0)
+    else if ((target->m_movement.m_moveFlags & MOVEFLAG_BACKWARD) != 0)
     {
         pos.m_positionX -= cos(orientation) * speed;
         pos.m_positionY -= std::sin(orientation) * speed;
     }
 
-    if ((target->m_movement.m_moveFlags & MOVEMENTFLAG_STRAFE_LEFT) != 0)
+    if ((target->m_movement.m_moveFlags & MOVEFLAG_STRAFE_LEFT) != 0)
     {
         pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
         pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
     }
-    else if ((target->m_movement.m_moveFlags & MOVEMENTFLAG_STRAFE_RIGHT) != 0)
+    else if ((target->m_movement.m_moveFlags & MOVEFLAG_STRAFE_RIGHT) != 0)
     {
         pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
         pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
@@ -392,7 +392,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
 
     if (isPlayerPet)
     {
-        targetIsMoving = (target->m_movement.m_moveFlags & (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT)) != 0;
+        targetIsMoving = (target->m_movement.m_moveFlags & (MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT)) != 0;
     }
 
     if (exactDistSq > distanceTolerance)

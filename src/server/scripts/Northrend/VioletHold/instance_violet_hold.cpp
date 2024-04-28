@@ -350,14 +350,14 @@ public:
                         pBoss->GetMotionMaster()->MovePoint(0, BossStartMove2);
                     if (Creature* pGuard1 = instance->GetCreature(NPC_ErekemGuardGUID[0]))
                     {
-                        pGuard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        pGuard1->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         pGuard1->SetImmuneToNPC(false);
                         pGuard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* pGuard2 = instance->GetCreature(NPC_ErekemGuardGUID[1]))
                     {
-                        pGuard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        pGuard2->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                         pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         pGuard2->SetImmuneToNPC(false);
                         pGuard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
@@ -391,7 +391,7 @@ public:
 
             if (pBoss)
             {
-                pBoss->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                pBoss->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                 pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 pBoss->SetImmuneToNPC(false);
                 pBoss->SetReactState(REACT_AGGRESSIVE);
@@ -421,7 +421,7 @@ public:
                             {
                                 c->SetReactState(REACT_PASSIVE);
                                 c->CombatStop();
-                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                                 c->GetMotionMaster()->MovePoint(0, guardMovePosition);
                             }
                         events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5s);
@@ -439,7 +439,7 @@ public:
                     {
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                         {
-                            c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            c->RemoveUnitMovementFlag(MOVEFLAG_WALK);
                             c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                         }
                         SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);

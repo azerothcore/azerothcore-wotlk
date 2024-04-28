@@ -653,7 +653,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movement.m_moveFlags &= ~(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
+    m_movement.m_moveFlags &= ~(MOVEFLAG_SPLINE_AWAITING_LOAD | MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD);
     movespline->_Interrupt();
 }
 
@@ -15707,7 +15707,7 @@ void Unit::CleanupsBeforeDelete(bool finalCleanup)
         GetTransport()->RemovePassenger(this);
         SetTransport(nullptr);
         m_movement.transport.Reset();
-        m_movement.m_moveFlags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        m_movement.m_moveFlags &= ~MOVEFLAG_IMMOBILIZED;
     }
 
     CleanupBeforeRemoveFromMap(finalCleanup);
@@ -18410,18 +18410,18 @@ void Unit::SetRooted(bool apply, bool isStun)
         if (m_rootTimes > 0) // blizzard internal check?
             m_rootTimes++;
 
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
-        // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
-        // setting MOVEMENTFLAG_ROOT
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+        // MOVEFLAG_ROOTED cannot be used in conjunction with MOVEFLAG_MOVE_MASK (tested 3.3.5a)
+        // this will freeze clients. That's why we remove MOVEFLAG_MOVE_MASK before
+        // setting MOVEFLAG_ROOTED
+        RemoveUnitMovementFlag(MOVEFLAG_MOVE_MASK);
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEFLAG_ROOTED);
         }
 
          // Creature specific
@@ -18453,7 +18453,7 @@ void Unit::SetRooted(bool apply, bool isStun)
     }
     else
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
+        RemoveUnitMovementFlag(MOVEFLAG_ROOTED | MOVEFLAG_PENDING_ROOT);
 
         if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
         {
@@ -18661,7 +18661,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
         // Xinef: If creature can fly, add normal player flying flag (fixes speed)
         if (charmer->GetTypeId() == TYPEID_PLAYER && ToCreature()->CanFly())
-            AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            AddUnitMovementFlag(MOVEFLAG_FLYING);
     }
     else
     {
@@ -18880,7 +18880,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
             creature->AI()->OnCharmed(false);
 
         // Xinef: Remove movement flag flying
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        RemoveUnitMovementFlag(MOVEFLAG_FLYING);
     }
     else
         ToPlayer()->SetClientControl(this, true); // verified
@@ -19982,7 +19982,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!vehicleBase)
         return;
 
-    SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
+    SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEFLAG_ROOTED
 
     Position pos;
     if (!exitPosition)                          // Exit position not specified
@@ -20023,7 +20023,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
     }
-    else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    else if (HasUnitMovementFlag(MOVEFLAG_ROOTED))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
         data << GetPackGUID();
@@ -20112,7 +20112,7 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
     *data << GetOrientation();
 
     // 0x00000200
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_ONTRANSPORT)
+    if (GetUnitMovementFlags() & MOVEFLAG_IMMOBILIZED)
     {
         if (m_vehicle)
             *data << m_vehicle->GetBase()->GetPackGUID();
@@ -20133,14 +20133,14 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
     }
 
     // 0x02200000
-    if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
+    if ((GetUnitMovementFlags() & (MOVEFLAG_SWIMMING | MOVEFLAG_FLYING))
             || (m_movement.m_moveFlags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
         *data << (float)m_movement.pitch;
 
     *data << (uint32)m_movement.fallTime;
 
     // 0x00001000
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_FALLING)
+    if (GetUnitMovementFlags() & MOVEFLAG_FALLING)
     {
         *data << (float)m_movement.jump.zspeed;
         *data << (float)m_movement.jump.sinAngle;
@@ -20149,13 +20149,13 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
     }
 
     // 0x04000000
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)
+    if (GetUnitMovementFlags() & MOVEFLAG_SPLINE_MOVER)
         *data << (float)m_movement.splineElevation;
 }
 
 bool Unit::IsFalling() const
 {
-    return ((m_movement.m_moveFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) != 0)
+    return ((m_movement.m_moveFlags & (MOVEFLAG_FALLING | MOVEFLAG_FALLEN_FAR)) != 0)
             || (!movespline->Finalized() && movespline->Initialized() && movespline->isFalling());
 }
 
@@ -20808,7 +20808,7 @@ void Unit::SetFacingTo(float ori)
 {
     Movement::MoveSplineInit init(this);
     init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ(), false);
-    if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && GetTransGUID())
+    if (HasUnitMovementFlag(MOVEFLAG_IMMOBILIZED) && GetTransGUID())
         init.DisableTransportPathTransformations(); // It makes no sense to target global orientation
     init.SetFacing(ori);
     init.Launch();
@@ -20833,9 +20833,9 @@ bool Unit::SetWalk(bool enable)
         return false;
 
     if (enable)
-        AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+        AddUnitMovementFlag(MOVEFLAG_WALK);
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+        RemoveUnitMovementFlag(MOVEFLAG_WALK);
 
     propagateSpeedChange();
     return true;
@@ -20848,12 +20848,12 @@ bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*u
 
     if (disable)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        AddUnitMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
+        RemoveUnitMovementFlag(MOVEFLAG_FALLING);
     }
     else
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        RemoveUnitMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
     }
 
     return true;
@@ -20861,17 +20861,17 @@ bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*u
 
 bool Unit::SetSwim(bool enable)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    if (enable == HasUnitMovementFlag(MOVEFLAG_SWIMMING))
         return false;
 
     if (enable)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        AddUnitMovementFlag(MOVEFLAG_SWIMMING);
         SetUnitFlag(UNIT_FLAG_SWIMMING);
     }
     else
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        RemoveUnitMovementFlag(MOVEFLAG_SWIMMING);
         RemoveUnitFlag(UNIT_FLAG_SWIMMING);
     }
 
@@ -20880,17 +20880,17 @@ bool Unit::SetSwim(bool enable)
 
 bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
+    if (enable == HasUnitMovementFlag(MOVEFLAG_CAN_FLY))
         return false;
 
     if (enable)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        AddUnitMovementFlag(MOVEFLAG_CAN_FLY);
+        RemoveUnitMovementFlag(MOVEFLAG_FALLING);
     }
     else
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
+        RemoveUnitMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
     }
 
     return true;
@@ -20898,13 +20898,13 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
 
 bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false*/)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))
+    if (enable == HasUnitMovementFlag(MOVEFLAG_WATER_WALK))
         return false;
 
     if (enable)
-        AddUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
+        AddUnitMovementFlag(MOVEFLAG_WATER_WALK);
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
+        RemoveUnitMovementFlag(MOVEFLAG_WATER_WALK);
 
     return true;
 }
@@ -20920,13 +20920,13 @@ void Unit::SendMovementWaterWalking(Player* sendTo)
 
 bool Unit::SetFeatherFall(bool enable, bool /*packetOnly = false*/)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW))
+    if (enable == HasUnitMovementFlag(MOVEFLAG_FEATHER_FALL))
         return false;
 
     if (enable)
-        AddUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
+        AddUnitMovementFlag(MOVEFLAG_FEATHER_FALL);
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
+        RemoveUnitMovementFlag(MOVEFLAG_FEATHER_FALL);
 
     return true;
 }
@@ -20942,20 +20942,20 @@ void Unit::SendMovementFeatherFall(Player* sendTo)
 
 bool Unit::SetHover(bool enable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
+    if (enable == HasUnitMovementFlag(MOVEFLAG_HOVER))
         return false;
 
     float hoverHeight = GetFloatValue(UNIT_FIELD_HOVERHEIGHT);
 
     if (enable)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
+        AddUnitMovementFlag(MOVEFLAG_HOVER);
         if (hoverHeight && GetPositionZ() - GetFloorZ() < hoverHeight)
             UpdateHeight(GetPositionZ() + hoverHeight);
     }
     else
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
+        RemoveUnitMovementFlag(MOVEFLAG_HOVER);
         if (hoverHeight && (!isDying() || GetTypeId() != TYPEID_UNIT))
         {
             float newZ = std::max<float>(GetFloorZ(), GetPositionZ() - hoverHeight);

@@ -390,13 +390,13 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
         switch (move_type)
         {
         case WAYPOINT_MOVE_TYPE_WALK:
-            member->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            member->AddUnitMovementFlag(MOVEFLAG_WALK);
             break;
         case WAYPOINT_MOVE_TYPE_RUN:
-            member->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            member->RemoveUnitMovementFlag(MOVEFLAG_WALK);
             break;
         case WAYPOINT_MOVE_TYPE_LAND:
-            member->AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+            member->AddUnitMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
             break;
         }
 

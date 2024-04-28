@@ -1188,30 +1188,36 @@ public:
         }
         else
         {
-            static uint32 const FlagsWithHandlers = MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE |
-                MOVEMENTFLAG_WALKING | MOVEMENTFLAG_SWIMMING |
-                MOVEMENTFLAG_SPLINE_ENABLED;
+            static uint32 const FlagsWithHandlers = MOVEFLAG_DISABLE_GRAVITY |
+                                                    MOVEFLAG_ROOTED |
+                                                    MOVEFLAG_CAN_FLY |
+                                                    MOVEFLAG_WATER_WALK |
+                                                    MOVEFLAG_FEATHER_FALL |
+                                                    MOVEFLAG_HOVER |
+                                                    MOVEFLAG_WALK |
+                                                    MOVEFLAG_SWIMMING |
+                                                    MOVEFLAG_SPLINE_AWAITING_LOAD;
 
             bool unhandledFlag = ((*moveFlags ^ target->GetUnitMovementFlags()) & ~FlagsWithHandlers) != 0;
 
-            target->SetWalk((*moveFlags & MOVEMENTFLAG_WALKING) != 0);
-            target->SetDisableGravity((*moveFlags & MOVEMENTFLAG_DISABLE_GRAVITY) != 0);
-            target->SetSwim((*moveFlags & MOVEMENTFLAG_SWIMMING) != 0);
-            target->SetCanFly((*moveFlags & MOVEMENTFLAG_CAN_FLY) != 0);
-            target->SetWaterWalking((*moveFlags & MOVEMENTFLAG_WATERWALKING) != 0);
-            target->SetFeatherFall((*moveFlags & MOVEMENTFLAG_FALLING_SLOW) != 0);
-            target->SetHover((*moveFlags & MOVEMENTFLAG_HOVER) != 0);
+            target->SetWalk((*moveFlags & MOVEFLAG_WALK) != 0);
+            target->SetDisableGravity((*moveFlags & MOVEFLAG_DISABLE_GRAVITY) != 0);
+            target->SetSwim((*moveFlags & MOVEFLAG_SWIMMING) != 0);
+            target->SetCanFly((*moveFlags & MOVEFLAG_CAN_FLY) != 0);
+            target->SetWaterWalking((*moveFlags & MOVEFLAG_WATER_WALK) != 0);
+            target->SetFeatherFall((*moveFlags & MOVEFLAG_FEATHER_FALL) != 0);
+            target->SetHover((*moveFlags & MOVEFLAG_HOVER) != 0);
 
-            if (*moveFlags & (MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_CAN_FLY))
-                *moveFlags &= ~MOVEMENTFLAG_FALLING;
+            if (*moveFlags & (MOVEFLAG_DISABLE_GRAVITY | MOVEFLAG_CAN_FLY))
+                *moveFlags &= ~MOVEFLAG_FALLING;
 
-            if (*moveFlags & MOVEMENTFLAG_ROOT)
+            if (*moveFlags & MOVEFLAG_ROOTED)
             {
                 target->SetControlled(true, UNIT_STATE_ROOT);
-                *moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
+                *moveFlags &= ~MOVEFLAG_MOVE_MASK;
             }
 
-            if (target->HasUnitMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) && !(*moveFlags & MOVEMENTFLAG_SPLINE_ENABLED))
+            if (target->HasUnitMovementFlag(MOVEFLAG_SPLINE_AWAITING_LOAD) && !(*moveFlags & MOVEFLAG_SPLINE_AWAITING_LOAD))
                 target->StopMoving();
 
             if (unhandledFlag)

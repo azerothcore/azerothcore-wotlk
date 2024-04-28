@@ -254,7 +254,7 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 9s, 12s);
             events.ScheduleEvent(EVENT_SPELL_SMITE, 2s, 3s);
-            me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            me->RemoveUnitMovementFlag(MOVEFLAG_WALK);
             Talk(SAY_PALETRESS_AGGRO);
             if( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);

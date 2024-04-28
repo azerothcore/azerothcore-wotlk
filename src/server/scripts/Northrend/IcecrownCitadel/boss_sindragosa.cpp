@@ -295,7 +295,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
+            if (!me->HasUnitMovementFlag(MOVEFLAG_CAN_FLY))
                 BossAI::MoveInLineOfSight(who);
         }
 

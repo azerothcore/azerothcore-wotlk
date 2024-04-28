@@ -551,7 +551,7 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(17500ms, [&]
         {
             SetRoomState(GO_STATE_ACTIVE);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
+            me->SetUnitMovementFlags(MOVEFLAG_HOVER | MOVEFLAG_WALK | MOVEFLAG_DISABLE_GRAVITY);
             me->SendMovementFlagUpdate();
         }, EVENT_SCENE_7);
         ScheduleUniqueTimedEvent(19000ms, [&]
@@ -612,7 +612,7 @@ struct boss_kaelthas : public BossAI
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_WALKING);
+            me->SetUnitMovementFlags(MOVEFLAG_DISABLE_GRAVITY | MOVEFLAG_WALK);
             me->SendMovementFlagUpdate();
         }, EVENT_SCENE_15);
         ScheduleUniqueTimedEvent(36000ms, [&]
