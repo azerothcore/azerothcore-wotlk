@@ -1270,6 +1270,8 @@ public:
 
             static const auto can_affect = [](WorldObject const* o, Unit const* unit)
             {
+                if (!unit->IsAlive())
+                    return false;
                 AuraEffect const* eShield = unit->GetAuraEffect(SPELL_AURA_REDUCE_PUSHBACK, SPELLFAMILY_SHAMAN, 0x0, 0x400, 0x0);
                 return (!eShield || eShield->GetBase()->GetCharges() < 5 || eShield->GetBase()->GetDuration() < 30000) && o->GetDistance(unit) < 40 && (unit->IsInCombat() || !unit->isMoving());
             };
