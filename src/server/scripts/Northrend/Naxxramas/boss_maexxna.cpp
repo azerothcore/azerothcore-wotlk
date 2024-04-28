@@ -114,7 +114,6 @@ public:
         SummonList summons;
 
         std::vector<std::pair<uint32, ObjectGuid>> wraps;
-        std::vector<std::pair<uint32, ObjectGuid>> wraps2;
 
         bool IsInRoom()
         {
