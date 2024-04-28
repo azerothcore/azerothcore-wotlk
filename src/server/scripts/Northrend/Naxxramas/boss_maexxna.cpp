@@ -196,8 +196,10 @@ public:
             if (candidates.empty())
                 return;
 
-            for (uint i = 0; i < candidates.size() ; i++)
+            for (int i = 0; i < RAID_MODE(1, 2) ; i++)
             {
+                if (candidates.empty())
+                    break;
                 const Position &randomPos = PosWrap[positions[i]];
 
                 auto candIt = candidates.begin();
