@@ -46,7 +46,8 @@ enum Events
     EVENT_NECROTIC_POISON               = 3,
     EVENT_WEB_WRAP                      = 4,
     EVENT_HEALTH_CHECK                  = 5,
-    EVENT_SUMMON_SPIDERLINGS            = 6
+    EVENT_SUMMON_SPIDERLINGS            = 6,
+    EVENT_WEB_WRAP_APPLY_STUN           = 7
 };
 
 enum Emotes
@@ -113,7 +114,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        std::vector<std::pair<uint32, ObjectGuid>> wraps;
+        GuidList wraps;
 
         bool IsInRoom()
         {
@@ -221,32 +222,9 @@ public:
                 target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), -horizontalSpeed, verticalSpeed);
                 me->CastSpell(target, SPELL_WEB_WRAP_PACIFY_5, true); // pacify silence for 5 seconds
 
-                wraps.push_back(std::make_pair(uint32(2000), target->GetGUID()));
+                wraps.push_back(target->GetGUID());
             }
-        }
-
-        void UpdateWraps(uint32 diff)
-        {
-            bool wdone = false;
-            for (auto& p : wraps)
-            {
-                if (p.first < diff)
-                {
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, p.second))
-                    {
-                        player->CastSpell(player, SPELL_WEB_WRAP_STUN, true);
-                    }
-                    wdone = true;
-                }
-                else
-                {
-                    p.first -= diff;
-                }
-            }
-            if (wdone)
-            {
-                wraps.clear();
-            }
+            events.ScheduleEvent(EVENT_WEB_WRAP_APPLY_STUN, 2s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -256,8 +234,6 @@ public:
 
             if (!UpdateVictim())
                 return;
-
-            UpdateWraps(diff);
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -295,10 +271,23 @@ public:
                     events.Repeat(1s);
                     break;
                 case EVENT_WEB_WRAP:
+
                     Talk(EMOTE_WEB_WRAP);
                     DoCastWebWrap();
                     events.Repeat(40s);
                     break;
+                case EVENT_WEB_WRAP_APPLY_STUN:
+                {
+                    for (auto& p : wraps)
+                    {
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, p))
+                        {
+                            player->CastSpell(player, SPELL_WEB_WRAP_STUN, true);
+                        }
+                    }
+                    wraps.clear();
+                    break;
+                }
             }
             DoMeleeAttackIfReady();
         }
