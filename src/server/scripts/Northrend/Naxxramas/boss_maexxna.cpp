@@ -202,13 +202,13 @@ public:
                     break;
                 const Position &randomPos = PosWrap[positions[i]];
 
-                auto candIt = candidates.begin();
+                auto itr = candidates.begin();
 
                 if (candidates.size() > 1)
-                    std::advance(candIt, urand(0, candidates.size() - 1));
+                    std::advance(itr, urand(0, candidates.size() - 1));
 
-                Unit *target = *candIt;
-                candIt = candidates.erase(candIt);
+                Unit *target = *itr;
+                candidates.erase(itr);
 
                 float dx = randomPos.GetPositionX() - target->GetPositionX();
                 float dy = randomPos.GetPositionY() - target->GetPositionY();
