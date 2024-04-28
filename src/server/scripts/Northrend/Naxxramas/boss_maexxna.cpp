@@ -27,6 +27,8 @@ enum Spells
 
     SPELL_WEB_WRAP_KILL_WEBS = 52512,
 
+    SPELL_WEB_WRAP_INIT          = 28673,
+
     SPELL_WEB_WRAP_200          = 28618, // 200 Pull speed
     SPELL_WEB_WRAP_300          = 28619,
     SPELL_WEB_WRAP_400          = 28620,
@@ -71,12 +73,40 @@ enum Misc
     NPC_WEB_WRAP_TRIGGER                = 15384
 };
 
-const Position PosWrap[3] =
+    // {3546.796f, -3869.082f, 296.450f, 0.0f},
+    // {3531.271f, -3847.424f, 299.450f, 0.0f},
+    // {3497.067f, -3843.384f, 302.384f, 0.0f}
+
+const Position PosWrap[8] =
 {
-    {3546.796f, -3869.082f, 296.450f, 0.0f},
-    {3531.271f, -3847.424f, 299.450f, 0.0f},
-    {3497.067f, -3843.384f, 302.384f, 0.0f}
+    {3562.40f, -3890.35f, 314.30f, 0.0f},
+    {3560.78f, -3878.10f, 316.18f, 0.0f},
+    {3554.95f, -3863.24f, 314.46f, 0.0f},
+    {3549.02f, -3855.07f, 311.58f, 0.0f},
+    {3538.34f, -3844.68f, 314.21f, 0.0f},
+    {3526.43f, -3838.73f, 317.10f, 0.0f},
+    {3507.84f, -3832.71f, 319.00f, 0.0f},
+    {3493.35f, -3834.06f, 318.71f, 0.0f}
 };
+
+struct WebTargetSelector
+{
+    WebTargetSelector(Unit* maexxna) : _maexxna(maexxna) {}
+    bool operator()(Unit const* target) const
+    {
+        if (target->GetTypeId() != TYPEID_PLAYER) // never web nonplayers (pets, guardians, etc.)
+            return false;
+        if (_maexxna->GetVictim() == target) // never target tank
+            return false;
+        if (target->HasAura(SPELL_WEB_WRAP_STUN)) // never target targets that are already webbed
+            return false;
+        return true;
+    }
+
+    private:
+        Unit const* _maexxna;
+};
+
 
 class boss_maexxna : public CreatureScript
 {
@@ -98,6 +128,9 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
+
+        std::vector<std::pair<uint32, ObjectGuid>> wraps;
+        std::vector<std::pair<uint32, ObjectGuid>> wraps2;
 
         bool IsInRoom()
         {
@@ -167,8 +200,134 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            //summons.DespawnAll();
         }
+
+        bool DoCastWebWrap()
+        {
+
+            std::list<Unit*> candidates;
+            SelectTargetList(candidates, RAID_MODE(1, 2), SelectTargetMethod::Random, 1, WebTargetSelector(me));
+
+            if (candidates.empty())
+                return false;
+
+
+            for (uint i = 0; i < candidates.size() ; i++)
+            {
+                const Position &randomPos = PosWrap[urand(0,7)];
+
+                auto candIt = candidates.begin();
+
+                if (candidates.size() > 1)
+                    std::advance(candIt, urand(0, candidates.size() - 1));
+
+                Unit *target = *candIt;
+                candIt = candidates.erase(candIt);
+
+                float dx = target->GetPositionX() - randomPos.GetPositionX();
+                float dy = target->GetPositionY() - randomPos.GetPositionY();
+                float dist = sqrt((dx * dx) + (dy * dy));
+                float yDist = randomPos.GetPositionZ() - target->GetPositionZ();
+
+                // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
+                // velocity based on how close we are to it. If we are close initially, reduce the travel-time
+                // by increasing horizontal velocity, in which case we won't need as much vertical velocity, thus
+                // won't hit the ceiling.
+                // s=ut+(0.5a*t^2) || s = vertical speed, u = initial up velocity, a = gravity factor(negative), t = time of flight
+                // sadly this only aproximates some parts of this formula
+                float horizontalSpeed = dist / 1.5f;
+                float verticalSpeed = 20.0f + (yDist * 0.5f);
+                float angle = target->GetAngle(randomPos.GetPositionX(), randomPos.GetPositionY());
+
+                // set immune anticheat and calculate speed
+                if (Player *plr = target->ToPlayer())
+                {
+                    // plr->SetLaunched(true);
+                    // plr->SetXYSpeed(horizontalSpeed);
+                }
+
+                target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), horizontalSpeed, verticalSpeed);
+                // target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
+
+                wraps.push_back(std::make_pair(uint32(2000), target->GetGUID()));
+
+                auto candIt = candidates.begin();
+
+                if(candidates.size() > 1)
+                    std::advance(candIt, urand(0, candidates.size() - 1));
+
+                Unit* target = *candIt;
+                candIt = candidates.erase(candIt);
+
+                float dx = target->GetPositionX() - PosWrap[i].GetPositionX();
+                float dy = target->GetPositionY() - PosWrap[i].GetPositionY();
+                float dist = sqrt((dx * dx) + (dy * dy));
+                float yDist = PosWrap[i].GetPositionZ() - target->GetPositionZ();
+
+                // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
+                // velocity based on how close we are to it. If we are close initially, reduce the travel-time
+                // by increasing horizontal velocity, in which case we won't need as much vertical velocity, thus
+                // won't hit the ceiling.
+                //s=ut+(0.5a*t^2) || s = vertical speed, u = initial up velocity, a = gravity factor(negative), t = time of flight
+                // sadly this only aproximates some parts of this formula
+                float horizontalSpeed = dist/1.5f;
+                float verticalSpeed = 20.0f + (yDist*0.5f);
+                float angle = target->GetAngle(PosWrap[i].GetPositionX(), PosWrap[i].GetPositionY());
+
+                // set immune anticheat and calculate speed
+                if (Player* plr = target->ToPlayer())
+                {
+                    // plr->SetLaunched(true);
+                    // plr->SetXYSpeed(horizontalSpeed);
+                }
+
+                target->KnockbackFrom(PosWrap[i].GetPositionX(), PosWrap[i].GetPositionY(), horizontalSpeed, verticalSpeed);
+                // target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
+
+                wraps.push_back(std::make_pair(uint32(2000), target->GetGUID()));
+            }
+
+        return true;
+    }
+
+void UpdateWraps(uint32 uiDiff)
+    {
+        bool wdone = false;
+        for (auto& p : wraps2)
+        {
+            if (p.first < uiDiff)
+            {
+                if (Player* pl = ObjectAccessor::GetPlayer(*me, p.second))
+                {
+                    pl->SummonCreature(NPC_WEB_WRAP, pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 57000);
+                }
+                wdone = true;
+            }
+            else
+                p.first -= uiDiff;
+        }
+
+        if (wdone)
+            wraps2.clear();
+
+        wdone = false;
+        for (auto& p : wraps)
+        {
+            if (p.first < uiDiff)
+            {
+                if (Player* pl = ObjectAccessor::GetPlayer(*me, p.second))
+                {
+                    pl->CastSpell(pl, SPELL_WEB_WRAP_STUN, true);
+                    wraps2.push_back(std::make_pair(3000, p.second));
+                }
+                wdone = true;
+            }
+            else
+                p.first -= uiDiff;
+        }
+        if (wdone)
+            wraps.clear();
+    }
 
         void UpdateAI(uint32 diff) override
         {
@@ -215,54 +374,8 @@ public:
                     break;
                 case EVENT_WEB_WRAP:
                     Talk(EMOTE_WEB_WRAP);
-                    //for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
-                    for (uint8 i = 0; i < 1; ++i)
-                    {
-                        // TODO: this can select the same target twice
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, true, -SPELL_WEB_WRAP_STUN))
-                        {
-                            std::list<Creature*> triggers;
-                            // TODO: This list should be saved OnAggro and range 100.0f
-                            me->GetCreatureListWithEntryInGrid(triggers, NPC_WEB_WRAP_TRIGGER, 150.0f);
-                            if (!triggers.empty())
-                            {
-                                std::list<Creature*>::iterator itr = triggers.begin();
-                                std::advance(itr, urand(0, triggers.size() - 1));
-
-                                Creature* triggerNPC;
-                                triggerNPC = *itr;
-
-                                triggers.erase(std::remove(triggers.begin(), triggers.end(), triggerNPC), triggers.end());
-
-
-                                float dist = me->GetDistance(target);
-                                uint32 spellId = SPELL_WEB_WRAP_500;
-                                if (dist <= 20.f)
-                                   spellId = SPELL_WEB_WRAP_200;
-                                else if (dist <= 30.f)
-                                   spellId = SPELL_WEB_WRAP_300;
-                                else if (dist <= 40.f)
-                                   spellId = SPELL_WEB_WRAP_400;
-                                //triggerNPC->CastCustomSpell(SPELL_WEB_WRAP_200, SPELLVALUE_AURA_DURATION, 1000, target, true);
-                                //triggerNPC->CastSpell(target, spellId, true);
-                                triggerNPC->CastSpell(target, spellId, true); // 4 seconds
-
-
-                                //triggerNPC->AI()->SetGUID(target->GetGUID());
-
-                                //target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
-                                //uint8 pos = urand(0, 2);
-                                //if (Creature* wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                                //{
-                                //    wrap->AI()->SetGUID(target->GetGUID());
-                                //    target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
-                                //}
-
-
-                            }
-
-                        }
-                    }
+                    DoCastWebWrap();
+                    //me->CastSpell(me, SPELL_WEB_WRAP_INIT, true);
                     events.Repeat(40s);
                     break;
             }
@@ -284,7 +397,6 @@ public:
     struct boss_maexxna_webwrap_triggerAI : public NullCreatureAI
     {
         explicit boss_maexxna_webwrap_triggerAI(Creature* c) : NullCreatureAI(c) {}
-
 
         ObjectGuid victimGUID;
 
@@ -309,13 +421,10 @@ public:
 };
 
 
-
 class boss_maexxna_webwrap : public CreatureScript
 {
 public:
     boss_maexxna_webwrap() : CreatureScript("boss_maexxna_webwrap") { }
-
-
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
@@ -330,6 +439,24 @@ public:
 
         // void Reset() override {
         //    me->KillSelf(10000);
+        // }
+
+
+        // void SetGUID(ObjectGuid guid, int32  /*param*/) override
+        // {
+        //     victimGUID = guid;
+        //     if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
+        //     {
+        //         float dist = me->GetDistance(victim);
+        //         uint32 duration = 4000;
+        //         if (dist <= 20.f)
+        //             duration = 1000;
+        //         else if (dist <= 30.f)
+        //             duration = 2000;
+        //         else if (dist <= 40.f)
+        //             duration = 3000;
+        //         me->CastCustomSpell(SPELL_WEB_WRAP_200, SPELLVALUE_AURA_DURATION, duration, victim, true);
+        //     }
         // }
 
         void IsSummonedBy(WorldObject* summoner) override
@@ -348,9 +475,8 @@ public:
                 {
                     if (victim->IsAlive())
                     {
-                        // TODO: can be SPELL_WEB_WRAP if fixed
                         victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
-                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
+                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
                     }
                     victim->RestoreDisplayId();
                 }
@@ -365,9 +491,6 @@ public:
                 {
                     if (!victim->IsAlive())
                     {
-                        // TODO: can be SPELL_WEB_WRAP if fixed
-                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
-                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
                         me->CastSpell(me, SPELL_WEB_WRAP_KILL_WEBS, true);
                     }
                 }
@@ -378,42 +501,118 @@ public:
 };
 
 
-class spell_web_wrap_damage : public SpellScriptLoader
-{
-public:
-    spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
-
-    class spell_web_wrap_damage_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_web_wrap_damage_AuraScript);
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() == 2)
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
-            }
-
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_web_wrap_damage_AuraScript();
-    }
-};
+//class spell_web_wrap_maexxna : public SpellScriptLoader
+//{
+//public:
+//    spell_web_wrap_maexxna() : SpellScriptLoader("spell_web_wrap_maexxna") { }
+//
+//    class spell_web_wrap_maexxna_SpellScript : public SpellScript
+//    {
+//        PrepareSpellScript(spell_web_wrap_maexxna_SpellScript);
+//
+//        void HandleScriptEffect(SpellEffIndex effIndex)
+//        {
+//            PreventHitDefaultEffect(effIndex);
+//            for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
+//            {
+//                // TODO: this can select the same target twice
+//                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, true, -SPELL_WEB_WRAP_STUN))
+//                {
+//                    std::list<Creature*> triggers;
+//                    // TODO: This list should be saved OnAggro and range 100.0f
+//                    me->GetCreatureListWithEntryInGrid(triggers, NPC_WEB_WRAP_TRIGGER, 150.0f);
+//                    if (!triggers.empty())
+//                    {
+//                        std::list<Creature*>::iterator itr = triggers.begin();
+//                        std::advance(itr, urand(0, triggers.size() - 1));
+//
+//                        Creature* triggerNPC;
+//                        triggerNPC = *itr;
+//
+//                        triggers.erase(std::remove(triggers.begin(), triggers.end(), triggerNPC), triggers.end());
+//
+//
+//                        float dist = me->GetDistance(target);
+//                        uint32 spellId = SPELL_WEB_WRAP_500;
+//                        if (dist <= 20.f)
+//                            spellId = SPELL_WEB_WRAP_200;
+//                        else if (dist <= 30.f)
+//                            spellId = SPELL_WEB_WRAP_300;
+//                        else if (dist <= 40.f)
+//                            spellId = SPELL_WEB_WRAP_400;
+//                        //triggerNPC->CastCustomSpell(SPELL_WEB_WRAP_200, SPELLVALUE_AURA_DURATION, 1000, target, true);
+//                        //triggerNPC->CastSpell(target, spellId, true);
+//                        triggerNPC->CastSpell(target, spellId, true); // 4 seconds
+//
+//
+//                        //triggerNPC->AI()->SetGUID(target->GetGUID());
+//
+//                        //target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
+//                        //uint8 pos = urand(0, 2);
+//                        //if (Creature* wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+//                        //{
+//                        //    wrap->AI()->SetGUID(target->GetGUID());
+//                        //    target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
+//                        //}
+//
+//
+//                    }
+//
+//                }
+//            }
+//
+//        }
+//
+//        void Register() override
+//        {
+//            OnEffectHitTarget += SpellEffectFn(spell_web_wrap_maexxna_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+//        }
+//    };
+//
+//    SpellScript* GetSpellScript() const override
+//    {
+//        return new spell_web_wrap_maexxna_SpellScript();
+//    }
+//};
+//
+//
+// class spell_web_wrap_damage : public SpellScriptLoader
+// {
+// public:
+    // spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
+//
+    // class spell_web_wrap_damage_AuraScript : public AuraScript
+    // {
+        // PrepareAuraScript(spell_web_wrap_damage_AuraScript);
+//
+        // void OnPeriodic(AuraEffect const* aurEff)
+        // {
+            // if (aurEff->GetTickNumber() == 2)
+            // {
+                // GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
+            // }
+//
+        // }
+//
+        // void Register() override
+        // {
+            // OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+        // }
+    // };
+//
+    // AuraScript* GetAuraScript() const override
+    // {
+        // return new spell_web_wrap_damage_AuraScript();
+    // }
+// };
 
 void AddSC_boss_maexxna()
 {
     new boss_maexxna();
     new boss_maexxna_webwrap();
-    new boss_maexxna_webwrap_trigger();
-    new spell_web_wrap_damage();
+    //new boss_maexxna_webwrap_trigger();
+    //new spell_web_wrap_damage();
+    //new spell_web_wrap_maexxna();
 };
 
 
