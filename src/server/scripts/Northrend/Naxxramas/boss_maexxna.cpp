@@ -18,12 +18,16 @@
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Spells
 {
 
-    SPELL_WEB_WRAP_200          = 28618,
+    SPELL_WEB_WRAP_KILL_WEBS = 52512,
+
+    SPELL_WEB_WRAP_200          = 28618, // 200 Pull speed
     SPELL_WEB_WRAP_300          = 28619,
     SPELL_WEB_WRAP_400          = 28620,
     SPELL_WEB_WRAP_500          = 28621,
@@ -36,6 +40,7 @@ enum Spells
     SPELL_FRENZY_10                     = 54123,
     SPELL_FRENZY_25                     = 54124,
     SPELL_WEB_WRAP_STUN                 = 28622, // STUN Triggered by spells
+    SPELL_WEB_WRAP_SUMMON                 = 28627,
     SPELL_WEB_WRAP_SCRIPT_EFFECT_10 = 28673, // SCRIPT_EFFECT 0, INIT
     SPELL_WEB_WRAP_SCRIPT_EFFECT_25 = 54127, // SCRIPT_EFFECT 0, INIT
     SPELL_SUMMON_SPIDERLINGS_10 = 54130, // DOES NOT EXIST IN WRATH, 29434 1.12
@@ -162,7 +167,7 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            summons.DespawnAll();
+            //summons.DespawnAll();
         }
 
         void UpdateAI(uint32 diff) override
@@ -217,6 +222,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, true, -SPELL_WEB_WRAP_STUN))
                         {
                             std::list<Creature*> triggers;
+                            // TODO: This list should be saved OnAggro and range 100.0f
                             me->GetCreatureListWithEntryInGrid(triggers, NPC_WEB_WRAP_TRIGGER, 150.0f);
                             if (!triggers.empty())
                             {
@@ -239,7 +245,7 @@ public:
                                    spellId = SPELL_WEB_WRAP_400;
                                 //triggerNPC->CastCustomSpell(SPELL_WEB_WRAP_200, SPELLVALUE_AURA_DURATION, 1000, target, true);
                                 //triggerNPC->CastSpell(target, spellId, true);
-                                triggerNPC->CastSpell(target, 28620, true); // 4 seconds
+                                triggerNPC->CastSpell(target, spellId, true); // 4 seconds
 
 
                                 //triggerNPC->AI()->SetGUID(target->GetGUID());
@@ -279,6 +285,7 @@ public:
     {
         explicit boss_maexxna_webwrap_triggerAI(Creature* c) : NullCreatureAI(c) {}
 
+
         ObjectGuid victimGUID;
 
         void SetGUID(ObjectGuid guid, int32  /*param*/) override
@@ -308,46 +315,206 @@ class boss_maexxna_webwrap : public CreatureScript
 public:
     boss_maexxna_webwrap() : CreatureScript("boss_maexxna_webwrap") { }
 
+
+
     CreatureAI* GetAI(Creature* pCreature) const override
     {
         return GetNaxxramasAI<boss_maexxna_webwrapAI>(pCreature);
     }
 
-    struct boss_maexxna_webwrapAI : public NullCreatureAI
+    struct boss_maexxna_webwrapAI : public ScriptedAI
     {
-        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) {}
+        explicit boss_maexxna_webwrapAI(Creature* c) : ScriptedAI(c) { }
 
         ObjectGuid victimGUID;
 
-        void SetGUID(ObjectGuid guid, int32  /*param*/) override
-        {
-            victimGUID = guid;
+        // void Reset() override {
+        //    me->KillSelf(10000);
+        // }
 
-            if (me->m_spells[0] && victimGUID)
-            {
-                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
-                {
-                    victim->CastSpell(victim, me->m_spells[0], true, nullptr, nullptr, me->GetGUID());
-                }
-            }
+        void IsSummonedBy(WorldObject* summoner) override
+        {
+            if (!summoner)
+                return;
+
+            victimGUID = summoner->GetGUID();
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (me->m_spells[0] && victimGUID)
+            if (victimGUID)
             {
                 if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
                 {
-                    victim->RemoveAurasDueToSpell(me->m_spells[0], me->GetGUID());
+                    if (victim->IsAlive())
+                    {
+                        // TODO: can be SPELL_WEB_WRAP if fixed
+                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
+                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
+                    }
+                    victim->RestoreDisplayId();
                 }
             }
         }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (victimGUID)
+            {
+                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
+                {
+                    if (!victim->IsAlive())
+                    {
+                        // TODO: can be SPELL_WEB_WRAP if fixed
+                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
+                        // victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
+                        me->CastSpell(me, SPELL_WEB_WRAP_KILL_WEBS, true);
+                    }
+                }
+            }
+        }
+
     };
+};
+
+
+class spell_web_wrap_damage : public SpellScriptLoader
+{
+public:
+    spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
+
+    class spell_web_wrap_damage_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_web_wrap_damage_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            if (aurEff->GetTickNumber() == 2)
+            {
+                GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
+            }
+
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_web_wrap_damage_AuraScript();
+    }
 };
 
 void AddSC_boss_maexxna()
 {
     new boss_maexxna();
-    //new boss_maexxna_webwrap();
+    new boss_maexxna_webwrap();
     new boss_maexxna_webwrap_trigger();
-}
+    new spell_web_wrap_damage();
+};
+
+
+// class npc_gothik_trigger : public CreatureScript
+// {
+// public:
+//     npc_gothik_trigger() : CreatureScript("npc_gothik_trigger") { }
+
+//     CreatureAI* GetAI(Creature* creature) const override
+//     {
+//         return new npc_gothik_triggerAI(creature);
+//     }
+
+//     struct npc_gothik_triggerAI : public ScriptedAI
+//     {
+//         npc_gothik_triggerAI(Creature* creature) : ScriptedAI(creature) { creature->SetDisableGravity(true); }
+
+//         void EnterEvadeMode(EvadeReason /*why*/) override {}
+//         void UpdateAI(uint32 /*diff*/) override {}
+//         void JustEngagedWith(Unit* /*who*/) override {}
+//         void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override { damage = 0; }
+
+//         Creature* SelectRandomSkullPile()
+//         {
+//             std::list<Creature*> triggers;
+//             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
+//             // Remove triggers that are on live side or soul triggers on the platform
+//             triggers.remove_if([](Creature *trigger){
+//                 return ((trigger->GetPositionY() < POS_Y_GATE) || (trigger->GetPositionZ() > 280.0f));
+//                 });
+//             if (!triggers.empty())
+//             {
+//                 std::list<Creature*>::iterator itr = triggers.begin();
+//                 std::advance(itr, urand(0, triggers.size() - 1));
+//                 return *itr;
+//             }
+//             return nullptr;
+//         }
+//         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+//         {
+//             if (!spell)
+//             {
+//                 return;
+//             }
+
+//             switch (spell->Id)
+//             {
+//                 case SPELL_ANCHOR_1_TRAINEE:
+//                     DoCastAOE(SPELL_ANCHOR_2_TRAINEE, true);
+//                     break;
+//                 case SPELL_ANCHOR_1_DK:
+//                     DoCastAOE(SPELL_ANCHOR_2_DK, true);
+//                     break;
+//                 case SPELL_ANCHOR_1_RIDER:
+//                     DoCastAOE(SPELL_ANCHOR_2_RIDER, true);
+//                     break;
+//                 case SPELL_ANCHOR_2_TRAINEE:
+//                     if (Creature* target = SelectRandomSkullPile())
+//                     {
+//                         DoCast(target, SPELL_SKULLS_TRAINEE, true);
+//                     }
+//                     break;
+//                 case SPELL_ANCHOR_2_DK:
+//                     if (Creature* target = SelectRandomSkullPile())
+//                     {
+//                         DoCast(target, SPELL_SKULLS_DK, true);
+//                     }
+//                     break;
+//                 case SPELL_ANCHOR_2_RIDER:
+//                     if (Creature* target = SelectRandomSkullPile())
+//                     {
+//                         DoCast(target, SPELL_SKULLS_RIDER, true);
+//                     }
+//                     break;
+//                 case SPELL_SKULLS_TRAINEE:
+//                     DoSummon(NPC_DEAD_TRAINEE, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+//                     break;
+//                 case SPELL_SKULLS_DK:
+//                     DoSummon(NPC_DEAD_KNIGHT, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+//                     break;
+//                 case SPELL_SKULLS_RIDER:
+//                     DoSummon(NPC_DEAD_RIDER, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+//                     DoSummon(NPC_DEAD_HORSE, me, 0.0f, 15 * IN_MILLISECONDS, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+//                     break;
+//             }
+//         }
+
+//         // dead side summons are "owned" by gothik
+//         void JustSummoned(Creature* summon) override
+//         {
+//             if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK_BOSS)))
+//             {
+//                 gothik->AI()->JustSummoned(summon);
+//             }
+//         }
+//         void SummonedCreatureDespawn(Creature* summon) override
+//         {
+//             if (Creature* gothik = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_GOTHIK_BOSS)))
+//             {
+//                 gothik->AI()->SummonedCreatureDespawn(summon);
+//             }
+//         }
+//     };
+// };
