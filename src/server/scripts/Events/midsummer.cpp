@@ -1348,9 +1348,11 @@ float const fireworkSpawnPosition[COUNT_FIREWORK_SPAWN_POSITIONS][8] =
     { -8986.255f, 548.2847f, 163.08516f, 5.550147f, 0.0f, 0.0f, -0.35836792f, 0.93358046f }, /* 47 */
 };
 
+typedef std::vector<std::array<uint32, 3>> const FireworkShow;
+
 // VerifiedBuild 50250
 // timestamp[ms], firework gameobject ID, fireworkSpawnPositionIndex
-std::vector<std::array<uint32, 3>> const fireworkShowStormwind  =
+FireworkShow fireworkShowStormwind  =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE, 0 },
     { 2018, GO_FIREWORK_SHOW_TYPE_2_PURPLE, 1 },
@@ -2578,7 +2580,7 @@ std::vector<std::array<uint32, 3>> const fireworkShowStormwind  =
 };
 
 // <mapId, zoneId>, <fireworkShow pointer, fireworkShow count>
-std::map<std::pair<uint32, uint32>, std::pair<std::vector<std::array<uint32, 3>> const*, uint32>> const FireworkShowStore = {
+std::map<std::pair<uint32, uint32>, std::pair<FireworkShow*, uint32>> const FireworkShowStore = {
     // Stormwind
     { { 0, 1519 }, { &fireworkShowStormwind, 1223 } },
 };
@@ -2706,7 +2708,7 @@ private:
     uint32_t _curIdx;
     uint32_t _curTS;
     bool _showRunning;
-    std::vector<std::array<uint32, 3>> const* _fireworkShow;
+    FireworkShow* _fireworkShow;
     uint32 _maxCount;
 };
 
