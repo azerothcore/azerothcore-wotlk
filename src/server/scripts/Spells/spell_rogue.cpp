@@ -42,6 +42,7 @@ enum RogueSpells
     SPELL_ROGUE_SHIV_TRIGGERED                  = 5940,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST   = 57933,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
+    SPELL_ROGUE_T10_2P_BONUS                    = 70804
 };
 
 class spell_rog_savage_combat : public AuraScript
@@ -542,43 +543,66 @@ class spell_rog_prey_on_the_weak : public AuraScript
 };
 
 // -1943 - Rupture
-class spell_rog_rupture : public AuraScript
+#define RuptureScriptName "spell_rog_rupture"
+class spell_rog_rupture : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_rog_rupture);
+    public:
+        spell_rog_rupture() : SpellScriptLoader(RuptureScriptName) { }
 
-    bool Load() override
+    class spell_rog_rupture_AuraScript : public AuraScript
     {
-        Unit* caster = GetCaster();
-        return caster && caster->GetTypeId() == TYPEID_PLAYER;
-    }
+        public:
+            // For Glyph of Backstab use
+            uint32 BonusDuration;
 
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-    {
-        if (Unit* caster = GetCaster())
+        PrepareAuraScript(spell_rog_rupture_AuraScript);
+
+        bool Load() override
         {
-            canBeRecalculated = false;
-
-            float const attackpowerPerCombo[6] =
-            {
-                0.0f,
-                0.015f,         // 1 point:  ${($m1 + $b1*1 + 0.015 * $AP) * 4} damage over 8 secs
-                0.024f,         // 2 points: ${($m1 + $b1*2 + 0.024 * $AP) * 5} damage over 10 secs
-                0.03f,          // 3 points: ${($m1 + $b1*3 + 0.03 * $AP) * 6} damage over 12 secs
-                0.03428571f,    // 4 points: ${($m1 + $b1*4 + 0.03428571 * $AP) * 7} damage over 14 secs
-                0.0375f         // 5 points: ${($m1 + $b1*5 + 0.0375 * $AP) * 8} damage over 16 secs
-            };
-
-            uint8 cp = caster->ToPlayer()->GetComboPoints();
-            if (cp > 5)
-                cp = 5;
-
-            amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackpowerPerCombo[cp]);
+            Unit* caster = GetCaster();
+            BonusDuration = 0;
+            return caster && caster->GetTypeId() == TYPEID_PLAYER;
         }
-    }
 
-    void Register() override
+        void ResetDuration(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            BonusDuration = 0;
+        }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                canBeRecalculated = false;
+
+                float const attackpowerPerCombo[6] =
+                        {
+                                0.0f,
+                                0.015f,         // 1 point:  ${($m1 + $b1*1 + 0.015 * $AP) * 4} damage over 8 secs
+                                0.024f,         // 2 points: ${($m1 + $b1*2 + 0.024 * $AP) * 5} damage over 10 secs
+                                0.03f,          // 3 points: ${($m1 + $b1*3 + 0.03 * $AP) * 6} damage over 12 secs
+                                0.03428571f,    // 4 points: ${($m1 + $b1*4 + 0.03428571 * $AP) * 7} damage over 14 secs
+                                0.0375f         // 5 points: ${($m1 + $b1*5 + 0.0375 * $AP) * 8} damage over 16 secs
+                        };
+
+                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                if (cp > 5)
+                    cp = 5;
+
+                amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackpowerPerCombo[cp]);
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_rupture_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+            AfterEffectApply += AuraEffectApplyFn(spell_rog_rupture_AuraScript::ResetDuration, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_rupture::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        return new spell_rog_rupture_AuraScript();
     }
 };
 
@@ -767,6 +791,61 @@ class spell_rog_vanish : public SpellScript
     }
 };
 
+class spell_rog_glyph_of_backstab_triggered : public SpellScriptLoader
+{
+public:
+    spell_rog_glyph_of_backstab_triggered() : SpellScriptLoader("spell_rog_glyph_of_backstab_triggered") { }
+
+    class spell_rog_glyph_of_backstab_triggered_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_rog_glyph_of_backstab_triggered_SpellScript);
+
+        typedef spell_rog_rupture::spell_rog_rupture_AuraScript RuptureAuraScript;
+
+        void HandleScript(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+
+            Unit* caster = GetCaster();
+            // search our Rupture aura on target
+            if (AuraEffect* aurEff = GetHitUnit()->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x00100000, 0, 0, caster->GetGUID()))
+            {
+                RuptureAuraScript* ruptureAuraScript = dynamic_cast<RuptureAuraScript*>(aurEff->GetBase()->GetScriptByName(RuptureScriptName));
+                if (!ruptureAuraScript)
+                    return;
+
+                uint32& bonusDuration = ruptureAuraScript->BonusDuration;
+
+                // already includes duration mod from Glyph of Rupture
+                uint32 countMin = aurEff->GetBase()->GetMaxDuration();
+                uint32 countMax = countMin - bonusDuration;
+                // this glyph
+                countMax += 6000;
+
+                if (countMin < countMax)
+                {
+
+                    bonusDuration += 2000;
+                    aurEff->GetBase()->SetDuration(aurEff->GetBase()->GetDuration() + 2000);
+                    aurEff->GetBase()->SetMaxDuration(countMin + 2000);
+                }
+
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_rog_glyph_of_backstab_triggered_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_rog_glyph_of_backstab_triggered_SpellScript();
+    }
+};
+
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -778,7 +857,8 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_nerves_of_steel);
     RegisterSpellScript(spell_rog_preparation);
     RegisterSpellScript(spell_rog_prey_on_the_weak);
-    RegisterSpellScript(spell_rog_rupture);
+    new spell_rog_rupture();
+    new spell_rog_glyph_of_backstab_triggered();
     RegisterSpellScript(spell_rog_shiv);
     RegisterSpellScript(spell_rog_tricks_of_the_trade);
     RegisterSpellScript(spell_rog_tricks_of_the_trade_proc);

@@ -1,0 +1,3 @@
+UPDATE `spell_proc_event` SET `SpellFamilyMask0`=0x00000004 WHERE `entry`=56800;
+DELETE FROM `spell_script_names` WHERE `spell_id`=63975;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES  (63975, 'spell_rog_glyph_of_backstab_triggered');

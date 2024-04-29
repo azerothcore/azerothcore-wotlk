@@ -7567,16 +7567,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Glyph of Backstab
                     case 56800:
                         {
-                            if (victim)
-                                if (AuraEffect* aurEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x100000, 0, 0, GetGUID()))
-                                    if (Aura* aur = aurEff->GetBase())
-                                        if (!aur->IsRemoved() && aur->GetDuration() > 0)
-                                            if ((aur->GetApplyTime() + aur->GetMaxDuration() / 1000 + 5) > (GameTime::GetGameTime().count() + aur->GetDuration() / 1000) )
-                                            {
-                                                aur->SetDuration(aur->GetDuration() + 2000);
-                                                return true;
-                                            }
-                            return false;
+                            triggered_spell_id = 63975;
+                            break;
                         }
                     // Deadly Throw Interrupt
                     case 32748:
