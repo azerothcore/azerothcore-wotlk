@@ -1,6 +1,6 @@
-UPDATE gossip_menu_option_locale set OptionText=REPLACE(OptionText,'Ã¤','ä');
-UPDATE gossip_menu_option_locale set OptionText=REPLACE(OptionText,'Ã¼','ü');
-UPDATE gossip_menu_option_locale set OptionText=REPLACE(OptionText,'Ã¶','ö');
-UPDATE gossip_menu_option_locale set BoxText=REPLACE(BoxText,'Ã¤','ä');
-UPDATE gossip_menu_option_locale set BoxText=REPLACE(BoxText,'Ã¼','ü');
-UPDATE gossip_menu_option_locale set BoxText=REPLACE(BoxText,'Ã¶','ö');
+UPDATE `gossip_menu_option_locale` SET `OptionText`=REPLACE(`OptionText`,'Ã¤','ä') WHERE `Locale`='deDE';
+UPDATE `gossip_menu_option_locale` SET `OptionText`=REPLACE(`OptionText`,'Ã¼','ü') WHERE `Locale`='deDE';
+UPDATE `gossip_menu_option_locale` SET `OptionText`=REPLACE(`OptionText`,'Ã¶','ö') WHERE `Locale`='deDE';
+UPDATE `gossip_menu_option_locale` SET `BoxText`=REPLACE(`BoxText`,'Ã¤','ä') WHERE `Locale`='deDE';
+UPDATE `gossip_menu_option_locale` SET `BoxText`=REPLACE(`BoxText`,'Ã¼','ü') WHERE `Locale`='deDE';
+UPDATE `gossip_menu_option_locale` SET `BoxText`=REPLACE(`BoxText`,'Ã¶','ö') WHERE `Locale`='deDE';
