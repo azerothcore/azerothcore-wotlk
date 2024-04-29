@@ -41,8 +41,7 @@ enum RogueSpells
     SPELL_ROGUE_PREY_ON_THE_WEAK                = 58670,
     SPELL_ROGUE_SHIV_TRIGGERED                  = 5940,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST   = 57933,
-    SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
-    SPELL_ROGUE_T10_2P_BONUS                    = 70804
+    SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628
 };
 
 class spell_rog_savage_combat : public AuraScript
