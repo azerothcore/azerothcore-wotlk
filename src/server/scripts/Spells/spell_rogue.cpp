@@ -843,7 +843,6 @@ public:
     }
 };
 
-
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
