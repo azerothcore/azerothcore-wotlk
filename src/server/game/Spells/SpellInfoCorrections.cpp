@@ -4918,6 +4918,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
 
+    // Remove 1 from Area 52 guards friendly mask, making guards able to attack players
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1857)); // Area 52 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
+    factionTemplateEntry->friendlyMask &= ~1;
+
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
