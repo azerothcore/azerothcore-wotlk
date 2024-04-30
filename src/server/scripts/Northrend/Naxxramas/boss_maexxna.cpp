@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "Player.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
