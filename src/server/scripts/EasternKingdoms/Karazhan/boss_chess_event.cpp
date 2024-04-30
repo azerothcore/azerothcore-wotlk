@@ -467,7 +467,7 @@ struct npc_echo_of_medivh : public ScriptedAI
                             break;
                     }
 
-                    if (newRow < MAX_ROW && newCol < MAX_COL && newRow >= 0 && newCol >= 0)
+                    if (newRow < MAX_ROW && newCol < MAX_COL)
                         if (Creature* targetPiece = ObjectAccessor::GetCreature(*me, _boards[newRow][newCol].pieceGUID))
                             if (!IsFriendly(piece, targetPiece))
                                 return targetPiece;
