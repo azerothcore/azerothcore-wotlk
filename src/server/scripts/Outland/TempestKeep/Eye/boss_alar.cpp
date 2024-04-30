@@ -102,15 +102,6 @@ struct boss_alar : public BossAI
         });
     }
 
-    void JustReachedHome() override
-    {
-        BossAI::JustReachedHome();
-        if (me->IsEngaged())
-        {
-            ConstructWaypointsAndMove();
-        }
-    }
-
     void Reset() override
     {
         BossAI::Reset();
@@ -127,6 +118,15 @@ struct boss_alar : public BossAI
         me->SetModelVisible(true);
         me->SetReactState(REACT_AGGRESSIVE);
         ConstructWaypointsAndMove();
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        if (me->IsEngaged())
+        {
+            ConstructWaypointsAndMove();
+        }
     }
 
     void JustEngagedWith(Unit* who) override
@@ -156,6 +156,29 @@ struct boss_alar : public BossAI
             context.Repeat(_platformMoveRepeatTimer);
         });
         ScheduleMainSpellAttack(0s);
+    }
+
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        if (me->isMoving())
+            return true;
+
+        return _hasPretendedToDie || me->IsWithinMeleeRange(victim);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (why == EVADE_REASON_BOUNDARY)
+        {
+            BossAI::EnterEvadeMode(why);
+        }
+        else
+        {
+            if (me->GetThreatMgr().GetThreatList().empty())
+            {
+                BossAI::EnterEvadeMode(why);
+            }
+        }
     }
 
     void JustDied(Unit* killer) override
@@ -248,11 +271,11 @@ struct boss_alar : public BossAI
                 me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }, 30s);
-        ScheduleTimedEvent(50s, [&]
+        ScheduleTimedEvent(34s, [&]
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
-        }, 50s);
+        }, 57s);
         ScheduleUniqueTimedEvent(10min, [&]
         {
             DoCastSelf(SPELL_BERSERK);

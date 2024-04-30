@@ -19,6 +19,25 @@
 #define SCRIPT_OBJECT_ALL_SPELL_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum AllSpellHook
+{
+    ALLSPELLHOOK_ON_CALC_MAX_DURATION,
+    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_DAMAGE_DONE,
+    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_MOD_DAMAGE_PERCENT_DONE,
+    ALLSPELLHOOK_ON_SPELL_CHECK_CAST,
+    ALLSPELLHOOK_CAN_PREPARE,
+    ALLSPELLHOOK_CAN_SCALING_EVERYTHING,
+    ALLSPELLHOOK_CAN_SELECT_SPEC_TALENT,
+    ALLSPELLHOOK_ON_SCALE_AURA_UNIT_ADD,
+    ALLSPELLHOOK_ON_REMOVE_AURA_SCALE_TARGETS,
+    ALLSPELLHOOK_ON_BEFORE_AURA_RANK_FOR_LEVEL,
+    ALLSPELLHOOK_ON_DUMMY_EFFECT_GAMEOBJECT,
+    ALLSPELLHOOK_ON_DUMMY_EFFECT_CREATURE,
+    ALLSPELLHOOK_ON_DUMMY_EFFECT_ITEM,
+    ALLSPELLHOOK_END
+};
 
 enum SpellCastResult : uint8;
 enum SpellEffIndex : uint8;
@@ -26,7 +45,7 @@ enum SpellEffIndex : uint8;
 class AllSpellScript : public ScriptObject
 {
 protected:
-    AllSpellScript(const char* name);
+    AllSpellScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

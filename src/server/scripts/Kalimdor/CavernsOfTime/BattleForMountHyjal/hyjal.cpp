@@ -19,6 +19,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -55,6 +57,7 @@ enum Spells
     SPELL_RAISE_DEAD_1                = 31617,
     SPELL_RAISE_DEAD_2                = 31624,
     SPELL_RAISE_DEAD_3                = 31625,
+    SPELL_UNHOLY_FRENZY               = 31626,
     SPELL_SHADOW_BOLT                 = 31627,
 
     // Banshee (Ranged)
@@ -69,7 +72,10 @@ enum Spells
     SPELL_FROST_BREATH                = 31688,
 
     // Fel Stalker
-    SPELL_MANA_BURN                   = 31729
+    SPELL_MANA_BURN                   = 31729,
+
+    // Misc
+    SPELL_DEATH_AND_DECAY             = 31258
 };
 
 enum Talk
@@ -84,6 +90,8 @@ enum Talk
     SAY_TELEPORT = 7
 };
 
+const float UNHOLY_FRENZY_RANGE = 30.0f;
+
 class npc_hyjal_jaina : public CreatureScript
 {
 public:
@@ -95,7 +103,10 @@ public:
     }
     struct hyjalJainaAI : public ScriptedAI
     {
-        hyjalJainaAI(Creature* creature) : ScriptedAI(creature) { }
+        hyjalJainaAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->ApplySpellImmune(SPELL_DEATH_AND_DECAY, IMMUNITY_ID, SPELL_DEATH_AND_DECAY, true);
+        }
 
         void Reset() override
         {
@@ -318,6 +329,26 @@ public:
 
 };
 
+// 31538 - Cannibalize (Heal)
+class spell_cannibalize_heal : public SpellScript
+{
+    PrepareSpellScript(spell_cannibalize_heal);
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            uint32 heal = caster->CountPctFromMaxHealth(7);
+            SetHitHeal(heal);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_cannibalize_heal::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
 struct npc_hyjal_ground_trash : public ScriptedAI
 {
     npc_hyjal_ground_trash(Creature* creature) : ScriptedAI(creature)
@@ -411,6 +442,13 @@ struct npc_hyjal_ground_trash : public ScriptedAI
                             break;
                         }
                         context.Repeat(10s, 20s);
+                    }).Schedule(15s, 20s, [this](TaskContext context)
+                    {
+                        if (Creature* target = GetNearbyFriendlyTrashCreature(UNHOLY_FRENZY_RANGE))
+                        {
+                            DoCast(target, SPELL_UNHOLY_FRENZY);
+                        }
+                        context.Repeat(15s, 20s);
                     });
             break;
         }
@@ -499,6 +537,27 @@ struct npc_hyjal_ground_trash : public ScriptedAI
                 }, 1s);
             break;
         }
+    }
+
+    Creature* GetNearbyFriendlyTrashCreature(float radius)
+    {
+        //need accurate timer
+        Creature* creatureToReturn = nullptr;
+        std::list<Creature*> creatureList;
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_ABOMI, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_BANSH, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_STALK, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_NECRO, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_CRYPT, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_GHOUL, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_SKELETON_INVADER, radius);
+        Acore::Containers::RandomResize(creatureList, 1);
+        if (creatureList.size() > 0)
+        {
+            creatureToReturn = creatureList.front();
+        }
+        creatureList.clear();
+        return creatureToReturn;
     }
 
     void UpdateAI(uint32 diff) override
@@ -667,4 +726,5 @@ void AddSC_hyjal()
     RegisterHyjalAI(npc_hyjal_ground_trash);
     RegisterHyjalAI(npc_hyjal_gargoyle);
     RegisterHyjalAI(npc_hyjal_frost_wyrm);
+    RegisterSpellScript(spell_cannibalize_heal);
 }
