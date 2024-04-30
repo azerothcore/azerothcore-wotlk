@@ -638,7 +638,7 @@ uint32 BotMgr::GetAllNpcBotsClassMask() const
 {
     uint32 classMask = 0;
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
-        classMask |= (1 << (itr->second->GetBotClass() - 1));
+        classMask |= (1 << (BotMgr::GetBotEquipmentClass(itr->second->GetBotClass()) - 1));
 
     return classMask;
 }
@@ -1974,6 +1974,39 @@ uint8 BotMgr::GetBotPlayerClass(Creature const* bot)
 uint8 BotMgr::GetBotPlayerRace(Creature const* bot)
 {
     return GetBotPlayerRace(bot->GetBotAI()->GetBotClass(), bot->GetRace());
+}
+
+uint8 BotMgr::GetBotEquipmentClass(uint8 bot_class)
+{
+    if (bot_class >= BOT_CLASS_EX_START)
+    {
+        switch (bot_class)
+        {
+            case BOT_CLASS_BM:
+                return BOT_CLASS_WARRIOR;
+            case BOT_CLASS_SPHYNX:
+                return BOT_CLASS_PALADIN;
+            case BOT_CLASS_ARCHMAGE:
+                return BOT_CLASS_MAGE;
+            case BOT_CLASS_DREADLORD:
+                return BOT_CLASS_PALADIN;
+            case BOT_CLASS_SPELLBREAKER:
+                return BOT_CLASS_PALADIN;
+            case BOT_CLASS_DARK_RANGER:
+                return BOT_CLASS_HUNTER;
+            case BOT_CLASS_NECROMANCER:
+                return BOT_CLASS_PALADIN;
+            case BOT_CLASS_SEA_WITCH:
+                return BOT_CLASS_MAGE;
+            case BOT_CLASS_CRYPT_LORD:
+                return BOT_CLASS_WARRIOR;
+            default:
+                LOG_ERROR("npcbots", "GetPlayerClass: unknown Ex bot class {}!", bot_class);
+                return BOT_CLASS_PALADIN;
+        }
+    }
+
+    return BotMgr::GetBotPlayerClass(bot_class);
 }
 
 std::string BotMgr::GetTargetIconString(uint8 icon) const
