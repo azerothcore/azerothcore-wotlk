@@ -136,7 +136,7 @@ void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, R
 
 void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_LEARN_TALENTS, script->OnLearnSpell(player, spellID));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_SPELL, script->OnLearnSpell(player, spellID));
 }
 
 void ScriptMgr::OnPlayerForgotSpell(Player* player, uint32 spellID)
@@ -211,7 +211,7 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
 
 void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE, script->OnUpdate(player, p_time));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE, script->OnUpdate(player, p_time));
 }
 
 void ScriptMgr::OnPlayerLogin(Player* player)
