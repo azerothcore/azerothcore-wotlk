@@ -306,9 +306,9 @@ public:
         return GetNaxxramasAI<boss_maexxna_webwrapAI>(pCreature);
     }
 
-    struct boss_maexxna_webwrapAI : public ScriptedAI
+    struct boss_maexxna_webwrapAI : public NullCreatureAI
     {
-        explicit boss_maexxna_webwrapAI(Creature* c) : ScriptedAI(c) { }
+        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) { }
 
         ObjectGuid victimGUID;
 
