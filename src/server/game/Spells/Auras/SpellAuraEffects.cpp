@@ -1060,6 +1060,29 @@ float AuraEffect::CalcPeriodicCritChance(Unit const* caster, Unit const* target)
     float critChance = 0.0f;
     if (caster)
     {
+        //npcbot
+        if (caster->IsNPCBotOrPet())
+        {
+            Unit::AuraEffectList const& mPeriodicCritAuras = caster->GetAuraEffectsByType(SPELL_AURA_ABILITY_PERIODIC_CRIT);
+            for (Unit::AuraEffectList::const_iterator itr = mPeriodicCritAuras.begin(); itr != mPeriodicCritAuras.end(); ++itr)
+            {
+                if ((*itr)->IsAffectedOnSpell(GetSpellInfo()))
+                {
+                    critChance = caster->SpellDoneCritChance(nullptr, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), (GetSpellInfo()->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK), true);
+                    break;
+                }
+            }
+
+            switch(GetSpellInfo()->SpellFamilyName)
+            {
+                // Rupture - since 3.3.3 can crit
+                case SPELLFAMILY_ROGUE:
+                    if (GetSpellInfo()->SpellFamilyFlags[0] & 0x100000)
+                        critChance = caster->SpellDoneCritChance(nullptr, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), BASE_ATTACK, true);
+                    break;
+            }
+        }
+        //end npcbot
         if (Player* modOwner = caster->GetSpellModOwner())
         {
             Unit::AuraEffectList const& mPeriodicCritAuras = modOwner->GetAuraEffectsByType(SPELL_AURA_ABILITY_PERIODIC_CRIT);
