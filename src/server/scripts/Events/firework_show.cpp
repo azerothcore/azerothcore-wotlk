@@ -648,7 +648,7 @@ float const fireworkSpawnPosition[COUNT_FIREWORK_SPAWN_POSITIONS][8] =
 typedef std::vector<std::array<uint32, 3>> const FireworkShow;
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowTeldrassil =
+FireworkShow * fireworkShowTeldrassil = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE, 0 },
     { 2018, GO_FIREWORK_SHOW_TYPE_2_PURPLE, 1 },
@@ -1865,10 +1865,10 @@ FireworkShow fireworkShowTeldrassil =
     { 681116, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 22 },
     { 681116, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 14 },
     { 681116, GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG, 16 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowStormwind =
+FireworkShow * fireworkShowStormwind = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 58 },
     { 2030, GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG, 59 },
@@ -3430,10 +3430,10 @@ FireworkShow fireworkShowStormwind =
     { 681687, GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG, 59 },
     { 681687, GO_FIREWORK_SHOW_TYPE_2_WHITE_BIG, 96 },
     { 681687, GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG, 77 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowShattrath =
+FireworkShow * fireworkShowShattrath = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG, 106 },
     { 816, GO_FIREWORK_SHOW_TYPE_2_BLUE, 107 },
@@ -4497,10 +4497,10 @@ FireworkShow fireworkShowShattrath =
     { 677866, GO_FIREWORK_SHOW_TYPE_2_GREEN_BIG, 145 },
     { 677866, GO_FIREWORK_SHOW_TYPE_1_GREEN_BIG, 119 },
     { 679186, GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG, 138 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowSilvermoon =
+FireworkShow * fireworkShowSilvermoon = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE_BIG, 173 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 174 },
@@ -5816,10 +5816,10 @@ FireworkShow fireworkShowSilvermoon =
     { 643167, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 221 },
     { 643167, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 228 },
     { 643167, GO_FIREWORK_SHOW_TYPE_2_WHITE_BIG, 179 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowBootyBay =
+FireworkShow * fireworkShowBootyBay = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_GREEN_BIG, 240 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 241 },
@@ -6266,10 +6266,10 @@ FireworkShow fireworkShowBootyBay =
     { 682717, GO_FIREWORK_SHOW_TYPE_1_WHITE, 253 },
     { 686258, GO_FIREWORK_SHOW_TYPE_1_WHITE, 250 },
     { 690976, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 249 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowThunderBluff =
+FireworkShow * fireworkShowThunderBluff = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_WHITE_BIG, 280 },
     { 1032, GO_FIREWORK_SHOW_TYPE_2_RED, 281 },
@@ -7742,10 +7742,10 @@ FireworkShow fireworkShowThunderBluff =
     { 681981, GO_FIREWORK_SHOW_TYPE_1_WHITE_BIG, 323 },
     { 681981, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 288 },
     { 681981, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 316 },
-};
+});
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShow fireworkShowExodar =
+FireworkShow * fireworkShowExodar = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_GREEN, 338 },
     { 1638, GO_FIREWORK_SHOW_TYPE_2_RED, 339 },
@@ -8931,10 +8931,10 @@ FireworkShow fireworkShowExodar =
     { 678061, GO_FIREWORK_SHOW_TYPE_1_YELLOW, 382 },
     { 678061, GO_FIREWORK_SHOW_TYPE_2_RED, 345 },
     { 678061, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 381 },
-};
+});
 
 // VerifiedBuild 52237 - New Year's Eve
-FireworkShow fireworkShowUndercity =
+FireworkShow * fireworkShowUndercity = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 397 },
     { 1221, GO_FIREWORK_SHOW_TYPE_1_GREEN, 398 },
@@ -10108,10 +10108,10 @@ FireworkShow fireworkShowUndercity =
     { 678109, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 421 },
     { 678109, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 418 },
     { 678109, GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG, 452 },
-};
+});
 
 // VerifiedBuild 52237 - Lunar
-FireworkShow fireworkShowOrgrimmar =
+FireworkShow * fireworkShowOrgrimmar = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_YELLOW, 454 },
     { 3279, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 455 },
@@ -11626,10 +11626,10 @@ FireworkShow fireworkShowOrgrimmar =
     { 682042, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 494 },
     { 682042, GO_FIREWORK_SHOW_TYPE_2_RED, 475 },
     { 682042, GO_FIREWORK_SHOW_TYPE_1_GREEN_BIG, 467 },
-};
+});
 
 // VerifiedBuild 52237 - New Year's Eve
-FireworkShow fireworkShowIronforge =
+FireworkShow * fireworkShowIronforge = new FireworkShow(
 {
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 512 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED, 513 },
@@ -12941,30 +12941,30 @@ FireworkShow fireworkShowIronforge =
     { 637305, GO_FIREWORK_SHOW_TYPE_1_WHITE, 544 },
     { 637305, GO_FIREWORK_SHOW_TYPE_1_RED, 513 },
     { 639147, GO_FIREWORK_SHOW_TYPE_2_BLUE, 554 },
-};
+});
 
 // <mapId, zoneId>, <fireworkShow pointer, fireworkShow count>
-std::map<std::pair<uint32, uint32>, std::pair<FireworkShow*, uint32>> const FireworkShowStore = {
+std::map<std::pair<uint32, uint32>, FireworkShow*> const FireworkShowStore = {
     // Teldrassil
-    { { 1, 141 }, { &fireworkShowTeldrassil, fireworkShowTeldrassil.size() } },
+    { { 1, 141 }, fireworkShowTeldrassil },
     // Stormwind
-    { { 0, 1519 }, { &fireworkShowStormwind, fireworkShowStormwind.size() } },
+    { { 0, 1519 }, fireworkShowStormwind },
     // Shattrath
-    { { 530, 3703 } , { &fireworkShowShattrath, fireworkShowShattrath.size() } },
+    { { 530, 3703 }, fireworkShowShattrath },
     // Silvermoon
-    { { 530, 3430 } , { &fireworkShowSilvermoon, fireworkShowSilvermoon.size() } },
+    { { 530, 3430 }, fireworkShowSilvermoon },
     // Booty Bay
-    { { 0, 33 } , { &fireworkShowBootyBay, fireworkShowBootyBay.size() } },
+    { { 0, 33 }, fireworkShowBootyBay },
     // Thunder Bluff
-    { { 1, 1638 } , { &fireworkShowThunderBluff, fireworkShowThunderBluff.size() } },
+    { { 1, 1638 }, fireworkShowThunderBluff },
     // Exodar
-    { { 530, 3557 } , { &fireworkShowExodar, fireworkShowExodar.size() } },
+    { { 530, 3557 }, fireworkShowExodar },
     // Undercity
-    { { 0, 1497 } , { &fireworkShowUndercity, fireworkShowUndercity.size() } },
+    { { 0, 1497 }, fireworkShowUndercity },
     // Orgrimmar
-    { { 1, 1637 } , { &fireworkShowOrgrimmar, fireworkShowOrgrimmar.size() } },
+    { { 1, 1637 }, fireworkShowOrgrimmar },
     // Ironforge
-    { { 0, 1 } , { &fireworkShowIronforge, fireworkShowIronforge.size() } },
+    { { 0, 1 }, fireworkShowIronforge },
 };
 
 struct go_cheer_speaker : public GameObjectAI
@@ -12988,9 +12988,9 @@ struct go_cheer_speaker : public GameObjectAI
         auto itr = FireworkShowStore.find(std::make_pair(me->GetMapId(), me->GetZoneId()));
         if (itr != FireworkShowStore.end())
         {
-            if (itr->second.first)
+            if (itr->second)
             {
-                _fireworkShow = itr->second.first;
+                _fireworkShow = itr->second;
 
                 LOG_ERROR("scripts.midsummer", "initShow(): guid {} _fireworkShow.size() {}", me->GetSpawnId(), _fireworkShow->size());
             }
@@ -13051,7 +13051,7 @@ struct go_cheer_speaker : public GameObjectAI
         if (_curIdx >= _fireworkShow->size())
             return -3;
 
-        LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}, {}, {}, {}", _curIdx, (*_fireworkShow)[_curIdx][1], (*_fireworkShow)[_curIdx][2], (*_fireworkShow)[_curIdx][3]);
+        LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}, {}, {}, {}", _curIdx, (*_fireworkShow)[_curIdx][0], (*_fireworkShow)[_curIdx][1], (*_fireworkShow)[_curIdx][2]);
 
         uint32 posIdx = (*_fireworkShow)[_curIdx][2];
         if (posIdx < COUNT_FIREWORK_SPAWN_POSITIONS)
