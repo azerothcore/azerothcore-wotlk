@@ -1421,7 +1421,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (420973, 180754, 530, 0, 0, 1, 1, 9399.7294921875, -7261.02587890625, 15.26287841796875, 3.420850038528442382, 0, 0, -0.99026775360107421, 0.139175355434417724, 120, 255, 1, "", 50250, NULL);
 
 DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 72)
-AND AND (`guid` BETWEEN 420400 AND 420973);
+AND (`guid` BETWEEN 420400 AND 420973);
 INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 (72, 420400),
 (72, 420401),
