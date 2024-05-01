@@ -5874,7 +5874,8 @@ void Spell::EffectTitanGrip(SpellEffIndex /*effIndex*/)
         if (Aura* aur = m_caster->GetAura(49152))
             aur->RecalculateAmountOfEffects();
         else
-            m_caster->CastSpell(unitTarget, 49152, true); // damage reduction
+            if (Aura* blizzTitanGrip = m_caster->GetAura(46917)) // Only apply DR aura if the original blizz TitansGrip was found
+                m_caster->CastSpell(unitTarget, 49152, true); // damage reduction
 
         m_caster->ToPlayer()->SetCanTitanGrip(true);
     }
