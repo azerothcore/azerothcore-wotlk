@@ -221,9 +221,9 @@ public:
                 if (distXY <= 10.0f)
                     verticalSpeed = 12.0f;
                 else if (distXY <= 20.0f)
-                    (verticalSpeed = 16.0f);
+                    verticalSpeed = 16.0f;
                 else if (distXY <= 30.0f)
-                    (verticalSpeed = 20.0f);
+                    verticalSpeed = 20.0f;
                 else if (distXY <= 40.0f)
                     verticalSpeed = 24.0f;
 
