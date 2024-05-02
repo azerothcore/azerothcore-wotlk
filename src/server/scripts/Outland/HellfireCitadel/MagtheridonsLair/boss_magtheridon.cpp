@@ -71,9 +71,7 @@ enum Groups
 
 enum Actions
 {
-    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1,
-    ACTION_BANISH_SELF = 2,
-    ACTION_BANISH_SELF_REMOVE = 3
+    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1
 };
 
 struct boss_magtheridon : public BossAI
@@ -215,15 +213,6 @@ struct boss_magtheridon : public BossAI
                 });
             }
         }
-        else if (action == ACTION_BANISH_SELF )
-        {
-            Talk(SAY_BANISH);
-            me->CastSpell(me, SPELL_SHADOW_CAGE_STUN, true);
-        }
-        else if (action == ACTION_BANISH_SELF_REMOVE )
-        {
-            me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE_STUN);
-        }
     }
 
     void JustEngagedWith(Unit* who) override
@@ -352,15 +341,15 @@ class spell_magtheridon_shadow_grasp_visual : public AuraScript
 
     void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetUnitOwner()->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
+        if (GetTarget()->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
         {
-            GetUnitOwner()->GetAI()->DoAction(ACTION_BANISH_SELF);
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_CAGE, true);
         }
     }
 
     void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->GetAI()->DoAction(ACTION_BANISH_SELF_REMOVE);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE_STUN);
     }
 
     void Register() override
