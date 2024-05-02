@@ -71,7 +71,8 @@ enum Groups
 
 enum Actions
 {
-    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1
+    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1,
+    ACTION_BANISH_SELF = 2
 };
 
 struct boss_magtheridon : public BossAI
@@ -213,6 +214,11 @@ struct boss_magtheridon : public BossAI
                 });
             }
         }
+        else if (action == ACTION_BANISH_SELF )
+        {
+            Talk(SAY_BANISH);
+            me->CastSpell(me, SPELL_SHADOW_CAGE_STUN, true);
+        }
     }
 
     void JustEngagedWith(Unit* who) override
@@ -343,7 +349,7 @@ class spell_magtheridon_shadow_grasp_visual : public AuraScript
     {
         if (GetTarget()->GetAuraCount(SPELL_SHADOW_GRASP_VISUAL) == 5)
         {
-            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_CAGE, true);
+            GetTarget()->GetAI()->DoAction(ACTION_BANISH_SELF);
         }
     }
 
