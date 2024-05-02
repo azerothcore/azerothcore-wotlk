@@ -3262,7 +3262,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 -- gameobject 'Firework, Show, Type%'
 -- remove any existing spawns in relevant areas
 DELETE FROM `gameobject` WHERE (`id` IN (180728))
-AND (`guid` IN (825, 16586));
+AND (`guid` IN (825));
 
 -- SmartAI
 -- firework animation is beeing triggered on despawn
