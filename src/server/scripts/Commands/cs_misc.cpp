@@ -1384,28 +1384,31 @@ public:
             target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        if (!target->IsConnected())
+        if (!target || !target->IsConnected())
         {
             if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
                 return false;
 
-            QueryResult characterResult = CharacterDatabase.Query("SELECT `guid` FROM `characters` WHERE `name`='{}'", target->GetName());
+            ObjectGuid::LowType guid = sCharacterCache->GetCharacterGuidByName(target->GetName()).GetCounter();
 
-            if (!characterResult)
-                return false;
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_HOMEBIND);
+            stmt->SetData(0, guid);
 
-            QueryResult result = CharacterDatabase.Query("SELECT `mapId`, `zoneId`, `posX`, `posY`, `posZ`, `posO` FROM `character_homebind` WHERE `guid`={}", (*characterResult)[0].Get<uint32>());
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
-            uint32 mapId = (*result)[0].Get<int32>();
-            uint32 zoneId = (*result)[1].Get<int32>();
-            float posX = (*result)[2].Get<float>();
-            float posY = (*result)[3].Get<float>();
-            float posZ = (*result)[4].Get<float>();
-            float posO = (*result)[5].Get<float>();
+            if (result)
+            {
+                uint32 mapId = (*result)[0].Get<uint32>();
+                uint32 zoneId = (*result)[1].Get<uint32>();
+                float posX = (*result)[2].Get<float>();
+                float posY = (*result)[3].Get<float>();
+                float posZ = (*result)[4].Get<float>();
+                float posO = (*result)[5].Get<float>();
 
-            handler->PSendSysMessage(LANG_SUMMONING, target->GetName(), handler->GetAcoreString(LANG_OFFLINE));
+                Player::SavePositionInDB(mapId, posX, posY, posZ, posO, zoneId, target->GetGUID());
 
-            Player::SavePositionInDB(mapId, posX, posY, posZ, posO, zoneId, target->GetGUID());
+                handler->PSendSysMessage(LANG_SUMMONING, target->GetName(), handler->GetAcoreString(LANG_OFFLINE));
+            }
 
             return true;
         }
