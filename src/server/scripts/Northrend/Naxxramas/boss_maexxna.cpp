@@ -62,8 +62,7 @@ enum Emotes
 enum Misc
 {
     NPC_WEB_WRAP                        = 16486,
-    NPC_MAEXXNA_SPIDERLING              = 17055,
-    NPC_WEB_WRAP_TRIGGER                = 15384
+    NPC_MAEXXNA_SPIDERLING              = 17055
 };
 
 const Position PosWrap[7] =
@@ -214,12 +213,19 @@ public:
 
                 float dx = randomPos.GetPositionX() - target->GetPositionX();
                 float dy = randomPos.GetPositionY() - target->GetPositionY();
-                float distXY = sqrt((dx * dx) + (dy * dy));
-                float distZ = randomPos.GetPositionZ() - target->GetPositionZ();
+                float distXY = std::hypotf(dx, dy);
 
-                float horizontalSpeed = distXY / 1.5f;
                 // smooth knockback arc that avoids the ceiling
-                float verticalSpeed = std::min(28.0f, 12.0f + distZ * 0.2f + distXY * 0.2f);
+                float horizontalSpeed = distXY / 1.5f;
+                float verticalSpeed = 28.0f;
+                if (distXY <= 10.0f)
+                    verticalSpeed = 12.0f;
+                else if (distXY <= 20.0f)
+                    (verticalSpeed = 16.0f);
+                else if (distXY <= 30.0f)
+                    (verticalSpeed = 20.0f);
+                else if (distXY <= 40.0f)
+                    verticalSpeed = 24.0f;
 
                 target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), -horizontalSpeed, verticalSpeed);
                 me->CastSpell(target, SPELL_WEB_WRAP_PACIFY_5, true); // pacify silence for 5 seconds
@@ -330,7 +336,6 @@ public:
                         victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
                         victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
                     }
-                    victim->RestoreDisplayId();
                 }
             }
         }
