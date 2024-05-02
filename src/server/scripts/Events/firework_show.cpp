@@ -12943,7 +12943,7 @@ FireworkShow * fireworkShowIronforge = new FireworkShow(
     { 639147, GO_FIREWORK_SHOW_TYPE_2_BLUE, 554 },
 });
 
-// <mapId, zoneId>, <fireworkShow pointer, fireworkShow count>
+// <mapId, zoneId>, fireworkShow pointer
 std::map<std::pair<uint32, uint32>, FireworkShow*> const FireworkShowStore = {
     // Teldrassil
     { { 1, 141 }, fireworkShowTeldrassil },
@@ -12972,13 +12972,10 @@ struct go_cheer_speaker : public GameObjectAI
     go_cheer_speaker(GameObject* go) : GameObjectAI(go)
     {
         _curIdx = 0;
-        _curTS = 0;;
         _showRunning = false;
         _fireworkShow = nullptr;
 
         initShow();
-        stopShow();
-        startShow();
     }
 
     void initShow()
@@ -12995,23 +12992,55 @@ struct go_cheer_speaker : public GameObjectAI
                 LOG_ERROR("scripts.midsummer", "initShow(): guid {} _fireworkShow.size() {}", me->GetSpawnId(), _fireworkShow->size());
             }
         }
+
+        stopShow();
+
+        _scheduler.Schedule(Milliseconds(4200), [this](TaskContext context)
+            {
+                // check for show start
+                if (!_showRunning)
+                {
+                    tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
+                    tm local_tm = Acore::Time::TimeBreakdown();
+
+                    LOG_ERROR("scripts.midsummer", "{}: time check {}:{}:{}", me->GetSpawnId(), local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec);
+
+                    // each show runs approx. 12 minutes
+                    // and starts at the full hour
+                    if ((local_tm.tm_min >= 0) && (local_tm.tm_min < 12))
+                    {
+                        startShow(local_tm.tm_min);
+                    }
+                }
+
+                context.Repeat();
+            });
     }
 
-    // TODO: provide start offset to handle a "late start"
+    // provide start offset to handle a "late start"
     // e.g. if the gameobject is spawned later then the desired start time
-    void startShow()
+    void startShow(int minutesOffset)
     {
         if (!_fireworkShow)
             return;
 
         _curIdx = 0;
-        _curTS = 0;
         _showRunning = true;
-        _scheduler.CancelAll();
-
         me->setActive(true);
 
-        _scheduler.Schedule(Milliseconds(_curTS), [this](TaskContext context)
+        // fast-forward show if we've got a late start
+        if (minutesOffset > 0)
+        {
+            uint32 ts = 0;
+            do {
+                ts = (*_fireworkShow)[_curIdx][0];
+            } while ((ts <= (minutesOffset * MINUTE * IN_MILLISECONDS)) && (++_curIdx < _fireworkShow->size()));
+        }
+
+        if (_curIdx)
+            LOG_ERROR("scripts.midsummer", "{}: fast forward {}:{}:{}", me->GetSpawnId(), minutesOffset, _curIdx, (*_fireworkShow)[_curIdx][0]);
+
+        _scheduler.Schedule(0s, [this](TaskContext context)
             {
                 int32 dt = 0;
                 do {
@@ -13033,8 +13062,6 @@ struct go_cheer_speaker : public GameObjectAI
     void stopShow()
     {
         _showRunning = false;
-        _scheduler.CancelAll();
-
         me->setActive(false);
 
         LOG_ERROR("scripts.midsummer", "stopShow()");
@@ -13068,15 +13095,15 @@ struct go_cheer_speaker : public GameObjectAI
                 0);
         }
 
-        _curTS = (*_fireworkShow)[_curIdx][0];
+        uint32 ts = (*_fireworkShow)[_curIdx][0];
 
         if (++_curIdx >= _fireworkShow->size())
             return -4;
 
-        if ((*_fireworkShow)[_curIdx][0] < _curTS)
+        if ((*_fireworkShow)[_curIdx][0] < ts)
             return -5;
 
-        return ((*_fireworkShow)[_curIdx][0] - _curTS);
+        return ((*_fireworkShow)[_curIdx][0] - ts);
     }
 
     void UpdateAI(uint32 diff) override
@@ -13087,7 +13114,6 @@ struct go_cheer_speaker : public GameObjectAI
 private:
     TaskScheduler _scheduler;
     uint32_t _curIdx;
-    uint32_t _curTS;
     bool _showRunning;
     FireworkShow* _fireworkShow;
 };
