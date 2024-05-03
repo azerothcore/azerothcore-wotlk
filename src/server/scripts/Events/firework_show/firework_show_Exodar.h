@@ -85,7 +85,7 @@ float const fireworkSpawnPositionExodar[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-uint32 const fireworkShowTemplateExodar[][3] =
+FireworkShowEntry const fireworkShowExodar[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_GREEN, 338 },
     { 1638, GO_FIREWORK_SHOW_TYPE_2_RED, 339 },

@@ -94,7 +94,7 @@ float const fireworkSpawnPositionSilvermoon[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-uint32 const fireworkShowTemplateSilvermoon[][3] =
+FireworkShowEntry const fireworkShowSilvermoon[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE_BIG, 173 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 174 },

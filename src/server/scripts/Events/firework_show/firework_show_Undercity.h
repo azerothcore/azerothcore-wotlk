@@ -85,7 +85,7 @@ float const fireworkSpawnPositionUndercity[][8] =
 };
 
 // VerifiedBuild 52237 - New Year's Eve
-uint32 const fireworkShowTemplateUndercity[][3] =
+FireworkShowEntry const fireworkShowUndercity[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 397 },
     { 1221, GO_FIREWORK_SHOW_TYPE_1_GREEN, 398 },

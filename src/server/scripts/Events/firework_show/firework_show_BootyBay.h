@@ -67,7 +67,7 @@ float const fireworkSpawnPositionBootyBay[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-uint32 const fireworkShowTemplateBootyBay[][3] =
+FireworkShowEntry const fireworkShowBootyBay[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_GREEN_BIG, 240 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 241 },

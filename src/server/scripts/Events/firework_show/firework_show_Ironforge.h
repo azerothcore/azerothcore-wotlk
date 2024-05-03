@@ -84,7 +84,7 @@ float const fireworkSpawnPositionIronforge[][8] =
 };
 
 // VerifiedBuild 52237 - New Year's Eve
-uint32 const fireworkShowTemplateIronforge[][3] =
+FireworkShowEntry const fireworkShowIronforge[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 512 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED, 513 },

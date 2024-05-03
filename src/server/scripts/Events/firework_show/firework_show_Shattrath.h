@@ -94,7 +94,7 @@ float const fireworkSpawnPositionShattrath[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-uint32 const fireworkShowTemplateShattrath[][3] =
+FireworkShowEntry const fireworkShowShattrath[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG, 106 },
     { 816, GO_FIREWORK_SHOW_TYPE_2_BLUE, 107 },

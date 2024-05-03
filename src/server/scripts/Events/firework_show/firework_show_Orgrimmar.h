@@ -85,7 +85,7 @@ float const fireworkSpawnPositionOrgrimmar[][8] =
 };
 
 // VerifiedBuild 52237 - Lunar
-uint32 const fireworkShowTemplateOrgrimmar[][3] =
+FireworkShowEntry const fireworkShowOrgrimmar[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_YELLOW, 454 },
     { 3279, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 455 },

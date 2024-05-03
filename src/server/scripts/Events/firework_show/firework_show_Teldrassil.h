@@ -85,7 +85,7 @@ float const fireworkSpawnPositionTeldrassil[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-uint32 const fireworkShowTemplateTeldrassil[][3] =
+FireworkShowEntry const fireworkShowTeldrassil[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE, 0 },
     { 2018, GO_FIREWORK_SHOW_TYPE_2_PURPLE, 1 },
