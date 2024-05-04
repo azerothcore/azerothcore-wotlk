@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionIronforge[][8] =
+// VerifiedBuild 52237 - New Year's Eve
+FireworkShowGameobject const fireworkShowGameobjectIronforge[] =
 {
-    // VerifiedBuild 52237 - New Year's Eve
     { -5192.5557f, -784.4583f, 506.9716f, 4.729844f, 0.0f, 0.0f, -0.70090866f, 0.71325105f }, /* 512 */
     { -5195.0625f, -762.27954f, 510.0929f, 4.66003f, 0.0f, 0.0f, -0.7253742f, 0.68835473f }, /* 513 */
     { -5158.5767f, -784.24304f, 515.7791f, 3.0543265f, 0.0f, 0.0f, 0.99904823f, 0.04361926f }, /* 514 */
@@ -84,7 +83,7 @@ float const fireworkSpawnPositionIronforge[][8] =
 };
 
 // VerifiedBuild 52237 - New Year's Eve
-FireworkShowEntry const fireworkShowIronforge[] =
+FireworkShowScheduleEntry const fireworkShowScheduleIronforge[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 512 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_RED, 513 },
@@ -1396,6 +1395,20 @@ FireworkShowEntry const fireworkShowIronforge[] =
     { 637305, GO_FIREWORK_SHOW_TYPE_1_WHITE, 544 },
     { 637305, GO_FIREWORK_SHOW_TYPE_1_RED, 513 },
     { 639147, GO_FIREWORK_SHOW_TYPE_2_BLUE, 554 },
+};
+
+FireworkShow const fireworkShowIronforge =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleIronforge,
+        .size = sizeof(fireworkShowScheduleIronforge) / sizeof(fireworkShowScheduleIronforge[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectIronforge,
+        .size = sizeof(fireworkShowGameobjectIronforge) / sizeof(fireworkShowGameobjectIronforge[0])
+    }
 };
 
 #endif

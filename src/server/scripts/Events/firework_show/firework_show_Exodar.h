@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionExodar[][8] =
+// VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
+FireworkShowGameobject const fireworkShowGameobjectExodar[] =
 {
-    // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
     { -3972.8308f, -11850.722f, 89.65628f, 2.5481794f, 0.0f, 0.0f, 0.95630455f, 0.29237235f }, /* 338 */
     { -3992.4653f, -11843.856f, 186.40427f, 2.1991146f, 0.0f, 0.0f, 0.89100647f, 0.45399064f }, /* 339 */
     { -4009.4602f, -11824.119f, 126.70068f, 0.13962449f, 0.0f, 0.0f, 0.069755554f, 0.99756414f }, /* 340 */
@@ -85,7 +84,7 @@ float const fireworkSpawnPositionExodar[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShowEntry const fireworkShowExodar[] =
+FireworkShowScheduleEntry const fireworkShowScheduleExodar[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_GREEN, 338 },
     { 1638, GO_FIREWORK_SHOW_TYPE_2_RED, 339 },
@@ -1271,6 +1270,20 @@ FireworkShowEntry const fireworkShowExodar[] =
     { 678061, GO_FIREWORK_SHOW_TYPE_1_YELLOW, 382 },
     { 678061, GO_FIREWORK_SHOW_TYPE_2_RED, 345 },
     { 678061, GO_FIREWORK_SHOW_TYPE_2_RED_BIG, 381 },
+};
+
+FireworkShow const fireworkShowExodar =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleExodar,
+        .size = sizeof(fireworkShowScheduleExodar) / sizeof(fireworkShowScheduleExodar[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectExodar,
+        .size = sizeof(fireworkShowGameobjectExodar) / sizeof(fireworkShowGameobjectExodar[0])
+    }
 };
 
 #endif

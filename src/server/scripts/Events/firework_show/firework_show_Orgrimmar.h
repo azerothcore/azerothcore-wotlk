@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionOrgrimmar[][8] =
+// VerifiedBuild 52237 - Lunar
+FireworkShowGameobject const fireworkShowGameobjectOrgrimmar[] =
 {
-    // VerifiedBuild 52237 - Lunar
     { 1406.6771f, -4511.184f, 113.34069f, 0.13962449f, 0.0f, 0.0f, 0.069755554f, 0.99756414f }, /* 454 */
     { 1477.816f, -4424.3228f, 109.31654f, 4.729844f, 0.0f, 0.0f, -0.70090866f, 0.71325105f }, /* 455 */
     { 1397.3004f, -4405.6216f, 89.54938f, 2.1991146f, 0.0f, 0.0f, 0.89100647f, 0.45399064f }, /* 456 */
@@ -85,7 +84,7 @@ float const fireworkSpawnPositionOrgrimmar[][8] =
 };
 
 // VerifiedBuild 52237 - Lunar
-FireworkShowEntry const fireworkShowOrgrimmar[] =
+FireworkShowScheduleEntry const fireworkShowScheduleOrgrimmar[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_YELLOW, 454 },
     { 3279, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 455 },
@@ -1600,6 +1599,20 @@ FireworkShowEntry const fireworkShowOrgrimmar[] =
     { 682042, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 494 },
     { 682042, GO_FIREWORK_SHOW_TYPE_2_RED, 475 },
     { 682042, GO_FIREWORK_SHOW_TYPE_1_GREEN_BIG, 467 },
+};
+
+FireworkShow const fireworkShowOrgrimmar =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleOrgrimmar,
+        .size = sizeof(fireworkShowScheduleOrgrimmar) / sizeof(fireworkShowScheduleOrgrimmar[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectOrgrimmar,
+        .size = sizeof(fireworkShowGameobjectOrgrimmar) / sizeof(fireworkShowGameobjectOrgrimmar[0])
+    }
 };
 
 #endif

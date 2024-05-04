@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionSilvermoon[][8] =
+// VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
+FireworkShowGameobject const fireworkShowGameobjectSilvermoon[] =
 {
-    // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
     { 9411.597f, -7266.4204f, 102.0371f, 3.2637722f, 0.0f, 0.0f, -0.9981346f, 0.061051756f }, /* 173 */
     { 9399.398f, -7323.894f, 106.23338f, 2.6179893f, 0.0f, 0.0f, 0.9659252f, 0.2588213f }, /* 174 */
     { 9402.48f, -7333.2017f, 107.0458f, 2.4609127f, 0.0f, 0.0f, 0.94264126f, 0.33380756f }, /* 175 */
@@ -94,7 +93,7 @@ float const fireworkSpawnPositionSilvermoon[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShowEntry const fireworkShowSilvermoon[] =
+FireworkShowScheduleEntry const fireworkShowScheduleSilvermoon[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_BLUE_BIG, 173 },
     { 0, GO_FIREWORK_SHOW_TYPE_2_PURPLE_BIG, 174 },
@@ -1410,6 +1409,20 @@ FireworkShowEntry const fireworkShowSilvermoon[] =
     { 643167, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 221 },
     { 643167, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 228 },
     { 643167, GO_FIREWORK_SHOW_TYPE_2_WHITE_BIG, 179 },
+};
+
+FireworkShow const fireworkShowSilvermoon =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleSilvermoon,
+        .size = sizeof(fireworkShowScheduleSilvermoon) / sizeof(fireworkShowScheduleSilvermoon[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectSilvermoon,
+        .size = sizeof(fireworkShowGameobjectSilvermoon) / sizeof(fireworkShowGameobjectSilvermoon[0])
+    }
 };
 
 #endif

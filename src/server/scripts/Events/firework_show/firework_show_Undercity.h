@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionUndercity[][8] =
+// VerifiedBuild 52237 - New Year's Eve
+FireworkShowGameobject const fireworkShowGameobjectUndercity[] =
 {
-    // VerifiedBuild 52237 - New Year's Eve
     { 1851.9966f, 212.77257f, 127.95904f, 5.550147f, 0.0f, 0.0f, -0.35836792f, 0.93358046f }, /* 396 */
     { 1863.3073f, 267.875f, 113.7794f, 5.8992143f, 0.0f, 0.0f, -0.1908083f, 0.9816273f }, /* 397 */
     { 1838.3837f, 252.32639f, 103.84786f, 3.7001047f, 0.0f, 0.0f, -0.9612608f, 0.2756405f }, /* 398 */
@@ -85,7 +84,7 @@ float const fireworkSpawnPositionUndercity[][8] =
 };
 
 // VerifiedBuild 52237 - New Year's Eve
-FireworkShowEntry const fireworkShowUndercity[] =
+FireworkShowScheduleEntry const fireworkShowScheduleUndercity[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 397 },
     { 1221, GO_FIREWORK_SHOW_TYPE_1_GREEN, 398 },
@@ -1259,6 +1258,20 @@ FireworkShowEntry const fireworkShowUndercity[] =
     { 678109, GO_FIREWORK_SHOW_TYPE_1_RED_BIG, 421 },
     { 678109, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 418 },
     { 678109, GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG, 452 },
+};
+
+FireworkShow const fireworkShowUndercity =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleUndercity,
+        .size = sizeof(fireworkShowScheduleUndercity) / sizeof(fireworkShowScheduleUndercity[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectUndercity,
+        .size = sizeof(fireworkShowGameobjectUndercity) / sizeof(fireworkShowGameobjectUndercity[0])
+    }
 };
 
 #endif

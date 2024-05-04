@@ -20,10 +20,9 @@
 
 #include "firework_show.h"
 
- // X, Y, Z, orientation, rotX, rotY, rotZ, rotW
-float const fireworkSpawnPositionThunderBluff[][8] =
+// VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
+FireworkShowGameobject const fireworkShowGameobjectThunderBluff[] =
 {
-    // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
     { -1236.8251f, -18.461697f, 220.20761f, 4.66003f, 0.0f, 0.0f, -0.7253742f, 0.68835473f }, /* 280 */
     { -1229.8176f, -6.788249f, 209.45525f, 4.886924f, 0.0f, 0.0f, -0.642787f, 0.766045f }, /* 281 */
     { -1220.1172f, -10.938151f, 204.82965f, 4.7647495f, 0.0f, 0.0f, -0.6883545f, 0.72537446f }, /* 282 */
@@ -85,7 +84,7 @@ float const fireworkSpawnPositionThunderBluff[][8] =
 };
 
 // VerifiedBuild 50250 - Midsummer Fireworks Spectacular event
-FireworkShowEntry const fireworkShowThunderBluff[] =
+FireworkShowScheduleEntry const fireworkShowScheduleThunderBluff[] =
 {
     { 0, GO_FIREWORK_SHOW_TYPE_1_WHITE_BIG, 280 },
     { 1032, GO_FIREWORK_SHOW_TYPE_2_RED, 281 },
@@ -1558,6 +1557,20 @@ FireworkShowEntry const fireworkShowThunderBluff[] =
     { 681981, GO_FIREWORK_SHOW_TYPE_1_WHITE_BIG, 323 },
     { 681981, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 288 },
     { 681981, GO_FIREWORK_SHOW_TYPE_2_YELLOW, 316 },
+};
+
+FireworkShow const fireworkShowThunderBluff =
+{
+    .schedule =
+    {
+        .entries = fireworkShowScheduleThunderBluff,
+        .size = sizeof(fireworkShowScheduleThunderBluff) / sizeof(fireworkShowScheduleThunderBluff[0])
+    },
+    .spawns =
+    {
+        .entries = fireworkShowGameobjectThunderBluff,
+        .size = sizeof(fireworkShowGameobjectThunderBluff) / sizeof(fireworkShowGameobjectThunderBluff[0])
+    }
 };
 
 #endif

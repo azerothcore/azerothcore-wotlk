@@ -16,30 +16,30 @@
  */
 
 #include "firework_show.h"
-// #include "firework_show_BootyBay.h"
-// #include "firework_show_Exodar.h"
-// #include "firework_show_Ironforge.h"
-// #include "firework_show_Orgrimmar.h"
-// #include "firework_show_Shattrath.h"
-// #include "firework_show_Silvermoon.h"
-// #include "firework_show_Stormwind.h"
+#include "firework_show_BootyBay.h"
+#include "firework_show_Exodar.h"
+#include "firework_show_Ironforge.h"
+#include "firework_show_Orgrimmar.h"
+#include "firework_show_Shattrath.h"
+#include "firework_show_Silvermoon.h"
+#include "firework_show_Stormwind.h"
 #include "firework_show_Teldrassil.h"
-// #include "firework_show_ThunderBluff.h"
-// #include "firework_show_Undercity.h"
+#include "firework_show_ThunderBluff.h"
+#include "firework_show_Undercity.h"
 #include "GameObjectAI.h"
 
-// <mapId, zoneId>, show index
+// <mapId, zoneId>, show
 std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStore = {
-//     { { 0,   1    }, fireworkShowBootyBay    },
-//     { { 0,   33   }, FIREWORK_SHOW_BOOTYBAY     },
-//     { { 0,   1497 }, FIREWORK_SHOW_UNDERCITY    },
-//     { { 0,   1519 }, FIREWORK_SHOW_STORMWIND    },
-    { { 1,   141  }, &fireworkShowTeldrassil },
-//     { { 1,   1637 }, FIREWORK_SHOW_ORGRIMMAR    },
-//     { { 1,   1638 }, FIREWORK_SHOW_THUNDERBLUFF },
-//     { { 530, 3430 }, FIREWORK_SHOW_SILVERMOON   },
-//     { { 530, 3557 }, FIREWORK_SHOW_EXODAR       },
-//     { { 530, 3703 }, FIREWORK_SHOW_SHATTRATH    },
+    { { 0,   1    }, &fireworkShowIronforge    },
+    { { 0,   33   }, &fireworkShowBootyBay     },
+    { { 0,   1497 }, &fireworkShowUndercity    },
+    { { 0,   1519 }, &fireworkShowStormwind    },
+    { { 1,   141  }, &fireworkShowTeldrassil   },
+    { { 1,   1637 }, &fireworkShowOrgrimmar    },
+    { { 1,   1638 }, &fireworkShowThunderBluff },
+    { { 530, 3430 }, &fireworkShowSilvermoon   },
+    { { 530, 3557 }, &fireworkShowExodar       },
+    { { 530, 3703 }, &fireworkShowShattrath    },
 };
 
 struct go_cheer_speaker : public GameObjectAI
