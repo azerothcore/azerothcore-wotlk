@@ -32,16 +32,16 @@ SET @ENTRY := 27210;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 50908, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On aggro - Self: Cast spell  突襲聖印 (50908) on Self'),
-(@ENTRY, 0, 1, 0, 0, 0, 100, 0, 4000, 7000, 19000, 23000, 11, 50915, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Every 19 - 23 seconds (4 - 7s initially) (IC) - Self: Cast spell  盛怒奉獻 (50915) on Victim'),
-(@ENTRY, 0, 2, 0, 0, 0, 100, 0, 9000, 12000, 20000, 23000, 11, 50905, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Every 20 - 23 seconds (9 - 12s initially) (IC) - Self: Cast spell  突襲審判 (50905) on Victim'),
+(@ENTRY, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 50908, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On aggro - Cast spell  Seal of Onslaught (50908) on Self'),
+(@ENTRY, 0, 1, 0, 0, 0, 100, 0, 4000, 7000, 19000, 23000, 11, 50915, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - Cast spell - Raging Consecration (50915) on Victim'),
+(@ENTRY, 0, 2, 0, 0, 0, 100, 0, 9000, 12000, 20000, 23000, 11, 50905, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis-  Cast spell - Judgement of Onslaught  (50905) on Victim'),
 (@ENTRY, 0, 3, 4, 2, 0, 100, 1, 0, 20, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'When health between 0%-20%% (once) - Set event phase to phase 1'),
 (@ENTRY, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'When health between 0%-20%% (once) - Self: Talk 0 to Self'),
-(@ENTRY, 0, 5, 0, 0, 1, 100, 0, 0, 0, 6000, 6000, 11, 50921, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Every 6 seconds (0s initially) (IC) - Self: Cast spell  魯莽突襲 (50921) on Self'),
-(@ENTRY, 0, 6, 0, 6, 0, 100, 512, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'On death - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set creature data #1 to 1'),
-(@ENTRY, 0, 7, 0, 4, 0, 100, 512, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 19, 27951, 10, 0, 0, 0, 0, 0, 'On aggro - Closest alive creature Admiral Barean Westwind (27951) in 10 yards: Set creature data #0 to 1'),
-(@ENTRY, 0, 8, 0, 11, 0, 100, 512, 0, 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'On respawn - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set respawn timer to 0 ms'),
-(@ENTRY, 0, 9, 0, 25, 0, 100, 512, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'On reset - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set creature data #0 to 2'),
+(@ENTRY, 0, 5, 0, 0, 1, 100, 0, 0, 0, 6000, 6000, 11, 50921, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - Cast spell - Reckless Onslaught (50921) on Self'),
+(@ENTRY, 0, 6, 0, 6, 0, 100, 512, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'High General Abbendis - On death - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set creature data #1 to 1'),
+(@ENTRY, 0, 7, 0, 4, 0, 100, 512, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 19, 27951, 10, 0, 0, 0, 0, 0, 'High General Abbendis - On aggro - Closest alive creature Admiral Barean Westwind (27951) in 10 yards: Set creature data #0 to 1'),
+(@ENTRY, 0, 8, 0, 11, 0, 100, 512, 0, 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'High General Abbendis - On respawn - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set respawn timer to 0 ms'),
+(@ENTRY, 0, 9, 0, 25, 0, 100, 512, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 85322, 27951, 0, 0, 0, 0, 0, 'High General Abbendis - On reset - Creature Admiral Barean Westwind (27951) with guid 85322 (fetching): Set creature data #0 to 2'),
 (@ENTRY, 0, 10, 0, 38, 0, 100, 0, 0, 1, 5000, 5000, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 (wait 5000 - 5000 ms before next event trigger) - Self: Talk 1 to invoker'),
 (@ENTRY, 0, 11, 0, 38, 0, 100, 0, 0, 2, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 2 - Self: Attack storedTarget[0]');
 
