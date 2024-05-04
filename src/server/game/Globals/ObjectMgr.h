@@ -18,7 +18,7 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
-#include "Bag.h"
+#include "CGBag.h"
 #include "ConditionMgr.h"
 #include "Corpse.h"
 #include "Creature.h"

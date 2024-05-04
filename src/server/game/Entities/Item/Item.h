@@ -25,7 +25,7 @@
 #include "Object.h"
 
 class SpellInfo;
-class Bag;
+class CGBag;
 class Unit;
 
 struct ItemSetEffect
@@ -240,8 +240,8 @@ public:
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
 
-    Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return nullptr; }
-    [[nodiscard]] const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
+    CGBag* ToBag() { if (IsBag()) return reinterpret_cast<CGBag*>(this); else return nullptr; }
+    [[nodiscard]] const CGBag* ToBag() const { if (IsBag()) return reinterpret_cast<const CGBag*>(this); else return nullptr; }
 
     [[nodiscard]] bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
     [[nodiscard]] bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
@@ -269,11 +269,11 @@ public:
     BAG_RESULT CanBeMergedPartlyWith(ItemTemplate const* proto) const;
 
     [[nodiscard]] uint8 GetSlot() const {return m_slot;}
-    Bag* GetContainer() { return m_container; }
+    CGBag* GetContainer() { return m_container; }
     [[nodiscard]] uint8 GetBagSlot() const;
     void SetSlot(uint8 slot) { m_slot = slot; }
     [[nodiscard]] uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
-    void SetContainer(Bag* container) { m_container = container; }
+    void SetContainer(CGBag* container) { m_container = container; }
 
     [[nodiscard]] bool IsInBag() const { return m_container != nullptr; }
     [[nodiscard]] bool IsEquipped() const;
@@ -357,7 +357,7 @@ public:
 private:
     std::string m_text;
     uint8 m_slot;
-    Bag* m_container;
+    CGBag* m_container;
     ItemUpdateState uState;
     int32 uQueuePos;
     bool mb_in_trade;                                   // true if item is currently in trade-window

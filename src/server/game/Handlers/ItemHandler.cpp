@@ -983,7 +983,7 @@ void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
     {
         for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            if (Bag* pBag = m_player->GetBagByPos(i))
+            if (CGBag* pBag = m_player->GetBagByPos(i))
             {
                 if (bagguid == pBag->GetGUID())
                 {

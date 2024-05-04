@@ -16,7 +16,7 @@
  */
 
 #include "Guild.h"
-#include "Bag.h"
+#include "CGBag.h"
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"

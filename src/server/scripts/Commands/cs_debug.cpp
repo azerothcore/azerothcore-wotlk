@@ -22,7 +22,7 @@
  Category: commandscripts
  EndScriptData */
 
-#include "Bag.h"
+#include "CGBag.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -543,7 +543,7 @@ public:
 
                 if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 {
-                    if (Bag* bag = item->ToBag())
+                    if (CGBag* bag = item->ToBag())
                     {
                         for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                             if (Item* item2 = bag->GetItemByPos(j))
@@ -562,7 +562,7 @@ public:
 
             for (auto const& item : updateQueue)
             {
-                Bag* container = item->GetContainer();
+                CGBag* container = item->GetContainer();
                 uint8 bagSlot = container ? container->GetSlot() : uint8(INVENTORY_SLOT_BAG_0);
 
                 std::string st;
@@ -616,7 +616,7 @@ public:
                     continue;
                 }
 
-                if (Bag* container = item->GetContainer())
+                if (CGBag* container = item->GetContainer())
                 {
                     handler->PSendSysMessage("The item with slot %d %s has a container (slot: %d, %s) but shouldn't!", item->GetSlot(), item->GetGUID().ToString().c_str(), container->GetSlot(), container->GetGUID().ToString().c_str());
                     error = true;
@@ -654,7 +654,7 @@ public:
                     continue;
                 }
 
-                if (Bag* bag = item->ToBag())
+                if (CGBag* bag = item->ToBag())
                 {
                     for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                     {
@@ -676,7 +676,7 @@ public:
                             continue;
                         }
 
-                        Bag* container = item2->GetContainer();
+                        CGBag* container = item2->GetContainer();
                         if (!container)
                         {
                             handler->PSendSysMessage("The item in bag %d at slot %d %s has no container!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString().c_str());

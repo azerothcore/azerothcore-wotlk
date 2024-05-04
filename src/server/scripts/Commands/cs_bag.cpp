@@ -98,7 +98,7 @@ public:
         // in inventory bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
         {
-            if (Bag* bag = player->GetBagByPos(i))
+            if (CGBag* bag = player->GetBagByPos(i))
             {
                 for (uint32 j = 0; j < bag->GetBagSize(); j++)
                 {

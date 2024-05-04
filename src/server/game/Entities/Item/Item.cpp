@@ -311,7 +311,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owne
 // Returns false if Item is not a bag OR it is an empty bag.
 bool Item::IsNotEmptyBag() const
 {
-    if (Bag const* bag = ToBag())
+    if (CGBag const* bag = ToBag())
         return !bag->IsEmpty();
     return false;
 }
@@ -797,7 +797,7 @@ bool Item::CanBeTraded(bool mail, bool trade) const
     if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || !trade)))
         return false;
 
-    if (IsBag() && (Player::IsBagPos(GetPos()) || !((Bag const*)this)->IsEmpty()))
+    if (IsBag() && (Player::IsBagPos(GetPos()) || !((CGBag const*)this)->IsEmpty()))
         return false;
 
     if (Player* owner = GetOwner())

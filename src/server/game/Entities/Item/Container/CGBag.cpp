@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Bag.h"
+#include "CGBag.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "UpdateData.h"
 
-Bag::Bag(): Item()
+CGBag::CGBag(): Item()
 {
     m_objectType |= TYPEMASK_CONTAINER;
     m_objectTypeId = TYPEID_CONTAINER;
@@ -32,7 +32,7 @@ Bag::Bag(): Item()
     memset(m_bagslot, 0, sizeof(Item*) * MAX_BAG_SIZE);
 }
 
-Bag::~Bag()
+CGBag::~CGBag()
 {
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
         if (Item* item = m_bagslot[i])
@@ -48,7 +48,7 @@ Bag::~Bag()
         }
 }
 
-void Bag::AddToWorld()
+void CGBag::AddToWorld()
 {
     Item::AddToWorld();
 
@@ -57,7 +57,7 @@ void Bag::AddToWorld()
             m_bagslot[i]->AddToWorld();
 }
 
-void Bag::RemoveFromWorld()
+void CGBag::RemoveFromWorld()
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i])
@@ -66,7 +66,7 @@ void Bag::RemoveFromWorld()
     Item::RemoveFromWorld();
 }
 
-bool Bag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner)
+bool CGBag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner)
 {
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemid);
 
@@ -98,12 +98,12 @@ bool Bag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner
     return true;
 }
 
-void Bag::SaveToDB(CharacterDatabaseTransaction trans)
+void CGBag::SaveToDB(CharacterDatabaseTransaction trans)
 {
     Item::SaveToDB(trans);
 }
 
-bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+bool CGBag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
 {
     if (!Item::LoadFromDB(guid, owner_guid, fields, entry))
         return false;
@@ -121,7 +121,7 @@ bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fie
     return true;
 }
 
-void Bag::DeleteFromDB(CharacterDatabaseTransaction trans)
+void CGBag::DeleteFromDB(CharacterDatabaseTransaction trans)
 {
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
         if (m_bagslot[i])
@@ -130,7 +130,7 @@ void Bag::DeleteFromDB(CharacterDatabaseTransaction trans)
     Item::DeleteFromDB(trans);
 }
 
-uint32 Bag::GetFreeSlots() const
+uint32 CGBag::GetFreeSlots() const
 {
     uint32 slots = 0;
     for (uint32 i = 0; i < GetBagSize(); ++i)
@@ -140,7 +140,7 @@ uint32 Bag::GetFreeSlots() const
     return slots;
 }
 
-void Bag::RemoveItem(uint8 slot, bool /*update*/)
+void CGBag::RemoveItem(uint8 slot, bool /*update*/)
 {
     ASSERT(slot < MAX_BAG_SIZE);
 
@@ -151,7 +151,7 @@ void Bag::RemoveItem(uint8 slot, bool /*update*/)
     SetGuidValue(CONTAINER_FIELD_SLOT_1 + (slot * 2), ObjectGuid::Empty);
 }
 
-void Bag::StoreItem(uint8 slot, Item* pItem, bool /*update*/)
+void CGBag::StoreItem(uint8 slot, Item* pItem, bool /*update*/)
 {
     ASSERT(slot < MAX_BAG_SIZE);
 
@@ -166,7 +166,7 @@ void Bag::StoreItem(uint8 slot, Item* pItem, bool /*update*/)
     }
 }
 
-void Bag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
+void CGBag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     Item::BuildCreateUpdateBlockForPlayer(data, target);
 
@@ -176,7 +176,7 @@ void Bag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 }
 
 // If the bag is empty returns true
-bool Bag::IsEmpty() const
+bool CGBag::IsEmpty() const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i])
@@ -185,7 +185,7 @@ bool Bag::IsEmpty() const
     return true;
 }
 
-uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
+uint32 CGBag::GetItemCount(uint32 item, Item* eItem) const
 {
     Item* pItem;
     uint32 count = 0;
@@ -209,7 +209,7 @@ uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
     return count;
 }
 
-uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem) const
+uint32 CGBag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem) const
 {
     uint32 count = 0;
     for (uint32 i = 0; i < GetBagSize(); ++i)
@@ -222,7 +222,7 @@ uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem) 
     return count;
 }
 
-uint8 Bag::GetSlotByItemGUID(ObjectGuid guid) const
+uint8 CGBag::GetSlotByItemGUID(ObjectGuid guid) const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i] != 0)
@@ -232,7 +232,7 @@ uint8 Bag::GetSlotByItemGUID(ObjectGuid guid) const
     return NULL_SLOT;
 }
 
-Item* Bag::GetItemByPos(uint8 slot) const
+Item* CGBag::GetItemByPos(uint8 slot) const
 {
     if (slot < GetBagSize())
         return m_bagslot[slot];
@@ -240,7 +240,7 @@ Item* Bag::GetItemByPos(uint8 slot) const
     return nullptr;
 }
 
-std::string Bag::GetDebugInfo() const
+std::string CGBag::GetDebugInfo() const
 {
     std::stringstream sstr;
     sstr << Item::GetDebugInfo();

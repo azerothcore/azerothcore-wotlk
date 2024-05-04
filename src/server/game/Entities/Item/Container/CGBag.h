@@ -24,11 +24,11 @@
 #include "Item.h"
 #include "ItemTemplate.h"
 
-class Bag : public Item
+class CGBag : public Item
 {
 public:
-    Bag();
-    ~Bag() override;
+    CGBag();
+    ~CGBag() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -66,6 +66,6 @@ protected:
 
 inline Item* NewItemOrBag(ItemTemplate const* proto)
 {
-    return (proto->InventoryType == INVTYPE_BAG) ? new Bag : new Item;
+    return (proto->InventoryType == INVTYPE_BAG) ? new CGBag : new Item;
 }
 #endif

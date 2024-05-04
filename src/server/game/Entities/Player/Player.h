@@ -1245,7 +1245,7 @@ public:
     [[nodiscard]] Item* GetItemByEntry(uint32 entry) const;
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
-    [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] CGBag*  GetBagByPos(uint8 slot) const;
     [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {

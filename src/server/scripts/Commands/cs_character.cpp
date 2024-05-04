@@ -948,7 +948,7 @@ public:
         }
         else
         {
-            if (Bag* bag = target->GetBagByPos(BagSlot))
+            if (CGBag* bag = target->GetBagByPos(BagSlot))
             {
                 for (uint32 i = 0; i < bag->GetBagSize(); i++)
                 {

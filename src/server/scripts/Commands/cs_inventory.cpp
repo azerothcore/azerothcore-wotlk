@@ -119,7 +119,7 @@ public:
         // Check bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
         {
-            if (Bag* bag = target->GetBagByPos(i))
+            if (CGBag* bag = target->GetBagByPos(i))
             {
                 if (ItemTemplate const* bagTemplate = bag->GetTemplate())
                 {
