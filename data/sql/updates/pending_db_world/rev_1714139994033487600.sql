@@ -5,9 +5,6 @@ DELETE FROM `gossip_menu_option` WHERE `MenuID` = 7175;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (7175, 0, 0, 'I am diseased. Please cure me, medic.', 12154, 1, 1, 0, 0, 0, 0, NULL, 0, 0);
 
-DELETE FROM `gossip_menu_option` WHERE `MenuID` = 7175;
-INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
-(7175, 0, 0, 'I am diseased. Please cure me, medic.', 12154, 1, 1, 0, 0, 0, 0, NULL, 0, 0);
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` IN (7175));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
 (15, 7175, 0, 0, 0, 1, 0, 12541, 0, 0, 0, 'Player for which gossip text is shown has aura of spell Ghoul Rot (Ghoul Rot12541), effect EFFECT_0'),
