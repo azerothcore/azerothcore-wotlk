@@ -42,9 +42,9 @@ std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStor
     { { 530, 3703 }, &fireworkShowShattrath    },
 };
 
-struct go_cheer_speaker : public GameObjectAI
+struct go_firework_show : public GameObjectAI
 {
-    go_cheer_speaker(GameObject* go) : GameObjectAI(go)
+    go_firework_show(GameObject* go) : GameObjectAI(go)
     {
         _curIdx = 0;
         _showRunning = false;
@@ -124,7 +124,7 @@ struct go_cheer_speaker : public GameObjectAI
                 else
                 {
                     stopShow();
-                    LOG_ERROR("scripts.midsummer", "go_cheer_speaker: could not schedule next firework explosion in {} ms.", dt);
+                    LOG_ERROR("scripts.midsummer", "go_firework_show: could not schedule next firework explosion in {} ms.", dt);
                 }
             });
 
@@ -193,5 +193,5 @@ private:
 void AddSC_event_firework_show_scripts()
 {
     // Gameobjects
-    RegisterGameObjectAI(go_cheer_speaker);
+    RegisterGameObjectAI(go_firework_show);
 }
