@@ -1343,6 +1343,15 @@ vmap.petLOS = 1
 vmap.BlizzlikePvPLOS = 1
 
 #
+#   vmap.BlizzlikeLOSInOpenWorld
+#       Description: Check line of sight to see game objects in the open world.
+#       Default:    1 (Enabled, Players will be able to cast spells through tree stumps and other objects in the open world).
+#                   0 (Disabled, Players will not be able to cast spells through tree stumps and other objects in the open world).
+#
+
+vmap.BlizzlikeLOSInOpenWorld = 1
+
+#
 #    vmap.enableIndoorCheck
 #        Description: VMap based indoor check to remove outdoor-only auras (mounts etc.).
 #        Default:     1 - (Enabled)
