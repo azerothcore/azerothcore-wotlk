@@ -150,7 +150,7 @@ struct go_firework_show : public GameObjectAI
         if (_curIdx >= _show->schedule.size)
             return -3;
 
-        LOG_ERROR("scripts.midsummer", "spawnNextFirework() {}, {}, {}, {}", _curIdx, _show->schedule.entries[_curIdx].timestamp, _show->schedule.entries[_curIdx].gameobjectId, _show->schedule.entries[_curIdx].spawnIndex);
+        LOG_ERROR("scripts.midsummer", "{}: spawnNextFirework() {}, {}, {}, {}", me->GetSpawnId(), _curIdx, _show->schedule.entries[_curIdx].timestamp, _show->schedule.entries[_curIdx].gameobjectId, _show->schedule.entries[_curIdx].spawnIndex);
 
         uint32 posIdx = _show->schedule.entries[_curIdx].spawnIndex;
         if (posIdx < _show->spawns.size)
@@ -165,6 +165,10 @@ struct go_firework_show : public GameObjectAI
                 _show->spawns.entries[posIdx].rot2,
                 _show->spawns.entries[posIdx].rot3,
                 0);
+        }
+        else
+        {
+            LOG_ERROR("scripts.midsummer", "{}: spawnNextFirework() - spawnIndex {} OUT OF BOUNDS ( {} )", me->GetSpawnId(), posIdx, _show->spawns.size);
         }
 
         uint32 ts = _show->schedule.entries[_curIdx].timestamp;
