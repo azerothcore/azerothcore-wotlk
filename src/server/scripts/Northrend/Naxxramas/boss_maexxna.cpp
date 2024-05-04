@@ -81,7 +81,7 @@ struct WebTargetSelector
     WebTargetSelector(Unit* maexxna) : _maexxna(maexxna) {}
     bool operator()(Unit const* target) const
     {
-        if (target->GetTypeId() != TYPEID_PLAYER) // never web nonplayers (pets, guardians, etc.)
+        if (target->IsPlayer()) // never web nonplayers (pets, guardians, etc.)
             return false;
         if (_maexxna->GetVictim() == target) // never target tank
             return false;
@@ -189,7 +189,7 @@ public:
         void DoCastWebWrap()
         {
             std::list<Unit*> candidates;
-            SelectTargetList(candidates, RAID_MODE(1, 2), SelectTargetMethod::Random, 1, WebTargetSelector(me));
+            SelectTargetList(candidates, RAID_MODE(1, 2), SelectTargetMethod::Random, 0, WebTargetSelector(me));
 
             std::vector<uint32> positions {0, 1, 2, 3, 4, 5, 6};
             Acore::Containers::RandomShuffle(positions);
