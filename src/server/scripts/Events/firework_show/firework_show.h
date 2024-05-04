@@ -43,27 +43,37 @@ enum eFireworks
     GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG  = 180739,
     GO_FIREWORK_SHOW_TYPE_2_PURPLE      = 180740,
     GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG  = 180741,
-
-    FIREWORK_SHOW_BOOTYBAY              = 0,
-    FIREWORK_SHOW_EXODAR                = 1,
-    FIREWORK_SHOW_IRONFORGE             = 2,
-    FIREWORK_SHOW_ORGRIMMAR             = 3,
-    FIREWORK_SHOW_SHATTRATH             = 4,
-    FIREWORK_SHOW_SILVERMOON            = 5,
-    FIREWORK_SHOW_STORMWIND             = 6,
-    FIREWORK_SHOW_TELDRASSIL            = 7,
-    FIREWORK_SHOW_THUNDERBLUFF          = 8,
-    FIREWORK_SHOW_UNDERCITY             = 9,
 };
 
-struct FireworkShowEntry
+struct FireworkShowGameobject
+{
+    float x;
+    float y;
+    float z;
+    float o;
+    float rot0;
+    float rot1;
+    float rot2;
+    float rot3;
+};
+
+struct FireworkShowScheduleEntry
 {
     uint32 timestamp;
     uint32 gameobjectId;
     uint32 spawnIndex;
 };
 
-// timestamp[ms], firework gameobject ID, fireworkSpawnPositionIndex
-typedef std::vector<FireworkShowEntry> FireworkShow;
+struct FireworkShow
+{
+    struct{
+        FireworkShowScheduleEntry const * entries;
+        uint32 const size;
+    } schedule;
+    struct {
+        FireworkShowGameobject const * entries;
+        uint32 const size;
+    } spawns;
+};
 
 #endif
