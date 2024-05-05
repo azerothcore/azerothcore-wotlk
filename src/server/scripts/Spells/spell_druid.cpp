@@ -1182,6 +1182,24 @@ class spell_dru_moonkin_form_passive_proc : public AuraScript
     {
         if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
         {
+            switch (spellInfo->Id)
+            {
+                //lv4
+                case 53201:
+                case 53195:
+                //lv3
+                case 53200:
+                case 53194:
+                //lv2
+                case 53199:
+                case 53191:
+                //lv1
+                case 48505:
+                case 50288:
+                    return false;
+                default:
+                    break;
+            }
             return !spellInfo->IsAffectingArea();
         }
 
