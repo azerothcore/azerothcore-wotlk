@@ -19,6 +19,7 @@
 #include "Player.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
