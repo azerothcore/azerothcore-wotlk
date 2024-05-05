@@ -81,7 +81,7 @@ struct WebTargetSelector
     WebTargetSelector(Unit* maexxna) : _maexxna(maexxna) {}
     bool operator()(Unit const* target) const
     {
-        if (target->IsPlayer()) // never web nonplayers (pets, guardians, etc.)
+        if (!target->IsPlayer()) // never web nonplayers (pets, guardians, etc.)
             return false;
         if (_maexxna->GetVictim() == target) // never target tank
             return false;
