@@ -1283,6 +1283,11 @@ FireworkShow const fireworkShowExodar =
     {
         .entries = fireworkShowGameobjectExodar,
         .size = sizeof(fireworkShowGameobjectExodar) / sizeof(fireworkShowGameobjectExodar[0])
+    },
+    .revelerId =
+    {
+        NPC_DRAENEI_REVELER,
+        0
     }
 };
 

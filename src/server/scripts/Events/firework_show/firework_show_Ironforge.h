@@ -1408,6 +1408,11 @@ FireworkShow const fireworkShowIronforge =
     {
         .entries = fireworkShowGameobjectIronforge,
         .size = sizeof(fireworkShowGameobjectIronforge) / sizeof(fireworkShowGameobjectIronforge[0])
+    },
+    .revelerId =
+    {
+        NPC_IRONFORGE_REVELER,
+        0
     }
 };
 

@@ -526,6 +526,11 @@ FireworkShow const fireworkShowBootyBay =
     {
         .entries = FireworkShowGameobjectBootyBay,
         .size = sizeof(FireworkShowGameobjectBootyBay) / sizeof(FireworkShowGameobjectBootyBay[0])
+    },
+    .revelerId =
+    {
+        NPC_BOOTY_BAY_REVELER,
+        0
     }
 };
 

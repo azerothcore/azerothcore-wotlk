@@ -45,6 +45,20 @@ enum eFireworks
     GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG  = 180741,
 
     GO_TOASTING_GOBLET                  = 180754,
+
+    NPC_STORMWIND_REVELER               = 15694,
+    NPC_THUNDER_BLUFF_REVELER           = 15719,
+    NPC_BOOTY_BAY_REVELER               = 15723,
+    NPC_DARNASSUS_REVELER               = 15905,
+    NPC_IRONFORGE_REVELER               = 15906,
+    NPC_UNDERCITY_REVELER               = 15907,
+    NPC_ORGRIMMAR_REVELER               = 15908,
+    NPC_SCRYER_REVELER                  = 23023,
+    NPC_ALDOR_REVELER                   = 23024,
+    NPC_DRAENEI_REVELER                 = 23039,
+    NPC_BLOOD_ELF_REVELER               = 23045,
+
+    COUNT_REVELER_ID                    = 2,
 };
 
 struct FireworkShowGameobject
@@ -76,6 +90,7 @@ struct FireworkShow
         FireworkShowGameobject const * entries;
         uint32 const size;
     } spawns;
+    uint32 const revelerId[COUNT_REVELER_ID];
 };
 
 #endif

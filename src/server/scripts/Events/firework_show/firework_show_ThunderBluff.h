@@ -1570,6 +1570,11 @@ FireworkShow const fireworkShowThunderBluff =
     {
         .entries = fireworkShowGameobjectThunderBluff,
         .size = sizeof(fireworkShowGameobjectThunderBluff) / sizeof(fireworkShowGameobjectThunderBluff[0])
+    },
+    .revelerId =
+    {
+        NPC_THUNDER_BLUFF_REVELER,
+        0
     }
 };
 

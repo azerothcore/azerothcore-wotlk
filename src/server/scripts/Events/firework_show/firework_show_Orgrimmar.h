@@ -1612,6 +1612,11 @@ FireworkShow const fireworkShowOrgrimmar =
     {
         .entries = fireworkShowGameobjectOrgrimmar,
         .size = sizeof(fireworkShowGameobjectOrgrimmar) / sizeof(fireworkShowGameobjectOrgrimmar[0])
+    },
+    .revelerId =
+    {
+        NPC_ORGRIMMAR_REVELER,
+        0
     }
 };
 

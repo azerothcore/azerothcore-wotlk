@@ -1422,6 +1422,11 @@ FireworkShow const fireworkShowSilvermoon =
     {
         .entries = fireworkShowGameobjectSilvermoon,
         .size = sizeof(fireworkShowGameobjectSilvermoon) / sizeof(fireworkShowGameobjectSilvermoon[0])
+    },
+    .revelerId =
+    {
+        NPC_BLOOD_ELF_REVELER,
+        0
     }
 };
 

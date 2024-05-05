@@ -1649,6 +1649,11 @@ FireworkShow const fireworkShowStormwind =
     {
         .entries = fireworkShowGameobjectStormwind,
         .size = sizeof(fireworkShowGameobjectStormwind) / sizeof(fireworkShowGameobjectStormwind[0])
+    },
+    .revelerId =
+    {
+        NPC_STORMWIND_REVELER,
+        0
     }
 };
 

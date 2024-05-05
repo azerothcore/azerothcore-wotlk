@@ -135,7 +135,7 @@ struct go_firework_show : public GameObjectAI
     {
         if (_showRunning)
         {
-            // Spawn 'Toasting Goblets' on show end
+            // Trigger SAI to spawn 'Toasting Goblets' on show end
             std::list<GameObject*> _goList;
             me->GetGameObjectListWithEntryInGrid(_goList, GO_TOASTING_GOBLET, 1420.0f);
 
@@ -143,20 +143,22 @@ struct go_firework_show : public GameObjectAI
 
             for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); ++itr)
             {
-                // trigger AI to enable visible phase
-                if (GameObjectAI * ai = (*itr)->AI())
+                if (GameObjectAI* ai = (*itr)->AI())
                     ai->SetData(0, 1);
             }
 
-            // Revelers should cheer on show end
-            // std::list<Creature*> _crList;
-            // me->GetCreatureListWithEntryInGrid(_crList, GO_TOASTING_GOBLET, 420.0f);
-            // 
-            // for (std::list<GameObject*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr)
-            // {
-            //     // switch to visible phase
-            //     (*itr)->SetPhaseMask(PHASEMASK_NORMAL, true);
-            // }
+            // Trigger SAI to make Revelers cheer on show end
+            for (uint32 i = 0; i < COUNT_REVELER_ID; i++)
+            {
+                std::list<Creature*> _crList;
+                me->GetCreatureListWithEntryInGrid(_crList, _show->revelerId[i], 1420.0f);
+            
+                for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr)
+                {
+                    if (CreatureAI* ai = (*itr)->AI())
+                        ai->SetData(0, 1);
+                }
+            }
         }
 
         _showRunning = false;

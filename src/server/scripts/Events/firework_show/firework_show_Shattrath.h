@@ -1170,6 +1170,11 @@ FireworkShow const fireworkShowShattrath =
     {
         .entries = fireworkShowGameobjectShattrath,
         .size = sizeof(fireworkShowGameobjectShattrath) / sizeof(fireworkShowGameobjectShattrath[0])
+    },
+    .revelerId =
+    {
+        NPC_SCRYER_REVELER,
+        NPC_ALDOR_REVELER
     }
 };
 

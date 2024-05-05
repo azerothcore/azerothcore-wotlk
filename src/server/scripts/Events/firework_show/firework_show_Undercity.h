@@ -1271,6 +1271,11 @@ FireworkShow const fireworkShowUndercity =
     {
         .entries = fireworkShowGameobjectUndercity,
         .size = sizeof(fireworkShowGameobjectUndercity) / sizeof(fireworkShowGameobjectUndercity[0])
+    },
+    .revelerId =
+    {
+        NPC_UNDERCITY_REVELER,
+        0
     }
 };
 

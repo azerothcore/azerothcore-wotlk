@@ -1314,6 +1314,11 @@ FireworkShow const fireworkShowTeldrassil =
     {
         .entries = fireworkShowGameobjectTeldrassil,
         .size = sizeof(fireworkShowGameobjectTeldrassil) / sizeof(fireworkShowGameobjectTeldrassil[0])
+    },
+    .revelerId =
+    {
+        NPC_DARNASSUS_REVELER,
+        0
     }
 };
 
