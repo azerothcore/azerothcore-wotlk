@@ -2445,6 +2445,14 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
         }
     }
 
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD))
+    {
+        if (IsWorldMap())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
+
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
