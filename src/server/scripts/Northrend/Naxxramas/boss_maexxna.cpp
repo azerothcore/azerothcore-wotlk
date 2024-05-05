@@ -353,37 +353,27 @@ public:
     };
 };
 
-class spell_web_wrap_damage : public SpellScriptLoader
+class spell_web_wrap_damage : public AuraScript
 {
 public:
-    spell_web_wrap_damage() : SpellScriptLoader("spell_web_wrap_damage") { }
+    PrepareAuraScript(spell_web_wrap_damage);
 
-    class spell_web_wrap_damage_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_web_wrap_damage_AuraScript);
+        return ValidateSpellInfo({ SPELL_WEB_WRAP_SUMMON });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_WEB_WRAP_SUMMON });
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() == 2)
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_web_wrap_damage_AuraScript();
+        if (aurEff->GetTickNumber() == 2)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -391,5 +381,5 @@ void AddSC_boss_maexxna()
 {
     new boss_maexxna();
     new boss_maexxna_webwrap();
-    new spell_web_wrap_damage();
+    RegisterSpellScript(spell_web_wrap_damage);
 }
