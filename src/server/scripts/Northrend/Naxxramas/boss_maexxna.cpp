@@ -365,6 +365,11 @@ public:
     {
         PrepareAuraScript(spell_web_wrap_damage_AuraScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WEB_WRAP_SUMMON });
+        }
+
         void OnPeriodic(AuraEffect const* aurEff)
         {
             if (aurEff->GetTickNumber() == 2)
