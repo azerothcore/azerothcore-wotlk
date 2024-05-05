@@ -379,6 +379,16 @@ Network.OutUBuff = 4096
 Network.TcpNodelay = 1
 
 #
+#    Network.EnableProxyProtocol
+#        Description: Enables Proxy Protocol v2. When your server is behind a proxy,
+#                     load balancer, or similar component, you need to enable Proxy Protocol v2 on both
+#                     this server and the proxy/load balancer to track the real IP address of players.
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.EnableProxyProtocol = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -1343,6 +1353,15 @@ vmap.petLOS = 1
 #                     0 - (Disabled, players will NOT be able to fire spells through treestumps and other objects).
 
 vmap.BlizzlikePvPLOS = 1
+
+#
+#   vmap.BlizzlikeLOSInOpenWorld
+#       Description: Check line of sight to see game objects in the open world.
+#       Default:    1 (Enabled, Players will be able to cast spells through tree stumps and other objects in the open world).
+#                   0 (Disabled, Players will not be able to cast spells through tree stumps and other objects in the open world).
+#
+
+vmap.BlizzlikeLOSInOpenWorld = 1
 
 #
 #    vmap.enableIndoorCheck
