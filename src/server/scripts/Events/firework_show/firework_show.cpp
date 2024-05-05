@@ -59,11 +59,7 @@ struct go_firework_show : public GameObjectAI
 
         auto itr = FireworkShowStore.find(std::make_pair(me->GetMapId(), me->GetZoneId()));
         if (itr != FireworkShowStore.end() && itr->second)
-        {
             _show = itr->second;
-
-            LOG_ERROR("scripts.midsummer", "initShow(): guid {} _show->schedule.size {} _show->spawns.size {}", me->GetSpawnId(), _show->schedule.size, _show->spawns.size);
-        }
 
         stopShow();
 
@@ -74,8 +70,6 @@ struct go_firework_show : public GameObjectAI
                 {
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
                     tm local_tm = Acore::Time::TimeBreakdown();
-
-                    LOG_ERROR("scripts.midsummer", "{}: time check {}:{}:{}", me->GetSpawnId(), local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec);
 
                     // each show runs approx. 12 minutes
                     // and starts at the full hour
@@ -109,9 +103,6 @@ struct go_firework_show : public GameObjectAI
             } while ((ts <= (minutesOffset * MINUTE * IN_MILLISECONDS)) && (++_curIdx < _show->schedule.size));
         }
 
-        if (_curIdx)
-            LOG_ERROR("scripts.midsummer", "{}: fast forward {}:{}:{}", me->GetSpawnId(), minutesOffset, _curIdx, _show->schedule.entries[_curIdx].timestamp);
-
         _scheduler.Schedule(0s, [this](TaskContext context)
             {
                 int32 dt = 0;
@@ -122,13 +113,8 @@ struct go_firework_show : public GameObjectAI
                 if (0 < dt)
                     context.Repeat(Milliseconds(dt));
                 else
-                {
                     stopShow();
-                    LOG_ERROR("scripts.midsummer", "go_firework_show: could not schedule next firework explosion in {} ms.", dt);
-                }
             });
-
-        LOG_ERROR("scripts.midsummer", "startShow()");
     }
 
     void stopShow()
@@ -138,8 +124,6 @@ struct go_firework_show : public GameObjectAI
             // Trigger SAI to spawn 'Toasting Goblets' on show end
             std::list<GameObject*> _goList;
             me->GetGameObjectListWithEntryInGrid(_goList, GO_TOASTING_GOBLET, 1420.0f);
-
-            LOG_ERROR("scripts.midsummer", "spawn Toasting Goblets {}", _goList.size());
 
             for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); ++itr)
             {
@@ -163,8 +147,6 @@ struct go_firework_show : public GameObjectAI
 
         _showRunning = false;
         me->setActive(false);
-
-        LOG_ERROR("scripts.midsummer", "stopShow()");
     }
 
     int32 spawnNextFirework()
@@ -177,8 +159,6 @@ struct go_firework_show : public GameObjectAI
 
         if (_curIdx >= _show->schedule.size)
             return -3;
-
-        LOG_ERROR("scripts.midsummer", "{}: spawnNextFirework() {}, {}, {}, {}", me->GetSpawnId(), _curIdx, _show->schedule.entries[_curIdx].timestamp, _show->schedule.entries[_curIdx].gameobjectId, _show->schedule.entries[_curIdx].spawnIndex);
 
         uint32 posIdx = _show->schedule.entries[_curIdx].spawnIndex;
         if (posIdx < _show->spawns.size)
@@ -193,10 +173,6 @@ struct go_firework_show : public GameObjectAI
                 _show->spawns.entries[posIdx].rot2,
                 _show->spawns.entries[posIdx].rot3,
                 0);
-        }
-        else
-        {
-            LOG_ERROR("scripts.midsummer", "{}: spawnNextFirework() - spawnIndex {} OUT OF BOUNDS ( {} )", me->GetSpawnId(), posIdx, _show->spawns.size);
         }
 
         uint32 ts = _show->schedule.entries[_curIdx].timestamp;
