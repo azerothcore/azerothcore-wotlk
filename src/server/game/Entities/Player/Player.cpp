@@ -1413,12 +1413,12 @@ bool Player::Teleport(uint32 mapid, float x, float y, float z, float orientation
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
     SetUnitMovementFlags(GetUnitMovementFlags() &
-                         MOVEFLAG_DISABLE_GRAVITY |
+                         ~(MOVEFLAG_DISABLE_GRAVITY |
                          MOVEFLAG_ROOTED |
                          MOVEFLAG_CAN_FLY |
                          MOVEFLAG_WATER_WALK |
                          MOVEFLAG_FEATHER_FALL |
-                         MOVEFLAG_HOVER);
+                         MOVEFLAG_HOVER));
     DisableSpline();
 
     // Xinef: Remove all movement imparing effects auras, skip small teleport like blink
