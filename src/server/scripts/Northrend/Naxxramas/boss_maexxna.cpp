@@ -25,7 +25,6 @@
 
 enum Spells
 {
-
     SPELL_WEB_SPRAY_10                  = 29484,
     SPELL_WEB_SPRAY_25                  = 54125,
     SPELL_POISON_SHOCK_10               = 28741,
@@ -278,7 +277,6 @@ public:
                     events.Repeat(1s);
                     break;
                 case EVENT_WEB_WRAP:
-
                     Talk(EMOTE_WEB_WRAP);
                     DoCastWebWrap();
                     events.Repeat(40s);
