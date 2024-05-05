@@ -136,7 +136,7 @@ struct go_firework_show : public GameObjectAI
             {
                 std::list<Creature*> _crList;
                 me->GetCreatureListWithEntryInGrid(_crList, _show->revelerId[i], 1420.0f);
-            
+
                 for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr)
                 {
                     if (CreatureAI* ai = (*itr)->AI())
