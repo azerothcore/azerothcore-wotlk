@@ -2013,6 +2013,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 (72, 420972),
 (72, 420973);
 
+-- Update gameobject 'Festive Mug' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180905))
 AND (`guid` BETWEEN 421000 AND 421625);
