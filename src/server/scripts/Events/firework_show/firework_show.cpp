@@ -133,6 +133,32 @@ struct go_firework_show : public GameObjectAI
 
     void stopShow()
     {
+        if (_showRunning)
+        {
+            // Spawn 'Toasting Goblets' on show end
+            std::list<GameObject*> _goList;
+            me->GetGameObjectListWithEntryInGrid(_goList, GO_TOASTING_GOBLET, 1420.0f);
+
+            LOG_ERROR("scripts.midsummer", "spawn Toasting Goblets {}", _goList.size());
+
+            for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); ++itr)
+            {
+                // trigger AI to enable visible phase
+                if (GameObjectAI * ai = (*itr)->AI())
+                    ai->SetData(0, 1);
+            }
+
+            // Revelers should cheer on show end
+            // std::list<Creature*> _crList;
+            // me->GetCreatureListWithEntryInGrid(_crList, GO_TOASTING_GOBLET, 420.0f);
+            // 
+            // for (std::list<GameObject*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr)
+            // {
+            //     // switch to visible phase
+            //     (*itr)->SetPhaseMask(PHASEMASK_NORMAL, true);
+            // }
+        }
+
         _showRunning = false;
         me->setActive(false);
 

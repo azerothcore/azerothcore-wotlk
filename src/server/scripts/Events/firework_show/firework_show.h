@@ -43,6 +43,8 @@ enum eFireworks
     GO_FIREWORK_SHOW_TYPE_2_YELLOW_BIG  = 180739,
     GO_FIREWORK_SHOW_TYPE_2_PURPLE      = 180740,
     GO_FIREWORK_SHOW_TYPE_1_PURPLE_BIG  = 180741,
+
+    GO_TOASTING_GOBLET                  = 180754,
 };
 
 struct FireworkShowGameobject
