@@ -18,6 +18,8 @@
 #ifndef DEF_FIREWORK_SHOW_H
 #define DEF_FIREWORK_SHOW_H
 
+#include "Define.h"
+
 enum eFireworks
 {
     GO_FIREWORK_SHOW_TYPE_1_RED         = 180703,
