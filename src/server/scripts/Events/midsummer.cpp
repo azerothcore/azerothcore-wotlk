@@ -17,6 +17,7 @@
 
 #include "CreatureScript.h"
 #include "GameEventMgr.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
 #include "PlayerScript.h"
@@ -1281,3 +1282,4 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
 }
+
