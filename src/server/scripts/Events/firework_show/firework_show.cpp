@@ -97,7 +97,7 @@ struct go_firework_show : public GameObjectAI
         // fast-forward show if we've got a late start
         if (minutesOffset > 0)
         {
-            uint32 ts = 0;
+            int ts = 0;
             do {
                 ts = _show->schedule.entries[_curIdx].timestamp;
             } while ((ts <= (minutesOffset * MINUTE * IN_MILLISECONDS)) && (++_curIdx < _show->schedule.size));
