@@ -1154,7 +1154,7 @@ void GenerateBotCustomSpells()
 
     sinfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
     //sinfo->Effects[0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
-    sinfo->Effects[0].RadiusEntry = nullptr;//sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50_YARDS);
+    sinfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_30_YARDS);
     sinfo->Effects[0].BasePoints = 1;
     sinfo->Effects[0].DieSides = 49;
     sinfo->Effects[0].BonusMultiplier = 0.0f;
