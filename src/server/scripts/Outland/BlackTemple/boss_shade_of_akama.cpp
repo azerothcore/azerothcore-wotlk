@@ -213,6 +213,7 @@ struct npc_akama_shade : public ScriptedAI
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         DoCastSelf(SPELL_STEALTH, true);
         me->SetWalk(true);
+        _sayLowHealth = false;
         scheduler.CancelAll();
     }
 
@@ -261,6 +262,15 @@ struct npc_akama_shade : public ScriptedAI
         }
     }
 
+    void DamageTaken(Unit* /*unit*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPctDamaged(20, damage) && !_sayLowHealth)
+        {
+            _sayLowHealth = true;
+            Talk(SAY_LOW_HEALTH);
+        }
+    }
+
     void DoAction(int32 param) override
     {
         if (param == ACTION_AKAMA_START_OUTRO)
@@ -284,6 +294,7 @@ struct npc_akama_shade : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        Talk(SAY_DEATH);
         if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
         {
             shade->SetHomePosition(shade->GetHomePosition());
@@ -318,6 +329,9 @@ struct npc_akama_shade : public ScriptedAI
         scheduler.Update(diff);
         DoMeleeAttackIfReady();
     }
+
+    private:
+        bool _sayLowHealth;
 };
 
 struct npc_creature_generator_akama : public ScriptedAI
