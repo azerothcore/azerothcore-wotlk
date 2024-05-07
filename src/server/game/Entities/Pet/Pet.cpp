@@ -2498,11 +2498,6 @@ float Pet::GetNativeObjectScale() const
 {
     uint8 ctFamily = GetCreatureTemplate()->family;
 
-    // hackfix: Edge case where DBC scale values for DEVILSAUR pets make them too small.
-    // Therefore we take data from spirit beast instead.
-    if (ctFamily && ctFamily == CREATURE_FAMILY_DEVILSAUR)
-        ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
-
     CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
     if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
     {
@@ -2519,6 +2514,13 @@ float Pet::GetNativeObjectScale() const
 
         float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
 
+        scale = std::min(scale, creatureFamily->maxScale);
+
+        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        {
+            if (displayInfo->scale > 1.f)
+                scale *= displayInfo->scale;
+        }
         return scale;
     }
 
