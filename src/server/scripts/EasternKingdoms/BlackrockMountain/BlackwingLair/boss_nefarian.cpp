@@ -111,6 +111,7 @@ enum Paths
 
 enum GameObjects
 {
+    GO_DRAKONID_BONES          = 179804,
     GO_PORTCULLIS_ACTIVE       = 164726,
     GO_PORTCULLIS_TOBOSSROOMS  = 175186
 };
@@ -138,6 +139,8 @@ enum Spells
     SPELL_SHADOW_COMMAND            = 22667,
     SPELL_FEAR                      = 22678,
     SPELL_SHADOWBLINK               = 22664,
+    SPELL_RAISE_DRAKONID            = 23362,
+    SPELL_SUMMON_DRAKONID_CORPSE    = 23363,
 
     SPELL_NEFARIANS_BARRIER         = 22663,
 
@@ -274,6 +277,12 @@ public:
                     if (nefarian->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::WAYPOINT_MOTION_TYPE)
                     {
                         nefarian->DespawnOrUnsummon();
+                    }
+                    std::list<GameObject*> drakonidBones;
+                    me->GetGameObjectListWithEntryInGrid(drakonidBones, GO_DRAKONID_BONES, DEFAULT_VISIBILITY_INSTANCE);
+                    for (auto const& bones : drakonidBones)
+                    {
+                        bones->DespawnOrUnsummon();
                     }
                 }
                 else
@@ -548,19 +557,7 @@ struct boss_nefarian : public BossAI
 
         ScheduleHealthCheckEvent(20, [&]
         {
-            std::list<Creature*> constructList;
-            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-            for (Creature* const& summon : constructList)
-            {
-                if (summon && !summon->IsAlive())
-                {
-                    summon->Respawn();
-                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoZoneInCombat(summon);
-                }
-            }
+            DoCastSelf(SPELL_RAISE_DRAKONID, true);
             Talk(SAY_RAISE_SKELETONS);
         });
         ScheduleHealthCheckEvent(5, [&]
@@ -954,37 +951,21 @@ struct npc_drakonid_spawner : public ScriptedAI
 
     void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
     {
-        if (summon->GetEntry() != NPC_BONE_CONSTRUCT)
+        if (Creature* victor = ObjectAccessor::GetCreature(*me, _owner))
         {
-            if (Creature* victor = ObjectAccessor::GetCreature(*me, _owner))
-            {
-                victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-            }
-
-            ObjectGuid summonGuid = summon->GetGUID();
-
-            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            summon->SetHomePosition(summon->GetPosition());
-
-            _scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
-            {
-                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
-                {
-                    construct->SetVisible(false);
-                }
-            }).Schedule(2s, [this, summonGuid](TaskContext /*context*/)
-            {
-                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
-                {
-                    construct->UpdateEntry(NPC_BONE_CONSTRUCT, true);
-                    construct->SetReactState(REACT_PASSIVE);
-                    construct->SetStandState(UNIT_STAND_STATE_DEAD);
-                    construct->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    construct->SetCorpseRemoveTime(DAY * IN_MILLISECONDS);
-                    construct->SetVisible(true);
-                }
-            });
+            victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
         }
+
+        ObjectGuid summonGuid = summon->GetGUID();
+
+        _scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
+        {
+            if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
+            {
+                construct->SetVisible(false);
+                construct->CastSpell(construct, SPELL_SUMMON_DRAKONID_CORPSE, true);
+            }
+        });
     }
 
 protected:
