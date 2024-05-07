@@ -81,6 +81,8 @@ enum Says
     SAY_RAISE_SKELETONS        = 1,
     SAY_SLAY                   = 2,
     SAY_DEATH                  = 3,
+    SAY_XHEALTH                = 14,
+    SAY_SHADOWFLAME            = 15,
 
     SAY_MAGE                   = 4,
     SAY_WARRIOR                = 5,
@@ -521,19 +523,10 @@ public:
 
 struct boss_nefarian : public BossAI
 {
-    boss_nefarian(Creature* creature) : BossAI(creature, DATA_NEFARIAN), _introDone(false)
-    {
-        Initialize();
-    }
-
-    void Initialize()
-    {
-        Phase3 = false;
-    }
+    boss_nefarian(Creature* creature) : BossAI(creature, DATA_NEFARIAN), _introDone(false) { }
 
     void Reset() override
     {
-        Initialize();
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetCanFly(true);
@@ -552,6 +545,28 @@ struct boss_nefarian : public BossAI
         }
 
         classesPresent.clear();
+
+        ScheduleHealthCheckEvent(20, [&]
+        {
+            std::list<Creature*> constructList;
+            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
+            for (Creature* const& summon : constructList)
+            {
+                if (summon && !summon->IsAlive())
+                {
+                    summon->Respawn();
+                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                    summon->SetStandState(UNIT_STAND_STATE_STAND);
+                    DoZoneInCombat(summon);
+                }
+            }
+            Talk(SAY_RAISE_SKELETONS);
+        });
+        ScheduleHealthCheckEvent(5, [&]
+        {
+            Talk(SAY_XHEALTH);
+        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override {}
@@ -587,6 +602,7 @@ struct boss_nefarian : public BossAI
         if (id == 5)
         {
             DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
+            Talk(SAY_SHADOWFLAME);
         }
     }
 
@@ -614,29 +630,6 @@ struct boss_nefarian : public BossAI
         events.ScheduleEvent(EVENT_TAILLASH, 10s);
         events.ScheduleEvent(EVENT_CLASSCALL, 30s, 35s);
         _introDone = true;
-    }
-
-    void DamageTaken(Unit* /*unit*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (me->HealthBelowPctDamaged(20, damage) && !Phase3)
-        {
-            std::list<Creature*> constructList;
-            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-            for (Creature* const& summon : constructList)
-            {
-                if (summon && !summon->IsAlive())
-                {
-                    summon->Respawn();
-                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoZoneInCombat(summon);
-                }
-            }
-
-            Phase3 = true;
-            Talk(SAY_RAISE_SKELETONS);
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -762,7 +755,6 @@ struct boss_nefarian : public BossAI
     }
 
 private:
-    bool Phase3;
     bool _introDone;
     std::set<uint8> classesPresent;
 };
