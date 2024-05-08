@@ -1,10 +1,10 @@
-SET @REFIDONE       = 35100,
-@REFIDTWO           = 35101,
-@REFIDTHREE         = 35102,
-@TANZAR             = 22699,
-@KRAZ               = 22790,
-@ASHLI              = 22797,
-@HARKOR             = 22968;
+SET @REFIDONE = 35100,
+@REFIDTWO     = 35101,
+@REFIDTHREE   = 35102,
+@TANZAR       = 22699,
+@KRAZ         = 22790,
+@ASHLI        = 22797,
+@HARKOR       = 22968;
 
 DELETE FROM `gameobject_loot_template` WHERE `Entry` IN (@TANZAR, @KRAZ, @ASHLI, @HARKOR);
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
