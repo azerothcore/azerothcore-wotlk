@@ -2518,7 +2518,7 @@ float Pet::GetNativeObjectScale() const
 
         if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
         {
-            if (displayInfo->scale > 1.f)
+            if (scale < 1.f && displayInfo->scale > 1.f)
                 scale *= displayInfo->scale;
         }
         return scale;
