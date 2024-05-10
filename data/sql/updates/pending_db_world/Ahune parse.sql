@@ -5,30 +5,30 @@
 # Targeted database: WrathOfTheLichKing
 
 /*
-16592 - Midsummer Bonfire
-25697 - Luma Skymother
-25710 - Numa Cloudsister
-25740 - Ahune
-25745 - [PH] Ahune Summon Loc Bunny
-25746 - [PH] Ahune Loot Loc Bunny
-25754 - Earthen Ring Flamecaller
-25755 - Ahunite Hailstone
-25756 - Ahunite Coldwave
-25865 - Frozen Core
-25952 - Slippery Floor Bunny
-25961 - Earthen Ring Totem
-25964 - Shaman Beam Bunny 000
-25965 - Shaman Beam Bunny 001
-25966 - Shaman Beam Bunny 002
-25971 - Shaman Bonfire Bunny 000
-25972 - Shaman Bonfire Bunny 001
-25973 - Shaman Bonfire Bunny 002
-25985 - Ahune Ice Spear Bunny
-26120 - Wisp Dest Bunny
-26121 - Wisp Source Bunny
-26190 - [PH] Spank Target Bunny
-26230 - Snow Bunny
-40446 - Skar'this the Summoner
+16592 - Midsummer Bonfire           -- static
+25697 - Luma Skymother              -- static
+25710 - Numa Cloudsister            -- static
+25740 - Ahune                       -- summon
+25745 - [PH] Ahune Summon Loc Bunny -- static
+25746 - [PH] Ahune Loot Loc Bunny   -- static
+25754 - Earthen Ring Flamecaller    -- static
+25755 - Ahunite Hailstone           -- summon
+25756 - Ahunite Coldwave            -- summon
+25865 - Frozen Core                 -- summon
+25952 - Slippery Floor Bunny        -- static
+25961 - Earthen Ring Totem          -- static
+25964 - Shaman Beam Bunny 000       -- static
+25965 - Shaman Beam Bunny 001       -- static
+25966 - Shaman Beam Bunny 002       -- static
+25971 - Shaman Bonfire Bunny 000    -- static
+25972 - Shaman Bonfire Bunny 001    -- static
+25973 - Shaman Bonfire Bunny 002    -- static
+25985 - Ahune Ice Spear Bunny       -- summon
+26120 - Wisp Dest Bunny             -- static
+26121 - Wisp Source Bunny           -- static
+26190 - [PH] Spank Target Bunny     -- static
+26230 - Snow Bunny                  -- static
+40446 - Skar'this the Summoner      -- static
 */
 
 SET @CGUID := SET_VALUE_MANUALLY_HERE;
@@ -341,20 +341,20 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (@CGUID+, 40446, 547, 0, 0, 3, 1, 0, 0, -76.9917221069335937, -157.080520629882812, -2.10638880729675292, 5.637413501739501953, 7200, 0, 0, 50400, 0, 0, NULL, NULL, NULL, 0, 50172), -- 40446 (Area: -1 - Difficulty: 1) CreateObject1 (Auras: 75427 - 75427)
 
 /*
-181290 - Midsummer Bonfire Spawn Trap
-181376 - Midsummer Bonfire Campfire Damage Trap
-187882 - Ice Stone
-187892 - Ice Chest
-188067 - Ice Block
-188072 - Ice Stone Mount
-188073 - Ahune Bonfire
-188077 - Ice Spear
-188142 - Ice Block, Big
-188187 - Snow Pile
-188192 - Ice Chest
-195000 - [DND] Ice Block, X-TRA Big
+181290 - Midsummer Bonfire Spawn Trap           -- static
+181376 - Midsummer Bonfire Campfire Damage Trap -- static
+187882 - Ice Stone                              -- static
+187892 - Ice Chest                              -- summon
+188067 - Ice Block                              -- static
+188072 - Ice Stone Mount                        -- static
+188073 - Ahune Bonfire                          -- static
+188077 - Ice Spear                              -- summon
+188142 - Ice Block, Big                         -- static
+188187 - Snow Pile                              -- summon
+188192 - Ice Chest                              -- summon
+195000 - [DND] Ice Block, X-TRA Big             -- static
 
-214503 - Unknown, instance portal display?
+214503 - Unknown, instance portal display?      -- static
 */
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+0;
