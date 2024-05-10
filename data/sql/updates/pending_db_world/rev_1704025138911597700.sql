@@ -44,5 +44,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY * 100 + 1, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set invincibility to 0 HP'),
 (@ENTRY * 100 + 1, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Set event phase to phase 1');
 
-
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 6784 AND `SourceId` = 0;
+
+DELETE
+FROM `quest_details`
+WHERE `ID` IN (590,8);
+INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES
+(8, 2, 1, 1, 0, 0, 0, 0, 0, 52237),
+(590, 6, 1, 14, 0, 0, 0, 0, 0, 52237);
