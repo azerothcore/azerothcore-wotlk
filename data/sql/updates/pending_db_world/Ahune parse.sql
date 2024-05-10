@@ -4,6 +4,33 @@
 # Detected locale: enUS
 # Targeted database: WrathOfTheLichKing
 
+/*
+16592 - Midsummer Bonfire
+25697 - Luma Skymother
+25710 - Numa Cloudsister
+25740 - Ahune
+25745 - [PH] Ahune Summon Loc Bunny
+25746 - [PH] Ahune Loot Loc Bunny
+25754 - Earthen Ring Flamecaller
+25755 - Ahunite Hailstone
+25756 - Ahunite Coldwave
+25865 - Frozen Core
+25952 - Slippery Floor Bunny
+25961 - Earthen Ring Totem
+25964 - Shaman Beam Bunny 000
+25965 - Shaman Beam Bunny 001
+25966 - Shaman Beam Bunny 002
+25971 - Shaman Bonfire Bunny 000
+25972 - Shaman Bonfire Bunny 001
+25973 - Shaman Bonfire Bunny 002
+25985 - Ahune Ice Spear Bunny
+26120 - Wisp Dest Bunny
+26121 - Wisp Source Bunny
+26190 - [PH] Spank Target Bunny
+26230 - Snow Bunny
+40446 - Skar'this the Summoner
+*/
+
 SET @CGUID := SET_VALUE_MANUALLY_HERE;
 SET @OGUID := SET_VALUE_MANUALLY_HERE;
 
@@ -312,6 +339,23 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (@CGUID+, 26190, 547, 0, 0, 3, 1, 0, 0, -95.335723876953125, -207.483352661132812, 16.28742027282714843, 4.904375076293945312, 7200, 0, 0, 4120, 0, 0, NULL, NULL, NULL, 0, 50172); -- 26190 (Area: -1 - Difficulty: 1) CreateObject1 - !!! might be temporary spawn !!!
 (@CGUID+, 26230, 547, 0, 0, 3, 1, 0, 0, -98.8607406616210937, -233.752609252929687, 8.372927665710449218, 2.757620096206665039, 7200, 0, 0, 42, 0, 0, NULL, NULL, NULL, 0, 50172), -- 26230 (Area: -1 - Difficulty: 1) CreateObject1 - !!! might be temporary spawn !!!
 (@CGUID+, 40446, 547, 0, 0, 3, 1, 0, 0, -76.9917221069335937, -157.080520629882812, -2.10638880729675292, 5.637413501739501953, 7200, 0, 0, 50400, 0, 0, NULL, NULL, NULL, 0, 50172), -- 40446 (Area: -1 - Difficulty: 1) CreateObject1 (Auras: 75427 - 75427)
+
+/*
+181290 - Midsummer Bonfire Spawn Trap
+181376 - Midsummer Bonfire Campfire Damage Trap
+187882 - Ice Stone
+187892 - Ice Chest
+188067 - Ice Block
+188072 - Ice Stone Mount
+188073 - Ahune Bonfire
+188077 - Ice Spear
+188142 - Ice Block, Big
+188187 - Snow Pile
+188192 - Ice Chest
+195000 - [DND] Ice Block, X-TRA Big
+
+214503 - Unknown, instance portal display?
+*/
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+0;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
