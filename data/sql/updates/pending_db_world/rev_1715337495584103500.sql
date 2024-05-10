@@ -1,4 +1,4 @@
- -- Shen'dralar Ancient smart ai
+-- Shen'dralar Ancient smart ai
 SET @ENTRY := 14358;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
@@ -23,7 +23,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 14358 AND `SourceId` = 0;
 
- -- Shen'dralar Spirit smart ai
+-- Shen'dralar Spirit smart ai
 SET @ENTRY := 14364;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
