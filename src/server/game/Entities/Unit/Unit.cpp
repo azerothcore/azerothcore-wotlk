@@ -838,18 +838,14 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             pet->AI()->OwnerAttackedBy(attacker);
     }
 
-    //Dont deal damage to unit if .cheat god is enable.
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
-        {
-            return 0;
-        }
-    }
-
     // Signal the pet it was attacked so the AI can respond if needed
     if (victim->GetTypeId() == TYPEID_UNIT && attacker != victim && victim->IsPet() && victim->IsAlive())
         victim->ToPet()->AI()->AttackedBy(attacker);
+
+    if (victim->GetTypeId() == TYPEID_PLAYER &&
+        (victim->ToPlayer()->m_cheatFlags & CHEAT_GODMODE) != 0) {
+      return damage;
+    }
 
     if (damagetype != NODAMAGE)
     {

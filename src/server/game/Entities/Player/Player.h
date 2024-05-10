@@ -91,6 +91,10 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
+enum PLAYERCHEAT {
+  CHEAT_GODMODE             = 0x1
+};
+
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
 {
@@ -1072,6 +1076,8 @@ class Player : public Unit, public GridObject<Player>
 public:
     explicit Player(User* user);
     ~Player() override;
+
+    uint m_cheatFlags;
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
@@ -2898,6 +2904,9 @@ public:
     bool m_needZoneUpdate;
 
 private:
+
+    //uint m_cheatFlags;
+
     // internal common parts for CanStore/StoreItem functions
     BAG_RESULT CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
     BAG_RESULT CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;

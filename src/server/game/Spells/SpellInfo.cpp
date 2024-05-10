@@ -1886,14 +1886,13 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
             return SPELL_FAILED_BAD_TARGETS;
     }
 
-    // check GM mode and GM invisibility - only for player casts (npc casts are controlled by AI) and negative spells
-    if (unitTarget != caster && (caster->IsControlledByPlayer() || !IsPositive()) && unitTarget->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (!unitTarget->ToPlayer()->IsVisible())
-            return SPELL_FAILED_BM_OR_INVISGOD;
+    if (unitTarget != caster && unitTarget->GetTypeId() == TYPEID_PLAYER) {
+        if (!unitTarget->ToPlayer()->IsVisible() ||
+            (unitTarget->ToPlayer()->m_cheatFlags & CHEAT_GODMODE) != 0) {
 
-        if (unitTarget->ToPlayer()->IsGameMaster())
+            // Spells cannot be cast on Beastmaster, God Mode or GM Invis targets
             return SPELL_FAILED_BM_OR_INVISGOD;
+        }
     }
 
     // not allow casting on flying player
