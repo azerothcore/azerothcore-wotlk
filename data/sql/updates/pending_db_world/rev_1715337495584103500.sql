@@ -23,7 +23,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 14358 AND `SourceId` = 0;
 
--- Shen'dralar Spirit smart ai
+ -- Shen'dralar Spirit smart ai
 SET @ENTRY := 14364;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
@@ -44,4 +44,3 @@ SET @OGUID2:=44739;
 DELETE FROM `gameobject` WHERE (`id` = 179544) AND (`guid` IN (@OGUID2));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (@OGUID2,179544, 429, 2557, 2557, 3, 1, 163.0381622314453125, 530.1822509765625, -48.4669570922851562, 5.026549339294433593, 0, 0, -0.5877847671508789, 0.809017360210418701, 7200, 255, 1, '', 52237); -- 179544 (Area: 2557 - Difficulty: 1) CreateObject1
-
