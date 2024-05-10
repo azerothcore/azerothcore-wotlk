@@ -295,7 +295,7 @@ struct boss_jedoga_shadowseeker : public BossAI
     {
         if (!ritualTriggered && me->HealthBelowPctDamaged(55, damage) && events.IsInPhase(PHASE_NORMAL))
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
             me->SetReactState(REACT_PASSIVE);
@@ -368,7 +368,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
                 me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
                 me->RemoveAurasDueToSpell(SPELL_HOVER_FALL);
-                SetCombatMovement(true);
+                me->SetCombatMovement(true);
 
                 me->SetDisableGravity(false);
                 me->SetHover(false);
@@ -641,7 +641,7 @@ struct npc_twilight_volunteer : public ScriptedAI
         }
         else if (id == POINT_RITUAL)
         {
-            if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER)))
+            if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
             {
                 jedoga->AI()->Talk(SAY_SACRIFICE_2);
                 jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM); /// @todo: Visual is not working. (cosmetic)
@@ -665,7 +665,7 @@ struct npc_twilight_volunteer : public ScriptedAI
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
 
-                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER)))
+                if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
                 {
                     if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_TIMED_DESPAWN, 15000))
                     {

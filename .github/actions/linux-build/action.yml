@@ -1,0 +1,175 @@
+name: linux build
+description: a helper action to shorten running a build on linux
+inputs:
+  CC:
+    default: clang
+    description: C Compiler to use
+    type: string
+    required: true
+  CXX:
+    default: clang++
+    description: C++ compiler to use
+    type: string
+    required: true
+  modules:
+    default: false
+    description: Flag to install modules or not
+    required: true
+    type: boolean
+  pch:
+    default: false
+    description: Flag to enable or disable PCH
+    required: false
+    type: boolean
+runs:
+  using: composite
+  steps:
+    - name: Cache
+      uses: actions/cache@v3
+      if: inputs.pch != 'true'
+      with:
+        path: ${{ github.workspace }}/var/ccache
+          # format
+          # ccache:OS:CC_CXX:MODULES:GITHUB_REF:GITHUB_SHA
+        key: ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
+        restore-keys: |
+          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}
+          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
+          ccache:ubuntu-latest:${{ inputs.CC }}_${{ inputs.CXX }}
+
+    # This script moves sql files from "data/sql/updates/pending_$DB" to the
+    # proper folder for the db
+    - name: Process pending sql
+      shell: bash
+      run: bash apps/ci/ci-pending-sql.sh
+
+    - name: Install build dependencies
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt-get -y install ccache clang cmake curl google-perftools \
+          libmysqlclient-dev make unzip build-essential cmake-data  \
+          libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
+          libreadline6-dev libssl-dev libtool openssl zlib1g-dev
+
+        # Account for https://github.com/actions/runner-images/issues/8659
+        # based off of https://github.com/actions/runner-images/issues/8659#issuecomment-1852353116
+        UBUNTU_VERSION="$(grep VERSION_ID /etc/os-release | cut -f2 -d\")"
+        source /etc/os-release
+        if [[ "$VERSION_CODENAME" == "jammy" ]]; then
+          if [[ "${{ inputs.cc }}" =~ "clang-" ]]; then
+            CLANG_VERSION="$(echo '${{ inputs.cc }}' | cut -f2 -d\-)"
+            wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+            sudo add-apt-repository "deb http://apt.llvm.org/$VERSION_CODENAME/ llvm-toolchain-$VERSION_CODENAME-$CLANG_VERSION main"
+            sudo apt-get -qq update
+            sudo apt-get -qq install '${{ inputs.cc }}'
+          fi
+        fi
+
+    - name: setup ccache
+      shell: bash
+      env:
+        CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
+      run: |
+        cat <<EOF >> $GITHUB_ENV
+        CCACHE_DIR=${{ env.CCACHE_DIR }}
+        CCACHE_MAXSIZE=1000MB
+        CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
+        CCACHE_CPP2=true
+        CCACHE_COMPRESS=1
+        CCACHE_COMPRESSLEVEL=9
+        CCACHE_COMPILERCHECK=content
+        CCACHE_LOGFILE=$CCACHE_DIR/cache.debug
+        CC=${{ inputs.CC }}
+        CXX=${{ inputs.CXX }}
+        EOF
+
+    - name: Configure
+      shell: bash
+      run: |
+        set -x
+        mkdir build
+        cd build
+        cmake "$GITHUB_WORKSPACE" \
+          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/env/dist" \
+          -DAPPS_BUILD="all" \
+          -DTOOLS_BUILD="all" \
+          -DSCRIPTS="static" \
+          -DMODULES="static" \
+          -DWITH_WARNINGS="ON" \
+          -DCMAKE_BUILD_TYPE="Release" \
+          -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
+          -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
+          -DBUILD_TESTING="ON" \
+          -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
+          -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
+          ${{ inputs.pch == 'true' && '' || '-DNOPCH=true' }}
+
+    - name: build
+      shell: bash
+      working-directory: "${{ github.workspace }}/build"
+      run: cmake --build . --config "Release" -j "$(($(nproc) + 2))"
+
+    - name: install
+      shell: bash
+      working-directory: "${{ github.workspace }}/build"
+      run: cmake --install . --config "Release"
+
+    - name: Setup config
+      shell: bash
+      run: |
+        ls -1 env/dist/etc/*.conf.dist | while read -r dist; do
+          # chop the ".dist" off the end
+          config_name="$(<<< $dist rev | cut -f1 -d\. --complement | rev)"
+          cp -v "$dist" "$config_name"
+        done
+
+        cat <<EOF >> $GITHUB_ENV
+        AC_LOGIN_DATABASE_INFO=localhost;3306;root;root;acore_auth
+        AC_CHARACTER_DATABASE_INFO=localhost;3306;root;root;acore_characters
+        AC_WORLD_DATABASE_INFO=localhost;3306;root;root;acore_world
+        AC_DATA_DIR=env/dist/data
+        EOF
+
+    - name: get dbc files
+      shell: bash
+      run: |
+        git clone --depth 1 --branch master --single-branch https://github.com/ac-data/ac-data.git "$AC_DATA_DIR"
+
+    - name: Start MySQL container
+      shell: bash
+      run: sudo systemctl start mysql.service
+
+    - name: run dbimport
+      shell: bash
+      run: env/dist/bin/dbimport
+
+    - name: Dry run authserver
+      shell: bash
+      run: timeout 5m env/dist/bin/authserver --dry-run
+
+    - name: Dry run worldserver
+      shell: bash
+      run: timeout 5m env/dist/bin/worldserver --dry-run
+
+    - name: Check startup errors
+      shell: bash
+      run: |
+        error_log="./env/dist/bin/Errors.log"
+        # -s checks if the file's size is greater than 0 bytes
+        # ! -s checks if the file's size is less than/equal to 0 bytes
+        # if the error log is empty, exit without error
+        [[ ! -s "$error_log" ]] && exit 0
+        printf "The Errors.log file contains startup errors:\n\n"
+        cat "$error_log"
+        printf "\nPlease solve the startup errors listed above!\n"
+        exit 1
+
+    - name: Run unit tests
+      shell: bash
+      run: |
+        if [[ -f build/obj/src/test/unit_tests ]]; then
+          build/obj/src/test/unit_tests
+        else
+          exit 0
+        fi

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS `quest_offer_reward` (
   `EmoteDelay2` int unsigned NOT NULL DEFAULT '0',
   `EmoteDelay3` int unsigned NOT NULL DEFAULT '0',
   `EmoteDelay4` int unsigned NOT NULL DEFAULT '0',
-  `RewardText` text COLLATE utf8mb4_unicode_ci,
+  `RewardText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_offer_reward: ~9,628 rows (approximately)
+-- Dumping data for table acore_world.quest_offer_reward: ~8 761 rows (approximately)
 DELETE FROM `quest_offer_reward`;
 INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `RewardText`, `VerifiedBuild`) VALUES
 	(2, 0, 0, 0, 0, 0, 0, 0, 0, 'Most impressive, $N... the claw of Sharptalon could not have been easy to get! The Ashenvale Hunt goes well for you!$B$BSharptalon had long terrorized the peons from the lumber camps near its path as they tried to travel here to Splintertree Post. No doubt once the word gets out that it was you who put down the beast, many rousing songs of your bravery will be heard at campfires and lumber mills across Ashenvale!', 12340),
@@ -928,7 +928,7 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(943, 4, 0, 0, 0, 0, 0, 0, 0, 'Most excellent, $N!$B$BNow to see if I can use the stone to decipher the powers of the fossils.', 12340),
 	(944, 0, 0, 0, 0, 0, 0, 0, 0, 'The Twilight\'s Hammer is at the Master\'s Glaive?$b$bUnfortunate.$b$bThe old lord impaled by the glaive is long dead, but that does not mean slivers of his power do not still remain.$b$bThe Twilight\'s Hammer must be seeking this power.', 12340),
 	(945, 0, 0, 0, 0, 0, 0, 0, 0, 'My sister was where?? Therylune doesn\'t mind getting herself dirty, but still! That\'s a long way to wander, and the Master\'s Glaive is an unwholesome place...$B$BWell thank you, $N. It was very nice of you to let me know she\'s all right.', 12340),
-	(947, 2, 0, 0, 0, 0, 0, 0, 0, 'Many thanks, $N. These mushrooms are fine specimens!$b$bAnd when you were at Cliffspring Falls, did you find anything to confirm the warnings of the Ancients?$b$bThe Ancients are wise, but I had hoped that, this time, they were wrong.', 12340),
+	(947, 5, 0, 0, 0, 0, 0, 0, 0, 'Many thanks, $N. These mushrooms are fine specimens!$b$bAnd when you were at Cliffspring Falls, did you find anything to confirm the warnings of the Ancients?$b$bThe Ancients are wise, but I had hoped that, this time, they were wrong.', 12340),
 	(948, 0, 0, 0, 0, 0, 0, 0, 0, '$N. You are here.$b$bGood.$b$bWe have matters...to discuss. You and I.', 12340),
 	(949, 0, 0, 0, 0, 0, 0, 0, 0, 'This book is hand printed in an ancient language, and illustrated by a master artist.', 12340),
 	(950, 0, 0, 0, 0, 0, 0, 0, 0, 'A chaotic, primal magic surrounds this parchment of scribbles. I sense the work of the old ones in it.$b$bLet us hope it reveals the purpose of the Twilight\'s Hammer in Darkshore...', 12340),
@@ -1552,7 +1552,7 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(2159, 1, 0, 0, 0, 0, 0, 0, 0, 'Ah yes, the delivery of herbs from Shadowglen.  It is a shame Porthannius could not bring it himself, for we have much to discuss, he and I.  But I am glad to get the herbs nonetheless, and I am glad you came.$B$BWhile you are here, please, rest yourself.  Heroes must keep their strength and spirits high, and must find rest and solace whenever they may.  For to neglect one\'s peace of body and mind is a sure path to failure.$B$BSo... rest.', 12340),
 	(2160, 1, 2, 0, 0, 0, 0, 0, 0, 'Ah, at last, the supplies from Hands! I was beginning to worry, we\'ve had scarce word from Anvilmar ever since the troggs overran the pass.$b$bThanks for bring this to me, $N. And please, make yourself comfortable. You must be tired after your journey.', 12340),
 	(2161, 6, 1, 0, 0, 0, 0, 0, 0, 'Ah, this is the food Ukor brought to the Valley of Trials. Did they not need it? Well, I guess they like to starve you heroes in training. Builds spirit, they say!$b$bThank you for returning the food. I\'ll stick it back on the shelves... but here, let me offer you some refreshment first!$b$bAnd don\'t forget to rest here in the inn. You may be a brave $c ready to take on the world, but if your energy is sapped you won\'t be doing yourself, or the Horde, much good.', 12340),
-	(2178, 5, 0, 0, 0, 0, 0, 0, 0, 'Fantastic! Try it and tell me what you think, $N!', 42083),
+	(2178, 4, 0, 0, 0, 0, 0, 0, 0, 'Fantastic! Try it and tell me what you think, $N!', 42083),
 	(2198, 25, 0, 0, 0, 0, 0, 0, 0, 'Yes... I am the jeweler who made this necklace. I also am not in the business of handing out information as though it were free. Information is never free, friend. If I am going to help you out, you need to help ME out first.', 12340),
 	(2199, 21, 0, 0, 0, 0, 0, 0, 0, 'You\'re all right in my book; I don\'t care what everyone else has been saying... I kid, I kid!  Seriously, thank you my friend.$B$BNow, the necklace you have is one of my finest creations, but it is missing three gems that help bind magic power to it.  I crafted it for a paladin some time ago.  He was on a self-appointed quest to clear out the "evil taint" present at an excavation site in the Badlands called Uldaman.$B$BWell... that paladin died in Uldaman, and that was just the beginning of my woes.', 12340),
 	(2200, 0, 0, 0, 0, 0, 0, 0, 0, 'Remains of a paladin: Reading the journal reveals that after much effort, the paladin had identified the location of all three missing gems:$b$bThe Shadowforge dwarves hid the ruby in their barricaded area as they battled the Troggs for control of Uldaman.$b$bThe troggs stashed the topaz in an urn located near some unusual inhabitants of Uldaman - Alliance dwarves!$b$bFinally, the trogg elder himself took the sapphire as his own.', 12340),
@@ -2761,7 +2761,7 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(6389, 11, 4, 0, 0, 0, 0, 0, 0, 'Haha! Thank you, $N! You\'ve done it! My father\'s spirit can now rest and I can live in peace.$B$BThank you again. If there is anything I can do for you, please, just ask.', 12340),
 	(6390, 2, 0, 0, 0, 0, 0, 0, 0, 'Thank you, $N. Here, take this coin. I\'m sorry it\'s not more, but try to take some joy in helping destroy the Scarlet Crusade\'s efforts!', 12340),
 	(6391, 1, 0, 0, 0, 0, 0, 0, 0, 'Ah, the lastest list of Brock\'s best pupils. I have a batch of honorary picks ready to go. I just need to chisel in the names of the students...', 40593),
-	(6392, 1, 2, 0, 0, 0, 0, 0, 0, 'You brought the cleavers.  Great!  I\'ll get these to my students.  I\'m sure they\'re eager to use them on some fresh boar meat.$B$BThank you for your help, $n.  I am in your debt, but I hope this money will at least cover your travel costs.', 40593),
+	(6392, 1, 2, 0, 0, 0, 0, 0, 0, 'You brought the picks. Great! I\'ll get these to my mining students. I\'m sure they\'re eager to use them on the ore deposits of Loch Modan.$B$BThank you for your help, $N. I am in your debt, but I hope this money will at least cover your travel costs.', 40593),
 	(6393, 0, 0, 0, 0, 0, 0, 0, 0, 'The water spirits within me bubble with the excitement. $N, you have given me a glorious victory to report to the Tribunal of the Tides.$b$b', 12340),
 	(6394, 1, 0, 0, 0, 0, 0, 0, 0, 'Great, you got it! Thanks a lot, $N. This is my favorite pick! Now if my peons ever finish chopping down these trees, maybe we can find a nice cave to mine!', 12340),
 	(6395, 0, 0, 0, 0, 0, 0, 0, 0, 'You have done a good deed today, $N. Although our struggle against the Scourge continues, let us hope that Marla and Samuel will find peace together in their final resting place.', 12340),
@@ -4121,7 +4121,7 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(9142, 1, 0, 0, 0, 0, 0, 0, 0, 'You earned this, scrub. Now, don\'t cry about your orders. Fill \'em or destroy \'em.', 12340),
 	(9143, 0, 0, 0, 0, 0, 0, 0, 0, 'I appreciate your efforts, $c! Thank you. Now, we can say that this expedition and all the lives lost on it haven\'t been in vain.', 12340),
 	(9144, 0, 0, 0, 0, 0, 0, 0, 0, 'Help me, stranger. I must... reach Tranquillien... I cannot fail.$B$B<The blood elf falls back into unconsciousness as his eyes go blank.>', 12340),
-	(9145, 0, 0, 0, 0, 0, 0, 0, 0, 'Good to hear that Lethvalin made it to safety. and that he was smart enough to ask you for help instead of just waiting there.$B$BI hope that Ranger Salissa made it safely to Farstrider Enclave.', 12340),
+	(9145, 0, 0, 0, 0, 0, 0, 0, 0, 'Good to hear that Lethvalin made it to safety, and that he was smart enough to ask you for help instead of just waiting there.$B$BI hope that Ranger Salissa made it safely to Farstrider Enclave.', 12340),
 	(9146, 0, 0, 0, 0, 0, 0, 0, 0, 'That\'s dire news indeed -- I completely overestimated Tomathren\'s ability to lead. I\'ll see to it that a group is dispatched to safely bring him and Valanna back in.$B$BUnfortunately, we never heard from Ranger Salissa, so I fear the worst in her case.$B$BYou\'ve done the Farstriders a great service this day, $c. Please take one of these as a small token of our appreciation.', 12340),
 	(9147, 0, 0, 0, 0, 0, 0, 0, 0, 'Just in time, $N! I was about ready to start digging a hole for our friend here.$B$BMy potion seems to be working; he\'s coming to.$B$BHey, I think he\'s trying to get your attention. Why don\'t you talk to him?', 12340),
 	(9148, 0, 0, 0, 0, 0, 0, 0, 0, 'Finally!  We\'ve waited for a response from the regent lord for weeks! Let me see here...$B$B<Vandril begins to read the letter.>$B$BWhat\'s this? A dark presence? He senses a dark presence in the Ghostlands?! No kidding; I could have told him that!$B$BThis is what we\'ve been waiting for?', 12340),
@@ -4150,7 +4150,7 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(9172, 0, 0, 0, 0, 0, 0, 0, 0, 'This book... it can\'t be!  It\'s Dar\'Khan\'s very own handwriting.  There must be information here that will reveal a weakness in our opponent.$B$BYou\'ve done well in coming to us, $N.  The Farstriders have shown great wisdom in leaving this matter in our hands.  This armor should help you further our cause. ', 12340),
 	(9173, 0, 0, 0, 0, 0, 0, 0, 0, 'I\'m certain that Lady Sylvanas will be pleased to hear that we\'ve made progress in the matter.$B$BHere, take this coin as payment for your efforts.', 12340),
 	(9174, 0, 0, 0, 0, 0, 0, 0, 0, 'You\'ve avenged our deaths and broken Aquantion\'s grasp on our souls. We may finally rest.', 12340),
-	(9175, 0, 0, 0, 0, 0, 0, 0, 0, 'You say that you found it on one of the Scourge at Windrunner Spire and that there\'s an inscription on it? Let me see!Here, take this coin for a job well done. ', 12340),
+	(9175, 0, 0, 0, 0, 0, 0, 0, 0, 'You say that you found it on one of the Scourge at Windrunner Spire and that there\'s an inscription on it? Let me see!$B$BHere, take this coin for a job well done.', 12340),
 	(9176, 0, 0, 0, 0, 0, 0, 0, 0, 'The rumors were true!  The stone of light and the stone of flame do exist!  We shall use their power to create weapons against Dar\'Khan.$B$BUse them when the time is right and the energies of the Sunwell, trapped within these objects, will vanquish him with the very power he sought to steal from us!', 12340),
 	(9177, 0, 0, 0, 0, 0, 0, 0, 0, '<Sylvanas takes the necklace from your grasp.>$B$BIt can\'t be! After all this time, I thought it was lost forever.$B$B<After a lingering moment the Lady seems to become aware once again of her surroundings, composing herself.>$B$BYou thought this would amuse me? Do you think I long for a time before I was the queen of the Forsaken? Like you, it means nothing to me, and Alleria Windrunner is a long dead memory!$B$B<She drops the amulet to the ground.>$B$BYou may now remove yourself from my presence, $c.', 12340),
 	(9178, 0, 0, 0, 0, 0, 0, 0, 0, 'Yep, these will come in handy for the infantry\'s bashin\' weapons.', 12340),

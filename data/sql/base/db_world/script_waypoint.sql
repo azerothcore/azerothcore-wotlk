@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -23,11 +23,11 @@ CREATE TABLE IF NOT EXISTS `script_waypoint` (
   `location_y` float NOT NULL DEFAULT '0',
   `location_z` float NOT NULL DEFAULT '0',
   `waittime` int unsigned NOT NULL DEFAULT '0' COMMENT 'waittime in millisecs',
-  `point_comment` text COLLATE utf8mb4_unicode_ci,
+  `point_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`entry`,`pointid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Script Creature waypoints';
 
--- Dumping data for table acore_world.script_waypoint: ~2,302 rows (approximately)
+-- Dumping data for table acore_world.script_waypoint: ~2 305 rows (approximately)
 DELETE FROM `script_waypoint`;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
 	(349, 1, -8763.9, -2185.21, 141.217, 0, ''),
@@ -1061,7 +1061,10 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 	(17077, 47, 528.908, 3887.35, 189.762, 0, ''),
 	(17077, 48, 527.722, 3890.69, 189.24, 0, ''),
 	(17077, 49, 524.637, 3891.77, 189.149, 0, ''),
-	(17077, 50, 519.146, 3886.7, 190.128, 60000, 'SAY_WOLF_WELCOME'),
+	(17077, 50, 519.146, 3886.7, 190.128, 8000, 'RYGA_MOVEMENT_TO_WOLF'),
+	(17077, 51, 519.146, 3886.7, 190.128, 13000, 'RYGA_TIME_MOVEMENT_TO_WOLF'),
+	(17077, 52, 519.146, 3886.7, 190.128, 5000, 'RYGA_TIME_RETURN_SPAWN'),
+	(17077, 53, 519.146, 3886.7, 190.128, 50000, 'DESPAWN_WOLF'),
 	(17312, 0, -4784.53, -11051.1, 3.48426, 0, ''),
 	(17312, 1, -4805.51, -11037.3, 3.04394, 0, ''),
 	(17312, 2, -4827.83, -11034.4, 1.74196, 0, ''),

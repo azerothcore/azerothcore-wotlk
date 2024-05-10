@@ -94,8 +94,6 @@ public:
         try
         {
             std::shared_ptr<SocketType> newSocket = std::make_shared<SocketType>(std::move(sock));
-            newSocket->Start();
-
             _threads[threadIndex].AddSocket(newSocket);
         }
         catch (boost::system::system_error const& err)
@@ -104,9 +102,9 @@ public:
         }
     }
 
-    int32 GetNetworkThreadCount() const { return _threadCount; }
+    [[nodiscard]] int32 GetNetworkThreadCount() const { return _threadCount; }
 
-    uint32 SelectThreadWithMinConnections() const
+    [[nodiscard]] uint32 SelectThreadWithMinConnections() const
     {
         uint32 min = 0;
 

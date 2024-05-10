@@ -46,17 +46,17 @@ public:
                 case GO_DOOR_LEVER_2:
                 case GO_DOOR_LEVER_3:
                 case GO_CANNON:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
                 case GO_FACTORY_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     // GoState (Door opened) is restored during GO creation, but we need to set LootState to prevent Lever from closing it again
                     if (_encounters[TYPE_RHAHK_ZOR] == DONE)
                         gameobject->SetLootState(GO_ACTIVATED);
                     break;
                 case GO_IRON_CLAD_DOOR:
-                    gameobject->UpdateSaveToDb(true);
-                    if (gameobject->GetStateSavedOnInstance() == GO_STATE_ACTIVE)
+                    gameobject->AllowSaveToDB(true);
+                    if (GetStoredGameObjectState(gameobject->GetSpawnId()) == GO_STATE_ACTIVE)
                     {
                         gameobject->DespawnOrUnsummon();
                     }

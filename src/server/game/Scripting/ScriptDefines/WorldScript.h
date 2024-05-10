@@ -19,11 +19,30 @@
 #define SCRIPT_OBJECT_WORLD_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum WorldHook
+{
+    WORLDHOOK_ON_OPEN_STATE_CHANGE,
+    WORLDHOOK_ON_AFTER_CONFIG_LOAD,
+    WORLDHOOK_ON_LOAD_CUSTOM_DATABASE_TABLE,
+    WORLDHOOK_ON_BEFORE_CONFIG_LOAD,
+    WORLDHOOK_ON_MOTD_CHANGE,
+    WORLDHOOK_ON_SHUTDOWN_INITIATE,
+    WORLDHOOK_ON_SHUTDOWN_CANCEL,
+    WORLDHOOK_ON_UPDATE,
+    WORLDHOOK_ON_STARTUP,
+    WORLDHOOK_ON_SHUTDOWN,
+    WORLDHOOK_ON_AFTER_UNLOAD_ALL_MAPS,
+    WORLDHOOK_ON_BEFORE_FINALIZE_PLAYER_WORLD_SESSION,
+    WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED,
+    WORLDHOOK_END
+};
 
 class WorldScript : public ScriptObject
 {
 protected:
-    WorldScript(const char* name);
+    WorldScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when the open/closed state of the world changes.

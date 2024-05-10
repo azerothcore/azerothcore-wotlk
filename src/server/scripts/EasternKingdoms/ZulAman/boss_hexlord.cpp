@@ -447,9 +447,9 @@ public:
                     PlayerAbility_Timer = urand(8000, 10000);
                     PlayerClass = target->getClass() - 1;
 
-                    if (PlayerClass == CLASS_DRUID - 1)
+                    if (target->IsClass(CLASS_DRUID))
                         PlayerClass = CLASS_DRUID;
-                    else if (PlayerClass == CLASS_PRIEST - 1 && target->HasSpell(15473))
+                    else if (target->IsClass(CLASS_PRIEST) && target->HasSpell(15473))
                         PlayerClass = CLASS_PRIEST; // shadow priest
 
                     SiphonSoul_Timer = 99999;   // buff lasts 30 sec

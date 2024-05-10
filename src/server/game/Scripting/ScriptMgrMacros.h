@@ -69,4 +69,20 @@ inline bool ReturnValidBool(Optional<bool> ret, bool need = false)
     return ret && *ret ? need : !need;
 }
 
+#define CALL_ENABLED_HOOKS(scriptType, hookType, action) \
+    if (!ScriptRegistry<scriptType>::EnabledHooks[hookType].empty()) \
+        for (auto const& script : ScriptRegistry<scriptType>::EnabledHooks[hookType]) { action; }
+
+#define CALL_ENABLED_BOOLEAN_HOOKS(scriptType, hookType, action) \
+    if (ScriptRegistry<scriptType>::EnabledHooks[hookType].empty()) \
+        return true; \
+    for (auto const& script : ScriptRegistry<scriptType>::EnabledHooks[hookType]) { if (action) return false; } \
+    return true;
+
+#define CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(scriptType, hookType, action) \
+    if (ScriptRegistry<scriptType>::EnabledHooks[hookType].empty()) \
+        return false; \
+    for (auto const& script : ScriptRegistry<scriptType>::EnabledHooks[hookType]) { if (action) return true; } \
+    return false;
+
 #endif // _SCRIPT_MGR_MACRO_H_

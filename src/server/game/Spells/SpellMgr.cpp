@@ -2323,19 +2323,8 @@ void SpellMgr::LoadPetLevelupSpellMap()
             if (!creatureFamily->skillLine[j])
                 continue;
 
-            for (uint32 k = 0; k < sSkillLineAbilityStore.GetNumRows(); ++k)
+            for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(creatureFamily->skillLine[j]))
             {
-                SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(k);
-                if (!skillLine)
-                    continue;
-
-                //if (skillLine->skillId != creatureFamily->skillLine[0] &&
-                //    (!creatureFamily->skillLine[1] || skillLine->skillId != creatureFamily->skillLine[1]))
-                //    continue;
-
-                if (skillLine->SkillLine != creatureFamily->skillLine[j])
-                    continue;
-
                 if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
                     continue;
 
@@ -3249,7 +3238,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 57467: // Meteor
             case 26789: // Shard of the Fallen Star
             case 31436: // Malevolent Cleave
-            case 35181: // Dive Bomb
             case 40810: // Saber Lash
             case 43267: // Saber Lash
             case 43268: // Saber Lash
