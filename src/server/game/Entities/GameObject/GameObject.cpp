@@ -406,7 +406,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         }
     }
 
-    LastUsedScriptID = GetGOInfo()->ScriptId;
+    LastUsedScriptID = GetScriptId();
     AIM_Initialize();
 
     if (uint32 linkedEntry = GetGOInfo()->GetLinkedGameObjectEntry())
@@ -1140,6 +1140,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     GOState go_state = data->go_state;
     uint32 artKit = data->artKit;
 
+    m_goData = data;
     m_spawnId = spawnId;
 
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
@@ -1174,8 +1175,6 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         m_respawnDelayTime = -data->spawntimesecs;
         m_respawnTime = 0;
     }
-
-    m_goData = data;
 
     if (addToMap && !GetMap()->AddToMap(this))
         return false;
