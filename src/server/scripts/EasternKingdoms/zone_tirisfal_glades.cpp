@@ -19,11 +19,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 
-
-
-
-
 void AddSC_tirisfal_glades()
 {
-
 }
