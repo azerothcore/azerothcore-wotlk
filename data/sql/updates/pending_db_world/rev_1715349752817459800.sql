@@ -15,8 +15,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY * 100, 9, 7, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 54186, 16135, 0, 0, 0, 0, 0, 'Creature Rayne (16135) with guid 54186 (fetching): Talk 0 to invoker'),
 (@ENTRY * 100, 9, 8, 0, 0, 0, 100, 0, 58600, 58600, 0, 0, 41, 0, 0, 0, 0, 0, 0, 20, 181103, 10, 0, 0, 0, 0, 0, 'Closest gameobject Flower (181103) in 10 yards: Despawn instantly');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 16134 AND `SourceId` = 0;
-
 -- DEL Flower
 DELETE FROM `gameobject` WHERE `id` = 181103 AND `guid` = 45964;
 
