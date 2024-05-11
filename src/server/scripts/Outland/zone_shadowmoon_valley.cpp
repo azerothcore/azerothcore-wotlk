@@ -439,9 +439,6 @@ enum EnshlavedNetherwingDrake
     NPC_DRAGONMAW_WRANGLER          = 21717,
     NPC_ESCAPE_DUMMY                = 22317,
 
-    EVENT_TAKE_OFF                  = 1,
-    EVENT_CREDIT_PLAYER             = 2,
-
     // Point
     POINT_DESPAWN                   = 1
 };
@@ -457,6 +454,7 @@ public:
 
     void Reset() override
     {
+        scheduler.CancelAll();
         if (!_tapped)
         {
             me->RestoreFaction();
@@ -471,7 +469,6 @@ public:
     {
         _tapped = false;
         me->RestoreFaction();
-        events.CancelEvent(EVENT_TAKE_OFF);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -534,10 +531,10 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
-
-        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
