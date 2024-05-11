@@ -451,18 +451,13 @@ struct npc_enslaved_netherwing_drake : public ScriptedAI
 public:
     npc_enslaved_netherwing_drake(Creature* creature) : ScriptedAI(creature)
     {
-        Tapped = false;
+        _tapped = false;
         Reset();
     }
 
-    ObjectGuid PlayerGUID;
-    bool Tapped;
-
-    Player* GetPlayer() { return ObjectAccessor::GetPlayer(*me, PlayerGUID); }
-
     void Reset() override
     {
-        if (!Tapped)
+        if (!_tapped)
         {
             me->RestoreFaction();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -474,7 +469,7 @@ public:
 
     void JustDied(Unit* /*killer*/) override
     {
-        Tapped = false;
+        _tapped = false;
         me->RestoreFaction();
         events.CancelEvent(EVENT_TAKE_OFF);
     }
@@ -485,20 +480,45 @@ public:
         if (!playerCaster)
             return;
 
-        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !Tapped &&
+        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !_tapped &&
             playerCaster->GetQuestStatus(QUEST_THE_FORCE_OF_NELTHARAKU) == QUEST_STATUS_INCOMPLETE)
         {
-            Tapped = true;
-            PlayerGUID = caster->GetGUID();
+            _tapped = true;
+            _playerGUID = caster->GetGUID();
 
-            me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
+            scheduler.Schedule(2s, [this](TaskContext)
+            {
+                me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
 
-            if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
-                AttackStart(Dragonmaw);
-            else if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
-                AttackStart(Dragonmaw);
+                if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
+                    AttackStart(dragonmaw);
+                else if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
+                    AttackStart(dragonmaw);
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    _tapped = false;
+                    Position pos;
+                    if (Unit* escapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30.0f))
+                        pos = escapeDummy->GetPosition();
+                    else
+                    {
+                        pos = me->GetRandomNearPosition(20.0f);
+                        pos.m_positionZ += 25.0f;
+                    }
 
-            events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
+                    me->SetReactState(REACT_PASSIVE);
+                    scheduler.Schedule(100ms, [this](TaskContext)
+                    {
+                        if (Player* player = _GetPlayer())
+                        {
+                            DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
+                        }
+                        me->DespawnOrUnsummon(3s, 0s);
+                    });
+                });
+            });
         }
     }
 
@@ -514,40 +534,21 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
-
         if (!UpdateVictim())
-        {
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_TAKE_OFF:
-                {
-                    Tapped = false;
-                    Position pos;
-                    if (Unit* EscapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30))
-                        pos = EscapeDummy->GetPosition();
-                    else
-                    {
-                        pos = me->GetRandomNearPosition(20);
-                        pos.m_positionZ += 25;
-                    }
-
-                    me->SetDisableGravity(true);
-                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
-                    me->SetReactState(REACT_PASSIVE);
-                    events.ScheduleEvent(EVENT_CREDIT_PLAYER, 100ms);
-                    break;
-                }
-                case EVENT_CREDIT_PLAYER:
-                    DoCast(GetPlayer(), SPELL_FORCE_OF_NELTHARAKU, true);
-                    me->DespawnOrUnsummon(3s, 0s);
-                    break;
-            }
             return;
-        }
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
         DoMeleeAttackIfReady();
     }
+private:
+    bool _tapped;
+    ObjectGuid _playerGUID;
+
+    Player* _GetPlayer() { return ObjectAccessor::GetPlayer(*me, _playerGUID); }
 };
 
 /*#####
