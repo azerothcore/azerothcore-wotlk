@@ -34,13 +34,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 14364 AND `SourceId` = 0;
 
 -- Treasure of the Shen'dralar
+ -- 179517 (Area: 2557 - Difficulty: 1) CreateObject1
 SET @OGUID1:=11921;
 DELETE FROM `gameobject` WHERE (`id` = 179517) AND (`guid` IN (@OGUID1));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
-(@OGUID1, 179517, 429, 2557, 2557, 3, 1, 129.4810638427734375, 544.96710205078125, -48.4663200378417968, 1.623155713081359863, 0, 0, 0.725374221801757812, 0.688354730606079101, 7200, 255, 1, '', 52237); -- 179517 (Area: 2557 - Difficulty: 1) CreateObject1
+(@OGUID1, 179517, 429, 2557, 2557, 3, 1, 129.4810638427734375, 544.96710205078125, -48.4663200378417968, 1.623155713081359863, 0, 0, 0.725374221801757812, 0.688354730606079101, 7200, 255, 1, '', 52237);
 
 -- Skeletal Remains of Kariel Winthalus
+-- 179544 (Area: 2557 - Difficulty: 1) CreateObject1
 SET @OGUID2:=44739;
 DELETE FROM `gameobject` WHERE (`id` = 179544) AND (`guid` IN (@OGUID2));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
-(@OGUID2,179544, 429, 2557, 2557, 3, 1, 163.0381622314453125, 530.1822509765625, -48.4669570922851562, 5.026549339294433593, 0, 0, -0.5877847671508789, 0.809017360210418701, 7200, 255, 1, '', 52237); -- 179544 (Area: 2557 - Difficulty: 1) CreateObject1
+(@OGUID2,179544, 429, 2557, 2557, 3, 1, 163.0381622314453125, 530.1822509765625, -48.4669570922851562, 5.026549339294433593, 0, 0, -0.5877847671508789, 0.809017360210418701, 7200, 255, 1, '', 52237);
