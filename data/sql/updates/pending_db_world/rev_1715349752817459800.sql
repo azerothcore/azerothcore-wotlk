@@ -18,7 +18,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 16134 AND `SourceId` = 0;
 
 -- DEL Flower
-DELETE FROM `gameobject` WHERE `id` = 181103;
+DELETE FROM `gameobject` WHERE `id` = 181103 AND `guid` = 45964;
 
 -- DEL Small Dirt Mound
 DELETE FROM `gameobject` WHERE `id` = 181104;
