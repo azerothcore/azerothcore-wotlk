@@ -1,3 +1,4 @@
+-- DB update 2024_05_09_00 -> 2024_05_11_00
 --
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` IN (180690, 180691);
 
