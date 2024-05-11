@@ -21,4 +21,4 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` 
 DELETE FROM `gameobject` WHERE `id` = 181103 AND `guid` = 45964;
 
 -- DEL Small Dirt Mound
-DELETE FROM `gameobject` WHERE `id` = 181104;
+DELETE FROM `gameobject` WHERE `id` = 181104 AND `guid` = 45965;
