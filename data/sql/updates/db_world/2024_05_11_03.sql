@@ -1,3 +1,4 @@
+-- DB update 2024_05_11_02 -> 2024_05_11_03
 --
 -- 28622: Web Wrap stunned dot
 DELETE FROM `spell_script_names` WHERE `spell_id` = 28622;
