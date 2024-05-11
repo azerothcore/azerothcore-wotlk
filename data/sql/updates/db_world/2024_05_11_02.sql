@@ -1,3 +1,4 @@
+-- DB update 2024_05_11_01 -> 2024_05_11_02
 -- Onslaught Raven Priest with guid 102088 smart ai
 SET @ENTRY := -102088;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 27202;
