@@ -51,10 +51,10 @@ struct go_firework_show : public GameObjectAI
         _showRunning = false;
         _show = nullptr;
 
-        initShow();
+        InitShow();
     }
 
-    void initShow()
+    void InitShow()
     {
         _show = nullptr;
 
@@ -62,7 +62,7 @@ struct go_firework_show : public GameObjectAI
         if (itr != FireworkShowStore.end() && itr->second)
             _show = itr->second;
 
-        stopShow();
+        StopShow();
 
         _scheduler.Schedule(Milliseconds(4200), [this](TaskContext context)
             {
@@ -76,7 +76,7 @@ struct go_firework_show : public GameObjectAI
                     // and starts at the full hour
                     if ((local_tm.tm_min >= 0) && (local_tm.tm_min < 12))
                     {
-                        startShow(local_tm.tm_min);
+                        StartShow(local_tm.tm_min);
                     }
                 }
 
@@ -86,7 +86,7 @@ struct go_firework_show : public GameObjectAI
 
     // provide start offset to handle a "late start"
     // e.g. if the gameobject is spawned later then the desired start time
-    void startShow(int minutesOffset)
+    void StartShow(int minutesOffset)
     {
         if (!_show || !_show->schedule.entries || !_show->schedule.size || !_show->spawns.entries || !_show->spawns.size)
             return;
@@ -108,17 +108,17 @@ struct go_firework_show : public GameObjectAI
             {
                 int32 dt = 0;
                 do {
-                    dt = spawnNextFirework();
+                    dt = SpawnNextFirework();
                 } while (dt == 0);
 
                 if (0 < dt)
                     context.Repeat(Milliseconds(dt));
                 else
-                    stopShow();
+                    StopShow();
             });
     }
 
-    void stopShow()
+    void StopShow()
     {
         if (_showRunning)
         {
@@ -150,7 +150,7 @@ struct go_firework_show : public GameObjectAI
         me->setActive(false);
     }
 
-    int32 spawnNextFirework()
+    int32 SpawnNextFirework()
     {
         if (!_showRunning)
             return -1;
