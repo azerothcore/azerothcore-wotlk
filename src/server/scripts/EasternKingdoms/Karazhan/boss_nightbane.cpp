@@ -160,7 +160,7 @@ struct boss_nightbane : public BossAI
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
             DoResetThreatList();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
             {
                 _skeletonSpawnPos = target->GetPosition();
                 me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_RAIN_OF_BONES, true);
