@@ -162,8 +162,8 @@ struct boss_nightbane : public BossAI
             DoResetThreatList();
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
             {
-                me->CastSpell(target, SPELL_RAIN_OF_BONES);
                 _skeletonSpawnPos = target->GetPosition();
+                me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_RAIN_OF_BONES, true);
                 _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
                 {
                     //spawns skeletons every 2 seconds until skeletonCount is reached
