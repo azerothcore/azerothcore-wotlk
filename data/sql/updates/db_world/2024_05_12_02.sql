@@ -1,3 +1,4 @@
+-- DB update 2024_05_12_01 -> 2024_05_12_02
 -- Fireworks Spectacular
 DELETE FROM `game_event` WHERE `eventEntry` = 72;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
