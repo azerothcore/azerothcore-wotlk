@@ -19,9 +19,6 @@
 #include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
-#include "SpellScriptLoader.h"
-#include "SpellAuraEffects.h"
 #include "TaskScheduler.h"
 #include "karazhan.h"
 
@@ -79,12 +76,14 @@ struct boss_nightbane : public BossAI
     boss_nightbane(Creature* creature) : BossAI(creature, DATA_NIGHTBANE)
     {
         _intro = true;
+        _skeletonCount = 5;
         _movePhase = 0;
     }
 
     void Reset() override
     {
         BossAI::Reset();
+        _skeletonscheduler.CancelAll();
 
         me->SetSpeed(MOVE_RUN, 2.0f);
         me->SetDisableGravity(_intro);
@@ -156,10 +155,22 @@ struct boss_nightbane : public BossAI
 
     void ScheduleFly()
     {
+        _skeletonSpawnCounter = 0;
+
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
             DoResetThreatList();
             DoCastVictim(SPELL_RAIN_OF_BONES);
+            _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
+            {
+                //spawns skeletons every second until skeletonCount is reached
+                if(_skeletonSpawnCounter < _skeletonCount)
+                {
+                    DoCastVictim(SPELL_SUMMON_SKELETON, true);
+                    _skeletonSpawnCounter++;
+                    context.Repeat(2s);
+                }
+            });
         }).Schedule(20s, GROUP_FLYING, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_DISTRACTING_ASH);
@@ -333,6 +344,7 @@ struct boss_nightbane : public BossAI
             return;
 
         scheduler.Update(diff);
+        _skeletonscheduler.Update(diff);
 
         //  Phase 1 "GROUND FIGHT"
         if (Phase == 1)
@@ -350,11 +362,15 @@ struct boss_nightbane : public BossAI
 private:
     uint32 Phase;
 
+    TaskScheduler _skeletonscheduler;
+
     bool _intro;
     bool _flying;
     bool _movement;
 
     uint32 _movePhase;
+    uint8 _skeletonCount;
+    uint8 _skeletonSpawnCounter;
 };
 
 class go_blackened_urn : public GameObjectScript
@@ -380,31 +396,8 @@ public:
     }
 };
 
-// 37098 - Rain of Bones
-class spell_nightbane_rain_of_bones : public AuraScript
-{
-    PrepareAuraScript(spell_nightbane_rain_of_bones);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_SUMMON_SKELETON });
-    }
-
-    void OnTrigger(AuraEffect const* aurEff)
-    {
-        if (aurEff->GetTickNumber() % 5 == 0)
-            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SKELETON, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_nightbane_rain_of_bones::OnTrigger, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-    }
-};
-
 void AddSC_boss_nightbane()
 {
     RegisterKarazhanCreatureAI(boss_nightbane);
-    RegisterSpellScript(spell_nightbane_rain_of_bones);
     new go_blackened_urn();
 }
