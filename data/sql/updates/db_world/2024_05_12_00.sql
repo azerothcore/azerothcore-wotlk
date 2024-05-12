@@ -1,3 +1,4 @@
+-- DB update 2024_05_11_04 -> 2024_05_12_00
 
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 27354;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES

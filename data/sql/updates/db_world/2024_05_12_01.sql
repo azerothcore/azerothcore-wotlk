@@ -1,3 +1,4 @@
+-- DB update 2024_05_12_00 -> 2024_05_12_01
 -- Shen'dralar Ancient smart ai
 SET @ENTRY := 14358;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
