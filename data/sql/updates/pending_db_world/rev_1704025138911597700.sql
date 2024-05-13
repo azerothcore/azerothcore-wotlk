@@ -1,4 +1,4 @@
- -- Calvin Montague smart ai
+-- Calvin Montague smart ai
 SET @ENTRY := 6784;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
