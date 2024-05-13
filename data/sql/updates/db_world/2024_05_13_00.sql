@@ -1,3 +1,4 @@
+-- DB update 2024_05_12_03 -> 2024_05_13_00
 -- Rimblat Earthshatter smart ai
 SET @ENTRY := 16134;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
