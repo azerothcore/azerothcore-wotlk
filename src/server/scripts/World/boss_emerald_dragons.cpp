@@ -316,7 +316,7 @@ public:
         // Summon druid spirits on 75%, 50% and 25% health
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
+            if (_stage <= 3 && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
@@ -421,7 +421,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
+            if (_stage <= 3 && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_LETHON_DRAW_SPIRIT);
                 DoCast(me, SPELL_DRAW_SPIRIT);
@@ -547,7 +547,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
+            if (_stage <= 3 && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_EMERISS_CAST_CORRUPTION);
                 DoCast(me, SPELL_CORRUPTION_OF_EARTH, true);
@@ -645,7 +645,7 @@ public:
         {
             // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
             // Note: _stage holds the amount of times they have been summoned
-            if (!_banished && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
+            if (_stage <= 3 && !_banished && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 _banished = true;
                 _banishedTimer = 60000;
