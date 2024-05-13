@@ -1,5 +1,10 @@
-DELETE FROM `gossip_menu` WHERE `MenuID`=7175 AND `TextID`=8455;
-INSERT INTO `gossip_menu` VALUES (7175, 8455);
+DELETE FROM `gossip_menu` WHERE `MenuID` = 7175;
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7175, 8454),
+(7175, 8455);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` IN (7175));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+(14, 7175, 8455, 0, 0, 5, 0, 529, 240, 0, 0, 'Player for which gossip text is shown has at least reputation Friendly, Honored, Revered, Exalted to faction 529');
 
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 7175;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
