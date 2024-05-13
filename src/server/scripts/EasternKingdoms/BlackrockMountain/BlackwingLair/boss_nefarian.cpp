@@ -15,17 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObject.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "TaskScheduler.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
-#include "TaskScheduler.h"
 
 enum Events
 {
@@ -327,7 +329,6 @@ public:
                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
                     {
                         nefarian->setActive(true);
-                        nefarian->SetFarVisible(true);
                         nefarian->SetCanFly(true);
                         nefarian->SetDisableGravity(true);
                         nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
@@ -358,7 +359,7 @@ public:
             Talk(SAY_GAMESBEGIN_2);
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->SetImmuneToPC(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500ms);
@@ -1028,7 +1029,7 @@ class spell_class_call_handler : public SpellScript
             targets.remove_if([spellInfo](WorldObject const* target) -> bool
             {
                 Player const* player = target->ToPlayer();
-                if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
+                if (!player || player->IsClass(CLASS_DEATH_KNIGHT)) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
                 {
                     return true;
                 }
@@ -1306,3 +1307,4 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);
 }
+

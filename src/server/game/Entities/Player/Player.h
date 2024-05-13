@@ -37,8 +37,8 @@
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellAuras.h"
-#include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -721,7 +721,7 @@ enum BankBagSlots                                           // 7 slots
 
 enum BuyBackSlots                                           // 12 slots
 {
-    // stored in m_buybackitems
+    // stored in m_items, there is no more m_buybackitems
     BUYBACK_SLOT_START          = 74,
     BUYBACK_SLOT_END            = 86
 };
@@ -770,6 +770,14 @@ struct ItemPosCount
     uint32 count;
 };
 typedef std::vector<ItemPosCount> ItemPosCountVec;
+
+struct SavedItem
+{
+    Item* item;
+    uint16 dstpos;
+
+    SavedItem(Item* _item, uint16 dstpos) : item(_item), dstpos(dstpos) {}
+};
 
 enum TransferAbortReason
 {
@@ -1104,6 +1112,8 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
+    [[nodiscard]] bool IsClass(Classes playerClass, ClassContext context = CLASS_CONTEXT_NONE) const override;
+
     void SetInWater(bool apply);
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
@@ -1161,6 +1171,8 @@ public:
     void GiveLevel(uint8 level);
 
     void InitStatsForLevel(bool reapplyMods = false);
+
+    [[nodiscard]] bool HasActivePowerType(Powers power) override;
 
     // .cheat command related
     [[nodiscard]] bool GetCommandStatus(uint32 command) const { return _activeCheats & command; }
@@ -1686,6 +1698,7 @@ public:
     void SetFreeTalentPoints(uint32 points);
     bool resetTalents(bool noResetCost = false);
     [[nodiscard]] uint32 resetTalentsCost() const;
+    bool IsMaxLevel() const;
     void InitTalentForLevel();
     void BuildPlayerTalentsInfoData(WorldPacket* data);
     void BuildPetTalentsInfoData(WorldPacket* data);
@@ -1961,7 +1974,7 @@ public:
     [[nodiscard]] WorldSession* GetSession() const { return m_session; }
     void SetSession(WorldSession* sess) { m_session = sess; }
 
-    void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
+    void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) override;
     void DestroyForPlayer(Player* target, bool onDeath = false) const override;
     void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool recruitAFriend = false, float group_rate = 1.0f);
 
@@ -1986,10 +1999,10 @@ public:
 
     void ProcessTerrainStatusUpdate() override;
 
-    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self); } // pussywizard!
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
-    void SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const; // pussywizard!
-    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, skipped_rcvr); } // pussywizard!
+    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
+    void SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const; // pussywizard! param includeMargin not needed here
+    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
     void SendTeleportAckPacket();
 
@@ -2133,6 +2146,8 @@ public:
 
     void SetDrunkValue(uint8 newDrunkValue, uint32 itemId = 0);
     [[nodiscard]] uint8 GetDrunkValue() const { return GetByteValue(PLAYER_BYTES_3, 1); }
+    [[nodiscard]] int32 GetFakeDrunkValue() const { return GetInt32Value(PLAYER_FAKE_INEBRIATION); }
+    void UpdateInvisibilityDrunkDetect();
     static DrunkenState GetDrunkenstateByValue(uint8 value);
 
     [[nodiscard]] uint32 GetDeathTimer() const { return m_deathTimer; }
@@ -2342,8 +2357,9 @@ public:
 
     // currently visible objects at player client
     GuidUnorderedSet m_clientGUIDs;
+    std::vector<Unit*> m_newVisible; // pussywizard
 
-    [[nodiscard]] bool HaveAtClient(Object const* u) const;
+    [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;
     [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const;
 
     [[nodiscard]] bool IsNeverVisible() const override;
@@ -2351,13 +2367,13 @@ public:
     bool IsVisibleGloballyFor(Player const* player) const;
 
     void GetInitialVisiblePackets(Unit* target);
-    void UpdateObjectVisibility(bool forced = true) override;
+    void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
     void UpdateVisibilityForPlayer(bool mapChange = false);
     void UpdateVisibilityOf(WorldObject* target);
     void UpdateTriggerVisibility();
 
     template<class T>
-    void UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow);
+    void UpdateVisibilityOf(T* target, UpdateData& data, std::vector<Unit*>& visibleNow);
 
     uint8 m_forced_speed_changes[MAX_MOVE_TYPE];
 

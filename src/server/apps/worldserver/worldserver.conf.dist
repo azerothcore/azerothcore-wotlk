@@ -364,11 +364,11 @@ Network.OutKBuff = -1
 
 #
 #    Network.OutUBuff
-#        Description: Amount of memory (in bytes) reserved in the user space per connection for
-#                     output buffering.
-#         Default:    65536
+#        Description: Amount of memory (in bytes) reserved initially in the user space per
+#                     connection for output buffering.
+#         Default:    4096
 
-Network.OutUBuff = 65536
+Network.OutUBuff = 4096
 
 #
 #    Network.TcpNoDelay:
@@ -377,6 +377,16 @@ Network.OutUBuff = 65536
 #                     1 - (Disabled, More traffic, Less latency, TCP_NO_DELAY)
 
 Network.TcpNodelay = 1
+
+#
+#    Network.EnableProxyProtocol
+#        Description: Enables Proxy Protocol v2. When your server is behind a proxy,
+#                     load balancer, or similar component, you need to enable Proxy Protocol v2 on both
+#                     this server and the proxy/load balancer to track the real IP address of players.
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.EnableProxyProtocol = 0
 
 #
 ###################################################################################################
@@ -667,7 +677,7 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
-Logger.commands.gm=4,Console GM
+#Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
@@ -740,6 +750,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.scripts.ai.sai=4,Console Server
 #Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts.midsummer=4,Console Server
 #Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server
@@ -780,11 +791,13 @@ Metric.Enable = 0
 
 #
 #    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
+#        Description: Interval between every batch of data sent in seconds.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
+#        Default:     1 second
 #
 
-Metric.Interval = 10
+Metric.Interval = 1
 
 #
 #    Metric.ConnectionInfo
@@ -938,13 +951,6 @@ ClientCacheVersion = 0
 #        Default:     10000 - (10 milliseconds, 0.01 second)
 
 SessionAddDelay = 10000
-
-#
-#    GridCleanUpDelay
-#        Description: Time (in milliseconds) grid clean up delay.
-#        Default:     300000 - (5 minutes)
-
-GridCleanUpDelay = 300000
 
 #
 #    CloseIdleConnections
@@ -1251,17 +1257,17 @@ Visibility.GroupMode = 1
 #    Visibility.Distance.Instances
 #    Visibility.Distance.BGArenas
 #        Description: Visibility distance to see other players or gameobjects.
-#                     Visibility on continents on retail ~100 yards. In BG/Arenas ~533.
-#                     For instances default ~170.
-#                     Max limited by grid size: 533.33333
+#                     Visibility on continents on retail ~90 yards. In BG/Arenas ~180.
+#                     For instances default ~120.
+#                     Max limited by active player zone: ~ 333
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
-#        Default:     100  - (Visibility.Distance.Continents)
-#                     170 - (Visibility.Distance.Instances)
-#                     533 - (Visibility.Distance.BGArenas)
+#        Default:     90  - (Visibility.Distance.Continents)
+#                     120 - (Visibility.Distance.Instances)
+#                     180 - (Visibility.Distance.BGArenas)
 
-Visibility.Distance.Continents = 100
-Visibility.Distance.Instances = 170
-Visibility.Distance.BGArenas = 533
+Visibility.Distance.Continents = 90
+Visibility.Distance.Instances = 120
+Visibility.Distance.BGArenas = 180
 
 #
 #    Visibility.Notify.Period.OnContinents
@@ -1347,6 +1353,15 @@ vmap.petLOS = 1
 vmap.BlizzlikePvPLOS = 1
 
 #
+#   vmap.BlizzlikeLOSInOpenWorld
+#       Description: Check line of sight to see game objects in the open world.
+#       Default:    1 (Enabled, Players will be able to cast spells through tree stumps and other objects in the open world).
+#                   0 (Disabled, Players will not be able to cast spells through tree stumps and other objects in the open world).
+#
+
+vmap.BlizzlikeLOSInOpenWorld = 1
+
+#
 #    vmap.enableIndoorCheck
 #        Description: VMap based indoor check to remove outdoor-only auras (mounts etc.).
 #        Default:     1 - (Enabled)
@@ -1373,21 +1388,12 @@ DetectPosCollision = 1
 CheckGameObjectLoS = 1
 
 #
-#    GridUnload
-#        Description: Unload grids to save memory. Can be disabled if enough memory is available
-#                     to speed up moving players to new grids.
-#        Default:     1 - (enable, Unload grids)
-#                     0 - (disable, Do not unload grids)
-
-GridUnload = 1
-
-#
 #    PreloadAllNonInstancedMapGrids
-#        Description: Preload all grids on all non-instanced maps. Requires GridUnload to be disabled.
-#                     This will take a great amount of additional RAM (ca. 9 GB) and causes the server
-#                     to take longer to start, but can increase performance if used on a server with a
-#                     high amount of players. It will also activate all creatures which are set active
-#                     (e.g. the Fel Reavers in Hellfire Peninsula) on server start.
+#        Description: Preload all grids on all non-instanced maps. This will take a great amount
+#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
+#                     but can increase performance if used on a server with a high amount of players.
+#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
+#                     in Hellfire Peninsula) on server start.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -2060,6 +2066,13 @@ Rate.Damage.Fall = 1
 #        Default:     1
 
 Rate.Talent = 1
+
+#
+#    Rate.Talent.Pet
+#        Description: Pet Talent point rate.
+#        Default:     1
+
+Rate.Talent.Pet = 1
 
 #
 #    Rate.Health
@@ -2747,10 +2760,16 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Rate.RewardQuestMoney
+#        Description: Allows to tweak the amount of money rewarded by quests (does not affect RewardBonusMoney).
+#        Default:     1
+
+Rate.RewardQuestMoney = 1
+
+#
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
-#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
-#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#                     is at MaxPlayerLevel.
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
@@ -2768,15 +2787,6 @@ Rate.RewardBonusMoney = 1
 #        Default:     50.000000
 
 MonsterSight = 50.000000
-
-#
-#    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the combat
-#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
-#                     radius will be used.
-#        Default:     60
-
-ThreatRadius = 60
 
 #
 #    Rate.Creature.Aggro
@@ -3069,9 +3079,9 @@ Rate.RepairCost = 1
 #        Description: Should the player leave their group when they log out?
 #                     (It does not affect raids or dungeon finder groups)
 #
-#        Default:     1 - (Enabled)
+#        Default:     0 - (Disabled)
 
-LeaveGroupOnLogout.Enabled = 1
+LeaveGroupOnLogout.Enabled = 0
 
 #
 #    Group.Raid.LevelRestriction
@@ -3361,7 +3371,14 @@ Guild.BankTabCost1 = 2500000
 Guild.BankTabCost2 = 5000000
 Guild.BankTabCost3 = 10000000
 Guild.BankTabCost4 = 25000000
-Guild.BankTabCost5 = 50000000#
+Guild.BankTabCost5 = 50000000
+
+#
+#     Guild.MemberLimit
+#        Description: Do not allow inviting new players to the guild if the member limit is met or exceeded.
+#        Default:     0 - Disabled
+
+Guild.MemberLimit = 0
 
 #
 ###################################################################################################
@@ -4354,6 +4371,13 @@ TeleportTimeoutNear = 25
 #       Default:  45
 
 TeleportTimeoutFar = 45
+
+#
+#    DailyRBGArenaPoints.MinLevel
+#        Description: Allows gaining arena points on the first RBG win at level 70.
+#        Default: 71 - (Blizzlike)
+
+DailyRBGArenaPoints.MinLevel = 71
 
 #
 ###################################################################################################

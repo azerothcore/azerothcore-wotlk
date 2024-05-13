@@ -18,8 +18,13 @@
 #ifndef ACORE_FORMULAS_H
 #define ACORE_FORMULAS_H
 
-#include "ScriptMgr.h"
 #include "SharedDefines.h"
+#include <cmath>
+
+class Player;
+class Unit;
+
+enum ContentLevels : uint8;
 
 namespace Acore::Honor
 {

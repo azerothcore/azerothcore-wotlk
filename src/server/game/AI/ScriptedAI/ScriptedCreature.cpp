@@ -191,8 +191,7 @@ bool SummonList::IsAnyCreatureInCombat() const
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
-    IsFleeing(false),
-    _isCombatMovementAllowed(true)
+    IsFleeing(false)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -209,7 +208,7 @@ void ScriptedAI::AttackStartNoMove(Unit* who)
 
 void ScriptedAI::AttackStart(Unit* who)
 {
-    if (IsCombatMovementAllowed())
+    if (me->IsCombatMovementAllowed())
         CreatureAI::AttackStart(who);
     else
         AttackStartNoMove(who);
@@ -309,6 +308,29 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
 Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, uint32 despawntime)
 {
     return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime);
+}
+
+void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax, uint32 uniqueId)
+{
+    if (uniqueId && IsUniqueTimedEventDone(uniqueId))
+    {
+        return;
+    }
+
+    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    {
+        exec();
+
+        if (!uniqueId)
+        {
+            repeatMax > 0s ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
+        }
+    });
+
+    if (uniqueId)
+    {
+        SetUniqueTimedEventDone(uniqueId);
+    }
 }
 
 SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mechanic, SelectTargetType targets, uint32 powerCostMin, uint32 powerCostMax, float rangeMin, float rangeMax, SelectEffect effects)
@@ -514,11 +536,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
 }
 
-void ScriptedAI::SetCombatMovement(bool allowMovement)
-{
-    _isCombatMovementAllowed = allowMovement;
-}
-
 enum eNPCs
 {
     NPC_BROODLORD   = 12017,
@@ -554,8 +571,16 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     summons(creature),
     _bossId(bossId)
 {
+    callForHelpRange = 0.0f;
     if (instance)
         SetBoundary(instance->GetBossBoundary(bossId));
+
+    // Prevents updating the scheduler's timer while the creature is casting.
+    // Clear it in the script if you need it to update while the creature is casting.
+    scheduler.SetValidator([this]
+    {
+        return !me->HasUnitState(UNIT_STATE_CASTING);
+    });
 }
 
 bool BossAI::CanRespawn()
@@ -581,6 +606,7 @@ void BossAI::_Reset()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
+    ClearUniqueTimedEventsDone();
     _healthCheckEvents.clear();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
@@ -605,6 +631,13 @@ void BossAI::_JustEngagedWith()
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
+    if (callForHelpRange)
+    {
+        ScheduleTimedEvent(0s, [&]
+        {
+            me->CallForHelp(callForHelpRange);
+        }, 2s);
+    }
     if (instance)
     {
         // bosses do not respawn, check only on enter combat

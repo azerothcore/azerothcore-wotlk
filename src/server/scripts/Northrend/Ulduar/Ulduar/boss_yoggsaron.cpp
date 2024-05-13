@@ -15,16 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "CreatureAI.h"
+#include "CreatureScript.h"
 #include "Object.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum YoggSpells
@@ -1523,7 +1525,7 @@ public:
     {
         boss_yoggsaron_crusher_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->CastSpell(me, SPELL_CRUSH, true);
             me->CastSpell(me, SPELL_FOCUSED_ANGER, true);
             me->CastSpell(me, SPELL_DIMINISH_POWER, false);
@@ -1585,7 +1587,7 @@ public:
     {
         boss_yoggsaron_corruptor_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void DoAction(int32 param) override
@@ -1642,7 +1644,7 @@ public:
     {
         boss_yoggsaron_constrictor_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             _checkTimer = 1;
             _playerGUID.Clear();
         }

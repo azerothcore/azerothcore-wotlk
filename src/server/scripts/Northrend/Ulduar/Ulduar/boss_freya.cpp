@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "ulduar.h"
@@ -1298,3 +1299,4 @@ void AddSC_boss_freya()
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_on_wood", 2);
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_knock_on_wood", 3);
 }
+

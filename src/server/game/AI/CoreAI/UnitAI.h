@@ -152,7 +152,7 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
 
 struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
 {
-    FarthestTargetSelector(Unit const* unit, float dist, bool playerOnly, bool inLos) : _me(unit), _dist(dist), _playerOnly(playerOnly), _inLos(inLos) {}
+    FarthestTargetSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
     {
@@ -162,7 +162,7 @@ struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
         if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
             return false;
 
-        if (_dist > 0.0f && !_me->IsWithinCombatRange(target, _dist))
+        if (_maxDist > 0.0f && !_me->IsInRange(target, _minDist, _maxDist))
             return false;
 
         if (_inLos && !_me->IsWithinLOSInMap(target))
@@ -173,7 +173,7 @@ struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
 
 private:
     Unit const* _me;
-    float _dist;
+    float _minDist, _maxDist;
     bool _playerOnly;
     bool _inLos;
 };
@@ -364,6 +364,13 @@ public:
     // Called when the unit heals
     virtual void HealDone(Unit* /*done_to*/, uint32& /*addhealth*/) {}
 
+    // Called during damage calculations
+    virtual void OnCalculateMeleeDamageReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
+    virtual void OnCalculateSpellDamageReceived(int32& /*damage*/, Unit* /*attacker*/) {}
+
+    // Called during calculation when receiving periodic healing or damage (DoT or HoT)
+    virtual void OnCalculatePeriodicTickReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
+
     void AttackStartCaster(Unit* victim, float dist);
 
     SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
@@ -373,7 +380,7 @@ public:
     SpellCastResult DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
     SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
-    SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
+    SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false, bool withTank = true);
 
     // Cast spell on the top threat target, which may not be the current victim.
     SpellCastResult DoCastMaxThreat(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);

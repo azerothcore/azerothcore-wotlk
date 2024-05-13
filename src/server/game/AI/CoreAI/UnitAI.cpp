@@ -253,9 +253,9 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     return me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
-SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank)
 {
-    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
+    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank))
     {
         return DoCast(target, spellId, triggered);
     }

@@ -26,12 +26,12 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "ScriptMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -2323,19 +2323,8 @@ void SpellMgr::LoadPetLevelupSpellMap()
             if (!creatureFamily->skillLine[j])
                 continue;
 
-            for (uint32 k = 0; k < sSkillLineAbilityStore.GetNumRows(); ++k)
+            for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(creatureFamily->skillLine[j]))
             {
-                SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(k);
-                if (!skillLine)
-                    continue;
-
-                //if (skillLine->skillId != creatureFamily->skillLine[0] &&
-                //    (!creatureFamily->skillLine[1] || skillLine->skillId != creatureFamily->skillLine[1]))
-                //    continue;
-
-                if (skillLine->SkillLine != creatureFamily->skillLine[j])
-                    continue;
-
                 if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
                     continue;
 
@@ -2449,15 +2438,15 @@ void SpellMgr::LoadPetDefaultSpells()
     // different summon spells
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
-        SpellInfo const* spellEntry = GetSpellInfo(i);
-        if (!spellEntry)
+        SpellInfo const* spellInfo = GetSpellInfo(i);
+        if (!spellInfo)
             continue;
 
         for (uint8 k = 0; k < MAX_SPELL_EFFECTS; ++k)
         {
-            if (spellEntry->Effects[k].Effect == SPELL_EFFECT_SUMMON || spellEntry->Effects[k].Effect == SPELL_EFFECT_SUMMON_PET)
+            if (spellInfo->Effects[k].Effect == SPELL_EFFECT_SUMMON || spellInfo->Effects[k].Effect == SPELL_EFFECT_SUMMON_PET)
             {
-                uint32 creature_id = spellEntry->Effects[k].MiscValue;
+                uint32 creature_id = spellInfo->Effects[k].MiscValue;
                 CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(creature_id);
                 if (!cInfo)
                     continue;
@@ -3249,7 +3238,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 57467: // Meteor
             case 26789: // Shard of the Fallen Star
             case 31436: // Malevolent Cleave
-            case 35181: // Dive Bomb
             case 40810: // Saber Lash
             case 43267: // Saber Lash
             case 43268: // Saber Lash

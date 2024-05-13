@@ -72,7 +72,7 @@ void Vehicle::Install()
     {
         if (PowerDisplayEntry const* powerDisplay = sPowerDisplayStore.LookupEntry(_vehicleInfo->m_powerDisplayId))
             _me->setPowerType(Powers(powerDisplay->PowerType));
-        else if (_me->getClass() == CLASS_ROGUE)
+        else if (_me->IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY))
             _me->setPowerType(POWER_ENERGY);
     }
 
@@ -545,8 +545,7 @@ bool Vehicle::IsVehicleInUse()
 
 void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
 {
-    if (!_me->GetMap()->IsGridLoaded(x, y))
-        _me->GetMap()->LoadGrid(x, y);
+    _me->GetMap()->LoadGrid(x, y);
     _me->NearTeleportTo(x, y, z, ang, true);
 
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)

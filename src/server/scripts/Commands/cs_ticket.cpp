@@ -24,11 +24,10 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
 #include "TicketMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -158,10 +157,9 @@ public:
         return true;
     }
 
-    static bool HandleGMTicketCommentCommand(ChatHandler* handler, uint32 ticketId)
+    static bool HandleGMTicketCommentCommand(ChatHandler* handler, uint32 ticketId, Tail comment)
     {
-        char* comment = strtok(nullptr, "\n");
-        if (!comment)
+        if (comment.empty())
             return false;
 
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
@@ -180,14 +178,14 @@ public:
         }
 
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
-        ticket->SetComment(comment);
+        ticket->SetComment(comment.data());
         ticket->SaveToDB(trans);
         sTicketMgr->UpdateLastChange();
 
         std::string const assignedName = ticket->GetAssignedToName();
         std::string msg = ticket->FormatMessageString(*handler, assignedName.empty() ? nullptr : assignedName.c_str(), nullptr, nullptr, nullptr);
 
-        msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTADDCOMMENT, player ? player->GetName().c_str() : "Console", comment);
+        msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTADDCOMMENT, player ? player->GetName().c_str() : "Console", comment.data());
         handler->SendGlobalGMSysMessage(msg.c_str());
 
         return true;

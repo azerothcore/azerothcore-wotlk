@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,7 +17,7 @@
 -- Dumping structure for table acore_characters.addons
 DROP TABLE IF EXISTS `addons`;
 CREATE TABLE IF NOT EXISTS `addons` (
-  `name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `crc` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Addons';

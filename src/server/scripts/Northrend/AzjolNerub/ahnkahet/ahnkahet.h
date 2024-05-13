@@ -33,8 +33,6 @@ enum AhnkahetData
     // Other data
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,
-    DATA_TELDRAM_SPHERE1,
-    DATA_TELDRAM_SPHERE2,
 };
 
 enum AhnKahetCreatures
@@ -42,7 +40,7 @@ enum AhnKahetCreatures
     NPC_ELDER_NADOX                 = 29309,
     NPC_PRINCE_TALDARAM             = 29308,
     NPC_JEDOGA_SHADOWSEEKER         = 29310,
-    NPC_HERALD_JOLAZJ               = 29311,
+    NPC_HERALD_VOLAZJ               = 29311,
     NPC_AMANITAR                    = 30258,
     // Teldaram and Jedoga encounter related
     NPC_JEDOGA_CONTROLLER           = 30181,
@@ -64,6 +62,18 @@ enum AhnkahetObjects
 enum AhnKahetActions
 {
     ACTION_REMOVE_PRISON            = -1
+};
+
+enum AhnKahetTexts
+{
+    SAY_SPHERE_ACTIVATED            = 0
+};
+
+enum AhnKahetPersistentData
+{
+    DATA_TELDRAM_SPHERE1,
+    DATA_TELDRAM_SPHERE2,
+    MAX_PERSISTENT_DATA
 };
 
 template <class AI, class T>

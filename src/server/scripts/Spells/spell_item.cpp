@@ -15,23 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
+#include "CreatureScript.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SkillDiscovery.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "WorldSession.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used by items.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_item_".
  */
-
-#include "Battleground.h"
-#include "GameTime.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "Pet.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SkillDiscovery.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "WorldSession.h"
 
 enum MassiveSeaforiumCharge
 {
@@ -577,7 +576,7 @@ class spell_item_skull_of_impeding_doom : public AuraScript
 
     void CalculateManaLeechAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (!GetCaster() || GetCaster()->getPowerType() != POWER_MANA)
+        if (!GetCaster() || !GetCaster()->HasActivePowerType(POWER_MANA))
             return;
 
         amount = GetCaster()->GetMaxPower(POWER_MANA) * 0.12f; // 5 ticks which reduce health by 60%
@@ -2853,40 +2852,6 @@ class spell_item_purify_helboar_meat : public SpellScript
     }
 };
 
-enum CrystalPrison
-{
-    OBJECT_IMPRISONED_DOOMGUARD     = 179644,
-};
-
-class spell_item_crystal_prison_dummy_dnd : public SpellScript
-{
-    PrepareSpellScript(spell_item_crystal_prison_dummy_dnd);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        if (!sObjectMgr->GetGameObjectTemplate(OBJECT_IMPRISONED_DOOMGUARD))
-            return false;
-        return true;
-    }
-
-    void HandleDummy(SpellEffIndex /* effIndex */)
-    {
-        if (Creature* target = GetHitCreature())
-        {
-            if (target->isDead() && !target->IsPet())
-            {
-                GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - GameTime::GetGameTime().count()));
-                target->DespawnOrUnsummon();
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_crystal_prison_dummy_dnd::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 enum ReindeerTransformation
 {
     SPELL_FLYING_REINDEER_310                   = 44827,
@@ -3504,7 +3469,7 @@ class spell_item_refocus : public SpellScript
     {
         Player* caster = GetCaster()->ToPlayer();
 
-        if (!caster || caster->getClass() != CLASS_HUNTER)
+        if (!caster || !caster->IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY))
             return;
 
         caster->RemoveCategoryCooldown(SPELL_CATEGORY_AIMED_MULTI);
@@ -3948,6 +3913,31 @@ class spell_item_venomhide_feed : public SpellScript
     }
 };
 
+// 30077 - Carinda's Scroll of Retribution
+enum ScrollOfRetribution
+{
+    NPC_VIERA_SUNWHISPER    = 17226
+};
+
+class spell_item_scroll_of_retribution : public SpellScript
+{
+    PrepareSpellScript(spell_item_scroll_of_retribution)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_VIERA_SUNWHISPER)
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_scroll_of_retribution::CheckCast);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4038,7 +4028,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_refocus);
     RegisterSpellScript(spell_item_shimmering_vessel);
     RegisterSpellScript(spell_item_purify_helboar_meat);
-    RegisterSpellScript(spell_item_crystal_prison_dummy_dnd);
     RegisterSpellScript(spell_item_reindeer_transformation);
     RegisterSpellScript(spell_item_nigh_invulnerability);
     RegisterSpellScript(spell_item_poultryizer);
@@ -4069,4 +4058,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_elixir_of_shadows);
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
+    RegisterSpellScript(spell_item_scroll_of_retribution);
 }
+

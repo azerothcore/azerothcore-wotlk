@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
-*/
-
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
+/*
+    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
+*/
 
 enum Yells
 {
@@ -36,10 +36,9 @@ enum Yells
     EMOTE_VORTEX            = 3,
     EMOTE_TWINK_PACT        = 4,
     SAY_TWINK_PACT          = 5,
-    SAY_KILL_PLAYER_1       = 6,
+    SAY_KILL_PLAYER         = 6,
     SAY_BERSERK             = 7,
     SAY_DEATH               = 8,
-    SAY_KILL_PLAYER_2       = 9,
 };
 
 enum Equipment
@@ -502,10 +501,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         if( who->GetTypeId() == TYPEID_PLAYER )
         {
-            int32 id = urand(0, 1) ? SAY_KILL_PLAYER_1 : SAY_KILL_PLAYER_2;
-            Talk(id);
+            Talk(SAY_KILL_PLAYER);
             if( Creature* twin = GetSister() )
-                twin->AI()->Talk(id);
+                twin->AI()->Talk(SAY_KILL_PLAYER);
         }
     }
 
@@ -929,3 +927,4 @@ void AddSC_boss_twin_valkyr()
     new spell_valkyr_touch();
     new spell_valkyr_ball_periodic_dummy();
 }
+

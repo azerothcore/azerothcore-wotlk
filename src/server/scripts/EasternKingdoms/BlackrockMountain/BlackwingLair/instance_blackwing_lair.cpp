@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "EventMap.h"
 #include "GameObject.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
-
 #include <array>
 
 DoorData const doorData[] =
@@ -425,7 +426,6 @@ public:
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
-                            nefarius->SetFarVisible(true);
                             nefarius->Respawn();
                             nefarius->GetMotionMaster()->MoveTargetedHome();
                         }
@@ -542,3 +542,4 @@ void AddSC_instance_blackwing_lair()
     new spell_bwl_shadowflame();
     new at_orb_of_command();
 }
+

@@ -44,6 +44,7 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "DynamicVisibility.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
@@ -58,10 +59,11 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
+#include "M2Stores.h"
 #include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
-#include "M2Stores.h"
+#include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -71,7 +73,6 @@
 #include "PoolMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
-#include "MotdMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -107,10 +108,6 @@ uint32 World::m_worldLoopCounter = 0;
 float World::_maxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 float World::_maxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
 float World::_maxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
-
-int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
-int32 World::m_visibility_notify_periodInInstances = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
-int32 World::m_visibility_notify_periodInBGArenas = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
 Realm realm;
 
@@ -497,6 +494,7 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_DROP_ITEM_GROUP_AMOUNT]      = sConfigMgr->GetOption<float>("Rate.Drop.Item.GroupAmount", 1.0f);
     _rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetOption<float>("Rate.Drop.Money", 1.0f);
 
+    _rate_values[RATE_REWARD_QUEST_MONEY]          = sConfigMgr->GetOption<float>("Rate.RewardQuestMoney", 1.0f);
     _rate_values[RATE_REWARD_BONUS_MONEY]          = sConfigMgr->GetOption<float>("Rate.RewardBonusMoney", 1.0f);
     _rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     _rate_values[RATE_XP_BG_KILL_AV]               = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKillAV", 1.0f);
@@ -575,6 +573,12 @@ void World::LoadConfigSettings(bool reload)
     {
         LOG_ERROR("server.loading", "Rate.Talent ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT]);
         _rate_values[RATE_TALENT] = 1.0f;
+    }
+    _rate_values[RATE_TALENT_PET] = sConfigMgr->GetOption<float>("Rate.Talent.Pet", 1.0f);
+    if (_rate_values[RATE_TALENT_PET] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
+        _rate_values[RATE_TALENT_PET] = 1.0f;
     }
     _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
     if (_rate_values[RATE_MOVESPEED] < 0)
@@ -657,14 +661,6 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "PlayerSave.Stats.MinLevel ({}) must be in range 0..80. Using default, do not save character stats (0).", _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]);
         _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
     }
-    _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfigMgr->GetOption("GridCleanUpDelay", 5 * MINUTE * IN_MILLISECONDS);
-    if (_int_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
-    {
-        LOG_ERROR("server.loading", "GridCleanUpDelay ({}) must be greater {}. Use this minimal value.", _int_configs[CONFIG_INTERVAL_GRIDCLEAN], MIN_GRID_DELAY);
-        _int_configs[CONFIG_INTERVAL_GRIDCLEAN] = MIN_GRID_DELAY;
-    }
-    if (reload)
-        sMapMgr->SetGridCleanUpDelay(_int_configs[CONFIG_INTERVAL_GRIDCLEAN]);
 
     _int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetOption<int32>("MapUpdateInterval", 10);
     if (_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
@@ -1259,10 +1255,6 @@ void World::LoadConfigSettings(bool reload)
         _maxVisibleDistanceInBGArenas = MAX_VISIBILITY_DISTANCE;
     }
 
-    m_visibility_notify_periodOnContinents = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.OnContinents", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
-    m_visibility_notify_periodInInstances = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.InInstances", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
-    m_visibility_notify_periodInBGArenas = sConfigMgr->GetOption<int32>("Visibility.Notify.Period.InBGArenas", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
-
     ///- Load the CharDelete related config options
     _int_configs[CONFIG_CHARDELETE_METHOD]    = sConfigMgr->GetOption<int32>("CharDelete.Method", 0);
     _int_configs[CONFIG_CHARDELETE_MIN_LEVEL] = sConfigMgr->GetOption<int32>("CharDelete.MinLevel", 0);
@@ -1282,13 +1274,15 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
 
-    _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
+    _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", false);
 
     _bool_configs[CONFIG_QUEST_POI_ENABLED] = sConfigMgr->GetOption<bool>("QuestPOI.Enabled", true);
 
     _int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
+
+    _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
 
     _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
 
@@ -1323,6 +1317,7 @@ void World::LoadConfigSettings(bool reload)
     bool enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
     bool enablePetLOS = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
     _bool_configs[CONFIG_VMAP_BLIZZLIKE_PVP_LOS] = sConfigMgr->GetOption<bool>("vmap.BlizzlikePvPLOS", true);
+    _bool_configs[CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD] = sConfigMgr->GetOption<bool>("vmap.BlizzlikeLOSInOpenWorld", true);
 
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
@@ -1420,16 +1415,8 @@ void World::LoadConfigSettings(bool reload)
     // Prevent players AFK from being logged out
     _int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetOption<int32>("PreventAFKLogout", 0);
 
-    // Unload grids to save memory. Can be disabled if enough memory is available to speed up moving players to new grids.
-    _bool_configs[CONFIG_GRID_UNLOAD] = sConfigMgr->GetOption<bool>("GridUnload", true);
-
     // Preload all grids of all non-instanced maps
     _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetOption<bool>("PreloadAllNonInstancedMapGrids", false);
-    if (_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] && _bool_configs[CONFIG_GRID_UNLOAD])
-    {
-        LOG_ERROR("server.loading", "PreloadAllNonInstancedMapGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable base map pre-loading. Base map pre-loading disabled");
-        _bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = false;
-    }
 
     // ICC buff override
     _int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetOption<int32>("ICC.Buff.Horde", 73822);
@@ -1628,9 +1615,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
-
-    LOG_INFO("server.loading", "Loading Instance Saved Gameobject State Data...");
-    sObjectMgr->LoadInstanceSavedGameobjectStateData();
 
     LOG_INFO("server.loading", "Loading Character Cache...");
     sCharacterCache->LoadCharacterCacheStorage();
@@ -2172,14 +2156,21 @@ void World::SetInitialWorldSettings()
     {
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
 
-        sMapMgr->DoForAllMaps([](Map* map)
+        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
+
+            if (mapEntry && !mapEntry->Instanceable())
             {
-                if (!map->Instanceable())
+                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                if (map)
                 {
                     LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
                     map->LoadAllCells();
                 }
-            });
+            }
+        }
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
@@ -2254,6 +2245,8 @@ void World::Update(uint32 diff)
 
     // Record update if recording set in log and diff is greater then minimum set in log
     sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, GetActiveSessionCount());
+
+    DynamicVisibilityMgr::Update(GetActiveSessionCount());
 
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
@@ -3260,6 +3253,23 @@ void World::ProcessQueryCallbacks()
 void World::RemoveOldCorpses()
 {
     _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
+}
+
+void World::DoForAllOnlinePlayers(std::function<void(Player*)> exec)
+{
+    std::shared_lock lock(*HashMapHolder<Player>::GetLock());
+    for (auto const& it : ObjectAccessor::GetPlayers())
+    {
+        if (Player* player = it.second)
+        {
+            if (!player->IsInWorld())
+            {
+                continue;
+            }
+
+            exec(player);
+        }
+    }
 }
 
 bool World::IsPvPRealm() const

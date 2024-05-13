@@ -19,6 +19,8 @@
 #include "Config.h"
 #include "Log.h"
 #include "Timer.h"
+#include <algorithm>
+#include <iterator>
 
 // create instance
 WorldUpdateTime sWorldUpdateTime;
@@ -71,8 +73,34 @@ uint32 UpdateTime::GetLastUpdateTime() const
     return _updateTimeDataTable[_updateTimeTableIndex != 0 ? _updateTimeTableIndex - 1 : _updateTimeDataTable.size() - 1];
 }
 
+uint32 UpdateTime::GetDatasetSize() const
+{
+    return _updateTimeDataTable[_updateTimeDataTable.size() - 1] == 0 ? _updateTimeTableIndex : _orderedUpdateTimeDataTable.size();
+}
+
+uint32 UpdateTime::GetPercentile(uint8 p)
+{
+    if (_needsReorder)
+        SortUpdateTimeDataTable();
+
+    // Calculate the index of the element corresponding to the percentile
+    double index = (double(p) / 100.0) * (GetDatasetSize() - 1);
+
+    // If the index is an integer, return the value at that index
+    if (index == floor(index))
+       return _orderedUpdateTimeDataTable[index];
+
+    // Otherwise, perform linear interpolation
+    int lowerIndex = floor(index);
+    int upperIndex = ceil(index);
+    double fraction = index - lowerIndex;
+
+    return _orderedUpdateTimeDataTable[lowerIndex] * (1 - fraction) + _orderedUpdateTimeDataTable[upperIndex] * fraction;
+}
+
 void UpdateTime::UpdateWithDiff(uint32 diff)
 {
+    _needsReorder = true;
     _totalUpdateTime = _totalUpdateTime - _updateTimeDataTable[_updateTimeTableIndex] + diff;
     _updateTimeDataTable[_updateTimeTableIndex] = diff;
 
@@ -100,6 +128,26 @@ void UpdateTime::RecordUpdateTimeReset()
     _recordedTime = GetTimeMS();
 }
 
+void UpdateTime::SortUpdateTimeDataTable()
+{
+    if (!_needsReorder)
+        return;
+
+    auto endUpdateTable = _updateTimeDataTable.end();
+    if (!_updateTimeDataTable[_updateTimeDataTable.size() - 1])
+        endUpdateTable = std::next(_updateTimeDataTable.begin(), _updateTimeTableIndex);
+
+    std::copy(_updateTimeDataTable.begin(), endUpdateTable, _orderedUpdateTimeDataTable.begin());
+
+    auto endOrderedUpdateTable = _orderedUpdateTimeDataTable.end();
+    if (!_updateTimeDataTable[_updateTimeDataTable.size() - 1])
+        endOrderedUpdateTable = std::next(_orderedUpdateTimeDataTable.begin(), _updateTimeTableIndex);
+
+    std::sort(_orderedUpdateTimeDataTable.begin(), endOrderedUpdateTable);
+
+    _needsReorder = false;
+}
+
 void WorldUpdateTime::LoadFromConfig()
 {
     _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000));
@@ -117,7 +165,10 @@ void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uin
     {
         if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
-            LOG_INFO("time.update", "Update time diff: {}. Players online: {}.", GetAverageUpdateTime(), sessionCount);
+            LOG_INFO("time.update", "Last {} diffs summary with {} players online:", GetDatasetSize(), sessionCount);
+            LOG_INFO("time.update", " - Mean: {};", GetAverageUpdateTime());
+            LOG_INFO("time.update", " - Median: {};", GetPercentile(50));
+            LOG_INFO("time.update", " - Percentiles (95, 99, max): {}, {}, {}.", GetPercentile(95), GetPercentile(99), GetPercentile(100));
             _lastRecordTime = gameTimeMs;
         }
     }

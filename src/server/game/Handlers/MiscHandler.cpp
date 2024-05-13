@@ -29,6 +29,7 @@
 #include "GossipDef.h"
 #include "Group.h"
 #include "GuildMgr.h"
+#include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "LootMgr.h"
@@ -1117,7 +1118,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     if (AccountMgr::IsAdminAccount(GetSecurity()))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
 }
 
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
@@ -1128,7 +1129,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!AccountMgr::IsAdminAccount(GetSecurity()))
     {
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
 
@@ -1425,7 +1426,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                     return;
                 }
 
-                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (_player->GetRaidDifficulty() >= 0 && uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
                 {
                     if (!currMap)
                         currMap = groupGuy->GetMap();

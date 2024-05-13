@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "the_botanica.h"
 
@@ -51,6 +51,8 @@ struct boss_high_botanist_freywinn : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        scheduler.ClearValidator();
+
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 

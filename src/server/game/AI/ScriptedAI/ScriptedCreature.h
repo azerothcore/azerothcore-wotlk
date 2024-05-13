@@ -21,8 +21,8 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "InstanceScript.h"
 #include "EventMap.h"
+#include "InstanceScript.h"
 #include "TaskScheduler.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
@@ -353,6 +353,18 @@ struct ScriptedAI : public CreatureAI
     //Spawns a creature relative to me
     Creature* DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, uint32 despawntime);
 
+    bool IsUniqueTimedEventDone(uint32 id) const { return _uniqueTimedEvents.find(id) != _uniqueTimedEvents.end(); }
+    void SetUniqueTimedEventDone(uint32 id) { _uniqueTimedEvents.insert(id); }
+    void ResetUniqueTimedEvent(uint32 id) { _uniqueTimedEvents.erase(id); }
+    void ClearUniqueTimedEventsDone() { _uniqueTimedEvents.clear(); }
+
+    // Schedules a timed event using task scheduler.
+    void ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0);
+    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0) { ScheduleTimedEvent(0s, timerMax, exec, repeatMin, repeatMax, uniqueId); };
+
+    // Schedules a timed event using task scheduler that never repeats. Requires an unique non-zero ID.
+    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(0s, timer, exec, 0s, 0s, uniqueId); };
+
     bool HealthBelowPct(uint32 pct) const { return me->HealthBelowPct(pct); }
     bool HealthAbovePct(uint32 pct) const { return me->HealthAbovePct(pct); }
 
@@ -360,14 +372,6 @@ struct ScriptedAI : public CreatureAI
     SpellInfo const* SelectSpell(Unit* target, uint32 school, uint32 mechanic, SelectTargetType targets, uint32 powerCostMin, uint32 powerCostMax, float rangeMin, float rangeMax, SelectEffect effect);
 
     void SetEquipmentSlots(bool loadDefault, int32 mainHand = EQUIP_NO_CHANGE, int32 offHand = EQUIP_NO_CHANGE, int32 ranged = EQUIP_NO_CHANGE);
-
-    // Used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
-    // NOTE: If you use SetCombatMovement while the creature is in combat, it will do NOTHING - This only affects AttackStart
-    //       You should make the necessary to make it happen so.
-    //       Remember that if you modified _isCombatMovementAllowed (e.g: using SetCombatMovement) it will not be reset at Reset().
-    //       It will keep the last value you set.
-    void SetCombatMovement(bool allowMovement);
-    bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
 
     virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
 
@@ -440,8 +444,8 @@ struct ScriptedAI : public CreatureAI
 
 private:
     Difficulty _difficulty;
-    bool _isCombatMovementAllowed;
     bool _isHeroic;
+    std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
 struct HealthCheckEventData
@@ -457,6 +461,8 @@ class BossAI : public ScriptedAI
 public:
     BossAI(Creature* creature, uint32 bossId);
     ~BossAI() override {}
+
+    float callForHelpRange;
 
     InstanceScript* const instance;
 
@@ -494,9 +500,7 @@ protected:
 
     void TeleportCheaters();
 
-    EventMap events;
     SummonList summons;
-    TaskScheduler scheduler;
 
 private:
     uint32 const _bossId;

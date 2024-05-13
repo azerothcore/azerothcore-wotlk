@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
@@ -25,7 +26,6 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -334,7 +334,7 @@ public:
     {
         npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
 
@@ -392,7 +392,7 @@ public:
     {
         npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             deathTimer = 15000;
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
