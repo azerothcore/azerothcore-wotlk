@@ -1,3 +1,4 @@
+-- DB update 2024_05_14_00 -> 2024_05_14_01
 /*
 [ 1 ] + [ Expansion ] + [ Item Rarity ] + [ NPC Level Range ]
 
