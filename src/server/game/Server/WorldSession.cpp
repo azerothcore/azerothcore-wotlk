@@ -52,6 +52,10 @@
 #include "WorldSocket.h"
 #include <zlib.h>
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
@@ -576,6 +580,12 @@ void WorldSession::LogoutPlayer(bool save)
 
     m_playerLogout = true;
     m_playerSave = save;
+
+    //npcbot - free all bots and remove from botmap
+    if (_player->HaveBot() && _player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+        _player->GetBotMgr()->RemoveAllBotsFromGroup();
+    _player->RemoveAllBots();
+    //end npcbots
 
     if (_player)
     {
@@ -1622,6 +1632,17 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
                 maxPacketCounterAllowed = PLAYER_SLOTS_COUNT;
                 break;
             }
+
+        //npcbot: prevent kicks when too many bots spawned in one spot
+        case CMSG_GET_MIRRORIMAGE_DATA:
+        {
+            if (BotMgr::GetBotInfoPacketsLimit() > -1)
+                maxPacketCounterAllowed = BotMgr::GetBotInfoPacketsLimit();
+            else
+                maxPacketCounterAllowed = 100;
+            break;
+        }
+        //end npcbot
 
         default:
             {

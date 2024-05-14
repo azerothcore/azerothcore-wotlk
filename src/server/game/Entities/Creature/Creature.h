@@ -31,6 +31,12 @@
 
 class SpellInfo;
 
+// npcbot
+class bot_ai;
+class bot_pet_ai;
+class Battleground;
+//end npcbot
+
 class CreatureAI;
 class Quest;
 class Player;
@@ -98,7 +104,12 @@ public:
     [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
     void LoadSpellTemplateImmunity();
+    //npcbot
+    /*
     bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr) override;
+    */
+    bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr) const override;
+    //end npcbot
 
     [[nodiscard]] bool HasMechanicTemplateImmunity(uint32 mask) const;
     // redefine Unit::IsImmunedToSpell
@@ -153,9 +164,11 @@ public:
     } _spellFocusInfo;
 
     [[nodiscard]] uint32 GetShieldBlockValue() const override
+    ;/*
     {
         return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
     }
+    */
 
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
@@ -423,6 +436,83 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    //NPCBots
+    bool LoadBotCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool generated = false, uint32 entry = 0, Position const* pos = nullptr);
+    Player* GetBotOwner() const;
+    Unit* GetBotsPet() const;
+    bool IsNPCBot() const override;
+    bool IsNPCBotPet() const override;
+    bool IsNPCBotOrPet() const override;
+    bool IsFreeBot() const;
+    bool IsWandererBot() const;
+        Group* GetBotGroup() const;
+        void SetBotGroup(Group* group, int8 subgroup = -1);
+        uint8 GetSubGroup() const;
+        void SetSubGroup(uint8 subgroup);
+        void SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup = -1);
+        void RemoveFromBattlegroundOrBattlefieldRaid();
+        Group* GetOriginalGroup() const;
+        void SetOriginalGroup(Group* group, int8 subgroup = -1);
+        uint8 GetOriginalSubGroup() const;
+        void SetOriginalSubGroup(uint8 subgroup);
+    Battleground* GetBotBG() const;
+    uint8 GetBotClass() const;
+    uint32 GetBotRoles() const;
+    bot_ai* GetBotAI() const { return bot_AI; }
+    bot_pet_ai* GetBotPetAI() const { return bot_pet_AI; }
+    void SetBotAI(bot_ai* ai) { bot_AI = ai; }
+    void SetBotPetAI(bot_pet_ai* ai) { bot_pet_AI = ai; }
+    void ApplyBotDamageMultiplierMelee(uint32& damage, CalcDamageInfo& damageinfo) const;
+    void ApplyBotDamageMultiplierMelee(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit) const;
+    void ApplyBotDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& damageinfo, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit) const;
+    void ApplyBotDamageMultiplierHeal(Unit const* victim, float& heal, SpellInfo const* spellInfo, DamageEffectType damagetype, uint32 stack) const;
+    void ApplyBotCritMultiplierAll(Unit const* victim, float& crit_chance, SpellInfo const* spellInfo, SpellSchoolMask schoolMask, WeaponAttackType attackType) const;
+    void ApplyCreatureSpellCostMods(SpellInfo const* spellInfo, int32& cost) const;
+    void ApplyCreatureSpellCastTimeMods(SpellInfo const* spellInfo, int32& casttime) const;
+    void ApplyCreatureSpellRadiusMods(SpellInfo const* spellInfo, float& radius) const;
+    void ApplyCreatureSpellRangeMods(SpellInfo const* spellInfo, float& maxrange) const;
+    void ApplyCreatureSpellMaxTargetsMods(SpellInfo const* spellInfo, uint32& targets) const;
+    void ApplyCreatureSpellChanceOfSuccessMods(SpellInfo const* spellInfo, float& chance) const;
+    void ApplyCreatureEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
+    void OnBotSummon(Creature* summon);
+    void OnBotDespawn(Creature* summon);
+    void BotStopMovement();
+
+    bool CanParry() const;
+    bool CanDodge() const;
+    bool CanBlock() const;
+    bool CanCrit() const;
+    bool CanMiss() const;
+
+    float GetCreatureParryChance() const;
+    float GetCreatureDodgeChance() const;
+    float GetCreatureBlockChance() const;
+    float GetCreatureCritChance() const;
+    float GetCreatureMissChance() const;
+    float GetCreatureArmorPenetrationCoef() const;
+    uint32 GetCreatureExpertise() const;
+    uint32 GetCreatureSpellPenetration() const;
+    uint32 GetCreatureSpellPower() const;
+    uint32 GetCreatureDefense() const;
+    int32 GetCreatureResistanceBonus(SpellSchoolMask mask) const;
+    uint8 GetCreatureComboPoints() const;
+    float GetCreatureAmmoDPS() const;
+
+    bool IsTempBot() const;
+
+    MeleeHitOutcome BotRollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackType attType) const;
+
+    void CastCreatureItemCombatSpell(DamageInfo const& damageInfo);
+    //bool HasSpellCooldown(uint32 spellId) const;
+    void AddBotSpellCooldown(uint32 spellId, uint32 cooldown);
+    void ReleaseBotSpellCooldown(uint32 spellId);
+    void SpendBotRunes(SpellInfo const* spellInfo, bool didHit);
+
+    Item* GetBotEquips(uint8 slot) const;
+    Item* GetBotEquipsByGuid(ObjectGuid itemGuid) const;
+    float GetBotAverageItemLevel() const;
+    //End NPCBots
+
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -484,6 +574,11 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
 private:
+    //bot system
+    bot_ai* bot_AI;
+    bot_pet_ai* bot_pet_AI;
+    //end bot system
+
     void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;

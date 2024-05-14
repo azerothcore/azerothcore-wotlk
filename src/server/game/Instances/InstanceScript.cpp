@@ -31,6 +31,10 @@
 #include "Spell.h"
 #include "WorldSession.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 BossBoundaryData::~BossBoundaryData()
 {
     for (const_iterator it = begin(); it != end(); ++it)
@@ -642,6 +646,14 @@ void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
         player->RemoveAurasDueToSpell(spell);
         if (Pet* pet = player->GetPet())
             pet->RemoveAurasDueToSpell(spell);
+                //npcbot: include bots
+                if (player->HaveBot())
+                {
+                    for (auto const& bitr : *player->GetBotMgr()->GetBotMap())
+                        if (bitr.second && bitr.second->IsInWorld())
+                            DoRemoveAurasDueToSpellOnNPCBot(bitr.second, spell);
+                }
+                //end npcbot
     });
 }
 
@@ -651,8 +663,34 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
     instance->DoForAllPlayers([&](Player* player)
     {
         player->CastSpell(player, spell, true);
+        //npcbot: include bots
+        if (player->HaveBot())
+        {
+            for (auto const& bitr : *player->GetBotMgr()->GetBotMap())
+                if (bitr.second && bitr.second->IsInWorld())
+                    DoCastSpellOnNPCBot(bitr.second, spell);
+        }
+        //end npcbot
     });
 }
+
+//npcbot: hooks
+void InstanceScript::DoRemoveAurasDueToSpellOnNPCBot(Creature* bot, uint32 spell)
+{
+    ASSERT(bot && bot->IsNPCBot() && bot->IsInWorld() && !bot->IsFreeBot());
+    bot->RemoveAurasDueToSpell(spell);
+    if (Unit* botpet = bot->GetBotsPet())
+        botpet->RemoveAurasDueToSpell(spell);
+}
+
+void InstanceScript::DoCastSpellOnNPCBot(Creature* bot, uint32 spell)
+{
+    ASSERT(bot && bot->IsNPCBot() && bot->IsInWorld() && !bot->IsFreeBot());
+    bot->CastSpell(bot, spell, true);
+    if (Unit* botpet = bot->GetBotsPet())
+        botpet->CastSpell(botpet, spell, true);
+}
+//end npcbot
 
 void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
 {

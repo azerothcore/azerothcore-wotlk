@@ -40,6 +40,68 @@ void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
+    //npcbot: corrections for Life Tap (see Trinity-Bots issue #239)
+    ApplySpellFix({1454}, [](SpellInfo* spellInfo) // Life Tap (Rank 1)
+    {
+        spellInfo->SpellLevel = 6;
+        spellInfo->BaseLevel = 6;
+        spellInfo->MaxLevel = 16;
+    });
+    ApplySpellFix({1455}, [](SpellInfo* spellInfo) // Life Tap (Rank 2)
+    {
+        spellInfo->SpellLevel = 16;
+        spellInfo->BaseLevel = 16;
+        spellInfo->MaxLevel = 26;
+    });
+    ApplySpellFix({1456}, [](SpellInfo* spellInfo) // Life Tap (Rank 3)
+    {
+        spellInfo->SpellLevel = 26;
+        spellInfo->BaseLevel = 26;
+        spellInfo->MaxLevel = 36;
+    });
+    ApplySpellFix({11687}, [](SpellInfo* spellInfo) // Life Tap (Rank 4)
+    {
+        spellInfo->SpellLevel = 36;
+        spellInfo->BaseLevel = 36;
+        spellInfo->MaxLevel = 46;
+    });
+    ApplySpellFix({11688}, [](SpellInfo* spellInfo) // Life Tap (Rank 5)
+    {
+        spellInfo->SpellLevel = 46;
+        spellInfo->BaseLevel = 46;
+        spellInfo->MaxLevel = 56;
+    });
+    ApplySpellFix({11689}, [](SpellInfo* spellInfo) // Life Tap (Rank 6)
+    {
+        spellInfo->SpellLevel = 56;
+        spellInfo->BaseLevel = 56;
+        spellInfo->MaxLevel = 68;
+    });
+    ApplySpellFix({27222}, [](SpellInfo* spellInfo) // Life Tap (Rank 7)
+    {
+        spellInfo->SpellLevel = 68;
+        spellInfo->BaseLevel = 68;
+        spellInfo->MaxLevel = 78;
+    });
+    ApplySpellFix({57946}, [](SpellInfo* spellInfo) // Life Tap (Rank 8)
+    {
+        spellInfo->SpellLevel = 80;
+        spellInfo->BaseLevel = 80;
+        spellInfo->MaxLevel = 90;
+    });
+    //npcbot: corrections for Gunship Battle Shoot: should be able to target creatures (Hurl Axe can)
+    ApplySpellFix({
+        70162,  // Shoot 10N
+        72566,  // Shoot 25N
+        72567,  // Shoot 10H
+        72568   // Shoot 25H
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_ON_PLAYER;
+        spellInfo->TargetAuraSpell = 0;
+    });
+    //end npcbot
+
     ApplySpellFix({
         467,    // Thorns (Rank 1)
         782,    // Thorns (Rank 2)

@@ -80,7 +80,14 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
             i_y += 0.2f * std::sin(unit->GetOrientation());
         }
 
+        //npcbot: fix a bug - spline always generates path, !!_generatePath is False!!
+        /*
+        //end npcbot
         init.MoveTo(i_x, i_y, i_z, true);
+        //npcbot
+        */
+        init.MoveTo(i_x, i_y, i_z, false);
+        //end npcbot
     }
     if (speed > 0.0f)
         init.SetVelocity(speed);
