@@ -909,40 +909,32 @@ public:
     {
         PrepareAuraScript(spell_sindragosa_unchained_magic_AuraScript);
 
-        std::map<uint32, uint32> _lastMSTimeForSpell;
-
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            _lastMSTimeForSpell.clear();
             return true;
         }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
+        bool AfterCheckProc(ProcEventInfo& /*eventInfo*/, bool isTriggeredAtSpellProcEvent)
         {
-            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-            if (!spellInfo)
-                return false;
-
-            uint32 currMSTime = GameTime::GetGameTimeMS().count();
-            std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
-            if (itr != _lastMSTimeForSpell.end())
+            if (!isTriggeredAtSpellProcEvent)
             {
-                uint32 lastMSTime = itr->second;
-                itr->second = currMSTime;
-                if (getMSTimeDiff(lastMSTime, currMSTime) < 600)
-                    return false;
-
-                return true;
+                return false;
             }
-
-            _lastMSTimeForSpell[spellInfo->Id] = currMSTime;
+            uint32 currMSTime = GameTime::GetGameTimeMS().count();
+            if (_lastMSTime && getMSTimeDiff(_lastMSTime, currMSTime) < 600)
+            {
+                return false;
+            }
+            _lastMSTime = currMSTime;
             return true;
         }
 
         void Register() override
         {
-            DoCheckProc += AuraCheckProcFn(spell_sindragosa_unchained_magic_AuraScript::CheckProc);
+            DoAfterCheckProc += AuraAfterCheckProcFn(spell_sindragosa_unchained_magic_AuraScript::AfterCheckProc);
         }
+    private:
+        uint32 _lastMSTime;
     };
 
     AuraScript* GetAuraScript() const override
