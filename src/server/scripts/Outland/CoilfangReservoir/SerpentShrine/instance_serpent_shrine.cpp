@@ -57,6 +57,7 @@ MinionData const minionData[] =
 
 BossBoundaryData const boundaries =
 {
+    { DATA_HYDROSS_THE_UNSTABLE,   new CircleBoundary(Position(-228.0f, -333.0f), 60.0f) },
     { DATA_FATHOM_LORD_KARATHRESS, new RectangleBoundary(456.86f, 571.56f, -602.07f, -449.59f) },
     { DATA_MOROGRIM_TIDEWALKER,    new RectangleBoundary(304.32f, 457.59f, -786.5f, -661.3f) },
     { DATA_LADY_VASHJ,             new CircleBoundary(Position(29.99f, -922.409f), 83.65f) }

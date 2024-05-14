@@ -8249,11 +8249,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
                             }
 
-                            uint32 effectiveHeal = healInfo->GetEffectiveHeal();
+                            uint32 effectiveHeal = healInfo->GetHeal();
                             if (effectiveHeal)
                             {
                                 // heal amount
-                                basepoints0 = int32(CalculatePct(effectiveHeal, triggerAmount));
+                                basepoints0 = int32(CalculatePct(effectiveHeal * 0.5, triggerAmount));
                                 target = this;
 
                                 if (basepoints0)
