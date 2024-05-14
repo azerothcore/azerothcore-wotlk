@@ -186,6 +186,13 @@ public:
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
+    //npcbot: map hooks
+    virtual void OnNPCBotEnter(Creature* /*bot*/) { }
+    virtual void OnNPCBotLeave(Creature* /*bot*/) { }
+    void DoRemoveAurasDueToSpellOnNPCBot(Creature* bot, uint32 spell);
+    void DoCastSpellOnNPCBot(Creature* bot, uint32 spell);
+    //end npcbot
+
     //Handle open / close objects
     //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script

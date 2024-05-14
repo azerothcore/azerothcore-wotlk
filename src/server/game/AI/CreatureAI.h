@@ -145,6 +145,11 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
+    //npcbot
+    // Called when a spell starts
+    virtual void OnSpellStart(SpellInfo const* /*spell*/) { }
+    //end npcbot
+
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
     virtual bool IsEscorted() { return false; }

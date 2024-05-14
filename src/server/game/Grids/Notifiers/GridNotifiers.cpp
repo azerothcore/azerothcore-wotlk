@@ -76,6 +76,11 @@ void VisibleNotifier::SendToSelf()
         {
             if (i_largeOnly != obj->IsVisibilityOverridden())
                 continue;
+
+            //npcbot:
+            if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
+                continue;
+            //end npcbot
         }
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)

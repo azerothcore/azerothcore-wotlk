@@ -53,6 +53,10 @@
 #include "World.h"
 #include <boost/algorithm/string.hpp>
 
+//npcbot
+#include "botdatamgr.h"
+//end npcbot
+
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sWaypointScripts;
@@ -1294,6 +1298,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: {}) with expansion {}. Ignored and set to 0.", cInfo->Entry, cInfo->expansion);
         const_cast<CreatureTemplate*>(cInfo)->expansion = 0;
     }
+
+    //npcbot: skip flags check and damage multiplier
+    if (cInfo->IsNPCBotOrPet())
+        return;
+    //end npcbot
 
     if (uint32 badFlags = (cInfo->flags_extra & ~CREATURE_FLAG_EXTRA_DB_ALLOWED))
     {
@@ -8761,6 +8770,82 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
     return SKILL_RANGE_LEVEL;
 }
 
+void ObjectMgr::LoadCreatureOutfits()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureOutfitStore.clear();                           // for reload case (test only)
+
+    //                                                 0     1      2      3     4     5       6           7
+    QueryResult result = WorldDatabase.Query("SELECT entry, race, gender, skin, face, hair, haircolor, facialhair, "
+        //8       9        10    11     12     13    14     15     16     17     18
+        "head, shoulders, body, chest, waist, legs, feet, wrists, hands, back, tabard FROM creature_template_outfits");
+
+    if (!result)
+    {
+        LOG_ERROR("server.loading", ">> Loaded 0 creature outfits. DB table `creature_template_outfits` is empty!");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 i = 0;
+        uint32 entry     = fields[i++].Get<uint32>();
+
+        if (!GetCreatureTemplate(entry))
+        {
+            LOG_ERROR("server.loading", ">> Creature entry {} in `creature_template_outfits`, but not in `creature_template`!", entry);
+            continue;
+        }
+
+        CreatureOutfit co; // const, shouldnt be changed after saving
+        co.race          = fields[i++].Get<uint8>();
+        ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(co.race);
+        if (!rEntry)
+        {
+            LOG_ERROR("server.loading", ">> Creature entry {} in `creature_template_outfits` has incorrect race ({}).", entry, uint32(co.race));
+            continue;
+        }
+        co.gender        = fields[i++].Get<uint8>();
+        // Set correct displayId
+        switch (co.gender)
+        {
+            case GENDER_FEMALE:
+                _creatureTemplateStore[entry].Modelid1 = rEntry->model_f;
+                break;
+            case GENDER_MALE:
+                _creatureTemplateStore[entry].Modelid1 = rEntry->model_m;
+                break;
+            default:
+                LOG_ERROR("server.loading", ">> Creature entry {} in `creature_template_outfits` has invalid gender {}", entry, uint32(co.gender));
+                continue;
+        }
+        _creatureTemplateStore[entry].Modelid2 = 0;
+        _creatureTemplateStore[entry].Modelid3 = 0;
+        _creatureTemplateStore[entry].Modelid4 = 0;
+        _creatureTemplateStore[entry].unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE; // Needed so client requests mirror packet
+
+        co.skin          = fields[i++].Get<uint8>();
+        co.face          = fields[i++].Get<uint8>();
+        co.hair          = fields[i++].Get<uint8>();
+        co.haircolor     = fields[i++].Get<uint8>();
+        co.facialhair    = fields[i++].Get<uint8>();
+        for (uint32 j = 0; j != MAX_CREATURE_OUTFIT_DISPLAYS; ++j)
+            co.outfit[j] = fields[i+j].Get<uint32>();
+
+        _creatureOutfitStore[entry] = co;
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} creature outfits in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 void ObjectMgr::LoadGameTele()
 {
     uint32 oldMSTime = getMSTime();
@@ -9959,6 +10044,18 @@ GameObjectTemplateAddon const* ObjectMgr::GetGameObjectTemplateAddon(uint32 entr
 
 CreatureTemplate const* ObjectMgr::GetCreatureTemplate(uint32 entry)
 {
+    //npcbot: try fetch custom creature template
+    if (entry >= BOT_ENTRY_CREATE_BEGIN)
+    {
+        if (CreatureTemplate const* extra_template = BotDataMgr::GetBotExtraCreatureTemplate(entry))
+        {
+            //custom creature template should only exist in custom container
+            ASSERT_NODEBUGINFO(_creatureTemplateStore.find(entry) == _creatureTemplateStore.end());
+            return extra_template;
+        }
+    }
+    //end npcbot
+
     return entry < _creatureTemplateStoreFast.size() ? _creatureTemplateStoreFast[entry] : nullptr;
 }
 

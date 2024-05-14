@@ -92,5 +92,10 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+
+#NPCBots
+!/data/sql/custom/db_characters/
+!/data/sql/custom/db_world/
+
 /.vs
 /out

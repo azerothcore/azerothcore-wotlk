@@ -248,6 +248,20 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
+    //npcbot
+    GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const override;
+    void AddBot(Creature* bot) override;
+    void RemoveBot(ObjectGuid guid) override;
+    bool UpdateBotScore(Creature const* bot, uint32 type, uint32 value) override;
+    void HandleBotKillPlayer(Creature* killer, Player* victim) override;
+    void HandleBotKillBot(Creature* killer, Creature* victim) override;
+    void HandlePlayerKillBot(Creature* victim, Player* killer) override;
+    void EventBotDroppedFlag(Creature* bot) override;
+    void EventBotClickedOnFlag(Creature* bot, GameObject* target_obj) override;
+    void HandleBotAreaTrigger(Creature* bot, uint32 trigger) override;
+    void EventBotCapturedFlag(Creature* bot);
+    //end npcbot
+
     void UpdateFlagState(TeamId teamId, uint32 value);
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }

@@ -106,7 +106,14 @@ void GroupMgr::LoadGroups()
         CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
 
         // Delete all groups with less than 2 members
+        //npcbot: adjust this
+        /*
+        //end npcbot
         CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE guid NOT IN (SELECT guid FROM group_member GROUP BY guid HAVING COUNT(guid) > 1)");
+        //npcbot
+        */
+        CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE guid NOT IN (SELECT guid from group_member GROUP BY guid HAVING (SELECT (SELECT COUNT(guid) FROM group_member) + (SELECT COUNT(guid) FROM characters_npcbot_group_member)) > 1)");
+        //end npcbot
 
         // Delete invalid lfg_data
         CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data LEFT JOIN `groups` ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR groups.groupType <> 12");

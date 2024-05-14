@@ -514,8 +514,17 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
     {
         std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
         for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+        {
             if (ihit->targetGUID == GetCaster()->GetGUID())
+            {
+                //npcbot: get bot's crit
+                if (GetCaster()->IsNPCBot())
+                    ihit->crit = roll_chance_f(GetCaster()->ToCreature()->GetCreatureCritChance());
+                else
+                //end npcbot
                 ihit->crit = roll_chance_f(GetCaster()->GetFloatValue(PLAYER_CRIT_PERCENTAGE));
+            }
+        }
     }
 
     void Register() override
@@ -881,6 +890,22 @@ class spell_dk_anti_magic_shell_raid : public AuraScript
     {
         /// @todo: this should absorb limited amount of damage, but no info on calculation formula
         amount = -1;
+
+        SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
+        Unit* owner = GetCaster()->GetOwner();
+        if (!owner)
+            return;
+
+        //npcbot: take bot attack power into account
+        if (Creature const* bot = owner->ToCreature())
+        {
+            if (bot->IsNPCBot())
+            {
+                amount = talentSpell->GetEffect(EFFECT_0).CalcValue(owner);
+                amount += int32(2 * bot->GetTotalAttackPowerValue(BASE_ATTACK));
+            }
+        }
+        //end npcbot
     }
 
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
@@ -2119,6 +2144,16 @@ class spell_dk_spell_deflection : public AuraScript
         if (GetTarget()->IsNonMeleeSpellCast(false, false, true) || GetTarget()->HasUnitState(UNIT_STATE_CONTROLLED))
             chance = 0.0f;
 
+        //npcbot handle creature case (and prevent crashes)
+        Unit* target = GetTarget();
+        if (target->GetTypeId() == TYPEID_UNIT)
+        {
+            if (dmgInfo.GetDamageType() == SPELL_DIRECT_DAMAGE &&
+                roll_chance_f(target->ToCreature()->GetCreatureParryChance()))
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
+        }
+        else
+        //end npcbot
         if ((dmgInfo.GetDamageType() == SPELL_DIRECT_DAMAGE) && roll_chance_f(chance))
             absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
     }

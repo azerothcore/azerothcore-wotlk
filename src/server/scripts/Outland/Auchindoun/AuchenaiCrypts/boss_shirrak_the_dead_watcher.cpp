@@ -117,7 +117,14 @@ struct boss_shirrak_the_dead_watcher : public BossAI
             context.Repeat(10s);
         }).Schedule(17s, [this](TaskContext context)
         {
+            //npcbot
+            /*
+            //end npcbot
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            //npcbot
+            */
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f))
+            //end npcbot
             {
                 if (Creature* cr = me->SummonCreature(ENTRY_FOCUS_FIRE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 7000))
                 {

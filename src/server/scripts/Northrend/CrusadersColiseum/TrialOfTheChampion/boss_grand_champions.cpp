@@ -207,8 +207,14 @@ public:
         {
             if (m_ConditionsTimer <= diff)
             {
+                //npcbot: fix a crash where vehicle kit was already removed
+                if (me->GetVehicleKit())
+                //end npcbot
                 if (!conditions.empty())
                     if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                        //npcbot - do not check bots
+                        if (!passenger->IsNPCBot())
+                        //end npcbot
                         if (!sConditionMgr->IsObjectMeetToConditions(passenger, me, conditions))
                             passenger->ExitVehicle();
                 m_ConditionsTimer = VEHICLE_CONDITION_CHECK_TIME;
