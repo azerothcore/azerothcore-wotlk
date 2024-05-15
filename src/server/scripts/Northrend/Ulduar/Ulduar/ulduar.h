@@ -215,7 +215,15 @@ enum UlduarGameObjects
     GO_KOLOGARN_DOORS                       = 194553,
     GO_KEEPERS_GATE                         = 194255,
     GO_XT002_DOORS                          = 194631,
+
+    // Tram
     GO_MIMIRON_TRAM                         = 194675,
+    GO_MIMIRON_ACTIVATE_TRAM                = 194437,
+    GO_MIMIRON_CALL_TRAM_CENTER             = 194914,
+    GO_MIMIRON_CALL_TRAM_MIMIRON            = 194912,
+    GO_MIMIRON_TRAM_ROCKET_BOOSTER          = 194904,
+    GO_DOODAD_UL_TRAIN_TURNAROUND01         = 194915, // center
+    GO_DOODAD_UL_TRAIN_TURNAROUND02         = 194913, // mimiron
 
     // Mimiron, Hodir, Vezax
     GO_MIMIRON_ELEVATOR                     = 194749,
