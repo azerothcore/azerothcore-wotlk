@@ -899,11 +899,6 @@ class spell_sindragosa_unchained_magic_aura : public AuraScript
 {
     PrepareAuraScript(spell_sindragosa_unchained_magic_aura);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return true;
-    }
-
     bool AfterCheckProc(ProcEventInfo& /*eventInfo*/, bool isTriggeredAtSpellProcEvent)
     {
         if (!isTriggeredAtSpellProcEvent)
