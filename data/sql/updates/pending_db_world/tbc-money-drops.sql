@@ -3,4 +3,4 @@ UPDATE `creature_template` SET `mingold` = 625000, `maxgold` = 625000 WHERE `ent
 UPDATE `creature_template` SET `mingold` = 3000000, `maxgold` = 3000000 WHERE `entry` IN (17968, 19622, 21212, 22917);
 UPDATE `creature_template` SET `mingold` = 3500000, `maxgold` = 3500000 WHERE `entry` IN (25165, 25166);
 UPDATE `creature_template` SET `mingold` = 5000000, `maxgold` = 5000000 WHERE `entry` = 25315;
-UPDATE `creature_template` SET `mingold` = 4750000, `maxgold` = 5250000 WHERE `entry` IN (17257, 17711, 18728);
+UPDATE `creature_template` SET `mingold` = 4750000, `maxgold` = 5250000 WHERE `entry` IN (17257, 17711, 18728); -- Entirely guessed, ±25g from Wowhead's ~500g average money drop.
