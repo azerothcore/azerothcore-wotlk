@@ -4223,7 +4223,7 @@ void Unit::ProcessTerrainStatusUpdate()
     // remove appropriate auras if we are swimming/not swimming respectively
     if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
-    else if(!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    else if(!isSwimming())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     // liquid aura handling
