@@ -32,6 +32,14 @@ jobs:
             compiler:
               CC: gcc-12
               CXX: g++-12
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+          - os: ubuntu-24.04
+            compiler:
+              CC: gcc-14
+              CXX: g++-14
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
