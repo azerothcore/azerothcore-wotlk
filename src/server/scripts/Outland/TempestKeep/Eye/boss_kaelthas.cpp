@@ -472,7 +472,7 @@ struct boss_kaelthas : public BossAI
             {
                 DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
             }, 30250ms, 50650ms);
-            ScheduleTimedEvent(71000ms, [&]
+            ScheduleTimedEvent(50000ms, [&]
             {
                 Talk(SAY_SUMMON_PHOENIX);
                 DoCastSelf(SPELL_PHOENIX);

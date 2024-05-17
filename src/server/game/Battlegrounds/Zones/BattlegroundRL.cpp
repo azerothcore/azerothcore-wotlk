@@ -37,7 +37,7 @@ void BattlegroundRL::StartingEventOpenDoors()
         DoorOpen(i);
 
     for (uint32 i = BG_RL_OBJECT_BUFF_1; i <= BG_RL_OBJECT_BUFF_2; ++i)
-        SpawnBGObject(i, 60);
+        SpawnBGObject(i, 90);
 }
 
 bool BattlegroundRL::HandlePlayerUnderMap(Player* player)
