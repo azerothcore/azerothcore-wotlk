@@ -1398,14 +1398,11 @@ public:
 
             if (result)
             {
-                uint32 mapId = (*result)[0].Get<uint32>();
-                uint32 zoneId = (*result)[1].Get<uint32>();
-                float posX = (*result)[2].Get<float>();
-                float posY = (*result)[3].Get<float>();
-                float posZ = (*result)[4].Get<float>();
-                float posO = (*result)[5].Get<float>();
+                    Field* fieldsDB = result->Fetch();
+                    WorldLocation loc(fieldsDB[0].Get<uint16>(), fieldsDB[2].Get<float>(), fieldsDB[3].Get<float>(), fieldsDB[4].Get<float>(), 0.0f);
+                    uint32 zoneId = fieldsDB[1].Get<uint16>();
 
-                Player::SavePositionInDB(mapId, posX, posY, posZ, posO, zoneId, target->GetGUID());
+                    Player::SavePositionInDB(loc, zoneId, target->GetGUID(), nullptr);
 
                 handler->PSendSysMessage(LANG_SUMMONING, target->GetName(), handler->GetAcoreString(LANG_OFFLINE));
             }
