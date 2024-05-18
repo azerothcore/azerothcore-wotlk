@@ -27,10 +27,9 @@ enum Says
     SAY_DEATH                       = 3,
     SAY_PATHETIC                    = 4,
     SAY_TARGET_DUMMY                = 5,
-    // Death Knight Understudy
-    SAY_BEAT_ME                     = 0,
-    SAY_UNWORTHY                    = 1,
-    SAY_WORTHLESS                   = 2
+    SAY_DK_BEAT_ME                  = 0,
+    SAY_DK_UNWORTHY                 = 1,
+    SAY_DK_WORTHLESS                = 2
 };
 
 enum Spells
@@ -50,31 +49,19 @@ enum Events
     EVENT_JAGGED_KNIFE              = 3
 };
 
-enum Actions
-{
-    ACTION_SALUTE_RAZUVIOUS         = 0
-};
-
-enum Data
-{
-    DATA_CAN_SPEAK                  = 0
-};
-
-enum Groups
-{
-    GROUP_OOC_RP                    = 0
-};
-
 enum Misc
 {
     NPC_DEATH_KNIGHT_UNDERSTUDY     = 16803,
     NPC_RAZUVIOUS                   = 16061,
-    PATH = 1283120,
-    WP_TOP_LEFT = 1,
-    WP_TOP_RIGHT = 2,
-    WP_MIDDLE_RIGHT = 3,
-    WP_MIDDLE_BOTTOM = 4
-    // WP_MIDDLE_LEFT = 5,
+    NPC_TARGET_DUMMY                = 16211,
+    WP_TOP_LEFT                     = 1,
+    WP_TOP_RIGHT                    = 2,
+    WP_MIDDLE_RIGHT                 = 3,
+    WP_MIDDLE_BOTTOM                = 4,
+    // WP_MIDDLE_LEFT = 5
+    ACTION_INTERACT_WITH_RAZUVIOUS  = 0,
+    GROUP_OOC_RP                    = 0,
+    DATA_CAN_SPEAK                  = 0,
 };
 
 const uint32 TABLE_WAYPOINT_RP_10[4] = {WP_TOP_LEFT, WP_TOP_RIGHT, WP_TOP_LEFT, WP_TOP_RIGHT};
@@ -121,6 +108,7 @@ public:
         void Reset() override
         {
             BossAI::Reset();
+            me->SetControlled(false, UNIT_STATE_ROOT);
             summons.DespawnAll();
             events.Reset();
             SpawnHelpers();
@@ -140,41 +128,30 @@ public:
                 _roleplayReady = false;
                 if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
                 {
-                    // me->PauseMovement(); // ignores, keeps moving
-                    // me->StopMovingOnCurrentPos(); // ignores, keeps moving
-                    // me->StopMoving(); // ignores, keeps moving
-                    // me->GetMotionMaster()->MoveChase(understudy, 3.0f); // stops moving
-                    // me->GetMotionMaster()->Clear();
-                    // me->GetMotionMaster()->MovementExpired(false);
-                    // me->GetMotionMaster()->MovementExpired();
-                    // me->GetMotionMaster()->Clear();
-                    // me->GetMotionMaster()->MoveIdle();
-                    // me->GetMotionMaster()->MoveChase(understudy, 3.0f);
-                    me->PauseMovement(10000); // ignores, keeps moving
-
-                    scheduler.Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    me->SetFacingToObject(understudy);
+                    scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
-                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
+                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
                         {
-                            me->SetFacingToObject(understudy);
-                            if (_roleplayWaypointCount == 0 && Is25ManRaid())
-                            {
-                                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                            }
-                            else
+                            if (_roleplayWaypointCount == 0 && Is25ManRaid() && roll_chance_i(75))
                             {
                                 Talk(urand(SAY_PATHETIC,SAY_TARGET_DUMMY));
                             }
+                            else
+                            {
+                                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                            }
                         }
-                    }).Schedule(5s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                    }).Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
-                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
-                            understudy->AI()->DoAction(ACTION_SALUTE_RAZUVIOUS);
-                    }).Schedule(8s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
+                        {
+                            understudy->AI()->DoAction(ACTION_INTERACT_WITH_RAZUVIOUS);
+                        }
+                    }).Schedule(10s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
-                        // me->ResumeMovement();
-                        // me->GetMotionMaster()->MovePath(PATH, true);
-                        // me->GetMotionMaster()->
+                        me->SetControlled(false, UNIT_STATE_ROOT);
                     });
                 }
             }
@@ -184,14 +161,13 @@ public:
         {
             _roleplayWaypointCount = 1;
             _roleplayReady = false;
-            // scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
-            scheduler.Schedule(1s, 2s, GROUP_OOC_RP, [this](TaskContext context)
+            // scheduler.Schedule(1s, 2s, GROUP_OOC_RP, [this](TaskContext context)
+            scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
-                // waypoints 10M: 1,2 25M: 1,2,3,5
                 _roleplayWaypointCount = (_roleplayWaypointCount + 1) % 4;
                 _roleplayReady = true;
-                // context.Repeat(60s, 80s);
-                context.Repeat(30s, 40s);
+                context.Repeat(60s, 80s);
+                // context.Repeat(30s, 40s);
             });
         }
 
@@ -235,6 +211,7 @@ public:
         {
             BossAI::JustEngagedWith(who);
             scheduler.CancelGroup(GROUP_OOC_RP);
+            me->SetControlled(false, UNIT_STATE_ROOT);
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, 20s);
             events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, 15s);
@@ -298,28 +275,35 @@ public:
         {
             scheduler.CancelAll();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-            ScheduleRP();
+            scheduler.Schedule(6s, 9s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+            });
         }
 
         void DoAction(int32 param) override
         {
-            if (param == ACTION_SALUTE_RAZUVIOUS)
+            if (param == ACTION_INTERACT_WITH_RAZUVIOUS)
             {
-                if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f)) // TODO: lower this range
+                if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 36.0f))
                 {
                     me->SetFacingToObject(cr);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    scheduler.DelayGroup(GROUP_OOC_RP, 10s);
-                    scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                    scheduler.DelayGroup(GROUP_OOC_RP, 12s);
+                    scheduler.Schedule(2s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
                         if(_canSpeak)
-                            Talk(urand(SAY_BEAT_ME, SAY_WORTHLESS));
+                        {
+                            Talk(urand(SAY_DK_BEAT_ME, SAY_DK_WORTHLESS));
+                        }
                         else
+                        {
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    }).Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                        }
+                    }).Schedule(6s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
                         me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                    }).Schedule(7s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                    }).Schedule(11s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                     {
                         if (Creature* targetDummy = me->FindNearestCreature(16211, 10.0f))
                         {
@@ -329,14 +313,6 @@ public:
                     });
                 }
             }
-        }
-
-        void ScheduleRP()
-        {
-            scheduler.Schedule(6s, 8s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-            {
-                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-            });
         }
 
         void SetData(uint32 /*type*/, uint32 /*data*/) override
@@ -364,7 +340,8 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            scheduler.Update(diff);
+            if (!me->IsInCombat())
+                scheduler.Update(diff);
 
             if (UpdateVictim())
             {
