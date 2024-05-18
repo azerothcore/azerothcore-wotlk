@@ -159,13 +159,13 @@ public:
 
         void ScheduleRP()
         {
-            _roleplayWaypointCount = 1;
+            _roleplayWaypointNextIndex = 0;
             _roleplayReady = false;
             scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
-                _roleplayWaypointCount = (_roleplayWaypointCount + 1) % 4;
-                _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointCount];
+                _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointNextIndex];
                 _roleplayReady = true;
+                _roleplayWaypointNextIndex = (_roleplayWaypointNextIndex + 1) % 4;
                 context.Repeat(60s, 80s);
             });
         }
@@ -252,7 +252,7 @@ public:
         }
     private:
         bool _roleplayReady;
-        uint8 _roleplayWaypointCount;
+        uint8 _roleplayWaypointNextIndex;
         uint8 _roleplayWaypoint;
     };
 };
