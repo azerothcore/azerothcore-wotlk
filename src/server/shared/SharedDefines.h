@@ -365,11 +365,11 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] =
 size_t constexpr MAX_QUEST_DIFFICULTY = 5;
 uint32 constexpr QuestDifficultyColors[MAX_QUEST_DIFFICULTY] =
 {
-    0xff3fbf3f,
-    0xff7f7f7f,
+    0xff40c040,
+    0xff808080,
     0xffffff00,
-    0xffff7f3f,
-    0xffff1919
+    0xffff8040,
+    0xffff2020
 };
 
 // ***********************************
