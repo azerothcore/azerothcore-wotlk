@@ -109,6 +109,18 @@ struct boss_nightbane : public BossAI
         me->GetMotionMaster()->MoveTakeoff(POINT_DESPAWN, -11013.246f, -1770.5212f, 166.50139f);
     }
 
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageEffectType, SpellSchoolMask spellSchoolMask) override
+    {
+        if (_flying || Phase == 2)
+        {
+            if (damage >= me->GetHealth())
+            {
+                damage = me->GetHealth() - 1;
+            }
+        }
+        BossAI::DamageTaken(attacker, damage, damageEffectType, spellSchoolMask);
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -160,17 +172,21 @@ struct boss_nightbane : public BossAI
         scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
         {
             DoResetThreatList();
-            DoCastVictim(SPELL_RAIN_OF_BONES);
-            _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
             {
-                //spawns skeletons every second until skeletonCount is reached
-                if(_skeletonSpawnCounter < _skeletonCount)
+                _skeletonSpawnPos = target->GetPosition();
+                me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_RAIN_OF_BONES, true);
+                _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
                 {
-                    DoCastVictim(SPELL_SUMMON_SKELETON, true);
-                    _skeletonSpawnCounter++;
-                    context.Repeat(2s);
-                }
-            });
+                    //spawns skeletons every 2 seconds until skeletonCount is reached
+                    if(_skeletonSpawnCounter < _skeletonCount)
+                    {
+                        me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_SUMMON_SKELETON, true);
+                        _skeletonSpawnCounter++;
+                        context.Repeat(2s);
+                    }
+                });
+            }
         }).Schedule(20s, GROUP_FLYING, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_DISTRACTING_ASH);
@@ -371,6 +387,7 @@ private:
     uint32 _movePhase;
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
+    Position _skeletonSpawnPos;
 };
 
 class go_blackened_urn : public GameObjectScript
