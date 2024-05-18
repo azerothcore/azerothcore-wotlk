@@ -5,30 +5,86 @@
 # Targeted database: WrathOfTheLichKing
 
 /*
+17:51:28.833 - First stone gets consumed and summon begins.
+17:51:37.239 - Ahune appears.
+17:53:17.209 - Ahune submerges.
+17:53:46.262 - Frozen Core is destroyed, fight ends.
+*/
+
+/*
 16592 - Midsummer Bonfire           -- static
 25697 - Luma Skymother              -- static
+    Player casts 45926 on 25697, destroying her
 25710 - Numa Cloudsister            -- static
 25740 - Ahune                       -- summon
 25745 - [PH] Ahune Summon Loc Bunny -- static
+    Casts 45937 on position
+    Casts 46402 on position
+    Casts 46176 on position
+    Casts 46422 on 25740
+    Casts 45951 on position
+    Casts 46421 on 25740
+    Casts 46236 on 25754
+    Casts 46397 on self
+    Casts 46396 on position
 25746 - [PH] Ahune Loot Loc Bunny   -- static
+    Casts 46891 on position
+    Casts 46889 on self
 25754 - Earthen Ring Flamecaller    -- static
+    Casts 46345 on self
+    Casts 46341 on 25971
+    Casts 46341 on 25972
+    Casts 46341 on 25973
 25755 - Ahunite Hailstone           -- summon
+    Casts 46542 on self
+    Casts 2676 on self
 25756 - Ahunite Coldwave            -- summon
+    Casts 45955 on self
 25865 - Frozen Core                 -- summon
+    Casts 45941 on 25746
+    Casts 46843 on 26239
 25952 - Slippery Floor Bunny        -- static
+    Casts 46314
+    Makes players cast 45946, 45947 on themselves
 25961 - Earthen Ring Totem          -- static
+    Morphed with 32186 aura
 25964 - Shaman Beam Bunny 000       -- static
+    Casts 46333 on self
+    Casts 46336 on position
+    Gets destroyed after submerge?
 25965 - Shaman Beam Bunny 001       -- static
+    Casts 46333 on self
+    Casts 46336 on position
+    Gets destroyed after submerge?
 25966 - Shaman Beam Bunny 002       -- static
+    Casts 46333 on self
+    Casts 46336 on position
+    Gets destroyed after submerge?
 25971 - Shaman Bonfire Bunny 000    -- static
+    Casts 45964 on 25964
+    Casts 46339 on self
 25972 - Shaman Bonfire Bunny 001    -- static
+    Casts 45964 on 25965
+    Casts 46339 on self
 25973 - Shaman Bonfire Bunny 002    -- static
+    Casts 45964 on 25966
+    Casts 46339 on self
 25985 - Ahune Ice Spear Bunny       -- summon
+    Casts 46369 on position
+    Casts 75498 on self
+    Casts 46878 on self
+    Casts 46588 on position
 26120 - Wisp Dest Bunny             -- static
 26121 - Wisp Source Bunny           -- static
 26190 - [PH] Spank Target Bunny     -- static
+    Forces targets to cast 46735 on 26190
+    Casts 46734 on aforementioned targets
 26230 - Snow Bunny                  -- static
+26239 - Ghost of Ahune              -- ???
+    Casts 46786 on self
 40446 - Skar'this the Summoner      -- static
+    Casts 75427 on self
+    Casts 15043 on targets
 */
 
 SET @CGUID := SET_VALUE_MANUALLY_HERE;
