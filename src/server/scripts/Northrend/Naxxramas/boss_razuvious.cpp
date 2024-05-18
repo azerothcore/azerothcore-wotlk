@@ -123,7 +123,7 @@ public:
             if (!_roleplayReady)
                 return;
 
-            if (id == RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointCount])
+            if (id == _roleplayWaypoint)
             {
                 _roleplayReady = false;
                 if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
@@ -134,7 +134,7 @@ public:
                     {
                         if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
                         {
-                            if (_roleplayWaypointCount == 0 && Is25ManRaid() && roll_chance_i(75))
+                            if (_roleplayWaypoint == WP_MIDDLE_BOTTOM && roll_chance_i(75))
                             {
                                 Talk(urand(SAY_PATHETIC,SAY_TARGET_DUMMY));
                             }
@@ -164,6 +164,7 @@ public:
             scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
                 _roleplayWaypointCount = (_roleplayWaypointCount + 1) % 4;
+                _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointCount];
                 _roleplayReady = true;
                 context.Repeat(60s, 80s);
             });
@@ -252,6 +253,7 @@ public:
     private:
         bool _roleplayReady;
         uint8 _roleplayWaypointCount;
+        uint8 _roleplayWaypoint;
     };
 };
 
