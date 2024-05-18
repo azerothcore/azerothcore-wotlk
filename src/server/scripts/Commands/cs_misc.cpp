@@ -1389,10 +1389,8 @@ public:
             if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
                 return false;
 
-            ObjectGuid::LowType guid = sCharacterCache->GetCharacterGuidByName(target->GetName()).GetCounter();
-
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_HOMEBIND);
-            stmt->SetData(0, guid);
+            stmt->SetData(0, target->GetGUID().GetCounter());
 
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
