@@ -161,13 +161,11 @@ public:
         {
             _roleplayWaypointCount = 1;
             _roleplayReady = false;
-            // scheduler.Schedule(1s, 2s, GROUP_OOC_RP, [this](TaskContext context)
             scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
                 _roleplayWaypointCount = (_roleplayWaypointCount + 1) % 4;
                 _roleplayReady = true;
                 context.Repeat(60s, 80s);
-                // context.Repeat(30s, 40s);
             });
         }
 
