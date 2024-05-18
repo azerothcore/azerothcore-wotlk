@@ -16237,16 +16237,16 @@ std::string Player::GetPlayerName()
 
     switch (getClass())
     {
-        case CLASS_DEATH_KNIGHT: color = "|cffC41F3B"; break;
-        case CLASS_DRUID:        color = "|cffFF7D0A"; break;
-        case CLASS_HUNTER:       color = "|cffABD473"; break;
-        case CLASS_MAGE:         color = "|cff69CCF0"; break;
-        case CLASS_PALADIN:      color = "|cffF58CBA"; break;
-        case CLASS_PRIEST:       color = "|cffFFFFFF"; break;
-        case CLASS_ROGUE:        color = "|cffFFF569"; break;
-        case CLASS_SHAMAN:       color = "|cff0070DE"; break;
-        case CLASS_WARLOCK:      color = "|cff9482C9"; break;
-        case CLASS_WARRIOR:      color = "|cffC79C6E"; break;
+        case CLASS_DEATH_KNIGHT: color = "|cffc41e3a"; break;
+        case CLASS_DRUID:        color = "|cffff7c0a"; break;
+        case CLASS_HUNTER:       color = "|cffaad372"; break;
+        case CLASS_MAGE:         color = "|cff68ccef"; break;
+        case CLASS_PALADIN:      color = "|cfff48cba"; break;
+        case CLASS_PRIEST:       color = "|cffffffff"; break;
+        case CLASS_ROGUE:        color = "|cfffff468"; break;
+        case CLASS_SHAMAN:       color = "|cff0070dd"; break;
+        case CLASS_WARLOCK:      color = "|cff9382c9"; break;
+        case CLASS_WARRIOR:      color = "|cffc69b6d"; break;
     }
 
     return "|Hplayer:" + name + "|h" + color + name + "|h|r";
