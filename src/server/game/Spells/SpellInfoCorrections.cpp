@@ -4923,6 +4923,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry->friendlyMask &= ~1;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
     factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1812)); // K3 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
