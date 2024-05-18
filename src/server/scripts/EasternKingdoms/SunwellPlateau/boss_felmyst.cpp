@@ -178,6 +178,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
+            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
             BossAI::JustDied(killer);
             Talk(YELL_DEATH);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
