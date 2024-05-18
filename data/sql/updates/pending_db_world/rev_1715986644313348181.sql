@@ -1,8 +1,4 @@
 --
--- STATE_READY_1H
--- UPDATE `creature_template_addon` SET `emote` = 333 WHERE (`entry` = 16803);
--- UPDATE `creature_template_addon` SET `emote` = 333 WHERE (`entry` = 29941);
-
 -- Razuvious
 DELETE FROM `creature_text` WHERE `CreatureID` = 16061 AND `GroupID` IN (4, 5);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
