@@ -42,7 +42,26 @@ enum Events
 {
     EVENT_UNBALANCING_STRIKE        = 1,
     EVENT_DISRUPTING_SHOUT          = 2,
-    EVENT_JAGGED_KNIFE              = 3
+    EVENT_JAGGED_KNIFE              = 3,
+    // OOC RP
+    EVENT_GO_TRAINEE                = 4,
+    EVENT_TURN_TO_TRAINEE           = 5,
+    EVENT_EMOTE_SHOUT               = 6,
+    EVENT_ADD_TURN_RAZUV            = 7,
+    EVENT_ADD_TALK                  = 8,
+    EVENT_ADD_SALUTE                = 9,
+    EVENT_ADD_ATTACK                = 10,
+    EVENT_ADD_TURN_BACK             = 11
+};
+
+enum Actions
+{
+    ACTION_SALUTE_RAZUVIOUS = 0
+};
+
+enum Groups
+{
+    GROUP_OOC_RP        = 0
 };
 
 enum Misc
@@ -94,6 +113,49 @@ public:
             summons.DespawnAll();
             events.Reset();
             SpawnHelpers();
+            ScheduleRP();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != WAYPOINT_MOTION_TYPE)
+                return;
+
+            if (!_roleplayReady)
+                return;
+
+            if ( id == _roleplayWaypointCount || (id == 5 && _roleplayWaypointCount == 4))
+            {
+                _roleplayReady = false;
+                if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
+                {
+                    me->PauseMovement();
+                    me->SetFacingToObject(understudy);
+                    understudy->AI()->DoAction(ACTION_SALUTE_RAZUVIOUS);
+                    scheduler.Schedule(4s, GROUP_OOC_RP, [this](TaskContext context)
+                    {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    }).Schedule(8s, GROUP_OOC_RP, [this](TaskContext context)
+                    {
+                        me->ResumeMovement();
+                    });
+                }
+            }
+        }
+
+        void ScheduleRP()
+        {
+            _roleplayWaypointCount = 1;
+            _roleplayReady = false;
+            // scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
+            scheduler.Schedule(20s, 25s, GROUP_OOC_RP, [this](TaskContext context)
+            {
+                // waypoints 10M: 1,2 25M: 1,2,3,5
+                _roleplayWaypointCount = (_roleplayWaypointCount % RAID_MODE(2,4)) + 1;
+                _roleplayReady = true;
+                // context.Repeat(60s, 80s);
+                context.Repeat(30s, 40s);
+            });
         }
 
         void KilledUnit(Unit* who) override
@@ -135,6 +197,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
+            scheduler.CancelGroup(GROUP_OOC_RP);
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, 20s);
             events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, 15s);
@@ -171,6 +234,9 @@ public:
             }
             DoMeleeAttackIfReady();
         }
+    private:
+        bool _roleplayReady;
+        uint8 _roleplayWaypointCount;
     };
 };
 
@@ -193,7 +259,43 @@ public:
         void Reset() override
         {
             events.Reset();
+            ScheduleRP();
         }
+
+        void DoAction(int32 param) override
+        {
+            if (param == ACTION_SALUTE_RAZUVIOUS)
+            {
+                if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f))
+                {
+                    me->SetFacingToObject(cr);
+                    scheduler.DelayGroup(GROUP_OOC_RP, 10s);
+                    scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext context)
+                    {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    }).Schedule(4s, GROUP_OOC_RP, [this](TaskContext context)
+                    {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    }).Schedule(2s, GROUP_OOC_RP, [this](TaskContext context)
+                    {
+                        if (Creature* targetDummy = me->FindNearestCreature(16211, 10.0f))
+                        {
+                            me->SetFacingToObject(targetDummy);
+                            me->HandleEmoteCommand(EMOTE_STATE_READY1H);
+                        }
+                    });
+                }
+            }
+        }
+
+        void ScheduleRP()
+        {
+            scheduler.Schedule(6s, 8s, GROUP_OOC_RP, [this](TaskContext context)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+            });
+        }
+
 
         void KilledUnit(Unit* who) override
         {
@@ -205,6 +307,7 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
+            scheduler.CancelGroup(GROUP_OOC_RP);
             if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f))
             {
                 cr->SetInCombatWithZone();
