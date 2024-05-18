@@ -1739,6 +1739,26 @@ bool BattlegroundAV::SetupBattleground()
                 return false;
         }
 
+    // Generic gameobjects
+    for (uint16 i = 0; i <= (BG_AV_OBJECT_GENERIC_MAX - BG_AV_OBJECT_GENERIC_MIN); i++)
+    {
+        if (!AddObject(BG_AV_OBJECT_GENERIC_MIN + i,
+            std::get<0>(BG_AV_GenericObjectPos[i]),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionX(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionY(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionZ(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetOrientation(),
+            std::get<2>(BG_AV_GenericObjectPos[i])[0],
+            std::get<2>(BG_AV_GenericObjectPos[i])[1],
+            std::get<2>(BG_AV_GenericObjectPos[i])[2],
+            std::get<2>(BG_AV_GenericObjectPos[i])[3],
+            RESPAWN_ONE_DAY))
+        {
+            LOG_ERROR("bg.battleground", "BatteGroundAV: Failed to spawn some object Battleground not created!10.{}", i);
+            return false;
+        }
+    }
+
     // Quest banners
     if (!AddObject(BG_AV_OBJECT_FROSTWOLF_BANNER, BG_AV_OBJECTID_FROSTWOLF_BANNER, BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3], 0, 0, std::sin(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3] / 2), cos(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3] / 2), RESPAWN_ONE_DAY))
     {
@@ -1793,6 +1813,10 @@ bool BattlegroundAV::SetupBattleground()
     if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
         for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
             SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+
+    // Generic gameobjects
+    for (uint16 i = BG_AV_OBJECT_GENERIC_MIN; i <= BG_AV_OBJECT_GENERIC_MAX; i++)
+        SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
     // Quest banners
     SpawnBGObject(BG_AV_OBJECT_FROSTWOLF_BANNER, RESPAWN_IMMEDIATELY);
