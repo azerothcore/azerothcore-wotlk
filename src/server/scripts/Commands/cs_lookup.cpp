@@ -517,7 +517,7 @@ public:
 
                             if (handler->GetSession())
                             {
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, ItemQualityColors[itemTemplate.Quality], itemTemplate.ItemId, name.c_str());
                             }
                             else
                             {
