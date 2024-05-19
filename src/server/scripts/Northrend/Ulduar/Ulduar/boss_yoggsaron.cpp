@@ -1537,7 +1537,7 @@ public:
     {
         boss_yoggsaron_crusher_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->CastSpell(me, SPELL_CRUSH, true);
             me->CastSpell(me, SPELL_FOCUSED_ANGER, true);
             me->CastSpell(me, SPELL_DIMINISH_POWER, false);
@@ -1599,7 +1599,7 @@ public:
     {
         boss_yoggsaron_corruptor_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void DoAction(int32 param) override
@@ -1656,7 +1656,7 @@ public:
     {
         boss_yoggsaron_constrictor_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             _checkTimer = 1;
             _playerGUID.Clear();
         }

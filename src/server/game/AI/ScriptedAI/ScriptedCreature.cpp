@@ -191,8 +191,7 @@ bool SummonList::IsAnyCreatureInCombat() const
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
-    IsFleeing(false),
-    _isCombatMovementAllowed(true)
+    IsFleeing(false)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -209,7 +208,7 @@ void ScriptedAI::AttackStartNoMove(Unit* who)
 
 void ScriptedAI::AttackStart(Unit* who)
 {
-    if (IsCombatMovementAllowed())
+    if (me->IsCombatMovementAllowed())
         CreatureAI::AttackStart(who);
     else
         AttackStartNoMove(who);
@@ -537,11 +536,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
 }
 
-void ScriptedAI::SetCombatMovement(bool allowMovement)
-{
-    _isCombatMovementAllowed = allowMovement;
-}
-
 enum eNPCs
 {
     NPC_BROODLORD   = 12017,
@@ -577,6 +571,7 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     summons(creature),
     _bossId(bossId)
 {
+    callForHelpRange = 0.0f;
     if (instance)
         SetBoundary(instance->GetBossBoundary(bossId));
 
@@ -636,6 +631,13 @@ void BossAI::_JustEngagedWith()
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
+    if (callForHelpRange)
+    {
+        ScheduleTimedEvent(0s, [&]
+        {
+            me->CallForHelp(callForHelpRange);
+        }, 2s);
+    }
     if (instance)
     {
         // bosses do not respawn, check only on enter combat

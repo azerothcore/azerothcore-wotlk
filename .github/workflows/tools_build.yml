@@ -25,7 +25,7 @@ jobs:
       github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
       && (
         contains(github.event.pull_request.labels.*.name, 'run-build')
-        || github.event.label.name == 'run-build')
+        || github.event.label.name == 'run-build'
       )
     steps:
       - uses: actions/checkout@v4

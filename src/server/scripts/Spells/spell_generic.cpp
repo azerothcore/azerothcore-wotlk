@@ -5134,6 +5134,43 @@ class spell_gen_choking_vines : public AuraScript
     }
 };
 
+ // 28865 - Consumption
+class spell_gen_consumption : public SpellScript
+{
+    PrepareSpellScript(spell_gen_consumption);
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        Map* map = GetCaster()->GetMap();
+        if (!map)
+        {
+            return;
+        }
+        int32 value = 0;
+        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX25 N
+        {
+            value = urand(4500, 4700);
+        }
+        else if (map->GetId() == 533) // NAXX10 N
+        {
+            value = urand(3000, 3200);
+        }
+        else if (map->GetId() == 532) // Karazhan
+        {
+            value = urand(1110, 1310);
+        }
+        if (value)
+        {
+            SetEffectValue(value);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5287,5 +5324,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_jubling_cooldown);
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
+    RegisterSpellScript(spell_gen_consumption);
 }
 
