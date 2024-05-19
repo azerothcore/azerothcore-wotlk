@@ -832,14 +832,19 @@ class spell_dk_pet_scaling : public AuraScript
                 if (aurEff->GetMiscValue() == STAT_STAMINA)
                 {
                     uint32 actStat = GetUnitOwner()->GetHealth();
+                    float hppct = GetUnitOwner()->GetHealthPct() / 100.0f;//当前血量百分比
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                    //GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                    GetUnitOwner()->SetHealth((uint32)(GetUnitOwner()->GetMaxHealth() * hppct));//按百分比更新血量
+
                 }
                 else
                 {
                     uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    float pwpct = GetUnitOwner()->GetPowerPct(POWER_MANA) / 100.0f;//当前蓝量百分比
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    //GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_MANA, (uint32)(GetUnitOwner()->GetMaxPower(POWER_MANA) * pwpct));//按百分比更新蓝量
                 }
             }
         }
