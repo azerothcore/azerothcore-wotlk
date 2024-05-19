@@ -757,7 +757,6 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
             case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
             case SMART_ACTION_SET_COMBAT_DISTANCE: return sizeof(SmartAction::combatDistance);
-            case SMART_ACTION_SET_CASTER_COMBAT_DIST: return sizeof(SmartAction::casterDistance);
             case SMART_ACTION_FALL: return NO_PARAMS;
             case SMART_ACTION_SET_EVENT_FLAG_RESET: return sizeof(SmartAction::setActive);
             case SMART_ACTION_STOP_MOTION: return sizeof(SmartAction::stopMotion);
@@ -1927,7 +1926,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_EXIT_VEHICLE:
         case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS:
         case SMART_ACTION_SET_COMBAT_DISTANCE:
-        case SMART_ACTION_SET_CASTER_COMBAT_DIST:
         case SMART_ACTION_SET_SIGHT_DIST:
         case SMART_ACTION_FLEE:
         case SMART_ACTION_ADD_THREAT:
