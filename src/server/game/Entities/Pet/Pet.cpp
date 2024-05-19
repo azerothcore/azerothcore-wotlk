@@ -484,8 +484,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
                 setDeathState(DeathState::JustDied);
             else
             {
-                SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
-                SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+                //SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
+                //SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+                SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+                SetFullHealth();
             }
         }
 

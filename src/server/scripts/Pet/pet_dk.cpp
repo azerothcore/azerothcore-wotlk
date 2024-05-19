@@ -351,10 +351,13 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
         int32 damage = 60;
         if (Unit* caster = GetCaster())
         {
+            int32 ap = 0;
+            if (Unit* owner = caster->GetOwner())
+                ap = owner->GetInt32Value(UNIT_FIELD_ATTACK_POWER) + owner->GetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS);
             if (caster->GetLevel() >= 60)
             {
-                damage += (caster->GetLevel() - 60) * 4;
-                damage = damage * 2;//增加邪DK天鬼伤害至0.4AP(之前为0.2AP)
+                damage += (caster->GetLevel() - 60) * 3;
+                damage += ap * 0.4;//增加邪DK天鬼伤害0.4AP
             }
         }
 
@@ -363,7 +366,7 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectLaunchTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
