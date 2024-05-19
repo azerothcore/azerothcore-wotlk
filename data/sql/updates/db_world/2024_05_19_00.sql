@@ -1,3 +1,4 @@
+-- DB update 2024_05_18_02 -> 2024_05_19_00
 -- Update gameobject 'Crossroads' Supply Crates' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (175708))
