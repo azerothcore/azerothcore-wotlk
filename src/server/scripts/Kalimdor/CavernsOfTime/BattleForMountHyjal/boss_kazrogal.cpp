@@ -48,12 +48,17 @@ struct boss_kazrogal : public BossAI
 public:
     boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL)
     {
-        _recentlySpoken = false;
-        _markCounter = 0;
         scheduler.SetValidator([this]
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
+    }
+
+    void Reset() override
+    {
+        _recentlySpoken = false;
+        _markCounter = 0;
+        BossAI::Reset();
     }
 
     void JustEngagedWith(Unit * who) override
