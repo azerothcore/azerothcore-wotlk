@@ -102,6 +102,18 @@ WanderNode* WanderNode::FindInMapWPs(uint32 mapId, node_check_ftype_c const& pre
     return ci == ALL_WPS_PER_MAP.at(mapId).cend() ? nullptr : *ci;
 }
 
+WanderNode* WanderNode::FindInZoneWPs(uint32 zoneId, node_check_ftype_c const& pred)
+{
+    lock_type lock(*GetLock());
+
+    auto cim = ALL_WPS_PER_ZONE.find(zoneId);
+    if (cim == ALL_WPS_PER_ZONE.cend())
+        return nullptr;
+    auto ci = std::find_if(ALL_WPS_PER_ZONE.at(zoneId).cbegin(), ALL_WPS_PER_ZONE.at(zoneId).cend(), pred);
+
+    return ci == ALL_WPS_PER_ZONE.at(zoneId).cend() ? nullptr : *ci;
+}
+
 WanderNode* WanderNode::FindInAreaWPs(uint32 areaId, node_check_ftype_c const& pred)
 {
     lock_type lock(*GetLock());
