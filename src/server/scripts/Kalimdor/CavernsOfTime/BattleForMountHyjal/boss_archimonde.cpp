@@ -188,9 +188,12 @@ struct npc_doomfire_targetting : public ScriptedAI
     {
         ScheduleTimedEvent(5s, [&]
         {
-            // should move to a random new position every so often
-            Position randomPosition = me->GetRandomNearPosition(40.0f);
-            me->GetMotionMaster()->MovePoint(0, randomPosition);
+            // chases someone else every 5 seconds
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
+            {
+                me->GetMotionMaster()->MoveChase(target);
+            }
+            
         }, 5s);
     }
 
