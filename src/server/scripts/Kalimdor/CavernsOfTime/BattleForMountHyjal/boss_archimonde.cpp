@@ -310,7 +310,7 @@ struct boss_archimonde : public BossAI
         ScheduleTimedEvent(25s, 35s, [&]
         {
             Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST);
+            DoCastRandomTarget(SPELL_AIR_BURST, 0, 0.0f, true, false, false);
         }, 25s, 40s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
