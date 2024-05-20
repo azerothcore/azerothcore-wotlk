@@ -144,11 +144,9 @@ struct npc_ancient_wisp : public ScriptedAI
             return;
 
     }
-
 private:
     InstanceScript* _instance;
 };
-
 
 struct boss_archimonde : public BossAI
 {
