@@ -256,6 +256,7 @@ struct boss_archimonde : public BossAI
         }
 
         ScheduleHealthCheckEvent(10, [&]{
+            scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
             DoCastProtection();
             Talk(SAY_ENRAGE);
