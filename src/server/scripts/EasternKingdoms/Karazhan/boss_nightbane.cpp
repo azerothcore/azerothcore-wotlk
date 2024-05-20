@@ -51,7 +51,8 @@ enum Says
 enum Groups
 {
     GROUP_GROUND                = 0,
-    GROUP_FLYING                = 1
+    GROUP_FLYING                = 1,
+    GROUP_LAND                  = 2
 };
 
 enum Points
@@ -300,7 +301,8 @@ struct boss_nightbane : public BossAI
         ScheduleFly();
 
         //handle landing again
-        scheduler.Schedule(45s, 60s, [this](TaskContext)
+        scheduler.CancelGroup(GROUP_LAND);
+        scheduler.Schedule(45s, 60s, GROUP_LAND, [this](TaskContext)
         {
             Talk(YELL_LAND_PHASE);
 
@@ -309,7 +311,7 @@ struct boss_nightbane : public BossAI
 
             _flying = true;
             scheduler.CancelGroup(GROUP_FLYING);
-            scheduler.Schedule(2s, [this](TaskContext)
+            scheduler.Schedule(2s, GROUP_LAND, [this](TaskContext)
             {
                 ScheduleGround();
             });
