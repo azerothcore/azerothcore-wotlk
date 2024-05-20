@@ -149,58 +149,6 @@ private:
     InstanceScript* _instance;
 };
 
-//TODO: move to db?
-struct npc_doomfire : public ScriptedAI
-{
-    npc_doomfire(Creature* creature) : ScriptedAI(creature), _summons(me) { }
-
-    void Reset() override
-    {
-        _summons.DespawnAll();
-    }
-
-    void MoveInLineOfSight(Unit* /*who*/) override { }
-
-    void JustEngagedWith(Unit* /*who*/) override { }
-
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        damage = 0;
-    }
-
-    void JustSummoned(Creature* summoned) override
-    {
-        _summons.Summon(summoned);
-        if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
-        {
-            me->GetMotionMaster()->MoveFollow(summoned, 0.0f, 0.0f);
-        }
-    }
-private:
-    SummonList _summons;
-};
-
-struct npc_doomfire_targetting : public ScriptedAI
-{
-    npc_doomfire_targetting(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        ScheduleTimedEvent(5s, [&]
-        {
-            // chases someone else every 5 seconds
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
-            {
-                me->GetMotionMaster()->MoveChase(target);
-            }
-        }, 5s);
-    }
-
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        damage = 0;
-    }
-};
 
 struct boss_archimonde : public BossAI
 {
@@ -427,18 +375,23 @@ struct boss_archimonde : public BossAI
         {
             summoned->AI()->AttackStart(me);
         }
+        else if (summoned->GetEntry() == CREATURE_DOOMFIRE)
+        {
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
+        }
+        else if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
+        {
+            Position randomPosition = summoned->GetRandomNearPosition(40.0f);
+            summoned->GetMotionMaster()->MovePoint(0, randomPosition);
+        }
         else
         {
             summoned->SetFaction(me->GetFaction()); //remove?
             summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
-
-        if (summoned->GetEntry() == CREATURE_DOOMFIRE)
-        {
-            summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
-            summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
-        }
+        
     }
 
     void DoCastDoomFire(Unit* target)
@@ -447,12 +400,16 @@ struct boss_archimonde : public BossAI
         Talk(SAY_DOOMFIRE);
         Position spiritPosition = { target->GetPositionX() + DOOMFIRE_OFFSET,  target->GetPositionY() + DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
         Position doomfirePosition = { target->GetPositionX() - DOOMFIRE_OFFSET,  target->GetPositionY() - DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
-        if (Unit* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+        if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
-            if (Unit* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+            if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
             {
                 doomfireSpirit->SetVisible(false);
                 doomfire->SetVisible(false);
+                doomfireSpirit->SetWalk(false);
+                doomfireSpirit->SetReactState(REACT_PASSIVE);
+                doomfire->SetReactState(REACT_PASSIVE);
+                doomfire->GetMotionMaster()->MoveFollow(doomfireSpirit, 0.0f, 0.0f);
             }
         }
     }
@@ -553,8 +510,6 @@ void AddSC_boss_archimonde()
     RegisterSpellScript(spell_hand_of_death);
     RegisterSpellScript(spell_finger_of_death);
     RegisterHyjalAI(boss_archimonde);
-    RegisterHyjalAI(npc_doomfire);
-    RegisterHyjalAI(npc_doomfire_targetting);
     RegisterHyjalAI(npc_ancient_wisp);
 }
 
