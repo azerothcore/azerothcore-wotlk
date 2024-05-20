@@ -193,7 +193,6 @@ struct npc_doomfire_targetting : public ScriptedAI
             {
                 me->GetMotionMaster()->MoveChase(target);
             }
-            
         }, 5s);
     }
 
