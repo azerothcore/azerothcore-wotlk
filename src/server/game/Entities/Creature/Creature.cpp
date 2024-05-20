@@ -594,6 +594,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         AIM_Initialize();
     }
 
+    LastUsedScriptID = GetScriptId();
+
     return true;
 }
 
@@ -2959,8 +2961,11 @@ std::string Creature::GetScriptName() const
 uint32 Creature::GetScriptId() const
 {
     if (CreatureData const* creatureData = GetCreatureData())
-        if (uint32 scriptId = creatureData->ScriptId)
+    {
+        uint32 scriptId = creatureData->ScriptId;
+        if (scriptId && GetEntry() == creatureData->id1)
             return scriptId;
+    }
 
     return sObjectMgr->GetCreatureTemplate(GetEntry())->ScriptID;
 }

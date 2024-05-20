@@ -2197,8 +2197,11 @@ void GameObject::EventInform(uint32 eventId)
 uint32 GameObject::GetScriptId() const
 {
     if (GameObjectData const* gameObjectData = GetGameObjectData())
-        if (uint32 scriptId = gameObjectData->ScriptId)
+    {
+        uint32 scriptId = gameObjectData->ScriptId;
+        if (scriptId && GetEntry() == gameObjectData->id)
             return scriptId;
+    }
 
     return GetGOInfo()->ScriptId;
 }

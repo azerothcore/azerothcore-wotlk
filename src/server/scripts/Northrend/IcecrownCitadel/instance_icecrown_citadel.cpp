@@ -397,6 +397,13 @@ public:
                     DeathbringerSaurfangGUID = creature->GetGUID();
                     break;
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
+                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    {
+                        creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, creature->GetCreatureData(), true, true);
+                        creature->LoadEquipment();
+                    }
+                    DeathbringerSaurfangEventGUID = creature->GetGUID();
+                    break;
                 case NPC_SE_MURADIN_BRONZEBEARD:
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
                     break;
@@ -575,14 +582,6 @@ public:
                     return 0;
                 case NPC_SPIRE_FROSTWYRM:
                     if ((TeamIdInInstance == TEAM_ALLIANCE && data->posY < 2200.0f) || (TeamIdInInstance == TEAM_HORDE && data->posY > 2200.0f))
-                        return 0;
-                    break;
-                case NPC_SE_HIGH_OVERLORD_SAURFANG:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
-                        return 0;
-                    break;
-                case NPC_SE_MURADIN_BRONZEBEARD:
-                    if (TeamIdInInstance == TEAM_HORDE)
                         return 0;
                     break;
             }
