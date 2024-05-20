@@ -391,7 +391,6 @@ struct boss_archimonde : public BossAI
             summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
-        
     }
 
     void DoCastDoomFire(Unit* target)
