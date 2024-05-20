@@ -95,6 +95,8 @@ struct boss_nightbane : public BossAI
         _intro = true;
         Phase = 1;
         _movePhase = 0;
+        _triggerCountTakeOffWhileFlying = 0;
+        _flightPhasesCompleted = 0;
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
             TakeOff();
@@ -111,7 +113,7 @@ struct boss_nightbane : public BossAI
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageEffectType, SpellSchoolMask spellSchoolMask) override
     {
-        if (_flying || Phase == 2)
+        if (_flightPhasesCompleted < 3)
         {
             if (damage >= me->GetHealth())
             {
@@ -254,9 +256,22 @@ struct boss_nightbane : public BossAI
                 _movePhase = id + 1;
             else
             {
-                Phase = 1;
                 _flying = false;
-                _movement = true;
+                _flightPhasesCompleted++;
+                if (_triggerCountTakeOffWhileFlying > 0)
+                {
+                    _triggerCountTakeOffWhileFlying--;
+                    scheduler.Schedule(2s, [this](TaskContext)
+                    {
+                        TakeOff(true);
+                    });
+                }
+                else
+                {
+                    Phase = 1;
+                    _movement = true;
+                    ScheduleGround();
+                }
                 return;
             }
         }
@@ -284,8 +299,13 @@ struct boss_nightbane : public BossAI
         }
     }
 
-    void TakeOff()
+    void TakeOff(bool justLanded = false)
     {
+        if ((_flying || Phase == 2) && !justLanded)
+        {
+            _triggerCountTakeOffWhileFlying++;
+            return;
+        }
         Talk(YELL_FLY_PHASE);
         scheduler.CancelGroup(GROUP_GROUND);
 
@@ -309,10 +329,6 @@ struct boss_nightbane : public BossAI
 
             _flying = true;
             scheduler.CancelGroup(GROUP_FLYING);
-            scheduler.Schedule(2s, [this](TaskContext)
-            {
-                ScheduleGround();
-            });
         });
     }
 
@@ -388,6 +404,8 @@ private:
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
     Position _skeletonSpawnPos;
+    uint8 _triggerCountTakeOffWhileFlying;
+    uint8 _flightPhasesCompleted;
 };
 
 class go_blackened_urn : public GameObjectScript
