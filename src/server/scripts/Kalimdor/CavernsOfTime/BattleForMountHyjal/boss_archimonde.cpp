@@ -186,35 +186,18 @@ struct npc_doomfire_targetting : public ScriptedAI
 
     void Reset() override
     {
-        _chaseTarget = nullptr;
         ScheduleTimedEvent(5s, [&]
         {
-            if (_chaseTarget)
-            {
-                me->GetMotionMaster()->MoveFollow(_chaseTarget, 0.0f, 0.0f);
-            }
-            else
-            {
-                Position randomPosition = me->GetRandomNearPosition(40.0f);
-                me->GetMotionMaster()->MovePoint(0, randomPosition);
-            }
+            // should move to a random new position every so often
+            Position randomPosition = me->GetRandomNearPosition(40.0f);
+            me->GetMotionMaster()->MovePoint(0, randomPosition);
         }, 5s);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->IsPlayer())
-        {
-            _chaseTarget = who;
-        }
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         damage = 0;
     }
-private:
-    Unit* _chaseTarget;
 };
 
 struct boss_archimonde : public BossAI
