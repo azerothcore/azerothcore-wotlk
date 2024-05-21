@@ -17173,7 +17173,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             else
             {
                 _canAppearInWorld = false;
-                LOG_ERROR("npcbots", "Error: bot {} is not in world", me->GetEntry());
+                LOG_ERROR("npcbots", "Bot {} tried to check hide status but doesn't have a valid map set", me->GetEntry());
             }
         }
         else
@@ -18264,7 +18264,7 @@ bool bot_ai::FinishTeleport(bool reset)
     //1) Cannot teleport: master disappeared - return home
     if (IAmFree()/* || master->GetSession()->isLogingOut()*/)
     {
-        TeleportHomeStart(true);
+        TeleportHomeStart(!BotMgr::HideBotSpawns() || !CanAppearInWorld());
         _evadeMode = false;
 
         return false;
