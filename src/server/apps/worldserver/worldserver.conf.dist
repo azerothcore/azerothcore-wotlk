@@ -4611,6 +4611,16 @@ NpcBot.Limit.Dungeon = 1
 NpcBot.Limit.Raid    = 1
 
 #
+#    NpcBot.HideSpawns
+#        Description: Prevent inactive bots from entering world
+#        Note:        Botgiver npc will become the only way to hire bots
+#        Note2:       Only GM's presense will reveal bot's spawn location (temporarily)
+#        Default:     0 - (Disabled, keep all spawned bots in world)
+#                     1 - (Enabled)
+
+NpcBot.HideSpawns = 0
+
+#
 #    NpcBot.Cost
 #        Description: Bot recruitment cost (in copper).
 #        Note:        This value is for level 80 characters, for lower levels cost is reduced.

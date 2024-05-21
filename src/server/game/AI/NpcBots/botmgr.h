@@ -7,6 +7,7 @@
 #include <functional>
 #include <mutex>
 
+class bot_ai;
 class Battleground;
 class Creature;
 class GameObject;
@@ -43,7 +44,7 @@ enum BotAddResult
     BOT_ADD_MAX_CLASS_EXCEED            = 0x008,
     BOT_ADD_CANT_AFFORD                 = 0x010,
     BOT_ADD_INSTANCE_LIMIT              = 0x020,
-    BOT_ADD_BUSY                        = 0x040,
+    BOT_ADD_BUSY                        = 0x040, // unused
     BOT_ADD_NOT_AVAILABLE               = 0x080,
 
     BOT_ADD_SUCCESS                     = 0x100,
@@ -113,6 +114,7 @@ class AC_GAME_API BotMgr
         static bool MixWeaponInventoryTypes();
         static bool TransmogUseEquipmentSlots();
         static bool IsClassEnabled(uint8 m_class);
+        static bool HideBotSpawns();
         static bool IsEnrageOnDimissEnabled();
         static bool IsBotStatsLimitsEnabled();
         static bool IsPvPEnabled();
@@ -297,7 +299,7 @@ class AC_GAME_API BotMgr
 
         //TELEPORT BETWEEN MAPS
         //CONFIRMEND UNSAFE (charmer,owner)
-        static void TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick = false, bool reset = false);
+        static void TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick = false, bool reset = false, bot_ai* detatched_ai = nullptr);
 
         AoeSpotsVec const& GetAoeSpots() const { return _aoespots; }
         AoeSpotsVec& GetAoeSpots() { return _aoespots; }
@@ -315,7 +317,7 @@ class AC_GAME_API BotMgr
         static void HandleDelayedTeleports();
 
     private:
-        static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset);
+        static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset, bot_ai* detatched_ai);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
         void _setBotExactAttackRange(uint8 exactRange) { _exactAttackRange = exactRange; }
         static delayed_teleport_mutex_type* _getTpLock();
