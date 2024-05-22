@@ -347,7 +347,7 @@ public:
             GetInPosition(force, u);
         }
 
-        void JustEngagedWith(Unit* u) override { TotemsCheckTimer = 0; bot_ai::JustEngagedWith(u); }
+        void JustEngagedWith(Unit* u) override { TotemsCheckTimer = 0; canTremor = false; bot_ai::JustEngagedWith(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
@@ -474,19 +474,40 @@ public:
             if (TotemTimer[T_EARTH] <= diff && me->IsInCombat() && !IAmFree() &&
                 IsSpellReady(TREMOR_TOTEM_1, diff, false) && _totems[T_EARTH].second._type != BOT_TOTEM_TREMOR)
             {
-                //Tremor no cd, party members only
-                uint8 count = 0;
-                for (Unit const* member : members)
+                //Tremor no cd
+                if (Unit const* victim = me->GetVictim())
                 {
-                    if (me->GetMap() != member->FindMap() || !member->InSamePhase(me) ||
-                        !member->IsAlive() || me->GetDistance(member) > 20 ||
-                        (member->IsPlayer() ? member->ToPlayer()->GetSubGroup() : member->ToCreature()->GetSubGroup()) != subgr ||
-                        (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
-                        !member->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
-                        continue;
-                    ++count;
+                    if (Spell const* vspell = victim->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                    {
+                        if (vspell->m_targets.GetUnitTargetGUID() == me->GetGUID())
+                        {
+                            SpellInfo const* vspellInfo = vspell->GetSpellInfo();
+                            static const std::array<uint32, 3> TremorMechanics = { MECHANIC_FEAR, MECHANIC_CHARM, MECHANIC_SLEEP };
+                            static const auto is_tremor_effect = [](SpellEffectInfo const& effect) {  return effect.IsAura(SPELL_AURA_MOD_FEAR) || effect.IsAura(SPELL_AURA_MOD_CHARM); };
+                            if (std::find(TremorMechanics.cbegin(), TremorMechanics.cend(), vspellInfo->Mechanic) != TremorMechanics.cend() ||
+                                std::any_of(vspellInfo->Effects.cbegin(), vspellInfo->Effects.cend(), is_tremor_effect))
+                            {
+                                canTremor = true;
+                            }
+                        }
+                    }
                 }
-                if (count >= (1 + 1*(!!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH))))
+                if (!canTremor)
+                {
+                    uint8 count = 0;
+                    for (Unit const* member : members)
+                    {
+                        if (me->GetMap() != member->FindMap() || !member->InSamePhase(me) ||
+                            !member->IsAlive() || me->GetDistance(member) > 20 ||
+                            (member->IsPlayer() ? member->ToPlayer()->GetSubGroup() : member->ToCreature()->GetSubGroup()) != subgr ||
+                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
+                            !member->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
+                            continue;
+                        ++count;
+                    }
+                    canTremor = count >= (1 + 1*(!!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH)));
+                }
+                if (canTremor)
                 {
                     if (doCast(me, GetSpell(TREMOR_TOTEM_1), CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
                         if (!CotE)
@@ -2748,6 +2769,8 @@ public:
         uint32 mhEnchantExpireTimer, ohEnchantExpireTimer;
         uint32 mhEnchant, ohEnchant;
         bool needChooseMHEnchant, needChooseOHEnchant;
+
+        bool canTremor;
 
         typedef std::unordered_map<uint32 /*baseId*/, int32 /*amount*/> HealMap;
         HealMap _heals;
