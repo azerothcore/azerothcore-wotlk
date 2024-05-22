@@ -47,7 +47,7 @@
     Casts 46430 on 25740
     Casts 46843 on 26239
 25952 - Slippery Floor Bunny        -- static
-    Casts 46314
+    Casts 46314 on spawn
     Makes players cast 45946, 45947 on themselves
 25961 - Earthen Ring Totem          -- static
     Morphed with 32186 aura

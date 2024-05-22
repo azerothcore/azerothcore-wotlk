@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "the_slave_pens.h"
+#include "SpellScriptLoader.h"
 
 #define GOSSIP_TEXT_ID          15864
 #define QUEST_SUMMON_AHUNE      11691
@@ -64,6 +65,9 @@ enum EventSpells
     SPELL_ICE_SPEAR_SUMMON_OBJ  = 46369,
     SPELL_ICE_SPEAR_CONTROL_AURA= 46371, // periodic dummy
     */
+
+    SPELL_SLIPPED_SPEED         = 45946,
+    SPELL_SLIPPED_STUN          = 45947,
 };
 
 enum CreatureIds
@@ -399,9 +403,38 @@ public:
     }
 };
 
+class spell_ahune_slippery_ambient : public SpellScriptLoader
+{
+public:
+    spell_ahune_slippery_ambient() : SpellScriptLoader("spell_ahune_slippery_ambient") { }
+
+    class spell_ahune_slippery_ambient_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_ahune_slippery_ambient_AuraScript);
+
+        void Update(AuraEffect const* effect)
+        {
+            // check radius for players (18y)
+
+            // make players in radius cast the two slipped spells if they're moving (maybe?)
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ahune_slippery_ambient_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_ahune_slippery_ambient_AuraScript();
+    }
+};
+
 void AddSC_boss_ahune()
 {
     new go_ahune_ice_stone();
     RegisterTheSlavePensCreatureAI(boss_ahune);
+    new spell_ahune_slippery_ambient();    
 }
 
