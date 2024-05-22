@@ -51,7 +51,9 @@ enum Texts
     GOSSIP_MENU_CONFIRM         = 10333,
     NPC_TEXT_CONFIRM            = 14325,
 
-    SAY_KEEPER_SELECTED         = 1,
+    // Chosen
+    SAY_KEEPER_CHOSEN_TO_PLAYER = 0,
+    SAY_KEEPER_CHOSEN_ANNOUNCE  = 1,
 };
 
 enum UldNPCs
@@ -69,6 +71,7 @@ enum UldGameObjects
 
 enum UldSpells
 {
+    SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615
 };
 
@@ -121,30 +124,30 @@ public:
                 switch (creature->GetEntry())
                 {
                     case NPC_FREYA_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
                         _keeper = KEEPER_FREYA;
                         break;
                     case NPC_HODIR_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
                         _keeper = KEEPER_HODIR;
                         break;
                     case NPC_MIMIRON_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
                         _keeper = KEEPER_MIMIRON;
                         break;
                     case NPC_THORIM_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
                         _keeper = KEEPER_THORIM;
                         break;
                 }
 
-                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 CloseGossipMenuFor(player);
+
+                creature->AI()->Talk(SAY_KEEPER_CHOSEN_TO_PLAYER, player);
+                creature->AI()->Talk(SAY_KEEPER_CHOSEN_ANNOUNCE);
+                creature->CastSpell(creature, SPELL_KEEPER_TELEPORT);
 
                 if (creature->GetInstanceScript())
                 {
                     creature->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
-                    creature->DespawnOrUnsummon(6000);
+                    creature->DespawnOrUnsummon(2s, 0s);
                 }
             }
         }

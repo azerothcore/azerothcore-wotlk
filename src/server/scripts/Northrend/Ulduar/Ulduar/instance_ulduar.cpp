@@ -716,8 +716,11 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    if (Creature* sara = instance->GetCreature(m_saraGUID))
+                    {
+                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
+                    }
                     break;
-
                 case DATA_MAGE_BARRIER:
                     m_mageBarrier = data;
                     break;

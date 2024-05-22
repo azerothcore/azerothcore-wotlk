@@ -284,6 +284,8 @@ enum UlduarMisc
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
 
+    // Yogg'Saron
+    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
     KEEPER_FREYA                            = 0,
     KEEPER_HODIR                            = 1,
     KEEPER_MIMIRON                          = 2,
