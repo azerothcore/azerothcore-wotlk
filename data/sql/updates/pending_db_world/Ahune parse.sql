@@ -42,6 +42,9 @@
     Casts 45955 on self
 25865 - Frozen Core                 -- summon
     Casts 45941 on 25746
+    46371, 46810, 61976 auras
+    Casts 46359 on position
+    Casts 46430 on 25740
     Casts 46843 on 26239
 25952 - Slippery Floor Bunny        -- static
     Casts 46314
