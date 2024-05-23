@@ -273,6 +273,14 @@ struct LocationsXY
     float x, y, z;
 };
 
+Position const GossipKeepersPos[4] =
+{
+    {1945.6823f, 33.342014f, 411.44083f, 5.270895f}, // Freya
+    {1945.7609f, -81.52171f,  411.4407f, 1.029744f}, // Hodir
+    {2028.7656f,  17.42014f, 411.44458f, 3.857178f}, // Mimiron
+    {2028.8219f, -65.73573f, 411.44257f, 2.460914f}  // Thorim
+};
+
 const Position KeepersPos[4] =
 {
     {1939.32f,   42.165f, 338.415f, 5.17955f}, // Freya
@@ -280,6 +288,10 @@ const Position KeepersPos[4] =
     {2036.81f,  25.6646f, 338.415f, 3.74227f}, // Mimiron
     {2036.59f, -73.8499f, 338.415f, 2.34819f}  // Thorim
 };
+
+const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
+const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
+const uint32 TABLE_KEEPER_TYPE[4]  = {TYPE_FREYA,             TYPE_HODIR,       TYPE_MIMIRON,       TYPE_THORIM};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -460,7 +472,7 @@ public:
 
             _initFight = 1;
 
-            SpawnKeepers();
+            UpdateKeeperSpawns();
             _summonedGuardiansCount = 0;
             _p2TalkTimer = 0;
             _secondPhase = false;
@@ -492,6 +504,7 @@ public:
             me->SetInCombatWithZone();
             AttackStart(target);
 
+            DespawnGossipKeepers();
             // Engage Keepers
             summons.DoZoneInCombat();
 
@@ -506,31 +519,27 @@ public:
             me->setActive(true);
         }
 
-        void SpawnKeepers()
+        void DespawnGossipKeepers()
         {
-            for (uint8 i = 0; i < 4; ++i)
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+                summons.DespawnEntry(TABLE_GOSSIP_ENTRY[i]);
+        }
+
+        void UpdateKeeperSpawns()
+        {
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+            {
                 if (m_pInstance->GetData(TYPE_WATCHERS) & (1 << i))
                 {
-                    switch (i)
-                    {
-                        case KEEPER_FREYA:
-                            if (!summons.HasEntry(NPC_FREYA_KEEPER))
-                                me->SummonCreature(NPC_FREYA_KEEPER, KeepersPos[KEEPER_FREYA]);
-                            break;
-                        case KEEPER_HODIR:
-                            if (!summons.HasEntry(NPC_HODIR_KEEPER))
-                                me->SummonCreature(NPC_HODIR_KEEPER, KeepersPos[KEEPER_HODIR]);
-                            break;
-                        case KEEPER_MIMIRON:
-                            if (!summons.HasEntry(NPC_MIMIRON_KEEPER))
-                                me->SummonCreature(NPC_MIMIRON_KEEPER, KeepersPos[KEEPER_MIMIRON]);
-                            break;
-                        case KEEPER_THORIM:
-                            if (!summons.HasEntry(NPC_THORIM_KEEPER))
-                                me->SummonCreature(NPC_THORIM_KEEPER, KeepersPos[KEEPER_THORIM]);
-                            break;
-                    }
+                    if (!summons.HasEntry(TABLE_KEEPER_ENTRY[i]))
+                        me->SummonCreature(TABLE_KEEPER_ENTRY[i], KeepersPos[i]);
                 }
+                else if (m_pInstance->GetData(TABLE_KEEPER_TYPE[i]) == DONE)
+                {
+                    if (!summons.HasEntry(TABLE_GOSSIP_ENTRY[i]))
+                        me->SummonCreature(TABLE_GOSSIP_ENTRY[i], GossipKeepersPos[i]);
+                }
+            }
         }
 
         void InformCloud()
@@ -634,7 +643,7 @@ public:
         {
             if (param == ACTION_SARA_UPDATE_SUMMON_KEEPERS)
             {
-                SpawnKeepers();
+                UpdateKeeperSpawns();
             }
             else if (param == ACTION_BRAIN_DAMAGED)
             {
@@ -660,6 +669,10 @@ public:
             {
                 summons.DespawnEntry(NPC_VOICE_OF_YOGG_SARON);
                 summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
+                summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
+                summons.DespawnEntry(NPC_HODIR_GOSSIP);
+                summons.DespawnEntry(NPC_FREYA_GOSSIP);
+                summons.DespawnEntry(NPC_THORIM_GOSSIP);
                 summons.DespawnEntry(NPC_MIMIRON_KEEPER);
                 summons.DespawnEntry(NPC_HODIR_KEEPER);
                 summons.DespawnEntry(NPC_FREYA_KEEPER);
