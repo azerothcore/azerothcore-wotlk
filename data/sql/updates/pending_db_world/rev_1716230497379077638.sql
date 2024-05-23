@@ -13,3 +13,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (62671, 'spell_gen_area_aura_select_players_and_caster'),
 (62702, 'spell_gen_area_aura_select_players_and_caster'),
 (64174, 'spell_gen_area_aura_select_players');
+
+-- Keeper: handle spawns with script
+DELETE FROM `creature` WHERE `id1` IN (33213,33241,33242,33244);
+-- Keeper: remove not selectable, immune to pc, immune to player; civilian
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~(256 | 512 | 33554432), `flags_extra` = `flags_extra` & ~2 WHERE `entry` IN (33410,33411,33412,33413);
