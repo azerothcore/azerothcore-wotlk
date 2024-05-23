@@ -895,33 +895,6 @@ class spell_sindragosa_unchained_magic : public SpellScript
     }
 };
 
-class spell_sindragosa_unchained_magic_aura : public AuraScript
-{
-    PrepareAuraScript(spell_sindragosa_unchained_magic_aura);
-
-    bool AfterCheckProc(ProcEventInfo& /*eventInfo*/, bool isTriggeredAtSpellProcEvent)
-    {
-        if (!isTriggeredAtSpellProcEvent)
-        {
-            return false;
-        }
-        uint32 currMSTime = GameTime::GetGameTimeMS().count();
-        if (_lastMSTime && getMSTimeDiff(_lastMSTime, currMSTime) < 600)
-        {
-            return false;
-        }
-        _lastMSTime = currMSTime;
-        return true;
-    }
-
-    void Register() override
-    {
-        DoAfterCheckProc += AuraAfterCheckProcFn(spell_sindragosa_unchained_magic_aura::AfterCheckProc);
-    }
-private:
-    uint32 _lastMSTime;
-};
-
 class spell_sindragosa_permeating_chill : public SpellScriptLoader
 {
 public:
@@ -1983,7 +1956,7 @@ void AddSC_boss_sindragosa()
     new boss_sindragosa();
     new npc_ice_tomb();
     new spell_sindragosa_s_fury();
-    RegisterSpellAndAuraScriptPair(spell_sindragosa_unchained_magic, spell_sindragosa_unchained_magic_aura);
+    RegisterSpellScript(spell_sindragosa_unchained_magic);
     new spell_sindragosa_permeating_chill();
     new spell_sindragosa_instability();
     new spell_sindragosa_icy_grip();
