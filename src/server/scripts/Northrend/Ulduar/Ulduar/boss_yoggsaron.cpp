@@ -1719,10 +1719,7 @@ public:
 
     struct boss_yoggsaron_keeperAI : public NullCreatureAI
     {
-        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature)
-        {
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SCALE, true);
-        }
+        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
         void DoAction(int32 param) override
         {
@@ -2766,8 +2763,7 @@ class spell_keeper_freya_summon_sanity_well : public SpellScript
             if (InstanceScript* instance = caster->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(NPC_SARA)))
                     for (int i = 0; i < 5; i++)
-                        if (Creature* summon = sara->SummonCreature(NPC_SANITY_WELL, SanityWellsPos[i]))
-                            summon->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SCALE, true);
+                        sara->SummonCreature(NPC_SANITY_WELL, SanityWellsPos[i]);
     }
 
     void Register() override
@@ -2994,27 +2990,6 @@ public:
     }
 };
 
-// 62650 - Fortitude of Frost
-// 62670 - Resilience of Nature
-// 62671 - Speed of Invention
-// 62702 - Fury of the Storm
-class spell_yogg_saron_keeper_aura : public AuraScript
-{
-    PrepareAuraScript(spell_yogg_saron_keeper_aura);
-
-        bool CanApply(Unit* target)
-        {
-            if (target->GetTypeId() != TYPEID_PLAYER && target != GetCaster())
-                return false;
-            return true;
-        }
-
-    void Register() override
-    {
-        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_yogg_saron_keeper_aura::CanApply);
-    }
-};
-
 class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
 {
 public:
@@ -3117,7 +3092,6 @@ void AddSC_boss_yoggsaron()
     new spell_yogg_saron_in_the_maws_of_the_old_god();
     new spell_yogg_saron_target_selectors();
     new spell_yogg_saron_grim_reprisal();
-    RegisterSpellScript(spell_yogg_saron_keeper_aura);
 
     // ACHIEVEMENTS
     new achievement_yogg_saron_drive_me_crazy();

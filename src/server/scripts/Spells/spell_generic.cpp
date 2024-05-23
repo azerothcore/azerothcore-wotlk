@@ -628,6 +628,7 @@ class spell_gen_black_magic_enchant : public AuraScript
 };
 
 // 53642 - The Might of Mograine
+// 64174 - Protective Gaze
 class spell_gen_area_aura_select_players : public AuraScript
 {
     PrepareAuraScript(spell_gen_area_aura_select_players);
@@ -639,6 +640,24 @@ class spell_gen_area_aura_select_players : public AuraScript
     void Register() override
     {
         DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_area_aura_select_players::CheckAreaTarget);
+    }
+};
+
+// 62650 - Fortitude of Frost
+// 62670 - Resilience of Nature
+// 62671 - Speed of Invention
+// 62702 - Fury of the Storm
+class spell_gen_area_aura_select_players_and_caster : public AuraScript
+{
+    PrepareAuraScript(spell_gen_area_aura_select_players_and_caster);
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        return target->GetTypeId() == TYPEID_PLAYER || target == GetCaster();
+    }
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_area_aura_select_players_and_caster::CheckAreaTarget);
     }
 };
 
@@ -5193,6 +5212,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_disabled_above_63);
     RegisterSpellScript(spell_gen_black_magic_enchant);
     RegisterSpellScript(spell_gen_area_aura_select_players);
+    RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
