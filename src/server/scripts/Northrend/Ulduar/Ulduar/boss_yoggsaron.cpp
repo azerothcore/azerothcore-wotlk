@@ -380,7 +380,6 @@ public:
         SummonList summons;
 
         uint32 _initFight;
-        ObjectGuid _keepersGUID[4];
         uint8 _summonedGuardiansCount;
         uint32 _p2TalkTimer;
         bool _secondPhase;
@@ -394,10 +393,6 @@ public:
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-            if (NPC_FREYA_KEEPER <= cr->GetEntry() && cr->GetEntry() <= NPC_THORIM_KEEPER)
-            {
-                _keepersGUID[cr->GetEntry() - NPC_FREYA_KEEPER] = cr->GetGUID();
-            }
         }
 
         void SpawnClouds()
@@ -456,8 +451,6 @@ public:
             summons.DoAction(ACTION_DESPAWN_ADDS);
             events.Reset();
             summons.DespawnAll();
-            for (uint8 i = 0; i < 4; ++i)
-                _keepersGUID[i].Clear();
 
             me->SetVisible(true);
             me->SetDisplayId(me->GetNativeDisplayId());
@@ -518,21 +511,23 @@ public:
             for (uint8 i = 0; i < 4; ++i)
                 if (m_pInstance->GetData(TYPE_WATCHERS) & (1 << i))
                 {
-                    if (_keepersGUID[i]) // prevent double spawn
-                        continue;
                     switch (i)
                     {
                         case KEEPER_FREYA:
-                            me->SummonCreature(NPC_FREYA_KEEPER, KeepersPos[KEEPER_FREYA]);
+                            if (!summons.HasEntry(NPC_FREYA_KEEPER))
+                                me->SummonCreature(NPC_FREYA_KEEPER, KeepersPos[KEEPER_FREYA]);
                             break;
                         case KEEPER_HODIR:
-                            me->SummonCreature(NPC_HODIR_KEEPER, KeepersPos[KEEPER_HODIR]);
+                            if (!summons.HasEntry(NPC_HODIR_KEEPER))
+                                me->SummonCreature(NPC_HODIR_KEEPER, KeepersPos[KEEPER_HODIR]);
                             break;
                         case KEEPER_MIMIRON:
-                            me->SummonCreature(NPC_MIMIRON_KEEPER, KeepersPos[KEEPER_MIMIRON]);
+                            if (!summons.HasEntry(NPC_MIMIRON_KEEPER))
+                                me->SummonCreature(NPC_MIMIRON_KEEPER, KeepersPos[KEEPER_MIMIRON]);
                             break;
                         case KEEPER_THORIM:
-                            me->SummonCreature(NPC_THORIM_KEEPER, KeepersPos[KEEPER_THORIM]);
+                            if (!summons.HasEntry(NPC_THORIM_KEEPER))
+                                me->SummonCreature(NPC_THORIM_KEEPER, KeepersPos[KEEPER_THORIM]);
                             break;
                     }
                 }
@@ -625,7 +620,7 @@ public:
             {
                 uint8 _count = 0;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (_keepersGUID[i])
+                    if (m_pInstance->GetData(TYPE_WATCHERS) & (1 << i))
                         ++_count;
                 return _count;
             }
