@@ -377,7 +377,6 @@ public:
                     break;
                 case NPC_SARA:
                     m_saraGUID = creature->GetGUID();
-                    creature->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;
                 case NPC_BRAIN_OF_YOGG_SARON:
                     m_yoggsaronBrainGUID = creature->GetGUID();
