@@ -237,7 +237,6 @@ public:
             _looksAchievement = true;
 
             me->SetDisableGravity(true);
-            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             me->DisableRotate(true);
 
             events.Reset();
