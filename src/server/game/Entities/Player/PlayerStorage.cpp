@@ -4455,6 +4455,8 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         }
                     }
 
+                    sScriptMgr->OnApplyEnchantmentItemModsBefore(this, item, slot, apply, enchant_spell_id, enchant_amount);
+
                     LOG_DEBUG("entities.player.items", "Adding {} to stat nb {}", enchant_amount, enchant_spell_id);
                     switch (enchant_spell_id)
                     {
