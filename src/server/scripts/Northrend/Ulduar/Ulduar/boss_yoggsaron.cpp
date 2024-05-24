@@ -402,9 +402,9 @@ public:
         void AttackStart(Unit*) override { }
         void MoveInLineOfSight(Unit*) override { }
 
-        void JustSummoned(Creature* cr) override
+        void JustSummoned(Creature* summon) override
         {
-            summons.Summon(cr);
+            summons.Summon(summon);
         }
 
         void SpawnClouds()
