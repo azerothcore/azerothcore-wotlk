@@ -76,8 +76,8 @@ enum UldGameObjects
 
 enum UldSpells
 {
-    SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SIMPLE_TELEPORT       = 12980,
+    SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615
 };
 
