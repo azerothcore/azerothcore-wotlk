@@ -1720,67 +1720,56 @@ public:
     };
 };
 
-class boss_yoggsaron_keeper : public CreatureScript
+struct boss_yoggsaron_keeper : public NullCreatureAI
 {
-public:
-    boss_yoggsaron_keeper() : CreatureScript("boss_yoggsaron_keeper") { }
+    boss_yoggsaron_keeper(Creature* creature) : NullCreatureAI(creature), _summons(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void DoAction(int32 param) override
     {
-        return GetUlduarAI<boss_yoggsaron_keeperAI>(creature);
+        if (me->GetEntry() == NPC_THORIM_KEEPER && param == ACTION_THORIM_START_STORM)
+            me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
+        else if (param == ACTION_DESPAWN_ADDS)
+            _summons.DespawnAll();
     }
 
-    struct boss_yoggsaron_keeperAI : public NullCreatureAI
+    void JustSummoned(Creature* summon) override
     {
-        boss_yoggsaron_keeperAI(Creature* creature) : NullCreatureAI(creature), _summons(creature) { }
+        _summons.Summon(summon);
+    }
 
-        void DoAction(int32 param) override
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        switch (me->GetEntry())
         {
-            if (me->GetEntry() == NPC_THORIM_KEEPER && param == ACTION_THORIM_START_STORM)
-                me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
-            else if (param == ACTION_DESPAWN_ADDS)
-                _summons.DespawnAll();
+            case NPC_FREYA_KEEPER:
+                me->AddAura(SPELL_FREYA_PASSIVE, me);
+                me->CastSpell(me, SPELL_CONJURE_SANITY_WELL, false);
+                break;
+            case NPC_HODIR_KEEPER:
+                me->AddAura(SPELL_HODIR_PASSIVE, me);
+                me->AddAura(SPELL_PROTECTIVE_GAZE, me);
+                break;
+            case NPC_MIMIRON_KEEPER:
+                me->AddAura(SPELL_MIMIRON_PASSIVE, me);
+                scheduler.Schedule(2s, [this](TaskContext context)
+                {
+                    if (!me->HasUnitState(UNIT_STATE_CASTING))
+                        me->CastSpell(me, SPELL_DESTABILIZATION_MATRIX, false);
+                    context.Repeat(2s);
+                });
+                break;
+            case NPC_THORIM_KEEPER:
+                me->AddAura(SPELL_THORIM_PASSIVE, me);
+                break;
         }
+    }
 
-        void JustSummoned(Creature* summon) override
-        {
-            _summons.Summon(summon);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            switch (me->GetEntry())
-            {
-                case NPC_FREYA_KEEPER:
-                    me->AddAura(SPELL_FREYA_PASSIVE, me);
-                    me->CastSpell(me, SPELL_CONJURE_SANITY_WELL, false);
-                    break;
-                case NPC_HODIR_KEEPER:
-                    me->AddAura(SPELL_HODIR_PASSIVE, me);
-                    me->AddAura(SPELL_PROTECTIVE_GAZE, me);
-                    break;
-                case NPC_MIMIRON_KEEPER:
-                    me->AddAura(SPELL_MIMIRON_PASSIVE, me);
-                    scheduler.Schedule(2s, [this](TaskContext context)
-                    {
-                        if (!me->HasUnitState(UNIT_STATE_CASTING))
-                            me->CastSpell(me, SPELL_DESTABILIZATION_MATRIX, false);
-                        context.Repeat(2s);
-                    });
-                    break;
-                case NPC_THORIM_KEEPER:
-                    me->AddAura(SPELL_THORIM_PASSIVE, me);
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            scheduler.Update(diff);
-        }
-    private:
-        SummonList _summons;
-    };
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+private:
+    SummonList _summons;
 };
 
 class boss_yoggsaron_descend_portal : public CreatureScript
@@ -3085,7 +3074,7 @@ void AddSC_boss_yoggsaron()
     new boss_yoggsaron_crusher_tentacle();
     new boss_yoggsaron_corruptor_tentacle();
     new boss_yoggsaron_constrictor_tentacle();
-    new boss_yoggsaron_keeper();
+    RegisterUlduarCreatureAI(boss_yoggsaron_keeper);
     new boss_yoggsaron_descend_portal();
     new boss_yoggsaron_influence_tentacle();
     new boss_yoggsaron_immortal_guardian();
