@@ -284,7 +284,10 @@ enum UlduarMisc
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
 
-    // Yogg'Saron
+    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
+    SPELL_TELEPORT                          = 62940,
+
+    // Yogg-Saron
     ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
     KEEPER_FREYA                            = 0,
     KEEPER_HODIR                            = 1,
