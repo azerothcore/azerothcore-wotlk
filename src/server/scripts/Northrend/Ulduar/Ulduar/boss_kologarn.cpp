@@ -664,6 +664,45 @@ public:
     };
 };
 
+struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
+{
+    boss_kologarn_pit_kill_bunny(Creature* creature) : NullCreatureAI(creature) { }
+
+    void Reset() override
+    {
+        RectangleBoundary* _boundaryXY = new RectangleBoundary(1782.0f, 1832.0f, -56.0f, 8.0f);
+        ZRangeBoundary* _boundaryZ = new ZRangeBoundary(400.0f, 439.0f);
+        _boundaryIntersect = new BoundaryIntersectBoundary(_boundaryXY, _boundaryZ);
+
+        scheduler.Schedule(0s, [this](TaskContext context)
+        {
+            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
+
+            if (!PlayerList.IsEmpty())
+            {
+                for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (!player->IsGameMaster() && _boundaryIntersect->IsWithinBoundary(player->GetPosition()))
+                        {
+                            player->KillSelf(false);
+                        }
+                    }
+                }
+            }
+            context.Repeat(1s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+private:
+    BoundaryIntersectBoundary const* _boundaryIntersect;
+};
+
 // predicate function to select non main tank target
 class StoneGripTargetSelector
 {
@@ -893,6 +932,7 @@ void AddSC_boss_kologarn()
     new boss_kologarn();
     new boss_kologarn_arms();
     new boss_kologarn_eyebeam();
+    RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);
 
     // Spells
     new spell_ulduar_stone_grip_cast_target();
