@@ -1732,12 +1732,19 @@ public:
 
     struct boss_yoggsaron_keeperAI : public NullCreatureAI
     {
-        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
+        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature), _summons(pCreature) { }
 
         void DoAction(int32 param) override
         {
             if (me->GetEntry() == NPC_THORIM_KEEPER && param == ACTION_THORIM_START_STORM)
                 me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
+            else if (param == ACTION_DESPAWN_ADDS)
+                _summons.DespawnAll();
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            _summons.Summon(summon);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -1771,6 +1778,8 @@ public:
         {
             scheduler.Update(diff);
         }
+    private:
+        SummonList _summons;
     };
 };
 
@@ -2773,10 +2782,8 @@ class spell_keeper_freya_summon_sanity_well : public SpellScript
     void OnEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
-            if (InstanceScript* instance = caster->GetInstanceScript())
-                if (Creature* sara = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(NPC_SARA)))
-                    for (int i = 0; i < 5; i++)
-                        sara->SummonCreature(NPC_SANITY_WELL, SanityWellsPos[i]);
+            for (int i = 0; i < 5; i++)
+                caster->SummonCreature(NPC_SANITY_WELL, SanityWellsPos[i]);
     }
 
     void Register() override
