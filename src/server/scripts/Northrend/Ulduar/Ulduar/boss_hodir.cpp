@@ -383,7 +383,7 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
-                    scheduler.Schedule(9s, [this](TaskContext /*context*/)
+                    scheduler.Schedule(14s, [this](TaskContext /*context*/)
                     {
                         DoCastSelf(SPELL_TELEPORT);
                     });

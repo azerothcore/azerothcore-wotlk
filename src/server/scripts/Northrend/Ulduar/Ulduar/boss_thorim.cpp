@@ -782,7 +782,7 @@ public:
                     // Defeat credit
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THORIM, DONE);
-                    events.ScheduleEvent(EVENT_THORIM_OUTRO4, 7s, 0, 3);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
                     break;
                 case EVENT_THORIM_OUTRO4:
                     DoCastSelf(SPELL_TELEPORT);

@@ -360,7 +360,7 @@ public:
                         m_pInstance->SetData(TYPE_FREYA, DONE);
                     }
 
-                    scheduler.Schedule(4s, [this](TaskContext /*context*/)
+                    scheduler.Schedule(14s, [this](TaskContext /*context*/)
                     {
                         DoCastSelf(SPELL_TELEPORT);
                     });
