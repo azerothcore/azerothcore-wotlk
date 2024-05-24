@@ -347,7 +347,6 @@ public:
                     uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
                     chestId -= 2 * _elderCount; // offset
 
-                    me->DespawnOrUnsummon(5000);
                     if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
@@ -359,9 +358,12 @@ public:
                     {
                         me->CastSpell(me, 65074, true); // credit
                         m_pInstance->SetData(TYPE_FREYA, DONE);
-                        // DoCastSelf(SPELL_TELEPORT); // TODO: Delay by 4 seconds to match despawn time
-                        m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
                     }
+
+                    scheduler.Schedule(4s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_TELEPORT);
+                    });
                 }
             }
         }
@@ -558,6 +560,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             if (!UpdateVictim())
                 return;
 

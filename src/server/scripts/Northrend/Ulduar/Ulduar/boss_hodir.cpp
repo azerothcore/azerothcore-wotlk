@@ -383,15 +383,17 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
-                    // DoCastSelf(SPELL_TELEPORT); // TODO: Delay by 9 seconds to match despawn time
-                    pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
-                    me->DespawnOrUnsummon(10000);
+                    scheduler.Schedule(9s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_TELEPORT);
+                    });
                 }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
                 boss_hodirAI::EnterEvadeMode();
