@@ -499,6 +499,15 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            }
+        }
+
         Creature* GetHelper(uint8 index)
         {
             return Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr;

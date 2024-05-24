@@ -366,6 +366,15 @@ public:
             }
         }
 
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            }
+        }
+
         void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
