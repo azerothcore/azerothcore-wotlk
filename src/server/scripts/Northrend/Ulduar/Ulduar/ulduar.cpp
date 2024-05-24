@@ -21,6 +21,7 @@
 #include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "PassiveAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
