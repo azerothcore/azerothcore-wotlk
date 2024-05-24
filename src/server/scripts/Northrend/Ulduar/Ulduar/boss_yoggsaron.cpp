@@ -667,6 +667,11 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_DEATH)
             {
+                // Despawn everything but Yogg-Saron's corpse
+                summons.DoAction(ACTION_DESPAWN_ADDS);
+                summons.DespawnEntry(NPC_CRUSHER_TENTACLE);
+                summons.DespawnEntry(NPC_CONSTRICTOR_TENTACLE);
+                summons.DespawnEntry(NPC_CORRUPTOR_TENTACLE);
                 summons.DespawnEntry(NPC_VOICE_OF_YOGG_SARON);
                 summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
                 summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
