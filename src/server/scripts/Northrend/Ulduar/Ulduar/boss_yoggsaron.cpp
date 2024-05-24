@@ -1725,14 +1725,14 @@ class boss_yoggsaron_keeper : public CreatureScript
 public:
     boss_yoggsaron_keeper() : CreatureScript("boss_yoggsaron_keeper") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetUlduarAI<boss_yoggsaron_keeperAI>(pCreature);
+        return GetUlduarAI<boss_yoggsaron_keeperAI>(creature);
     }
 
     struct boss_yoggsaron_keeperAI : public NullCreatureAI
     {
-        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature), _summons(pCreature) { }
+        boss_yoggsaron_keeperAI(Creature* creature) : NullCreatureAI(creature), _summons(creature) { }
 
         void DoAction(int32 param) override
         {
