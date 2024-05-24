@@ -667,8 +667,6 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    if (Creature* sara = instance->GetCreature(m_saraGUID))
-                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
@@ -689,6 +687,8 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    [[fallthrough]];
+                case EVENT_KEEPER_TELEPORTED:
                     if (Creature* sara = instance->GetCreature(m_saraGUID))
                         sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;

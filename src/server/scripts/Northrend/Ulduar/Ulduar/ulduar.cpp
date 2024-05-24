@@ -92,7 +92,7 @@ public:
 
         void Reset() override
         {
-            scheduler.Schedule(500ms, [this](TaskContext /*context*/)
+            scheduler.Schedule(250ms, [this](TaskContext /*context*/)
             {
                 DoCastSelf(SPELL_SIMPLE_TELEPORT);
             });
@@ -122,9 +122,16 @@ public:
                 scheduler.Schedule(1s, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_KEEPER_TELEPORT);
-                    me->DespawnOrUnsummon(2s, 0s);
-                    me->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
                 });
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                me->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
             }
         }
 

@@ -346,6 +346,7 @@ public:
                     {
                         pInstance->SetData(TYPE_HODIR, DONE);
                         me->CastSpell(me, 64899, true); // credit
+                        pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
                     }
 
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -355,7 +356,6 @@ public:
                     me->CombatStop();
                     me->InterruptNonMeleeSpells(true);
                     me->RemoveAllAuras();
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
 
                     events.Reset();
                     summons.DespawnAll();
@@ -383,6 +383,8 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
+                    // DoCastSelf(SPELL_TELEPORT); // TODO: Delay by 9 seconds to match despawn time
+                    pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
                     me->DespawnOrUnsummon(10000);
                 }
             }

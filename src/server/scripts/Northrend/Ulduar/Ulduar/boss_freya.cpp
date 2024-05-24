@@ -359,6 +359,8 @@ public:
                     {
                         me->CastSpell(me, 65074, true); // credit
                         m_pInstance->SetData(TYPE_FREYA, DONE);
+                        // DoCastSelf(SPELL_TELEPORT); // TODO: Delay by 4 seconds to match despawn time
+                        m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
                     }
                 }
             }
