@@ -762,6 +762,8 @@ public:
                         summons.DespawnEntry(NPC_FLAMES_INITIAL);
                         summons.DespawnEntry(33576);
 
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
                         float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
@@ -793,6 +795,7 @@ public:
                 case EVENT_STAND_UP_FRIENDLY:
                     me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
                     DoCastSelf(SPELL_SLEEP_VISUAL_2);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 3s);
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
