@@ -124,6 +124,9 @@ public:
         ObjectGuid m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
+        // Ancient Gate
+        const Position triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
@@ -668,8 +671,17 @@ public:
                     m_auiEncounter[type] = data;
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
+                        {
+                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
+                            {
+                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10*IN_MILLISECONDS))
+                                {
+                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
+                                }
+                            }
+                        });
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;
