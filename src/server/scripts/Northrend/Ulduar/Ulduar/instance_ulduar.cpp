@@ -370,22 +370,6 @@ public:
                 case NPC_MIMIRON_ACU:
                     m_MimironACUguid = creature->GetGUID();
                     break;
-                case NPC_FREYA_GOSSIP:
-                    m_keepersGossipGUID[TYPE_FREYA - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_FREYA, creature);
-                    break;
-                case NPC_HODIR_GOSSIP:
-                    m_keepersGossipGUID[TYPE_HODIR - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_HODIR, creature);
-                    break;
-                case NPC_THORIM_GOSSIP:
-                    m_keepersGossipGUID[TYPE_THORIM - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_THORIM, creature);
-                    break;
-                case NPC_MIMIRON_GOSSIP:
-                    m_keepersGossipGUID[TYPE_MIMIRON - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_MIMIRON, creature);
-                    break;
                 case NPC_ELDER_IRONBRANCH:
                 case NPC_ELDER_STONEBARK:
                 case NPC_ELDER_BRIGHTLEAF:
@@ -431,19 +415,6 @@ public:
         {
             if (GetData(encounter) == DONE)
                 go->SetGoState(state);
-        }
-
-        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
-        {
-            if (!cr)
-            {
-                cr = instance->GetCreature(guid);
-                if (!cr)
-                    return;
-            }
-
-            bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type - TYPE_FREYA))));
-            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -695,7 +666,6 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
@@ -716,8 +686,11 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    [[fallthrough]];
+                case EVENT_KEEPER_TELEPORTED:
+                    if (Creature* sara = instance->GetCreature(m_saraGUID))
+                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;
-
                 case DATA_MAGE_BARRIER:
                     m_mageBarrier = data;
                     break;
