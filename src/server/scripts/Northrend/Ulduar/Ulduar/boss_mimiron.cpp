@@ -86,7 +86,8 @@ enum SpellData
     SPELL_HAND_PULSE_25_L                           = 64536,
 
     SPELL_SELF_REPAIR                               = 64383,
-    SPELL_SLEEP                                     = 64394,
+    SPELL_SLEEP_VISUAL_1                            = 64393,
+    SPELL_SLEEP_VISUAL_2                            = 64394,
 };
 
 enum NPCs
@@ -172,10 +173,11 @@ enum EVENTS
     EVENT_JOIN_ACU                                  = 35,
     EVENT_START_PHASE4                              = 36,
     EVENT_FINISH                                    = 50,
-    EVENT_SAY_VOLTRON_DEAD                          = 51,
-    EVENT_DISAPPEAR                                 = 52,
-    EVENT_BERSERK                                   = 53,
-    EVENT_BERSERK_2                                 = 54,
+    EVENT_STAND_UP_FRIENDLY                         = 51,
+    EVENT_SAY_VOLTRON_DEAD                          = 52,
+    EVENT_DISAPPEAR                                 = 53,
+    EVENT_BERSERK                                   = 54,
+    EVENT_BERSERK_2                                 = 55,
 
     // Leviathan:
     EVENT_SPELL_NAPALM_SHELL                        = 3,
@@ -765,6 +767,8 @@ public:
                         float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
 
+                        DoCastSelf(SPELL_SLEEP_VISUAL_1);
+
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
                                 if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
@@ -783,8 +787,13 @@ public:
                                 computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 6s);
+                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 3s);
                     }
+                    break;
+                case EVENT_STAND_UP_FRIENDLY:
+                    me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
+                    DoCastSelf(SPELL_SLEEP_VISUAL_2);
+                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 3s);
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
