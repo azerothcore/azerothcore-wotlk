@@ -762,7 +762,6 @@ public:
                         summons.DespawnEntry(33576);
 
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->CombatStop();
 
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
