@@ -1,3 +1,4 @@
+-- DB update 2024_05_21_00 -> 2024_05_25_00
 --
 -- Remove encounter auras minus glow aura from Keepers, add glow aura to Gossip Keepers
 UPDATE `creature_template_addon` SET `auras` = '62647' WHERE `entry` IN (33410,33411,33412,33413,33213,33241,33242,33244);
