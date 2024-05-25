@@ -90,7 +90,7 @@ public:
             if (_baronRunTime > 0)
                 if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
-        }        
+        }
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -425,7 +425,7 @@ public:
 
         void Update(uint32 diff) override
         {
-            events.Update(diff);          
+            events.Update(diff);
 
             Map::PlayerList const& players = instance->GetPlayers();
             // Loop over the two Gate traps, each one has up to three timers (trap reset, gate opening delay, critters spawning delay)
@@ -478,7 +478,7 @@ public:
                         }
                     }
                 }
-            }           
+            }
 
             const int GATE1 = 0;
             const int GATE2 = 1;
@@ -587,7 +587,7 @@ public:
                     if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID4))
                         gate->SetGoState(GO_STATE_ACTIVE);
                     break;
-                }              
+                }
                 default:
                     break;
             }
