@@ -65,7 +65,7 @@ public:
             context.Repeat(10s, 15s);
         }).Schedule(25s, 32s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_SLEEP) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_SLEEP, 0, 0.0f, true, false, false) == SPELL_CAST_OK)
                 Talk(SAY_SLEEP);
 
             context.Repeat(35s, 48s);
