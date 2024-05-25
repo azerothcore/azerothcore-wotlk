@@ -93,8 +93,6 @@ enum MiscIds
     SAY_BRAON_SUMMON_RAMSTEIN           = 5,
     SAY_BARON_GUARD_DEAD                = 6,
 
-    SAY_BARTHILAS_HELP                  = 0,
-
     EVENT_BARON_TIME                    = 1,
     EVENT_SPAWN_MINDLESS                = 2,
     EVENT_FORCE_SLAUGHTER_EVENT         = 3,
@@ -106,8 +104,6 @@ enum MiscIds
     EVENT_GATE2_TRAP                    = 9,
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
-    EVENT_BARTHILAS_MOVE_END            = 12,
-    EVENT_BARTHILAS_TEL_TO              = 13,
 
     SPELL_BARON_ULTIMATUM               = 27861
 };

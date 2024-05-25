@@ -90,11 +90,7 @@ public:
             if (_baronRunTime > 0)
                 if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
-            if (GetData(TYPE_BARTHILAS_RUN) == DONE)
-            {
-                events.ScheduleEvent(EVENT_BARTHILAS_TEL_TO, 0ms);
-            }
-        }
+        }        
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -122,6 +118,8 @@ public:
                     break;
                 case NPC_BARTHILAS:
                     _barthilasGUID = creature->GetGUID();
+                    //if (_barthilasrunProgress == DONE)
+                    //    SetData(TYPE_BARTHILAS_RUN, DONE);
                     break;
                 default:
                     break;
@@ -255,9 +253,6 @@ public:
                     go->AllowSaveToDB(true);
                     _trapGatesGUIDs[3] = go->GetGUID();
                     break;
-                case GO_SERVICE_ENTRANCE:
-                    _door_service_entrance = go->GetGUID();
-                    break;
                 default:
                     break;
             }
@@ -359,14 +354,16 @@ public:
                     ++_postboxesOpened;
                     break;
                 case TYPE_BARTHILAS_RUN:
-                    if (data == IN_PROGRESS)
+                    if (data == DONE)
                     {
                         if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
                         {
-                            barthilas->AI()->Talk(SAY_BARTHILAS_HELP);
-                            barthilas->GetMotionMaster()->MovePath(BARTHILAS_PATHID, false);
+                            if (barthilas->IsAlive())
+                            {
+                                barthilas->NearTeleportTo(BarthilasPos.GetPositionX(), BarthilasPos.GetPositionY(), BarthilasPos.GetPositionZ(), BarthilasPos.GetOrientation());
+                                barthilas->SetHomePosition(BarthilasPos);
+                            }
                         }
-                        events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 10s);
                     }
                     _barthilasrunProgress = data;
                     break;
@@ -426,62 +423,9 @@ public:
             return 0;
         }
 
-        bool PlayDead()
-        {
-            Map::PlayerList const& lPlayers = instance->GetPlayers();
-            if (!lPlayers.IsEmpty())
-            {
-                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->isDead())
-                            return true;
-                    }
-                }
-                return false;
-            }
-            return false;
-        }
-
-        bool NoPlayersInCombat()
-        {
-            Map::PlayerList const& lPlayers = instance->GetPlayers();
-            if (!lPlayers.IsEmpty())
-            {
-                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->IsInCombat())
-                            return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
         void Update(uint32 diff) override
         {
-            events.Update(diff);
-
-            if (GetData(TYPE_BARTHILAS_RUN) == NOT_STARTED)
-            {
-                if (GameObject* go = instance->GetGameObject(_door_service_entrance))
-                {
-                    if (go->GetGoState() == GO_STATE_ACTIVE)
-                    {
-                        if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
-                        {
-                            if (barthilas->IsAlive() && !barthilas->IsInCombat())
-                            {
-                                SetData(TYPE_BARTHILAS_RUN, IN_PROGRESS);
-                            }
-                        }
-                    }
-                }
-            }
+            events.Update(diff);          
 
             Map::PlayerList const& players = instance->GetPlayers();
             // Loop over the two Gate traps, each one has up to three timers (trap reset, gate opening delay, critters spawning delay)
@@ -534,24 +478,7 @@ public:
                         }
                     }
                 }
-            }
-
-            // Players are dead and no players are in combat
-            if (PlayDead() && NoPlayersInCombat())
-            {
-                // Destroy the Psychic Tower
-                if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
-                {
-                    if (GameObject* go = instance->GetGameObject(_slaughterGateGUID))
-                    {
-                        //The door is closed
-                        if (go->GetGoState() == GO_STATE_READY)
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                        }
-                    }
-                }
-            }
+            }           
 
             const int GATE1 = 0;
             const int GATE2 = 1;
@@ -660,32 +587,7 @@ public:
                     if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID4))
                         gate->SetGoState(GO_STATE_ACTIVE);
                     break;
-                }
-                case EVENT_BARTHILAS_MOVE_END:
-                    if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
-                    {
-                        if (barthilas->isDead())
-                            break;
-                        if (barthilas->IsAlive() && (barthilas->GetPosition()) == BarthilasPos)
-                        {
-                            barthilas->SetHomePosition(BarthilasPos);
-                            SetData(TYPE_BARTHILAS_RUN, DONE);
-                            SaveToDB();
-                            break;
-                        }
-                    }
-                    events.ScheduleEvent(EVENT_BARTHILAS_MOVE_END, 4s);
-                    break;
-                case EVENT_BARTHILAS_TEL_TO:
-                    if (Creature* barthilas = instance->GetCreature(_barthilasGUID))
-                    {
-                        if (barthilas->IsAlive() && !barthilas->IsInCombat())
-                        {
-                            barthilas->NearTeleportTo(BarthilasPos.GetPositionX(), BarthilasPos.GetPositionY(),BarthilasPos.GetPositionZ(), BarthilasPos.GetOrientation());
-                            barthilas->SetHomePosition(BarthilasPos);
-                        }
-                    }
-                    break;
+                }              
                 default:
                     break;
             }
@@ -703,7 +605,6 @@ public:
         uint32 _postboxesOpened;
         EventMap events;
 
-        ObjectGuid _door_service_entrance;
         ObjectGuid _zigguratDoorsGUID1;
         ObjectGuid _zigguratDoorsGUID2;
         ObjectGuid _zigguratDoorsGUID3;
