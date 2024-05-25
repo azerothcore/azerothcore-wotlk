@@ -78,8 +78,7 @@ enum GameobjectIds
     GO_PORT_TRAP_GATE_2                 = 175350,  // Gate trap scarlet side
     GO_PORT_TRAP_GATE_3                 = 175355,  // Gate trap undead side
     GO_PORT_TRAP_GATE_4                 = 175354,
-    GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083,
-    GO_SERVICE_ENTRANCE                 = 175368
+    GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083
 };
 
 enum MiscIds
@@ -106,11 +105,6 @@ enum MiscIds
     EVENT_GATE2_CRITTER_DELAY           = 11,
 
     SPELL_BARON_ULTIMATUM               = 27861
-};
-
-enum WaypointData
-{
-    BARTHILAS_PATHID                    = 104350
 };
 
 template <class AI, class T>
