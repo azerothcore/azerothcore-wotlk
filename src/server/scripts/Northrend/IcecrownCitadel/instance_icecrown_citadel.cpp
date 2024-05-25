@@ -403,6 +403,7 @@ public:
                         creature->LoadEquipment();
                     }
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
+                    creature->LastUsedScriptID = creature->GetScriptId();
                     break;
                 case NPC_SE_MURADIN_BRONZEBEARD:
                     DeathbringerSaurfangEventGUID = creature->GetGUID();

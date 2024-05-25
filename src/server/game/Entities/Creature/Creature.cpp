@@ -594,8 +594,6 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         AIM_Initialize();
     }
 
-    LastUsedScriptID = GetScriptId();
-
     return true;
 }
 
