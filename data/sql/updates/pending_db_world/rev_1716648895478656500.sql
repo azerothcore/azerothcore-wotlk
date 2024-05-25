@@ -11,7 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (429400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - Actionlist - Set_Faction Friend'),
 (429400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - Actionlist - stop movement'),
 -- new add
-(429400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 212, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Sorcerer - Actionlist - Stop motion (StopMoving: 1, MovementExpired: 1)'),
+(429400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 212, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - Actionlist - Stop motion (StopMoving: 1, MovementExpired: 1)'),
 (429400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - Actionlist - Set Facing player'),
 (429400, 9, 4, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent - Actionlist - SetStandState UNIT_STAND_STATE_STAND'),
 (429400, 9, 5, 0, 0, 0, 100, 0, 500, 2500, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Monaster AshbringerEvent  - Actionlist -  SetSheath  SHEATH_STATE_UNARMED'),
