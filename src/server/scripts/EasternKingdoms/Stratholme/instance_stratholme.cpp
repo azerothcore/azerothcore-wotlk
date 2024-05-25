@@ -90,6 +90,8 @@ public:
             if (_baronRunTime > 0)
                 if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
+            if (_barthilasrunProgress == DONE)
+                instance->LoadGrid(3663.229980f, -3619.139893f);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -118,8 +120,6 @@ public:
                     break;
                 case NPC_BARTHILAS:
                     _barthilasGUID = creature->GetGUID();
-                    //if (_barthilasrunProgress == DONE)
-                    //    SetData(TYPE_BARTHILAS_RUN, DONE);
                     break;
                 default:
                     break;

@@ -5,9 +5,7 @@ INSERT INTO `waypoints` VALUES
 (104350, 3, 3723.08, -3600.48, 142.359, NULL, 0, NULL),
 (104350, 4, 3723.08, -3600.48, 142.359, NULL, 0, NULL);
 
-  -- Magistrate Barthilas smart ai
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10435;
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 10435);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (10435, 0, 0, 0, 0, 0, 100, 0, 3000, 5000, 2000, 6000, 0, 0, 11, 16791, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast \'Furious Anger\''),
@@ -16,23 +14,25 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10435, 0, 3, 0, 0, 0, 100, 0, 4000, 4000, 12000, 15000, 0, 0, 11, 16793, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - In Combat - Cast \'Draining Blow\''),
 (10435, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16794, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Just Died - Cast \'Transformation\''),
 (10435, 0, 5, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16794, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Initialize - Cast \'Transformation\''),
-(10435, 0, 6, 7, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Set gameobject to GO_STATE_READY'),
-(10435, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 15, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On aggro - Set gameobject to GO_STATE_READY'),
-(10435, 0, 8, 9, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas -On death - Set gameobject to GO_STATE_ACTIVE_ALTERNATIVE'),
-(10435, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Set gameobject to GO_STATE_ACTIVE_ALTERNATIVE'),
-(10435, 0, 10, 11, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 11165, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Set gameobject to GO_STATE_ACTIVE_ALTERNATIVE'),
-(10435, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 14, 6852, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Set gameobject to GO_STATE_ACTIVE_ALTERNATIVE'),
-(10435, 0, 12, 13, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 53, 1, 104350, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Data Set 0 1 - Start Waypoint Path 104350'),
-(10435, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Data Set 0 1 - Say Line 0'),
-(10435, 0, 14, 0, 40, 0, 100, 0, 2, 104350, 0, 0, 0, 0, 54, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Point 2 of Path 104350 Reached - Pause Waypoint'),
-(10435, 0, 15, 16, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 62, 329, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 4068.74, -3535.97, 122.825, 2.47837, 'Magistrate Barthilas - On Respawn - Teleport'),
-(10435, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On Respawn - Set Home Position');
+(10435, 0, 6, 7, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 20, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas  - On aggro - Set Closest gameobject  (175377) to GO_STATE_READY'),
+(10435, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 20, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas  - On aggro - Set Closest gameobject (175372) to GO_STATE_READY'),
+(10435, 0, 8, 9, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 20, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On death - Set Closest gameobject (175377)  to GO_STATE_ACTIVE_ALTERNATIVE'),
+(10435, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 20, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas  - On death -  Set Closest gameobject (175372) to GO_STATE_ACTIVE_ALTERNATIVE'),
+(10435, 0, 10, 11, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 20, 175377, 70, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas  -  On reset -  Set Closest gameobject (175377) to GO_STATE_ACTIVE_ALTERNATIVE'),
+(10435, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 2, 0, 0, 0, 0, 0, 20, 175372, 90, 0, 0, 0, 0, 0, 0, 'Magistrate Barthilas - On reset - Set Closest gameobject (175372) to GO_STATE_ACTIVE_ALTERNATIVE'),
+(10435, 0, 12, 13, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 53, 1, 104350, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Self: Start path #104350, run, do not repeat, Aggressive'),
+(10435, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Self: Talk 0 to invoker'),
+(10435, 0, 14, 0, 40, 0, 100, 0, 2, 104350, 0, 0, 0, 0, 54, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On wapoint 2 of path 104350 reached - Self: Pause path for 1000 ms'),
+(10435, 0, 15, 0, 58, 0, 100, 0, 0, 104350, 0, 0, 0, 0, 67, 1, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On any waypoint of path 104350 ended - Trigger timed event timedEvent[1] in 100 - 100 ms // -meta_wait'),
+(10435, 0, 16, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 0, 34, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On timed event timedEvent[1] triggered - Set instance data #6 to 3'),
+(10435, 0, 17, 18, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 62, 329, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 4068.74, -3535.97, 122.825, 2.47837, 'On respawn - Self: Teleport to (4068.74, -3535.97, 122.825, 2.47837) on map stratholme (329)'),
+(10435, 0, 18, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'On respawn - Self: Set home position to current position');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 10435 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
 (22, 6, 10435, 0, 0, 36, 0, 0, 0, 0, 1, 'Action invoker is dead'),
 (22, 13, 10435, 0, 0, 21, 1, 16384, 0, 0, 1, 'Object doesn\'t have unit state UNIT_STATE_ATTACK_PLAYER'),
-(22, 16, 10435, 0, 0, 13, 1, 6, 3, 0, 0, 'instance data 6 equals 3');
+(22, 18, 10435, 0, 0, 13, 1, 6, 3, 0, 0, 'instance data 6 equals 3');
 
  -- Service Entrance Gate smart ai
 SET @ENTRY := -6851;
