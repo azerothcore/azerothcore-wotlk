@@ -800,7 +800,7 @@ public:
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    if( pInstance )
+                    if (pInstance)
                         pInstance->SetData(TYPE_MIMIRON, DONE);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
