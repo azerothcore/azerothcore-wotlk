@@ -788,14 +788,14 @@ public:
                                 computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 3s);
+                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
                     }
                     break;
                 case EVENT_STAND_UP_FRIENDLY:
                     me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
                     DoCastSelf(SPELL_SLEEP_VISUAL_2);
                     me->SetFaction(FACTION_FRIENDLY);
-                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 3s);
+                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 4s);
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
@@ -809,7 +809,7 @@ public:
                             go->SetLootRecipient(me->GetMap());
                         }
                     }
-                    events.ScheduleEvent(EVENT_DISAPPEAR, 15s);
+                    events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
                     break;
                 case EVENT_DISAPPEAR:
                     if( pInstance )
