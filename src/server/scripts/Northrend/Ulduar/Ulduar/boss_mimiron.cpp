@@ -756,7 +756,6 @@ public:
                         Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                         me->GetMotionMaster()->Clear();
                         summons.DoAction(1337); // despawn summons of summons
                         summons.DespawnEntry(NPC_FLAMES_INITIAL);
@@ -800,6 +799,7 @@ public:
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                     {
