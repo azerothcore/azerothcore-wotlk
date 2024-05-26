@@ -16,11 +16,19 @@
  */
 
 #include "boss_four_horsemen.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "naxxramas.h"
+
+using namespace FourHorsemen;
 
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();
     new spell_four_horsemen_mark();
-    RegisterSpellScript(spell_four_horsemen_consumption);
 }
 

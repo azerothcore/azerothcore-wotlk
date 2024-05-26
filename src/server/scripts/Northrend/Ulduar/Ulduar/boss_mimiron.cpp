@@ -802,9 +802,18 @@ public:
                 case EVENT_DISAPPEAR:
                     if( pInstance )
                         pInstance->SetData(TYPE_MIMIRON, DONE);
+                    DoCastSelf(SPELL_TELEPORT);
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon();
                     break;
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
             }
         }
 

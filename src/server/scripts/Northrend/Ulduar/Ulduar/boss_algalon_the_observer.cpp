@@ -46,7 +46,6 @@ enum Spells
     SPELL_COSMIC_SMASH_VISUAL_STATE     = 62300,
     SPELL_SELF_STUN                     = 65256,
     SPELL_KILL_CREDIT                   = 65184,
-    SPELL_TELEPORT                      = 62940,
     SPELL_DUAL_WIELD                    = 42459,
 
     // Algalon Stalker

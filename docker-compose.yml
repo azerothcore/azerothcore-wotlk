@@ -5,7 +5,6 @@
 # Don't make changes this file! make a `docker-compose.override.yml` and make your
 # changes there instead.
 
-version: '3'
 services:
   ac-database:
     container_name: ac-database
