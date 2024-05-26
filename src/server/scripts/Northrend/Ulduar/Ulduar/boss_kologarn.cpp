@@ -676,21 +676,13 @@ struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
 
         scheduler.Schedule(0s, [this](TaskContext context)
         {
-            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-
-            if (!PlayerList.IsEmpty())
+            me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                if (_boundaryIntersect->IsWithinBoundary(player->GetPosition()) && !player->IsGameMaster())
                 {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (!player->IsGameMaster() && _boundaryIntersect->IsWithinBoundary(player->GetPosition()))
-                        {
-                            player->KillSelf(false);
-                        }
-                    }
+                    player->KillSelf(false);
                 }
-            }
+            });
             context.Repeat(1s);
         });
     }
