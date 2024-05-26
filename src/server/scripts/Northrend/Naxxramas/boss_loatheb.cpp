@@ -20,6 +20,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+using namespace Loatheb;
+
 void AddSC_boss_loatheb()
 {
     new boss_loatheb();

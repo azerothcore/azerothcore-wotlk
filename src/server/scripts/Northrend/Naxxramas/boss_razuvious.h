@@ -5,6 +5,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace Razuvious {
+    
 enum RazuviousSays
 {
     RAZUVIOUS_SAY_AGGRO                       = 0,
@@ -212,4 +214,5 @@ public:
     };
 };
 
+}
 #endif

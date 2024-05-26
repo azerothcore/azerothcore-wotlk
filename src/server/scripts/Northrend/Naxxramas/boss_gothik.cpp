@@ -24,6 +24,8 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
+using namespace Gothik;
+
 void AddSC_boss_gothik()
 {
     new boss_gothik();

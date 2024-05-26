@@ -6,6 +6,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace Heigan {
+
 enum HeiganSays
 {
     HEIGAN_SAY_AGGRO                       = 0,
@@ -232,4 +234,5 @@ public:
     };
 };
 
+}
 #endif

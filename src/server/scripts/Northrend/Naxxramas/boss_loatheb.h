@@ -5,6 +5,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace Loatheb {
+
 enum LoathebSpells
 {
     SPELL_NECROTIC_AURA                         = 55593,
@@ -183,4 +185,5 @@ public:
     };
 };
 
+}
 #endif

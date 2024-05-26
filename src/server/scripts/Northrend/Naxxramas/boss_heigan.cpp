@@ -22,6 +22,8 @@
 
 #include "boss_heigan.h"
 
+using namespace Heigan;
+
 void AddSC_boss_heigan()
 {
     new boss_heigan();

@@ -23,6 +23,8 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
+using namespace Kelthuzad;
+
 void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();

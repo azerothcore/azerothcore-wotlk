@@ -5,6 +5,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace Anubrekhan {
+    
 enum AnubrekhanSays
 {
     ANUBREKHAN_SAY_AGGRO                       = 0,
@@ -228,5 +230,7 @@ public:
         }
     };
 };
+
+}
 
 #endif

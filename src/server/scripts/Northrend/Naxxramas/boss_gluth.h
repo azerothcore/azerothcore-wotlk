@@ -7,6 +7,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Gluth {
+
 enum GluthSpells
 {
     GLUTH_SPELL_MORTAL_WOUND                  = 25646,
@@ -262,5 +264,7 @@ public:
         return new spell_gluth_decimate_SpellScript();
     }
 };
+
+}
 
 #endif

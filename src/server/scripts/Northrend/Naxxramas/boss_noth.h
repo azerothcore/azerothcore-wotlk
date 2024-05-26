@@ -5,6 +5,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace Noth {
+    
 enum NothSays
 {
     NOTH_SAY_AGGRO                               = 0,
@@ -285,5 +287,6 @@ public:
     };
 };
 
+}
 
 #endif

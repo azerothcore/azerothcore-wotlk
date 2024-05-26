@@ -25,6 +25,8 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
+using namespace Grobbulus;
+
 void AddSC_boss_grobbulus()
 {
     new boss_grobbulus();

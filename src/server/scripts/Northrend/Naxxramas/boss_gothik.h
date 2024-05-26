@@ -8,6 +8,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Gothik {
+    
 enum GothikYells
 {
     GOTHIK_SAY_INTRO_1                     = 0,
@@ -698,5 +700,7 @@ public:
         return new spell_gothik_shadow_bolt_volley_SpellScript();
     }
 };
+
+}
 
 #endif

@@ -9,9 +9,11 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
-enum FourHorsemenSpells
+namespace FourHorsemen {
+
+enum Spells
 {
-    FOURHORSEMEN_SPELL_BERSERK                       = 26662,
+    SPELL_BERSERK                       = 26662,
     // Marks
     SPELL_MARK_OF_KORTHAZZ              = 28832,
     SPELL_MARK_OF_BLAUMEUX              = 28833,
@@ -38,15 +40,15 @@ enum FourHorsemenSpells
     SPELL_RIVENDARE_UNHOLY_SHADOW_25    = 57369
 };
 
-enum FourHorsemenEvents
+enum Events
 {
     EVENT_MARK_CAST                     = 1,
     EVENT_PRIMARY_SPELL                 = 2,
     EVENT_SECONDARY_SPELL               = 3,
-    FOURHORSEMEN_EVENT_BERSERK                       = 4
+    EVENT_BERSERK                       = 4
 };
 
-enum FourHorsemenMisc
+enum Misc
 {
     // Movement
     MOVE_PHASE_NONE                     = 0,
@@ -61,12 +63,12 @@ enum FourHorsemenMisc
 
 enum FourHorsemen
 {
-    FOURHORSEMEN_SAY_AGGRO                           = 0,
-    FOURHORSEMEN_SAY_TAUNT                           = 1,
-    FOURHORSEMEN_SAY_SPECIAL                         = 2,
-    FOURHORSEMEN_SAY_SLAY                            = 3,
-    FOURHORSEMEN_SAY_DEATH                           = 4,
-    FOURHORSEMEN_EMOTE_RAGECAST                      = 7
+    SAY_AGGRO                           = 0,
+    SAY_TAUNT                           = 1,
+    SAY_SPECIAL                         = 2,
+    SAY_SLAY                            = 3,
+    SAY_DEATH                           = 4,
+    EMOTE_RAGECAST                      = 7
 };
 
 // MARKS
@@ -180,7 +182,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
             events.RescheduleEvent(EVENT_MARK_CAST, 24s);
-            events.RescheduleEvent(FOURHORSEMEN_EVENT_BERSERK, 10min);
+            events.RescheduleEvent(EVENT_BERSERK, 10min);
             if ((me->GetEntry() != NPC_LADY_BLAUMEUX && me->GetEntry() != NPC_SIR_ZELIEK))
             {
                 events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10s, 15s);
@@ -247,7 +249,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            Talk(FOURHORSEMEN_SAY_SLAY);
+            Talk(SAY_SLAY);
             if (pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -277,7 +279,7 @@ public:
                     }
                 }
             }
-            Talk(FOURHORSEMEN_SAY_DEATH);
+            Talk(SAY_DEATH);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -285,7 +287,7 @@ public:
             BossAI::JustEngagedWith(who);
             if (movementPhase == MOVE_PHASE_NONE)
             {
-                Talk(FOURHORSEMEN_SAY_AGGRO);
+                Talk(SAY_AGGRO);
                 me->SetReactState(REACT_PASSIVE);
                 movementPhase = MOVE_PHASE_STARTED;
                 me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN), true);
@@ -324,12 +326,12 @@ public:
                     me->CastSpell(me, TABLE_SPELL_MARK[horsemanId], false);
                     events.Repeat((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK) ? 15s : 12s);
                     return;
-                case FOURHORSEMEN_EVENT_BERSERK:
-                    Talk(FOURHORSEMEN_SAY_SPECIAL);
-                    me->CastSpell(me, FOURHORSEMEN_SPELL_BERSERK, true);
+                case EVENT_BERSERK:
+                    Talk(SAY_SPECIAL);
+                    me->CastSpell(me, SPELL_BERSERK, true);
                     return;
                 case EVENT_PRIMARY_SPELL:
-                    Talk(FOURHORSEMEN_SAY_TAUNT);
+                    Talk(SAY_TAUNT);
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                     events.Repeat(15s);
                     return;
@@ -355,7 +357,7 @@ public:
                 else if (!me->IsWithinDistInMap(me->GetVictim(), 45.0f) || !me->IsValidAttackTarget(me->GetVictim()))
                 {
                     DoCastAOE(TABLE_SPELL_PUNISH[horsemanId]);
-                    Talk(FOURHORSEMEN_EMOTE_RAGECAST);
+                    Talk(EMOTE_RAGECAST);
                 }
             }
             else
@@ -423,20 +425,6 @@ public:
     }
 };
 
-class spell_four_horsemen_consumption : public SpellScript
-{
-    PrepareSpellScript(spell_four_horsemen_consumption);
-
-    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-    {
-        uint32 damage = GetCaster()->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250;
-        SetHitDamage(damage);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_four_horsemen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
+} // namespace FourHorsemen
 
 #endif

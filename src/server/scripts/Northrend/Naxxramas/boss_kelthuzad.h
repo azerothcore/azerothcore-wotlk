@@ -7,6 +7,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Kelthuzad {
+
 enum KelthuzadYells
 {
     KELTHUZAD_SAY_ANSWER_REQUEST                      = 3,
@@ -729,4 +731,5 @@ public:
     }
 };
 
+}
 #endif

@@ -7,6 +7,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Thaddius {
+
 enum ThaddiusSays
 {
     // Stalagg
@@ -749,5 +751,7 @@ public:
         return true;
     }
 };
+
+}
 
 #endif

@@ -9,6 +9,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Grobbulus {
+    
 enum GrobbulusSpells
 {
     GROBBULUS_SPELL_POISON_CLOUD                      = 28240,
@@ -304,5 +306,7 @@ class spell_grobbulus_mutating_injection : public SpellScriptLoader
             return new spell_grobbulus_mutating_injection_AuraScript();
         }
 };
+
+}
 
 #endif

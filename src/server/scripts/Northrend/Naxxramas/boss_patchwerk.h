@@ -5,6 +5,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+namespace PatchWerk {
+    
 enum PatchwerkYells
 {
     PATCHWERK_SAY_AGGRO                       = 0,
@@ -180,4 +182,5 @@ public:
     };
 };
 
+}
 #endif

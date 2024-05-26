@@ -6,6 +6,8 @@
 #include "SpellInfo.h"
 #include "naxxramas.h"
 
+namespace Faerlina {
+
 enum FaerlinaYells
 {
     FAERLINA_SAY_GREET                           = 0,
@@ -231,5 +233,7 @@ public:
         }
     };
 };
+
+}
 
 #endif

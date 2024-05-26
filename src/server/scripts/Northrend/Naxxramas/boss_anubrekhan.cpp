@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+using namespace Anubrekhan;
 
 void AddSC_boss_anubrekhan()
 {

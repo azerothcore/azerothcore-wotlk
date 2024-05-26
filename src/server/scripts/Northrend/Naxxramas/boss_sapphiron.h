@@ -7,6 +7,8 @@
 #include "SpellScript.h"
 #include "naxxramas.h"
 
+namespace Sapphiron {
+    
 enum SapphironYells
 {
     EMOTE_AIR_PHASE         = 0,
@@ -443,5 +445,7 @@ public:
         return new spell_sapphiron_frost_explosion_SpellScript();
     }
 };
+
+}
 
 #endif
