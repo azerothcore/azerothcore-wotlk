@@ -290,6 +290,10 @@ enum UlduarMisc
     // Freya, Hodir, Mimiron, Thorim
     EVENT_KEEPER_TELEPORTED                 = 62941,
 
+    // Ancient Gate
+    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
+    EMOTE_ANCIENT_GATE_UNLOCKED             = 19,
+
     // Yogg-Saron
     ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
     KEEPER_FREYA                            = 0,
