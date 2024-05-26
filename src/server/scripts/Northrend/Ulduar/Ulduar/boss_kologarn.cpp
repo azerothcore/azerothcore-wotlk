@@ -237,7 +237,6 @@ public:
             _looksAchievement = true;
 
             me->SetDisableGravity(true);
-            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             me->DisableRotate(true);
 
             events.Reset();
@@ -327,6 +326,8 @@ public:
                 arm->DespawnOrUnsummon(3000); // visual
             if (Creature* arm = ObjectAccessor::GetCreature(*me, _right))
                 arm->DespawnOrUnsummon(3000); // visual
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetDisableGravity(true);
         }
 
         void KilledUnit(Unit*) override

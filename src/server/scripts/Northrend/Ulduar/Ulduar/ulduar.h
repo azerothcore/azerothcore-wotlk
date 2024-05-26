@@ -284,6 +284,18 @@ enum UlduarMisc
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
 
+    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
+    SPELL_TELEPORT                          = 62940,
+
+    // Freya, Hodir, Mimiron, Thorim
+    EVENT_KEEPER_TELEPORTED                 = 62941,
+
+    // Ancient Gate
+    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
+    EMOTE_ANCIENT_GATE_UNLOCKED             = 19,
+
+    // Yogg-Saron
+    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
     KEEPER_FREYA                            = 0,
     KEEPER_HODIR                            = 1,
     KEEPER_MIMIRON                          = 2,

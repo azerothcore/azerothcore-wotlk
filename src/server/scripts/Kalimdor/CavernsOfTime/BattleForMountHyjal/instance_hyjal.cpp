@@ -96,8 +96,6 @@ public:
 
         void Initialize() override
         {
-            SetHeaders(DataHeader);
-
             _bossWave = 0;
             _retreat = 0;
             trash = 0;
