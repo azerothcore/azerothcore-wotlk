@@ -144,7 +144,11 @@ enum HyjalMisc
     START_WAVE_HORDE_RETREAT    = 39,
     START_WAVE_NIGHT_ELF        = 42,
 
-    CONTEXT_GROUP_WAVES         = 1
+    CONTEXT_GROUP_WAVES         = 1,
+
+    AREA_NORDRASSIL             = 3710,
+
+    SPELL_ETERNAL_SILENCE       = 42201
 };
 
 enum HyjalPaths
