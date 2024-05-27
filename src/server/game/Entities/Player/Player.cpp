@@ -2176,6 +2176,9 @@ void Player::SetInWater(bool apply)
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     getHostileRefMgr().updateThreatTables();
+
+    if (InstanceScript* instance = GetInstanceScript())
+        instance->OnPlayerInWaterStateUpdate(this, apply);
 }
 
 bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
