@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -117,7 +119,27 @@ private:
 
 };
 
+class spell_azgalor_doom : public AuraScript
+{
+    PrepareAuraScript(spell_azgalor_doom);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+        {
+            target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_azgalor_doom::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
+    RegisterSpellScript(spell_azgalor_doom);
 }
