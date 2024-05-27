@@ -24,14 +24,14 @@
 
 enum Spells
 {
-    // phase 1
+    // Fly Phase
     SPELL_BELLOWING_ROAR        = 39427,
     SPELL_CLEAVE                = 30131,
     SPELL_CHARRED_EARTH         = 30129,
     SPELL_DISTRACTING_ASH       = 30130,
     SPELL_SMOLDERING_BREATH     = 30210,
     SPELL_TAIL_SWEEP            = 25653,
-    // phase 2
+    // Ground Phase
     SPELL_RAIN_OF_BONES         = 37098,
     SPELL_SMOKING_BLAST         = 37057,
     SPELL_FIREBALL_BARRAGE      = 30282,
@@ -48,15 +48,37 @@ enum Says
     EMOTE_BREATH                = 4
 };
 
-enum Groups
+enum Actions
+{
+    ACTION_START_INTRO = 0
+};
+
+enum Phases
+{
+    PHASE_INTRO                 = 0,
+    PHASE_GROUND                = 1,
+    PHASE_FLY                   = 2,
+    PHASE_TAKE_OFF              = 3,
+    PHASE_LAND                  = 4
+};
+
+ enum Groups
 {
     GROUP_GROUND                = 0,
-    GROUP_FLYING                = 1
-};
+    GROUP_FLYING                = 1,
+    GROUP_LAND                  = 2
+ };
 
 enum Points
 {
-    POINT_DESPAWN = 10 // Other points used dynamically throughout the script
+    POINT_DESPAWN = 10, // Other points used dynamically throughout the script
+    POINT_INTRO_END             = 11,
+    POINT_LANDING_END           = 6,
+    POINT_ID_AIR_MID            = 1,
+    POINT_ID_AIR_PHASE          = 2,
+    POINT_ID_GROUND             = 3,
+
+    POINT_TAKE_OFF_INTRO = 12,
 };
 
 float IntroWay[8][3] =
@@ -70,6 +92,22 @@ float IntroWay[8][3] =
     {-11140.00f, -1915.00f, 122.00f},
     {-11163.00f, -1903.00f, 91.473f}
 }; //TODO: move to table
+
+
+Position const positionLanding = {-11142.712f, -1891.193f, 92.25038f};
+Position const FlyPosition = { -11160.13f, -1870.683f, 97.73876f, 0.0f };
+Position const FlyPositionLeft = { -11094.42f, -1866.992f, 107.8375f, 0.0f };
+Position const FlyPositionRight = { -11193.77f, -1921.983f, 107.9845f, 0.0f };
+
+
+// -11110.674,  -1878.7712,  107.89686 intermediate do land or go circle
+
+// -11162.23f, -1900.329f, 91.47265f Landing location, cmangos after combat
+
+enum Misc
+{
+    NPC_NIGHTBANE_HELPER_TARGET = 17260
+};
 
 struct boss_nightbane : public BossAI
 {
@@ -85,18 +123,21 @@ struct boss_nightbane : public BossAI
         BossAI::Reset();
         _skeletonscheduler.CancelAll();
 
-        me->SetSpeed(MOVE_RUN, 2.0f);
-        me->SetDisableGravity(_intro);
-        me->SetWalk(false);
-        me->setActive(true);
+        // me->SetSpeed(MOVE_RUN, 2.0f);
+        // me->SetDisableGravity(_intro);
+        // me->SetWalk(false);
+        // me->setActive(true);
 
         _flying = false;
         _movement = false;
         _intro = true;
-        Phase = 1;
+        // Phase = 1;
         _movePhase = 0;
         _triggerCountTakeOffWhileFlying = 0;
         _flightPhasesCompleted = 0;
+
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetReactState(REACT_PASSIVE);
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
             TakeOff();
@@ -110,6 +151,7 @@ struct boss_nightbane : public BossAI
         me->SendMovementFlagUpdate();
         me->GetMotionMaster()->MoveTakeoff(POINT_DESPAWN, -11013.246f, -1770.5212f, 166.50139f);
     }
+
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageEffectType, SpellSchoolMask spellSchoolMask) override
     {
@@ -127,10 +169,52 @@ struct boss_nightbane : public BossAI
     {
         BossAI::JustEngagedWith(who);
         _intro = false;
+        _phase = PHASE_GROUND;
 
         Talk(YELL_AGGRO);
         ScheduleGround();
     }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_INTRO)
+        {
+            me->GetMap()->LoadGrid(-11260.0f, -1771.0f); // load grid at far end of path
+            me->GetMap()->SetVisibilityRange(300.0f); // see nightbane
+            me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            _phase = PHASE_INTRO;
+            me->AI()->Talk(EMOTE_SUMMON);
+            scheduler.Schedule(2s, [this](TaskContext context)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                // me->SetHover(true);
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MoveTakeoff(POINT_TAKE_OFF_INTRO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, 14.0f);
+            }).Schedule(4s, [this](TaskContext context)
+            {
+                me->GetMotionMaster()->MovePath(me->GetEntry()*10, false);
+            });
+            // me->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+            // me->SetCanFly(true);
+            // me->SetDisableGravity(true);
+            // me->SetHover(true);
+            // me->GetMotionMaster()->MoveSplinePath(me->GetEntry()); //Crashes
+            // me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+            // me->SendMovementFlagUpdate();
+//            // _phase = PHASE_INTRO;
+//            // Talk(EMOTE_SUMMON);
+//            me->setActive(true);
+//            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+//
+//            // me->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND);
+
+//            // me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER , UNIT_BYTE1_FLAG_FLY);
+//            me->SetDisableGravity(true);
+//            me->setActive(true);
+//            me->GetMotionMaster()->MoveSplinePath(me->GetEntry());
+        }
+     }
+
 
     void ScheduleGround()
     {
@@ -209,20 +293,47 @@ struct boss_nightbane : public BossAI
 
     void AttackStart(Unit* who) override
     {
-        if (!_intro && !_flying)
+        if (_phase == PHASE_GROUND)
             ScriptedAI::AttackStart(who);
     }
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_intro && !_flying)
+        if (_phase == PHASE_GROUND)
             ScriptedAI::MoveInLineOfSight(who);
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
+
+    if (type == WAYPOINT_MOTION_TYPE)
+        {
+            if (me->IsInCombat()) // combat movement
+            {
+                if (id == POINT_LANDING_END)
+                {
+                    // me->GetMap()->SetVisibilityRange(200.0f); // see nightbane
+                    // me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+                    // m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_MISC_FLAGS, UNIT_BYTE1_FLAG_FLY_ANIM);
+                    // m_creature->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_MISC_FLAGS, UNIT_BYTE1_FLAG_ALWAYS_STAND);
+                    // me->SetCanFly(false);
+                    // me->SetHover(false);
+                    me->GetMotionMaster()->MovePoint(POINT_ID_GROUND, -11162.23f, -1900.329f, 91.47265f); // noted as falling in sniff
+                }
+            }
+            else // intro movement
+            {
+                if (id == 8)
+                {
+                    ScheduleIntroLand();
+                    me->GetMap()->SetVisibilityRange(200.0f); // see nightbane
+                }
+            }
+        }
+
         if (type != POINT_MOTION_TYPE)
             return;
+
 
         if (id == POINT_DESPAWN)
         {
@@ -231,7 +342,7 @@ struct boss_nightbane : public BossAI
 
         if (_intro)
         {
-            if (id >= 8)
+            if (id >= 11)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetInCombatWithZone();
@@ -277,6 +388,45 @@ struct boss_nightbane : public BossAI
         }
     }
 
+    void ScheduleIntroLand()
+    {
+        scheduler.Schedule(2s, [this](TaskContext /*context*/)
+        {
+            // me->GetMotionMaster()->MovePoint(POINT_INTRO_END, positionLanding);
+            me->GetMotionMaster()->MoveLand(POINT_INTRO_END, positionLanding, 14.0f);
+            me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+        }).Schedule(5s, [this](TaskContext /*context*/)
+        {
+            // me->GetMotionMaster()->MoveIdle();
+            // me->GetMotionMaster()->Clear(false);
+            // me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            // me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            // me->SetReactState(REACT_AGGRESSIVE);
+            // me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            // me->SetCanFly(false);
+            // me->SetHover(false);
+            // me->SetDisableGravity(false);
+            // // me->SetStandState(UNIT_STAND_STATE_STAND);
+            // ScheduleGround();
+
+            // me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetReactState(REACT_AGGRESSIVE);
+
+            // me->GetMotionMaster()->MoveIdle();
+
+            me->SetSpeed(MOVE_RUN, 2.0f);
+            me->SetCanFly(false);
+            // me->SetHover(false);
+            // me->SetDisableGravity(true);
+            me->SetDisableGravity(false);
+            // Position land = me->GetPosition();
+            // me->GetMotionMaster()->MoveLand(0, land, 14.0f);
+
+            _movement = true; // attack on landing
+        });
+    }
+
     void JustSummoned(Creature* summon) override
     {
         summon->AI()->AttackStart(me->GetVictim());
@@ -313,7 +463,7 @@ struct boss_nightbane : public BossAI
         me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
         me->SetDisableGravity(true);
         me->GetMotionMaster()->Clear(false);
-        me->GetMotionMaster()->MovePoint(0, IntroWay[2][0], IntroWay[2][1], IntroWay[2][2]);
+        // me->GetMotionMaster()->MovePoint(0, IntroWay[2][0], IntroWay[2][1], IntroWay[2][2]);
 
         _flying = true;
 
@@ -325,7 +475,7 @@ struct boss_nightbane : public BossAI
             Talk(YELL_LAND_PHASE);
 
             me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MovePoint(3, IntroWay[3][0], IntroWay[3][1], IntroWay[3][2]);
+            // me->GetMotionMaster()->MovePoint(3, IntroWay[3][0], IntroWay[3][1], IntroWay[3][2]);
 
             _flying = true;
             scheduler.CancelGroup(GROUP_FLYING);
@@ -334,52 +484,57 @@ struct boss_nightbane : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (_intro)
-        {
-            if (_movePhase)
-            {
-                if (_movePhase >= 7)
-                {
-                    me->SetDisableGravity(false);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                    me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
-                }
-                else
-                {
-                    me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
-                }
-                _movePhase = 0;
-            }
-            return;
-        }
+        // if (_intro)
+        // {
+        //     if (_movePhase)
+        //     {
+        //         if (_movePhase >= 10)
+        //         {
+        //             me->SetDisableGravity(false);
+        //             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+        //         }
+        //         _movePhase = 0;
+        //     }
+        //     return;
+        // }
 
-        if (_flying && _movePhase)
-        {
-            if (_movePhase >= 7)
-            {
-                me->SetDisableGravity(false);
-                DoResetThreatList();
-                me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
-            }
-            else
-                me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
+        // if (_flying && _movePhase)
+        // {
+        //     if (_movePhase >= 7)
+        //     {
+        //         me->SetDisableGravity(false);
+        //         DoResetThreatList();
+        //         me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+        //         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+        //         // me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
+        //     }
+        //     else
+        //         // me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
 
-            _movePhase = 0;
-        }
+        //     _movePhase = 0;
+        scheduler.Update(diff);
+        // }
+        // if (isIntroPathComplete && _phase == PHASE_INTRO)
+        // {
+            // scheduler.Schedule(2s, [this](TaskContext /*context*/)
+            // {
+                // me->GetMotionMaster()->MovePoint(POINT_INTRO_END, positionLanding, false, true);
+                // me->GetMotionMaster()->MovePoint(POINT_INTRO_END, positionLanding, 14.0f);
+                // me->GetMotionMaster()->MovePoint(POINT_INTRO_END, positionLanding, false, true);
+            // });
+            // isIntroPathComplete = false;
+        // }
 
         if (!UpdateVictim())
             return;
 
-        if (_flying)
-            return;
+        // if (_flying)
+        //     return;
 
-        scheduler.Update(diff);
         _skeletonscheduler.Update(diff);
 
         //  Phase 1 "GROUND FIGHT"
-        if (Phase == 1)
+        if (_phase == PHASE_GROUND)
         {
             if (_movement)
             {
@@ -400,6 +555,9 @@ private:
     bool _flying;
     bool _movement;
 
+    bool isIntroPathComplete;
+    uint8 _phase;
+
     uint32 _movePhase;
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
@@ -417,17 +575,22 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+            if (instance->GetBossState(DATA_NIGHTBANE) == DONE || instance->GetBossState(DATA_NIGHTBANE) == IN_PROGRESS)
+                return false;
+            if (Creature* nightbane = instance->GetCreature(DATA_NIGHTBANE))
             {
-                if (Creature* nightbane = instance->GetCreature(DATA_NIGHTBANE))
-                {
-                    nightbane->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
-                    nightbane->AI()->Talk(EMOTE_SUMMON);
-                }
+                nightbane->AI()->DoAction(ACTION_START_INTRO);
             }
         }
-
         return false;
+    }
+};
+
+struct npc_nightbane_helper_target : public NullCreatureAI
+{
+    npc_nightbane_helper_target(Creature* creature) : NullCreatureAI(creature)
+    {
+        me->SetDisableGravity(true);
     }
 };
 
@@ -435,4 +598,5 @@ void AddSC_boss_nightbane()
 {
     RegisterKarazhanCreatureAI(boss_nightbane);
     new go_blackened_urn();
+    RegisterKarazhanCreatureAI(npc_nightbane_helper_target);
 }
