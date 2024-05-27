@@ -1,3 +1,4 @@
+-- DB update 2024_05_26_02 -> 2024_05_27_00
 -- update DONT_OVERRIDE_SAI_ENTRY
 -- #18734
 UPDATE `creature_template` SET `flags_extra` = 134217728 WHERE (`entry` = 4300);
