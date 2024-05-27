@@ -60,7 +60,7 @@ public:
             context.Repeat(8s, 16s);
         }).Schedule(25s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f);
+            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f, false);
             context.Repeat(15s);
         }).Schedule(30s, [this](TaskContext context)
         {
