@@ -1287,19 +1287,21 @@ public:
             if (!summoner)
                 return;
 
-            if (summoner->GetTypeId() != TYPEID_UNIT)
-            {
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
-            }
 
-            summoner->ToUnit()->CastSpell(summoner->ToUnit(), SPELL_WAITING_FOR_A_BOMBER, true);
-            summoner->ToUnit()->CastSpell(summoner->ToUnit(), SPELL_FLIGHT_ORDERS, true);
+            Player* player = summoner->ToPlayer();
+            if (!player)
+                return;
+
+            player->CastSpell(player, SPELL_WAITING_FOR_A_BOMBER, true);
+            player->CastSpell(player, SPELL_FLIGHT_ORDERS, true);
             events.ScheduleEvent(EVENT_START_FLIGHT, 0);
             events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
-            me->SetFaction(summoner->ToUnit()->GetFaction());
+            me->SetFaction(player->GetFaction());
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override

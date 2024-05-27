@@ -25,7 +25,7 @@ runs:
   using: composite
   steps:
     - name: Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache

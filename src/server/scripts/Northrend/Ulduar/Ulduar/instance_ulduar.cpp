@@ -124,6 +124,9 @@ public:
         ObjectGuid m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
+        // Ancient Gate
+        const Position triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
@@ -370,22 +373,6 @@ public:
                 case NPC_MIMIRON_ACU:
                     m_MimironACUguid = creature->GetGUID();
                     break;
-                case NPC_FREYA_GOSSIP:
-                    m_keepersGossipGUID[TYPE_FREYA - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_FREYA, creature);
-                    break;
-                case NPC_HODIR_GOSSIP:
-                    m_keepersGossipGUID[TYPE_HODIR - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_HODIR, creature);
-                    break;
-                case NPC_THORIM_GOSSIP:
-                    m_keepersGossipGUID[TYPE_THORIM - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_THORIM, creature);
-                    break;
-                case NPC_MIMIRON_GOSSIP:
-                    m_keepersGossipGUID[TYPE_MIMIRON - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_MIMIRON, creature);
-                    break;
                 case NPC_ELDER_IRONBRANCH:
                 case NPC_ELDER_STONEBARK:
                 case NPC_ELDER_BRIGHTLEAF:
@@ -431,19 +418,6 @@ public:
         {
             if (GetData(encounter) == DONE)
                 go->SetGoState(state);
-        }
-
-        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
-        {
-            if (!cr)
-            {
-                cr = instance->GetCreature(guid);
-                if (!cr)
-                    return;
-            }
-
-            bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type - TYPE_FREYA))));
-            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -695,11 +669,19 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
+                        {
+                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
+                            {
+                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10*IN_MILLISECONDS))
+                                {
+                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
+                                }
+                            }
+                        });
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;
@@ -716,8 +698,11 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    [[fallthrough]];
+                case EVENT_KEEPER_TELEPORTED:
+                    if (Creature* sara = instance->GetCreature(m_saraGUID))
+                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;
-
                 case DATA_MAGE_BARRIER:
                     m_mageBarrier = data;
                     break;
@@ -728,6 +713,7 @@ public:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     {
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
+                        instance->LoadGrid(364.0f, 32.0f); //make sure Mimiron's and Thorim's Targetting Crystal are loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
                         for (uint8 i = 0; i < 2; ++i)
                         {
