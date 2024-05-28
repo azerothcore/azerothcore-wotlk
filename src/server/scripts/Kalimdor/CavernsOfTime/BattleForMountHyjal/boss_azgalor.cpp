@@ -70,7 +70,7 @@ public:
             context.Repeat(18s, 20s);
         }).Schedule(45s, 55s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_DOOM, 0, 100.f, true, false, false);
+            DoCastRandomTarget(SPELL_DOOM, 1, 100.f, true, false, false);
             Talk(SAY_DOOM);
             context.Repeat();
         }).Schedule(10min, [this](TaskContext context)
