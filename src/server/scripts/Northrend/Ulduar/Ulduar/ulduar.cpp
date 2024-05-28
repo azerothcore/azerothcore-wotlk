@@ -545,33 +545,6 @@ public:
     }
 };
 
-class go_call_tram : public GameObjectScript
-{
-public:
-    go_call_tram() : GameObjectScript("go_call_tram") { }
-
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
-    {
-        InstanceScript* pInstance = go->GetInstanceScript();
-
-        if (!pInstance)
-            return false;
-
-        switch(go->GetEntry())
-        {
-            case 194914:
-            case 194438:
-                pInstance->SetData(DATA_CALL_TRAM, 0);
-                break;
-            case 194912:
-            case 194437:
-                pInstance->SetData(DATA_CALL_TRAM, 1);
-                break;
-        }
-        return true;
-    }
-};
-
 struct npc_salvaged_siege_engine : public VehicleAI
 {
     npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
@@ -609,7 +582,5 @@ void AddSC_ulduar()
     new npc_ulduar_arachnopod_destroyer();
     new spell_ulduar_arachnopod_damaged();
     new AreaTrigger_at_celestial_planetarium_enterance();
-    new go_call_tram();
-
     RegisterCreatureAI(npc_salvaged_siege_engine);
 }
