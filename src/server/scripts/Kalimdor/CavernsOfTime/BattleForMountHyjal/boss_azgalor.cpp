@@ -126,7 +126,7 @@ class spell_azgalor_doom : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && !IsExpired())
         {
             target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
         }
