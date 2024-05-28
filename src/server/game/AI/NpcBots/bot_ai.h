@@ -284,6 +284,7 @@ class bot_ai : public CreatureAI
         uint32 GetReviveTimer() const { return _reviveTimer; }
         void SetReviveTimer(uint32 newtime) { _reviveTimer = newtime; }
         void UpdateReviveTimer(uint32 diff);
+        uint32 GetSelfRezSpell() const { return _selfrez_spell_id; }
 
         uint32 GetEngageTimer() const { return _engageTimer; }
         void ResetEngageTimer(uint32 delay);

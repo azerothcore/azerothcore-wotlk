@@ -1693,7 +1693,7 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
     if (!group)
     {
         player = master;
-        if (!player->IsAlive() && !player->isResurrectRequested())
+        if (!player->IsAlive() && !player->isResurrectRequested() && !player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
         {
             target = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) ? player->ToUnit() : (Unit*)player->GetCorpse();
             if (target && target->IsInWorld() && me->GetMap() == target->FindMap() &&
@@ -1721,7 +1721,7 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
         {
             target = bitr->second;
             if (!target || !target->IsInWorld() || target->IsAlive()) continue;
-            if (bitr->second->GetBotAI()->GetReviveTimer() < 15000) continue;
+            if (bitr->second->GetBotAI()->GetReviveTimer() < 15000 || bitr->second->GetBotAI()->GetSelfRezSpell()) continue;
             if (me->GetDistance(target) < 30 && target->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS) &&
                 !player->GetBotMgr()->IsBeingResurrected(target))
                 bottargets.push_back(bitr->second);
@@ -1737,7 +1737,7 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
             if (!player || player->FindMap() != me->GetMap()) continue;
             if (!Bots && player->HaveBot())
                 Bots = true;
-            if (player->IsAlive() || player->isResurrectRequested()) continue;
+            if (player->IsAlive() || player->isResurrectRequested() || player->GetUInt32Value(PLAYER_SELF_RES_SPELL)) continue;
             if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                 target = (Unit*)player->GetCorpse();
             if (!target || !target->IsInWorld()) continue;
@@ -1778,7 +1778,7 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
             {
                 target = bitr->second;
                 if (!target || !target->IsInWorld() || target->IsAlive()) continue;
-                if (bitr->second->GetBotAI()->GetReviveTimer() < 15000) continue;
+                if (bitr->second->GetBotAI()->GetReviveTimer() < 15000 || bitr->second->GetBotAI()->GetSelfRezSpell()) continue;
                 if (me->GetDistance(target) < 30 && target->IsWithinLOSInMap(me, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS) &&
                     !player->GetBotMgr()->IsBeingResurrected(target))
                     bottargets.push_back(bitr->second);
@@ -7406,6 +7406,7 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
                 }
 
                 BotMgr::ReviveBot(me, caster);
+                _selfrez_spell_id = 0;
 
                 me->SetHealth(health);
                 if (me->GetMaxPower(POWER_MANA) > 1)
@@ -15795,7 +15796,7 @@ void bot_ai::OnBotSpellGo(Spell const* spell, bool ok)
                 StartPotionTimer();
             if (curInfo->Id == ACTIVATE_SPEC)
                 SetSpec(_newspec);
-            if (curInfo->Id == _selfrez_spell_id)
+            if (curInfo->Id == GetSelfRezSpell())
                 OnSpellHit(me, curInfo);
 
             OnClassSpellGo(curInfo);
@@ -17108,8 +17109,8 @@ void bot_ai::UpdateDeadAI(uint32 diff)
         SendUpdateToOutOfRangeBotGroupMembers();
 
     // soulstone
-    if (_selfrez_spell_id && (IAmFree() || !master->GetBotMgr()->IsPartyInCombat()) && Rand() < 15)
-        me->CastSpell(me, _selfrez_spell_id);
+    if (GetSelfRezSpell() && (IAmFree() || !master->GetBotMgr()->IsPartyInCombat()) && Rand() < 15)
+        me->CastSpell(me, GetSelfRezSpell());
 }
 //opponent unsafe
 bool bot_ai::GlobalUpdate(uint32 diff)
