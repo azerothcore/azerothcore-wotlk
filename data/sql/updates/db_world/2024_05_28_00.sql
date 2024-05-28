@@ -1,3 +1,4 @@
+-- DB update 2024_05_27_02 -> 2024_05_28_00
 --
 -- Rocket Booster
 UPDATE `gameobject` SET `position_x`=2307.000003, `position_y`=265.6011, `position_z`=424.287993  WHERE (`id` = 194904) AND (`guid` IN (35524));
