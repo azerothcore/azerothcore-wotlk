@@ -1352,9 +1352,9 @@ void BotMgr::OnTeleportFar(uint32 mapId, float x, float y, float z, float ori)
     }
 }
 
-void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset, bot_ai* detatched_ai)
+void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset, bot_ai* detached_ai)
 {
-    bot_ai* botai = detatched_ai ? detatched_ai : bot->GetBotAI();
+    bot_ai* botai = detached_ai ? detached_ai : bot->GetBotAI();
     ASSERT(botai);
     botai->AbortTeleport();
     botai->SetIsDuringTeleport(true);
@@ -1498,9 +1498,9 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     });
 }
 
-void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick, bool reset, bot_ai* detatched_ai)
+void BotMgr::TeleportBot(Creature* bot, Map* newMap, Position const* pos, bool quick, bool reset, bot_ai* detached_ai)
 {
-    _teleportBot(bot, newMap, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation(), quick, reset, detatched_ai);
+    _teleportBot(bot, newMap, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation(), quick, reset, detached_ai);
 }
 
 void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
