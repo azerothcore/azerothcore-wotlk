@@ -30,6 +30,11 @@ enum Spells
     SPELL_BERSERK               = 26662
 };
 
+enum Misc
+{
+    NPC_LESSER_DOOMGUARD   = 17864
+};
+
 enum Texts
 {
     SAY_ONDEATH             = 0,
@@ -50,6 +55,22 @@ public:
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        std::list<Creature* > doomguardList;
+        me->GetCreatureListWithEntryInGrid(doomguardList, NPC_LESSER_DOOMGUARD, 100.0f);
+        if (doomguardList.size() > 0)
+        {
+            for (Creature* doomguard : doomguardList)
+            {
+                doomguard->DespawnOrUnsummon();
+            }
+        }
+        doomguardList.clear();
+        instance->SetData(DATA_RESET_HORDE, 0);
+        me->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit * who) override
