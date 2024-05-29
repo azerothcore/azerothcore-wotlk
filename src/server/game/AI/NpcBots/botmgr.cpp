@@ -264,8 +264,8 @@ BotMgr::~BotMgr()
 
 void BotMgr::Initialize()
 {
-    BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() });
     LoadConfig();
+    BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
 
     BotDataMgr::LoadNpcBots();
     BotDataMgr::LoadWanderMap();
@@ -400,7 +400,8 @@ void BotMgr::LoadConfig(bool reload)
     _bothk_achievements_enable      = sConfigMgr->GetBoolDefault("NpcBot.HK.Achievements.Enable", false);
     _bothk_rate_honor               = sConfigMgr->GetFloatDefault("NpcBot.HK.Rate.Honor", 1.0);
 
-    BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
+    if (reload)
+        BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0));
 
     _max_npcbots = {};
     std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");

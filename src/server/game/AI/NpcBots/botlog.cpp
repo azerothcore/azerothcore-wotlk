@@ -61,10 +61,11 @@ void BotLogger::Log(uint16 log_type, uint32 entry, Args&&... params)
     if (!BotMgr::IsNpcBotLogEnabled())
         return;
 
-    if (Creature const* bot = BotDataMgr::FindBot(entry))
+    if (Creature const* bot = entry ? BotDataMgr::FindBot(entry) : nullptr)
         BotLogger::Log(log_type, bot, std::forward<Args>(params)...);
     else
     {
+        if (entry)
         {
             std::stringstream ss;
             using compounder = int[];
@@ -81,5 +82,6 @@ template void BotLogger::Log(uint16, Creature const*, bool&&, bool&&, bool&&, ui
 template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&);
 template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&, uint32&&);
 template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&, uint32&&, uint32&&);
+template void BotLogger::Log(uint16, uint32);
 template void BotLogger::Log(uint16, uint32, std::string_view&&);
 template void BotLogger::Log(uint16, uint32, std::string&, std::string&, std::string&, std::string&, std::string&);
