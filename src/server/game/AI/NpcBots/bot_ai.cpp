@@ -6,6 +6,7 @@
 #include "bot_Events.h"
 #include "bot_GridNotifiers.h"
 #include "botdatamgr.h"
+#include "botlog.h"
 #include "botmgr.h"
 #include "botgearscore.h"
 #include "botgossip.h"
@@ -10518,7 +10519,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         bool prio = i == _primaryIconTank;
                         ObjectGuid guid = gr->GetTargetIcons()[i];
                         if (guid && BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
-                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i + 1)), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
+                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i)), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
                     }
                     AddGossipItemFor(player, (_primaryIconTank == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF - 1));
                     break;
@@ -10531,7 +10532,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         if (HasRole(BOT_ROLE_RANGED))
                             iconMask |= BotMgr::GetRangedDPSTargetIconFlags();
                         if (guid && iconMask & GroupIconsFlags[i])
-                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i + 1)), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
+                            AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i)), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
                     }
                     AddGossipItemFor(player, (_primaryIconDamage == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF - 1));
                     break;
@@ -12435,6 +12436,8 @@ bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
 
     uint32 itemId = item->GetEntry();
 
+    BotLogger::Log(NPCBOT_LOG_UNEQUIP, me, uint32(slot), uint32(item->GetGUID().GetCounter()), uint32(itemId), uint32(receiver.GetCounter()));
+
     _removeEquipment(slot);
 
     //hand old weapon to master
@@ -12531,6 +12534,8 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         //BotWhisper("You have no space for my current item", master);
         return false;
     }
+
+    BotLogger::Log(NPCBOT_LOG_EQUIP, me, uint32(slot), uint32(newItem->GetGUID().GetCounter()), uint32(newItemId), uint32(receiver.GetCounter()));
 
     if (receiver && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != newItemId))
     {
@@ -12654,9 +12659,13 @@ bool bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver)
     ASSERT(einfo, "Trying to reset equipment for bot with no equip info!");
 
     uint32 itemId = einfo->ItemEntry[slot];
+    Item const* oldItem = _equips[slot];
+
+    BotLogger::Log(NPCBOT_LOG_EQUIP_RESET, me, uint32(slot), uint32(oldItem ? oldItem->GetGUID().GetCounter() : 0), uint32(oldItem ? oldItem->GetEntry() : 0), uint32(receiver.GetCounter()), uint32(itemId));
+
     if (!itemId)
         return _unequip(slot, receiver);
-    else if (Item const* oldItem = _equips[slot])
+    else if (oldItem)
         if (oldItem->GetEntry() == itemId)
             return true;
 
@@ -14184,6 +14193,7 @@ void bot_ai::DefaultInit()
         ASSERT(!me->GetBotAI());
         ASSERT(!me->GetBotPetAI());
         me->SetBotAI(this);
+        BotLogger::Log(NPCBOT_LOG_SPAWN, me);
     }
 
     me->SetPvP(master->IsPvP() || IsWanderer());
@@ -14962,6 +14972,7 @@ void bot_ai::InitEquips()
                     {
                         _equips[i] = item;
                         found = true;
+                        BotLogger::Log(NPCBOT_LOG_INIT_EQUIP, me, uint32(i), uint32(itemGuidLow), uint32(itemId));
                         break;
                     }
                 }
@@ -18282,6 +18293,8 @@ bool bot_ai::FinishTeleport(bool reset)
 
         return false;
     }
+
+    BotLogger::Log(NPCBOT_LOG_TELEPORT_FINISH, me, me->IsInGrid(), me->IsWandererBot(), CanAppearInWorld());
 
     BotMgr::AddDelayedTeleportCallback([this, reset]() {
         Map* map = master->FindMap();

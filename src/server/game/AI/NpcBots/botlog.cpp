@@ -68,4 +68,11 @@ void BotLogger::Log(uint16 log_type, uint32 entry, Args&&... params)
     }
 }
 
+template void BotLogger::Log(uint16, Creature const*);
+template void BotLogger::Log(uint16, Creature const*, bool&&, bool&&, bool&&);
+template void BotLogger::Log(uint16, Creature const*, bool&&, bool&&, bool&&, uint32&&, bool&&);
+template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&);
+template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&, uint32&&);
+template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&, uint32&&, uint32&&);
+template void BotLogger::Log(uint16, uint32, std::string_view&&);
 template void BotLogger::Log(uint16, uint32, std::string&, std::string&, std::string&, std::string&, std::string&);

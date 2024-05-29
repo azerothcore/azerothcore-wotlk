@@ -4,6 +4,7 @@
 #include "bot_Events.h"
 #include "botdatamgr.h"
 #include "botdpstracker.h"
+#include "botlog.h"
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottext.h"
@@ -29,6 +30,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "World.h"
+#include "GitRevision.h"
 /*
 Npc Bot Manager by Trickerer (onlysuffering@gmail.com)
 Player NpcBots management
@@ -261,6 +263,7 @@ BotMgr::~BotMgr()
 
 void BotMgr::Initialize()
 {
+    BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() });
     LoadConfig();
 
     BotDataMgr::LoadNpcBots();
@@ -285,6 +288,8 @@ void BotMgr::LoadConfig(bool reload)
         __firstload = false;
     else if (!reload)
         return;
+
+    BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() });
 
     _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
     _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
@@ -1362,6 +1367,8 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
     botai->KillEvents(true);
     bot->m_Events.KillAllEvents(false);
 
+    BotLogger::Log(NPCBOT_LOG_TELEPORT_START, bot, bot->IsInGrid(), bot->IsWandererBot(), botai->CanAppearInWorld(), newMap->GetId(), bool(reset));
+
     BotMgr::AddDelayedTeleportCallback([bot, botai, newMap, x, y, z, ori, quick, reset]() {
         if (bot->GetVehicle())
             bot->ExitVehicle();
@@ -1427,6 +1434,8 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                 botai->SetTeleportFinishEvent(delayedTeleportEvent);
                 return;
             }
+
+            BotLogger::Log(NPCBOT_LOG_TELEPORT_FINISH, bot, bot->IsInGrid(), bot->IsWandererBot(), botai->CanAppearInWorld(), newMap->GetId(), bool(reset));
 
             newMap->AddToMap(bot);
             if (reset)
@@ -2024,12 +2033,12 @@ uint8 BotMgr::GetBotEquipmentClass(uint8 bot_class)
     return BotMgr::GetBotPlayerClass(bot_class);
 }
 
-std::string BotMgr::GetTargetIconString(uint8 icon) const
+std::string BotMgr::GetTargetIconString(uint8 icon_idx) const
 {
     std::ostringstream ss;
-    ss << "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" << uint32(icon) << ":12|t";
-    if (size_t(icon - 1) < TargetIconNamesCacheSize)
-        ss << _targetIconNamesCache[icon - 1];
+    ss << "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" << uint32(icon_idx + 1) << ":12|t";
+    if (size_t(icon_idx) < TargetIconNamesCacheSize)
+        ss << _targetIconNamesCache[icon_idx];
 
     return ss.str();
 }
@@ -2098,7 +2107,7 @@ void BotMgr::KillAllBots()
         KillBot(itr->second);
 }
 
-void BotMgr::KillBot(Creature* bot)
+void BotMgr::KillBot(Creature* bot) const
 {
     ASSERT(GetBot(bot->GetGUID()));
 
@@ -2269,7 +2278,7 @@ void BotMgr::BuildBotPartyMemberStatsChangedPacket(Creature const* bot, WorldPac
         if (mask & (1 << i))
             byteCount += GroupUpdateLength[i];
 
-    data->Initialize(SMSG_PARTY_MEMBER_STATS, 8 + 4 + byteCount);
+    data->Initialize(SMSG_PARTY_MEMBER_STATS, size_t(8 + 4 + byteCount));
     *data << bot->GetPackGUID();
     *data << uint32(mask);
 

@@ -229,7 +229,7 @@ class AC_GAME_API BotMgr
         static uint8 GetBotPlayerRace(Creature const* bot);
         static uint8 GetBotEquipmentClass(uint8 bot_class);
 
-        std::string GetTargetIconString(uint8 icon) const;
+        std::string GetTargetIconString(uint8 icon_idx) const;
 
         void OnTeleportFar(uint32 mapId, float x, float y, float z, float ori = 0.f);
         void OnOwnerSetGameMaster(bool on);
@@ -240,7 +240,7 @@ class AC_GAME_API BotMgr
         void RecallAllBots(bool teleport = false);
         void RecallBot(Creature* bot);
         void KillAllBots();
-        void KillBot(Creature* bot);
+        void KillBot(Creature* bot) const;
 
         void CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
         static void CleanupsBeforeBotDelete(Creature* bot);
