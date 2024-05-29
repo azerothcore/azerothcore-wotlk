@@ -4416,6 +4416,14 @@ Debug.Arena = 0
 NpcBot.Enable = 1
 
 #
+#    NpcBot.LogToDB
+#        Description: Log bot events debug info to DB. Records will be kept up to 30 days
+#        Default:     1 - (Enable)
+#                     0 - (Disable)
+
+NpcBot.LogToDB = 1
+
+#
 #    NpcBot.MaxBots
 #        Description: Maximum number of bots allowed for players per level bracket:
 #                     0-9, 10-19, 20,29, ... , 70-79, 80+.

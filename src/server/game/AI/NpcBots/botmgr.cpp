@@ -78,6 +78,7 @@ uint32 _targetBGPlayersPerTeamCount_EY;
 uint32 _targetBGPlayersPerTeamCount_SA;
 uint32 _targetBGPlayersPerTeamCount_IC;
 bool _enableNpcBots;
+bool _logToDB;
 bool _enableNpcBotsDungeons;
 bool _enableNpcBotsRaids;
 bool _enableNpcBotsBGs;
@@ -292,6 +293,7 @@ void BotMgr::LoadConfig(bool reload)
     BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() });
 
     _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
+    _logToDB                        = sConfigMgr->GetBoolDefault("NpcBot.LogToDB", true);
     _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
     _filterRaces                    = sConfigMgr->GetBoolDefault("NpcBot.Botgiver.FilterRaces", false);
     _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
@@ -654,6 +656,11 @@ uint32 BotMgr::GetAllNpcBotsClassMask() const
 bool BotMgr::IsNpcBotModEnabled()
 {
     return _enableNpcBots;
+}
+
+bool BotMgr::IsNpcBotLogEnabled()
+{
+    return _logToDB;
 }
 
 bool BotMgr::IsNpcBotDungeonFinderEnabled()

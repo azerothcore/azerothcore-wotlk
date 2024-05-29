@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "botdatamgr.h"
+#include "botmgr.h"
 #include "botlog.h"
 #include "Creature.h"
 #include "DatabaseEnvFwd.h"
@@ -47,6 +48,9 @@ template<typename... Args>
 requires NPCBots::LoggableArguments<Args...>
 void BotLogger::Log(uint16 log_type, Creature const* bot, Args&&... params)
 {
+    if (!BotMgr::IsNpcBotLogEnabled())
+        return;
+
     BotLogImpl(log_type, bot, int32(bot->GetBotAI() ? bot->GetBotAI()->GetBotOwnerGuid() : -1), std::forward<Args>(params)...);
 }
 
@@ -54,6 +58,9 @@ template<typename... Args>
 requires NPCBots::LoggableArguments<Args...>
 void BotLogger::Log(uint16 log_type, uint32 entry, Args&&... params)
 {
+    if (!BotMgr::IsNpcBotLogEnabled())
+        return;
+
     if (Creature const* bot = BotDataMgr::FindBot(entry))
         BotLogger::Log(log_type, bot, std::forward<Args>(params)...);
     else
