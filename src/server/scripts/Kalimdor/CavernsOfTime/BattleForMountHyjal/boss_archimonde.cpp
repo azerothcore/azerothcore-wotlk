@@ -97,7 +97,7 @@ uint32 const availableChargeAurasAndSpells[3][2] = {
 
 Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
-float const DOOMFIRE_OFFSET = 15.0f;
+float const DOOMFIRE_OFFSET = 25.0f;
 uint8 const WISP_OFFSET = 40;
 uint8 NEAR_POINT = 0;
 
@@ -162,10 +162,10 @@ struct npc_doomfire_spirit : public ScriptedAI
         ScheduleTimedEvent(0s, [&]{
             if (Creature* archimonde = _instance->GetCreature(DATA_ARCHIMONDE))
             {
-                Position randomNearPosition = archimonde->GetRandomNearPosition(100.0f);
+                Position randomNearPosition = archimonde->GetRandomNearPosition(200.0f);
                 me->GetMotionMaster()->MovePoint(NEAR_POINT, randomNearPosition);
             }
-        }, 2s);
+        }, 6s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -426,8 +426,8 @@ struct boss_archimonde : public BossAI
     {
         // hack because spell doesn't work?
         Talk(SAY_DOOMFIRE);
-        Position spiritPosition = { me->GetPositionX() + DOOMFIRE_OFFSET,  me->GetPositionY() + DOOMFIRE_OFFSET, me->GetPositionZ(), 0.0f };
-        Position doomfirePosition = { me->GetPositionX() - DOOMFIRE_OFFSET,  me->GetPositionY() - DOOMFIRE_OFFSET, me->GetPositionZ(), 0.0f };
+        Position spiritPosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
+        Position doomfirePosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
