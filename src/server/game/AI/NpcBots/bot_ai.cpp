@@ -18288,7 +18288,11 @@ bool bot_ai::FinishTeleport(bool reset)
     //1) Cannot teleport: master disappeared - return home
     if (IAmFree()/* || master->GetSession()->isLogingOut()*/)
     {
+        uint16 mapid = uint16(me->GetMapId());
+        Position pos;
         if (BotMgr::HideBotSpawns() && !CanAppearInWorld())
+            GetHomePosition(mapid, &pos);
+        if (BotMgr::HideBotSpawns() && !CanAppearInWorld() && me->GetMapId() == mapid && me->GetExactDist2d(pos) < 10.0f)
         {
             TeleportFinishEvent* delayedTeleportEvent = new TeleportFinishEvent(this, reset);
             Events.AddEvent(delayedTeleportEvent, Events.CalculateTime(urand(5000, 8000)));

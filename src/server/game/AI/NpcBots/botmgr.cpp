@@ -290,8 +290,6 @@ void BotMgr::LoadConfig(bool reload)
     else if (!reload)
         return;
 
-    BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() });
-
     _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
     _logToDB                        = sConfigMgr->GetBoolDefault("NpcBot.LogToDB", true);
     _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
@@ -401,6 +399,8 @@ void BotMgr::LoadConfig(bool reload)
     _bothk_message_enable           = sConfigMgr->GetBoolDefault("NpcBot.HK.Message.Enable", false);
     _bothk_achievements_enable      = sConfigMgr->GetBoolDefault("NpcBot.HK.Achievements.Enable", false);
     _bothk_rate_honor               = sConfigMgr->GetFloatDefault("NpcBot.HK.Rate.Honor", 1.0);
+
+    BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0), std::string_view{ GitRevision::GetFileVersionStr() }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
 
     _max_npcbots = {};
     std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");
