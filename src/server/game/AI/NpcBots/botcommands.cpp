@@ -2,6 +2,7 @@
 #include "botdatamgr.h"
 #include "botdump.h"
 #include "botgearscore.h"
+#include "botlog.h"
 #include "botmgr.h"
 #include "botwanderful.h"
 #include "Bag.h"
@@ -508,6 +509,12 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable npcbotLogCommandTable =
+        {
+            //{ "testwrite",  HandleNpcBotLogTestWriteCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
+            { "clear",      HandleNpcBotLogClearCommand,            rbac::RBAC_PERM_COMMAND_NPCBOT_DELETE,             Console::Yes },
+        };
+
         static ChatCommandTable npcbotToggleCommandTable =
         {
             { "flags",      HandleNpcBotToggleFlagsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_TOGGLE_FLAGS,       Console::No  },
@@ -676,6 +683,7 @@ public:
             { "vehicle",    npcbotVehicleCommandTable                                                                               },
             { "dump",       npcbotDumpCommandTable                                                                                  },
             { "wp",         npcbotWPCommandTable                                                                                    },
+            { "log",        npcbotLogCommandTable                                                                                   },
         };
 
         static ChatCommandTable commandTable =
@@ -683,6 +691,32 @@ public:
             { "npcbot",     npcbotCommandTable                                                                                      },
         };
         return commandTable;
+    }
+
+    static bool HandleNpcBotLogClearCommand(ChatHandler* handler)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        trans->Append("TRUNCATE TABLE `characters_npcbot_logs`");
+        trans->Append("ALTER TABLE `characters_npcbot_logs` AUTO_INCREMENT = 0");
+        CharacterDatabase.CommitTransaction(trans);
+        handler->SendSysMessage("Table `characters_npcbot_logs` was cleared and autoincrement was reset");
+        return true;
+    }
+
+    static bool HandleNpcBotLogTestWriteCommand(ChatHandler* handler, Optional<std::underlying_type_t<BotLogType>> log_type, Optional<uint32> entry, Optional<std::vector<std::string>> extra)
+    {
+        if (!log_type || !entry)
+        {
+            handler->PSendSysMessage(".npcbot log testwrite #log_type #entry #[owner] #[mapid] #[inmap] #[inworld] #[params[1-%u]]", MAX_BOT_LOG_PARAMS);
+            handler->SendSysMessage("Test `characters_npcbot_logs` table write 2");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        decltype(extra)::value_type extras{ extra.value_or(decltype(extra)::value_type{}) };
+        extras.resize(MAX_BOT_LOG_PARAMS, "");
+        BotLogger::Log(*log_type, *entry, extras[0], extras[1], extras[2], extras[3], extras[4]);
+        return true;
     }
 
     static TempSummon* HandleWPSummon(WanderNode* wp, Map* map)
