@@ -765,6 +765,13 @@ public:
             }
         }
 
+        uint32 CalculateHealthPercentageAfterHit(uint32 damage)
+        {
+            uint32 expectedHealthAfterDamage = me->GetHealth() > damage ? me->GetHealth() - damage : 0;
+            float healthPercentageAfterHit = (static_cast<float>(expectedHealthAfterDamage) / me->GetMaxHealth()) * 100.0f;
+            return static_cast<uint32>(healthPercentageAfterHit);
+        }
+
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || (_bFrostmournePhase && attacker->GetExactDistSq(495.708f, -2523.76f, 1049.95f) > 40.0f * 40.0f)) // frostmourne room, prevent exploiting (tele hack to get back and damage him)
@@ -773,7 +780,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_ONE && !HealthAbovePct(70) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if (_phase == PHASE_ONE && (CalculateHealthPercentageAfterHit(damage) < 70))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -784,7 +791,28 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_TWO && !HealthAbovePct(40) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if ((CalculateHealthPercentageAfterHit(damage) < 40) && me->HasAura(SPELL_REMORSELESS_WINTER_1))
+            {
+                me->RemoveAura(SPELL_REMORSELESS_WINTER_1);
+                events.CancelEventGroup(EVENT_GROUP_ABILITIES);
+                events.CancelEvent(EVENT_QUAKE);
+                me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
+                _phase = PHASE_TWO;
+
+
+                return;
+            }
+
+            if ((CalculateHealthPercentageAfterHit(damage) < 10) && me->HasAura(SPELL_REMORSELESS_WINTER_2))
+            {
+                me->RemoveAura(SPELL_REMORSELESS_WINTER_2);
+                me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
+                _phase = PHASE_THREE;
+                events.CancelEvent(EVENT_QUAKE_2);
+                return;
+            }
+
+            if (_phase == PHASE_TWO && (CalculateHealthPercentageAfterHit(damage) < 40))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -795,7 +823,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_THREE && HealthBelowPct(10) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if (_phase == PHASE_THREE && (CalculateHealthPercentageAfterHit(damage) < 10))
             {
                 _phase = PHASE_OUTRO;
                 EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
@@ -984,7 +1012,8 @@ public:
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)
-                                Unit::Kill(me, player);
+                                    if(!player->IsGameMaster())
+                                         Unit::Kill(me, player);
             }
             else
                 _positionCheckTimer -= diff;
