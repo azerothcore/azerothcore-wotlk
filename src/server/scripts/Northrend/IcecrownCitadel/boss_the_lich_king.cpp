@@ -798,8 +798,6 @@ public:
                 events.CancelEvent(EVENT_QUAKE);
                 me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
                 _phase = PHASE_TWO;
-
-
                 return;
             }
 
