@@ -27,5 +27,3 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Nightbane helper target
 UPDATE `creature_template` SET `type_flags` = `type_flags` | 134217728, `movementId` = 1693, `ScriptName` = 'npc_nightbane_helper_target' WHERE `entry` = 17260;
--- Remove extra helper on the roof
-DELETE FROM `creature` WHERE `guid` = 135676;
