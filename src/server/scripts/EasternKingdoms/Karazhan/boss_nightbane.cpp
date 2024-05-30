@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
+#include "PassiveAI.h"
 #include "karazhan.h"
 
 enum Spells
