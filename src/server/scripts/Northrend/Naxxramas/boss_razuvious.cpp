@@ -117,7 +117,6 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            me->SetControlled(false, UNIT_STATE_ROOT);
             summons.DespawnAll();
             events.Reset();
             SpawnHelpers();
@@ -264,7 +263,6 @@ public:
         {
             BossAI::JustEngagedWith(who);
             scheduler.CancelGroup(GROUP_OOC_RP);
-            me->SetControlled(false, UNIT_STATE_ROOT);
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, 20s);
             events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, 15s);
