@@ -765,13 +765,6 @@ public:
             }
         }
 
-        uint32 CalculateHealthPercentageAfterHit(uint32 damage)
-        {
-            uint32 expectedHealthAfterDamage = me->GetHealth() > damage ? me->GetHealth() - damage : 0;
-            float healthPercentageAfterHit = (static_cast<float>(expectedHealthAfterDamage) / me->GetMaxHealth()) * 100.0f;
-            return static_cast<uint32>(healthPercentageAfterHit);
-        }
-
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || (_bFrostmournePhase && attacker->GetExactDistSq(495.708f, -2523.76f, 1049.95f) > 40.0f * 40.0f)) // frostmourne room, prevent exploiting (tele hack to get back and damage him)
@@ -780,7 +773,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_ONE && (CalculateHealthPercentageAfterHit(damage) < 70))
+            if (_phase == PHASE_ONE && me->HealthBelowPctDamaged(70, damage))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -791,7 +784,7 @@ public:
                 return;
             }
 
-            if ((CalculateHealthPercentageAfterHit(damage) < 40) && me->HasAura(SPELL_REMORSELESS_WINTER_1))
+            if (me->HealthBelowPctDamaged(40, damage) && me->HasAura(SPELL_REMORSELESS_WINTER_1))
             {
                 me->RemoveAura(SPELL_REMORSELESS_WINTER_1);
                 events.CancelEventGroup(EVENT_GROUP_ABILITIES);
@@ -801,7 +794,7 @@ public:
                 return;
             }
 
-            if ((CalculateHealthPercentageAfterHit(damage) < 10) && me->HasAura(SPELL_REMORSELESS_WINTER_2))
+            if (me->HealthBelowPctDamaged(10,damage) && me->HasAura(SPELL_REMORSELESS_WINTER_2))
             {
                 me->RemoveAura(SPELL_REMORSELESS_WINTER_2);
                 me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
@@ -810,7 +803,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_TWO && (CalculateHealthPercentageAfterHit(damage) < 40))
+            if (_phase == PHASE_TWO && me->HealthBelowPctDamaged(40, damage))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -821,7 +814,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_THREE && (CalculateHealthPercentageAfterHit(damage) < 10))
+            if (_phase == PHASE_THREE && me->HealthBelowPctDamaged(10,damage))
             {
                 _phase = PHASE_OUTRO;
                 EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
