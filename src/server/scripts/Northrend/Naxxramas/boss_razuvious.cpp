@@ -27,9 +27,7 @@ enum Says
     SAY_DEATH                       = 3,
     SAY_PATHETIC                    = 4,
     SAY_TARGET_DUMMY                = 5,
-    SAY_DK_BEAT_ME                  = 0,
-    SAY_DK_UNWORTHY                 = 1,
-    SAY_DK_WORTHLESS                = 2
+    SAY_DEATH_KNIGHT_UNDERSTUDY     = 0,
 };
 
 enum Spells
@@ -49,22 +47,34 @@ enum Events
     EVENT_JAGGED_KNIFE              = 3
 };
 
-enum Misc
+enum NPCs
 {
     NPC_DEATH_KNIGHT_UNDERSTUDY     = 16803,
     NPC_RAZUVIOUS                   = 16061,
     NPC_TARGET_DUMMY                = 16211,
+};
+
+enum Actions
+{
+    ACTION_FACE_ME                 = 0,
+    ACTION_TALK                    = 1,
+    ACTION_EMOTE                   = 2,
+    ACTION_SALUTE                  = 3,
+    ACTION_BACK_TO_TRAINING        = 4,
+};
+
+enum Misc
+{
+    GROUP_OOC_RP                    = 0,
+    PATH_RAZUVIOUS                  = 1283120,
+    POINT_DEATH_KNIGHT              = 0,
     WP_TOP_LEFT                     = 1,
     WP_TOP_RIGHT                    = 2,
     WP_MIDDLE_RIGHT                 = 3,
     WP_MIDDLE_BOTTOM                = 4,
-    // WP_MIDDLE_LEFT = 5
-    ACTION_INTERACT_WITH_RAZUVIOUS  = 0,
-    GROUP_OOC_RP                    = 0,
-    DATA_CAN_SPEAK                  = 0,
 };
 
-const uint32 TABLE_WAYPOINT_RP_10[4] = {WP_TOP_LEFT, WP_TOP_RIGHT, WP_TOP_LEFT, WP_TOP_RIGHT};
+const uint32 TABLE_WAYPOINT_RP_10[4] = {WP_MIDDLE_BOTTOM, WP_TOP_RIGHT, WP_MIDDLE_BOTTOM, WP_TOP_RIGHT};
 const uint32 TABLE_WAYPOINT_RP_25[4] = {WP_MIDDLE_BOTTOM, WP_TOP_LEFT, WP_MIDDLE_RIGHT, WP_TOP_RIGHT};
 
 class boss_razuvious : public CreatureScript
@@ -95,8 +105,7 @@ public:
             if (Is25ManRaid())
             {
                 me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2782.45f, -3088.03f, 267.685f, 0.75f);
-                if (TempSummon* temp = me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2778.56f, -3113.74f, 267.685f, 5.28f))
-                    temp->AI()->SetData(DATA_CAN_SPEAK, 1);
+                me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2778.56f, -3113.74f, 267.685f, 5.28f);
             }
         }
 
@@ -112,11 +121,75 @@ public:
             summons.DespawnAll();
             events.Reset();
             SpawnHelpers();
+            _roleplayWaypointNextIndex = 0;
+            _roleplayReady = false;
             ScheduleRP();
+        }
+
+        void ScheduleInteractWithDeathKnight()
+        {
+            scheduler.Schedule(2s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                if (rpBuddyGUID)
+                    if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        understudy->AI()->DoAction(ACTION_FACE_ME);
+            }).Schedule(8s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                if (rpBuddyGUID)
+                    if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        understudy->AI()->DoAction(ACTION_SALUTE);
+            }).Schedule(11s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePath(PATH_RAZUVIOUS, true);
+                ScheduleRP();
+            }).Schedule(13s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                if (rpBuddyGUID)
+                    if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        understudy->AI()->DoAction(ACTION_BACK_TO_TRAINING);
+            });
+
+            if (rpBuddyGUID)
+                if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                    me->SetFacingToObject(understudy);
+
+            if (roll_chance_i(75))
+            {
+                bool longText = roll_chance_i(50);
+                Talk(longText ? SAY_TARGET_DUMMY : SAY_PATHETIC);
+                scheduler.Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                {
+                    if (rpBuddyGUID)
+                        if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                            understudy->AI()->DoAction(ACTION_TALK);
+                });
+                if (longText)
+                    scheduler.DelayGroup(GROUP_OOC_RP, 5s);
+            }
+            else
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                scheduler.Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                {
+                    if (rpBuddyGUID)
+                        if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        {
+                            if (roll_chance_i(25))
+                                understudy->AI()->DoAction(ACTION_EMOTE);
+                            else
+                                understudy->AI()->DoAction(ACTION_TALK);
+                        }
+                });
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
+            if (type == POINT_MOTION_TYPE && id == POINT_DEATH_KNIGHT)
+            {
+                ScheduleInteractWithDeathKnight();
+            }
+
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
@@ -126,47 +199,28 @@ public:
             if (id == _roleplayWaypoint)
             {
                 _roleplayReady = false;
-                if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 15.0f))
+                if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
                 {
-                    me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->SetFacingToObject(understudy);
-                    scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
-                        {
-                            if (_roleplayWaypoint == WP_MIDDLE_BOTTOM && roll_chance_i(75))
-                            {
-                                Talk(urand(SAY_PATHETIC,SAY_TARGET_DUMMY));
-                            }
-                            else
-                            {
-                                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                            }
-                        }
-                    }).Schedule(4s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
-                        {
-                            understudy->AI()->DoAction(ACTION_INTERACT_WITH_RAZUVIOUS);
-                        }
-                    }).Schedule(10s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        me->SetControlled(false, UNIT_STATE_ROOT);
-                    });
+                    rpBuddyGUID = understudy->GetGUID();
+                    me->GetMotionMaster()->MovementExpired(false);
+                    me->GetMotionMaster()->MoveIdle();
                 }
+                scheduler.Schedule(0s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                {
+                    if (rpBuddyGUID)
+                        if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                            me->GetMotionMaster()->MovePoint(POINT_DEATH_KNIGHT, understudy->GetNearPosition(INTERACTION_DISTANCE, understudy->GetRelativeAngle(me)));
+                });
             }
         }
 
         void ScheduleRP()
         {
-            _roleplayWaypointNextIndex = 0;
-            _roleplayReady = false;
-            scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
+            scheduler.Schedule(10s, 10s, GROUP_OOC_RP, [this](TaskContext /*context*/)
             {
                 _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointNextIndex];
                 _roleplayReady = true;
                 _roleplayWaypointNextIndex = (_roleplayWaypointNextIndex + 1) % 4;
-                context.Repeat(60s, 80s);
             });
         }
 
@@ -254,6 +308,7 @@ public:
         bool _roleplayReady;
         uint8 _roleplayWaypointNextIndex;
         uint8 _roleplayWaypoint;
+        ObjectGuid rpBuddyGUID;
     };
 };
 
@@ -262,62 +317,60 @@ class boss_razuvious_minion : public CreatureScript
 public:
     boss_razuvious_minion() : CreatureScript("boss_razuvious_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetNaxxramasAI<boss_razuvious_minionAI>(pCreature);
+        return GetNaxxramasAI<boss_razuvious_minionAI>(creature);
     }
 
     struct boss_razuvious_minionAI : public ScriptedAI
     {
-        explicit boss_razuvious_minionAI(Creature* c) : ScriptedAI(c) { }
+        explicit boss_razuvious_minionAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
             scheduler.CancelAll();
+            ScheduleAttackDummy();
+        }
+
+        void ScheduleAttackDummy()
+        {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-            scheduler.Schedule(6s, 9s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            if (Creature* targetDummy = me->FindNearestCreature(NPC_TARGET_DUMMY, 10.0f))
+            {
+                me->SetFacingToObject(targetDummy);
+            }
+            scheduler.Schedule(6s, 9s, GROUP_OOC_RP, [this](TaskContext context)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
+                context.Repeat(6s, 9s);
             });
         }
 
-        void DoAction(int32 param) override
+        void DoAction(int32 action) override
         {
-            if (param == ACTION_INTERACT_WITH_RAZUVIOUS)
+            switch (action)
             {
-                if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 36.0f))
-                {
-                    me->SetFacingToObject(cr);
+                case ACTION_FACE_ME:
+                    scheduler.CancelGroup(GROUP_OOC_RP);
+                    me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    scheduler.DelayGroup(GROUP_OOC_RP, 12s);
-                    scheduler.Schedule(2s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        if(_canSpeak)
-                        {
-                            Talk(urand(SAY_DK_BEAT_ME, SAY_DK_WORTHLESS));
-                        }
-                        else
-                        {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        }
-                    }).Schedule(6s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                    }).Schedule(11s, GROUP_OOC_RP, [this](TaskContext /*context*/)
-                    {
-                        if (Creature* targetDummy = me->FindNearestCreature(16211, 10.0f))
-                        {
-                            me->SetFacingToObject(targetDummy);
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                        }
-                    });
-                }
+                    if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 36.0f))
+                        me->SetFacingToObject(cr);
+                    break;
+                case ACTION_TALK:
+                    Talk(SAY_DEATH_KNIGHT_UNDERSTUDY);
+                    break;
+                case ACTION_EMOTE:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    break;
+                case ACTION_SALUTE:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    break;
+                case ACTION_BACK_TO_TRAINING:
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    ScheduleAttackDummy();
+                    break;
             }
-        }
-
-        void SetData(uint32 /*type*/, uint32 /*data*/) override
-        {
-            _canSpeak = true;
         }
 
         void KilledUnit(Unit* who) override
@@ -340,8 +393,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->IsInCombat())
-                scheduler.Update(diff);
+            scheduler.Update(diff);
 
             if (UpdateVictim())
             {
@@ -351,8 +403,6 @@ public:
                 }
             }
         }
-    private:
-        bool _canSpeak;
     };
 };
 
