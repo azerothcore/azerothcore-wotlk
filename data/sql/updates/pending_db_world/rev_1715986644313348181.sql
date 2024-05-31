@@ -9,5 +9,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `creature_text` WHERE `CreatureID` = 16803;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (16803, 0, 0, 'Sir, student requests that you beat him for his lack of understanding!', 12, 0, 100, 1, 0, 0, 13140, 0, 'Death Knight Understudy SAY_BEAT_ME'),
-(16803, 1, 0, 'I am unworthy, master!', 12, 0, 100, 1, 0, 0, 13138, 0, 'Death Knight Understudy SAY_UNWORTHY'),
-(16803, 2, 0, 'Student is worthless, master! Student apologizes for his deficiency!', 12, 0, 100, 1, 0, 0, 13137, 0, 'Death Knight Understudy SAY_WORTHLESS');
+(16803, 0, 1, 'I am unworthy, master!', 12, 0, 100, 1, 0, 0, 13138, 0, 'Death Knight Understudy SAY_UNWORTHY'),
+(16803, 0, 2, 'Student is worthless, master! Student apologizes for his deficiency!', 12, 0, 100, 1, 0, 0, 13137, 0, 'Death Knight Understudy SAY_WORTHLESS');
