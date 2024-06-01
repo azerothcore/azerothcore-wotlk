@@ -59,7 +59,7 @@ public:
             });
     }
 
-    void EnterEvadeMode(EvadeReason why) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         std::list<Creature* > infernalList;
         me->GetCreatureListWithEntryInGrid(infernalList, NPC_TOWERING_INFERNAL, 100.0f);
