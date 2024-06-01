@@ -57,7 +57,7 @@ public:
             });
     }
 
-    void EnterEvadeMode(EvadeReason why) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         std::list<Creature* > doomguardList;
         me->GetCreatureListWithEntryInGrid(doomguardList, NPC_LESSER_DOOMGUARD, 100.0f);
