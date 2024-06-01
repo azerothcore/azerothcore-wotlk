@@ -1,3 +1,4 @@
+-- DB update 2024_05_29_00 -> 2024_06_01_00
 UPDATE `gameobject_loot_template` SET `MaxCount` = 6 WHERE `Entry` = 22070 AND `Item` IN (22573, 22574); -- Mote of Fire/Earth
 UPDATE `gameobject_loot_template` SET `MaxCount` = 4 WHERE `Entry` = 22070 AND `Item` = 32464; -- Nethercite Ore
 UPDATE `item_loot_template` SET `Chance` = 60, `MaxCount` = 3 WHERE `Entry` = 32724 AND `Item` = 32728; -- Sludge
