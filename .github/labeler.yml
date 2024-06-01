@@ -12,10 +12,10 @@ DB:
 
 CORE:
 - changed-files:
-    - any-glob-to-any-file: src/**/*
+    - any-glob-to-any-file: 'src/**/*'
     - all-globs-to-all-files:
-      - !src/server/scripts/*
-      - !src/tests/*
+      - '!src/server/scripts/*'
+      - '!src/tests/*'
 
 Script:
 - changed-files:
