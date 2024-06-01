@@ -352,8 +352,9 @@ public:
                     scheduler.CancelGroup(GROUP_OOC_RP);
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 36.0f))
-                        me->SetFacingToObject(cr);
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                        if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAZUVIOUS)))
+                            me->SetFacingToObject(cr);
                     break;
                 case ACTION_TALK:
                     Talk(SAY_DEATH_KNIGHT_UNDERSTUDY);
