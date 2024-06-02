@@ -32,11 +32,6 @@ enum Spells
     SPELL_INFERNAL_IMMOLATION = 31304
 };
 
-enum Misc
-{
-    NPC_TOWERING_INFERNAL   = 17818
-};
-
 enum Texts
 {
     SAY_ONDEATH         = 0,

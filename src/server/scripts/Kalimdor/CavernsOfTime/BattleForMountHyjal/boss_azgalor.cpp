@@ -30,11 +30,6 @@ enum Spells
     SPELL_BERSERK               = 26662
 };
 
-enum Misc
-{
-    NPC_LESSER_DOOMGUARD   = 17864
-};
-
 enum Texts
 {
     SAY_ONDEATH             = 0,
