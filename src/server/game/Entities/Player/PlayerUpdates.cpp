@@ -457,8 +457,6 @@ void Player::UpdateNextMailTimeAndUnreads()
 
         unReadMails++;
     }
-    if (unReadMails)
-        volatile int huhu = 4;
 }
 
 void Player::UpdateLocalChannels(uint32 newZone)
