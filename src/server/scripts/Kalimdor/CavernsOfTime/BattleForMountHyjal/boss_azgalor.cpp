@@ -123,24 +123,6 @@ private:
     bool _recentlySpoken;
 };
 
-struct npc_lesser_doomguard : public ScriptedAI
-{
-    npc_lesser_doomguard(Creature* creature) : ScriptedAI(creature){ }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        if (InstanceScript* hyjal = me->GetInstanceScript())
-        {
-            if (Creature* azgalor = hyjal->GetCreature(DATA_AZGALOR))
-            {
-                // forces doomguard as summoned creature
-                azgalor->AI()->JustSummoned(me);
-            }
-        }
-        ScriptedAI::Reset();
-    }
-};
 
 class spell_azgalor_doom : public AuraScript
 {
@@ -164,6 +146,5 @@ class spell_azgalor_doom : public AuraScript
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
-    RegisterHyjalAI(npc_lesser_doomguard);
     RegisterSpellScript(spell_azgalor_doom);
 }

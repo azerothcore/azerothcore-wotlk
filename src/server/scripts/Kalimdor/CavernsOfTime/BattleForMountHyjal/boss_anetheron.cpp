@@ -143,25 +143,6 @@ private:
     bool _recentlySpoken;
 };
 
-struct npc_towering_infernal : public ScriptedAI
-{
-    npc_towering_infernal(Creature* creature) : ScriptedAI(creature){ }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        if (InstanceScript* hyjal = me->GetInstanceScript())
-        {
-            if (Creature* anetheron = hyjal->GetCreature(DATA_ANETHERON))
-            {
-                // forces infernal as summoned creature
-                anetheron->AI()->JustSummoned(me);
-            }
-        }
-        ScriptedAI::Reset();
-    }
-};
-
 class spell_anetheron_sleep : public SpellScript
 {
     PrepareSpellScript(spell_anetheron_sleep);
@@ -181,6 +162,5 @@ class spell_anetheron_sleep : public SpellScript
 void AddSC_boss_anetheron()
 {
     RegisterHyjalAI(boss_anetheron);
-    RegisterHyjalAI(npc_towering_infernal);
     RegisterSpellScript(spell_anetheron_sleep);
 }

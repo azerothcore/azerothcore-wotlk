@@ -102,6 +102,7 @@ public:
             trash = 0;
             _currentWave = 0;
             _encounterNPCs.clear();
+            _summonedNPCs.clear();
             _baseAlliance.clear();
             _baseHorde.clear();
             _infernalTargets.clear();
@@ -200,6 +201,13 @@ public:
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
                     break;
+                case NPC_TOWERING_INFERNAL:
+                case NPC_LESSER_DOOMGUARD:
+                    if (creature->IsSummon())
+                    {
+                        _summonedNPCs.insert(creature->GetGUID());
+                    }
+                    break;
             }
             InstanceScript::OnCreatureCreate(creature);
         }
@@ -232,6 +240,10 @@ public:
                                 SetData(DATA_SPAWN_WAVES, 1);
                         }
                     }
+                    break;
+                case NPC_TOWERING_INFERNAL:
+                case NPC_LESSER_DOOMGUARD:
+                    _summonedNPCs.erase(unit->ToCreature()->GetGUID());
                     break;
                 case NPC_WINTERCHILL:
                 case NPC_ANETHERON:
@@ -402,6 +414,11 @@ public:
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
+                    // also force despawn boss summons
+                    for (ObjectGuid const& guid : _summonedNPCs)
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
+
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
@@ -417,6 +434,11 @@ public:
                             creature->DespawnOrUnsummon();
 
                     for (ObjectGuid const& guid : _encounterNPCs)
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
+
+                    // also force despawn boss summons
+                    for (ObjectGuid const& guid : _summonedNPCs)
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
@@ -455,6 +477,7 @@ public:
                 case DATA_RESET_WAVES:
                     _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
                     _encounterNPCs.clear();
+                    _summonedNPCs.clear();
                     _currentWave = 0;
                     trash = 0;
                     _bossWave = 0;
@@ -546,6 +569,7 @@ public:
         uint8 _retreat;
         TaskScheduler _scheduler;
         GuidSet _encounterNPCs;
+        GuidSet _summonedNPCs;
         GuidSet _baseAlliance;
         GuidSet _baseHorde;
         GuidVector _infernalTargets;
