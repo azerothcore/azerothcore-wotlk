@@ -120,7 +120,11 @@ enum HyjalCreaturesIds
     NPC_KAZROGAL                = 17888,
     NPC_AZGALOR                 = 17842,
     NPC_ARCHIMONDE              = 17968,
-    NPC_WORLD_TRIGGER_TINY      = 21987
+    NPC_WORLD_TRIGGER_TINY      = 21987,
+
+    // Boss summons
+    NPC_TOWERING_INFERNAL       = 17818,
+    NPC_LESSER_DOOMGUARD        = 17864
 };
 
 enum HyjalGameobjectIds

@@ -32,11 +32,6 @@ enum Spells
     SPELL_INFERNAL_IMMOLATION = 31304
 };
 
-enum Misc
-{
-    NPC_TOWERING_INFERNAL   = 17818
-};
-
 enum Texts
 {
     SAY_ONDEATH         = 0,
@@ -57,22 +52,6 @@ public:
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
-    }
-
-    void EnterEvadeMode(EvadeReason /*why*/) override
-    {
-        std::list<Creature* > infernalList;
-        me->GetCreatureListWithEntryInGrid(infernalList, NPC_TOWERING_INFERNAL, 100.0f);
-        if (infernalList.size() > 0)
-        {
-            for (Creature* infernal : infernalList)
-            {
-                infernal->DespawnOrUnsummon();
-            }
-        }
-        infernalList.clear();
-        instance->SetData(DATA_RESET_ALLIANCE, 0);
-        me->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit * who) override
@@ -157,7 +136,6 @@ public:
 
 private:
     bool _recentlySpoken;
-
 };
 
 class spell_anetheron_sleep : public SpellScript
