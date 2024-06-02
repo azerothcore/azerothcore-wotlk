@@ -59,22 +59,6 @@ public:
             });
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
-    {
-        std::list<Creature* > infernalList;
-        me->GetCreatureListWithEntryInGrid(infernalList, NPC_TOWERING_INFERNAL, 100.0f);
-        if (infernalList.size() > 0)
-        {
-            for (Creature* infernal : infernalList)
-            {
-                infernal->DespawnOrUnsummon();
-            }
-        }
-        infernalList.clear();
-        instance->SetData(DATA_RESET_ALLIANCE, 0);
-        me->DespawnOrUnsummon();
-    }
-
     void JustEngagedWith(Unit * who) override
     {
         BossAI::JustEngagedWith(who);
@@ -157,7 +141,25 @@ public:
 
 private:
     bool _recentlySpoken;
+};
 
+struct npc_towering_infernal : public ScriptedAI
+{
+    npc_towering_infernal(Creature* creature) : ScriptedAI(creature){ }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        if (InstanceScript* hyjal = me->GetInstanceScript())
+        {
+            if (Creature* anetheron = hyjal->GetCreature(DATA_ANETHERON))
+            {
+                // forces infernal as summoned creature
+                anetheron->AI()->JustSummoned(me);
+            }
+        }
+        ScriptedAI::Reset();
+    }
 };
 
 class spell_anetheron_sleep : public SpellScript
@@ -179,5 +181,6 @@ class spell_anetheron_sleep : public SpellScript
 void AddSC_boss_anetheron()
 {
     RegisterHyjalAI(boss_anetheron);
+    RegisterHyjalAI(npc_towering_infernal);
     RegisterSpellScript(spell_anetheron_sleep);
 }
