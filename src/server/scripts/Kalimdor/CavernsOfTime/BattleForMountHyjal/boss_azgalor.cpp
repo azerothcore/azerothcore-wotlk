@@ -118,7 +118,6 @@ private:
     bool _recentlySpoken;
 };
 
-
 class spell_azgalor_doom : public AuraScript
 {
     PrepareAuraScript(spell_azgalor_doom);
