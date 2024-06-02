@@ -1,3 +1,4 @@
+-- DB update 2024_06_01_00 -> 2024_06_02_00
 --
 DELETE FROM `achievement_reward` WHERE `ID` = 431;
 INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES
