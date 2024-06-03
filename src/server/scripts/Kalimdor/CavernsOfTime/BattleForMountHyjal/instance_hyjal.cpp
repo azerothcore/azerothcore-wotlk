@@ -480,7 +480,8 @@ public:
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
-                    GetCreature(DATA_ARCHIMONDE)->DespawnOrUnsummon();
+                    if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
+                        archimonde->DespawnOrUnsummon();
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
