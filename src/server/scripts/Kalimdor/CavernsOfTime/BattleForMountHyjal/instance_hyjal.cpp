@@ -419,6 +419,9 @@ public:
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
+                    if (_bossWave && (GetBossState(_bossWave) != DONE))
+                        SetBossState(_bossWave, NOT_STARTED);
+
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
@@ -441,6 +444,9 @@ public:
                     for (ObjectGuid const& guid : _summonedNPCs)
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
+
+                    if (_bossWave && (GetBossState(_bossWave) != DONE))
+                        SetBossState(_bossWave, NOT_STARTED);
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
