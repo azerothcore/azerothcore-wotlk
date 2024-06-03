@@ -64,19 +64,6 @@ enum Talks
     SAY_NALORAKK_EVENT2 // Not implemented
 };
 
-// Trash Waves
-const Position NalorakkWay[8] =
-{
-    { 18.569f, 1414.512f, 11.42f}, // waypoint 1
-    {-17.264f, 1419.551f, 12.62f},
-    {-52.642f, 1419.357f, 27.31f}, // waypoint 2
-    {-69.908f, 1419.721f, 27.31f},
-    {-79.929f, 1395.958f, 27.31f},
-    {-80.072f, 1374.555f, 40.87f}, // waypoint 3
-    {-80.072f, 1314.398f, 40.87f},
-    {-80.072f, 1295.775f, 48.60f} // waypoint 4
-};
-
 enum Points
 {
     POINT_FIRST_RAMP            = 0,
@@ -109,6 +96,7 @@ struct boss_nalorakk : public BossAI
     {
         BossAI::Reset();
         _waveList.clear();
+        _introScheduler.CancelAll();
         if (_ranIntro)
         {
             _phase = PHASE_START_COMBAT;
@@ -129,15 +117,15 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 10.0f, NPC_AMANISHI_TRIBESMAN);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE1);
-                    scheduler.Schedule(5s, [this](TaskContext context)
+                    _introScheduler.Schedule(5s, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
                         {
-                            scheduler.CancelAll();
+                            _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_2;
-                            me->GetMotionMaster()->MovePoint(POINT_SECOND_RAMP, NalorakkWay[0]);
-                            scheduler.Schedule(2s, [this](TaskContext)
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
+                            _introScheduler.Schedule(4s, [this](TaskContext)
                             {
                                 _active = true;
                             });
@@ -151,15 +139,15 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 10.0f, NPC_AMANISHI_MEDICINE_MAN);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE2);
-                    scheduler.Schedule(5s, [this](TaskContext context)
+                    _introScheduler.Schedule(5s, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
                         {
-                            scheduler.CancelAll();
+                            _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_3;
-                            me->GetMotionMaster()->MovePoint(POINT_THIRD_RAMP, NalorakkWay[2]);
-                            scheduler.Schedule(2s, [this](TaskContext)
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
+                            _introScheduler.Schedule(6s, [this](TaskContext)
                             {
                                 _active = true;
                             });
@@ -171,15 +159,15 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 10.0f, NPC_AMANISHI_WARBRINGER);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE3);
-                    scheduler.Schedule(5s, [this](TaskContext context)
+                    _introScheduler.Schedule(5s, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
                         {
-                            scheduler.CancelAll();
+                            _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_4;
-                            me->GetMotionMaster()->MovePoint(POINT_FOURTH_RAMP, NalorakkWay[5]);
-                            scheduler.Schedule(2s, [this](TaskContext)
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
+                            _introScheduler.Schedule(2s, [this](TaskContext)
                             {
                                 _active = true;
                             });
@@ -192,11 +180,11 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 10.0f, NPC_AMANISHI_MEDICINE_MAN);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE4);
-                    scheduler.Schedule(5s, [this](TaskContext context)
+                    _introScheduler.Schedule(5s, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
                         {
-                            scheduler.CancelAll();
+                            _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_START_COMBAT;
                         }
@@ -208,12 +196,23 @@ struct boss_nalorakk : public BossAI
         BossAI::MoveInLineOfSight(who);
     }
 
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+    }
+
     void GroupedAttack(std::list<Creature* > attackerList)
     {
         for (Creature* attacker : attackerList)
         {
             attacker->SetInCombatWithZone();
         }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _introScheduler.Update(diff);
+        BossAI::UpdateAI(diff);
     }
 
     bool CheckFullyDeadGroup(std::list<Creature* > groupToCheck)
@@ -231,6 +230,7 @@ private:
     uint8 _phase;
     bool _ranIntro;
     bool _active;
+    TaskScheduler _introScheduler;
     std::list<Creature *> _waveList;
 };
 
