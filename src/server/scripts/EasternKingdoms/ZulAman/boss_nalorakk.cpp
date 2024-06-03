@@ -90,6 +90,7 @@ struct boss_nalorakk : public BossAI
         _ranIntro = false;
         _active = true;
         creature->SetReactState(REACT_PASSIVE);
+        me->SetImmuneToAll(true);
     }
 
     void Reset() override
@@ -102,6 +103,7 @@ struct boss_nalorakk : public BossAI
             _phase = PHASE_START_COMBAT;
             me->SetReactState(REACT_AGGRESSIVE);
             _active = false;
+
         }
     }
 
@@ -124,9 +126,11 @@ struct boss_nalorakk : public BossAI
                             _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_2;
-                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
-                            _introScheduler.Schedule(4s, [this](TaskContext)
+                            
+                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+1);
+                            _introScheduler.Schedule(10s, [this](TaskContext)
                             {
+                                me->Yell("active again", LANG_UNIVERSAL);
                                 _active = true;
                             });
                         }
@@ -146,9 +150,11 @@ struct boss_nalorakk : public BossAI
                             _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_3;
-                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
-                            _introScheduler.Schedule(6s, [this](TaskContext)
+                            
+                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+2);
+                            _introScheduler.Schedule(20s, [this](TaskContext)
                             {
+                                me->Yell("active again", LANG_UNIVERSAL);
                                 _active = true;
                             });
                         }
@@ -166,10 +172,13 @@ struct boss_nalorakk : public BossAI
                             _introScheduler.CancelAll();
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_4;
-                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
-                            _introScheduler.Schedule(2s, [this](TaskContext)
+                            
+                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+3);
+                            _introScheduler.Schedule(5s, [this](TaskContext)
                             {
+                                me->Yell("active again", LANG_UNIVERSAL);
                                 _active = true;
+                                 me->SetImmuneToAll(false);
                             });
                         }
                         context.Repeat(5s);
