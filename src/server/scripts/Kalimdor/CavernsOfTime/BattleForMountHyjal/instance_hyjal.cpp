@@ -220,41 +220,41 @@ public:
             {
                 switch (creature->GetEntry())
                 {
-                case NPC_NECRO:
-                case NPC_ABOMI:
-                case NPC_GHOUL:
-                case NPC_BANSH:
-                case NPC_CRYPT:
-                case NPC_GARGO:
-                case NPC_FROST:
-                case NPC_INFER:
-                case NPC_STALK:
-                    if (unit->ToCreature()->IsSummon())
-                    {
-                        if (_bossWave)
+                    case NPC_NECRO:
+                    case NPC_ABOMI:
+                    case NPC_GHOUL:
+                    case NPC_BANSH:
+                    case NPC_CRYPT:
+                    case NPC_GARGO:
+                    case NPC_FROST:
+                    case NPC_INFER:
+                    case NPC_STALK:
+                        if (creature->IsSummon())
                         {
-                            DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
-                            _encounterNPCs.erase(unit->ToCreature()->GetGUID());    // Used for despawning on wipe
+                            if (_bossWave)
+                            {
+                                DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
+                                _encounterNPCs.erase(creature->GetGUID());    // Used for despawning on wipe
 
-                            if (trash == 0) // It can reach negatives if trash spawned after a retreat are killed, it shouldn't affect anything. Also happens on retail
-                                SetData(DATA_SPAWN_WAVES, 1);
+                                if (trash == 0) // It can reach negatives if trash spawned after a retreat are killed, it shouldn't affect anything. Also happens on retail
+                                    SetData(DATA_SPAWN_WAVES, 1);
+                            }
                         }
-                    }
-                    break;
-                case NPC_TOWERING_INFERNAL:
-                case NPC_LESSER_DOOMGUARD:
-                    _summonedNPCs.erase(unit->ToCreature()->GetGUID());
-                    break;
-                case NPC_WINTERCHILL:
-                case NPC_ANETHERON:
-                case NPC_KAZROGAL:
-                case NPC_AZGALOR:
-                    if (Creature* jaina = GetCreature(DATA_JAINA))
-                        jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    if (Creature* thrall = GetCreature(DATA_THRALL))
-                        thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    SetData(DATA_RESET_WAVES, 1);
-                    break;
+                        break;
+                    case NPC_TOWERING_INFERNAL:
+                    case NPC_LESSER_DOOMGUARD:
+                        _summonedNPCs.erase(creature->GetGUID());
+                        break;
+                    case NPC_WINTERCHILL:
+                    case NPC_ANETHERON:
+                    case NPC_KAZROGAL:
+                    case NPC_AZGALOR:
+                        if (Creature* jaina = GetCreature(DATA_JAINA))
+                            jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        if (Creature* thrall = GetCreature(DATA_THRALL))
+                            thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        SetData(DATA_RESET_WAVES, 1);
+                        break;
                 }
             }
         }
@@ -268,19 +268,23 @@ public:
                     _retreat = DATA_ALLIANCE_RETREAT;
                     // Spawn Ancient Gems
                     for (ObjectGuid const& guid : _ancientGemAlliance)
-                        instance->GetGameObject(guid)->Respawn();
+                        if (GameObject* gem = instance->GetGameObject(guid))
+                            gem->Respawn();
 
                     // Move all alliance NPCs near Jaina (only happens in this base, not Horde's)
                     if (Creature* jaina = GetCreature(DATA_JAINA))
                     {
                         for (ObjectGuid const& guid : _baseAlliance)
                         {
-                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive())
+                            if (Creature* creature = instance->GetCreature(guid))
                             {
-                                float x, y, z;
-                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
-                                instance->GetCreature(guid)->SetWalk(true);
-                                instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
+                                if (creature->IsAlive())
+                                {
+                                    float x, y, z;
+                                    jaina->GetNearPoint(creature, x, y, z, 10.f, 0, jaina->GetAngle(creature));
+                                    creature->SetWalk(true);
+                                    creature->GetMotionMaster()->MovePoint(1, x, y, z);
+                                }
                             }
                         }
                     }
@@ -296,7 +300,10 @@ public:
                             _scheduler.Schedule(30s, [this](TaskContext)
                                 {
                                     for (ObjectGuid const& guid : _roaringFlameAlliance)
-                                        instance->GetGameObject(guid)->Respawn();
+                                    {
+                                        if (GameObject* flame = instance->GetGameObject(guid))
+                                            flame->Respawn();
+                                    }
                                 });
                         });
 
@@ -309,18 +316,24 @@ public:
                     _bossWave = 0;
                     _retreat = DATA_HORDE_RETREAT;
                     for (ObjectGuid const& guid : _ancientGemHorde)
-                        instance->GetGameObject(guid)->Respawn();
+                    {
+                        if (GameObject* gem = instance->GetGameObject(guid))
+                            gem->Respawn();
+                    }
 
                     if (Creature* jaina = GetCreature(DATA_JAINA))
                     {
                         for (ObjectGuid const& guid : _baseHorde)
                         {
-                            if (instance->GetCreature(guid) && instance->GetCreature(guid)->IsAlive())
+                            if (Creature* creature = instance->GetCreature(guid))
                             {
-                                float x, y, z;
-                                jaina->GetNearPoint(instance->GetCreature(guid), x, y, z, 10.f, 0, jaina->GetAngle(instance->GetCreature(guid)));
-                                instance->GetCreature(guid)->SetWalk(true);
-                                instance->GetCreature(guid)->GetMotionMaster()->MovePoint(1, x, y, z);
+                                if (creature->IsAlive())
+                                {
+                                    float x, y, z;
+                                    jaina->GetNearPoint(creature, x, y, z, 10.f, 0, jaina->GetAngle(creature));
+                                    creature->SetWalk(true);
+                                    creature->GetMotionMaster()->MovePoint(1, x, y, z);
+                                }
                             }
                         }
                     }
@@ -334,7 +347,8 @@ public:
                             _scheduler.Schedule(30s, [this](TaskContext)
                                 {
                                     for (ObjectGuid const& guid : _roaringFlameHorde)
-                                        instance->GetGameObject(guid)->Respawn();
+                                        if (GameObject* flame = instance->GetGameObject(guid))
+                                            flame->Respawn();
                                 });
                         });
 
@@ -466,7 +480,8 @@ public:
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
-                    GetCreature(DATA_ARCHIMONDE)->DespawnOrUnsummon();
+                    if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
+                        archimonde->DespawnOrUnsummon();
 
                     _scheduler.Schedule(300s, [this](TaskContext)
                         {
