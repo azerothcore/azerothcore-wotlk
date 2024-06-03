@@ -127,7 +127,7 @@ struct boss_nalorakk : public BossAI
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_2;
                             
-                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+1);
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
                             _introScheduler.Schedule(10s, [this](TaskContext)
                             {
                                 me->Yell("active again", LANG_UNIVERSAL);
@@ -151,7 +151,7 @@ struct boss_nalorakk : public BossAI
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_3;
                             
-                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+2);
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
                             _introScheduler.Schedule(20s, [this](TaskContext)
                             {
                                 me->Yell("active again", LANG_UNIVERSAL);
@@ -173,12 +173,12 @@ struct boss_nalorakk : public BossAI
                             _waveList.clear();
                             _phase = PHASE_SEND_GUARDS_4;
                             
-                            me->GetMotionMaster()->MoveSplinePath(me->GetEntry()*100+3);
+                            me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
                             _introScheduler.Schedule(5s, [this](TaskContext)
                             {
                                 me->Yell("active again", LANG_UNIVERSAL);
                                 _active = true;
-                                 me->SetImmuneToAll(false);
+                                me->SetImmuneToAll(false);
                             });
                         }
                         context.Repeat(5s);
