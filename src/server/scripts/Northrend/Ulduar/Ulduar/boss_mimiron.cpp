@@ -86,7 +86,8 @@ enum SpellData
     SPELL_HAND_PULSE_25_L                           = 64536,
 
     SPELL_SELF_REPAIR                               = 64383,
-    SPELL_SLEEP                                     = 64394,
+    SPELL_SLEEP_VISUAL_1                            = 64393,
+    SPELL_SLEEP_VISUAL_2                            = 64394,
 };
 
 enum NPCs
@@ -172,10 +173,11 @@ enum EVENTS
     EVENT_JOIN_ACU                                  = 35,
     EVENT_START_PHASE4                              = 36,
     EVENT_FINISH                                    = 50,
-    EVENT_SAY_VOLTRON_DEAD                          = 51,
-    EVENT_DISAPPEAR                                 = 52,
-    EVENT_BERSERK                                   = 53,
-    EVENT_BERSERK_2                                 = 54,
+    EVENT_STAND_UP_FRIENDLY                         = 51,
+    EVENT_SAY_VOLTRON_DEAD                          = 52,
+    EVENT_DISAPPEAR                                 = 53,
+    EVENT_BERSERK                                   = 54,
+    EVENT_BERSERK_2                                 = 55,
 
     // Leviathan:
     EVENT_SPELL_NAPALM_SHELL                        = 3,
@@ -754,16 +756,19 @@ public:
                         Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                         me->GetMotionMaster()->Clear();
                         summons.DoAction(1337); // despawn summons of summons
                         summons.DespawnEntry(NPC_FLAMES_INITIAL);
                         summons.DespawnEntry(33576);
 
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
                         float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
+
+                        DoCastSelf(SPELL_SLEEP_VISUAL_1);
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
@@ -783,11 +788,20 @@ public:
                                 computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 6s);
+                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
                     }
+                    break;
+                case EVENT_STAND_UP_FRIENDLY:
+                    me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
+                    DoCastSelf(SPELL_SLEEP_VISUAL_2);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 4s);
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    if (pInstance)
+                        pInstance->SetData(TYPE_MIMIRON, DONE);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                     {
@@ -797,11 +811,9 @@ public:
                             go->SetLootRecipient(me->GetMap());
                         }
                     }
-                    events.ScheduleEvent(EVENT_DISAPPEAR, 15s);
+                    events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
                     break;
                 case EVENT_DISAPPEAR:
-                    if( pInstance )
-                        pInstance->SetData(TYPE_MIMIRON, DONE);
                     DoCastSelf(SPELL_TELEPORT);
                     summons.DespawnAll();
                     break;

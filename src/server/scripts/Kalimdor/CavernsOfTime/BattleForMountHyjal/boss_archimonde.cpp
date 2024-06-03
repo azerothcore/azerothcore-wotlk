@@ -97,8 +97,9 @@ uint32 const availableChargeAurasAndSpells[3][2] = {
 
 Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
-float const DOOMFIRE_OFFSET = 15.0f;
+float const DOOMFIRE_OFFSET = 25.0f;
 uint8 const WISP_OFFSET = 40;
+uint8 NEAR_POINT = 0;
 
 struct npc_ancient_wisp : public ScriptedAI
 {
@@ -143,6 +144,39 @@ struct npc_ancient_wisp : public ScriptedAI
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
+    }
+private:
+    InstanceScript* _instance;
+};
+
+struct npc_doomfire_spirit : public ScriptedAI
+{
+    npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        ScheduleTimedEvent(0s, [&]{
+            if (Creature* archimonde = _instance->GetCreature(DATA_ARCHIMONDE))
+            {
+                Position randomNearPosition = archimonde->GetRandomNearPosition(200.0f);
+                me->GetMotionMaster()->MovePoint(NEAR_POINT, randomNearPosition);
+            }
+        }, 6s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
     }
 private:
     InstanceScript* _instance;
@@ -262,10 +296,7 @@ struct boss_archimonde : public BossAI
         }, 25s, 40s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
-            {
-                DoCastDoomFire(target);
-            }
+            DoCastDoomFire();
         }, 20s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
@@ -391,12 +422,12 @@ struct boss_archimonde : public BossAI
         }
     }
 
-    void DoCastDoomFire(Unit* target)
+    void DoCastDoomFire()
     {
         // hack because spell doesn't work?
         Talk(SAY_DOOMFIRE);
-        Position spiritPosition = { target->GetPositionX() + DOOMFIRE_OFFSET,  target->GetPositionY() + DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
-        Position doomfirePosition = { target->GetPositionX() - DOOMFIRE_OFFSET,  target->GetPositionY() - DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
+        Position spiritPosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
+        Position doomfirePosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
@@ -508,5 +539,6 @@ void AddSC_boss_archimonde()
     RegisterSpellScript(spell_finger_of_death);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);
+    RegisterHyjalAI(npc_doomfire_spirit);
 }
 

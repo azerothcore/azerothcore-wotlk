@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -60,7 +62,7 @@ public:
             context.Repeat(8s, 16s);
         }).Schedule(25s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f);
+            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f, false);
             context.Repeat(15s);
         }).Schedule(30s, [this](TaskContext context)
         {
@@ -68,7 +70,7 @@ public:
             context.Repeat(18s, 20s);
         }).Schedule(45s, 55s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_DOOM, 0, 100.f, true, false, false);
+            DoCastRandomTarget(SPELL_DOOM, 1, 100.f, true, false, false);
             Talk(SAY_DOOM);
             context.Repeat();
         }).Schedule(10min, [this](TaskContext context)
@@ -114,10 +116,29 @@ public:
 
 private:
     bool _recentlySpoken;
+};
 
+class spell_azgalor_doom : public AuraScript
+{
+    PrepareAuraScript(spell_azgalor_doom);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && !IsExpired())
+        {
+            target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_azgalor_doom::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
+    RegisterSpellScript(spell_azgalor_doom);
 }
