@@ -342,6 +342,10 @@ struct boss_archimonde : public BossAI
                 DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
             }
         }, 3500ms);
+        ScheduleTimedEvent(10min, [&]
+        {
+            DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
+        }, 3500ms);
 
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
