@@ -60,7 +60,7 @@ public:
 
         scheduler.Schedule(20s, 28s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f, false) == SPELL_CAST_OK)
                 Talk(SAY_SWARM);
             context.Repeat(10s, 15s);
         }).Schedule(25s, 32s, [this](TaskContext context)
