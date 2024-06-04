@@ -218,6 +218,7 @@ struct boss_nalorakk : public BossAI
                                 me->SetInCombatWithZone();
                                 _waveList.clear();
                                 _phase = PHASE_START_COMBAT;
+                                _ranIntro = true;
                             }
                         }
                         context.Repeat(5s);
