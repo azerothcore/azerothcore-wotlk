@@ -212,6 +212,7 @@ struct boss_nalorakk : public BossAI
                             if (_phase == PHASE_SEND_GUARDS_4)
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
+                                me->SetHomePosition(me->GetPosition());
                                 me->SetImmuneToAll(false);
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 me->SetInCombatWithZone();
