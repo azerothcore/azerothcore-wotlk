@@ -1234,7 +1234,7 @@ class spell_death_knight_initiate_visual : public SpellScript
     }
 };
 
-enum Spells_Lich_King_whisper
+enum spells_lich_king_whisper
 {
     SPELL_LICH_KING_VO_BLOCKER = 58207,
     SPELL_LICHKINGDK001 = 58208,
@@ -1256,29 +1256,30 @@ enum Spells_Lich_King_whisper
 };
 
 //spell 58207 rand Whisper
-class spell_Lich_King_vo_blocker : public AuraScript
+class spell_lich_king_vo_blocker : public AuraScript
 {
-    PrepareAuraScript(spell_Lich_King_vo_blocker);
+    PrepareAuraScript(spell_lich_king_vo_blocker);
 
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* target = GetTarget()->ToPlayer())
-        {    //spell 58208-58223 
+        {
+            //spell 58208-58223 
             GetCaster()->CastSpell(target, urand(SPELL_LICHKINGDK001, SPELL_LICHKINGDK016), true);
         }
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_Lich_King_vo_blocker::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_lich_king_vo_blocker::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 // 58208 - 58224 - Creature - The Lich King (28765)  Whisper
-class spell_Lich_King_whisper : public SpellScript
+class spell_lich_king_whisper : public SpellScript
 {
-    PrepareSpellScript(spell_Lich_King_whisper);
+    PrepareSpellScript(spell_lich_king_whisper);
 
     bool Validate(SpellInfo const* spellInfo) override
     {
@@ -1300,8 +1301,8 @@ class spell_Lich_King_whisper : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_Lich_King_whisper::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        OnEffectHitTarget += SpellEffectFn(spell_Lich_King_whisper::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_lich_king_whisper::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_lich_king_whisper::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1327,7 +1328,7 @@ void AddSC_the_scarlet_enclave_c1()
     new go_inconspicuous_mine_car();
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
-    RegisterSpellScript(spell_Lich_King_whisper);
-    RegisterSpellScript(spell_Lich_King_vo_blocker);
+    RegisterSpellScript(spell_lich_king_whisper);
+    RegisterSpellScript(spell_lich_king_vo_blocker);
 }
 
