@@ -100,6 +100,15 @@ public:
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
         Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
+        // Mimiron Tram
+        ObjectGuid m_mimironTramGUID;
+        ObjectGuid m_mimironActivateTramGUID;
+        ObjectGuid m_mimironTramRocketBoosterGUID;
+        ObjectGuid m_mimironTramTurnaround1GUID;
+        ObjectGuid m_mimironTramTurnaround2GUID;
+        ObjectGuid m_mimironCallTramCenterGUID;
+        ObjectGuid m_mimironCallTramMimironGUID;
+
         // Mimiron
         ObjectGuid m_MimironDoor[3];
         ObjectGuid m_MimironLeviathanMKIIguid;
@@ -124,10 +133,12 @@ public:
         ObjectGuid m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
+        // Ancient Gate
+        const Position triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
-        ObjectGuid m_mimironTramGUID;
         ObjectGuid m_keepersgateGUID;
         ObjectGuid m_keepersGossipGUID[4];
 
@@ -170,7 +181,18 @@ public:
             // mimiron tram:
             instance->LoadGrid(2307.0f, 284.632f);
             if (GameObject* MimironTram = instance->GetGameObject(m_mimironTramGUID))
+            {
                 player->UpdateVisibilityOf(MimironTram);
+                if (StaticTransport* t = MimironTram->ToStaticTransport())
+                {
+                    if (GameObject* go = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                        if (!go->GetTransport())
+                            t->AddPassenger(go, true);
+                    if (GameObject* go = instance->GetGameObject(m_mimironActivateTramGUID))
+                        if (!go->GetTransport())
+                            t->AddPassenger(go, true);
+                }
+            }
 
             if (!m_uiAlgalonGUID && m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -370,22 +392,6 @@ public:
                 case NPC_MIMIRON_ACU:
                     m_MimironACUguid = creature->GetGUID();
                     break;
-                case NPC_FREYA_GOSSIP:
-                    m_keepersGossipGUID[TYPE_FREYA - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_FREYA, creature);
-                    break;
-                case NPC_HODIR_GOSSIP:
-                    m_keepersGossipGUID[TYPE_HODIR - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_HODIR, creature);
-                    break;
-                case NPC_THORIM_GOSSIP:
-                    m_keepersGossipGUID[TYPE_THORIM - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_THORIM, creature);
-                    break;
-                case NPC_MIMIRON_GOSSIP:
-                    m_keepersGossipGUID[TYPE_MIMIRON - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_MIMIRON, creature);
-                    break;
                 case NPC_ELDER_IRONBRANCH:
                 case NPC_ELDER_STONEBARK:
                 case NPC_ELDER_BRIGHTLEAF:
@@ -431,19 +437,6 @@ public:
         {
             if (GetData(encounter) == DONE)
                 go->SetGoState(state);
-        }
-
-        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
-        {
-            if (!cr)
-            {
-                cr = instance->GetCreature(guid);
-                if (!cr)
-                    return;
-            }
-
-            bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type - TYPE_FREYA))));
-            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -582,10 +575,29 @@ public:
                 case GO_SNOW_MOUND:
                     gameObject->EnableCollision(false);
                     break;
+                // Mimiron Tram
                 case GO_MIMIRON_TRAM:
                     if (GetData(TYPE_MIMIRON) == DONE)
                         m_mimironTramUsed = true;
                     m_mimironTramGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_TRAM_ROCKET_BOOSTER:
+                    m_mimironTramRocketBoosterGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_ACTIVATE_TRAM:
+                    m_mimironActivateTramGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_CALL_TRAM_CENTER:
+                    m_mimironCallTramCenterGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_CALL_TRAM_MIMIRON:
+                    m_mimironCallTramMimironGUID = gameObject->GetGUID();
+                    break;
+                case GO_DOODAD_UL_TRAIN_TURNAROUND01:
+                    m_mimironTramTurnaround1GUID = gameObject->GetGUID();
+                    break;
+                case GO_DOODAD_UL_TRAIN_TURNAROUND02:
+                    m_mimironTramTurnaround2GUID = gameObject->GetGUID();
                     break;
                 // Algalon the Observer
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_10:
@@ -695,11 +707,19 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
+                        {
+                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
+                            {
+                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10*IN_MILLISECONDS))
+                                {
+                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
+                                }
+                            }
+                        });
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;
@@ -716,8 +736,11 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    [[fallthrough]];
+                case EVENT_KEEPER_TELEPORTED:
+                    if (Creature* sara = instance->GetCreature(m_saraGUID))
+                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;
-
                 case DATA_MAGE_BARRIER:
                     m_mageBarrier = data;
                     break;
@@ -812,9 +835,51 @@ public:
                         if (StaticTransport* t = MimironTram->ToStaticTransport())
                         {
                             if (data == 0 && t->GetGoState() == GO_STATE_ACTIVE && t->GetPathProgress() == t->GetPauseTime())
+                            {
                                 MimironTram->SetGoState(GO_STATE_READY);
+                                if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                    rocketBooster->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                    activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                if (GameObject* callTramCenterButton = instance->GetGameObject(m_mimironCallTramCenterGUID))
+                                    callTramCenterButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                scheduler.Schedule(30s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* turnaround1 = instance->GetGameObject(m_mimironTramTurnaround1GUID))
+                                        turnaround1->UseDoorOrButton();
+                                    if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                        rocketBooster->SetGoState(GO_STATE_READY);
+                                }).Schedule(60s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                        activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                    if (GameObject* callTramMimironButton = instance->GetGameObject(m_mimironCallTramMimironGUID))
+                                        callTramMimironButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                });
+                            }
                             if (data == 1 && t->GetGoState() == GO_STATE_READY && t->GetPathProgress() == 0)
+                            {
                                 MimironTram->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                    rocketBooster->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                    activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                if (GameObject* callTramMimironButton = instance->GetGameObject(m_mimironCallTramMimironGUID))
+                                    callTramMimironButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                scheduler.Schedule(33s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* turnaround2 = instance->GetGameObject(m_mimironTramTurnaround2GUID))
+                                        turnaround2->UseDoorOrButton();
+                                    if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                        rocketBooster->SetGoState(GO_STATE_READY);
+                                }).Schedule(63s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                        activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                    if (GameObject* callTramCenterButton = instance->GetGameObject(m_mimironCallTramCenterGUID))
+                                        callTramCenterButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                });
+                            }
                         }
                     break;
                 case DATA_BRANN_MEMOTESAY:
