@@ -216,7 +216,7 @@ struct boss_nalorakk : public BossAI
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 me->SetInCombatWithZone();
                                 _waveList.clear();
-                                _phase = PHASE_START_COMBAT;   
+                                _phase = PHASE_START_COMBAT;
                             }
                         }
                         context.Repeat(5s);
