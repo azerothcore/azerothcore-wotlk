@@ -62,7 +62,8 @@ enum Talks
     SAY_DEATH,
     SAY_NALORAKK_EVENT1, // Not implemented
     SAY_NALORAKK_EVENT2, // Not implemented
-    SAY_RUN_AWAY
+    SAY_RUN_AWAY,
+    EMOTE_BEAR
 };
 
 enum Phases
@@ -135,7 +136,7 @@ struct boss_nalorakk : public BossAI
                                 _waveList.clear();
                                 me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
                                 Talk(SAY_RUN_AWAY);
-                                _introScheduler.Schedule(4s, [this](TaskContext)
+                                _introScheduler.Schedule(5s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(6.25f);
                                     _active = true;
@@ -162,7 +163,7 @@ struct boss_nalorakk : public BossAI
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
                                 me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
-                                _introScheduler.Schedule(5s, [this](TaskContext)
+                                _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
                                     _active = true;
@@ -188,7 +189,7 @@ struct boss_nalorakk : public BossAI
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
                                 me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
-                                _introScheduler.Schedule(4s, [this](TaskContext)
+                                _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
                                     _active = true;
@@ -279,15 +280,8 @@ struct boss_nalorakk : public BossAI
                 context.Repeat();
             }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
             {
-                if (!me->GetVictim()->HasAura(SPELL_MANGLEEFFECT))
-                {
-                    DoCastVictim(SPELL_MANGLE);
-                    context.Repeat(1s);
-                }
-                else
-                {
-                    context.Repeat();
-                }
+                DoCastVictim(SPELL_MANGLE);
+                context.Repeat();
             }).Schedule(10min, GROUP_BERSERK, [this](TaskContext)
             {
                 Talk(SAY_BERSERK);
@@ -300,6 +294,7 @@ struct boss_nalorakk : public BossAI
         else
         {
             Talk(SAY_SHIFTEDTOBEAR);
+            Talk(EMOTE_BEAR);
             DoCastSelf(SPELL_BEARFORM, true);
             scheduler.CancelGroup(GROUP_HUMAN);
             _bearForm = true;
@@ -315,7 +310,7 @@ struct boss_nalorakk : public BossAI
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
                 context.Repeat(15s, 20s);
-            }).Schedule(20s, 25s, GROUP_BEAR, [this](TaskContext context)
+            }).Schedule(25s, 30s, GROUP_BEAR, [this](TaskContext context)
             {
                 ShapeShift(_bearForm);
                 context.Repeat();
