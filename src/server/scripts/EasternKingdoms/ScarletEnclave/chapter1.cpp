@@ -1265,7 +1265,7 @@ class spell_lich_king_vo_blocker : public AuraScript
     {
         if (Player* target = GetTarget()->ToPlayer())
         {
-            //spell 58208-58223 
+            //spell 58208-58223
             GetCaster()->CastSpell(target, urand(SPELL_LICHKINGDK001, SPELL_LICHKINGDK016), true);
         }
     }
