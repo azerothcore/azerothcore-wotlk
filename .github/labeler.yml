@@ -1,14 +1,14 @@
 file-cpp:
 - changed-files:
     - any-glob-to-any-file: 
-      - src/**/*.cpp
-      - src/**/*.h
-      - deps/**/*.cpp
-      - deps/**/*.h
+      - 'src/**/*.cpp'
+      - 'src/**/*.h'
+      - 'deps/**/*.cpp'
+      - 'deps/**/*.h'
 
 DB:
 - changed-files:
-  - any-glob-to-any-file: data/**/*.sql
+  - any-glob-to-any-file: 'data/**/*.sql'
 
 CORE:
 - all:
@@ -21,34 +21,34 @@ CORE:
 Script:
 - changed-files:
     - any-glob-to-any-file: 
-      - src/server/scripts/**/*.cpp
-      - src/server/scripts/**/*.h
+      - 'src/server/scripts/**/*.cpp'
+      - 'src/server/scripts/**/*.h'
 
 UnitTests:
 - changed-files:
-    - any-glob-to-any-file: src/test/**/*
+    - any-glob-to-any-file: 'src/test/**/*'
 
 Documentation:
 - changed-files:
-    - any-glob-to-any-file: ./*.md
+    - any-glob-to-any-file: './*.md'
 
 Bash:
 - changed-files:
     - any-glob-to-any-file: 
-      - ./*.sh
-      - apps/**/*.sh
-      - conf/**/*.sh
-      - deps/**/*.sh
-      - modules/**/*.sh
+      - './*.sh'
+      - 'apps/**/*.sh'
+      - 'conf/**/*.sh'
+      - 'deps/**/*.sh'
+      - 'modules/**/*.sh'
 
 CMake:
 - changed-files:
-    - any-glob-to-any-file: ./*.cmake
+    - any-glob-to-any-file: './*.cmake'
 
 Workflow:
 - changed-files:
-    - any-glob-to-any-file: .github/workflows/*
+    - any-glob-to-any-file: '.github/workflows/*'
 
 Batch:
 - changed-files:
-    - any-glob-to-any-file: apps/**/*.bat
+    - any-glob-to-any-file: 'apps/**/*.bat'
