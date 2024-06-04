@@ -18,7 +18,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (58209, 'spell_Lich_King_whisper'),
 (58210, 'spell_Lich_King_whisper'),
 (58211, 'spell_Lich_King_whisper'),
-(58212, 'spell_TLich_King_whisper'),
+(58212, 'spell_Lich_King_whisper'),
 (58213, 'spell_Lich_King_whisper'),
 (58214, 'spell_Lich_King_whisper'),
 (58215, 'spell_Lich_King_whisper'),
