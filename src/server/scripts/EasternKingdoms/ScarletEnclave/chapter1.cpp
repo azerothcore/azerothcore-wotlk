@@ -1260,7 +1260,6 @@ class spell_lich_king_vo_blocker : public AuraScript
 {
     PrepareAuraScript(spell_lich_king_vo_blocker);
 
-
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* target = GetTarget()->ToPlayer())
