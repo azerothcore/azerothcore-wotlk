@@ -4,7 +4,7 @@ on:
 
 jobs:
   triage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     permissions: write-all
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
