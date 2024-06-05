@@ -158,5 +158,5 @@ class spell_azgalor_doom_aura : public AuraScript
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
-    RegisterSpellScript(spell_azgalor_doom);
+    RegisterSpellAndAuraScriptPair(spell_azgalor_doom, spell_azgalor_doom_aura);
 }
