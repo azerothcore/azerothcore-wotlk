@@ -38,6 +38,7 @@ enum Spells
     SPELL_PSYCHIC_SCREAM                = 34322,
     SPELL_VOID_BOLT                     = 39329,
     SPELL_TRUE_BEAM                     = 33365,
+    SPELL_TELEPORT_START_POSITION       = 33244,
 };
 
 enum Misc
@@ -55,6 +56,9 @@ enum Misc
 #define CENTER_Z                    17.9608f
 #define CENTER_O                    1.06421f
 #define PORTAL_Z                    17.005f
+#define START_POSITION_X            432.74f
+#define START_POSITION_Y            -373.645f
+#define START_POSITION_Z            18.0138f
 
 struct boss_high_astromancer_solarian : public BossAI
 {
@@ -146,11 +150,30 @@ struct boss_high_astromancer_solarian : public BossAI
         }).Schedule(52100ms, [this](TaskContext context)
         {
             me->SetReactState(REACT_PASSIVE);
-            Talk(SAY_SUMMON);
-            me->RemoveAllAuras();
-            me->SetModelVisible(false);
-            scheduler.DelayAll(21s);
-            scheduler.Schedule(6s, [this](TaskContext)
+            scheduler.DelayAll(22s);
+            // blink to room center in this line using SPELL_TELEPORT_START_POSITION and START_POSITION_X, START_POSITION_Y, START_POSITION_Z
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                for (uint8 i = 0; i < 3; ++i)
+                {
+                    float o = rand_norm() * 2 * M_PI;
+                    if (i == 0)
+                    {
+                        me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000);
+                    }
+                    else
+                    {
+                        me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000);
+                    }
+                }
+            }).Schedule(2s, [this](TaskContext)
+            {
+                Talk(SAY_SUMMON);
+            }).Schedule(3s, [this](TaskContext)
+            {
+                me->RemoveAllAuras();
+                me->SetModelVisible(false);
+            }).Schedule(7s, [this](TaskContext)
             {
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -171,7 +194,7 @@ struct boss_high_astromancer_solarian : public BossAI
                         }
                     }
                 });
-            }).Schedule(20s, [this](TaskContext)
+            }).Schedule(23s, [this](TaskContext)
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 summons.DoForAllSummons([&](WorldObject* summon)
@@ -194,20 +217,7 @@ struct boss_high_astromancer_solarian : public BossAI
                     }
                 });
             });
-
-            for (uint8 i = 0; i < 3; ++i)
-            {
-                float o = rand_norm() * 2 * M_PI;
-                if (i == 0)
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*INNER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*INNER_PORTAL_RADIUS, CENTER_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
-                else
-                {
-                    me->SummonCreature(NPC_ASTROMANCER_SOLARIAN_SPOTLIGHT, CENTER_X + cos(o)*OUTER_PORTAL_RADIUS, CENTER_Y + std::sin(o)*OUTER_PORTAL_RADIUS, PORTAL_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 26000);
-                }
-            }
-            context.Repeat(67500ms, 71200ms);
+            context.Repeat(87500ms, 91200ms);
         });
     }
 
@@ -280,4 +290,3 @@ void AddSC_boss_high_astromancer_solarian()
     RegisterSpellScript(spell_astromancer_wrath_of_the_astromancer);
     RegisterSpellScript(spell_astromancer_solarian_transform);
 }
-

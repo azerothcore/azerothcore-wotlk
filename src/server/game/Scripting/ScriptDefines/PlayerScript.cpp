@@ -136,7 +136,7 @@ void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, R
 
 void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_LEARN_TALENTS, script->OnLearnSpell(player, spellID));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_SPELL, script->OnLearnSpell(player, spellID));
 }
 
 void ScriptMgr::OnPlayerForgotSpell(Player* player, uint32 spellID)
@@ -211,7 +211,7 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
 
 void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE, script->OnUpdate(player, p_time));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE, script->OnUpdate(player, p_time));
 }
 
 void ScriptMgr::OnPlayerLogin(Player* player)
@@ -637,6 +637,16 @@ void ScriptMgr::OnCustomScalingStatValueBefore(Player* player, ItemTemplate cons
 void ScriptMgr::OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CUSTOM_SCALING_STAT_VALUE, script->OnCustomScalingStatValue(player, proto, statType, val, itemProtoStatNumber, ScalingStatValue, ssv));
+}
+
+void ScriptMgr::OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint8 itemProtoStatNumber, uint32 statType, int32& val)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_ITEM_MODS_BEFORE, script->OnApplyItemModsBefore(player, slot, apply, itemProtoStatNumber, statType, val));
+}
+
+void ScriptMgr::OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_ENCHANTMENT_ITEM_MODS_BEFORE, script->OnApplyEnchantmentItemModsBefore(player, item, slot, apply, enchant_spell_id, enchant_amount));
 }
 
 bool ScriptMgr::CanArmorDamageModifier(Player* player)

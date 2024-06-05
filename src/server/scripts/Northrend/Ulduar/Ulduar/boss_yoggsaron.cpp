@@ -251,6 +251,8 @@ enum Misc
     ACTION_ILLUSION_ICECROWN            = 2,
     ACTION_ILLUSION_STORMWIND           = 3,
 
+    // ACTION_SARA_UPDATE_SUMMON_KEEPERS = 4, // defined in ulduar.h
+
     EVENT_PHASE_ONE                     = 1,
     EVENT_PHASE_TWO                     = 2,
     EVENT_PHASE_THREE                   = 3,
@@ -270,6 +272,26 @@ struct LocationsXY
 {
     float x, y, z;
 };
+
+Position const GossipKeepersPos[4] =
+{
+    {1945.6823f, 33.342014f, 411.44083f, 5.270895f}, // Freya
+    {1945.7609f, -81.52171f,  411.4407f, 1.029744f}, // Hodir
+    {2028.7656f,  17.42014f, 411.44458f, 3.857178f}, // Mimiron
+    {2028.8219f, -65.73573f, 411.44257f, 2.460914f}  // Thorim
+};
+
+const Position KeepersPos[4] =
+{
+    {1939.32f,   42.165f, 338.415f, 5.17955f}, // Freya
+    {1939.13f, -90.8332f, 338.415f, 1.00123f}, // Hodir
+    {2036.81f,  25.6646f, 338.415f, 3.74227f}, // Mimiron
+    {2036.59f, -73.8499f, 338.415f, 2.34819f}  // Thorim
+};
+
+const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
+const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
+const uint32 TABLE_KEEPER_TYPE[4]  = {TYPE_FREYA,             TYPE_HODIR,       TYPE_MIMIRON,       TYPE_THORIM};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -344,7 +366,6 @@ enum Texts
     SAY_LK_2                            = 1,
     SAY_YOGG_5                          = 3,
     SAY_YOGG_6                          = 4,
-
 };
 
 const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI * 1.5f};
@@ -371,7 +392,6 @@ public:
         SummonList summons;
 
         uint32 _initFight;
-        ObjectGuid _keepersGUID[4];
         uint8 _summonedGuardiansCount;
         uint32 _p2TalkTimer;
         bool _secondPhase;
@@ -382,17 +402,9 @@ public:
         void AttackStart(Unit*) override { }
         void MoveInLineOfSight(Unit*) override { }
 
-        void JustSummoned(Creature* cr) override
+        void JustSummoned(Creature* summon) override
         {
-            summons.Summon(cr);
-            if (cr->GetEntry() >= NPC_FREYA_KEEPER && cr->GetEntry() <= NPC_THORIM_KEEPER)
-            {
-                if (cr->GetEntry() == NPC_FREYA_KEEPER)
-                    cr->CastSpell(cr, SPELL_CONJURE_SANITY_WELL, false);
-                _keepersGUID[cr->GetEntry() - NPC_FREYA_KEEPER] = cr->GetGUID();
-            }
-            else if (cr->GetEntry() == NPC_SANITY_WELL)
-                cr->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SCALE, true);
+            summons.Summon(summon);
         }
 
         void SpawnClouds()
@@ -405,15 +417,6 @@ public:
                 else
                     me->SummonCreature(NPC_OMINOUS_CLOUD, me->GetPositionX() - 8 - i * 7, me->GetPositionY() - 8 - i * 7, 326 + Zplus, 0);
             }
-        }
-
-        void SpawnWeels()
-        {
-            me->SummonCreature(NPC_SANITY_WELL, 2042.56f, -40.3667f, 329.274f, 0.0f);
-            me->SummonCreature(NPC_SANITY_WELL, 1975.89f, 40.0216f, 331.1f, 0.0f);
-            me->SummonCreature(NPC_SANITY_WELL, 1987.12f, -91.2702f, 330.186f, 0.0f);
-            me->SummonCreature(NPC_SANITY_WELL, 1900.48f, -51.2386f, 332.13f, 0.0f);
-            me->SummonCreature(NPC_SANITY_WELL, 1899.94f, 0.330621f, 332.296f, 0.0f);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -469,9 +472,7 @@ public:
 
             _initFight = 1;
 
-            for (uint8 i = 0; i < 4; ++i)
-                _keepersGUID[i].Clear();
-
+            UpdateKeeperSpawns();
             _summonedGuardiansCount = 0;
             _p2TalkTimer = 0;
             _secondPhase = false;
@@ -503,9 +504,11 @@ public:
             me->SetInCombatWithZone();
             AttackStart(target);
 
-            me->CastSpell(me, SPELL_SANITY_BASE, true);
+            DespawnGossipKeepers();
+            // Engage Keepers
+            summons.DoZoneInCombat();
 
-            SaveKeepers();
+            me->CastSpell(me, SPELL_SANITY_BASE, true);
 
             events.ScheduleEvent(EVENT_SARA_P1_DOORS_CLOSE, 15s, 0, EVENT_PHASE_ONE);
             events.ScheduleEvent(EVENT_SARA_P1_BERSERK, 15min, 0, 0);
@@ -516,26 +519,27 @@ public:
             me->setActive(true);
         }
 
-        void SaveKeepers()
+        void DespawnGossipKeepers()
         {
-            for (uint8 i = 0; i < 4; ++i)
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+                summons.DespawnEntry(TABLE_GOSSIP_ENTRY[i]);
+        }
+
+        void UpdateKeeperSpawns()
+        {
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+            {
                 if (m_pInstance->GetData(TYPE_WATCHERS) & (1 << i))
-                    switch (i)
-                    {
-                        case KEEPER_FREYA:
-                            SpawnWeels();
-                            me->SummonCreature(NPC_FREYA_KEEPER, 1939.32f, 42.165f, 338.415f, 5.17955f);
-                            break;
-                        case KEEPER_HODIR:
-                            me->SummonCreature(NPC_HODIR_KEEPER, 1939.13f, -90.8332f, 338.415f, 1.00123f);
-                            break;
-                        case KEEPER_MIMIRON:
-                            me->SummonCreature(NPC_MIMIRON_KEEPER, 2036.81f, 25.6646f, 338.415f, 3.74227f);
-                            break;
-                        case KEEPER_THORIM:
-                            me->SummonCreature(NPC_THORIM_KEEPER, 2036.59f, -73.8499f, 338.415f, 2.34819f);
-                            break;
-                    }
+                {
+                    if (!summons.HasEntry(TABLE_KEEPER_ENTRY[i]))
+                        me->SummonCreature(TABLE_KEEPER_ENTRY[i], KeepersPos[i]);
+                }
+                else if (m_pInstance->GetData(TABLE_KEEPER_TYPE[i]) == DONE)
+                {
+                    if (!summons.HasEntry(TABLE_GOSSIP_ENTRY[i]))
+                        me->SummonCreature(TABLE_GOSSIP_ENTRY[i], GossipKeepersPos[i]);
+                }
+            }
         }
 
         void InformCloud()
@@ -625,9 +629,8 @@ public:
             {
                 uint8 _count = 0;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (_keepersGUID[i])
+                    if (m_pInstance->GetData(TYPE_WATCHERS) & (1 << i))
                         ++_count;
-
                 return _count;
             }
             else if (param == DATA_GET_SARA_PHASE)
@@ -638,7 +641,11 @@ public:
 
         void DoAction(int32 param) override
         {
-            if (param == ACTION_BRAIN_DAMAGED)
+            if (param == ACTION_SARA_UPDATE_SUMMON_KEEPERS)
+            {
+                UpdateKeeperSpawns();
+            }
+            else if (param == ACTION_BRAIN_DAMAGED)
             {
                 summons.DoAction(ACTION_REMOVE_STUN);
 
@@ -648,7 +655,7 @@ public:
                 EntryCheckPredicate pred3(NPC_THORIM_KEEPER);
                 summons.DoAction(ACTION_THORIM_START_STORM, pred3);
 
-                if (!(_keepersGUID[0] && _keepersGUID[1] && _keepersGUID[2] && _keepersGUID[3]) && me->GetMap()->Is25ManRaid())
+                if (me->GetMap()->Is25ManRaid() && (GetData(DATA_GET_KEEPERS_COUNT) > 0))
                     summons.DoAction(ACTION_YOGG_SARON_HARD_MODE, pred2);
 
                 summons.DespawnEntry(NPC_DEATH_ORB);
@@ -660,8 +667,17 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_DEATH)
             {
+                // Despawn everything but Yogg-Saron's corpse
+                summons.DoAction(ACTION_DESPAWN_ADDS);
+                summons.DespawnEntry(NPC_CRUSHER_TENTACLE);
+                summons.DespawnEntry(NPC_CONSTRICTOR_TENTACLE);
+                summons.DespawnEntry(NPC_CORRUPTOR_TENTACLE);
                 summons.DespawnEntry(NPC_VOICE_OF_YOGG_SARON);
                 summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
+                summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
+                summons.DespawnEntry(NPC_HODIR_GOSSIP);
+                summons.DespawnEntry(NPC_FREYA_GOSSIP);
+                summons.DespawnEntry(NPC_THORIM_GOSSIP);
                 summons.DespawnEntry(NPC_MIMIRON_KEEPER);
                 summons.DespawnEntry(NPC_HODIR_KEEPER);
                 summons.DespawnEntry(NPC_FREYA_KEEPER);
@@ -1709,52 +1725,56 @@ public:
     };
 };
 
-class boss_yoggsaron_keeper : public CreatureScript
+struct boss_yoggsaron_keeper : public NullCreatureAI
 {
-public:
-    boss_yoggsaron_keeper() : CreatureScript("boss_yoggsaron_keeper") { }
+    boss_yoggsaron_keeper(Creature* creature) : NullCreatureAI(creature), _summons(creature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void DoAction(int32 param) override
     {
-        return GetUlduarAI<boss_yoggsaron_keeperAI>(pCreature);
+        if (me->GetEntry() == NPC_THORIM_KEEPER && param == ACTION_THORIM_START_STORM)
+            me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
+        else if (param == ACTION_DESPAWN_ADDS)
+            _summons.DespawnAll();
     }
 
-    struct boss_yoggsaron_keeperAI : public NullCreatureAI
+    void JustSummoned(Creature* summon) override
     {
-        boss_yoggsaron_keeperAI(Creature* pCreature) : NullCreatureAI(pCreature)
+        _summons.Summon(summon);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        switch (me->GetEntry())
         {
-            _checkTimer = 0;
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SCALE, true);
-        }
-
-        uint32 _checkTimer;
-
-        void DoAction(int32 param) override
-        {
-            if (me->GetEntry() == NPC_THORIM_KEEPER && param == ACTION_THORIM_START_STORM)
-                me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (me->GetInstanceScript())
-                if (me->GetInstanceScript()->GetData(TYPE_YOGGSARON) != IN_PROGRESS)
-                    return;
-
-            _checkTimer += diff;
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if (me->GetEntry() == NPC_MIMIRON_KEEPER)
-            {
-                if (_checkTimer >= 2000)
+            case NPC_FREYA_KEEPER:
+                me->AddAura(SPELL_FREYA_PASSIVE, me);
+                me->CastSpell(me, SPELL_CONJURE_SANITY_WELL, false);
+                break;
+            case NPC_HODIR_KEEPER:
+                me->AddAura(SPELL_HODIR_PASSIVE, me);
+                me->AddAura(SPELL_PROTECTIVE_GAZE, me);
+                break;
+            case NPC_MIMIRON_KEEPER:
+                me->AddAura(SPELL_MIMIRON_PASSIVE, me);
+                scheduler.Schedule(2s, [this](TaskContext context)
                 {
-                    me->CastSpell(me, SPELL_DESTABILIZATION_MATRIX, false);
-                    _checkTimer = 0;
-                }
-            }
+                    if (!me->HasUnitState(UNIT_STATE_CASTING))
+                        me->CastSpell(me, SPELL_DESTABILIZATION_MATRIX, false);
+                    context.Repeat(2s);
+                });
+                break;
+            case NPC_THORIM_KEEPER:
+                me->AddAura(SPELL_THORIM_PASSIVE, me);
+                break;
         }
-    };
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+private:
+    SummonList _summons;
 };
 
 class boss_yoggsaron_descend_portal : public CreatureScript
@@ -2739,6 +2759,33 @@ public:
     }
 };
 
+const Position SanityWellsPos[5] =
+{
+    {2042.56f,  -40.3667f,  329.274f,  0.0f},
+    {1975.89f,   40.0216f,    331.1f,  0.0f},
+    {1987.12f,  -91.2702f,  330.186f,  0.0f},
+    {1900.48f,  -51.2386f,   332.13f,  0.0f},
+    {1899.94f,  0.330621f,  332.296f,  0.0f}
+};
+
+// 64170 - Sanity Well
+class spell_keeper_freya_summon_sanity_well : public SpellScript
+{
+    PrepareSpellScript(spell_keeper_freya_summon_sanity_well);
+
+    void OnEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            for (int i = 0; i < 5; i++)
+                caster->SummonCreature(NPC_SANITY_WELL, SanityWellsPos[i]);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_keeper_freya_summon_sanity_well::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+    }
+};
+
 /* 63881 - Malady of the Mind
    63795 - Psychosis
    63830 - Malady of the Mind
@@ -3032,7 +3079,7 @@ void AddSC_boss_yoggsaron()
     new boss_yoggsaron_crusher_tentacle();
     new boss_yoggsaron_corruptor_tentacle();
     new boss_yoggsaron_constrictor_tentacle();
-    new boss_yoggsaron_keeper();
+    RegisterUlduarCreatureAI(boss_yoggsaron_keeper);
     new boss_yoggsaron_descend_portal();
     new boss_yoggsaron_influence_tentacle();
     new boss_yoggsaron_immortal_guardian();
@@ -3053,6 +3100,7 @@ void AddSC_boss_yoggsaron()
     new spell_yogg_saron_insane_periodic_trigger();
     new spell_yogg_saron_insane();
     new spell_yogg_saron_sanity_well();
+    RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     new spell_yogg_saron_sanity_reduce();
     new spell_yogg_saron_empowering_shadows();
     new spell_yogg_saron_in_the_maws_of_the_old_god();
