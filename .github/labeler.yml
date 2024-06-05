@@ -28,7 +28,7 @@ UnitTests:
 - changed-files:
     - any-glob-to-any-file: 'src/test/**/*'
 
-Documentation:
+Profession:
 - changed-files:
   - any-glob-to-any-file: '**'
 
