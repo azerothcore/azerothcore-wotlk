@@ -261,7 +261,7 @@ struct boss_ahune : public BossAI
         me->RemoveAurasDueToSpell(SPELL_STAY_SUBMERGED);
         DoCastSelf(SPELL_STAND);
         DoCastSelf(SPELL_RESURFACE, true);
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3s);
     }
 
@@ -308,7 +308,7 @@ struct npc_frozen_core : public ScriptedAI
     {
         if (action == ACTION_AHUNE_RETREAT)
         {
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToPC(false);
             me->RemoveAurasDueToSpell(SPELL_ICE_SPEAR_CONTROL_AURA);
             _events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3000, 0, PHASE_TWO);
