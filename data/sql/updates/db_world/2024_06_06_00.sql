@@ -1,3 +1,4 @@
+-- DB update 2024_06_02_00 -> 2024_06_06_00
 --
 UPDATE `conditions` SET `Comment`='Target Non-Combat Pet - Ancona Chicken' WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=48649 AND `ConditionValue2`=7394;
 UPDATE `conditions` SET `Comment`='Target Non-Combat Pet - Azure Whelpling' WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=48649 AND `ConditionValue2`=7547;
