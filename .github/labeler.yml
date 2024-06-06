@@ -15,8 +15,8 @@ CORE:
     - changed-files:
         - any-glob-to-any-file: 'src/**/*'
         - all-globs-to-all-files:
-          - '!src/server/scripts/*'
-          - '!src/tests/*'
+          - '!src/server/scripts/**/*'
+          - '!src/test/**/*'
 
 Script:
 - changed-files:
@@ -30,12 +30,12 @@ UnitTests:
 
 Documentation:
 - changed-files:
-    - any-glob-to-any-file: './*.md'
+    - any-glob-to-any-file: '*.md'
 
 Bash:
 - changed-files:
     - any-glob-to-any-file: 
-      - './*.sh'
+      - '*.sh'
       - 'apps/**/*.sh'
       - 'conf/**/*.sh'
       - 'deps/**/*.sh'
@@ -43,7 +43,7 @@ Bash:
 
 CMake:
 - changed-files:
-    - any-glob-to-any-file: './*.cmake'
+    - any-glob-to-any-file: '*.cmake'
 
 Workflow:
 - changed-files:
