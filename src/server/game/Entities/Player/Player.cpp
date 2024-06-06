@@ -2176,6 +2176,9 @@ void Player::SetInWater(bool apply)
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     getHostileRefMgr().updateThreatTables();
+
+    if (InstanceScript* instance = GetInstanceScript())
+        instance->OnPlayerInWaterStateUpdate(this, apply);
 }
 
 bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
@@ -6584,6 +6587,8 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
+
+            sScriptMgr->OnApplyItemModsBefore(this, slot, apply, i, statType, val);
         }
 
         if (val == 0)
