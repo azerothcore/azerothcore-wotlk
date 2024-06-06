@@ -869,85 +869,29 @@ private:
     bool _removeHealers;
 };
 
-class spell_sindragosa_unchained_magic : public SpellScriptLoader
+class spell_sindragosa_unchained_magic : public SpellScript
 {
-public:
-    spell_sindragosa_unchained_magic() : SpellScriptLoader("spell_sindragosa_unchained_magic") { }
+    PrepareSpellScript(spell_sindragosa_unchained_magic);
 
-    class spell_sindragosa_unchained_magic_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_sindragosa_unchained_magic_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            std::list<WorldObject*> healList = unitList;
-            std::list<WorldObject*> dpsList = unitList;
-            unitList.clear();
-            uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
-            healList.remove_if(UnchainedMagicTargetSelector(false));
-            if (healList.size() > maxSize)
-                Acore::Containers::RandomResize(healList, maxSize);
-            dpsList.remove_if(UnchainedMagicTargetSelector(true));
-            if (dpsList.size() > maxSize)
-                Acore::Containers::RandomResize(dpsList, maxSize);
-            unitList.splice(unitList.begin(), healList);
-            unitList.splice(unitList.begin(), dpsList);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_unchained_magic_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_sindragosa_unchained_magic_SpellScript();
+        std::list<WorldObject*> healList = unitList;
+        std::list<WorldObject*> dpsList = unitList;
+        unitList.clear();
+        uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
+        healList.remove_if(UnchainedMagicTargetSelector(false));
+        if (healList.size() > maxSize)
+            Acore::Containers::RandomResize(healList, maxSize);
+        dpsList.remove_if(UnchainedMagicTargetSelector(true));
+        if (dpsList.size() > maxSize)
+            Acore::Containers::RandomResize(dpsList, maxSize);
+        unitList.splice(unitList.begin(), healList);
+        unitList.splice(unitList.begin(), dpsList);
     }
 
-    class spell_sindragosa_unchained_magic_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_sindragosa_unchained_magic_AuraScript);
-
-        std::map<uint32, uint32> _lastMSTimeForSpell;
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            _lastMSTimeForSpell.clear();
-            return true;
-        }
-
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-            if (!spellInfo)
-                return false;
-
-            uint32 currMSTime = GameTime::GetGameTimeMS().count();
-            std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
-            if (itr != _lastMSTimeForSpell.end())
-            {
-                uint32 lastMSTime = itr->second;
-                itr->second = currMSTime;
-                if (getMSTimeDiff(lastMSTime, currMSTime) < 600)
-                    return false;
-
-                return true;
-            }
-
-            _lastMSTimeForSpell[spellInfo->Id] = currMSTime;
-            return true;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_sindragosa_unchained_magic_AuraScript::CheckProc);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_sindragosa_unchained_magic_AuraScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_unchained_magic::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -2026,7 +1970,7 @@ void AddSC_boss_sindragosa()
     new boss_sindragosa();
     new npc_ice_tomb();
     new spell_sindragosa_s_fury();
-    new spell_sindragosa_unchained_magic();
+    RegisterSpellScript(spell_sindragosa_unchained_magic);
     new spell_sindragosa_permeating_chill();
     new spell_sindragosa_instability();
     new spell_sindragosa_icy_grip();

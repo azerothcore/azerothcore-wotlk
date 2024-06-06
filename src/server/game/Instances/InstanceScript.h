@@ -186,6 +186,9 @@ public:
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
+    //Called when a player enters/leaves water bodies.
+    virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
+
     //npcbot: map hooks
     virtual void OnNPCBotEnter(Creature* /*bot*/) { }
     virtual void OnNPCBotLeave(Creature* /*bot*/) { }

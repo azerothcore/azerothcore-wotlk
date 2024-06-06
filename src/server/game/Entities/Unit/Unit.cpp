@@ -4478,7 +4478,7 @@ void Unit::ProcessTerrainStatusUpdate()
     // remove appropriate auras if we are swimming/not swimming respectively
     if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
-    else
+    else if (!isSwimming())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     // liquid aura handling
