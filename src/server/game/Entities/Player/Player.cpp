@@ -3983,7 +3983,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
     // remove from group
     if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(playerGuid))
-        if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
+        if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
             RemoveFromGroup(group, playerGuid);
 
     // Remove signs from petitions (also remove petitions if owner);
