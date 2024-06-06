@@ -14989,7 +14989,8 @@ void bot_ai::InitEquips()
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
         {
             if (assigned_item_guids[i] != 0)
-                LOG_ERROR("npcbots", "InitEquips: bot {} {} has item guid {} assigned to slot {} which doesn't exist in DB!", me->GetEntry(), me->GetName(), assigned_item_guids[i], uint32(i));
+                LOG_ERROR("npcbots", "InitEquips: bot {} {} owner {} has item guid {} assigned to slot {} which doesn't exist in DB!",
+                    me->GetEntry(), me->GetName(), _ownerGuid, assigned_item_guids[i], uint32(i));
         }
     }
 

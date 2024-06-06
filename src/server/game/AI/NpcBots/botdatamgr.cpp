@@ -2496,31 +2496,36 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
 }
 void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType updateType, void* data)
 {
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     CharacterDatabasePreparedStatement* bstmt;
+    uint32 newowner = *(uint32*)(data);
     switch (updateType)
     {
         case NPCBOT_UPDATE_OWNER:
-            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER_ALL);
-            //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE owner = ?", CONNECTION_ASYNC
-            bstmt->SetData(0, *(uint32*)(data));
-            bstmt->SetData(1, uint64(*(uint32*)(data) ? time(0) : 1ULL));
-            bstmt->SetData(2, playerGuid);
-            CharacterDatabase.Execute(bstmt);
-            //break; //no break: erase transmogs
-        [[fallthrough]];
-        case NPCBOT_UPDATE_TRANSMOG_ERASE:
+            ASSERT(newowner == 0);
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_EQUIP_RESET_ALL);
+            //"UPDATE characters_npcbot SET equipMhEx = 0, equipOhEx = 0, equipRhEx = 0, equipHead = 0, equipShoulders = 0, equipChest = 0, equipWaist = 0, equipLegs = 0, equipFeet = 0, "
+            //"equipWrist = 0, equipHands = 0, equipBack = 0, equipBody = 0, equipFinger1 = 0, equipFinger2 = 0, equipTrinket1 = 0, equipTrinket2 = 0, equipNeck = 0 WHERE owner = ?", CONNECTION_ASYNC
+            bstmt->SetData(0, playerGuid);
+            trans->Append(bstmt);
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT_TRANSMOG_ALL);
             //"DELETE FROM characters_npcbot_transmog WHERE entry IN (SELECT entry FROM characters_npcbot WHERE owner = ?)", CONNECTION_ASYNC
             bstmt->SetData(0, playerGuid);
-            CharacterDatabase.Execute(bstmt);
+            trans->Append(bstmt);
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER_ALL);
+            //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE owner = ?", CONNECTION_ASYNC
+            bstmt->SetData(0, newowner);
+            bstmt->SetData(1, uint64(1ULL));
+            bstmt->SetData(2, playerGuid);
+            trans->Append(bstmt);
             break;
-        //case NPCBOT_UPDATE_ROLES:
-        //case NPCBOT_UPDATE_FACTION:
-        //case NPCBOT_UPDATE_EQUIPS:
         default:
             LOG_ERROR("sql.sql", "BotDataMgr:UpdateNpcBotDataAll: unhandled updateType {}", uint32(updateType));
             break;
     }
+
+    if (trans->GetSize() > 0)
+        CharacterDatabase.CommitTransaction(trans);
 }
 
 void BotDataMgr::SaveNpcBotStats(NpcBotStats const* stats)
