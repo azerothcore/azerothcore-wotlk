@@ -4,3 +4,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10719, 0, 0, 0, 1, 0, 100, 0, 12000, 12000, 0, 0, 0, 0, 1, 0, 13, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Say Line 0'),
 (10719, 0, 1, 0, 1, 0, 100, 0, 15000, 15000, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Say Line 1'),
 (10719, 0, 2, 0, 1, 0, 100, 0, 19000, 19000, 0, 0, 0, 0, 11, 16609, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Cast \'Warchief`s Blessing\'');
+
+-- Limit Herald of Thrall shout range to Area
+UPDATE `creature_text` SET `TextRange` = 1 WHERE `CreatureID` = 10719;
