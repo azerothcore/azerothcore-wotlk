@@ -250,12 +250,9 @@ public:
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_0);
                     })
-                .Schedule(13s, [this](TaskContext /*context*/)
+                .Schedule(9s, [this](TaskContext /*context*/)
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_1);
-                    })
-                .Schedule(15s, [this](TaskContext /*context*/)
-                    {
                         DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
                         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         me->GetMap()->DoForAllPlayers([&](Player* p)
