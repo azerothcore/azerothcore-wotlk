@@ -97,7 +97,7 @@ uint32 const availableChargeAurasAndSpells[3][2] = {
 
 Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
-float const DOOMFIRE_OFFSET = 25.0f;
+float const DOOMFIRE_OFFSET = 15.0f;
 uint8 const WISP_OFFSET = 40;
 uint8 NEAR_POINT = 0;
 
@@ -158,14 +158,26 @@ struct npc_doomfire_spirit : public ScriptedAI
 
     void Reset() override
     {
+        Position randomPosition;
+
         scheduler.CancelAll();
-        ScheduleTimedEvent(0s, [&]{
-            if (Creature* archimonde = _instance->GetCreature(DATA_ARCHIMONDE))
-            {
-                Position randomNearPosition = archimonde->GetRandomNearPosition(200.0f);
-                me->GetMotionMaster()->MovePoint(NEAR_POINT, randomNearPosition);
-            }
-        }, 6s);
+        ScheduleTimedEvent(0s, [&] {
+            DoomfireMovement(randomPosition, me->GetPosition());
+
+            me->GetMotionMaster()->MovePoint(NEAR_POINT, randomPosition);
+            }, 1500ms);
+    }
+
+    void DoomfireMovement(Position& targetPos, Position mePos)
+    {
+        float angle = mePos.GetOrientation();
+        float distance = 100.0f;
+        float newAngle = angle + ((rand() % 181) - 90) * M_PI / 180;
+        float x = mePos.GetPositionX() + distance * cos(newAngle);
+        float y = mePos.GetPositionY() + distance * sin(newAngle);
+
+        targetPos = Position(x, y, me->GetPositionZ());
+        return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -430,8 +442,11 @@ struct boss_archimonde : public BossAI
     {
         // hack because spell doesn't work?
         Talk(SAY_DOOMFIRE);
-        Position spiritPosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
-        Position doomfirePosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
+        float angle = 2 * M_PI * rand() / RAND_MAX;
+        float x = me->GetPositionX() + DOOMFIRE_OFFSET * cos(angle);
+        float y = me->GetPositionY() + DOOMFIRE_OFFSET * sin(angle);
+        Position spiritPosition = Position(x, y, me->GetPositionZ());
+        Position doomfirePosition = Position(x, y, me->GetPositionZ());
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
