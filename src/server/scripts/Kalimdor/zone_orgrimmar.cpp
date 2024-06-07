@@ -248,25 +248,36 @@ public:
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                 scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_0);
+                }).Schedule(9s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_1);
+                    DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    me->GetMap()->DoForAllPlayers([&](Player* p)
                     {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_0);
-                    })
-                .Schedule(9s, [this](TaskContext /*context*/)
-                    {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_1);
-                        DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
-                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        me->GetMap()->DoForAllPlayers([&](Player* p)
+                        if (p->IsAlive() && !p->IsGameMaster())
+                        {
+                            if (p->GetAreaId() == AREA_ORGRIMMAR)
                             {
-                                if (p->IsAlive() && !p->IsGameMaster())
-                                {
-                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_CROSSROADS)
-                                    {
-                                        p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
-                                    }
-                                }
-                            });
+                                p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
                     });
+                }).Schedule(19s, [this](TaskContext /*context*/)
+                {
+                    me->GetMap()->DoForAllPlayers([&](Player* p)
+                    {
+                        if (p->IsAlive() && !p->IsGameMaster())
+                        {
+                            if (p->GetAreaId() == AREA_CROSSROADS)
+                            {
+                                p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
+                    });
+                });
             }
         }
 
