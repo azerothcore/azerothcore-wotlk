@@ -246,7 +246,7 @@ public:
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                scheduler.Schedule(2s, [this](TaskContext /*context*/)
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_0);
                     })
@@ -274,7 +274,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
 
             if (!UpdateVictim())
                 return;
@@ -295,9 +295,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        protected:
-            TaskScheduler _scheduler;
     };
 };
 
