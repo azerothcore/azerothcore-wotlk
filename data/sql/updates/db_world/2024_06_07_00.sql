@@ -1,3 +1,4 @@
+-- DB update 2024_06_06_00 -> 2024_06_07_00
 DELETE FROM `waypoints` WHERE `entry`=104350;
 INSERT INTO `waypoints` VALUES 
 (104350, 1, 3684.35, -3605.47, 137.872, NULL, 0, NULL),
