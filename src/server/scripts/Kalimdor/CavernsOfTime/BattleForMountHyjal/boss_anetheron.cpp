@@ -32,11 +32,6 @@ enum Spells
     SPELL_INFERNAL_IMMOLATION = 31304
 };
 
-enum Misc
-{
-    NPC_TOWERING_INFERNAL   = 17818
-};
-
 enum Texts
 {
     SAY_ONDEATH         = 0,
@@ -59,29 +54,13 @@ public:
             });
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        std::list<Creature* > infernalList;
-        me->GetCreatureListWithEntryInGrid(infernalList, NPC_TOWERING_INFERNAL, 100.0f);
-        if (infernalList.size() > 0)
-        {
-            for (Creature* infernal : infernalList)
-            {
-                infernal->DespawnOrUnsummon();
-            }
-        }
-        infernalList.clear();
-        instance->SetData(DATA_RESET_ALLIANCE, 0);
-        me->DespawnOrUnsummon();
-    }
-
     void JustEngagedWith(Unit * who) override
     {
         BossAI::JustEngagedWith(who);
 
         scheduler.Schedule(20s, 28s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f, false) == SPELL_CAST_OK)
                 Talk(SAY_SWARM);
             context.Repeat(10s, 15s);
         }).Schedule(25s, 32s, [this](TaskContext context)
@@ -157,7 +136,6 @@ public:
 
 private:
     bool _recentlySpoken;
-
 };
 
 class spell_anetheron_sleep : public SpellScript

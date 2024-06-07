@@ -30,11 +30,6 @@ enum Spells
     SPELL_BERSERK               = 26662
 };
 
-enum Misc
-{
-    NPC_LESSER_DOOMGUARD   = 17864
-};
-
 enum Texts
 {
     SAY_ONDEATH             = 0,
@@ -57,22 +52,6 @@ public:
             });
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        std::list<Creature* > doomguardList;
-        me->GetCreatureListWithEntryInGrid(doomguardList, NPC_LESSER_DOOMGUARD, 100.0f);
-        if (doomguardList.size() > 0)
-        {
-            for (Creature* doomguard : doomguardList)
-            {
-                doomguard->DespawnOrUnsummon();
-            }
-        }
-        doomguardList.clear();
-        instance->SetData(DATA_RESET_HORDE, 0);
-        me->DespawnOrUnsummon();
-    }
-
     void JustEngagedWith(Unit * who) override
     {
         BossAI::JustEngagedWith(who);
@@ -91,7 +70,7 @@ public:
             context.Repeat(18s, 20s);
         }).Schedule(45s, 55s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_DOOM, 1, 100.f, true, false, false);
+            DoCastAOE(SPELL_DOOM);
             Talk(SAY_DOOM);
             context.Repeat();
         }).Schedule(10min, [this](TaskContext context)
@@ -137,12 +116,29 @@ public:
 
 private:
     bool _recentlySpoken;
-
 };
 
-class spell_azgalor_doom : public AuraScript
+class spell_azgalor_doom : public SpellScript
 {
-    PrepareAuraScript(spell_azgalor_doom);
+    PrepareSpellScript(spell_azgalor_doom);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* victim = GetCaster()->GetVictim())
+        {
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_azgalor_doom::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+class spell_azgalor_doom_aura : public AuraScript
+{
+    PrepareAuraScript(spell_azgalor_doom_aura);
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
@@ -155,12 +151,12 @@ class spell_azgalor_doom : public AuraScript
 
     void Register() override
     {
-        OnEffectRemove += AuraEffectRemoveFn(spell_azgalor_doom::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_azgalor_doom_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
-    RegisterSpellScript(spell_azgalor_doom);
+    RegisterSpellAndAuraScriptPair(spell_azgalor_doom, spell_azgalor_doom_aura);
 }
