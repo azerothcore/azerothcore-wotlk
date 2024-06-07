@@ -364,22 +364,22 @@ struct boss_archimonde : public BossAI
     {
         switch (player->getClass())
         {
-            case CLASS_PRIEST:
             case CLASS_PALADIN:
+            case CLASS_PRIEST:
             case CLASS_WARLOCK:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
                 break;
+            case CLASS_DEATH_KNIGHT:
             case CLASS_MAGE:
             case CLASS_ROGUE:
             case CLASS_WARRIOR:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
                 break;
             case CLASS_DRUID:
-            case CLASS_SHAMAN:
             case CLASS_HUNTER:
+            case CLASS_SHAMAN:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
                 break;
-            case CLASS_DEATH_KNIGHT:
             case CLASS_NONE:
             default:
                 break;
