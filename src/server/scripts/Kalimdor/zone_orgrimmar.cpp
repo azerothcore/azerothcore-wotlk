@@ -259,7 +259,7 @@ public:
                             {
                                 if (p->IsAlive() && !p->IsGameMaster())
                                 {
-                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_RAZOR_HILL || p->GetAreaId() == AREA_CROSSROADS || p->GetAreaId() == AREA_CAMP_TAURAJO)
+                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_CROSSROADS)
                                     {
                                         p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
                                     }
