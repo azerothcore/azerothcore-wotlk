@@ -246,6 +246,7 @@ public:
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                 scheduler.Schedule(2s, [this](TaskContext /*context*/)
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_0);
