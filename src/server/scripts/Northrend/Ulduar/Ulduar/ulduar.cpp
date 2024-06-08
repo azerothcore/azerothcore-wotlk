@@ -21,6 +21,7 @@
 #include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "PassiveAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -51,7 +52,14 @@ enum Texts
     GOSSIP_MENU_CONFIRM         = 10333,
     NPC_TEXT_CONFIRM            = 14325,
 
-    SAY_KEEPER_SELECTED         = 1,
+    // Chosen
+    SAY_KEEPER_CHOSEN_TO_PLAYER = 0,
+    SAY_KEEPER_CHOSEN_ANNOUNCE  = 1,
+};
+
+enum UldActions
+{
+    ACTION_KEEPER_OUTRO         = 0,
 };
 
 enum UldNPCs
@@ -69,6 +77,8 @@ enum UldGameObjects
 
 enum UldSpells
 {
+    SPELL_SIMPLE_TELEPORT       = 12980,
+    SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615
 };
 
@@ -76,6 +86,68 @@ class npc_ulduar_keeper : public CreatureScript
 {
 public:
     npc_ulduar_keeper() : CreatureScript("npc_ulduar_keeper_gossip") { }
+
+    struct npc_ulduar_keeperAI : public NullCreatureAI
+    {
+        npc_ulduar_keeperAI(Creature* creature) : NullCreatureAI(creature) { }
+
+        void Reset() override
+        {
+            scheduler.Schedule(250ms, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_SIMPLE_TELEPORT);
+            });
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (param == ACTION_KEEPER_OUTRO)
+            {
+                switch (me->GetEntry())
+                {
+                    case NPC_FREYA_GOSSIP:
+                        _keeper = KEEPER_FREYA;
+                        break;
+                    case NPC_HODIR_GOSSIP:
+                        _keeper = KEEPER_HODIR;
+                        break;
+                    case NPC_MIMIRON_GOSSIP:
+                        _keeper = KEEPER_MIMIRON;
+                        break;
+                    case NPC_THORIM_GOSSIP:
+                        _keeper = KEEPER_THORIM;
+                        break;
+                    default:
+                        return;
+                }
+                scheduler.Schedule(1s, [this](TaskContext /*context*/)
+                {
+                    DoCastSelf(SPELL_KEEPER_TELEPORT);
+                });
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                me->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+    private:
+        uint8 _keeper;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetUlduarAI<npc_ulduar_keeperAI>(creature);
+    }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -109,7 +181,6 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        uint8 _keeper = 0;
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
@@ -118,34 +189,12 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
             {
-                switch (creature->GetEntry())
-                {
-                    case NPC_FREYA_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
-                        _keeper = KEEPER_FREYA;
-                        break;
-                    case NPC_HODIR_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
-                        _keeper = KEEPER_HODIR;
-                        break;
-                    case NPC_MIMIRON_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
-                        _keeper = KEEPER_MIMIRON;
-                        break;
-                    case NPC_THORIM_GOSSIP:
-                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
-                        _keeper = KEEPER_THORIM;
-                        break;
-                }
-
-                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 CloseGossipMenuFor(player);
 
-                if (creature->GetInstanceScript())
-                {
-                    creature->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
-                    creature->DespawnOrUnsummon(6000);
-                }
+                creature->AI()->Talk(SAY_KEEPER_CHOSEN_TO_PLAYER, player);
+                creature->AI()->Talk(SAY_KEEPER_CHOSEN_ANNOUNCE);
+                creature->AI()->DoAction(ACTION_KEEPER_OUTRO);
             }
         }
         return true;
@@ -496,33 +545,6 @@ public:
     }
 };
 
-class go_call_tram : public GameObjectScript
-{
-public:
-    go_call_tram() : GameObjectScript("go_call_tram") { }
-
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
-    {
-        InstanceScript* pInstance = go->GetInstanceScript();
-
-        if (!pInstance)
-            return false;
-
-        switch(go->GetEntry())
-        {
-            case 194914:
-            case 194438:
-                pInstance->SetData(DATA_CALL_TRAM, 0);
-                break;
-            case 194912:
-            case 194437:
-                pInstance->SetData(DATA_CALL_TRAM, 1);
-                break;
-        }
-        return true;
-    }
-};
-
 struct npc_salvaged_siege_engine : public VehicleAI
 {
     npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
@@ -560,7 +582,5 @@ void AddSC_ulduar()
     new npc_ulduar_arachnopod_destroyer();
     new spell_ulduar_arachnopod_damaged();
     new AreaTrigger_at_celestial_planetarium_enterance();
-    new go_call_tram();
-
     RegisterCreatureAI(npc_salvaged_siege_engine);
 }

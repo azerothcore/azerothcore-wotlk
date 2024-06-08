@@ -72,6 +72,7 @@ public:
     static WanderNode* FindInMapWPs(uint32 mapId, Creature const* creature);
     static WanderNode* FindInMapWPs(uint32 mapId, uint32 wpId);
     static WanderNode* FindInMapWPs(uint32 mapId, node_check_ftype_c const& pred);
+    static WanderNode* FindInZoneWPs(uint32 zoneId, node_check_ftype_c const& pred);
     static WanderNode* FindInAreaWPs(uint32 areaId, node_check_ftype_c const& pred);
 
     template<typename Container, typename Func>

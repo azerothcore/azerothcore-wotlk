@@ -165,6 +165,8 @@ class BotDataMgr
         static void LoadNpcBotGroupData();
         static void LoadNpcBotGearStorage();
 
+        static void DeleteOldLogs();
+
         static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
         static NpcBotData const* SelectNpcBotData(uint32 entry);
         static void UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType, void* data = nullptr);

@@ -3721,6 +3721,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && !m_triggeredByAuraSpell && m_caster->IsSitState())
     {
+        //npcbot
+        if (!m_originalCaster || m_caster == m_originalCaster)
+        //end npcbot
         m_caster->SetStandState(UNIT_STAND_STATE_STAND);
     }
 

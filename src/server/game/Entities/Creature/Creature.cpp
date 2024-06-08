@@ -61,6 +61,7 @@ CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType
 
 //npcbot
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botmgr.h"
 #include "bpet_ai.h"
 //end npcbot
@@ -1756,6 +1757,11 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         LOG_ERROR("sql.sql", "Creature (SpawnId: {}) not found in table `creature`, can't load. ", spawnId);
         return false;
     }
+
+    //npcbot
+    if (BotDataMgr::SelectNpcBotData(data->id1))
+        return false;
+    //end npcbot
 
     // xinef: this has to be assigned before Create function, properly loads equipment id from DB
     m_creatureData = data;
