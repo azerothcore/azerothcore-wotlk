@@ -665,45 +665,34 @@ public:
     };
 };
 
-class spell_kelthuzad_frost_blast : public SpellScriptLoader
+class spell_kelthuzad_frost_blast : public SpellScript
 {
-public:
-    spell_kelthuzad_frost_blast() : SpellScriptLoader("spell_kelthuzad_frost_blast") { }
+    PrepareSpellScript(spell_kelthuzad_frost_blast);
 
-    class spell_kelthuzad_frost_blast_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kelthuzad_frost_blast_SpellScript);
+        Unit* caster = GetCaster();
+        if (!caster || !caster->ToCreature())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        std::list<WorldObject*> tmplist;
+        for (auto& target : targets)
         {
-            Unit* caster = GetCaster();
-            if (!caster || !caster->ToCreature())
-                return;
-
-            std::list<WorldObject*> tmplist;
-            for (auto& target : targets)
+            if (!target->ToUnit()->HasAura(SPELL_FROST_BLAST))
             {
-                if (!target->ToUnit()->HasAura(SPELL_FROST_BLAST))
-                {
-                    tmplist.push_back(target);
-                }
-            }
-            targets.clear();
-            for (auto& itr : tmplist)
-            {
-                targets.push_back(itr);
+                tmplist.push_back(target);
             }
         }
-
-        void Register() override
+        targets.clear();
+        for (auto& itr : tmplist)
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kelthuzad_frost_blast_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+            targets.push_back(itr);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kelthuzad_frost_blast_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kelthuzad_frost_blast::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -748,7 +737,7 @@ void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
     new boss_kelthuzad_minion();
-    new spell_kelthuzad_frost_blast();
+    RegisterSpellScript(spell_kelthuzad_frost_blast);
     new spell_kelthuzad_detonate_mana();
 }
 
