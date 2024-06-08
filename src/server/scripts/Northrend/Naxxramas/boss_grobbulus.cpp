@@ -267,53 +267,42 @@ class spell_grobbulus_poison : public SpellScript
     }
 };
 
-class spell_grobbulus_mutating_injection : public SpellScriptLoader
+class spell_grobbulus_mutating_injection_aura : public AuraScript
 {
-    public:
-        spell_grobbulus_mutating_injection() : SpellScriptLoader("spell_grobbulus_mutating_injection") { }
+    PrepareAuraScript(spell_grobbulus_mutating_injection_aura);
 
-        class spell_grobbulus_mutating_injection_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        switch (GetTargetApplication()->GetRemoveMode())
         {
-            PrepareAuraScript(spell_grobbulus_mutating_injection_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
-            }
-
-            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                switch (GetTargetApplication()->GetRemoveMode())
+            case AURA_REMOVE_BY_ENEMY_SPELL:
+            case AURA_REMOVE_BY_EXPIRE:
+                if (auto caster = GetCaster())
                 {
-                    case AURA_REMOVE_BY_ENEMY_SPELL:
-                    case AURA_REMOVE_BY_EXPIRE:
-                        if (auto caster = GetCaster())
-                        {
-                            caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
-                        }
-                        break;
-                    default:
-                        return;
+                    caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
                 }
-            }
-
-            void Register() override
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_grobbulus_mutating_injection_AuraScript();
+                break;
+            default:
+                return;
         }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 void AddSC_boss_grobbulus()
 {
     new boss_grobbulus();
     new boss_grobbulus_poison_cloud();
-    new spell_grobbulus_mutating_injection();
+    RegisterSpellScript(spell_grobbulus_mutating_injection_aura);
     RegisterSpellScript(spell_grobbulus_poison);
 }
 
