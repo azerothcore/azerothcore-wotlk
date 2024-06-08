@@ -8,7 +8,7 @@ INSERT INTO `npc_text` (`ID`,`text0_0`,`VerifiedBuild`) VALUES
 (70675,'Stormwind','-1'),
 (70676,'Ironforge','-1'),
 (70677,'Darnassus','-1'),
-(70678,'Exordar','-1'),
+(70678,'Exodar','-1'),
 (70679,'Orgrimmar','-1'),
 (70680,'Undercity','-1'),
 (70681,'Thunder Bluff','-1'),

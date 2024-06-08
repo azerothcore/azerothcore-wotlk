@@ -73,8 +73,7 @@ all_schools_valid(School school, Schools... schools)
 }
 
 template<class...Schools>
-std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
-    std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>>
+std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>, std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>>
 CanAffectVictimSchools(Unit const* target, Schools... schools)
 {
     static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");

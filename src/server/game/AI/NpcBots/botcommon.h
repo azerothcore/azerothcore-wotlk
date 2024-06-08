@@ -13,6 +13,9 @@ NpcBot System by Trickerer (onlysuffering@gmail.com)
 Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
 */
 
+constexpr std::size_t MAX_BOT_LOG_PARAMS = 5;
+constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
+
 struct Position;
 
 typedef std::vector<std::pair<Position, float> > AoeSpotsVec;
@@ -93,6 +96,7 @@ enum BotCommonValues
     CREATURE_UK_SHADOW_AXE_H            = 31835,
     CREATURE_EOE_STATIC_FIELD           = 30592,
     CREATURE_ICC_OOZE_PUDDLE            = 37690,
+    GAMEOBJECT_HOT_COAL                 = 178164,
 //COMMON ENEMY CREATURES
     CREATURE_BOSS_EREGOS_N              = 27656,
     CREATURE_BOSS_EREGOS_H              = 31561,

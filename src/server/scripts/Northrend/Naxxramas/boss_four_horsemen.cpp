@@ -437,26 +437,9 @@ public:
     }
 };
 
-class spell_four_horsemen_consumption : public SpellScript
-{
-    PrepareSpellScript(spell_four_horsemen_consumption);
-
-    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-    {
-        uint32 damage = GetCaster()->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250;
-        SetHitDamage(damage);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_four_horsemen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
-
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();
     new spell_four_horsemen_mark();
-    RegisterSpellScript(spell_four_horsemen_consumption);
 }
 

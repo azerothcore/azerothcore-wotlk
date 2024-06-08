@@ -97,8 +97,9 @@ uint32 const availableChargeAurasAndSpells[3][2] = {
 
 Position const nordrassilPosition = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
-float const DOOMFIRE_OFFSET = 15.0f;
+float const DOOMFIRE_OFFSET = 25.0f;
 uint8 const WISP_OFFSET = 40;
+uint8 NEAR_POINT = 0;
 
 struct npc_ancient_wisp : public ScriptedAI
 {
@@ -144,77 +145,41 @@ struct npc_ancient_wisp : public ScriptedAI
             return;
 
     }
-
 private:
     InstanceScript* _instance;
 };
 
-//TODO: move to db?
-struct npc_doomfire : public ScriptedAI
+struct npc_doomfire_spirit : public ScriptedAI
 {
-    npc_doomfire(Creature* creature) : ScriptedAI(creature), _summons(me) { }
+    npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+    }
 
     void Reset() override
     {
-        _summons.DespawnAll();
+        scheduler.CancelAll();
+        ScheduleTimedEvent(0s, [&]{
+            if (Creature* archimonde = _instance->GetCreature(DATA_ARCHIMONDE))
+            {
+                Position randomNearPosition = archimonde->GetRandomNearPosition(200.0f);
+                me->GetMotionMaster()->MovePoint(NEAR_POINT, randomNearPosition);
+            }
+        }, 6s);
     }
 
-    void MoveInLineOfSight(Unit* /*who*/) override { }
-
-    void JustEngagedWith(Unit* /*who*/) override { }
-
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void UpdateAI(uint32 diff) override
     {
-        damage = 0;
-    }
+        scheduler.Update(diff);
 
-    void JustSummoned(Creature* summoned) override
-    {
-        _summons.Summon(summoned);
-        if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
-        {
-            me->GetMotionMaster()->MoveFollow(summoned, 0.0f, 0.0f);
-        }
+        if (!UpdateVictim())
+            return;
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
     }
 private:
-    SummonList _summons;
-};
-
-struct npc_doomfire_targetting : public ScriptedAI
-{
-    npc_doomfire_targetting(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        _chaseTarget = nullptr;
-        ScheduleTimedEvent(5s, [&]
-        {
-            if (_chaseTarget)
-            {
-                me->GetMotionMaster()->MoveFollow(_chaseTarget, 0.0f, 0.0f);
-            }
-            else
-            {
-                Position randomPosition = me->GetRandomNearPosition(40.0f);
-                me->GetMotionMaster()->MovePoint(0, randomPosition);
-            }
-        }, 5s);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->IsPlayer())
-        {
-            _chaseTarget = who;
-        }
-    }
-
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        damage = 0;
-    }
-private:
-    Unit* _chaseTarget;
+    InstanceScript* _instance;
 };
 
 struct boss_archimonde : public BossAI
@@ -256,6 +221,7 @@ struct boss_archimonde : public BossAI
         }
 
         ScheduleHealthCheckEvent(10, [&]{
+            scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
             DoCastProtection();
             Talk(SAY_ENRAGE);
@@ -326,14 +292,11 @@ struct boss_archimonde : public BossAI
         ScheduleTimedEvent(25s, 35s, [&]
         {
             Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST);
+            DoCastRandomTarget(SPELL_AIR_BURST, 0, 0.0f, true, false, false);
         }, 25s, 40s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-            {
-                DoCastDoomFire(target);
-            }
+            DoCastDoomFire();
         }, 20s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
@@ -379,6 +342,10 @@ struct boss_archimonde : public BossAI
                 DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
             }
         }, 3500ms);
+        ScheduleTimedEvent(10min, [&]
+        {
+            DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
+        }, 3500ms);
 
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
@@ -397,22 +364,22 @@ struct boss_archimonde : public BossAI
     {
         switch (player->getClass())
         {
-            case CLASS_PRIEST:
             case CLASS_PALADIN:
+            case CLASS_PRIEST:
             case CLASS_WARLOCK:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
                 break;
+            case CLASS_DEATH_KNIGHT:
             case CLASS_MAGE:
             case CLASS_ROGUE:
             case CLASS_WARRIOR:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
                 break;
             case CLASS_DRUID:
-            case CLASS_SHAMAN:
             case CLASS_HUNTER:
+            case CLASS_SHAMAN:
                 player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
                 break;
-            case CLASS_DEATH_KNIGHT:
             case CLASS_NONE:
             default:
                 break;
@@ -441,32 +408,40 @@ struct boss_archimonde : public BossAI
         {
             summoned->AI()->AttackStart(me);
         }
+        else if (summoned->GetEntry() == CREATURE_DOOMFIRE)
+        {
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
+            summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
+        }
+        else if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
+        {
+            Position randomPosition = summoned->GetRandomNearPosition(40.0f);
+            summoned->GetMotionMaster()->MovePoint(0, randomPosition);
+        }
         else
         {
             summoned->SetFaction(me->GetFaction()); //remove?
             summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
-
-        if (summoned->GetEntry() == CREATURE_DOOMFIRE)
-        {
-            summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
-            summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
-        }
     }
 
-    void DoCastDoomFire(Unit* target)
+    void DoCastDoomFire()
     {
         // hack because spell doesn't work?
         Talk(SAY_DOOMFIRE);
-        Position spiritPosition = { target->GetPositionX() + DOOMFIRE_OFFSET,  target->GetPositionY() + DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
-        Position doomfirePosition = { target->GetPositionX() - DOOMFIRE_OFFSET,  target->GetPositionY() - DOOMFIRE_OFFSET, target->GetPositionZ(), 0.0f };
-        if (Unit* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+        Position spiritPosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
+        Position doomfirePosition = me->GetRandomNearPosition(DOOMFIRE_OFFSET);
+        if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
-            if (Unit* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
+            if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
             {
                 doomfireSpirit->SetVisible(false);
                 doomfire->SetVisible(false);
+                doomfireSpirit->SetWalk(false);
+                doomfireSpirit->SetReactState(REACT_PASSIVE);
+                doomfire->SetReactState(REACT_PASSIVE);
+                doomfire->GetMotionMaster()->MoveFollow(doomfireSpirit, 0.0f, 0.0f);
             }
         }
     }
@@ -567,8 +542,7 @@ void AddSC_boss_archimonde()
     RegisterSpellScript(spell_hand_of_death);
     RegisterSpellScript(spell_finger_of_death);
     RegisterHyjalAI(boss_archimonde);
-    RegisterHyjalAI(npc_doomfire);
-    RegisterHyjalAI(npc_doomfire_targetting);
     RegisterHyjalAI(npc_ancient_wisp);
+    RegisterHyjalAI(npc_doomfire_spirit);
 }
 
