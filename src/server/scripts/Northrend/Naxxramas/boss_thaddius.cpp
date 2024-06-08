@@ -660,56 +660,45 @@ class spell_thaddius_pos_neg_charge : public SpellScript
     }
 };
 
-class spell_thaddius_polarity_shift : public SpellScriptLoader
+class spell_thaddius_polarity_shift : public SpellScript
 {
-public:
-    spell_thaddius_polarity_shift() : SpellScriptLoader("spell_thaddius_polarity_shift") { }
+    PrepareSpellScript(spell_thaddius_polarity_shift);
 
-    class spell_thaddius_polarity_shift_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_thaddius_polarity_shift_SpellScript);
+        return ValidateSpellInfo({ SPELL_POSITIVE_POLARITY, SPELL_NEGATIVE_POLARITY });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
+    void HandleDummy(SpellEffIndex /* effIndex */)
+    {
+        Unit* caster = GetCaster();
+        if (Unit* target = GetHitUnit())
         {
-            return ValidateSpellInfo({ SPELL_POSITIVE_POLARITY, SPELL_NEGATIVE_POLARITY });
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
+            target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, caster->GetGUID());
         }
+    }
 
-        void HandleDummy(SpellEffIndex /* effIndex */)
+    void HandleAfterCast()
+    {
+        if (GetCaster())
         {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
+            if (Creature* caster = GetCaster()->ToCreature())
             {
-                target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
-                target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
-                target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, caster->GetGUID());
-            }
-        }
-
-        void HandleAfterCast()
-        {
-            if (GetCaster())
-            {
-                if (Creature* caster = GetCaster()->ToCreature())
+                if (caster->GetEntry() == NPC_THADDIUS)
                 {
-                    if (caster->GetEntry() == NPC_THADDIUS)
-                    {
-                        caster->AI()->Talk(SAY_ELECT);
-                        caster->AI()->Talk(EMOTE_POLARITY_SHIFTED);
-                    }
+                    caster->AI()->Talk(SAY_ELECT);
+                    caster->AI()->Talk(EMOTE_POLARITY_SHIFTED);
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_thaddius_polarity_shift_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            AfterCast += SpellCastFn(spell_thaddius_polarity_shift_SpellScript::HandleAfterCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_thaddius_polarity_shift_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_thaddius_polarity_shift::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        AfterCast += SpellCastFn(spell_thaddius_polarity_shift::HandleAfterCast);
     }
 };
 
@@ -761,6 +750,6 @@ void AddSC_boss_thaddius()
     new boss_thaddius_summon();
     new npc_tesla();
     RegisterSpellScript(spell_thaddius_pos_neg_charge);
-    new spell_thaddius_polarity_shift();
+    RegisterSpellScript(spell_thaddius_polarity_shift);
     new at_thaddius_entrance();
 }
