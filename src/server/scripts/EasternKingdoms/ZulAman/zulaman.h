@@ -52,7 +52,7 @@ enum CreatureIds
 enum GameobjectIds
 {
     GO_DOOR_HALAZZI                     = 186303,
-    GO_GATE_ZULJIN                      = 186304,
+    GO_GATE_ZULJIN                      = 186306,
     GO_GATE_HEXLORD                     = 186305,
     GO_MASSIVE_GATE                     = 186728,
     GO_DOOR_AKILZON                     = 186858,
