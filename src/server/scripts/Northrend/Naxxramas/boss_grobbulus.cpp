@@ -240,41 +240,30 @@ public:
     };
 };
 
-class spell_grobbulus_poison : public SpellScriptLoader
+class spell_grobbulus_poison : public SpellScript
 {
-public:
-    spell_grobbulus_poison() : SpellScriptLoader("spell_grobbulus_poison") { }
+    PrepareSpellScript(spell_grobbulus_poison);
 
-    class spell_grobbulus_poison_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_grobbulus_poison_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        std::list<WorldObject*> tmplist;
+        for (auto& target : targets)
         {
-            std::list<WorldObject*> tmplist;
-            for (auto& target : targets)
+            if (GetCaster()->IsWithinDist3d(target, 0.0f))
             {
-                if (GetCaster()->IsWithinDist3d(target, 0.0f))
-                {
-                    tmplist.push_back(target);
-                }
-            }
-            targets.clear();
-            for (auto& itr : tmplist)
-            {
-                targets.push_back(itr);
+                tmplist.push_back(target);
             }
         }
-
-        void Register() override
+        targets.clear();
+        for (auto& itr : tmplist)
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            targets.push_back(itr);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_grobbulus_poison_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -325,6 +314,6 @@ void AddSC_boss_grobbulus()
     new boss_grobbulus();
     new boss_grobbulus_poison_cloud();
     new spell_grobbulus_mutating_injection();
-    new spell_grobbulus_poison();
+    RegisterSpellScript(spell_grobbulus_poison);
 }
 
