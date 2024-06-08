@@ -547,35 +547,17 @@ class spell_air_burst : public SpellScript
 {
     PrepareSpellScript(spell_air_burst);
 
-    void ModDest(SpellDestination& dest)
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (Unit* caster = GetCaster())
+        if (Unit* victim = GetCaster()->GetVictim())
         {
-            if (Unit* victim = caster->GetVictim())
-            {
-                ThreatContainer::StorageType const& threatList = caster->GetThreatMgr().GetThreatList();
-                uint8 threatListSize = threatList.size();
-                uint8 counter = 0;
-                uint8 randomChoice = urand(1, threatListSize);
-                for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                {
-                    if (counter == randomChoice)
-                    {
-                        if (Unit* unit = ObjectAccessor::GetUnit(*caster, (*i)->getUnitGuid()))
-                        {
-                            dest.Relocate(unit->GetPosition());
-                        }
-                    }
-                    ++counter;
-
-                }
-            }
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
     }
 
     void Register() override
     {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_air_burst::ModDest, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_air_burst::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
