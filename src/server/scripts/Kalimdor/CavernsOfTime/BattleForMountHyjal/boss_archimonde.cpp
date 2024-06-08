@@ -71,22 +71,12 @@ enum Summons
 
 enum Events
 {
-    EVENT_DRAIN_WORLD_TREE              = 1,
-    EVENT_SPELL_FEAR                    = 2,
-    EVENT_SPELL_AIR_BURST               = 3,
-    EVENT_SPELL_GRIP_OF_THE_LEGION      = 4,
-    EVENT_SPELL_UNLEASH_SOUL_CHARGES    = 5,
-    EVENT_SPELL_DOOMFIRE                = 6,
-    EVENT_SPELL_FINGER_OF_DEATH         = 7,
-    EVENT_SPELL_HAND_OF_DEATH           = 8,
-    EVENT_SPELL_PROTECTION_OF_ELUNE     = 9,
-    EVENT_ENRAGE                        = 10,
-    EVENT_CHECK_WORLD_TREE_DISTANCE     = 11,    // Enrage if too close to the tree
-    EVENT_BELOW_10_PERCENT_HP           = 12,
-    EVENT_SUMMON_WISPS                  = 13,
-    EVENT_TOO_CLOSE_TO_WORLD_TREE       = 14,
-    EVENT_ENRAGE_ROOT                   = 15,
-    EVENT_SPELL_FINGER_OF_DEATH_PHASE_4 = 16
+    EVENT_ENRAGE = 0
+};
+
+enum SpellGroups
+{
+    GROUP_FEAR  = 0
 };
 
 uint32 const availableChargeAurasAndSpells[3][2] = {
@@ -303,17 +293,14 @@ struct boss_archimonde : public BossAI
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
         {
+            scheduler.DelayGroup(GROUP_FEAR, 5s);
             Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST, 0, 0.0f, true, false, false);
+            DoCastAOE(SPELL_AIR_BURST);
         }, 25s, 40s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
             DoCastDoomFire();
         }, 20s);
-        ScheduleTimedEvent(25s, 35s, [&]
-        {
-            DoCastVictim(SPELL_FEAR);
-        }, 42s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
             DoCastRandomTarget(SPELL_GRIP_OF_THE_LEGION);
@@ -356,9 +343,14 @@ struct boss_archimonde : public BossAI
         }, 3500ms);
         ScheduleTimedEvent(10min, [&]
         {
-            DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
-        }, 3500ms);
-
+            DoCastVictim(SPELL_RED_SKY_EFFECT);
+            DoCastVictim(SPELL_HAND_OF_DEATH);
+        }, 3s);
+        scheduler.Schedule(25s, 35s, GROUP_FEAR, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FEAR);
+            context.Repeat(42s);
+        });
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
 
@@ -551,11 +543,30 @@ class spell_hand_of_death : public SpellScript
     }
 };
 
+class spell_air_burst : public SpellScript
+{
+    PrepareSpellScript(spell_air_burst);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* victim = GetCaster()->GetVictim())
+        {
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_air_burst::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
     RegisterSpellScript(spell_hand_of_death);
     RegisterSpellScript(spell_finger_of_death);
+    RegisterSpellScript(spell_air_burst);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);
     RegisterHyjalAI(npc_doomfire_spirit);
