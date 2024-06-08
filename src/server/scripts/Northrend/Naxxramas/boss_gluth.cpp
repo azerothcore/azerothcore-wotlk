@@ -237,50 +237,39 @@ public:
     };
 };
 
-class spell_gluth_decimate : public SpellScriptLoader
+class spell_gluth_decimate : public SpellScript
 {
-public:
-    spell_gluth_decimate() : SpellScriptLoader("spell_gluth_decimate") { }
+    PrepareSpellScript(spell_gluth_decimate);
 
-    class spell_gluth_decimate_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_gluth_decimate_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        if (Unit* unitTarget = GetHitUnit())
         {
-            if (Unit* unitTarget = GetHitUnit())
+            int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
+            if (damage <= 0)
+                return;
+
+            if (Creature* cTarget = unitTarget->ToCreature())
             {
-                int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
-                if (damage <= 0)
-                    return;
-
-                if (Creature* cTarget = unitTarget->ToCreature())
-                {
-                    cTarget->SetWalk(true);
-                    cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-                    cTarget->SetReactState(REACT_PASSIVE);
-                    Unit::DealDamage(GetCaster(), cTarget, damage);
-                    return;
-                }
-                GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
+                cTarget->SetWalk(true);
+                cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                cTarget->SetReactState(REACT_PASSIVE);
+                Unit::DealDamage(GetCaster(), cTarget, damage);
+                return;
             }
+            GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gluth_decimate_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_gluth()
 {
     new boss_gluth();
-    new spell_gluth_decimate();
+    RegisterSpellScript(spell_gluth_decimate);
 }
 
