@@ -2108,6 +2108,17 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
 {
     PrepareAuraScript(spell_mimiron_rapid_burst_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_RAPID_BURST_DAMAGE_10_1,
+                SPELL_RAPID_BURST_DAMAGE_10_2,
+                SPELL_RAPID_BURST_DAMAGE_25_1,
+                SPELL_RAPID_BURST_DAMAGE_25_2
+            });
+    }
+
     void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
         if (Unit* caster = GetCaster())
@@ -2123,57 +2134,53 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     }
 };
 
-class spell_mimiron_p3wx2_laser_barrage : public SpellScriptLoader
+enum p3wx2LaserBarrage
 {
-public:
-    spell_mimiron_p3wx2_laser_barrage() : SpellScriptLoader("spell_mimiron_p3wx2_laser_barrage") { }
+    SPELL_P3WX2_LASER_BARRAGE_1 = 63297,
+    SPELL_P3WX2_LASER_BARRAGE_2 = 64042
+};
 
-    class spell_mimiron_p3wx2_laser_barrage_AuraScript : public AuraScript
+class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
+{
+    PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_aura);
+
+    bool Load() override
     {
-        PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_AuraScript)
-
-        uint32 lastMSTime;
-        float lastOrientation;
-
-        bool Load() override
-        {
-            lastMSTime = GameTime::GetGameTimeMS().count();
-            lastOrientation = -1.0f;
-            return true;
-        }
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* c = GetCaster())
-            {
-                if (c->GetTypeId() != TYPEID_UNIT)
-                    return;
-                uint32 diff = getMSTimeDiff(lastMSTime, GameTime::GetGameTimeMS().count());
-                if (lastOrientation == -1.0f)
-                {
-                    lastOrientation = (c->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
-                    diff = 0;
-                }
-                float new_o = Position::NormalizeOrientation(lastOrientation - (M_PI / 60) * (diff / 250.0f));
-                lastMSTime = GameTime::GetGameTimeMS().count();
-                lastOrientation = new_o;
-                c->SetFacingTo(new_o);
-
-                c->CastSpell((Unit*)nullptr, 63297, true);
-                c->CastSpell((Unit*)nullptr, 64042, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_mimiron_p3wx2_laser_barrage_AuraScript();
+        _lastMSTime = GameTime::GetGameTimeMS().count();
+        _lastOrientation = -1.0f;
+        return true;
     }
+
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->GetTypeId() != TYPEID_UNIT)
+                return;
+            uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
+            if (_lastOrientation == -1.0f)
+            {
+                _lastOrientation = (caster->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
+                diff = 0;
+            }
+            float new_o = Position::NormalizeOrientation(_lastOrientation - (M_PI / 60) * (diff / 250.0f));
+            _lastMSTime = GameTime::GetGameTimeMS().count();
+            _lastOrientation = new_o;
+            caster->SetFacingTo(new_o);
+
+            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_1, true);
+            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_2, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    uint32 _lastMSTime;
+    float _lastOrientation;
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
@@ -2508,7 +2515,7 @@ void AddSC_boss_mimiron()
     new npc_ulduar_magnetic_core();
     new npc_ulduar_bot_summon_trigger();
     RegisterSpellScript(spell_mimiron_rapid_burst_aura);
-    new spell_mimiron_p3wx2_laser_barrage();
+    RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
     new npc_ulduar_flames_spread();
