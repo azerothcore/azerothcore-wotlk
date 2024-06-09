@@ -473,53 +473,65 @@ class spell_ignis_grab_initial : public SpellScript
     }
 };
 
-class spell_ignis_slag_pot : public SpellScriptLoader
+enum SlagPot
 {
-public:
-    spell_ignis_slag_pot() : SpellScriptLoader("spell_ignis_slag_pot") { }
+    SPELL_SLAG_POT_DAMAGE_1 = 65722,
+    SPELL_SLAG_POT_DAMAGE_2 = 65723,
+    SPELL_SCORCH_DAMAGE_1   = 62549,
+    SPELL_SCORCH_DAMAGE_2   = 63475,
+    SPELL_SLAG_IMBUED_1     = 62836,
+    SPELL_SLAG_IMBUED_2     = 63536
+};
 
-    class spell_ignis_slag_pot_AuraScript : public AuraScript
+class spell_ignis_slag_pot_aura : public AuraScript
+{
+    PrepareAuraScript(spell_ignis_slag_pot_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ignis_slag_pot_AuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* c = GetCaster())
-                if (Unit* t = GetTarget())
-                    c->CastSpell(t, (GetId() == 62717 ? 65722 : 65723), true);
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* t = GetTarget())
+        return ValidateSpellInfo(
             {
-                t->ApplySpellImmune(GetId(), IMMUNITY_ID, 62549, true);
-                t->ApplySpellImmune(GetId(), IMMUNITY_ID, 63475, true);
-            }
-        }
+                SPELL_SLAG_POT_DAMAGE_1,
+                SPELL_SLAG_POT_DAMAGE_2,
+                SPELL_SCORCH_DAMAGE_1,
+                SPELL_SCORCH_DAMAGE_2,
+                SPELL_SLAG_IMBUED_1,
+                SPELL_SLAG_IMBUED_2
+            });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* t = GetTarget())
-            {
-                t->ApplySpellImmune(GetId(), IMMUNITY_ID, 62549, false);
-                t->ApplySpellImmune(GetId(), IMMUNITY_ID, 63475, false);
-                if (t->IsAlive())
-                    t->CastSpell(t, (GetId() == 62717 ? 62836 : 63536), true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_slag_pot_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectApply += AuraEffectApplyFn(spell_ignis_slag_pot_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_ignis_slag_pot_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_ignis_slag_pot_AuraScript();
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
+                caster->CastSpell(target, (GetId() == SPELL_SLAG_POT_10 ? SPELL_SLAG_POT_DAMAGE_1 : SPELL_SLAG_POT_DAMAGE_2), true);
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_1, true);
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_2, true);
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_1, false);
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_2, false);
+            if (target->IsAlive())
+                target->CastSpell(target, (GetId() == SPELL_SLAG_POT_10 ? SPELL_SLAG_IMBUED_1 : SPELL_SLAG_IMBUED_2), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_slag_pot_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_ignis_slag_pot_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_ignis_slag_pot_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -542,6 +554,6 @@ void AddSC_boss_ignis()
     new npc_ulduar_iron_construct();
     RegisterSpellScript(spell_ignis_scorch_aura);
     RegisterSpellScript(spell_ignis_grab_initial);
-    new spell_ignis_slag_pot();
+    RegisterSpellScript(spell_ignis_slag_pot_aura);
     new achievement_ignis_shattered();
 }
