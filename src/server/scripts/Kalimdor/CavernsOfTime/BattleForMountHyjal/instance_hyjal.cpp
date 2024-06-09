@@ -256,41 +256,7 @@ public:
 
         void ResetWaves(uint8 type)
         {
-            if (GetBossState(DATA_ANETHERON) != DONE)
-            {
-                for (ObjectGuid const& guid : _baseAlliance)
-                    if (Creature* creature = instance->GetCreature(guid))
-                        creature->DespawnOrUnsummon(0s, 300s);
-            }
 
-            if (GetBossState(DATA_AZGALOR) != DONE)
-            {
-                for (ObjectGuid const& guid : _baseHorde)
-                    if (Creature* creature = instance->GetCreature(guid))
-                        creature->DespawnOrUnsummon(0s, 300s);
-            }
-
-            for (ObjectGuid const& guid : _baseNightElf)
-                if (Creature* creature = instance->GetCreature(guid))
-                    creature->DespawnOrUnsummon(0s, 300s);
-
-            if (type == DATA_RESET_NIGHT_ELF)
-                if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
-                    archimonde->DespawnOrUnsummon(0s, 300s);
-
-            for (ObjectGuid const& guid : _encounterNPCs)
-                if (Creature* creature = instance->GetCreature(guid))
-                    creature->DespawnOrUnsummon();
-
-            // also force despawn boss summons
-            for (ObjectGuid const& guid : _summonedNPCs)
-                if (Creature* creature = instance->GetCreature(guid))
-                    creature->DespawnOrUnsummon();
-
-            if (_bossWave && (GetBossState(_bossWave) != DONE))
-                SetBossState(_bossWave, NOT_STARTED);
-
-            SetData(DATA_RESET_WAVES, 0);
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -453,10 +419,43 @@ public:
                     }
                 }
                     break;
+                case DATA_RESET_NIGHT_ELF:
+                    if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
+                        archimonde->DespawnOrUnsummon(0s, 300s);
+                    [[fallthrough]];
                 case DATA_RESET_ALLIANCE:
                 case DATA_RESET_HORDE:
-                case DATA_RESET_NIGHT_ELF:
-                    ResetWaves(type);
+                    if (GetBossState(DATA_ANETHERON) != DONE)
+                    {
+                        for (ObjectGuid const& guid : _baseAlliance)
+                            if (Creature* creature = instance->GetCreature(guid))
+                                creature->DespawnOrUnsummon(0s, 300s);
+                    }
+
+                    if (GetBossState(DATA_AZGALOR) != DONE)
+                    {
+                        for (ObjectGuid const& guid : _baseHorde)
+                            if (Creature* creature = instance->GetCreature(guid))
+                                creature->DespawnOrUnsummon(0s, 300s);
+                    }
+
+                    for (ObjectGuid const& guid : _baseNightElf)
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon(0s, 300s);
+
+                    for (ObjectGuid const& guid : _encounterNPCs)
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
+
+                    // also force despawn boss summons
+                    for (ObjectGuid const& guid : _summonedNPCs)
+                        if (Creature* creature = instance->GetCreature(guid))
+                            creature->DespawnOrUnsummon();
+
+                    if (_bossWave && (GetBossState(_bossWave) != DONE))
+                        SetBossState(_bossWave, NOT_STARTED);
+
+                    SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_WAVES:
                     scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
