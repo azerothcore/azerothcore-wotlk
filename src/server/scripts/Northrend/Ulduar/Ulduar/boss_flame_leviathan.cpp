@@ -1476,62 +1476,51 @@ class spell_load_into_catapult_aura : public AuraScript
     }
 };
 
-class spell_auto_repair : public SpellScriptLoader
+enum AutoRepair
 {
-    enum Spells
+    SPELL_AUTO_REPAIR = 62705,
+};
+
+class spell_auto_repair : public SpellScript
+{
+    PrepareSpellScript(spell_auto_repair);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        SPELL_AUTO_REPAIR = 62705,
-    };
+        std::list<WorldObject*> tmplist;
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if (!(*itr)->ToUnit()->HasAura(SPELL_AUTO_REPAIR))
+                tmplist.push_back(*itr);
 
-public:
-    spell_auto_repair() : SpellScriptLoader("spell_auto_repair") {}
+        targets.clear();
+        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
+            targets.push_back(*itr);
+    }
 
-    class spell_auto_repair_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*eff*/)
     {
-        PrepareSpellScript(spell_auto_repair_SpellScript);
+        Vehicle* vehicle = GetHitUnit()->GetVehicleKit();
+        if (!vehicle)
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if (!(*itr)->ToUnit()->HasAura(SPELL_AUTO_REPAIR))
-                    tmplist.push_back(*itr);
+        Unit* driver = vehicle->GetPassenger(0);
+        if (!driver)
+            return;
 
-            targets.clear();
-            for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                targets.push_back(*itr);
-        }
+        //driver->TextEmote(VEHICLE_EMOTE_REPAIR, driver, true); // No source
 
-        void HandleScript(SpellEffIndex /*eff*/)
-        {
-            Vehicle* vehicle = GetHitUnit()->GetVehicleKit();
-            if (!vehicle)
-                return;
+        // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
+        vehicle->GetBase()->SetFullHealth();
 
-            Unit* driver = vehicle->GetPassenger(0);
-            if (!driver)
-                return;
+        // Achievement
+        if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
+            instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+    }
 
-            //driver->TextEmote(VEHICLE_EMOTE_REPAIR, driver, true); // No source
-
-            // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
-            vehicle->GetBase()->SetFullHealth();
-
-            // Achievement
-            if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
-                instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auto_repair_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_auto_repair_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_auto_repair_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auto_repair::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_auto_repair::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2138,7 +2127,7 @@ void AddSC_boss_flame_leviathan()
 
     // Spells
     RegisterSpellScript(spell_load_into_catapult_aura);
-    new spell_auto_repair();
+    RegisterSpellScript(spell_auto_repair);
     new spell_systems_shutdown();
     new spell_pursue();
     new spell_vehicle_throw_passenger();
