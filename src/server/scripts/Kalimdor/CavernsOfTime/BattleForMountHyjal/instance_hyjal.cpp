@@ -198,6 +198,8 @@ public:
                     break;
                 case NPC_TOWERING_INFERNAL:
                 case NPC_LESSER_DOOMGUARD:
+                case NPC_DIRE_WOLF:
+                case NPC_GUARDIAN_ELEMENTAL:
                     if (creature->IsSummon())
                     {
                         _summonedNPCs.insert(creature->GetGUID());
