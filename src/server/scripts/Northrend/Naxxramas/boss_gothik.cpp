@@ -692,6 +692,11 @@ class spell_gothik_shadow_bolt_volley : public SpellScript
 {
     PrepareSpellScript(spell_gothik_shadow_bolt_volley);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_MARK });
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(Acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
