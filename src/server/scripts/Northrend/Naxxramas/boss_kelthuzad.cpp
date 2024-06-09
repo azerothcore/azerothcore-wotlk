@@ -669,6 +669,11 @@ class spell_kelthuzad_frost_blast : public SpellScript
 {
     PrepareSpellScript(spell_kelthuzad_frost_blast);
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FROST_BLAST });
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         Unit* caster = GetCaster();
