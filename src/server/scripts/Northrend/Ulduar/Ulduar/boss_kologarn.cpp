@@ -788,53 +788,37 @@ class spell_ulduar_squeezed_lifeless : public SpellScript
     }
 };
 
-class spell_kologarn_stone_shout : public SpellScriptLoader
+class spell_kologarn_stone_shout : public SpellScript
 {
-public:
-    spell_kologarn_stone_shout() :  SpellScriptLoader("spell_kologarn_stone_shout") { }
+    PrepareSpellScript(spell_kologarn_stone_shout);
 
-    class spell_kologarn_stone_shout_AuraScript : public AuraScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareAuraScript(spell_kologarn_stone_shout_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            uint32 triggerSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, triggerSpellId, false);
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_kologarn_stone_shout_AuraScript();
+        targets.remove_if (PlayerOrPetCheck());
     }
 
-    class spell_kologarn_stone_shout_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_kologarn_stone_shout_SpellScript);
+        if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if (PlayerOrPetCheck());
-        }
+class spell_kologarn_stone_shout_aura : public AuraScript
+{
+    PrepareAuraScript(spell_kologarn_stone_shout_aura);
 
-        void Register() override
-        {
-            if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_kologarn_stone_shout_SpellScript();
+        uint32 triggerSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, triggerSpellId, false);
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -898,7 +882,7 @@ void AddSC_boss_kologarn()
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     RegisterSpellScript(spell_ulduar_stone_grip_aura);
     RegisterSpellScript(spell_ulduar_squeezed_lifeless);
-    new spell_kologarn_stone_shout();
+    RegisterSpellAndAuraScriptPair(spell_kologarn_stone_shout, spell_kologarn_stone_shout_aura);
 
     // Achievements
     new achievement_kologarn_looks_could_kill();
