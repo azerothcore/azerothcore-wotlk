@@ -2273,6 +2273,11 @@ class spell_yogg_saron_malady_of_the_mind_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_malady_of_the_mind_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEATH_RAY_DAMAGE_REAL, SPELL_MALADY_OF_THE_MIND_TRIGGER });
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         GetUnitOwner()->ApplySpellImmune(SPELL_DEATH_RAY_DAMAGE_REAL, IMMUNITY_ID, SPELL_DEATH_RAY_DAMAGE_REAL, true);
@@ -2317,6 +2322,11 @@ class spell_yogg_saron_brain_link : public SpellScript
 class spell_yogg_saron_brain_link_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_brain_link_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BRAIN_LINK_DAMAGE, SPELL_BRAIN_LINK_OK });
+    }
 
     void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
@@ -2410,6 +2420,11 @@ class spell_yogg_saron_destabilization_matrix : public SpellScript
 {
     PrepareSpellScript(spell_yogg_saron_destabilization_matrix);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DESTABILIZATION_MATRIX_ATTACK });
+    }
+
     void HandleDummyEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
@@ -2501,6 +2516,11 @@ class spell_yogg_saron_protective_gaze_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_protective_gaze_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HODIR_FLASH_FREEZE });
+    }
+
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // Set absorbtion amount to unlimited
@@ -2530,6 +2550,11 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_empowered_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_EMPOWERED, SPELL_WEAKENED });
+    }
+
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
         Unit* target = GetUnitOwner();
@@ -2557,6 +2582,11 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 class spell_yogg_saron_insane_periodic_trigger : public SpellScript
 {
     PrepareSpellScript(spell_yogg_saron_insane_periodic_trigger);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_INSANE1, SPELL_INSANE2 });
+    }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
     {
@@ -2740,31 +2770,31 @@ class spell_yogg_saron_sanity_reduce : public SpellScript
 };
 
 // 64467 - Empowering Shadows
-class spell_yogg_saron_empowering_shadows : public SpellScriptLoader
+enum EmpoweringShadows
 {
-public:
-    spell_yogg_saron_empowering_shadows() : SpellScriptLoader("spell_yogg_saron_empowering_shadows") { }
+    SPELL_EMPOWERING_SHADOWS_HEAL_10 = 64468,
+    SPELL_EMPOWERING_SHADOWS_HEAL_25 = 64486
+};
 
-    class spell_yogg_saron_empowering_shadows_SpellScript : public SpellScript
+class spell_yogg_saron_empowering_shadows : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_empowering_shadows);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_yogg_saron_empowering_shadows_SpellScript);
+        return ValidateSpellInfo({ SPELL_EMPOWERING_SHADOWS_HEAL_10, SPELL_EMPOWERING_SHADOWS_HEAL_25 });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, target->GetMap()->Is25ManRaid() ? 64486 : 64468, true); // SPELL_EMPOWERING_SHADOWS_HEAL
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_empowering_shadows_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_yogg_saron_empowering_shadows_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, target->GetMap()->Is25ManRaid() ? SPELL_EMPOWERING_SHADOWS_HEAL_25 : SPELL_EMPOWERING_SHADOWS_HEAL_10, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_empowering_shadows::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2977,7 +3007,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);
-    new spell_yogg_saron_empowering_shadows();
+    RegisterSpellScript(spell_yogg_saron_empowering_shadows);
     new spell_yogg_saron_in_the_maws_of_the_old_god();
     new spell_yogg_saron_target_selectors();
     new spell_yogg_saron_grim_reprisal();
