@@ -1607,55 +1607,44 @@ public:
     }
 };
 
-class spell_pursue : public SpellScriptLoader
+class spell_pursue : public SpellScript
 {
-public:
-    spell_pursue() : SpellScriptLoader("spell_pursue") {}
+    PrepareSpellScript(spell_pursue);
 
-    class spell_pursue_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_pursue_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.remove_if(FlameLeviathanPursuedTargetSelector());
+        if (targets.empty())
         {
-            targets.remove_if(FlameLeviathanPursuedTargetSelector());
-            if (targets.empty())
-            {
-                if (Creature* caster = GetCaster()->ToCreature())
-                    caster->AI()->EnterEvadeMode();
-            }
-            else
-            {
-                //! In the end, only one target should be selected
-                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                if (_target)
-                    targets.push_back(_target);
-            }
+            if (Creature* caster = GetCaster()->ToCreature())
+                caster->AI()->EnterEvadeMode();
         }
-
-        void HandleScript(SpellEffIndex /*eff*/)
+        else
         {
-            Creature* target = GetHitCreature();
-            Unit* caster = GetCaster();
-            if (!target || !caster)
-                return;
-
-            caster->GetThreatMgr().ResetAllThreat();
-            caster->GetAI()->AttackStart(target);    // Chase target
-            caster->AddThreat(target, 10000000.0f);
+            //! In the end, only one target should be selected
+            WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            if (_target)
+                targets.push_back(_target);
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pursue_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_pursue_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*eff*/)
     {
-        return new spell_pursue_SpellScript();
+        Creature* target = GetHitCreature();
+        Unit* caster = GetCaster();
+        if (!target || !caster)
+            return;
+
+        caster->GetThreatMgr().ResetAllThreat();
+        caster->GetAI()->AttackStart(target);    // Chase target
+        caster->AddThreat(target, 10000000.0f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pursue::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_pursue::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -2128,7 +2117,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_load_into_catapult_aura);
     RegisterSpellScript(spell_auto_repair);
     RegisterSpellScript(spell_systems_shutdown_aura);
-    new spell_pursue();
+    RegisterSpellScript(spell_pursue);
     new spell_vehicle_throw_passenger();
     new spell_tar_blaze();
     new spell_vehicle_grab_pyrite();
