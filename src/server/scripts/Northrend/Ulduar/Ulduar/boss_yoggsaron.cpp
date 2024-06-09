@@ -2474,36 +2474,25 @@ class spell_yogg_saron_titanic_storm : public SpellScript
 };
 
 // 64164, 64168 - Lunatic Gaze
-class spell_yogg_saron_lunatic_gaze : public SpellScriptLoader
+class spell_yogg_saron_lunatic_gaze : public SpellScript
 {
-public:
-    spell_yogg_saron_lunatic_gaze() : SpellScriptLoader("spell_yogg_saron_lunatic_gaze") { }
+    PrepareSpellScript(spell_yogg_saron_lunatic_gaze);
 
-    class spell_yogg_saron_lunatic_gaze_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_yogg_saron_lunatic_gaze_SpellScript);
+        std::list<WorldObject*> tmplist;
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if ((*itr)->HasInArc(M_PI, GetCaster()))
+                tmplist.push_back(*itr);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->HasInArc(M_PI, GetCaster()))
-                    tmplist.push_back(*itr);
+        targets.clear();
+        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
+            targets.push_back(*itr);
+    }
 
-            targets.clear();
-            for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                targets.push_back(*itr);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_lunatic_gaze_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_lunatic_gaze_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_lunatic_gaze::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3034,7 +3023,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_shadow_beacon_aura);
     RegisterSpellScript(spell_yogg_saron_destabilization_matrix);
     RegisterSpellScript(spell_yogg_saron_titanic_storm);
-    new spell_yogg_saron_lunatic_gaze();
+    RegisterSpellScript(spell_yogg_saron_lunatic_gaze);
     new spell_yogg_saron_protective_gaze();
     new spell_yogg_saron_empowered();
     new spell_yogg_saron_insane_periodic_trigger();
