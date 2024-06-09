@@ -2590,29 +2590,18 @@ class spell_yogg_saron_insane_periodic_trigger : public SpellScript
 };
 
 // 63120 - Insane
-class spell_yogg_saron_insane : public SpellScriptLoader
+class spell_yogg_saron_insane_aura : public AuraScript
 {
-public:
-    spell_yogg_saron_insane() : SpellScriptLoader("spell_yogg_saron_insane") { }
+    PrepareAuraScript(spell_yogg_saron_insane_aura);
 
-    class spell_yogg_saron_insane_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_yogg_saron_insane_AuraScript);
+        Unit::Kill(GetUnitOwner(), GetUnitOwner());
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit::Kill(GetUnitOwner(), GetUnitOwner());
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_insane_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_insane_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_insane_aura::OnRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2994,7 +2983,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_protective_gaze_aura);
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
     RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
-    new spell_yogg_saron_insane();
+    RegisterSpellScript(spell_yogg_saron_insane_aura);
     new spell_yogg_saron_sanity_well();
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     new spell_yogg_saron_sanity_reduce();
