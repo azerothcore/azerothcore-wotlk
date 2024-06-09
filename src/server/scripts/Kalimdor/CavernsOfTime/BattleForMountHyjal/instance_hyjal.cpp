@@ -256,26 +256,27 @@ public:
 
         void ResetWaves(uint8 type)
         {
-            if (type == DATA_RESET_HORDE)
+            if (GetBossState(DATA_ANETHERON) != DONE)
+            {
+                for (ObjectGuid const& guid : _baseAlliance)
+                    if (Creature* creature = instance->GetCreature(guid))
+                        creature->DespawnOrUnsummon(0s, 300s);
+            }
+
+            if (GetBossState(DATA_AZGALOR) != DONE)
             {
                 for (ObjectGuid const& guid : _baseHorde)
                     if (Creature* creature = instance->GetCreature(guid))
                         creature->DespawnOrUnsummon(0s, 300s);
             }
-            else if (type == DATA_RESET_ALLIANCE)
-            {
-                for (ObjectGuid const& guid : _baseAlliance)
-                    if (Creature* creature = instance->GetCreature(guid))
-                        creature->DespawnOrUnsummon(0s, 300s);
-            } else
-            {
-                for (ObjectGuid const& guid : _baseNightElf)
-                    if (Creature* creature = instance->GetCreature(guid))
-                        creature->DespawnOrUnsummon(0s, 300s);
 
+            for (ObjectGuid const& guid : _baseNightElf)
+                if (Creature* creature = instance->GetCreature(guid))
+                    creature->DespawnOrUnsummon(0s, 300s);
+
+            if (type == DATA_RESET_NIGHT_ELF)
                 if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
                     archimonde->DespawnOrUnsummon(0s, 300s);
-            }
 
             for (ObjectGuid const& guid : _encounterNPCs)
                 if (Creature* creature = instance->GetCreature(guid))
