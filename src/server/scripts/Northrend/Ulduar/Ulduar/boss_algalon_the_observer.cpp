@@ -1192,41 +1192,30 @@ public:
     }
 };
 
-class spell_algalon_phase_punch : public SpellScriptLoader
+class spell_algalon_phase_punch_aura : public AuraScript
 {
-public:
-    spell_algalon_phase_punch() : SpellScriptLoader("spell_algalon_phase_punch") { }
+    PrepareAuraScript(spell_algalon_phase_punch_aura);
 
-    class spell_algalon_phase_punch_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_algalon_phase_punch_AuraScript);
+        PreventDefaultAction();
+        if (GetStackAmount() != 1)
+            GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 2]);
+        GetTarget()->CastSpell(GetTarget(), PhasePunchAlphaId[GetStackAmount() - 1], TRIGGERED_FULL_MASK);
+        if (GetStackAmount() == 5)
+            Remove(AURA_REMOVE_BY_DEFAULT);
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (GetStackAmount() != 1)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 2]);
-            GetTarget()->CastSpell(GetTarget(), PhasePunchAlphaId[GetStackAmount() - 1], TRIGGERED_FULL_MASK);
-            if (GetStackAmount() == 5)
-                Remove(AURA_REMOVE_BY_DEFAULT);
-        }
-
-        void OnRemove(AuraEffect const*, AuraEffectHandleModes)
-        {
-            if (GetStackAmount() != 5)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 1]);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_phase_punch_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_algalon_phase_punch_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const*, AuraEffectHandleModes)
     {
-        return new spell_algalon_phase_punch_AuraScript();
+        if (GetStackAmount() != 5)
+            GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 1]);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_phase_punch_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_algalon_phase_punch_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1470,7 +1459,7 @@ void AddSC_boss_algalon_the_observer()
     new go_celestial_planetarium_access();
 
     // Spells
-    new spell_algalon_phase_punch();
+    RegisterSpellScript(spell_algalon_phase_punch_aura);
     new spell_algalon_collapse();
     new spell_algalon_trigger_3_adds();
     new spell_algalon_cosmic_smash_damage();
