@@ -753,30 +753,19 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
     }
 };
 
-class spell_ulduar_stone_grip : public SpellScriptLoader
+class spell_ulduar_stone_grip_aura : public AuraScript
 {
-public:
-    spell_ulduar_stone_grip() : SpellScriptLoader("spell_ulduar_stone_grip") { }
+    PrepareAuraScript(spell_ulduar_stone_grip_aura);
 
-    class spell_ulduar_stone_grip_AuraScript : public AuraScript
+    void OnRemoveStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_ulduar_stone_grip_AuraScript);
+        if (Player* owner = GetOwner()->ToPlayer())
+            owner->RemoveAurasDueToSpell(aurEff->GetAmount());
+    }
 
-        void OnRemoveStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* owner = GetOwner()->ToPlayer())
-                owner->RemoveAurasDueToSpell(aurEff->GetAmount());
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_ulduar_stone_grip_AuraScript::OnRemoveStun, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_ulduar_stone_grip_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_ulduar_stone_grip_aura::OnRemoveStun, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -918,7 +907,7 @@ void AddSC_boss_kologarn()
 
     // Spells
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
-    new spell_ulduar_stone_grip();
+    RegisterSpellScript(spell_ulduar_stone_grip_aura);
     new spell_ulduar_squeezed_lifeless();
     new spell_kologarn_stone_shout();
 
