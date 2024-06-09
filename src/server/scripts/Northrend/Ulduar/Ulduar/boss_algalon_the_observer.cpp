@@ -1244,40 +1244,29 @@ public:
     }
 };
 
-class spell_algalon_trigger_3_adds : public SpellScriptLoader
+class spell_algalon_trigger_3_adds : public SpellScript
 {
-public:
-    spell_algalon_trigger_3_adds() : SpellScriptLoader("spell_algalon_trigger_3_adds") { }
+    PrepareSpellScript(spell_algalon_trigger_3_adds);
 
-    class spell_algalon_trigger_3_adds_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_algalon_trigger_3_adds_SpellScript);
+        targets.remove_if(ActiveConstellationFilter());
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(ActiveConstellationFilter());
-        }
-
-        void HandleDummyEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
-
-            target->AI()->DoAction(ACTION_ACTIVATE_STAR);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_trigger_3_adds_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_algalon_trigger_3_adds_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummyEffect(SpellEffIndex effIndex)
     {
-        return new spell_algalon_trigger_3_adds_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        target->AI()->DoAction(ACTION_ACTIVATE_STAR);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_trigger_3_adds::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_algalon_trigger_3_adds::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1450,7 +1439,7 @@ void AddSC_boss_algalon_the_observer()
     // Spells
     RegisterSpellScript(spell_algalon_phase_punch_aura);
     RegisterSpellScript(spell_algalon_collapse_aura);
-    new spell_algalon_trigger_3_adds();
+    RegisterSpellScript(spell_algalon_trigger_3_adds);
     new spell_algalon_cosmic_smash_damage();
     new spell_algalon_big_bang();
     new spell_algalon_remove_phase();
