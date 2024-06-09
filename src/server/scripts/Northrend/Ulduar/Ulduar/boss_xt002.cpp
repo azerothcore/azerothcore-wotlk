@@ -967,53 +967,37 @@ class spell_xt002_gravity_bomb_damage : public SpellScript
 };
 
 // 63018, 65121 - Searing Light
-class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
+class spell_xt002_searing_light_spawn_life_spark : public SpellScript
 {
-public:
-    spell_xt002_searing_light_spawn_life_spark() : SpellScriptLoader("spell_xt002_searing_light_spawn_life_spark") { }
+    PrepareSpellScript(spell_xt002_searing_light_spawn_life_spark);
 
-    class spell_xt002_searing_light_spawn_life_spark_AuraScript : public AuraScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareAuraScript(spell_xt002_searing_light_spawn_life_spark_AuraScript);
-
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* player = GetOwner()->ToPlayer())
-                if (Unit* xt002 = GetCaster())
-                    if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
-                        xt002->SummonCreature(NPC_LIFE_SPARK, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_xt002_searing_light_spawn_life_spark_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_xt002_searing_light_spawn_life_spark_AuraScript();
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
     }
 
-    class spell_xt002_searing_light_spawn_life_spark_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_xt002_searing_light_spawn_life_spark_SpellScript);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_searing_light_spawn_life_spark::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-        }
+class spell_xt002_searing_light_spawn_life_spark_aura : public AuraScript
+{
+    PrepareAuraScript(spell_xt002_searing_light_spawn_life_spark_aura);
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_searing_light_spawn_life_spark_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_xt002_searing_light_spawn_life_spark_SpellScript();
+        if (Player* player = GetOwner()->ToPlayer())
+            if (Unit* xt002 = GetCaster())
+                if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                    xt002->SummonCreature(NPC_LIFE_SPARK, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_xt002_searing_light_spawn_life_spark_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1063,7 +1047,7 @@ void AddSC_boss_xt002()
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     RegisterSpellAndAuraScriptPair(spell_xt002_gravity_bomb, spell_xt002_gravity_bomb_aura);
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);
-    new spell_xt002_searing_light_spawn_life_spark();
+    RegisterSpellAndAuraScriptPair(spell_xt002_searing_light_spawn_life_spark, spell_xt002_searing_light_spawn_life_spark_aura);
 
     // Achievements
     new achievement_xt002_nerf_engineering();
