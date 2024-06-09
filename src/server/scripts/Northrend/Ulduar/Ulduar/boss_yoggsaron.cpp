@@ -2668,73 +2668,74 @@ class spell_keeper_freya_summon_sanity_well : public SpellScript
    63803 - Brain Link
    65301 - Psychosis
    64168 - Lunatic Gaze */
-class spell_yogg_saron_sanity_reduce : public SpellScriptLoader
+enum SanityReduce
 {
-public:
-    spell_yogg_saron_sanity_reduce() : SpellScriptLoader("spell_yogg_saron_sanity_reduce") { }
+    SPELL_SANITY_SCREEN_EFFECT    = 63752,
+    SPELL_LUNATIC_GAZE_TRIGGER    = 64168,
+    SPELL_YS_LUNATIC_GAZE_TRIGGER = 64164
+};
 
-    class spell_yogg_saron_sanity_reduce_SpellScript : public SpellScript
+class spell_yogg_saron_sanity_reduce : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_sanity_reduce);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_yogg_saron_sanity_reduce_SpellScript);
+        return ValidateSpellInfo({ SPELL_CANCEL_ILLUSION_AURA, SPELL_SANITY_SCREEN_EFFECT });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Player* target = GetHitPlayer();
+        if (!target)
+            return;
+
+        uint8 _reduceAmount = 0;
+        switch (GetSpellInfo()->Id)
         {
-            PreventHitDefaultEffect(effIndex);
-            Player* target = GetHitPlayer();
-            if (!target)
-                return;
-
-            uint8 _reduceAmount = 0;
-            switch (GetSpellInfo()->Id)
-            {
-                case SPELL_SARA_PSYCHOSIS_10:
-                    _reduceAmount = 9;
-                    break;
-                case SPELL_SARA_PSYCHOSIS_25:
-                    _reduceAmount = 12;
-                    break;
-                case SPELL_MALADY_OF_THE_MIND:
-                    _reduceAmount = 3;
-                    break;
-                case SPELL_MALADY_OF_THE_MIND_TRIGGER:
-                    _reduceAmount = 3;
-                    break;
-                case SPELL_BRAIN_LINK_DAMAGE:
-                    _reduceAmount = 2;
-                    break;
-                case 64168 /*SPELL_LUNATIC_GAZE*/:
-                    _reduceAmount = 2;
-                    break;
-                case 64164 /*SPELL_YS_LUNATIC_GAZE*/:
-                    _reduceAmount = 4;
-                    break;
-                case SPELL_INDUCE_MADNESS:
-                    // Teleported out of brain
-                    if (target->GetPositionZ() > 300.0f)
-                        return;
-                    else
-                        target->CastSpell(target, SPELL_CANCEL_ILLUSION_AURA, true); // else we are underground, remove illusion aura and teleport outside
-                    _reduceAmount = 100;
-                    break;
-            }
-
-            if (Aura* aur = target->GetAura(SPELL_SANITY))
-            {
-                if ((aur->GetStackAmount() - _reduceAmount) <= 20)
-                    target->CastSpell(target, 63752 /*SANITY_SCREEN_EFFECT*/, true);
-                aur->ModStackAmount(-_reduceAmount);
-            }
+            case SPELL_SARA_PSYCHOSIS_10:
+                _reduceAmount = 9;
+                break;
+            case SPELL_SARA_PSYCHOSIS_25:
+                _reduceAmount = 12;
+                break;
+            case SPELL_MALADY_OF_THE_MIND:
+                _reduceAmount = 3;
+                break;
+            case SPELL_MALADY_OF_THE_MIND_TRIGGER:
+                _reduceAmount = 3;
+                break;
+            case SPELL_BRAIN_LINK_DAMAGE:
+                _reduceAmount = 2;
+                break;
+            case SPELL_LUNATIC_GAZE_TRIGGER:
+                _reduceAmount = 2;
+                break;
+            case SPELL_YS_LUNATIC_GAZE_TRIGGER:
+                _reduceAmount = 4;
+                break;
+            case SPELL_INDUCE_MADNESS:
+                // Teleported out of brain
+                if (target->GetPositionZ() > 300.0f)
+                    return;
+                else
+                    target->CastSpell(target, SPELL_CANCEL_ILLUSION_AURA, true); // else we are underground, remove illusion aura and teleport outside
+                _reduceAmount = 100;
+                break;
         }
 
-        void Register() override
+        if (Aura* aur = target->GetAura(SPELL_SANITY))
         {
-            OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce_SpellScript::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+            if ((aur->GetStackAmount() - _reduceAmount) <= 20)
+                target->CastSpell(target, SPELL_SANITY_SCREEN_EFFECT, true);
+            aur->ModStackAmount(-_reduceAmount);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_sanity_reduce_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2975,7 +2976,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_insane_aura);
     RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
-    new spell_yogg_saron_sanity_reduce();
+    RegisterSpellScript(spell_yogg_saron_sanity_reduce);
     new spell_yogg_saron_empowering_shadows();
     new spell_yogg_saron_in_the_maws_of_the_old_god();
     new spell_yogg_saron_target_selectors();
