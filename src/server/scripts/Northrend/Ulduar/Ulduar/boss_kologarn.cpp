@@ -718,49 +718,38 @@ private:
     Unit const* _victim;
 };
 
-class spell_ulduar_stone_grip_cast_target : public SpellScriptLoader
+class spell_ulduar_stone_grip_cast_target : public SpellScript
 {
-public:
-    spell_ulduar_stone_grip_cast_target() : SpellScriptLoader("spell_ulduar_stone_grip_cast_target") { }
+    PrepareSpellScript(spell_ulduar_stone_grip_cast_target);
 
-    class spell_ulduar_stone_grip_cast_target_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_ulduar_stone_grip_cast_target_SpellScript);
+        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+            return false;
+        return true;
+    }
 
-        bool Load() override
-        {
-            if (GetCaster()->GetTypeId() != TYPEID_UNIT)
-                return false;
-            return true;
-        }
-
-        void FilterTargetsInitial(std::list<WorldObject*>& targets)
-        {
-            // Remove "main tank" and non-player targets
-            targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
-            // Maximum affected targets per difficulty mode
-            uint32 maxTargets = 1;
-            if (GetSpellInfo()->Id == 63981)
-                maxTargets = 3;
-
-            // Return a random amount of targets based on maxTargets
-            while (maxTargets < targets.size())
-            {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                advance(itr, urand(0, targets.size() - 1));
-                targets.erase(itr);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ulduar_stone_grip_cast_target_SpellScript::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        return new spell_ulduar_stone_grip_cast_target_SpellScript();
+        // Remove "main tank" and non-player targets
+        targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
+        // Maximum affected targets per difficulty mode
+        uint32 maxTargets = 1;
+        if (GetSpellInfo()->Id == 63981)
+            maxTargets = 3;
+
+        // Return a random amount of targets based on maxTargets
+        while (maxTargets < targets.size())
+        {
+            std::list<WorldObject*>::iterator itr = targets.begin();
+            advance(itr, urand(0, targets.size() - 1));
+            targets.erase(itr);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ulduar_stone_grip_cast_target::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -928,7 +917,7 @@ void AddSC_boss_kologarn()
     RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);
 
     // Spells
-    new spell_ulduar_stone_grip_cast_target();
+    RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     new spell_ulduar_stone_grip();
     new spell_ulduar_squeezed_lifeless();
     new spell_kologarn_stone_shout();
