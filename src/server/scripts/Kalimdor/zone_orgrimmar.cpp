@@ -255,25 +255,25 @@ public:
                     Talk(SAY_THRALL_ON_QUEST_REWARD_1);
                     DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    me->GetMap()->DoForAllPlayers([&](Player* p)
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
                     {
-                        if (p->IsAlive() && !p->IsGameMaster())
+                        if (player->IsAlive() && !player->IsGameMaster())
                         {
-                            if (p->GetAreaId() == AREA_ORGRIMMAR)
+                            if (player->GetAreaId() == AREA_ORGRIMMAR)
                             {
-                                p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
                             }
                         }
                     });
                 }).Schedule(19s, [this](TaskContext /*context*/)
                 {
-                    me->GetMap()->DoForAllPlayers([&](Player* p)
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
                     {
-                        if (p->IsAlive() && !p->IsGameMaster())
+                        if (player->IsAlive() && !player->IsGameMaster())
                         {
-                            if (p->GetAreaId() == AREA_CROSSROADS)
+                            if (player->GetAreaId() == AREA_CROSSROADS)
                             {
-                                p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
                             }
                         }
                     });
