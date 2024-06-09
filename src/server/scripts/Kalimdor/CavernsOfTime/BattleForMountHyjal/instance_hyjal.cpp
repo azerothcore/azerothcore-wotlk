@@ -51,11 +51,6 @@ ObjectData const creatureData[] =
     { 0,               0                }
 };
 
-ObjectData const objectData[] =
-{
-    { 0, 0 }
-};
-
 Milliseconds hyjalWaveTimers[4][MAX_WAVES_STANDARD]
 {
     { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Winterchill
@@ -92,7 +87,7 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            LoadObjectData(creatureData, objectData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void Initialize() override
