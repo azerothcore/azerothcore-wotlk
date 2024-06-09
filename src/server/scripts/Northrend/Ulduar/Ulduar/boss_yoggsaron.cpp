@@ -2440,47 +2440,36 @@ class spell_yogg_saron_destabilization_matrix : public SpellScript
 };
 
 // 64172 - Titanic Storm
-class spell_yogg_saron_titanic_storm : public SpellScriptLoader
+class spell_yogg_saron_titanic_storm : public SpellScript
 {
-public:
-    spell_yogg_saron_titanic_storm() : SpellScriptLoader("spell_yogg_saron_titanic_storm") { }
+    PrepareSpellScript(spell_yogg_saron_titanic_storm);
 
-    class spell_yogg_saron_titanic_storm_SpellScript : public SpellScript
+    void HandleDummyEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_yogg_saron_titanic_storm_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            Unit::Kill(GetCaster(), target);
+    }
 
-        void HandleDummyEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                Unit::Kill(GetCaster(), target);
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            WorldObject* target = nullptr;
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->ToUnit()->HasAura(SPELL_WEAKENED))
-                {
-                    target = *itr;
-                    break;
-                }
-
-            targets.clear();
-            if (target)
-                targets.push_back(target);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_titanic_storm_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_titanic_storm_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_yogg_saron_titanic_storm_SpellScript();
+        WorldObject* target = nullptr;
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if ((*itr)->ToUnit()->HasAura(SPELL_WEAKENED))
+            {
+                target = *itr;
+                break;
+            }
+
+        targets.clear();
+        if (target)
+            targets.push_back(target);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_titanic_storm::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_titanic_storm::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
     }
 };
 
@@ -3044,7 +3033,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellAndAuraScriptPair(spell_yogg_saron_brain_link, spell_yogg_saron_brain_link_aura);
     RegisterSpellScript(spell_yogg_saron_shadow_beacon_aura);
     RegisterSpellScript(spell_yogg_saron_destabilization_matrix);
-    new spell_yogg_saron_titanic_storm();
+    RegisterSpellScript(spell_yogg_saron_titanic_storm);
     new spell_yogg_saron_lunatic_gaze();
     new spell_yogg_saron_protective_gaze();
     new spell_yogg_saron_empowered();
