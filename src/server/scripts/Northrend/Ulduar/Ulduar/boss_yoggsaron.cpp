@@ -2606,41 +2606,30 @@ class spell_yogg_saron_insane_aura : public AuraScript
 };
 
 // 64169 - Sanity Well
-class spell_yogg_saron_sanity_well : public SpellScriptLoader
+class spell_yogg_saron_sanity_well_aura : public AuraScript
 {
-public:
-    spell_yogg_saron_sanity_well() : SpellScriptLoader("spell_yogg_saron_sanity_well") { }
+    PrepareAuraScript(spell_yogg_saron_sanity_well_aura);
 
-    class spell_yogg_saron_sanity_well_AuraScript : public AuraScript
+    void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
     {
-        PrepareAuraScript(spell_yogg_saron_sanity_well_AuraScript);
+        isPeriodic = true;
+        amplitude = 2 * IN_MILLISECONDS;
+    }
 
-        void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 2 * IN_MILLISECONDS;
-        }
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            if (!target || !target->IsPlayer())
-                return;
-
-            if (Aura* aur = target->GetAura(SPELL_SANITY))
-                aur->SetStackAmount(std::min(100, aur->GetStackAmount() + 20));
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_yogg_saron_sanity_well_AuraScript::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_yogg_saron_sanity_well_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_yogg_saron_sanity_well_AuraScript();
+        Unit* target = GetTarget();
+        if (!target || !target->IsPlayer())
+            return;
+
+        if (Aura* aur = target->GetAura(SPELL_SANITY))
+            aur->SetStackAmount(std::min(100, aur->GetStackAmount() + 20));
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_yogg_saron_sanity_well_aura::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_yogg_saron_sanity_well_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     }
 };
 
@@ -2984,7 +2973,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
     RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
     RegisterSpellScript(spell_yogg_saron_insane_aura);
-    new spell_yogg_saron_sanity_well();
+    RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     new spell_yogg_saron_sanity_reduce();
     new spell_yogg_saron_empowering_shadows();
