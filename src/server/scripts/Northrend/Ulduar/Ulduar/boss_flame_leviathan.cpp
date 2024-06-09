@@ -1648,69 +1648,58 @@ class spell_pursue : public SpellScript
     }
 };
 
-class spell_vehicle_throw_passenger : public SpellScriptLoader
+class spell_vehicle_throw_passenger : public SpellScript
 {
-public:
-    spell_vehicle_throw_passenger() : SpellScriptLoader("spell_vehicle_throw_passenger") {}
-
-    class spell_vehicle_throw_passenger_SpellScript : public SpellScript
+    PrepareSpellScript(spell_vehicle_throw_passenger);
+    void HandleScript()
     {
-        PrepareSpellScript(spell_vehicle_throw_passenger_SpellScript);
-        void HandleScript()
-        {
-            Spell* baseSpell = GetSpell();
-            SpellCastTargets targets = baseSpell->m_targets;
-            if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(3))
+        Spell* baseSpell = GetSpell();
+        SpellCastTargets targets = baseSpell->m_targets;
+        if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
+            if (Unit* passenger = vehicle->GetPassenger(3))
+            {
+                // use 99 because it is 3d search
+                std::list<WorldObject*> targetList;
+                Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+                Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
+                Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
+                float minDist = 99 * 99;
+                Unit* target = nullptr;
+                for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 {
-                    // use 99 because it is 3d search
-                    std::list<WorldObject*> targetList;
-                    Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                    Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
-                    float minDist = 99 * 99;
-                    Unit* target = nullptr;
-                    for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                    {
-                        if (Unit* unit = (*itr)->ToUnit())
-                            if (unit->GetEntry() == NPC_SEAT)
-                                if (Vehicle* seat = unit->GetVehicleKit())
-                                    if (!seat->GetPassenger(0))
-                                        if (Unit* device = seat->GetPassenger(2))
-                                            if (!device->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    if (Unit* unit = (*itr)->ToUnit())
+                        if (unit->GetEntry() == NPC_SEAT)
+                            if (Vehicle* seat = unit->GetVehicleKit())
+                                if (!seat->GetPassenger(0))
+                                    if (Unit* device = seat->GetPassenger(2))
+                                        if (!device->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                                        {
+                                            float dist = unit->GetExactDistSq(targets.GetDstPos());
+                                            if (dist < minDist)
                                             {
-                                                float dist = unit->GetExactDistSq(targets.GetDstPos());
-                                                if (dist < minDist)
-                                                {
-                                                    minDist = dist;
-                                                    target = unit;
-                                                }
+                                                minDist = dist;
+                                                target = unit;
                                             }
-                    }
-                    if (target && target->IsWithinDist2d(targets.GetDstPos(), GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
-                    {
-                        passenger->ExitVehicle();
-                        passenger->EnterVehicle(target, 0);
-                    }
-                    else
-                    {
-                        passenger->ExitVehicle();
-                        float x, y, z;
-                        targets.GetDstPos()->GetPosition(x, y, z);
-                        passenger->GetMotionMaster()->MoveJump(x, y, z, targets.GetSpeedXY(), targets.GetSpeedZ());
-                    }
+                                        }
                 }
-        }
+                if (target && target->IsWithinDist2d(targets.GetDstPos(), GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
+                {
+                    passenger->ExitVehicle();
+                    passenger->EnterVehicle(target, 0);
+                }
+                else
+                {
+                    passenger->ExitVehicle();
+                    float x, y, z;
+                    targets.GetDstPos()->GetPosition(x, y, z);
+                    passenger->GetMotionMaster()->MoveJump(x, y, z, targets.GetSpeedXY(), targets.GetSpeedZ());
+                }
+            }
+    }
 
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_vehicle_throw_passenger_SpellScript::HandleScript);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_vehicle_throw_passenger_SpellScript();
+        AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
     }
 };
 
@@ -2118,7 +2107,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_auto_repair);
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
-    new spell_vehicle_throw_passenger();
+    RegisterSpellScript(spell_vehicle_throw_passenger);
     new spell_tar_blaze();
     new spell_vehicle_grab_pyrite();
     new spell_vehicle_circuit_overload();
