@@ -1828,65 +1828,59 @@ class spell_thorims_hammer : public SpellScript
     }
 };
 
-class spell_transitus_shield_beam : public SpellScriptLoader
+class spell_transitus_shield_beam_aura : public AuraScript
 {
-public:
-    spell_transitus_shield_beam() : SpellScriptLoader("spell_transitus_shield_beam") { }
+    PrepareAuraScript(spell_transitus_shield_beam_aura);
 
-    class spell_transitus_shield_beam_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_transitus_shield_beam_AuraScript);
+        return ValidateSpellInfo({ SPELL_TRANSITUS_SHIELD_IMPACT });
+    }
 
-        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-            {
-                return;
-            }
-
-            Unit* target = GetTarget();
-
-            if (!target)
-            {
-                return;
-            }
-
-            switch (aurEff->GetEffIndex())
-            {
-            case EFFECT_0:
-                caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
-                break;
-            }
-        }
-
-        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-            {
-                return;
-            }
-
-            Unit* target = GetTarget();
-
-            if (target)
-            {
-                target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
-            }
-        }
-
-        void Register()
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_transitus_shield_beam_AuraScript();
+        Unit* caster = GetCaster();
+        if (!caster)
+        {
+            return;
+        }
+
+        Unit* target = GetTarget();
+
+        if (!target)
+        {
+            return;
+        }
+
+        switch (aurEff->GetEffIndex())
+        {
+        case EFFECT_0:
+            caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
+            break;
+        }
+    }
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster)
+        {
+            return;
+        }
+
+        Unit* target = GetTarget();
+
+        if (target)
+        {
+            target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_aura::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_aura::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -2075,7 +2069,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_vehicle_circuit_overload_aura);
     RegisterSpellScript(spell_orbital_supports_aura);
     RegisterSpellScript(spell_thorims_hammer);
-    new spell_transitus_shield_beam();
+    RegisterSpellScript(spell_transitus_shield_beam_aura);
     new spell_shield_generator();
     new spell_demolisher_ride_vehicle();
 
