@@ -1437,48 +1437,42 @@ public:
     }
 };
 
-class spell_load_into_catapult : public SpellScriptLoader
+enum LoadIntoCataPult
 {
-    enum Spells
+    SPELL_PASSENGER_LOADED = 62340
+};
+
+class spell_load_into_catapult_aura : public AuraScript
+{
+    PrepareAuraScript(spell_load_into_catapult_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        SPELL_PASSENGER_LOADED = 62340,
-    };
+        return ValidateSpellInfo({ SPELL_PASSENGER_LOADED });
+    }
 
-public:
-    spell_load_into_catapult() : SpellScriptLoader("spell_load_into_catapult") { }
-
-    class spell_load_into_catapult_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_load_into_catapult_AuraScript);
+        Unit* owner = GetOwner()->ToUnit();
+        if (!owner)
+            return;
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* owner = GetOwner()->ToUnit();
-            if (!owner)
-                return;
+        owner->CastSpell(owner, SPELL_PASSENGER_LOADED, true);
+    }
 
-            owner->CastSpell(owner, SPELL_PASSENGER_LOADED, true);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* owner = GetOwner()->ToUnit();
-            if (!owner)
-                return;
-
-            owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_load_into_catapult_AuraScript::OnApply, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_load_into_catapult_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_load_into_catapult_AuraScript();
+        Unit* owner = GetOwner()->ToUnit();
+        if (!owner)
+            return;
+
+        owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_load_into_catapult_aura::OnApply, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_load_into_catapult_aura::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -2143,7 +2137,7 @@ void AddSC_boss_flame_leviathan()
     new go_ulduar_tower();
 
     // Spells
-    new spell_load_into_catapult();
+    RegisterSpellScript(spell_load_into_catapult_aura);
     new spell_auto_repair();
     new spell_systems_shutdown();
     new spell_pursue();
