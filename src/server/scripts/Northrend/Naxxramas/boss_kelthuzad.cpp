@@ -29,7 +29,7 @@ void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
     new boss_kelthuzad_minion();
-    new spell_kelthuzad_frost_blast();
-    new spell_kelthuzad_detonate_mana();
+    RegisterSpellScript(spell_kelthuzad_frost_blast);
+    RegisterSpellScript(spell_kelthuzad_detonate_mana_aura);
 }
 

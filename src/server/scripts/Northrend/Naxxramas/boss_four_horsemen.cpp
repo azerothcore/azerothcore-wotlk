@@ -29,6 +29,6 @@ using namespace FourHorsemen;
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();
-    new spell_four_horsemen_mark();
+    RegisterSpellScript(spell_four_horsemen_mark_aura);
 }
 

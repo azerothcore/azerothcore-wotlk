@@ -9,22 +9,22 @@
 #include "naxxramas.h"
 
 namespace Gothik {
-    
-enum GothikYells
-{
-    GOTHIK_SAY_INTRO_1                     = 0,
-    GOTHIK_SAY_INTRO_2                     = 1,
-    GOTHIK_SAY_INTRO_3                     = 2,
-    GOTHIK_SAY_INTRO_4                     = 3,
-    GOTHIK_SAY_PHASE_TWO                   = 4,
-    GOTHIK_SAY_DEATH                       = 5,
-    GOTHIK_SAY_KILL                        = 6,
 
-    GOTHIK_EMOTE_PHASE_TWO                 = 7,
-    GOTHIK_EMOTE_GATE_OPENED               = 8
+enum Yells
+{
+    SAY_INTRO_1                     = 0,
+    SAY_INTRO_2                     = 1,
+    SAY_INTRO_3                     = 2,
+    SAY_INTRO_4                     = 3,
+    SAY_PHASE_TWO                   = 4,
+    SAY_DEATH                       = 5,
+    SAY_KILL                        = 6,
+
+    EMOTE_PHASE_TWO                 = 7,
+    EMOTE_GATE_OPENED               = 8
 };
 
-enum GothikSpells
+enum Spells
 {
     // Gothik
     SPELL_HARVEST_SOUL              = 28679,
@@ -60,7 +60,7 @@ enum GothikSpells
     SPELL_STOMP                     = 27993
 };
 
-enum GothikMisc
+enum Misc
 {
     NPC_LIVING_TRAINEE              = 16124,
     NPC_LIVING_KNIGHT               = 16125,
@@ -72,7 +72,7 @@ enum GothikMisc
     //NPC_TRIGGER                     = 16137, fix me
 };
 
-enum GothikEvents
+enum Events
 {
     // Gothik
     EVENT_SUMMON_ADDS               = 1,
@@ -241,7 +241,7 @@ public:
         {
             BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
-            Talk(GOTHIK_SAY_INTRO_1);
+            Talk(SAY_INTRO_1);
             events.ScheduleEvent(EVENT_INTRO_2, 4s);
             events.ScheduleEvent(EVENT_INTRO_3, 9s);
             events.ScheduleEvent(EVENT_INTRO_4, 14s);
@@ -303,7 +303,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            Talk(GOTHIK_SAY_KILL);
+            Talk(SAY_KILL);
             if (pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -313,7 +313,7 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            Talk(GOTHIK_SAY_DEATH);
+            Talk(SAY_DEATH);
             summons.DespawnAll();
             if (pInstance)
             {
@@ -433,13 +433,13 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_INTRO_2:
-                    Talk(GOTHIK_SAY_INTRO_2);
+                    Talk(SAY_INTRO_2);
                     break;
                 case EVENT_INTRO_3:
-                    Talk(GOTHIK_SAY_INTRO_3);
+                    Talk(SAY_INTRO_3);
                     break;
                 case EVENT_INTRO_4:
-                    Talk(GOTHIK_SAY_INTRO_4);
+                    Talk(SAY_INTRO_4);
                     break;
                 case EVENT_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
@@ -488,8 +488,8 @@ public:
                     else
                     {
                         secondPhase = true;
-                        Talk(GOTHIK_SAY_PHASE_TWO);
-                        Talk(GOTHIK_EMOTE_PHASE_TWO);
+                        Talk(SAY_PHASE_TWO);
+                        Talk(EMOTE_PHASE_TWO);
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
@@ -510,7 +510,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         gateOpened = true;
-                        Talk(GOTHIK_EMOTE_GATE_OPENED);
+                        Talk(EMOTE_GATE_OPENED);
                     }
                     break;
             }
@@ -675,29 +675,23 @@ public:
     };
 };
 
-class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
+class spell_gothik_shadow_bolt_volley : public SpellScript
 {
-public:
-    spell_gothik_shadow_bolt_volley() : SpellScriptLoader("spell_gothik_shadow_bolt_volley") { }
+    PrepareSpellScript(spell_gothik_shadow_bolt_volley);
 
-    class spell_gothik_shadow_bolt_volley_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_gothik_shadow_bolt_volley_SpellScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_MARK });
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_gothik_shadow_bolt_volley_SpellScript();
+        targets.remove_if(Acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 

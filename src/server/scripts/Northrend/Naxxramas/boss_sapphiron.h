@@ -9,15 +9,15 @@
 
 namespace Sapphiron {
     
-enum SapphironYells
+enum Yells
 {
     EMOTE_AIR_PHASE         = 0,
     EMOTE_GROUND_PHASE      = 1,
     EMOTE_BREATH            = 2,
-    SAPPHIRON_EMOTE_ENRAGE            = 3
+    EMOTE_ENRAGE            = 3
 };
 
-enum SapphironSpells
+enum Spells
 {
     // Fight
     SPELL_FROST_AURA_10             = 28531,
@@ -40,7 +40,7 @@ enum SapphironSpells
     SPELL_SAPPHIRON_DIES            = 29357
 };
 
-enum SapphironMisc
+enum Misc
 {
     GO_ICE_BLOCK                    = 181247,
     NPC_BLIZZARD                    = 16474,
@@ -48,9 +48,9 @@ enum SapphironMisc
     POINT_CENTER                    = 1
 };
 
-enum SapphironEvents
+enum Events
 {
-    SAPPHIRON_EVENT_BERSERK                   = 1,
+    EVENT_BERSERK                   = 1,
     EVENT_CLEAVE                    = 2,
     EVENT_TAIL_SWEEP                = 3,
     EVENT_LIFE_DRAIN                = 4,
@@ -151,7 +151,7 @@ public:
             BossAI::JustEngagedWith(who);
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
-            events.ScheduleEvent(SAPPHIRON_EVENT_BERSERK, 15min);
+            events.ScheduleEvent(EVENT_BERSERK, 15min);
             events.ScheduleEvent(EVENT_CLEAVE, 5s);
             events.ScheduleEvent(EVENT_TAIL_SWEEP, 10s);
             events.ScheduleEvent(EVENT_LIFE_DRAIN, 17s);
@@ -241,8 +241,8 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case SAPPHIRON_EVENT_BERSERK:
-                    Talk(SAPPHIRON_EMOTE_ENRAGE);
+                case EVENT_BERSERK:
+                    Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     return;
                 case EVENT_CLEAVE:
@@ -404,45 +404,34 @@ public:
     };
 };
 
-class spell_sapphiron_frost_explosion : public SpellScriptLoader
+class spell_sapphiron_frost_explosion : public SpellScript
 {
-public:
-    spell_sapphiron_frost_explosion() : SpellScriptLoader("spell_sapphiron_frost_explosion") { }
+    PrepareSpellScript(spell_sapphiron_frost_explosion);
 
-    class spell_sapphiron_frost_explosion_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_sapphiron_frost_explosion_SpellScript);
+        Unit* caster = GetCaster();
+        if (!caster || !caster->ToCreature())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        std::list<WorldObject*> tmplist;
+        for (auto& target : targets)
         {
-            Unit* caster = GetCaster();
-            if (!caster || !caster->ToCreature())
-                return;
-
-            std::list<WorldObject*> tmplist;
-            for (auto& target : targets)
+            if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
             {
-                if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
-                {
-                    tmplist.push_back(target);
-                }
-            }
-            targets.clear();
-            for (auto& itr : tmplist)
-            {
-                targets.push_back(itr);
+                tmplist.push_back(target);
             }
         }
-
-        void Register() override
+        targets.clear();
+        for (auto& itr : tmplist)
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            targets.push_back(itr);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sapphiron_frost_explosion_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 

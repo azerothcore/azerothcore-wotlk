@@ -10,38 +10,38 @@
 #include "naxxramas.h"
 
 namespace Grobbulus {
-    
-enum GrobbulusSpells
+
+enum Spells
 {
-    GROBBULUS_SPELL_POISON_CLOUD                      = 28240,
-    GROBBULUS_SPELL_MUTATING_INJECTION                = 28169,
-    GROBBULUS_SPELL_MUTATING_EXPLOSION                = 28206,
-    GROBBULUS_SPELL_SLIME_SPRAY_10                    = 28157,
-    GROBBULUS_SPELL_SLIME_SPRAY_25                    = 54364,
-    GROBBULUS_SPELL_POISON_CLOUD_DAMAGE_AURA_10       = 28158,
-    GROBBULUS_SPELL_POISON_CLOUD_DAMAGE_AURA_25       = 54362,
-    GROBBULUS_SPELL_BERSERK                           = 26662,
-    GROBBULUS_SPELL_BOMBARD_SLIME                     = 28280
+    SPELL_POISON_CLOUD                      = 28240,
+    SPELL_MUTATING_INJECTION                = 28169,
+    SPELL_MUTATING_EXPLOSION                = 28206,
+    SPELL_SLIME_SPRAY_10                    = 28157,
+    SPELL_SLIME_SPRAY_25                    = 54364,
+    SPELL_POISON_CLOUD_DAMAGE_AURA_10       = 28158,
+    SPELL_POISON_CLOUD_DAMAGE_AURA_25       = 54362,
+    SPELL_BERSERK                           = 26662,
+    SPELL_BOMBARD_SLIME                     = 28280
 };
 
-enum GrobbulusEmotes
+enum Emotes
 {
-    GROBBULUS_EMOTE_SLIME                             = 0
+    EMOTE_SLIME                             = 0
 };
 
-enum GrobbulusEvents
+enum Events
 {
-    GROBBULUS_EVENT_BERSERK                           = 1,
-    GROBBULUS_EVENT_POISON_CLOUD                      = 2,
-    GROBBULUS_EVENT_SLIME_SPRAY                       = 3,
-    GROBBULUS_EVENT_MUTATING_INJECTION                = 4
+    EVENT_BERSERK                           = 1,
+    EVENT_POISON_CLOUD                      = 2,
+    EVENT_SLIME_SPRAY                       = 3,
+    EVENT_MUTATING_INJECTION                = 4
 };
 
-enum GrobbulusMisc
+enum Misc
 {
-    GROBBULUS_NPC_FALLOUT_SLIME                       = 16290,
-    GROBBULUS_NPC_SEWAGE_SLIME                        = 16375,
-    GROBBULUS_NPC_STICHED_GIANT                       = 16025
+    NPC_FALLOUT_SLIME                       = 16290,
+    NPC_SEWAGE_SLIME                        = 16375,
+    NPC_STICHED_GIANT                       = 16025
 };
 
 class boss_grobbulus : public CreatureScript
@@ -77,7 +77,7 @@ public:
         void PullChamberAdds()
         {
             std::list<Creature*> StichedGiants;
-            me->GetCreaturesWithEntryInRange(StichedGiants, 300.0f, GROBBULUS_NPC_STICHED_GIANT);
+            me->GetCreaturesWithEntryInRange(StichedGiants, 300.0f, NPC_STICHED_GIANT);
             for (std::list<Creature*>::const_iterator itr = StichedGiants.begin(); itr != StichedGiants.end(); ++itr)
             {
                 (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
@@ -89,23 +89,23 @@ public:
             BossAI::JustEngagedWith(who);
             PullChamberAdds();
             me->SetInCombatWithZone();
-            events.ScheduleEvent(GROBBULUS_EVENT_POISON_CLOUD, 15s);
-            events.ScheduleEvent(GROBBULUS_EVENT_MUTATING_INJECTION, 20s);
-            events.ScheduleEvent(GROBBULUS_EVENT_SLIME_SPRAY, 10s);
-            events.ScheduleEvent(GROBBULUS_EVENT_BERSERK, RAID_MODE(720000, 540000));
+            events.ScheduleEvent(EVENT_POISON_CLOUD, 15s);
+            events.ScheduleEvent(EVENT_MUTATING_INJECTION, 20s);
+            events.ScheduleEvent(EVENT_SLIME_SPRAY, 10s);
+            events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720000, 540000));
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == RAID_MODE(GROBBULUS_SPELL_SLIME_SPRAY_10, GROBBULUS_SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
+            if (spellInfo->Id == RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
             {
-                me->SummonCreature(GROBBULUS_NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+                me->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
             }
         }
 
         void JustSummoned(Creature* cr) override
         {
-            if (cr->GetEntry() == GROBBULUS_NPC_FALLOUT_SLIME)
+            if (cr->GetEntry() == NPC_FALLOUT_SLIME)
             {
                 cr->SetInCombatWithZone();
             }
@@ -136,9 +136,9 @@ public:
             dropSludgeTimer += diff;
             if (!me->IsInCombat() && dropSludgeTimer >= 5000)
             {
-                if (me->IsWithinDist3d(3178, -3305, 319, 5.0f) && !summons.HasEntry(GROBBULUS_NPC_SEWAGE_SLIME))
+                if (me->IsWithinDist3d(3178, -3305, 319, 5.0f) && !summons.HasEntry(NPC_SEWAGE_SLIME))
                 {
-                    me->CastSpell(3128.96f + irand(-20, 20), -3312.96f + irand(-20, 20), 293.25f, GROBBULUS_SPELL_BOMBARD_SLIME, false);
+                    me->CastSpell(3128.96f + irand(-20, 20), -3312.96f + irand(-20, 20), 293.25f, SPELL_BOMBARD_SLIME, false);
                 }
                 dropSludgeTimer = 0;
             }
@@ -152,22 +152,22 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case GROBBULUS_EVENT_POISON_CLOUD:
-                    me->CastSpell(me, GROBBULUS_SPELL_POISON_CLOUD, true);
+                case EVENT_POISON_CLOUD:
+                    me->CastSpell(me, SPELL_POISON_CLOUD, true);
                     events.Repeat(15s);
                     break;
-                case GROBBULUS_EVENT_BERSERK:
-                    me->CastSpell(me, GROBBULUS_SPELL_BERSERK, true);
+                case EVENT_BERSERK:
+                    me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case GROBBULUS_EVENT_SLIME_SPRAY:
-                    Talk(GROBBULUS_EMOTE_SLIME);
-                    me->CastSpell(me->GetVictim(), RAID_MODE(GROBBULUS_SPELL_SLIME_SPRAY_10, GROBBULUS_SPELL_SLIME_SPRAY_25), false);
+                case EVENT_SLIME_SPRAY:
+                    Talk(EMOTE_SLIME);
+                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25), false);
                     events.Repeat(20s);
                     break;
-                case GROBBULUS_EVENT_MUTATING_INJECTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -GROBBULUS_SPELL_MUTATING_INJECTION))
+                case EVENT_MUTATING_INJECTION:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_MUTATING_INJECTION))
                     {
-                        me->CastSpell(target, GROBBULUS_SPELL_MUTATING_INJECTION, false);
+                        me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
                     }
                     events.RepeatEvent(6000 + uint32(120 * me->GetHealthPct()));
                     break;
@@ -217,7 +217,7 @@ public:
                 auraVisualTimer += diff;
                 if (auraVisualTimer >= 1000)
                 {
-                    me->CastSpell(me, (me->GetMap()->Is25ManRaid() ? GROBBULUS_SPELL_POISON_CLOUD_DAMAGE_AURA_25 : GROBBULUS_SPELL_POISON_CLOUD_DAMAGE_AURA_10), true);
+                    me->CastSpell(me, (me->GetMap()->Is25ManRaid() ? SPELL_POISON_CLOUD_DAMAGE_AURA_25 : SPELL_POISON_CLOUD_DAMAGE_AURA_10), true);
                     auraVisualTimer = 0;
                 }
             }
@@ -227,84 +227,62 @@ public:
     };
 };
 
-class spell_grobbulus_poison : public SpellScriptLoader
+class spell_grobbulus_poison : public SpellScript
 {
-public:
-    spell_grobbulus_poison() : SpellScriptLoader("spell_grobbulus_poison") { }
+    PrepareSpellScript(spell_grobbulus_poison);
 
-    class spell_grobbulus_poison_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_grobbulus_poison_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        std::list<WorldObject*> tmplist;
+        for (auto& target : targets)
         {
-            std::list<WorldObject*> tmplist;
-            for (auto& target : targets)
+            if (GetCaster()->IsWithinDist3d(target, 0.0f))
             {
-                if (GetCaster()->IsWithinDist3d(target, 0.0f))
-                {
-                    tmplist.push_back(target);
-                }
-            }
-            targets.clear();
-            for (auto& itr : tmplist)
-            {
-                targets.push_back(itr);
+                tmplist.push_back(target);
             }
         }
-
-        void Register() override
+        targets.clear();
+        for (auto& itr : tmplist)
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            targets.push_back(itr);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_grobbulus_poison_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_grobbulus_mutating_injection : public SpellScriptLoader
+class spell_grobbulus_mutating_injection_aura : public AuraScript
 {
-    public:
-        spell_grobbulus_mutating_injection() : SpellScriptLoader("spell_grobbulus_mutating_injection") { }
+    PrepareAuraScript(spell_grobbulus_mutating_injection_aura);
 
-        class spell_grobbulus_mutating_injection_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        switch (GetTargetApplication()->GetRemoveMode())
         {
-            PrepareAuraScript(spell_grobbulus_mutating_injection_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ GROBBULUS_SPELL_MUTATING_EXPLOSION });
-            }
-
-            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                switch (GetTargetApplication()->GetRemoveMode())
+            case AURA_REMOVE_BY_ENEMY_SPELL:
+            case AURA_REMOVE_BY_EXPIRE:
+                if (auto caster = GetCaster())
                 {
-                    case AURA_REMOVE_BY_ENEMY_SPELL:
-                    case AURA_REMOVE_BY_EXPIRE:
-                        if (auto caster = GetCaster())
-                        {
-                            caster->CastSpell(GetTarget(), GROBBULUS_SPELL_MUTATING_EXPLOSION, true);
-                        }
-                        break;
-                    default:
-                        return;
+                    caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
                 }
-            }
-
-            void Register() override
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_grobbulus_mutating_injection_AuraScript();
+                break;
+            default:
+                return;
         }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 }
