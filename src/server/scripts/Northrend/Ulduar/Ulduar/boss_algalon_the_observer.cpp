@@ -1219,30 +1219,19 @@ class spell_algalon_phase_punch_aura : public AuraScript
     }
 };
 
-class spell_algalon_collapse : public SpellScriptLoader
+class spell_algalon_collapse_aura : public AuraScript
 {
-public:
-    spell_algalon_collapse() : SpellScriptLoader("spell_algalon_collapse") { }
+    PrepareAuraScript(spell_algalon_collapse_aura);
 
-    class spell_algalon_collapse_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_algalon_collapse_AuraScript);
+        PreventDefaultAction();
+        Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_collapse_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_algalon_collapse_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_collapse_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1460,7 +1449,7 @@ void AddSC_boss_algalon_the_observer()
 
     // Spells
     RegisterSpellScript(spell_algalon_phase_punch_aura);
-    new spell_algalon_collapse();
+    RegisterSpellScript(spell_algalon_collapse_aura);
     new spell_algalon_trigger_3_adds();
     new spell_algalon_cosmic_smash_damage();
     new spell_algalon_big_bang();
