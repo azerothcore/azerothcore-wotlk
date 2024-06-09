@@ -1324,31 +1324,20 @@ private:
     uint32 _targetCount;
 };
 
-class spell_algalon_remove_phase : public SpellScriptLoader
+class spell_algalon_remove_phase_aura : public AuraScript
 {
-public:
-    spell_algalon_remove_phase() : SpellScriptLoader("spell_algalon_remove_phase") { }
+    PrepareAuraScript(spell_algalon_remove_phase_aura);
 
-    class spell_algalon_remove_phase_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_algalon_remove_phase_AuraScript);
+        PreventDefaultAction();
+        GetTarget()->RemoveAurasByType(SPELL_AURA_PHASE);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_DAMAGE);
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->RemoveAurasByType(SPELL_AURA_PHASE);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_DAMAGE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_remove_phase_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_algalon_remove_phase_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_remove_phase_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1421,7 +1410,7 @@ void AddSC_boss_algalon_the_observer()
     RegisterSpellScript(spell_algalon_trigger_3_adds);
     RegisterSpellScript(spell_algalon_cosmic_smash_damage);
     RegisterSpellScript(spell_algalon_big_bang);
-    new spell_algalon_remove_phase();
+    RegisterSpellScript(spell_algalon_remove_phase_aura);
     new spell_algalon_supermassive_fail();
 
     // Achievements
