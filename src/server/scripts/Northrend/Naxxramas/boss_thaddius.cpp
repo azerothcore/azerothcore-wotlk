@@ -610,6 +610,11 @@ class spell_thaddius_pos_neg_charge : public SpellScript
 {
     PrepareSpellScript(spell_thaddius_pos_neg_charge);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_POSITIVE_CHARGE, SPELL_POSITIVE_CHARGE_STACK });
+    }
+
     void HandleTargets(std::list<WorldObject*>& targets)
     {
         uint8 count = 0;
