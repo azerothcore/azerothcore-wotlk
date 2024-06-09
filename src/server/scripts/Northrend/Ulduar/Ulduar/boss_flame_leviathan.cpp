@@ -1915,47 +1915,36 @@ private:
     uint32 _absorbPct;
 };
 
-class spell_demolisher_ride_vehicle : public SpellScriptLoader
+class spell_demolisher_ride_vehicle : public SpellScript
 {
-public:
-    spell_demolisher_ride_vehicle() : SpellScriptLoader("spell_demolisher_ride_vehicle") {}
+    PrepareSpellScript(spell_demolisher_ride_vehicle);
 
-    class spell_demolisher_ride_vehicle_SpellScript : public SpellScript
+    SpellCastResult CheckCast()
     {
-        PrepareSpellScript(spell_demolisher_ride_vehicle_SpellScript);
-
-        SpellCastResult CheckCast()
-        {
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                return SPELL_CAST_OK;
-
-            Unit* target = this->GetExplTargetUnit();
-            if (!target || target->GetEntry() != NPC_SALVAGED_DEMOLISHER)
-                return SPELL_FAILED_DONT_REPORT;
-
-            Vehicle* veh = target->GetVehicleKit();
-            if (veh && veh->GetPassenger(0))
-                if (Unit* target2 = veh->GetPassenger(1))
-                    if (Vehicle* veh2 = target2->GetVehicleKit())
-                    {
-                        if (!veh2->GetPassenger(0))
-                            target2->HandleSpellClick(GetCaster());
-
-                        return SPELL_FAILED_DONT_REPORT;
-                    }
-
+        if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
             return SPELL_CAST_OK;
-        }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_demolisher_ride_vehicle_SpellScript::CheckCast);
-        }
-    };
+        Unit* target = this->GetExplTargetUnit();
+        if (!target || target->GetEntry() != NPC_SALVAGED_DEMOLISHER)
+            return SPELL_FAILED_DONT_REPORT;
 
-    SpellScript* GetSpellScript() const override
+        Vehicle* vehicle = target->GetVehicleKit();
+        if (vehicle && vehicle->GetPassenger(0))
+            if (Unit* target2 = vehicle->GetPassenger(1))
+                if (Vehicle* vehicle2 = target2->GetVehicleKit())
+                {
+                    if (!vehicle2->GetPassenger(0))
+                        target2->HandleSpellClick(GetCaster());
+
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
     {
-        return new spell_demolisher_ride_vehicle_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_demolisher_ride_vehicle::CheckCast);
     }
 };
 
@@ -2061,7 +2050,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_thorims_hammer);
     RegisterSpellScript(spell_transitus_shield_beam_aura);
     RegisterSpellScript(spell_shield_generator_aura);
-    new spell_demolisher_ride_vehicle();
+    RegisterSpellScript(spell_demolisher_ride_vehicle);
 
     // Achievements
     new achievement_flame_leviathan_towers("achievement_flame_leviathan_orbital_bombardment", 1);
