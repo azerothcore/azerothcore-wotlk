@@ -2554,49 +2554,38 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 };
 
 // 64555 - Insane Periodic
-class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
+class spell_yogg_saron_insane_periodic_trigger : public SpellScript
 {
-public:
-    spell_yogg_saron_insane_periodic_trigger() : SpellScriptLoader("spell_yogg_saron_insane_periodic_trigger") { }
+    PrepareSpellScript(spell_yogg_saron_insane_periodic_trigger);
 
-    class spell_yogg_saron_insane_periodic_trigger_SpellScript : public SpellScript
+    void HandleDummyEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_yogg_saron_insane_periodic_trigger_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        Player* target = GetHitPlayer();
+        if (!target)
+            return;
 
-        void HandleDummyEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Player* target = GetHitPlayer();
-            if (!target)
-                return;
+        Unit* caster = GetCaster();
+        caster->CastSpell(target, SPELL_INSANE1, true);
+        target->CastSpell(target, SPELL_INSANE2, true);
+    }
 
-            Unit* caster = GetCaster();
-            caster->CastSpell(target, SPELL_INSANE1, true);
-            target->CastSpell(target, SPELL_INSANE2, true);
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
-                    tmplist.push_back(*itr);
-
-            targets.clear();
-            for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                targets.push_back(*itr);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_insane_periodic_trigger_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_insane_periodic_trigger_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_yogg_saron_insane_periodic_trigger_SpellScript();
+        std::list<WorldObject*> tmplist;
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
+                tmplist.push_back(*itr);
+
+        targets.clear();
+        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
+            targets.push_back(*itr);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_insane_periodic_trigger::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_insane_periodic_trigger::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3004,7 +2993,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_lunatic_gaze);
     RegisterSpellScript(spell_yogg_saron_protective_gaze_aura);
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
-    new spell_yogg_saron_insane_periodic_trigger();
+    RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
     new spell_yogg_saron_insane();
     new spell_yogg_saron_sanity_well();
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
