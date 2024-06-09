@@ -1798,44 +1798,33 @@ class spell_orbital_supports_aura : public AuraScript
     }
 };
 
-class spell_thorims_hammer : public SpellScriptLoader
+class spell_thorims_hammer : public SpellScript
 {
-public:
-    spell_thorims_hammer() : SpellScriptLoader("spell_thorims_hammer") { }
+    PrepareSpellScript(spell_thorims_hammer);
 
-    class spell_thorims_hammer_SpellScript : public SpellScript
+    void RecalculateDamage(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_thorims_hammer_SpellScript);
-
-        void RecalculateDamage(SpellEffIndex effIndex)
+        if (!GetHitUnit() || effIndex == EFFECT_1)
         {
-            if (!GetHitUnit() || effIndex == EFFECT_1)
-            {
-                PreventHitDefaultEffect(effIndex);
-                return;
-            }
-
-            float dist = GetHitUnit()->GetExactDist2d(GetCaster());
-            if (dist <= 7.0f)
-            {
-                SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-            }
-            else
-            {
-                dist -= 6.0f;
-                SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
-            }
+            PreventHitDefaultEffect(effIndex);
+            return;
         }
 
-        void Register() override
+        float dist = GetHitUnit()->GetExactDist2d(GetCaster());
+        if (dist <= 7.0f)
         {
-            OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer_SpellScript::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
+            SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
         }
-    };
+        else
+        {
+            dist -= 6.0f;
+            SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
+        }
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_thorims_hammer_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -2085,7 +2074,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_vehicle_grab_pyrite);
     RegisterSpellScript(spell_vehicle_circuit_overload_aura);
     RegisterSpellScript(spell_orbital_supports_aura);
-    new spell_thorims_hammer();
+    RegisterSpellScript(spell_thorims_hammer);
     new spell_transitus_shield_beam();
     new spell_shield_generator();
     new spell_demolisher_ride_vehicle();
