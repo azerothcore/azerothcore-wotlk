@@ -245,9 +245,9 @@ public:
                     case NPC_KAZROGAL:
                     case NPC_AZGALOR:
                         if (Creature* jaina = GetCreature(DATA_JAINA))
-                            jaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            jaina->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         if (Creature* thrall = GetCreature(DATA_THRALL))
-                            thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         SetData(DATA_RESET_WAVES, 1);
                         break;
                 }
