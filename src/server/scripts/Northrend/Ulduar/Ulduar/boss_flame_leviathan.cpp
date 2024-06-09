@@ -1485,6 +1485,11 @@ class spell_auto_repair : public SpellScript
 {
     PrepareSpellScript(spell_auto_repair);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_AUTO_REPAIR });
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         std::list<WorldObject*> tmplist;
@@ -1524,47 +1529,41 @@ class spell_auto_repair : public SpellScript
     }
 };
 
-class spell_systems_shutdown : public SpellScriptLoader
+class spell_systems_shutdown_aura : public AuraScript
 {
-public:
-    spell_systems_shutdown() : SpellScriptLoader("spell_systems_shutdown") { }
+    PrepareAuraScript(spell_systems_shutdown_aura);
 
-    class spell_systems_shutdown_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_systems_shutdown_AuraScript);
+        return ValidateSpellInfo({ SPELL_GATHERING_SPEED });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* owner = GetOwner()->ToCreature();
-            if (!owner)
-                return;
-
-            owner->SetControlled(true, UNIT_STATE_STUNNED);
-            owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
-            if (Vehicle* veh = owner->GetVehicleKit())
-                if (Unit* cannon = veh->GetPassenger(SEAT_CANNON))
-                    cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* owner = GetOwner()->ToCreature();
-            if (!owner)
-                return;
-
-            owner->SetControlled(false, UNIT_STATE_STUNNED);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_systems_shutdown_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_systems_shutdown_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_systems_shutdown_AuraScript();
+        Creature* owner = GetOwner()->ToCreature();
+        if (!owner)
+            return;
+
+        owner->SetControlled(true, UNIT_STATE_STUNNED);
+        owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        if (Vehicle* vehicle = owner->GetVehicleKit())
+            if (Unit* cannon = vehicle->GetPassenger(SEAT_CANNON))
+                cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* owner = GetOwner()->ToCreature();
+        if (!owner)
+            return;
+
+        owner->SetControlled(false, UNIT_STATE_STUNNED);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_systems_shutdown_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_systems_shutdown_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2128,7 +2127,7 @@ void AddSC_boss_flame_leviathan()
     // Spells
     RegisterSpellScript(spell_load_into_catapult_aura);
     RegisterSpellScript(spell_auto_repair);
-    new spell_systems_shutdown();
+    RegisterSpellScript(spell_systems_shutdown_aura);
     new spell_pursue();
     new spell_vehicle_throw_passenger();
     new spell_tar_blaze();
