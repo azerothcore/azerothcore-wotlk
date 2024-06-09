@@ -2526,41 +2526,30 @@ class spell_yogg_saron_protective_gaze_aura : public AuraScript
 };
 
 // 64161 - Empowered
-class spell_yogg_saron_empowered : public SpellScriptLoader
+class spell_yogg_saron_empowered_aura : public AuraScript
 {
-public:
-    spell_yogg_saron_empowered() : SpellScriptLoader("spell_yogg_saron_empowered") { }
+    PrepareAuraScript(spell_yogg_saron_empowered_aura);
 
-    class spell_yogg_saron_empowered_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_yogg_saron_empowered_AuraScript);
+        Unit* target = GetUnitOwner();
+        uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
+        if (!stack)
         {
-            Unit* target = GetUnitOwner();
-            uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
-
-            if (!stack)
-            {
-                target->RemoveAura(SPELL_EMPOWERED);
-                target->CastSpell(target, SPELL_WEAKENED, true);
-            }
-            else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
-            {
-                aur->SetStackAmount(stack);
-                target->RemoveAurasDueToSpell(SPELL_WEAKENED);
-            }
+            target->RemoveAura(SPELL_EMPOWERED);
+            target->CastSpell(target, SPELL_WEAKENED, true);
         }
-
-        void Register() override
+        else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
         {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_yogg_saron_empowered_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            aur->SetStackAmount(stack);
+            target->RemoveAurasDueToSpell(SPELL_WEAKENED);
         }
-    };
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_empowered_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_yogg_saron_empowered_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -3014,7 +3003,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_titanic_storm);
     RegisterSpellScript(spell_yogg_saron_lunatic_gaze);
     RegisterSpellScript(spell_yogg_saron_protective_gaze_aura);
-    new spell_yogg_saron_empowered();
+    RegisterSpellScript(spell_yogg_saron_empowered_aura);
     new spell_yogg_saron_insane_periodic_trigger();
     new spell_yogg_saron_insane();
     new spell_yogg_saron_sanity_well();
