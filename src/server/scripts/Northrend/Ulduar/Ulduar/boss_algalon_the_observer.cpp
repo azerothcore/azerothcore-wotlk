@@ -1196,6 +1196,11 @@ class spell_algalon_phase_punch_aura : public AuraScript
 {
     PrepareAuraScript(spell_algalon_phase_punch_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(PhasePunchAlphaId);
+    }
+
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
