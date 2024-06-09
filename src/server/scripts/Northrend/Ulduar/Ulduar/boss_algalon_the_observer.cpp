@@ -1341,32 +1341,21 @@ class spell_algalon_remove_phase_aura : public AuraScript
     }
 };
 
-class spell_algalon_supermassive_fail : public SpellScriptLoader
+class spell_algalon_supermassive_fail : public SpellScript
 {
-public:
-    spell_algalon_supermassive_fail() : SpellScriptLoader("spell_algalon_supermassive_fail") { }
+    PrepareSpellScript(spell_algalon_supermassive_fail);
 
-    class spell_algalon_supermassive_fail_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_algalon_supermassive_fail_SpellScript);
+        if (!GetHitPlayer())
+            return;
 
-        void RecalculateDamage()
-        {
-            if (!GetHitPlayer())
-                return;
+        GetHitPlayer()->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_SPELL_HIT, GetSpellInfo()->Id, true);
+    }
 
-            GetHitPlayer()->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_SPELL_HIT, GetSpellInfo()->Id, true);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_algalon_supermassive_fail_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_algalon_supermassive_fail_SpellScript();
+        OnHit += SpellHitFn(spell_algalon_supermassive_fail::RecalculateDamage);
     }
 };
 
@@ -1411,7 +1400,7 @@ void AddSC_boss_algalon_the_observer()
     RegisterSpellScript(spell_algalon_cosmic_smash_damage);
     RegisterSpellScript(spell_algalon_big_bang);
     RegisterSpellScript(spell_algalon_remove_phase_aura);
-    new spell_algalon_supermassive_fail();
+    RegisterSpellScript(spell_algalon_supermassive_fail);
 
     // Achievements
     new achievement_algalon_he_feeds_on_your_tears();
