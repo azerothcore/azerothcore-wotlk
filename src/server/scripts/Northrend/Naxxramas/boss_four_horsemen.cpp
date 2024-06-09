@@ -384,6 +384,11 @@ class spell_four_horsemen_mark_aura : public AuraScript
 {
     PrepareAuraScript(spell_four_horsemen_mark_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MARK_DAMAGE });
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
