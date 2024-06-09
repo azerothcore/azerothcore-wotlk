@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
 #include "CreatureAIImpl.h"
