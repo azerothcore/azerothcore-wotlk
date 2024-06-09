@@ -844,31 +844,20 @@ public:
     };
 };
 
-class spell_shield_of_runes : public SpellScriptLoader
+class spell_shield_of_runes_aura : public AuraScript
 {
-public:
-    spell_shield_of_runes() : SpellScriptLoader("spell_shield_of_runes") { }
+    PrepareAuraScript(spell_shield_of_runes_aura);
 
-    class spell_shield_of_runes_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_shield_of_runes_AuraScript);
+        if (Unit* owner = GetUnitOwner())
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL && aurEff->GetAmount() <= 0)
+                owner->CastSpell(owner, SPELL_SHIELD_OF_RUNES_BUFF, false);
+    }
 
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* owner = GetUnitOwner())
-                if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL && aurEff->GetAmount() <= 0)
-                    owner->CastSpell(owner, SPELL_SHIELD_OF_RUNES_BUFF, false);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_shield_of_runes_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_shield_of_runes_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_shield_of_runes_aura::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -978,7 +967,7 @@ void AddSC_boss_assembly_of_iron()
     new boss_stormcaller_brundir();
     new npc_assembly_lightning();
 
-    new spell_shield_of_runes();
+    RegisterSpellScript(spell_shield_of_runes_aura);
     new spell_assembly_meltdown();
     new spell_assembly_rune_of_summoning();
 
