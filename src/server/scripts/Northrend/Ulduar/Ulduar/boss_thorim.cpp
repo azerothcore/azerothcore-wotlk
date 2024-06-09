@@ -1746,31 +1746,20 @@ class spell_thorim_lightning_pillar_P2_aura : public AuraScript
     }
 };
 
-class spell_thorim_trash_impale : public SpellScriptLoader
+class spell_thorim_trash_impale_aura : public AuraScript
 {
-public:
-    spell_thorim_trash_impale() : SpellScriptLoader("spell_thorim_trash_impale") { }
+    PrepareAuraScript(spell_thorim_trash_impale_aura);
 
-    class spell_thorim_trash_impale_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_thorim_trash_impale_AuraScript);
+        // deals damage until target is healed above 90%
+        if (GetUnitOwner()->HealthAbovePct(90))
+            SetDuration(0);
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            // deals damage until target is healed above 90%
-            if (GetUnitOwner()->HealthAbovePct(90))
-                SetDuration(0);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_thorim_trash_impale_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1828,7 +1817,7 @@ void AddSC_boss_thorim()
 
     // Spells
     RegisterSpellScript(spell_thorim_lightning_pillar_P2_aura);
-    new spell_thorim_trash_impale();
+    RegisterSpellScript(spell_thorim_trash_impale_aura);
 
     // Achievements
     new achievement_thorim_stand_in_the_lightning();
