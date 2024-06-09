@@ -2378,42 +2378,31 @@ protected:
 };
 
 // 64465 - Shadow Beacon
-class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
+class spell_yogg_saron_shadow_beacon_aura : public AuraScript
 {
-    public:
-        spell_yogg_saron_shadow_beacon() : SpellScriptLoader("spell_yogg_saron_shadow_beacon") { }
+    PrepareAuraScript(spell_yogg_saron_shadow_beacon_aura);
 
-        class spell_yogg_saron_shadow_beacon_AuraScript : public AuraScript
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_yogg_saron_shadow_beacon_AuraScript);
-
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            if (Creature* target = GetTarget()->ToCreature())
             {
-                if (Creature* target = GetTarget()->ToCreature())
-                {
-                    target->SetEntry(NPC_MARKED_IMMORTAL_GUARDIAN);
-                }
+                target->SetEntry(NPC_MARKED_IMMORTAL_GUARDIAN);
             }
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Creature* target = GetTarget()->ToCreature())
-                {
-                    target->SetEntry(NPC_IMMORTAL_GUARDIAN);
-                }
-            }
-
-            void Register() override
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_yogg_saron_shadow_beacon_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_shadow_beacon_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_yogg_saron_shadow_beacon_AuraScript();
         }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* target = GetTarget()->ToCreature())
+            {
+                target->SetEntry(NPC_IMMORTAL_GUARDIAN);
+            }
+        }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_yogg_saron_shadow_beacon_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_shadow_beacon_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 // 65206 - Destabilization Matrix
@@ -3064,7 +3053,7 @@ void AddSC_boss_yoggsaron()
     // SPELLS
     RegisterSpellScript(spell_yogg_saron_malady_of_the_mind_aura);
     RegisterSpellAndAuraScriptPair(spell_yogg_saron_brain_link, spell_yogg_saron_brain_link_aura);
-    new spell_yogg_saron_shadow_beacon();
+    RegisterSpellScript(spell_yogg_saron_shadow_beacon_aura);
     new spell_yogg_saron_destabilization_matrix();
     new spell_yogg_saron_titanic_storm();
     new spell_yogg_saron_lunatic_gaze();
