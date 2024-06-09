@@ -2799,40 +2799,29 @@ class spell_yogg_saron_empowering_shadows : public SpellScript
 };
 
 // 64184 - In the Maws of the Old God
-class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScriptLoader
+class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScript
 {
-public:
-    spell_yogg_saron_in_the_maws_of_the_old_god() : SpellScriptLoader("spell_yogg_saron_in_the_maws_of_the_old_god") {}
+    PrepareSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
 
-    class spell_yogg_saron_in_the_maws_of_the_old_god_SpellScript : public SpellScript
+    SpellCastResult CheckCast()
     {
-        PrepareSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god_SpellScript);
+        if (!GetCaster()->IsPlayer())
+            return SPELL_FAILED_BAD_TARGETS;
 
-        SpellCastResult CheckCast()
-        {
-            if (!GetCaster()->IsPlayer())
-                return SPELL_FAILED_BAD_TARGETS;
+        Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit();
+        if (!target || target->GetEntry() != NPC_YOGG_SARON)
+            return SPELL_FAILED_BAD_TARGETS;
 
-            Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit();
-            if (!target || target->GetEntry() != NPC_YOGG_SARON)
-                return SPELL_FAILED_BAD_TARGETS;
+        Spell* spell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (!spell || spell->GetSpellInfo()->Id != SPELL_DEAFENING_ROAR)
+            return SPELL_FAILED_TARGET_AURASTATE;
 
-            Spell* spell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-            if (!spell || spell->GetSpellInfo()->Id != SPELL_DEAFENING_ROAR)
-                return SPELL_FAILED_TARGET_AURASTATE;
+        return SPELL_CAST_OK;
+    }
 
-            return SPELL_CAST_OK;
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_yogg_saron_in_the_maws_of_the_old_god_SpellScript::CheckCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_in_the_maws_of_the_old_god_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_yogg_saron_in_the_maws_of_the_old_god::CheckCast);
     }
 };
 
@@ -3008,7 +2997,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);
     RegisterSpellScript(spell_yogg_saron_empowering_shadows);
-    new spell_yogg_saron_in_the_maws_of_the_old_god();
+    RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
     new spell_yogg_saron_target_selectors();
     new spell_yogg_saron_grim_reprisal();
 
