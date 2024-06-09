@@ -1,3 +1,4 @@
+-- DB update 2024_06_09_01 -> 2024_06_09_02
 --
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 18145;
 
