@@ -259,6 +259,44 @@ public:
             }
         }
 
+        void ResetWaves(uint8 type)
+        {
+            if (type == TEAM_HORDE)
+            {
+                for (ObjectGuid const& guid : _baseHorde)
+                    if (Creature* creature = instance->GetCreature(guid))
+                        creature->DespawnOrUnsummon(0s, 300s);
+            }
+            else if (type == DATA_RESET_ALLIANCE)
+            {
+                for (ObjectGuid const& guid : _baseAlliance)
+                    if (Creature* creature = instance->GetCreature(guid))
+                        creature->DespawnOrUnsummon(0s, 300s);
+            } else
+            {
+                for (ObjectGuid const& guid : _baseNightElf)
+                    if (Creature* creature = instance->GetCreature(guid))
+                        creature->DespawnOrUnsummon(0s, 300s);
+
+                if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
+                    archimonde->DespawnOrUnsummon(0s, 300s);
+            }
+
+            for (ObjectGuid const& guid : _encounterNPCs)
+                if (Creature* creature = instance->GetCreature(guid))
+                    creature->DespawnOrUnsummon();
+
+            // also force despawn boss summons
+            for (ObjectGuid const& guid : _summonedNPCs)
+                if (Creature* creature = instance->GetCreature(guid))
+                    creature->DespawnOrUnsummon();
+
+            if (_bossWave && (GetBossState(_bossWave) != DONE))
+                SetBossState(_bossWave, NOT_STARTED);
+
+            SetData(DATA_RESET_WAVES, 0);
+        }
+
         void SetData(uint32 type, uint32 data) override
         {
             switch (type)
@@ -290,14 +328,14 @@ public:
                     }
 
                     // Despawn all alliance NPCs
-                    _scheduler.Schedule(21000ms, [this](TaskContext)
+                    scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->DespawnOrUnsummon();
 
                             // Spawn Roaring Flame after a delay
-                            _scheduler.Schedule(30s, [this](TaskContext)
+                            scheduler.Schedule(30s, [this](TaskContext)
                                 {
                                     for (ObjectGuid const& guid : _roaringFlameAlliance)
                                     {
@@ -338,13 +376,13 @@ public:
                         }
                     }
 
-                    _scheduler.Schedule(21000ms, [this](TaskContext)
+                    scheduler.Schedule(21000ms, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->DespawnOrUnsummon();
 
-                            _scheduler.Schedule(30s, [this](TaskContext)
+                            scheduler.Schedule(30s, [this](TaskContext)
                                 {
                                     for (ObjectGuid const& guid : _roaringFlameHorde)
                                         if (GameObject* flame = instance->GetGameObject(guid))
@@ -420,83 +458,12 @@ public:
                 }
                     break;
                 case DATA_RESET_ALLIANCE:
-                    for (ObjectGuid const& guid : _baseAlliance)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    for (ObjectGuid const& guid : _encounterNPCs)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    // also force despawn boss summons
-                    for (ObjectGuid const& guid : _summonedNPCs)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    if (_bossWave && (GetBossState(_bossWave) != DONE))
-                        SetBossState(_bossWave, NOT_STARTED);
-
-                    _scheduler.Schedule(300s, [this](TaskContext)
-                        {
-                            for (ObjectGuid const& guid : _baseAlliance)
-                                if (Creature* creature = instance->GetCreature(guid))
-                                    creature->Respawn();
-                        });
-
-                    SetData(DATA_RESET_WAVES, 0);
-                    break;
                 case DATA_RESET_HORDE:
-                    for (ObjectGuid const& guid : _baseHorde)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    for (ObjectGuid const& guid : _encounterNPCs)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    // also force despawn boss summons
-                    for (ObjectGuid const& guid : _summonedNPCs)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    if (_bossWave && (GetBossState(_bossWave) != DONE))
-                        SetBossState(_bossWave, NOT_STARTED);
-
-                    _scheduler.Schedule(300s, [this](TaskContext)
-                        {
-                            for (ObjectGuid const& guid : _baseHorde)
-                                if (Creature* creature = instance->GetCreature(guid))
-                                    creature->Respawn();
-                        });
-
-                    SetData(DATA_RESET_WAVES, 0);
-                    break;
                 case DATA_RESET_NIGHT_ELF:
-                    for (ObjectGuid const& guid : _baseNightElf)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    for (ObjectGuid const& guid : _encounterNPCs)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            creature->DespawnOrUnsummon();
-
-                    if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
-                        archimonde->DespawnOrUnsummon();
-
-                    _scheduler.Schedule(300s, [this](TaskContext)
-                        {
-                            for (ObjectGuid const& guid : _baseNightElf)
-                                if (Creature* creature = instance->GetCreature(guid))
-                                    creature->Respawn();
-
-                            if (Creature* archi = GetCreature(DATA_ARCHIMONDE))
-                                archi->Respawn();
-                        });
-
-                    SetData(DATA_RESET_WAVES, 0);
+                    ResetWaves(type);
                     break;
                 case DATA_RESET_WAVES:
-                    _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
+                    scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
                     _encounterNPCs.clear();
                     _summonedNPCs.clear();
                     _currentWave = 0;
@@ -533,10 +500,10 @@ public:
         void ScheduleWaves(Milliseconds /* time */, uint8 startWaves, uint8 maxWaves, Milliseconds timerptr[])
         {
             // No overlapping!
-            _scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
+            scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
             trash = 0;    // Reset counter here to avoid resetting the counter from scheduled waves. Required because creatures killed for RP events counts towards the kill counter as well, confirmed in Retail.
 
-            _scheduler.Schedule(1ms, [this, startWaves, maxWaves, timerptr](TaskContext context)
+            scheduler.Schedule(1ms, [this, startWaves, maxWaves, timerptr](TaskContext context)
                 {
                     // If all waves reached, cancel scheduling new ones
                     if (_currentWave >= maxWaves)
@@ -572,7 +539,7 @@ public:
 
         void Update(uint32 diff) override
         {
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
         }
 
         void OnPlayerInWaterStateUpdate(Player* player, bool inWater) override
@@ -588,7 +555,6 @@ public:
         uint8 _currentWave;
         uint8 _bossWave;
         uint8 _retreat;
-        TaskScheduler _scheduler;
         GuidSet _encounterNPCs;
         GuidSet _summonedNPCs;
         GuidSet _baseAlliance;
