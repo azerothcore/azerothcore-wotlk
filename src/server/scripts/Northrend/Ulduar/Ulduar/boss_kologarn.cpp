@@ -769,33 +769,22 @@ class spell_ulduar_stone_grip_aura : public AuraScript
     }
 };
 
-class spell_ulduar_squeezed_lifeless : public SpellScriptLoader
+class spell_ulduar_squeezed_lifeless : public SpellScript
 {
-public:
-    spell_ulduar_squeezed_lifeless() : SpellScriptLoader("spell_ulduar_squeezed_lifeless") { }
+    PrepareSpellScript(spell_ulduar_squeezed_lifeless);
 
-    class spell_ulduar_squeezed_lifeless_SpellScript : public SpellScript
+    void HandleInstaKill(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_ulduar_squeezed_lifeless_SpellScript);
+        if (!GetHitPlayer() || !GetHitPlayer()->GetVehicle())
+            return;
 
-        void HandleInstaKill(SpellEffIndex  /*effIndex*/)
-        {
-            if (!GetHitPlayer() || !GetHitPlayer()->GetVehicle())
-                return;
+        // Hack to set correct position is in _ExitVehicle()
+        GetHitPlayer()->ExitVehicle();
+    }
 
-            // Hack to set correct position is in _ExitVehicle()
-            GetHitPlayer()->ExitVehicle();
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ulduar_squeezed_lifeless_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_ulduar_squeezed_lifeless_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_ulduar_squeezed_lifeless::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
     }
 };
 
@@ -908,7 +897,7 @@ void AddSC_boss_kologarn()
     // Spells
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     RegisterSpellScript(spell_ulduar_stone_grip_aura);
-    new spell_ulduar_squeezed_lifeless();
+    RegisterSpellScript(spell_ulduar_squeezed_lifeless);
     new spell_kologarn_stone_shout();
 
     // Achievements
