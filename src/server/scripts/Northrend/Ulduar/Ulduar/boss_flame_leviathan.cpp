@@ -1703,29 +1703,18 @@ class spell_vehicle_throw_passenger : public SpellScript
     }
 };
 
-class spell_tar_blaze : public SpellScriptLoader
+class spell_tar_blaze_aura : public AuraScript
 {
-public:
-    spell_tar_blaze() : SpellScriptLoader("spell_tar_blaze") { }
+    PrepareAuraScript(spell_tar_blaze_aura);
 
-    class spell_tar_blaze_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_tar_blaze_AuraScript);
+        GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_tar_blaze_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_tar_blaze_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_tar_blaze_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -2108,7 +2097,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
-    new spell_tar_blaze();
+    RegisterSpellScript(spell_tar_blaze_aura);
     new spell_vehicle_grab_pyrite();
     new spell_vehicle_circuit_overload();
     new spell_orbital_supports();
