@@ -1759,34 +1759,23 @@ class spell_vehicle_grab_pyrite : public SpellScript
     }
 };
 
-class spell_vehicle_circuit_overload : public SpellScriptLoader
+class spell_vehicle_circuit_overload_aura : public AuraScript
 {
-public:
-    spell_vehicle_circuit_overload() : SpellScriptLoader("spell_vehicle_circuit_overload") { }
+    PrepareAuraScript(spell_vehicle_circuit_overload_aura);
 
-    class spell_vehicle_circuit_overload_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_vehicle_circuit_overload_AuraScript);
+        if (Unit* target = GetTarget())
+            if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
+            {
+                target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
+                target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
+            }
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
-                {
-                    target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
-                    target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_vehicle_circuit_overload_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -2100,7 +2089,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_vehicle_throw_passenger);
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);
-    new spell_vehicle_circuit_overload();
+    RegisterSpellScript(spell_vehicle_circuit_overload_aura);
     new spell_orbital_supports();
     new spell_thorims_hammer();
     new spell_transitus_shield_beam();
