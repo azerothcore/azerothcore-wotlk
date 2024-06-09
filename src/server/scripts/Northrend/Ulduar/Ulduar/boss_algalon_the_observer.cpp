@@ -1292,46 +1292,36 @@ class spell_algalon_cosmic_smash_damage : public SpellScript
     }
 };
 
-class spell_algalon_big_bang : public SpellScriptLoader
+class spell_algalon_big_bang : public SpellScript
 {
-public:
-    spell_algalon_big_bang() : SpellScriptLoader("spell_algalon_big_bang") { }
+    PrepareSpellScript(spell_algalon_big_bang);
 
-    class spell_algalon_big_bang_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_algalon_big_bang_SpellScript);
-
-        bool Load() override
-        {
-            _targetCount = 0;
-            return true;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _targetCount = targets.size();
-        }
-
-        void CheckTargets()
-        {
-            Unit* caster = GetCaster();
-            if (!_targetCount && caster && caster->GetAI())
-                caster->GetAI()->DoAction(ACTION_ASCEND);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_big_bang_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            AfterCast += SpellCastFn(spell_algalon_big_bang_SpellScript::CheckTargets);
-        }
-
-        uint32 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_algalon_big_bang_SpellScript();
+        _targetCount = 0;
+        return true;
     }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _targetCount = targets.size();
+    }
+
+    void CheckTargets()
+    {
+        Unit* caster = GetCaster();
+        if (!_targetCount && caster && caster->GetAI())
+            caster->GetAI()->DoAction(ACTION_ASCEND);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_big_bang::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        AfterCast += SpellCastFn(spell_algalon_big_bang::CheckTargets);
+    }
+
+private:
+    uint32 _targetCount;
 };
 
 class spell_algalon_remove_phase : public SpellScriptLoader
@@ -1430,7 +1420,7 @@ void AddSC_boss_algalon_the_observer()
     RegisterSpellScript(spell_algalon_collapse_aura);
     RegisterSpellScript(spell_algalon_trigger_3_adds);
     RegisterSpellScript(spell_algalon_cosmic_smash_damage);
-    new spell_algalon_big_bang();
+    RegisterSpellScript(spell_algalon_big_bang);
     new spell_algalon_remove_phase();
     new spell_algalon_supermassive_fail();
 
