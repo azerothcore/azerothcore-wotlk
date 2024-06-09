@@ -501,30 +501,19 @@ public:
     };
 };
 
-class spell_ulduar_arachnopod_damaged : public SpellScriptLoader
+class spell_ulduar_arachnopod_damaged_aura : public AuraScript
 {
-public:
-    spell_ulduar_arachnopod_damaged() : SpellScriptLoader("spell_ulduar_arachnopod_damaged") { }
+    PrepareAuraScript(spell_ulduar_arachnopod_damaged_aura);
 
-    class spell_ulduar_arachnopod_damaged_AuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        PrepareAuraScript(spell_ulduar_arachnopod_damaged_AuraScript)
+        if (Unit* caster = GetCaster())
+            Unit::Kill(caster, caster, false);
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* c = GetCaster())
-                Unit::Kill(c, c, false);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_ulduar_arachnopod_damaged_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -581,7 +570,7 @@ void AddSC_ulduar()
     RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
     new npc_ulduar_storm_tempered_keeper();
     new npc_ulduar_arachnopod_destroyer();
-    new spell_ulduar_arachnopod_damaged();
+    RegisterSpellScript(spell_ulduar_arachnopod_damaged_aura);
     new AreaTrigger_at_celestial_planetarium_enterance();
     RegisterCreatureAI(npc_salvaged_siege_engine);
 }
