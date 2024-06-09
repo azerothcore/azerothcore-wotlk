@@ -1884,45 +1884,35 @@ class spell_transitus_shield_beam_aura : public AuraScript
     }
 };
 
-class spell_shield_generator : public SpellScriptLoader
+class spell_shield_generator_aura : public AuraScript
 {
-public:
-    spell_shield_generator() : SpellScriptLoader("spell_shield_generator") { }
+    PrepareAuraScript(spell_shield_generator_aura);
 
-    class spell_shield_generator_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_shield_generator_AuraScript);
-
-        uint32 absorbPct;
-
-        bool Load() override
-        {
-            absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
-            return true;
-        }
-
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_shield_generator_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_shield_generator_AuraScript::Absorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_shield_generator_AuraScript();
+        _absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
+        return true;
     }
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
+
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), _absorbPct);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_shield_generator_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_shield_generator_aura::Absorb, EFFECT_0);
+    }
+
+private:
+    uint32 _absorbPct;
 };
 
 class spell_demolisher_ride_vehicle : public SpellScriptLoader
@@ -2070,7 +2060,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_orbital_supports_aura);
     RegisterSpellScript(spell_thorims_hammer);
     RegisterSpellScript(spell_transitus_shield_beam_aura);
-    new spell_shield_generator();
+    RegisterSpellScript(spell_shield_generator_aura);
     new spell_demolisher_ride_vehicle();
 
     // Achievements
