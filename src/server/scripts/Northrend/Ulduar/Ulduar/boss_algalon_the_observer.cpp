@@ -1270,36 +1270,25 @@ class spell_algalon_trigger_3_adds : public SpellScript
     }
 };
 
-class spell_algalon_cosmic_smash_damage : public SpellScriptLoader
+class spell_algalon_cosmic_smash_damage : public SpellScript
 {
-public:
-    spell_algalon_cosmic_smash_damage() : SpellScriptLoader("spell_algalon_cosmic_smash_damage") { }
+    PrepareSpellScript(spell_algalon_cosmic_smash_damage);
 
-    class spell_algalon_cosmic_smash_damage_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_algalon_cosmic_smash_damage_SpellScript);
+        if (!GetExplTargetDest() || !GetHitUnit())
+            return;
 
-        void RecalculateDamage()
-        {
-            if (!GetExplTargetDest() || !GetHitUnit())
-                return;
+        float distance = GetHitUnit()->GetDistance2d(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY());
+        if (distance >= 10.0f)
+            SetHitDamage(int32(float(GetHitDamage()) / distance));
+        else if (distance > 6.0f)
+            SetHitDamage(int32(float(GetHitDamage()) / distance) * 2);
+    }
 
-            float distance = GetHitUnit()->GetDistance2d(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY());
-            if (distance >= 10.0f)
-                SetHitDamage(int32(float(GetHitDamage()) / distance));
-            else if (distance > 6.0f)
-                SetHitDamage(int32(float(GetHitDamage()) / distance) * 2);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_algalon_cosmic_smash_damage_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_algalon_cosmic_smash_damage_SpellScript();
+        OnHit += SpellHitFn(spell_algalon_cosmic_smash_damage::RecalculateDamage);
     }
 };
 
@@ -1440,7 +1429,7 @@ void AddSC_boss_algalon_the_observer()
     RegisterSpellScript(spell_algalon_phase_punch_aura);
     RegisterSpellScript(spell_algalon_collapse_aura);
     RegisterSpellScript(spell_algalon_trigger_3_adds);
-    new spell_algalon_cosmic_smash_damage();
+    RegisterSpellScript(spell_algalon_cosmic_smash_damage);
     new spell_algalon_big_bang();
     new spell_algalon_remove_phase();
     new spell_algalon_supermassive_fail();
