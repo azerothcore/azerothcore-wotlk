@@ -2104,33 +2104,22 @@ public:
     };
 };
 
-class spell_mimiron_rapid_burst : public SpellScriptLoader
+class spell_mimiron_rapid_burst_aura : public AuraScript
 {
-public:
-    spell_mimiron_rapid_burst() : SpellScriptLoader("spell_mimiron_rapid_burst") { }
+    PrepareAuraScript(spell_mimiron_rapid_burst_aura);
 
-    class spell_mimiron_rapid_burst_AuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_mimiron_rapid_burst_AuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
+        if (Unit* caster = GetCaster())
         {
-            if (Unit* c = GetCaster())
-            {
-                uint32 id = ( c->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1) );
-                c->CastSpell((Unit*)nullptr, id, true);
-            }
+            uint32 id = (caster->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1));
+            caster->CastSpell((Unit*)nullptr, id, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rapid_burst_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_mimiron_rapid_burst_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rapid_burst_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -2518,7 +2507,7 @@ void AddSC_boss_mimiron()
     new npc_ulduar_mimiron_rocket();
     new npc_ulduar_magnetic_core();
     new npc_ulduar_bot_summon_trigger();
-    new spell_mimiron_rapid_burst();
+    RegisterSpellScript(spell_mimiron_rapid_burst_aura);
     new spell_mimiron_p3wx2_laser_barrage();
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
