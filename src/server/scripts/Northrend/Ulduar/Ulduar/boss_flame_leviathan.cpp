@@ -1651,6 +1651,7 @@ class spell_pursue : public SpellScript
 class spell_vehicle_throw_passenger : public SpellScript
 {
     PrepareSpellScript(spell_vehicle_throw_passenger);
+
     void HandleScript()
     {
         Spell* baseSpell = GetSpell();
@@ -1718,43 +1719,43 @@ class spell_tar_blaze_aura : public AuraScript
     }
 };
 
-class spell_vehicle_grab_pyrite : public SpellScriptLoader
+enum VehicleGrabPyrite
 {
-public:
-    spell_vehicle_grab_pyrite() : SpellScriptLoader("spell_vehicle_grab_pyrite") {}
+    SPELL_ADD_PYRITE = 62496
+};
 
-    class spell_vehicle_grab_pyrite_SpellScript : public SpellScript
+class spell_vehicle_grab_pyrite : public SpellScript
+{
+    PrepareSpellScript(spell_vehicle_grab_pyrite);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_vehicle_grab_pyrite_SpellScript);
-        void HandleScript(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (Unit* seat = GetCaster()->GetVehicleBase())
+        return ValidateSpellInfo({ SPELL_ADD_PYRITE });
+    }
+
+    void HandleScript(SpellEffIndex  /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            if (Unit* seat = GetCaster()->GetVehicleBase())
+            {
+                if (Vehicle* vehicle = seat->GetVehicleKit())
+                    if (Unit* pyrite = vehicle->GetPassenger(1))
+                        pyrite->ExitVehicle();
+
+                if (Unit* parent = seat->GetVehicleBase())
                 {
-                    if (Vehicle* vSeat = seat->GetVehicleKit())
-                        if (Unit* pyrite = vSeat->GetPassenger(1))
-                            pyrite->ExitVehicle();
+                    GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
+                    target->CastSpell(seat, GetEffectValue());
 
-                    if (Unit* parent = seat->GetVehicleBase())
-                    {
-                        GetCaster()->CastSpell(parent, 62496 /*SPELL_ADD_PYRITE*/, true);
-                        target->CastSpell(seat, GetEffectValue());
-
-                        if (target->GetTypeId() == TYPEID_UNIT)
-                            target->ToCreature()->DespawnOrUnsummon(1300);
-                    }
+                    if (target->GetTypeId() == TYPEID_UNIT)
+                        target->ToCreature()->DespawnOrUnsummon(1300);
                 }
-        }
+            }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_vehicle_grab_pyrite_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2098,7 +2099,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
     RegisterSpellScript(spell_tar_blaze_aura);
-    new spell_vehicle_grab_pyrite();
+    RegisterSpellScript(spell_vehicle_grab_pyrite);
     new spell_vehicle_circuit_overload();
     new spell_orbital_supports();
     new spell_thorims_hammer();
