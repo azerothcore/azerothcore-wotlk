@@ -848,6 +848,11 @@ class spell_shield_of_runes_aura : public AuraScript
 {
     PrepareAuraScript(spell_shield_of_runes_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHIELD_OF_RUNES_BUFF });
+    }
+
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* owner = GetUnitOwner())
@@ -881,6 +886,11 @@ class spell_assembly_meltdown : public SpellScript
 class spell_assembly_rune_of_summoning_aura : public AuraScript
 {
     PrepareAuraScript(spell_assembly_rune_of_summoning_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RUNE_OF_SUMMONING_SUMMON });
+    }
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
