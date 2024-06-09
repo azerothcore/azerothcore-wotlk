@@ -29,6 +29,7 @@ enum Spells
     SPELL_ENRAGE_25                     = 54427,
     SPELL_DECIMATE_10                   = 28374,
     SPELL_DECIMATE_25                   = 54426,
+    SPELL_DECIMATE_DAMAGE               = 28375,
     SPELL_BERSERK                       = 26662,
     SPELL_INFECTED_WOUND                = 29306,
     SPELL_CHOW_SEARCHER                 = 28404
@@ -241,6 +242,11 @@ class spell_gluth_decimate : public SpellScript
 {
     PrepareSpellScript(spell_gluth_decimate);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DECIMATE_DAMAGE });
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* unitTarget = GetHitUnit())
@@ -257,7 +263,7 @@ class spell_gluth_decimate : public SpellScript
                 Unit::DealDamage(GetCaster(), cTarget, damage);
                 return;
             }
-            GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
+            GetCaster()->CastCustomSpell(SPELL_DECIMATE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, unitTarget);
         }
     }
 
