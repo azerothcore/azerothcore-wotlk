@@ -2497,42 +2497,31 @@ class spell_yogg_saron_lunatic_gaze : public SpellScript
 };
 
 // 64174 - Protective Gaze
-class spell_yogg_saron_protective_gaze : public SpellScriptLoader
+class spell_yogg_saron_protective_gaze_aura : public AuraScript
 {
-public:
-    spell_yogg_saron_protective_gaze() : SpellScriptLoader("spell_yogg_saron_protective_gaze") { }
+    PrepareAuraScript(spell_yogg_saron_protective_gaze_aura);
 
-    class spell_yogg_saron_protective_gaze_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_yogg_saron_protective_gaze_AuraScript);
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            Unit* target = GetTarget();
-            if (dmgInfo.GetDamage() < target->GetHealth() || !GetCaster() || GetCaster()->ToCreature()->HasSpellCooldown(SPELL_HODIR_FLASH_FREEZE))
-                return;
-
-            target->CastSpell(target, SPELL_HODIR_FLASH_FREEZE, true);
-            GetCaster()->AddSpellCooldown(SPELL_HODIR_FLASH_FREEZE, 0, 0);
-            absorbAmount = dmgInfo.GetDamage();
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_yogg_saron_protective_gaze_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_yogg_saron_protective_gaze_AuraScript::Absorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        return new spell_yogg_saron_protective_gaze_AuraScript();
+        Unit* target = GetTarget();
+        if (dmgInfo.GetDamage() < target->GetHealth() || !GetCaster() || GetCaster()->ToCreature()->HasSpellCooldown(SPELL_HODIR_FLASH_FREEZE))
+            return;
+
+        target->CastSpell(target, SPELL_HODIR_FLASH_FREEZE, true);
+        GetCaster()->AddSpellCooldown(SPELL_HODIR_FLASH_FREEZE, 0, 0);
+        absorbAmount = dmgInfo.GetDamage();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_yogg_saron_protective_gaze_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_yogg_saron_protective_gaze_aura::Absorb, EFFECT_0);
     }
 };
 
@@ -3024,7 +3013,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_destabilization_matrix);
     RegisterSpellScript(spell_yogg_saron_titanic_storm);
     RegisterSpellScript(spell_yogg_saron_lunatic_gaze);
-    new spell_yogg_saron_protective_gaze();
+    RegisterSpellScript(spell_yogg_saron_protective_gaze_aura);
     new spell_yogg_saron_empowered();
     new spell_yogg_saron_insane_periodic_trigger();
     new spell_yogg_saron_insane();
