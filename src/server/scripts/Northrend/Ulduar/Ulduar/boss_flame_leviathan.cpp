@@ -1763,6 +1763,11 @@ class spell_vehicle_circuit_overload_aura : public AuraScript
 {
     PrepareAuraScript(spell_vehicle_circuit_overload_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SYSTEMS_SHUTDOWN });
+    }
+
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
         if (Unit* target = GetTarget())
@@ -1779,28 +1784,17 @@ class spell_vehicle_circuit_overload_aura : public AuraScript
     }
 };
 
-class spell_orbital_supports : public SpellScriptLoader
+class spell_orbital_supports_aura : public AuraScript
 {
-public:
-    spell_orbital_supports() : SpellScriptLoader("spell_orbital_supports") { }
+    PrepareAuraScript(spell_orbital_supports_aura);
 
-    class spell_orbital_supports_AuraScript : public AuraScript
+    bool CheckAreaTarget(Unit* target)
     {
-        PrepareAuraScript(spell_orbital_supports_AuraScript);
-
-        bool CheckAreaTarget(Unit* target)
-        {
-            return target->GetEntry() == NPC_LEVIATHAN;
-        }
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_orbital_supports_AuraScript::CheckAreaTarget);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+        return target->GetEntry() == NPC_LEVIATHAN;
+    }
+    void Register() override
     {
-        return new spell_orbital_supports_AuraScript();
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_orbital_supports_aura::CheckAreaTarget);
     }
 };
 
@@ -2090,7 +2084,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);
     RegisterSpellScript(spell_vehicle_circuit_overload_aura);
-    new spell_orbital_supports();
+    RegisterSpellScript(spell_orbital_supports_aura);
     new spell_thorims_hammer();
     new spell_transitus_shield_beam();
     new spell_shield_generator();
