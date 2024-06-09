@@ -861,31 +861,20 @@ class spell_shield_of_runes_aura : public AuraScript
     }
 };
 
-class spell_assembly_meltdown : public SpellScriptLoader
+class spell_assembly_meltdown : public SpellScript
 {
-public:
-    spell_assembly_meltdown() : SpellScriptLoader("spell_assembly_meltdown") { }
+    PrepareSpellScript(spell_assembly_meltdown);
 
-    class spell_assembly_meltdown_SpellScript : public SpellScript
+    void HandleInstaKill(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_assembly_meltdown_SpellScript);
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_STEELBREAKER)))
+                Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
+    }
 
-        void HandleInstaKill(SpellEffIndex /*effIndex*/)
-        {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_STEELBREAKER)))
-                    Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_assembly_meltdown_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_assembly_meltdown_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_assembly_meltdown::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
     }
 };
 
@@ -968,7 +957,7 @@ void AddSC_boss_assembly_of_iron()
     new npc_assembly_lightning();
 
     RegisterSpellScript(spell_shield_of_runes_aura);
-    new spell_assembly_meltdown();
+    RegisterSpellScript(spell_assembly_meltdown);
     new spell_assembly_rune_of_summoning();
 
     new achievement_assembly_of_iron("achievement_but_im_on_your_side", 0);
