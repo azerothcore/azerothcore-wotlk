@@ -396,6 +396,10 @@ public:
                         _bossWave = DATA_ARCHIMONDE;
                         ScheduleWaves(1ms, START_WAVE_NIGHT_ELF, MAX_WAVES_NIGHT_ELF, hyjalNightElfWaveTimers[0]);
                     }
+
+                    if (_bossWave)
+                        DoUpdateWorldState(WORLD_STATE_WAVES, 0);
+
                     break;
                 case DATA_SPAWN_INFERNALS:
                 {
