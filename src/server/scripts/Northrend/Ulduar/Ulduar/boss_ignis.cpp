@@ -452,30 +452,24 @@ class spell_ignis_scorch_aura : public AuraScript
     }
 };
 
-class spell_ignis_grab_initial : public SpellScriptLoader
+class spell_ignis_grab_initial : public SpellScript
 {
-public:
-    spell_ignis_grab_initial() : SpellScriptLoader("spell_ignis_grab_initial") { }
+    PrepareSpellScript(spell_ignis_grab_initial);
 
-    class spell_ignis_grab_initial_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ignis_grab_initial_SpellScript);
+        return ValidateSpellInfo( { SPELL_GRAB_TRIGGERED });
+    }
 
-        void HandleScript(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* t = GetHitUnit())
-                t->CastSpell(t, SPELL_GRAB_TRIGGERED, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ignis_grab_initial_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_ignis_grab_initial_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_GRAB_TRIGGERED, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ignis_grab_initial::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -547,7 +541,7 @@ void AddSC_boss_ignis()
     new boss_ignis();
     new npc_ulduar_iron_construct();
     RegisterSpellScript(spell_ignis_scorch_aura);
-    new spell_ignis_grab_initial();
+    RegisterSpellScript(spell_ignis_grab_initial);
     new spell_ignis_slag_pot();
     new achievement_ignis_shattered();
 }
