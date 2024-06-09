@@ -857,36 +857,25 @@ public:
 };
 
 // 62775 - Tympanic Tantrum
-class spell_xt002_tympanic_tantrum : public SpellScriptLoader
+class spell_xt002_tympanic_tantrum : public SpellScript
 {
-public:
-    spell_xt002_tympanic_tantrum() : SpellScriptLoader("spell_xt002_tympanic_tantrum") { }
+    PrepareSpellScript(spell_xt002_tympanic_tantrum);
 
-    class spell_xt002_tympanic_tantrum_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_xt002_tympanic_tantrum_SpellScript);
+        targets.remove_if(PlayerOrPetCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(PlayerOrPetCheck());
-        }
-
-        void RecalculateDamage()
-        {
-            if (GetHitUnit())
-                SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(GetHitDamage()));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_tympanic_tantrum_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnHit += SpellHitFn(spell_xt002_tympanic_tantrum_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void RecalculateDamage()
     {
-        return new spell_xt002_tympanic_tantrum_SpellScript();
+        if (GetHitUnit())
+            SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(GetHitDamage()));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_tympanic_tantrum::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnHit += SpellHitFn(spell_xt002_tympanic_tantrum::RecalculateDamage);
     }
 };
 
@@ -1088,7 +1077,7 @@ void AddSC_boss_xt002()
     new npc_xt002_life_spark();
 
     // Spells
-    new spell_xt002_tympanic_tantrum();
+    RegisterSpellScript(spell_xt002_tympanic_tantrum);
     new spell_xt002_gravity_bomb_aura();
     new spell_xt002_gravity_bomb_damage();
     new spell_xt002_searing_light_spawn_life_spark();
