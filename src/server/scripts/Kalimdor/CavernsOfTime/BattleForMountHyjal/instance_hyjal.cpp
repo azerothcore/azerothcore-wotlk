@@ -256,11 +256,6 @@ public:
             }
         }
 
-        void ResetWaves(uint8 type)
-        {
-
-        }
-
         void SetData(uint32 type, uint32 data) override
         {
             switch (type)
