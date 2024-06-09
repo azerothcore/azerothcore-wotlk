@@ -951,35 +951,24 @@ public:
 };
 
 // 64233, 63025 - Gravity Bomb
-class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
+class spell_xt002_gravity_bomb_damage : public SpellScript
 {
-public:
-    spell_xt002_gravity_bomb_damage() : SpellScriptLoader("spell_xt002_gravity_bomb_damage") { }
+    PrepareSpellScript(spell_xt002_gravity_bomb_damage);
 
-    class spell_xt002_gravity_bomb_damage_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*eff*/)
     {
-        PrepareSpellScript(spell_xt002_gravity_bomb_damage_SpellScript);
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
 
-        void HandleScript(SpellEffIndex /*eff*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
+        if (GetHitDamage() >= int32(GetHitUnit()->GetHealth()))
+            if (caster->GetAI())
+                caster->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
+    }
 
-            if (GetHitDamage() >= int32(GetHitUnit()->GetHealth()))
-                if (caster->GetAI())
-                    caster->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_xt002_gravity_bomb_damage_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_xt002_gravity_bomb_damage_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_xt002_gravity_bomb_damage::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -1079,7 +1068,7 @@ void AddSC_boss_xt002()
     // Spells
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     new spell_xt002_gravity_bomb_aura();
-    new spell_xt002_gravity_bomb_damage();
+    RegisterSpellScript(spell_xt002_gravity_bomb_damage);
     new spell_xt002_searing_light_spawn_life_spark();
 
     // Achievements
