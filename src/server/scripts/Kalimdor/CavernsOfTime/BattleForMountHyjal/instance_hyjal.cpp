@@ -256,7 +256,7 @@ public:
 
         void ResetWaves(uint8 type)
         {
-            if (type == TEAM_HORDE)
+            if (type == DATA_RESET_HORDE)
             {
                 for (ObjectGuid const& guid : _baseHorde)
                     if (Creature* creature = instance->GetCreature(guid))
