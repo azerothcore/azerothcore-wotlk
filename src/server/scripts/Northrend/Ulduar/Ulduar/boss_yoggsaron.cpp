@@ -2828,33 +2828,22 @@ class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScript
 /* 63744 - Sara's Anger
    63747 - Sara's Fervor
    63745 - Sara's Blessing */
-class spell_yogg_saron_target_selectors : public SpellScriptLoader
+class spell_yogg_saron_target_selectors : public SpellScript
 {
-public:
-    spell_yogg_saron_target_selectors() : SpellScriptLoader("spell_yogg_saron_target_selectors") { }
+    PrepareSpellScript(spell_yogg_saron_target_selectors);
 
-    class spell_yogg_saron_target_selectors_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_yogg_saron_target_selectors_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
+        if (Unit* target = GetHitUnit())
         {
-            if (Unit* target = GetHitUnit())
-            {
-                GetCaster()->SetFacingToObject(target);
-                GetCaster()->CastSpell(target, uint32(GetEffectValue()));
-            }
+            GetCaster()->SetFacingToObject(target);
+            GetCaster()->CastSpell(target, uint32(GetEffectValue()));
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_target_selectors_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_yogg_saron_target_selectors_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_target_selectors::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2998,7 +2987,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);
     RegisterSpellScript(spell_yogg_saron_empowering_shadows);
     RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
-    new spell_yogg_saron_target_selectors();
+    RegisterSpellScript(spell_yogg_saron_target_selectors);
     new spell_yogg_saron_grim_reprisal();
 
     // ACHIEVEMENTS
