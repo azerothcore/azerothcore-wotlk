@@ -1333,6 +1333,11 @@ class spell_algalon_remove_phase_aura : public AuraScript
 {
     PrepareAuraScript(spell_algalon_remove_phase_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLACK_HOLE_DAMAGE });
+    }
+
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
