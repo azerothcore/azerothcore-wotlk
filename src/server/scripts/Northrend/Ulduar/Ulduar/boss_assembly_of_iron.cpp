@@ -878,38 +878,27 @@ class spell_assembly_meltdown : public SpellScript
     }
 };
 
-class spell_assembly_rune_of_summoning : public SpellScriptLoader
+class spell_assembly_rune_of_summoning_aura : public AuraScript
 {
-public:
-    spell_assembly_rune_of_summoning() : SpellScriptLoader("spell_assembly_rune_of_summoning") { }
+    PrepareAuraScript(spell_assembly_rune_of_summoning_aura);
 
-    class spell_assembly_rune_of_summoning_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_assembly_rune_of_summoning_AuraScript);
+        PreventDefaultAction();
+        if (aurEff->GetTickNumber() % 2 == 0)
+            GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : ObjectGuid::Empty);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (aurEff->GetTickNumber() % 2 == 0)
-                GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : ObjectGuid::Empty);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (TempSummon* summ = GetTarget()->ToTempSummon())
-                summ->DespawnOrUnsummon(1);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_assembly_rune_of_summoning_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_assembly_rune_of_summoning_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_assembly_rune_of_summoning_AuraScript();
+        if (TempSummon* summ = GetTarget()->ToTempSummon())
+            summ->DespawnOrUnsummon(1);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_assembly_rune_of_summoning_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_assembly_rune_of_summoning_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -958,7 +947,7 @@ void AddSC_boss_assembly_of_iron()
 
     RegisterSpellScript(spell_shield_of_runes_aura);
     RegisterSpellScript(spell_assembly_meltdown);
-    new spell_assembly_rune_of_summoning();
+    RegisterSpellScript(spell_assembly_rune_of_summoning_aura);
 
     new achievement_assembly_of_iron("achievement_but_im_on_your_side", 0);
     new achievement_assembly_of_iron("achievement_assembly_steelbreaker", NPC_STEELBREAKER);
