@@ -546,31 +546,20 @@ class spell_mark_of_the_faceless_periodic_aura : public AuraScript
     }
 };
 
-class spell_mark_of_the_faceless_drainhealth : public SpellScriptLoader
+class spell_mark_of_the_faceless_drainhealth : public SpellScript
 {
-public:
-    spell_mark_of_the_faceless_drainhealth() : SpellScriptLoader("spell_mark_of_the_faceless_drainhealth") { }
+    PrepareSpellScript(spell_mark_of_the_faceless_drainhealth);
 
-    class spell_mark_of_the_faceless_drainhealth_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_mark_of_the_faceless_drainhealth_SpellScript);
+        targets.remove(GetExplTargetUnit());
+        if (targets.empty())
+            Cancel();
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove(GetExplTargetUnit());
-            if (targets.empty())
-                Cancel();
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_the_faceless_drainhealth_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_mark_of_the_faceless_drainhealth_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_the_faceless_drainhealth::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -689,7 +678,7 @@ void AddSC_boss_vezax()
 
     new spell_aura_of_despair();
     RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);
-    new spell_mark_of_the_faceless_drainhealth();
+    RegisterSpellScript(spell_mark_of_the_faceless_drainhealth);
     new spell_saronite_vapors_dummy();
     new spell_saronite_vapors_damage();
 
