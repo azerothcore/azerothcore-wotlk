@@ -140,12 +140,12 @@ public:
             }).Schedule(11s, GROUP_OOC_RP, [this](TaskContext /*context*/)
             {
                 me->GetMotionMaster()->MovePath(PATH_RAZUVIOUS, true);
-                ScheduleRP();
             }).Schedule(13s, GROUP_OOC_RP, [this](TaskContext /*context*/)
             {
                 if (rpBuddyGUID)
                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
                         understudy->AI()->DoAction(ACTION_BACK_TO_TRAINING);
+                ScheduleRP();
             });
 
             if (rpBuddyGUID)
