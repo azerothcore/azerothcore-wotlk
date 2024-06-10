@@ -587,35 +587,29 @@ class spell_saronite_vapors_dummy_aura : public AuraScript
     }
 };
 
-class spell_saronite_vapors_damage : public SpellScriptLoader
+class spell_saronite_vapors_damage : public SpellScript
 {
-public:
-    spell_saronite_vapors_damage() : SpellScriptLoader("spell_saronite_vapors_damage") { }
+    PrepareSpellScript(spell_saronite_vapors_damage);
 
-    class spell_saronite_vapors_damage_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_saronite_vapors_damage_SpellScript);
+        return ValidateSpellInfo({ SPELL_SARONITE_VAPORS_ENERGIZE });
+    }
 
-        void HandleAfterHit()
-        {
-            if (Unit* caster = GetCaster())
-                if (GetHitDamage() > 2)
-                {
-                    int32 mana = GetHitDamage() / 2;
-                    if (Unit* t = GetHitUnit())
-                        caster->CastCustomSpell(t, SPELL_SARONITE_VAPORS_ENERGIZE, &mana, nullptr, nullptr, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_saronite_vapors_damage_SpellScript::HandleAfterHit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleAfterHit()
     {
-        return new spell_saronite_vapors_damage_SpellScript();
+        if (Unit* caster = GetCaster())
+            if (GetHitDamage() > 2)
+            {
+                int32 mana = GetHitDamage() / 2;
+                if (Unit* target = GetHitUnit())
+                    caster->CastCustomSpell(target, SPELL_SARONITE_VAPORS_ENERGIZE, &mana, nullptr, nullptr, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_saronite_vapors_damage::HandleAfterHit);
     }
 };
 
@@ -674,7 +668,7 @@ void AddSC_boss_vezax()
     RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);
     RegisterSpellScript(spell_mark_of_the_faceless_drainhealth);
     RegisterSpellScript(spell_saronite_vapors_dummy_aura);
-    new spell_saronite_vapors_damage();
+    RegisterSpellScript(spell_saronite_vapors_damage);
 
     new achievement_smell_saronite();
     new achievement_shadowdodger();
