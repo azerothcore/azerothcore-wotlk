@@ -563,33 +563,27 @@ class spell_mark_of_the_faceless_drainhealth : public SpellScript
     }
 };
 
-class spell_saronite_vapors_dummy : public SpellScriptLoader
+class spell_saronite_vapors_dummy_aura : public AuraScript
 {
-public:
-    spell_saronite_vapors_dummy() : SpellScriptLoader("spell_saronite_vapors_dummy") { }
+    PrepareAuraScript(spell_saronite_vapors_dummy_aura);
 
-    class spell_saronite_vapors_dummy_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_saronite_vapors_dummy_AuraScript)
+        return ValidateSpellInfo({ SPELL_SARONITE_VAPORS_DMG });
+    }
 
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                int32 damage = 100 * pow(2.0f, (float)GetStackAmount());
-                caster->CastCustomSpell(GetTarget(), SPELL_SARONITE_VAPORS_DMG, &damage, nullptr, nullptr, true);
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_saronite_vapors_dummy_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_saronite_vapors_dummy_AuraScript();
+        if (Unit* caster = GetCaster())
+        {
+            int32 damage = 100 * pow(2.0f, (float)GetStackAmount());
+            caster->CastCustomSpell(GetTarget(), SPELL_SARONITE_VAPORS_DMG, &damage, nullptr, nullptr, true);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_saronite_vapors_dummy_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -679,7 +673,7 @@ void AddSC_boss_vezax()
     new spell_aura_of_despair();
     RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);
     RegisterSpellScript(spell_mark_of_the_faceless_drainhealth);
-    new spell_saronite_vapors_dummy();
+    RegisterSpellScript(spell_saronite_vapors_dummy_aura);
     new spell_saronite_vapors_damage();
 
     new achievement_smell_saronite();
