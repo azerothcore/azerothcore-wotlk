@@ -1,3 +1,4 @@
+-- DB update 2024_06_10_00 -> 2024_06_10_01
 -- Chicken
 DELETE FROM `creature` WHERE (`id1` = 620) AND (`guid` IN (14896, 15403, 15943, 16368));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
