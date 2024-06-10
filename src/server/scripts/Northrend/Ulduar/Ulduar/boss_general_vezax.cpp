@@ -472,51 +472,45 @@ public:
     };
 };
 
-class spell_aura_of_despair : public SpellScriptLoader
+class spell_aura_of_despair_aura : public AuraScript
 {
-public:
-    spell_aura_of_despair() : SpellScriptLoader("spell_aura_of_despair") { }
+    PrepareAuraScript(spell_aura_of_despair_aura);
 
-    class spell_aura_of_despair_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_aura_of_despair_AuraScript)
+        return ValidateSpellInfo({ SPELL_AURA_OF_DESPAIR_2, SPELL_CORRUPTED_RAGE, SPELL_CORRUPTED_WISDOM });
+    }
 
-        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetTarget())
-                {
-                    if (target->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
-                    if( target->HasSpell(SPELL_SHAMANISTIC_RAGE) )
-                        caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
-                    else if( target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2) )
-                        caster->CastSpell(target, SPELL_CORRUPTED_WISDOM, true);
-                }
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
+    void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
             {
-                target->RemoveAurasDueToSpell(SPELL_AURA_OF_DESPAIR_2);
-                target->RemoveAurasDueToSpell(SPELL_CORRUPTED_RAGE);
-                target->RemoveAurasDueToSpell(SPELL_CORRUPTED_WISDOM);
+                if (target->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
+                if (target->HasSpell(SPELL_SHAMANISTIC_RAGE))
+                    caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
+                else if (target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2))
+                    caster->CastSpell(target, SPELL_CORRUPTED_WISDOM, true);
             }
-        }
+    }
 
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_aura_of_despair_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_aura_of_despair_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_aura_of_despair_AuraScript();
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_AURA_OF_DESPAIR_2);
+            target->RemoveAurasDueToSpell(SPELL_CORRUPTED_RAGE);
+            target->RemoveAurasDueToSpell(SPELL_CORRUPTED_WISDOM);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_aura_of_despair_aura::OnApply, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_aura_of_despair_aura::OnRemove, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -664,7 +658,7 @@ void AddSC_boss_vezax()
     new npc_ulduar_saronite_vapors();
     new npc_ulduar_saronite_animus();
 
-    new spell_aura_of_despair();
+    RegisterSpellScript(spell_aura_of_despair_aura);
     RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);
     RegisterSpellScript(spell_mark_of_the_faceless_drainhealth);
     RegisterSpellScript(spell_saronite_vapors_dummy_aura);
