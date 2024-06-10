@@ -520,35 +520,29 @@ public:
     }
 };
 
-class spell_mark_of_the_faceless_periodic : public SpellScriptLoader
+class spell_mark_of_the_faceless_periodic_aura : public AuraScript
 {
-public:
-    spell_mark_of_the_faceless_periodic() : SpellScriptLoader("spell_mark_of_the_faceless_periodic") { }
+    PrepareAuraScript(spell_mark_of_the_faceless_periodic_aura);
 
-    class spell_mark_of_the_faceless_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_mark_of_the_faceless_periodic_AuraScript)
+        return ValidateSpellInfo({ SPELL_MARK_OF_THE_FACELESS_EFFECT });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetTarget())
-                    if (target->GetMapId() == 603)
-                    {
-                        int32 dmg = 5000;
-                        caster->CastCustomSpell(target, SPELL_MARK_OF_THE_FACELESS_EFFECT, 0, &dmg, 0, true);
-                    }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mark_of_the_faceless_periodic_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_mark_of_the_faceless_periodic_AuraScript();
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
+                if (target->GetMapId() == 603)
+                {
+                    int32 dmg = 5000;
+                    caster->CastCustomSpell(target, SPELL_MARK_OF_THE_FACELESS_EFFECT, 0, &dmg, 0, true);
+                }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mark_of_the_faceless_periodic_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -694,7 +688,7 @@ void AddSC_boss_vezax()
     new npc_ulduar_saronite_animus();
 
     new spell_aura_of_despair();
-    new spell_mark_of_the_faceless_periodic();
+    RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);
     new spell_mark_of_the_faceless_drainhealth();
     new spell_saronite_vapors_dummy();
     new spell_saronite_vapors_damage();
