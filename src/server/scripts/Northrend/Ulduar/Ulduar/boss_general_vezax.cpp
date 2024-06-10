@@ -478,16 +478,7 @@ class spell_aura_of_despair_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo(
-            {
-                SPELL_AURA_OF_DESPAIR_2,
-                SPELL_CORRUPTED_RAGE,
-                SPELL_CORRUPTED_WISDOM,
-                SPELL_SHAMANISTIC_RAGE,
-                SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1,
-                SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1,
-                SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2
-            });
+        return ValidateSpellInfo({ SPELL_AURA_OF_DESPAIR_2, SPELL_CORRUPTED_RAGE, SPELL_CORRUPTED_WISDOM });
     }
 
     void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
