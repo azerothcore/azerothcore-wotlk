@@ -215,7 +215,7 @@ public:
 
         void ScheduleRP()
         {
-            scheduler.Schedule(10s, 10s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            scheduler.Schedule(10s, 10s, GROUP_OOC_RP, [this](TaskContext /*context*/) // TODO: increase this time to 60s-80s
             {
                 _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointNextIndex];
                 _roleplayReady = true;
