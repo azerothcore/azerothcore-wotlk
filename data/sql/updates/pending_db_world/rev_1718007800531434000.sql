@@ -37,3 +37,9 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 -- del path_id
 DELETE FROM `creature_addon` WHERE (`guid` IN (18604));
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 23600;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23600, 0, 0, 'Hmm... I wonder...', 12, 0, 100, 6, 0, 0, 22042, 0, 'Apprentice Morlann'),
+(23600, 1, 0, 'Now, where is it?', 12, 0, 100, 1, 0, 0, 22045, 0, 'Apprentice Morlann'),
+(23600, 2, 0, 'Stupid mages... always using the last of a reagent and never replacing it.', 12, 0, 100, 0, 0, 0, 22043, 0, 'Apprentice Morlann');
