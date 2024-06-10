@@ -21,11 +21,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `waypoints` WHERE `entry`=23600;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES 
 (23600, 1, -4044.12, -3393.59, 38.1363, NULL, 0, 'Apprentice Morlann Points'),
---WayPoints
+-- WayPoints
 (23600, 2, -4044.21, -3394.23, 38.3905, NULL, 0, 'Apprentice Morlann WayPoints'),
---WayPoints
+-- WayPoints
 (23600, 3, -4042.96, -3396.48, 38.3905, NULL, 0, 'Apprentice Morlann WayPoints'),
---WayPoints
+-- WayPoints
 (23600, 4, -4041.71, -3397.23, 38.3905, NULL, 0, 'Apprentice Morlann WayPoints'),
 (23600, 5, -4040.8, -3396.88, 38.1447, NULL, 0, 'Apprentice Morlann Points'),
 (23600, 6, -4043.67, -3395.27, 38.1634, NULL, 0, 'Apprentice Morlann Points');
