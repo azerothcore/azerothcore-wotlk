@@ -141,24 +141,17 @@ private:
 
 struct npc_doomfire_spirit : public ScriptedAI
 {
-    npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-    }
+    npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
     void Reset() override
     {
-        Position randomPosition;
-
         scheduler.CancelAll();
         ScheduleTimedEvent(0s, [&] {
-            DoomfireMovement(randomPosition, me->GetPosition());
-
-            me->GetMotionMaster()->MovePoint(NEAR_POINT, randomPosition);
+            me->GetMotionMaster()->MovePoint(NEAR_POINT, DoomfireMovement(me->GetPosition()));
             }, 1500ms);
     }
 
-    void DoomfireMovement(Position& targetPos, Position mePos)
+    Position DoomfireMovement(Position mePos)
     {
         float angle = mePos.GetOrientation();
         float distance = 100.0f;
@@ -166,8 +159,8 @@ struct npc_doomfire_spirit : public ScriptedAI
         float x = mePos.GetPositionX() + distance * cos(newAngle);
         float y = mePos.GetPositionY() + distance * sin(newAngle);
 
-        targetPos = Position(x, y, me->GetPositionZ());
-        return;
+        Position targetPos = Position(x, y, me->GetPositionZ());
+        return targetPos;
     }
 
     void UpdateAI(uint32 diff) override
@@ -180,8 +173,6 @@ struct npc_doomfire_spirit : public ScriptedAI
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
     }
-private:
-    InstanceScript* _instance;
 };
 
 struct boss_archimonde : public BossAI
