@@ -79,7 +79,8 @@ enum UldSpells
 {
     SPELL_SIMPLE_TELEPORT       = 12980,
     SPELL_KEEPER_TELEPORT       = 62940,
-    SPELL_SNOW_MOUND_PARTICLES  = 64615
+    SPELL_SNOW_MOUND_PARTICLES  = 64615,
+    SPELL_ENERGY_SAP_10         = 64740
 };
 
 class npc_ulduar_keeper : public CreatureScript
@@ -201,30 +202,30 @@ public:
     }
 };
 
-class spell_ulduar_energy_sap : public SpellScriptLoader
+enum EnergySap
 {
-public:
-    spell_ulduar_energy_sap() : SpellScriptLoader("spell_ulduar_energy_sap") { }
+    SPELL_ENERGY_SAP_DAMAGE_1 = 64747,
+    SPELL_ENERGY_SAP_DAMAGE_2 = 64863,
+};
 
-    class spell_ulduar_energy_sap_AuraScript : public AuraScript
+class spell_ulduar_energy_sap_aura : public AuraScript
+{
+    PrepareAuraScript(spell_ulduar_energy_sap_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ulduar_energy_sap_AuraScript)
+        return ValidateSpellInfo({ SPELL_ENERGY_SAP_DAMAGE_1, SPELL_ENERGY_SAP_DAMAGE_2 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (Unit* target = GetTarget())
-                target->CastSpell(target, (aurEff->GetId() == 64740) ? 64747 : 64863, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_energy_sap_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_ulduar_energy_sap_AuraScript();
+        if (Unit* target = GetTarget())
+            target->CastSpell(target, (aurEff->GetId() == SPELL_ENERGY_SAP_10) ? SPELL_ENERGY_SAP_DAMAGE_1 : SPELL_ENERGY_SAP_DAMAGE_2, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_energy_sap_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -500,30 +501,19 @@ public:
     };
 };
 
-class spell_ulduar_arachnopod_damaged : public SpellScriptLoader
+class spell_ulduar_arachnopod_damaged_aura : public AuraScript
 {
-public:
-    spell_ulduar_arachnopod_damaged() : SpellScriptLoader("spell_ulduar_arachnopod_damaged") { }
+    PrepareAuraScript(spell_ulduar_arachnopod_damaged_aura);
 
-    class spell_ulduar_arachnopod_damaged_AuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        PrepareAuraScript(spell_ulduar_arachnopod_damaged_AuraScript)
+        if (Unit* caster = GetCaster())
+            Unit::Kill(caster, caster, false);
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* c = GetCaster())
-                Unit::Kill(c, c, false);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_ulduar_arachnopod_damaged_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -576,11 +566,11 @@ struct npc_salvaged_siege_engine : public VehicleAI
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
-    new spell_ulduar_energy_sap();
+    RegisterSpellScript(spell_ulduar_energy_sap_aura);
     RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
     new npc_ulduar_storm_tempered_keeper();
     new npc_ulduar_arachnopod_destroyer();
-    new spell_ulduar_arachnopod_damaged();
+    RegisterSpellScript(spell_ulduar_arachnopod_damaged_aura);
     new AreaTrigger_at_celestial_planetarium_enterance();
     RegisterCreatureAI(npc_salvaged_siege_engine);
 }
