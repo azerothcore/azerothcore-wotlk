@@ -1,3 +1,4 @@
+-- DB update 2024_06_10_02 -> 2024_06_11_00
 --
 UPDATE `spell_script_names` SET `ScriptName`='spell_algalon_collapse_aura' WHERE `spell_id`=62018;
 UPDATE `spell_script_names` SET `ScriptName`='spell_algalon_phase_punch_aura' WHERE `spell_id`=64412;
