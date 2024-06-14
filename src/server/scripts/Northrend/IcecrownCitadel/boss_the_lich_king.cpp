@@ -773,7 +773,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_ONE && !HealthAbovePct(70) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if (_phase == PHASE_ONE && me->HealthBelowPctDamaged(70, damage))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -784,7 +784,26 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_TWO && !HealthAbovePct(40) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if (me->HealthBelowPctDamaged(40, damage) && me->HasAura(SPELL_REMORSELESS_WINTER_1))
+            {
+                me->RemoveAura(SPELL_REMORSELESS_WINTER_1);
+                events.CancelEventGroup(EVENT_GROUP_ABILITIES);
+                events.CancelEvent(EVENT_QUAKE);
+                me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
+                _phase = PHASE_TWO;
+                return;
+            }
+
+            if (me->HealthBelowPctDamaged(10,damage) && me->HasAura(SPELL_REMORSELESS_WINTER_2))
+            {
+                me->RemoveAura(SPELL_REMORSELESS_WINTER_2);
+                me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
+                _phase = PHASE_THREE;
+                events.CancelEvent(EVENT_QUAKE_2);
+                return;
+            }
+
+            if (_phase == PHASE_TWO && me->HealthBelowPctDamaged(40, damage))
             {
                 _phase = PHASE_TRANSITION;
                 me->SetReactState(REACT_PASSIVE);
@@ -795,7 +814,7 @@ public:
                 return;
             }
 
-            if (_phase == PHASE_THREE && HealthBelowPct(10) && !me->HasUnitState(UNIT_STATE_CASTING))
+            if (_phase == PHASE_THREE && me->HealthBelowPctDamaged(10,damage))
             {
                 _phase = PHASE_OUTRO;
                 EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
@@ -984,7 +1003,8 @@ public:
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)
-                                Unit::Kill(me, player);
+                                    if(!player->IsGameMaster())
+                                         Unit::Kill(me, player);
             }
             else
                 _positionCheckTimer -= diff;
