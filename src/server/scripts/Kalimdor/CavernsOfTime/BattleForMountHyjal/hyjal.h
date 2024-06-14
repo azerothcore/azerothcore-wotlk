@@ -90,6 +90,7 @@ enum HyjalCreaturesIds
     NPC_ALLIANCE_RIFLEMAN       = 17921,
     NPC_ALLIANCE_PRIEST         = 17928,
     NPC_ALLIANCE_SORCERESS      = 17922,
+    NPC_GUARDIAN_ELEMENTAL      = 18001,
 
     // Horde Base
     NPC_THRALL                  = 17852,
@@ -102,6 +103,7 @@ enum HyjalCreaturesIds
     NPC_HORDE_PEON              = 17937,
     NPC_INFERNAL_RELAY          = 18242,
     NPC_INFERNAL_TARGET         = 21075,
+    NPC_DIRE_WOLF               = 17854,
 
     // Night Elf Base
     NPC_TYRANDE                 = 17948,
