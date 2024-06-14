@@ -25,7 +25,8 @@ runs:
   using: composite
   steps:
     - name: Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
+      if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache
           # format
@@ -46,6 +47,7 @@ runs:
       shell: bash
       run: |
         sudo apt update
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo apt-get -y install ccache clang cmake curl google-perftools \
           libmysqlclient-dev make unzip build-essential cmake-data  \
           libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
@@ -102,7 +104,7 @@ runs:
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
-          ${{ !inputs.pch && '-DNOPCH=true' || '' }}
+          ${{ inputs.pch == 'true' && '' || '-DNOPCH=true' }}
 
     - name: build
       shell: bash

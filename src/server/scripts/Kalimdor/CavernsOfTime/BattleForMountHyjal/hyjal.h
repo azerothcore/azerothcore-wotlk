@@ -90,6 +90,7 @@ enum HyjalCreaturesIds
     NPC_ALLIANCE_RIFLEMAN       = 17921,
     NPC_ALLIANCE_PRIEST         = 17928,
     NPC_ALLIANCE_SORCERESS      = 17922,
+    NPC_GUARDIAN_ELEMENTAL      = 18001,
 
     // Horde Base
     NPC_THRALL                  = 17852,
@@ -102,6 +103,7 @@ enum HyjalCreaturesIds
     NPC_HORDE_PEON              = 17937,
     NPC_INFERNAL_RELAY          = 18242,
     NPC_INFERNAL_TARGET         = 21075,
+    NPC_DIRE_WOLF               = 17854,
 
     // Night Elf Base
     NPC_TYRANDE                 = 17948,
@@ -120,7 +122,11 @@ enum HyjalCreaturesIds
     NPC_KAZROGAL                = 17888,
     NPC_AZGALOR                 = 17842,
     NPC_ARCHIMONDE              = 17968,
-    NPC_WORLD_TRIGGER_TINY      = 21987
+    NPC_WORLD_TRIGGER_TINY      = 21987,
+
+    // Boss summons
+    NPC_TOWERING_INFERNAL       = 17818,
+    NPC_LESSER_DOOMGUARD        = 17864
 };
 
 enum HyjalGameobjectIds
@@ -144,7 +150,11 @@ enum HyjalMisc
     START_WAVE_HORDE_RETREAT    = 39,
     START_WAVE_NIGHT_ELF        = 42,
 
-    CONTEXT_GROUP_WAVES         = 1
+    CONTEXT_GROUP_WAVES         = 1,
+
+    AREA_NORDRASSIL             = 3710,
+
+    SPELL_ETERNAL_SILENCE       = 42201
 };
 
 enum HyjalPaths

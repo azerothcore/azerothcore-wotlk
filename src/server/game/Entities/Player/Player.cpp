@@ -444,6 +444,7 @@ Player::~Player()
     delete m_runes;
     delete m_achievementMgr;
     delete m_reputationMgr;
+    delete _cinematicMgr;
 
     sWorld->DecreasePlayerCount();
 
@@ -2175,6 +2176,9 @@ void Player::SetInWater(bool apply)
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     getHostileRefMgr().updateThreatTables();
+
+    if (InstanceScript* instance = GetInstanceScript())
+        instance->OnPlayerInWaterStateUpdate(this, apply);
 }
 
 bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
@@ -3791,7 +3795,7 @@ Mail* Player::GetMail(uint32 id)
     return nullptr;
 }
 
-void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     if (target == this)
     {
@@ -3978,8 +3982,8 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
         sTicketMgr->CloseTicket(ticket->GetId(), playerGuid);
 
     // remove from group
-    if (uint32 groupId = sCharacterCache->GetCharacterGuildIdByGuid(playerGuid))
-        if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
+    if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(playerGuid))
+        if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
             RemoveFromGroup(group, playerGuid);
 
     // Remove signs from petitions (also remove petitions if owner);
@@ -6583,6 +6587,8 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
+
+            sScriptMgr->OnApplyItemModsBefore(this, slot, apply, i, statType, val);
         }
 
         if (val == 0)

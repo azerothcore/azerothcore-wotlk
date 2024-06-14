@@ -2383,20 +2383,45 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
 
-        void CheckEnergy()
+        void CalculatePower()
         {
-            if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            SpellInfo const* spellInfo = GetSpellInfo();
+            if (!spellInfo)
+                return;
+
+            // Check if the effect is energize
+            if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_ENERGIZE)
             {
-                GetCaster()->CastSpell(GetCaster(), SPELL_OVERHEAT, true);
-                if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                        sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), SAY_OVERHEAT, passenger);
+                int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
+
+                // Apply the power gain directly to the caster
+                caster->ModifyPower(POWER_ENERGY, energizeAmount);
             }
+
+            if (caster->GetPower(POWER_ENERGY) >= 100)
+            {
+                caster->CastSpell(caster, SPELL_OVERHEAT, true);
+                if (Vehicle* vehicle = caster->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
+            }
+
+        }
+
+        void PreventPowerGainOnHit(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_igb_cannon_blast_SpellScript::CheckEnergy);
+            OnCast += SpellCastFn(spell_igb_cannon_blast_SpellScript::CalculatePower);
+            OnEffectHitTarget += SpellEffectFn(spell_igb_cannon_blast_SpellScript::PreventPowerGainOnHit, EFFECT_1, SPELL_EFFECT_ENERGIZE);
+
         }
     };
 

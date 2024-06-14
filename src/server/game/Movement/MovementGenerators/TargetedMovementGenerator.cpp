@@ -91,13 +91,22 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     Unit* target = i_target.getTarget();
 
-    bool const mutualChase = IsMutualChase(owner, target);
+    bool mutualChase = IsMutualChase(owner, target);
+    bool const mutualTarget = target->GetVictim() == owner;
     float const chaseRange = GetChaseRange(owner, target);
+    float const meleeRange = owner->GetMeleeRange(target);
     float const minTarget = (_range ? _range->MinTolerance : 0.0f) + chaseRange;
-    float const maxRange = _range ? _range->MaxRange + chaseRange : owner->GetMeleeRange(target); // melee range already includes hitboxes
+    float const maxRange = _range ? _range->MaxRange + chaseRange : meleeRange; // melee range already includes hitboxes
     float const maxTarget = _range ? _range->MaxTolerance + chaseRange : CONTACT_DISTANCE + chaseRange;
 
     Optional<ChaseAngle> angle = mutualChase ? Optional<ChaseAngle>() : _angle;
+
+    // Prevent almost infinite spinning of mutual targets.
+    if (angle && !mutualChase && _mutualChase && mutualTarget && chaseRange < meleeRange)
+    {
+        angle = Optional<ChaseAngle>();
+        mutualChase = true;
+    }
 
     // periodically check if we're already in the expected range...
     i_recheckDistance.Update(time_diff);
