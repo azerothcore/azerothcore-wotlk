@@ -703,7 +703,7 @@ public:
             std::list<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
             // Remove triggers that are on live side or soul triggers on the platform
-            triggers.remove_if([](Creature *trigger){
+            triggers.remove_if([](Creature* trigger){
                 return ((trigger->GetPositionY() < POS_Y_GATE) || (trigger->GetPositionZ() > 280.0f));
                 });
             if (!triggers.empty())
@@ -714,6 +714,7 @@ public:
             }
             return nullptr;
         }
+
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (!spell)
