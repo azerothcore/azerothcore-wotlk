@@ -17034,9 +17034,10 @@ void Unit::RecalculateObjectScale()
     SetObjectScale(std::max(scale, scaleMin));
 }
 
-void Unit::SetDisplayId(uint32 modelId)
+void Unit::SetDisplayId(uint32 modelId, float displayScale /*=1.f*/)
 {
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
+
     // Set Gender by modelId
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
@@ -21233,17 +21234,11 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             {
                 if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
                 {
-                    if (cinfo->Modelid1)
-                        displayId = cinfo->Modelid1;    // Modelid1 is a visible model for gms
-                    else
-                        displayId = 17519;              // world visible trigger's model
+                    cinfo->GetFirstVisibleModel()->CreatureDisplayID;
                 }
                 else
                 {
-                    if (cinfo->Modelid2)
-                        displayId = cinfo->Modelid2;    // Modelid2 is an invisible model for players
-                    else
-                        displayId = 11686;              // world invisible trigger's model
+                    cinfo->GetFirstInvisibleModel()->CreatureDisplayID;
                 }
             }
         }
